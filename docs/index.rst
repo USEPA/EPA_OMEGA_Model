@@ -5,6 +5,7 @@ Is **awesome**
 .. toctree::
 	:maxdepth: 2
 	:caption: Contents:
-  
-	../README
+  	
 	Introduction
+	History
+	
