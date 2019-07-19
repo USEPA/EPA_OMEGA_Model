@@ -6,6 +6,6 @@ Is **awesome**
 	:maxdepth: 1
 	:caption: Contents:
   	
-	Introduction
-	History
+	introduction
+	history
 	
