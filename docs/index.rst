@@ -3,7 +3,7 @@ OMEGA2 Documentation
 Is **awesome**
 
 .. toctree::
-	:maxdepth: 2
+	:maxdepth: 1
 	:caption: Contents:
   	
 	Introduction
