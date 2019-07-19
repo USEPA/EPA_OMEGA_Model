@@ -12,8 +12,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('C:\Users\KNewman\Documents\GitHub\EPA_OMEGA_Model\omega2'))
-# sys.path.append(   os.path.abspath('I:\Project\OMEGA2\Coding Languages\Python\Python 367\dev'))
+sys.path.insert(0, os.path.join(path, '..', '..', 'omega2'))
 
 # -- Project information -----------------------------------------------------
 
