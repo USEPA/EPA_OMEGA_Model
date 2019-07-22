@@ -2,7 +2,7 @@
 OMEGA2 Documentation
 ====================
 
-Is **awesome**
+Is **incomplete**
 
 .. toctree::
 	:maxdepth: 1
@@ -10,7 +10,7 @@ Is **awesome**
   	
 	introduction
 	history
-    	glossary
+	glossary
 	code
 	
 Indices and tables
