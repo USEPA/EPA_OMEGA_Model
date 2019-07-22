@@ -6,3 +6,5 @@ Term                  Acroynm               Physical Parallel     Synonym       
 ===================== ===================== ===================== ===================== =====================
 OMEGA                 OMEGA                                                             Optimization Model for reducing Emissions of Greenhouse Gases from Automobiles
 ===================== ===================== ===================== ===================== =====================
+OMEGA                 OMEGA                                                             Optimization Model for reducing Emissions of Greenhouse Gases from Automobiles
+===================== ===================== ===================== ===================== =====================
