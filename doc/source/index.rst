@@ -21,4 +21,4 @@ Indices and Tables
 * :ref:`modindex`
 * :ref:`search`
 
-CBI
+CBI.rst
