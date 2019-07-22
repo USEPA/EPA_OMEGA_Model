@@ -12,6 +12,7 @@ Is **incomplete**
 	history
 	glossary
 	code
+	misc
 	
 Indices and tables
 ==================
