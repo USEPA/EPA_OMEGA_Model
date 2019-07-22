@@ -14,9 +14,11 @@ Is **incomplete**
 	code
 	misc
 	
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+CBI.rst
