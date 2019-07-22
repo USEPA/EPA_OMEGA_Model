@@ -10,7 +10,7 @@ Is **awesome**
   	
 	introduction
 	history
-    glossary
+    	glossary
 	code
 	
 Indices and tables
