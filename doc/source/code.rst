@@ -1,5 +1,5 @@
-OMEGA2
-======
+OMEGA2 Code
+===========
 
 .. toctree::
    :maxdepth: 4
