@@ -8,7 +8,7 @@ Is **incomplete**
 	:maxdepth: 1
 	:caption: Contents:
   	
-	introduction1
+	introduction
 	history
 	glossary
 	code
