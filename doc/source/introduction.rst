@@ -9,9 +9,6 @@ OMEGA2 is like OMEGA1, only better.
 Goals
 -----
 
-Sounds
-------
-
 OMEGA2 should be:
 
 * Transparent
