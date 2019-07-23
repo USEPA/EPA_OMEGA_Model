@@ -11,6 +11,7 @@ Is **incomplete**
 	introduction
 	history
 	glossary
+    developer
 	code
 	misc
 	
