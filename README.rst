@@ -1,7 +1,7 @@
 EPA_OMEGA_Model
 ===============
 
-This repo is for the development of the OMEGA2 model.
+The OMEGA2 model determines compliance pathways for light-duty vehicle GHG standards.
 
 Installation
 ------------
