@@ -17,4 +17,3 @@ OMEGA2 should be:
 * Robust
 * Modular
 
-.. image:: https://cherryschalkboard.weebly.com/uploads/2/1/2/1/21210114/img-3208_orig.jpg
