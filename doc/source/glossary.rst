@@ -2,7 +2,7 @@ Glossary
 ========
 
 ===================== ===================== ===================== ==================================== ==================================================================================================================
-Term                  Acroynm               Physical Parallel     Synonym                              Definition
+Term                  Acronym               Physical Parallel     Synonym                              Definition
 ===================== ===================== ===================== ==================================== ==================================================================================================================
 OMEGA                 OMEGA                                                                            Optimization Model for reducing Emissions of Greenhouse Gases from Automobiles
 Nameplate                                                         Model                                Consumer recognizable name of historical vehicles (e.g. "Cruze")
