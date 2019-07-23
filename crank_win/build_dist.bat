@@ -1,11 +1,12 @@
 REM usage build_dist
 
-SET PYTHONPATH=C:\Users\Public\OMEGA2\Python3.6.7
-
 cd ..
 
+REM move old distributions so twine doesn't try to re-distribute them
 move dist\*.* dist_old
 
-%PYTHONPATH%\python setup.py sdist
+REM create source distribution in "dist" folder
+python setup.py sdist
 
-%PYTHONPATH%\Scripts\twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+REM upload distribution to pypi or trypi
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
