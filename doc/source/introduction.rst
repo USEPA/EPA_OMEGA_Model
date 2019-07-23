@@ -16,3 +16,5 @@ OMEGA2 should be:
 * User-friendly
 * Robust
 * Modular
+
+.. image:: https://www.brandeps.com/logo-download/O/Omega-01.png
