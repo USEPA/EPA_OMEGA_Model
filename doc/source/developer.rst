@@ -15,6 +15,13 @@ and the required development packages:
 
 ::
 
-    $ python -m pip install --upgrade pip
+    $ python -m pip install --upgrade pip setuptools
     $ pip install -r requirements-dev.txt
+
+You can test your install with the following:
+
+::
+
+    $ bumpversion --help
+    $ twine --help
 
