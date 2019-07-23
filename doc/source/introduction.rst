@@ -17,4 +17,3 @@ OMEGA2 should be:
 * Robust
 * Modular
 
-.. image:: https://www.brandeps.com/logo-download/O/Omega-01.png
