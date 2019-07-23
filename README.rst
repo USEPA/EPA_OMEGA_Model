@@ -15,3 +15,8 @@ Usage
 
 >>> import usepa_omega2 as o2
 >>> print('OMEGA2 version %s' % o2.__version__)
+
+Documentation
+-------------
+
+https://omega2.readthedocs.io/en/latest/index.html
