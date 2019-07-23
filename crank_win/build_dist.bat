@@ -1,4 +1,4 @@
-REM usage build_dist [major|minor|patch]
+REM usage build_dist
 
 SET PYTHONPATH=C:\Users\Public\OMEGA2\Python3.6.7
 
