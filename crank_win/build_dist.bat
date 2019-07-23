@@ -2,7 +2,7 @@ SET PYTHONPATH=C:\Users\Public\OMEGA2\Python3.6.7
 
 cd ..
 
-%PYTHONPATH%\Scripts\bumpversion minor
+%PYTHONPATH%\Scripts\bumpversion patch
 
 %PYTHONPATH%\python setup.py sdist
 
