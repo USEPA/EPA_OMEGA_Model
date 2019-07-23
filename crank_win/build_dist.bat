@@ -10,6 +10,6 @@ git commit -m "commit before release" --all
 
 move dist\*.* dist_old
 
-REM %PYTHONPATH%\python setup.py sdist
+%PYTHONPATH%\python setup.py sdist
 
-REM %PYTHONPATH%\Scripts\twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+%PYTHONPATH%\Scripts\twine upload --repository-url https://test.pypi.org/legacy/ dist/*
