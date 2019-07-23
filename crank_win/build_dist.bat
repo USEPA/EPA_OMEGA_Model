@@ -1,9 +1,15 @@
+REM usage build_dist [major|minor|patch]
+
 SET PYTHONPATH=C:\Users\Public\OMEGA2\Python3.6.7
 
 cd ..
 
-%PYTHONPATH%\Scripts\bumpversion patch
+git commit -m "commit before release" --all
 
-%PYTHONPATH%\python setup.py sdist
+%PYTHONPATH%\Scripts\bumpversion %1
 
-%PYTHONPATH%\Scripts\twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+move dist\*.* dist_old
+
+REM %PYTHONPATH%\python setup.py sdist
+
+REM %PYTHONPATH%\Scripts\twine upload --repository-url https://test.pypi.org/legacy/ dist/*
