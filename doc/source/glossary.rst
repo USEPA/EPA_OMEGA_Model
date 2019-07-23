@@ -4,7 +4,7 @@ Glossary
 ===================== ===================== ===================== ==================================== ==================================================================================================================
 Term                  Acronym               Physical Parallel     Synonym                              Definition
 ===================== ===================== ===================== ==================================== ==================================================================================================================
-OMEGA                 OMEGA-OMEGA                                                                      Optimization Model for reducing Emissions of Greenhouse Gases from Automobiles
+OMEGA                 OMEGAOMEGA                                                                       Optimization Model for reducing Emissions of Greenhouse Gases from Automobiles
 Nameplate                                                         Model                                Consumer recognizable name of historical vehicles (e.g. "Cruze")
 Make                                                              Brand                                Consumer recognizable brand of a historical vehicle (e.g. "Chevrolet")
 Manufacturer                                                                                           Company that is treated as a regulated entity (e.g. "General Motors")
