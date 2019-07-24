@@ -8,7 +8,7 @@ Installation
 
 ::
 
-    $ pip install usepa-omega2
+    pip install usepa-omega2
 
 Usage
 -----
