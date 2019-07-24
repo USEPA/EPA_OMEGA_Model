@@ -13,8 +13,17 @@ Installation
 Usage
 -----
 
->>> import usepa_omega2 as o2
->>> print('OMEGA2 version %s' % o2.__version__)
+To run from the command line:
+
+::
+    python -m usepa_omega2
+
+To use from within Python::
+
+    >>> import usepa_omega2 as o2
+    >>> print('OMEGA2 version %s' % o2.__version__)
+
+
 
 Documentation
 -------------
