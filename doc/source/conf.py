@@ -13,7 +13,7 @@
 import os
 import sys
 path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(path, '..', '..', 'omega2'))
+sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2'))
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +22,7 @@ copyright = '2019, US EPA'
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.0'
+release = '0.1.9'
 
 
 # -- General configuration ---------------------------------------------------
