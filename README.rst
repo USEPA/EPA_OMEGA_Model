@@ -13,9 +13,8 @@ Installation
 Usage
 -----
 
-To run from the command line:
+To run from the command line::
 
-::
     python -m usepa_omega2
 
 To use from within Python::
