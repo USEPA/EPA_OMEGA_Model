@@ -15,13 +15,38 @@ and the required development packages:
 
 ::
 
-    $ python -m pip install --upgrade pip setuptools
-    $ pip install -r requirements-dev.txt
+    python -m pip install --upgrade pip setuptools
+    pip install -r requirements-dev.txt
 
 You can test your install with the following:
 
 ::
 
-    $ bumpversion --help
-    $ twine --help
+    bumpversion --help
+    twine --help
+
+Versioning and Distribution Tools
+---------------------------------
+
+The ``crank_win`` folder contains batch files for "turning the crank" and updating code version numbers and
+creating distributions that can be uploaded to PyPi, for example.  The ``_win`` refers to Windows, in the future
+maybe there will be a ``_nix`` folder for routines that perform the equivalent job on unix/linux machines.
+
+``bump_version.bat`` can be used to increment the code version number.  There are three components to the version #.
+The format is major.minor.patch.  So version 1.2.3 would be major version 1, minor version 2, path version 3.
+
+``bump_version`` can be used as follows to increment the patch, minor and major version numbers respectively::
+
+    bump_version patch
+    bump_version minor
+    bump_version major
+
+``bump_version`` uses the ``bump2version`` Python package to update version numbers
+in ``setup.py`` and ``__init__.py``.
+
+.. note::
+    Once a particular version number has been uploaded (to PyPi, for example) it cannot ever be reused.  So if you
+    accidentally bump the major version and upload it, you have to live with the new version number forever, as far as
+    I can tell!
+
 
