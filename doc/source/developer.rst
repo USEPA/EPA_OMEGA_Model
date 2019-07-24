@@ -66,3 +66,5 @@ Distribution
 
 ``build_dist`` uses the ``setuptools`` and ``twine`` Python packages to build the distributable files and upload
 them to the internet.
+
+``twine`` will ask for a username and password in order to upload the files to the appropriate destination site.
