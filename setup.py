@@ -10,7 +10,7 @@ README = (HERE / "README.rst").read_text()
 # This call to setup() does all the work
 setup(
     name="usepa-omega2",
-    version="0.1.12",
+    version="0.1.13",
     description="OMEGA Model, version 2",
     long_description=README,
     long_description_content_type="text/x-rst",
