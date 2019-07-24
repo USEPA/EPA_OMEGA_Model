@@ -68,3 +68,14 @@ Distribution
 them to the internet.
 
 ``twine`` will ask for a username and password in order to upload the files to the appropriate destination site.
+
+Documentation
+^^^^^^^^^^^^^
+
+Project documentation primarily takes the form of reStructuredText (``.rst``) files.  Here are some helpful references:
+
+http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
+
+https://devguide.python.org/documenting/
+
+https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst
