@@ -33,7 +33,7 @@ creating distributions that can be uploaded to PyPi, for example.  The ``_win`` 
 maybe there will be a ``_nix`` folder for routines that perform the equivalent job on unix/linux machines.
 
 ``bump_version.bat`` can be used to increment the code version number.  There are three components to the version #.
-The format is major.minor.patch.  So version 1.2.3 would be major version 1, minor version 2, path version 3.
+The format is major.minor.patch.  So version 1.2.3 would be major version 1, minor version 2, patch version 3.
 
 ``bump_version`` can be used as follows to increment the patch, minor and major version numbers respectively::
 
