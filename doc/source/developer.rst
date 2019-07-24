@@ -65,4 +65,4 @@ Distribution
     Should distributions be put out on the network?  Right now they are only whatever machine runs ``build_dist``.
 
 ``build_dist`` uses the ``setuptools`` and ``twine`` Python packages to build the distributable files and upload
- them to the internet.
+them to the internet.
