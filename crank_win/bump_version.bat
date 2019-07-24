@@ -8,3 +8,5 @@ git commit -m "commit before version bump" --all
 
 REM bump the version
 bumpversion %1 --verbose
+
+cd crank_win

@@ -15,6 +15,8 @@ setup(
     long_description=README,
     long_description_content_type="text/x-rst",
     url="https://github.com/USEPA/EPA_OMEGA_Model",
+    project_urls={'OMEGA2 Documentation':'https://omega2.readthedocs.io/en/latest/index.html'
+    },
     author="US EPA",
     author_email="newman.kevin@epa.gov",
     license="MIT",
