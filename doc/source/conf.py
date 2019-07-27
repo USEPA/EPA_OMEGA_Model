@@ -22,7 +22,7 @@ copyright = '2019, US EPA'
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.13'
+release = '0.1.14'
 
 
 # -- General configuration ---------------------------------------------------
