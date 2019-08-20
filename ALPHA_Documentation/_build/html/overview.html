@@ -4,47 +4,56 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Overview &#8212; ALPHA Documentation 1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <title>2. Overview &#8212; ALPHA Documentation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Introduction" href="introduction.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="next" title="3. Common Use Cases" href="common_use_cases.html" />
+    <link rel="prev" title="1. Introduction" href="introduction.html" /> 
   </head><body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="common_use_cases.html" title="3. Common Use Cases"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="1. Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<h1>2. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="running-alpha-quickstart">
-<h2>Running ALPHA - Quickstart<a class="headerlink" href="#running-alpha-quickstart" title="Permalink to this headline">¶</a></h2>
+<h2>2.1. Running ALPHA - Quickstart<a class="headerlink" href="#running-alpha-quickstart" title="Permalink to this headline">¶</a></h2>
 <p>Launch Matlab and make sure that REVS_Common is on the Matlab path as described in the installation instructions above.  As a quick check you can execute the following Matlab command, if it succeeds then it should return the path to the top-level ALPHA model:</p>
-<blockquote>
-<div><p>which REVS_VM</p>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">which</span> <span class="n">REVS_VM</span>
+</pre></div>
+</div>
 <p>If the command fails then you need to double check your path setup.</p>
-<p>Change the Matlab working directory to the ALPHA DEMO folder and run run_ALPHA_quickstart.  The REVS_VM model will open up (so we can watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, YYYY_MM_DD_hh_mm_ss_, following by sim_results.csv and sim_1_console.txt.   For example, 2019_02_01_09_36_23_sim_results.csv and 2019_02_01_09_36_23_sim_1_console.txt, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The sim_results file contains a summary of the simulation inputs, settings and outputs.  The console.txt file captures anything that would have been output to the Matlab console window.  In this case it contains the SAE J2951 Drive Quality Metrics by default.</p>
+<p>Change the Matlab working directory to the ALPHA DEMO folder and run run_ALPHA_quickstart.  The REVS_VM model will open up (so we can watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, YYYY_MM_DD_hh_mm_ss_, following by sim_results.csv and sim_1_console.txt.  For example, 2019_02_01_09_36_23_sim_results.csv and 2019_02_01_09_36_23_sim_1_console.txt, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The sim_results file contains a summary of the simulation inputs, settings and outputs.  The console.txt file captures anything that would have been output to the Matlab console window.  In this case it contains the SAE J2951 Drive Quality Metrics by default.</p>
 <p>If you open run_ALPHA_quickstart in the Matlab editor you’ll see it only takes a handful of Matlab commands to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed below.</p>
 </div>
 <div class="section" id="understanding-the-modeling-process">
-<h2>Understanding the Modeling Process<a class="headerlink" href="#understanding-the-modeling-process" title="Permalink to this headline">¶</a></h2>
+<h2>2.2. Understanding the Modeling Process<a class="headerlink" href="#understanding-the-modeling-process" title="Permalink to this headline">¶</a></h2>
 <p>The fundamental modeling process consists of creating a Matlab workspace that contains all the variables necessary to run the REVS_VM (REVS Vehicle Model) Simulink model.  There are several ways to accomplish this.</p>
 <ol class="arabic simple">
 <li><p>Load a saved workspace available in a .mat file and then run the model</p></li>
@@ -83,13 +92,13 @@
 <p>The batch approach will be the primary focus of this document due to its numerous advantages.</p>
 </div>
 <div class="section" id="controlling-the-modeling-process">
-<h2>Controlling the Modeling Process<a class="headerlink" href="#controlling-the-modeling-process" title="Permalink to this headline">¶</a></h2>
+<h2>2.3. Controlling the Modeling Process<a class="headerlink" href="#controlling-the-modeling-process" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="what-is-a-sim-batch">
-<h3>What is a Sim Batch?<a class="headerlink" href="#what-is-a-sim-batch" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.1. What is a Sim Batch?<a class="headerlink" href="#what-is-a-sim-batch" title="Permalink to this headline">¶</a></h3>
 <p>A class_REVS_sim_batch object actually contains a vector of class_REVS_sim_case objects stored in the sim_case property.  A sim_case could be created and run without a batch but there is no advantage to doing so since the batch process provides all the necessary pre- and post-processing is much easier to use.  Typically the only reason to manipulate a particular sim_case would be to extract its local workspace to populate the top-level workspace for direct access.  This will be covered in more detail below in the discussion on working with workspaces.</p>
 </div>
 <div class="section" id="understanding-the-alpha-quickstart-script">
-<h3>Understanding the ALPHA quickstart script<a class="headerlink" href="#understanding-the-alpha-quickstart-script" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.2. Understanding the ALPHA quickstart script<a class="headerlink" href="#understanding-the-alpha-quickstart-script" title="Permalink to this headline">¶</a></h3>
 <p>The run_ALPHA_quickstart M-script demonstrates the simplest possible batch process - a single simulation run with the default settings, only the minimum required input files and minimal outputs.  Let’s take a closer look.</p>
 <blockquote>
 <div><p>run_ALPHA_quickstart.m:</p>
@@ -144,7 +153,7 @@
 </div></blockquote>
 </div>
 <div class="section" id="understanding-simulation-pre-and-post-processing">
-<h3>Understanding Simulation Pre- and Post-Processing<a class="headerlink" href="#understanding-simulation-pre-and-post-processing" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.3. Understanding Simulation Pre- and Post-Processing<a class="headerlink" href="#understanding-simulation-pre-and-post-processing" title="Permalink to this headline">¶</a></h3>
 <p>The goal of simulation pre-processing is to set up the simulation workspace before simulation, including any modifications to data loaded from the specified param files.  For example, we may load a particular vehicle param file and then want to change the test weight or roadload in some manner and then run the simulation, perhaps as part of a sweep of test weight values.  Any arbitrary M-script can be run in order to prepare the simulation workspace.</p>
 <p>The REVS_VM model itself performs some post-processing to create simulation results (phase integrated results, for example), datalogs, and to perform any auditing that may be desired.  These tasks are handled by creating result, datalog and audit objects in the workspace from class_REVS_result, class_REVS_datalog and class_REVS_audit classes respectively.  These objects are created in the model’s StopFcn callback which can be seen in the model’s Model Properties dialog box.</p>
 <p>Simulation post-processing may be used to take the raw simulation outputs and calculate fuel economy or GHG emissions.  The default simulation post-processing is generally used, but any M-script may be run if desired.</p>
@@ -159,7 +168,7 @@
 </div></blockquote>
 </div>
 <div class="section" id="understanding-config-strings-keys">
-<h3>Understanding Config Strings (Keys)<a class="headerlink" href="#understanding-config-strings-keys" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.4. Understanding Config Strings (Keys)<a class="headerlink" href="#understanding-config-strings-keys" title="Permalink to this headline">¶</a></h3>
 <p>Formatting for the batch config_set config strings (also known as Keys in the output summary file) is defined by class_REVS_sim_config.  The easiest way to see which config tags are available is to use this command:</p>
 <blockquote>
 <div><p>class_REVS_sim_config.show_tags</p>
@@ -195,7 +204,7 @@
 </div>
 <p>The arguments to the class_REVS_config_element constructor are the tag string, the tag type, and an optional default value.</p>
 <div class="section" id="literal-config-tags">
-<h4>Literal Config Tags<a class="headerlink" href="#literal-config-tags" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.1. Literal Config Tags<a class="headerlink" href="#literal-config-tags" title="Permalink to this headline">¶</a></h4>
 <p>In the example above, the drive_cycle property holds a ‘literal’ tag, which means that the part of the string associated with that tag will not automatically be evaluated (turned into a numeric or other value, but rather taken literally).  Typically this would be used for something like file names or other strings.  Literal tags may be evaluated in user scripts.  For example, if the literal tag was the name of script then that script may be called in the user pre- or post-processing scripts at the appropriate time to perform whatever its function is.  Literal tags can be used to hold a single value or, combined with delayed evaluation (in a user script, instead of during config string parsing) may hold multiple values.  For example, within a config string, these are possible uses of the CYC: tag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CYC</span><span class="p">:</span><span class="n">EPA_IM240</span>
 <span class="n">CYC</span><span class="p">:{</span><span class="s1">&#39;&#39;</span><span class="n">EPA_FTP_NOSOAK</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="n">EPA_HWFET</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="n">EPA_US06</span><span class="s1">&#39;&#39;</span><span class="p">}</span>
@@ -212,7 +221,7 @@
 <p>Drive cycle loading of a single cycle or the combining of multiple cycles into a single cycle is automatically handled in class_REVS_sim_case.load_drive_cycles() but the same concept can apply to user-defined literal tags used by user scripts.  Drive cycle creation and handling will be discussed in further detail below.</p>
 </div>
 <div class="section" id="eval-config-tags">
-<h4>Eval Config Tags<a class="headerlink" href="#eval-config-tags" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.2. Eval Config Tags<a class="headerlink" href="#eval-config-tags" title="Permalink to this headline">¶</a></h4>
 <p>As shown above, the class_REVS_sim_config ETW_lbs property is an ‘eval’ tag which means its value will be automatically evaluated by the class_REV_sim_config in the parse_key() method.  If the eval tag is created with a default value then that value will be used if the tag is not specified by the user.  Eval tags should be numeric or should refer to variables available in the workspace.  An eval tag may evaluate to a single value or a vector of multiple values to perform variable sweeps.  For example, the following would all be valid eval tags within a config string:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ETW_LBS</span><span class="p">:</span><span class="mi">3625</span>
 <span class="n">ETW_LBS</span><span class="p">:[</span><span class="mi">3000</span><span class="p">:</span><span class="mi">500</span><span class="p">:</span><span class="mi">5000</span><span class="p">]</span>
@@ -222,7 +231,7 @@
 <p>The first case evaluates to a single number, 3625, the second case evaluates to a vector, [3000 3500 4000 4500 5000], as does the last case which becomes [3563.2 4454 5344.8].  Any valid Matlab syntax may be used in an eval tag, including mathematical operations such as multiply, divide, etc.  If addition is used, there must not be any spaces surrounding the + sign, as ‘ + ‘ (space,plus-sign,space) is the separator used to build composite config strings and will result in an erroneously split string.</p>
 </div>
 <div class="section" id="config-string-expansion">
-<h4>Config String Expansion<a class="headerlink" href="#config-string-expansion" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.3. Config String Expansion<a class="headerlink" href="#config-string-expansion" title="Permalink to this headline">¶</a></h4>
 <p>Each string in the sim batch config_set cell array is evaluated to determine how many simulations it defines.  As seen above, each tag may be used to define multiple values.  Each config string is expanded to a full factorial combination of all of its elements.   The expanded set of strings is stored in the sim batch expanded_config_set property after the expand_config_set() method is called.  Config set expansion is handled automatically by the class_REVS_sim_batch run_sim_cases() method but under certain circumstances it may also be useful to manually expand the config set, although this is not typically done.  Manual expansion could be used to examine the number of cases represented by a config set without having to commit to running any simulations.</p>
 <p>For example, the following tag could be used within a config string to run simulations with and without engine start-stop:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+</span> <span class="n">SS</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
@@ -247,7 +256,7 @@
 <p>String expansion provides a simple and powerful method for defining entire sets of simulations within a single user-defined config string.</p>
 </div>
 <div class="section" id="config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers">
-<h4>Config String left-hand-side and right-hand-side and Unique Key Numbers<a class="headerlink" href="#config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.4. Config String left-hand-side and right-hand-side and Unique Key Numbers<a class="headerlink" href="#config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers" title="Permalink to this headline">¶</a></h4>
 <p>A special string separator, || (double vertical bars) may be used to separate the left and right hand sides of a config string.  This is typically used for processing performance neutral runs but could also be used for any user-defined purpose.  For performance neutral runs, the left hand side of the string defines the unique simulation case, and the right hand side is used to define multiple engine scaling levels to evaluate for performance neutrality and GHG emissions.  The REVS_postprocess_sim_batch script considers all cases with the same left hand side to represent a single simulation case and then chooses the result from that set that meets performance criteria and has the lowest GHG emissions.  Each unique left hand side is assigned a unique key number through the UKN: tag by the class_REVS_sim_batch gen_unique_config_set() method.</p>
 <p>For example, this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;SS:[1,0] + LU:[0,1]&#39;</span>
@@ -274,7 +283,7 @@
 <p>In this way, subsets of simulation batches may be considered as groups and the unique key number can be used to find these groups in the output file and then process them accordingly.  In either case above, all four simulations will be run and all four results will be available in the output summary file.</p>
 </div>
 <div class="section" id="creating-new-config-tags">
-<h4>Creating New Config Tags<a class="headerlink" href="#creating-new-config-tags" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.5. Creating New Config Tags<a class="headerlink" href="#creating-new-config-tags" title="Permalink to this headline">¶</a></h4>
 <p>class_REVS_sim_config defines quite a few useful tags that should cover many modeling applications but it’s also very easy to add new ones.  Adding a new tag is as simple as adding a new property to class_REVS_sim_config:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_config</span>  <span class="o">=</span> <span class="n">class_REVS_config_element</span><span class="p">(</span><span class="s1">&#39;NEWTAG:&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
 </pre></div>
@@ -286,7 +295,7 @@
 <p>The default value (if provided) is shown next to the tag, in this case the default value for sim_config.new_config is 42.  The variable sim_config.new_config would now be available for use in user pre- and post-processing scripts.</p>
 </div>
 <div class="section" id="how-to-use-sim-config-values">
-<h4>How to Use sim_config Values<a class="headerlink" href="#how-to-use-sim-config-values" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.6. How to Use sim_config Values<a class="headerlink" href="#how-to-use-sim-config-values" title="Permalink to this headline">¶</a></h4>
 <p>The value of a sim_config property is accessed through the value property.  In addition, the has_value() method can be used to check if a value has been set by the user before trying to use it in a script.  For example, from REVS_preprocess_sim_case:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">sim_config</span><span class="o">.</span><span class="n">adjust_A_lbs</span><span class="o">.</span><span class="n">has_value</span>
     <span class="n">vehicle</span><span class="o">.</span><span class="n">coastdown_adjust_A_lbf</span> <span class="o">=</span> <span class="n">sim_config</span><span class="o">.</span><span class="n">adjust_A_lbs</span><span class="o">.</span><span class="n">value</span><span class="p">;</span>
@@ -296,15 +305,15 @@
 <p>A default value, if provided, is always available even if the user has not provided a value (has_value() returns false).</p>
 </div>
 <div class="section" id="output-summary-file-keys">
-<h4>Output Summary File Keys<a class="headerlink" href="#output-summary-file-keys" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.4.7. Output Summary File Keys<a class="headerlink" href="#output-summary-file-keys" title="Permalink to this headline">¶</a></h4>
 <p>The has_value() method is also used to cull unnecessary tags from the config string that appears in the output summary file Key column.  Culling empty or default value tags from the Key column makes the strings easier to read and understand but still specifies the correct simulation parameters.</p>
 <p>Keys from the output file can be used directly in new config sets by cutting and pasting them into user batch file config sets.  In this way, an end-user of the simulation results can select runs to examine further or may even create new config strings to be run.  Because the output summary file is a .csv file, commas in the Key column are replaced with # symbols to prevent incorrect column breaks.  Even though the # symbol is not a valid Matlab operator, these strings can still be used directly in new config sets – the batch process converts #’s to commas before parsing the strings.</p>
 </div>
 </div>
 <div class="section" id="controlling-datalogging-and-auditing">
-<h3>Controlling Datalogging and Auditing<a class="headerlink" href="#controlling-datalogging-and-auditing" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.5. Controlling Datalogging and Auditing<a class="headerlink" href="#controlling-datalogging-and-auditing" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="controlling-datalogging">
-<h4>Controlling Datalogging<a class="headerlink" href="#controlling-datalogging" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.5.1. Controlling Datalogging<a class="headerlink" href="#controlling-datalogging" title="Permalink to this headline">¶</a></h4>
 <p>Datalogging and auditing are controlled by the logging_config property of the class_REVS_sim_batch object.  logging_config is an object of class class_REVS_logging_config.  The constructor of class_REVS_sim_batch takes a single optional argument which is the default log list.  A log list is a class_REVS_log_package object.  Many predefined log lists are contained in the REVS_Commonlog_packages folder.</p>
 <p>The following are typical examples of creating a sim batch and setting up the default datalogging:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_batch</span> <span class="o">=</span> <span class="n">class_REVS_sim_batch</span><span class="p">(</span><span class="n">REVS_log_default</span><span class="p">);</span>
@@ -337,7 +346,7 @@
 </div>
 </div>
 <div class="section" id="understanding-the-datalog-and-model-data-objects">
-<h4>Understanding the datalog and model_data objects<a class="headerlink" href="#understanding-the-datalog-and-model-data-objects" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.5.2. Understanding the datalog and model_data objects<a class="headerlink" href="#understanding-the-datalog-and-model-data-objects" title="Permalink to this headline">¶</a></h4>
 <p>The datalog object has hierarchical properties.  The top level should look something like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>datalog =
   class_REVS_datalog with properties:
@@ -361,7 +370,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">model_data</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">model_data</span><span class="o">.</span><span class="n">vehicle</span><span class="o">.</span><span class="n">speed_mps</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Generally it is best to use model_data for most analysis if it contains what you need.  Datalogs are copied to the model_data object through the REVS_posprocess_XXX M-scripts in the REVS_Common/log_packages folder.</p>
+<p>Generally it is best to use model_data for most analysis if it contains what you need.  Datalogs are copied to the model_data object through the REVS_postprocess_XXX M-scripts in the REVS_Common/log_packages folder.</p>
 <p>For example, REVS_postprocess_engine_basics_log.m:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_data</span><span class="o">.</span><span class="n">vehicle</span><span class="o">.</span><span class="n">fuel</span><span class="o">.</span><span class="n">mass_g</span>               <span class="o">=</span> <span class="n">datalog</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">fuel_consumed_g</span><span class="p">;</span>
 
@@ -406,7 +415,7 @@
 </div>
 </div>
 <div class="section" id="auditing">
-<h4>Auditing<a class="headerlink" href="#auditing" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.5.3. Auditing<a class="headerlink" href="#auditing" title="Permalink to this headline">¶</a></h4>
 <p>Auditing can be controlled by setting a sim batch logging_config audit flag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logging_config</span><span class="o">.</span><span class="n">audit_total</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
 
@@ -482,10 +491,10 @@
 </div>
 </div>
 <div class="section" id="how-to-save-and-restore-simulation-workspaces">
-<h3>How to Save and Restore Simulation Workspaces<a class="headerlink" href="#how-to-save-and-restore-simulation-workspaces" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.6. How to Save and Restore Simulation Workspaces<a class="headerlink" href="#how-to-save-and-restore-simulation-workspaces" title="Permalink to this headline">¶</a></h3>
 <p>There are several methods available to save and restore simulation workspaces.  Generally, only one approach will be used at a time, but it is possible to combine approaches if desired.</p>
 <div class="section" id="retain-workspaces-in-memory">
-<h4>Retain Workspaces in Memory<a class="headerlink" href="#retain-workspaces-in-memory" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.6.1. Retain Workspaces in Memory<a class="headerlink" href="#retain-workspaces-in-memory" title="Permalink to this headline">¶</a></h4>
 <p>The simplest approach, for a relatively small number of simulations, is to retain the workspace in memory.  Set the sim batch retain_output_workspace property to true.  For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_batch</span><span class="o">.</span><span class="n">retain_output_workspace</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
 </pre></div>
@@ -497,7 +506,7 @@
 <p>The workspace is contained in the sim case workspace property but extracting the workspace to the top-level makes it easier to work with.</p>
 </div>
 <div class="section" id="saving-the-input-workspace">
-<h4>Saving the Input Workspace<a class="headerlink" href="#saving-the-input-workspace" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.6.2. Saving the Input Workspace<a class="headerlink" href="#saving-the-input-workspace" title="Permalink to this headline">¶</a></h4>
 <p>The simulation workspace may be saved prior to simulation by setting the sim batch save_input_workspace property to true:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_batch</span><span class="o">.</span><span class="n">save_input_workspace</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
 </pre></div>
@@ -509,7 +518,7 @@
 <p>The workspace is saved after all pre-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time.  This can be useful when running too many simulations to retain the workspaces in memory while also providing the ability to run individual cases later without having to set up a sim batch.  The workspace may be loaded by using the load command, or double-clicking the filename in the Matlab Current Folder file browser.</p>
 </div>
 <div class="section" id="saving-the-output-workspace">
-<h4>Saving the Output Workspace<a class="headerlink" href="#saving-the-output-workspace" title="Permalink to this headline">¶</a></h4>
+<h4>2.3.6.3. Saving the Output Workspace<a class="headerlink" href="#saving-the-output-workspace" title="Permalink to this headline">¶</a></h4>
 <p>The simulation workspace may be saved after simulation by setting the sim batch save_output_workspace property to true:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sim_batch</span><span class="o">.</span><span class="n">save_output_workspace</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
 </pre></div>
@@ -522,7 +531,7 @@
 </div>
 </div>
 <div class="section" id="post-simulation-data-analysis">
-<h3>Post-Simulation Data Analysis<a class="headerlink" href="#post-simulation-data-analysis" title="Permalink to this headline">¶</a></h3>
+<h3>2.3.7. Post-Simulation Data Analysis<a class="headerlink" href="#post-simulation-data-analysis" title="Permalink to this headline">¶</a></h3>
 <p>As mentioned above, a model_data object is created in the output workspace and may contain various model outputs.  One of the easiest ways to take a look at simulation data is to run a Data Observation Report (DOR) on the model data.  There are DORs for conventional (CVM), hybrid (HVM) and electric vehicles (EVM).  To run the default conventional vehicle model DOR, use the REVS_DOR_CVM() function:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REVS_DOR_CVM</span><span class="p">({},</span><span class="n">model_data</span><span class="p">);</span>
 </pre></div>
@@ -617,68 +626,63 @@
 
 
           </div>
-          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">ALPHA Documentation</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
+<h3><a href="index.html">Table of Contents</a></h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#running-alpha-quickstart">Running ALPHA - Quickstart</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#understanding-the-modeling-process">Understanding the Modeling Process</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#controlling-the-modeling-process">Controlling the Modeling Process</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#what-is-a-sim-batch">What is a Sim Batch?</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#understanding-the-alpha-quickstart-script">Understanding the ALPHA quickstart script</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#understanding-simulation-pre-and-post-processing">Understanding Simulation Pre- and Post-Processing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#understanding-config-strings-keys">Understanding Config Strings (Keys)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#literal-config-tags">Literal Config Tags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#eval-config-tags">Eval Config Tags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#config-string-expansion">Config String Expansion</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers">Config String left-hand-side and right-hand-side and Unique Key Numbers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#creating-new-config-tags">Creating New Config Tags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#how-to-use-sim-config-values">How to Use sim_config Values</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#output-summary-file-keys">Output Summary File Keys</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-alpha-quickstart">2.1. Running ALPHA - Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-the-modeling-process">2.2. Understanding the Modeling Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#controlling-the-modeling-process">2.3. Controlling the Modeling Process</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-a-sim-batch">2.3.1. What is a Sim Batch?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#understanding-the-alpha-quickstart-script">2.3.2. Understanding the ALPHA quickstart script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#understanding-simulation-pre-and-post-processing">2.3.3. Understanding Simulation Pre- and Post-Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#understanding-config-strings-keys">2.3.4. Understanding Config Strings (Keys)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#literal-config-tags">2.3.4.1. Literal Config Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval-config-tags">2.3.4.2. Eval Config Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config-string-expansion">2.3.4.3. Config String Expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers">2.3.4.4. Config String left-hand-side and right-hand-side and Unique Key Numbers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-new-config-tags">2.3.4.5. Creating New Config Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-use-sim-config-values">2.3.4.6. How to Use sim_config Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output-summary-file-keys">2.3.4.7. Output Summary File Keys</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#controlling-datalogging-and-auditing">Controlling Datalogging and Auditing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#controlling-datalogging">Controlling Datalogging</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#understanding-the-datalog-and-model-data-objects">Understanding the datalog and model_data objects</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#auditing">Auditing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#controlling-datalogging-and-auditing">2.3.5. Controlling Datalogging and Auditing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#controlling-datalogging">2.3.5.1. Controlling Datalogging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#understanding-the-datalog-and-model-data-objects">2.3.5.2. Understanding the datalog and model_data objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#auditing">2.3.5.3. Auditing</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#how-to-save-and-restore-simulation-workspaces">How to Save and Restore Simulation Workspaces</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#retain-workspaces-in-memory">Retain Workspaces in Memory</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#saving-the-input-workspace">Saving the Input Workspace</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#saving-the-output-workspace">Saving the Output Workspace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-save-and-restore-simulation-workspaces">2.3.6. How to Save and Restore Simulation Workspaces</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#retain-workspaces-in-memory">2.3.6.1. Retain Workspaces in Memory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#saving-the-input-workspace">2.3.6.2. Saving the Input Workspace</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#saving-the-output-workspace">2.3.6.3. Saving the Output Workspace</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#post-simulation-data-analysis">Post-Simulation Data Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#post-simulation-data-analysis">2.3.7. Post-Simulation Data Analysis</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="common_use_cases.html">3. Common Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_inputs.html">4. Model Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_outputs.html">5. Model Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="alpha_development.html">6. ALPHA Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_information.html">7. Contact Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="company_information.html">8. Company Information</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="introduction.html" title="previous chapter">Introduction</a></li>
-  </ul></li>
-</ul>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/overview.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -689,32 +693,28 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2019, EPA.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/overview.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="common_use_cases.html" title="3. Common Use Cases"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="1. Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, EPA.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+    </div>
   </body>
 </html>

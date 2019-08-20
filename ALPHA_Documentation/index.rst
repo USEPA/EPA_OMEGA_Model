@@ -9,16 +9,18 @@ Welcome to ALPHA Documentation!
 .. toctree::
     :maxdepth: 4
     :caption: Contents:
+    :numbered:
 
     introduction
     overview
     common_use_cases
     model_inputs
-    Model_outputs
+    model_outputs
     alpha_development
+    contact_information
+    company_information
 
-
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

@@ -1,4 +1,3 @@
-.. image:: https://www.epa.gov/sites/production/files/styles/medium/public/2013-06/epa_logo_horiz_verysmall.gif
 
 Introduction
 ============
@@ -14,7 +13,9 @@ EPA engineers utilize ALPHA as an in-house research tool to explore in detail cu
 
 ALPHA a (and EPA’s Heavy-Duty compliance model, GEM) are built on a common platform known as “REVS” – Regulated Emissions Vehicle Simulation.  REVS forms the foundation of ALPHA.  This document refers to the third revision of REVS, known as REVS3.  ALPHA can be considered a tool as well as a modeling process, the components of which are defined in REVS.
 
-For more information, visit https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha
+    For more information, visit:
+
+    https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha
 
 What is this Document?
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -26,19 +27,21 @@ The target audience for this document is anyone who is interested in learning mo
 
 System Requirements for Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 System Requirements
 -------------------
 ALPHA REVS3 requires Matlab/Simulink with StateFlow 2016b, but should also work with later releases after library/model up-conversions.  Also required is a compiler, for compiling the StateFlow code, see www.mathworks.com/support/compilers/R2016b/index.html
 
 Installation
 ------------
-Install Matlab/Simulink and the Simulink StateFlow toolbox following MathWork’s instructions.  Copy the REVS_Common folder (and Matlab Common if provided) to a suitable directory on your modeling machine.  Matlab Common is a directory of helpful Matlab scripts and functions which are commonly used for data analysis and visualization, etc.  If Matlab Common is provided, add it to your Matlab path in the same manner as REVS_Common.
+Install Matlab/Simulink and the Simulink StateFlow toolbox following MathWork's instructions.  Copy the REVS_Common folder (and Matlab Common if provided) to a suitable directory on your modeling machine.  Matlab Common is a directory of helpful Matlab scripts and functions which are commonly used for data analysis and visualization, etc.  If Matlab Common is provided, add it to your Matlab path in the same manner as REVS_Common.
 
-Launch Matlab and add REVS_Common and its subfolders to your Matlab path (from the Matlab console, select "Set Path" from the "HOME" tab of the Matlab window, then select "Add with Subfolders..." and browse to REVS_Common).  The path may be saved for future sessions or it’s also possible to write a simple script to add the required folders to your path on an as-needed basis.  For example,
+Launch Matlab and add REVS_Common and its subfolders to your Matlab path (from the Matlab console, select "Set Path" from the "HOME" tab of the Matlab window, then select "Add with Subfolders..." and browse to REVS_Common).  The path may be saved for future sessions or it is also possible to write a simple script to add the required folders to your path on an as-needed basis.  For example:
 
-addpath(genpath('C:\dev\REVS3 localdev\REVS_Common'));
+::
 
-addpath(genpath('C:\dev\Matlab Common'));
+    addpath(genpath('C:\dev\REVS3 localdev\REVS_Common'));
+    addpath(genpath('C:\dev\Matlab Common'));
 
 Directory Structure
 ^^^^^^^^^^^^^^^^^^^
@@ -51,7 +54,7 @@ A high-level description of the REVS_Common directory structure follows.  Use it
 * drive_cycles
     * Contains .mat files that represent various compliance or custom drive cycles in the form of class_REVS_drive_cycle objects with the name drive_cycle. The "sim_xxx.m" Matlab scripts are basically deprecated at this point and have been replaced by the use of tags in config strings within the batch process (more on that below)
 * executable_tools
-    * Contains tools for generating executable (binary) versions of the model.  Primarily used for developing the GEM comliance model
+    * Contains tools for generating executable (binary) versions of the model.  Primarily used for developing the GEM compliance model
 * functions
     * Contains various Matlab functions used during the modeling process.   Also contains functionSignatures.json which Matlab can use to provide auto-completion assistance in the Editor
 * helper_scripts

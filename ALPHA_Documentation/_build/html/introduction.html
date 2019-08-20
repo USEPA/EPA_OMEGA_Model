@@ -4,69 +4,81 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Introduction &#8212; ALPHA Documentation 1.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <title>1. Introduction &#8212; ALPHA Documentation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Overview" href="overview.html" />
-    <link rel="prev" title="Welcome to ALPHA Documentation’s documentation!" href="index.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="next" title="2. Overview" href="overview.html" />
+    <link rel="prev" title="Welcome to ALPHA Documentation!" href="index.html" /> 
   </head><body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="overview.html" title="2. Overview"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to ALPHA Documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
-  <img alt="https://www.epa.gov/sites/production/files/styles/medium/public/2013-06/epa_logo_horiz_verysmall.gif" src="https://www.epa.gov/sites/production/files/styles/medium/public/2013-06/epa_logo_horiz_verysmall.gif" />
-<div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="introduction">
+<h1>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="what-is-alpha">
-<h2>What is ALPHA?<a class="headerlink" href="#what-is-alpha" title="Permalink to this headline">¶</a></h2>
+<h2>1.1. What is ALPHA?<a class="headerlink" href="#what-is-alpha" title="Permalink to this headline">¶</a></h2>
 <p>The Advanced Light-Duty Powertrain and Hybrid Analysis (ALPHA) tool was created by EPA to evaluate the Greenhouse Gas (GHG) emissions of Light-Duty (LD) vehicles.  ALPHA is a physics-based, forward-looking, full vehicle computer simulation capable of analyzing various vehicle types combined with different powertrain technologies. The software tool is a MATLAB/Simulink based application.</p>
 <p>EPA has developed the ALPHA model to enable the simulation of current and future vehicles, and as a tool for understanding vehicle behavior, greenhouse gas emissions and the effectiveness of various powertrain technologies.  For GHG, ALPHA calculates CO2 emissions based on test fuel properties and vehicle fuel consumption.  No other emissions are calculated at the present time but future work on other emissions is not precluded.</p>
 <p>EPA engineers utilize ALPHA as an in-house research tool to explore in detail current and future advanced vehicle technologies.  ALPHA is continually refined and updated to more accurately model light-duty vehicle behavior and to include new technologies.</p>
 <p>ALPHA a (and EPA’s Heavy-Duty compliance model, GEM) are built on a common platform known as “REVS” – Regulated Emissions Vehicle Simulation.  REVS forms the foundation of ALPHA.  This document refers to the third revision of REVS, known as REVS3.  ALPHA can be considered a tool as well as a modeling process, the components of which are defined in REVS.</p>
-<p>For more information, visit <a class="reference external" href="https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha">https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha</a></p>
+<blockquote>
+<div><p>For more information, visit:</p>
+<p><a class="reference external" href="https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha">https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha</a></p>
+</div></blockquote>
 </div>
 <div class="section" id="what-is-this-document">
-<h2>What is this Document?<a class="headerlink" href="#what-is-this-document" title="Permalink to this headline">¶</a></h2>
+<h2>1.2. What is this Document?<a class="headerlink" href="#what-is-this-document" title="Permalink to this headline">¶</a></h2>
 <p>This documentation should provide the reader a good overview of the ALPHA modeling process and serve as a starting point for understanding some of the ALPHA implementation details.  Common use cases are covered as a way to jump start ALPHA use and techniques commonly used to control and modify the modeling process are presented.</p>
 </div>
 <div class="section" id="target-audience">
-<h2>Target Audience<a class="headerlink" href="#target-audience" title="Permalink to this headline">¶</a></h2>
+<h2>1.3. Target Audience<a class="headerlink" href="#target-audience" title="Permalink to this headline">¶</a></h2>
 <p>The target audience for this document is anyone who is interested in learning more about how to run EPA’s ALPHA model.  Prior modeling experience or a good understanding of vehicle powertrains and some Matlab familiarity is assumed.  There are plentiful resources available to learn the basics of Matlab and Simulink in print and online from MathWorks and other third parties.</p>
 </div>
 <div class="section" id="system-requirements-for-installation">
-<h2>System Requirements for Installation<a class="headerlink" href="#system-requirements-for-installation" title="Permalink to this headline">¶</a></h2>
+<h2>1.4. System Requirements for Installation<a class="headerlink" href="#system-requirements-for-installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="system-requirements">
-<h3>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h3>
+<h3>1.4.1. System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h3>
 <p>ALPHA REVS3 requires Matlab/Simulink with StateFlow 2016b, but should also work with later releases after library/model up-conversions.  Also required is a compiler, for compiling the StateFlow code, see www.mathworks.com/support/compilers/R2016b/index.html</p>
 </div>
 <div class="section" id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<h3>1.4.2. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
 <p>Install Matlab/Simulink and the Simulink StateFlow toolbox following MathWork’s instructions.  Copy the REVS_Common folder (and Matlab Common if provided) to a suitable directory on your modeling machine.  Matlab Common is a directory of helpful Matlab scripts and functions which are commonly used for data analysis and visualization, etc.  If Matlab Common is provided, add it to your Matlab path in the same manner as REVS_Common.</p>
-<p>Launch Matlab and add REVS_Common and its subfolders to your Matlab path (from the Matlab console, select “Set Path” from the “HOME” tab of the Matlab window, then select “Add with Subfolders…” and browse to REVS_Common).  The path may be saved for future sessions or it’s also possible to write a simple script to add the required folders to your path on an as-needed basis.  For example,</p>
-<p>addpath(genpath(‘C:devREVS3 localdevREVS_Common’));</p>
-<p>addpath(genpath(‘C:devMatlab Common’));</p>
+<p>Launch Matlab and add REVS_Common and its subfolders to your Matlab path (from the Matlab console, select “Set Path” from the “HOME” tab of the Matlab window, then select “Add with Subfolders…” and browse to REVS_Common).  The path may be saved for future sessions or it is also possible to write a simple script to add the required folders to your path on an as-needed basis.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">addpath</span><span class="p">(</span><span class="n">genpath</span><span class="p">(</span><span class="s1">&#39;C:\dev\REVS3 localdev\REVS_Common&#39;</span><span class="p">));</span>
+<span class="n">addpath</span><span class="p">(</span><span class="n">genpath</span><span class="p">(</span><span class="s1">&#39;C:\dev\Matlab Common&#39;</span><span class="p">));</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="directory-structure">
-<h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h2>
+<h2>1.5. Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h2>
 <p>A high-level description of the REVS_Common directory structure follows.  Use it as a rough guide to exploring the file system.  Not all releases of ALPHA may contain all subfolders (for example, the HIL-related files) but this should still give a good idea of where common items are located.</p>
 <ul class="simple">
 <li><dl class="simple">
@@ -92,7 +104,7 @@
 </li>
 <li><dl class="simple">
 <dt>executable_tools</dt><dd><ul>
-<li><p>Contains tools for generating executable (binary) versions of the model.  Primarily used for developing the GEM comliance model</p></li>
+<li><p>Contains tools for generating executable (binary) versions of the model.  Primarily used for developing the GEM compliance model</p></li>
 </ul>
 </dd>
 </dl>
@@ -163,26 +175,26 @@
 </ul>
 </div>
 <div class="section" id="design-principles">
-<h2>Design Principles<a class="headerlink" href="#design-principles" title="Permalink to this headline">¶</a></h2>
+<h2>1.6. Design Principles<a class="headerlink" href="#design-principles" title="Permalink to this headline">¶</a></h2>
 <p>This section will lay out of the some high-level design principles that guide ALPHA development.</p>
 <div class="section" id="object-oriented-design">
-<h3>Object Oriented Design<a class="headerlink" href="#object-oriented-design" title="Permalink to this headline">¶</a></h3>
+<h3>1.6.1. Object Oriented Design<a class="headerlink" href="#object-oriented-design" title="Permalink to this headline">¶</a></h3>
 <p>REVS3 makes significant use of Matlab classes and objects in order to provide a well-defined, maintainable and re-usable set of data structures and model functionality.  Class definitions start with class_ and enumerated types start with enum_.  With a few exceptions, most of the classes start with class_REVS so that Matlab auto-completion provides a useful list of the available classes.</p>
 </div>
 <div class="section" id="component-reuse">
-<h3>Component Reuse<a class="headerlink" href="#component-reuse" title="Permalink to this headline">¶</a></h3>
+<h3>1.6.2. Component Reuse<a class="headerlink" href="#component-reuse" title="Permalink to this headline">¶</a></h3>
 <p>The use of Matlab classes and objects aids in the maintenance of the code base by allowing easier addition of new elements and behaviors to existing data structures.  Using classes (instead of structures) also ensures that data structures have known and reusable definitions.</p>
 <p>Generally speaking, model components have class definitions that correspond to the required parameters and data necessary for their intended function.  There are rare exceptions for a few legacy components that came over from REVS2 (which did not generally used Matlab classes and objects).  New components should be added to the model following the object-oriented paradigm whenever possible.</p>
 </div>
 <div class="section" id="datalogging-and-auditing">
-<h3>Datalogging and Auditing<a class="headerlink" href="#datalogging-and-auditing" title="Permalink to this headline">¶</a></h3>
+<h3>1.6.3. Datalogging and Auditing<a class="headerlink" href="#datalogging-and-auditing" title="Permalink to this headline">¶</a></h3>
 <p>Datalogging enables post-simulation data analysis and debugging.  Significant effort was applied to the creation of a datalogging framework that is both flexible and fast.  For that reason there are controls available to limit the amount of data logged by the model (excess datalogging significantly slows the model down and is therefore to be avoided).  For example, datalogging may be limited to the bare minimum required to calculate fuel economy, or datalogging may be limited to the bare minimum plus everything related to the engine or transmission.  It is also possible to log every available signal in the model, if desired and the associated performance slowdown is acceptable.  Datalogging should generally be limited to the signals or components required for the investigation at hand.  Datalogs are found in a workspace object named result at the end of simulation.</p>
 <p>The model is also set up to audit the energy flows throughout the model.  If auditing is enabled then a text file (or console output) is created that shows the energy sources and sinks that were simulated.  The total energy provided and absorbed should be equal if the model conserves energy.  Since the model runs at discrete time steps and since modeling is an exercise in approximation there is commonly some slight discrepancy which is noted as the Simulation Error in the audit report.  The Energy Conservation is reported as a percentage ratio between the Net Energy Provided and the Total Loss Energy.</p>
 <p>If new components are added to the model then new audit blocks need also to be added and the corresponding audit scripts will require updating in order to capture the new energy source or sink in the audit report.  Adding audits to the model is somewhat of an advanced topic, primarily because the block layout of the model and the mathematical structure of the model are not the same – except that sometimes they are!  The primary principle is to remember that the purpose of the audit is to monitor the physical energy flows and not the energy flow through the Simulink blocks which may be distinct from the physics.</p>
 <p>Auditing the energy flow in the model is a key factor in ensuring the plausibility and function of the model.</p>
 </div>
 <div class="section" id="conventions-and-guidelines">
-<h3>Conventions and Guidelines<a class="headerlink" href="#conventions-and-guidelines" title="Permalink to this headline">¶</a></h3>
+<h3>1.6.4. Conventions and Guidelines<a class="headerlink" href="#conventions-and-guidelines" title="Permalink to this headline">¶</a></h3>
 <p>There are several conventions and guidelines that enhance the consistency and usability of the model, see section 6.1.1 under ALPHA Development.</p>
 </div>
 </div>
@@ -190,53 +202,48 @@
 
 
           </div>
-          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">ALPHA Documentation</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-alpha">What is ALPHA?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-this-document">What is this Document?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#target-audience">Target Audience</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#system-requirements-for-installation">System Requirements for Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#system-requirements">System Requirements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-alpha">1.1. What is ALPHA?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-this-document">1.2. What is this Document?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#target-audience">1.3. Target Audience</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-requirements-for-installation">1.4. System Requirements for Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#system-requirements">1.4.1. System Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installation">1.4.2. Installation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#design-principles">Design Principles</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#object-oriented-design">Object Oriented Design</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#component-reuse">Component Reuse</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#datalogging-and-auditing">Datalogging and Auditing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#conventions-and-guidelines">Conventions and Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#directory-structure">1.5. Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#design-principles">1.6. Design Principles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#object-oriented-design">1.6.1. Object Oriented Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#component-reuse">1.6.2. Component Reuse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#datalogging-and-auditing">1.6.3. Datalogging and Auditing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#conventions-and-guidelines">1.6.4. Conventions and Guidelines</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">2. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_use_cases.html">3. Common Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_inputs.html">4. Model Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_outputs.html">5. Model Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="alpha_development.html">6. ALPHA Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_information.html">7. Contact Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="company_information.html">8. Company Information</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to ALPHA Documentation’s documentation!</a></li>
-      <li>Next: <a href="overview.html" title="next chapter">Overview</a></li>
-  </ul></li>
-</ul>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/introduction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -247,32 +254,28 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2019, EPA.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/introduction.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="overview.html" title="2. Overview"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to ALPHA Documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, EPA.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+    </div>
   </body>
 </html>
