@@ -413,8 +413,195 @@ For example, the REVS_log_all package is defined like this:
 
     end
 
+Auditing
+++++++++
 
+Auditing can be controlled by setting a sim batch logging_config audit flag:
 
+::
+
+    logging_config.audit_total = true;
+
+        Audits the total energy flow for the entire drive cycle
+
+Or:
+
+::
+
+    logging_config.audit_phase = true;
+
+        Audits the total energy flow for the entire drive cycle AND also audits each drive cycle phase individually
+
+By default both flags are set to false, only one flag or the other needs to be set.  To print the audit to the console, use the print() method:
+
+::
+
+    audit.print
+
+Which should return something like the following for a conventional vehicle:
+
+::
+
+       EPA_UDDS audit: -----------------
+
+             ---- Energy Audit Report ----
+
+    Gross Energy Provided            = 28874.34 kJ
+        Fuel Energy                  = 28868.08 kJ     99.98%
+        Stored Energy                =     6.26 kJ      0.02%
+        Kinetic Energy               =     0.00 kJ      0.00%
+        Potential Energy             =     0.00 kJ      0.00%
+
+    Net Energy Provided              =  7641.47 kJ
+        Engine Energy                =  7637.05 kJ   99.94%
+             Engine Efficiency       =    26.46 %
+        Stored Energy                =     4.41 kJ    0.06%
+        Kinetic Energy               =     0.00 kJ    0.00%
+        Potential Energy             =     0.00 kJ    0.00%
+
+    Energy Consumed by ABC roadload  =  3007.20 kJ     39.35%
+    Energy Consumed by Gradient      =     0.00 kJ      0.00%
+    Energy Consumed by Accessories   =   823.48 kJ     10.78%
+        Starter                      =     0.40 kJ      0.01%
+        Alternator                   =   286.81 kJ      3.75%
+        Battery Stored Charge        =     0.00 kJ      0.00%
+        Engine Fan                   =     0.00 kJ      0.00%
+             Electrical              =     0.00 kJ      0.00%
+             Mechanical              =     0.00 kJ      0.00%
+        Power Steering               =     0.00 kJ      0.00%
+             Electrical              =     0.00 kJ      0.00%
+             Mechanical              =     0.00 kJ      0.00%
+        Air Conditioning             =     0.00 kJ      0.00%
+             Electrical              =     0.00 kJ      0.00%
+             Mechanical              =     0.00 kJ      0.00%
+        Generic Loss                 =   536.27 kJ      7.02%
+             Electrical              =   536.27 kJ      7.02%
+             Mechanical              =     0.00 kJ      0.00%
+        Total Electrical Accessories =   536.27 kJ      7.02%
+        Total Mechanical Accessories =     0.00 kJ      0.00%
+    Energy Consumed by Driveline     =  3811.03 kJ     49.87%
+         Engine                      =     0.00 kJ      0.00%
+         Launch Device               =   541.63 kJ      7.09%
+         Gearbox                     =  1572.46 kJ     20.58%
+             Pump Loss               =   874.74 kJ     11.45%
+             Spin Loss               =   382.50 kJ      5.01%
+             Gear Loss               =   256.71 kJ      3.36%
+             Inertia Loss            =    58.51 kJ      0.77%
+         Final Drive                 =     0.00 kJ      0.00%
+         Friction Brakes             =  1669.65 kJ     21.85%
+         Tire Slip                   =    27.30 kJ      0.36%
+    System Kinetic Energy Gain       =     0.44 kJ      0.01%
+                                        ------------
+    Total Loss Energy                =  7642.15 kJ
+    Simulation Error                 =    -0.68 kJ
+    Energy Conservation              =  100.009 %
+
+How to Save and Restore Simulation Workspaces
+---------------------------------------------
+
+There are several methods available to save and restore simulation workspaces.  Generally, only one approach will be used at a time, but it is possible to combine approaches if desired.
+
+Retain Workspaces in Memory
++++++++++++++++++++++++++++
+
+The simplest approach, for a relatively small number of simulations, is to retain the workspace in memory.  Set the sim batch retain_output_workspace property to true.  For example:
+
+::
+
+    sim_batch.retain_output_workspace = true;
+
+The workspace will be contained in the sim batch sim_case property which holds one or more class_REVS_sim_batch objects.  To pull the workspace into the top-level workspace, use the sim case’s extract_workspace() method:
+
+::
+
+    sim_batch.sim_case(1).extract_workspace;
+
+The workspace is contained in the sim case workspace property but extracting the workspace to the top-level makes it easier to work with.
+
+Saving the Input Workspace
+++++++++++++++++++++++++++
+
+The simulation workspace may be saved prior to simulation by setting the sim batch save_input_workspace property to true:
+
+::
+
+    sim_batch.save_input_workspace = true;
+
+This will create a timestamped .mat file in the sim batch output folder’s sim_input directory.  The filename also includes the index of the sim case.  For example, the input workspace for the first simulation (sim_1) in a batch:
+
+::
+
+    output\sim_input\2019_02_11_16_46_37sim_1_input_workspace.mat
+
+The workspace is saved after all pre-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time.  This can be useful when running too many simulations to retain the workspaces in memory while also providing the ability to run individual cases later without having to set up a sim batch.  The workspace may be loaded by using the load command, or double-clicking the filename in the Matlab Current Folder file browser.
+
+Saving the Output Workspace
++++++++++++++++++++++++++++
+
+The simulation workspace may be saved after simulation by setting the sim batch save_output_workspace property to true:
+
+::
+
+    sim_batch.save_output_workspace = true;
+
+This will create a timestamped .mat file in the sim batch output folder.  The filename also includes the index of the sim case.  For example, the output workspace for the first simulation (sim_1) in a batch:
+
+::
+
+    output\2019_02_11_16_52_39_sim_1_output_workspace.mat
+
+The workspace is saved after all post-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time and also all of the datalogs, audits, etc.  The simulation may be run again or the outputs examined directly without the need for running the simulation.  Keep in mind that, output workspaces will always be bigger than input workspaces and also take longer to save.  The workspace may be loaded by using the load command, or double-clicking the filename in the Matlab Current Folder file browser.
+
+Post-Simulation Data Analysis
+-----------------------------
+
+As mentioned above, a model_data object is created in the output workspace and may contain various model outputs.  One of the easiest ways to take a look at simulation data is to run a Data Observation Report (DOR) on the model data.  There are DORs for conventional (CVM), hybrid (HVM) and electric vehicles (EVM).  To run the default conventional vehicle model DOR, use the REVS_DOR_CVM() function:
+
+::
+
+    REVS_DOR_CVM({},model_data);
+
+The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:
+
+Sample Figures from REVS_DOR_CVM()
+
++---------------------------------+---------------------------------+
+| .. image:: images/table_1-1.jpg | .. image:: images/table_1-2.jpg |
++---------------------------------+---------------------------------+
+| .. image:: images/table_1-3.jpg | .. image:: images/table_1-4.jpg |
++---------------------------------+---------------------------------+
+
+The various DORs support several optional arguments, known as varargs in Matlab.  Optional arguments are passed in after the model_data and consist of strings and/or string-value pairs.  For example:
+
+::
+
+    REVS_DOR_CVM({},model_data, 'name of some vararg', vararg_value_if_required);
+
+The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in Table 2.
+
+The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in the table below.
+
+List of Available DOR Varargs
+
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+| Vararg Target               | Vararg Name               | Value                        | Description                                                                                                                               |
++=============================+===========================+==============================+===========================================================================================================================================+
+| Common                      | 'descriptor'              | string                       | A string description of the data being presented, for example ‘ALPHA Quickstart’                                                          |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+|                             | 'time\_range'             | numeric vector               | A two-element vector representing the desired start and end time in seconds for plots and analysis. For example, [505 1375]               |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+| REVS\_DOR\_Vehicle()        | 'vehicle\_speed\_units'   | string                       | Vehicle speed units will be miles per hour (by default or if 'mph' is provided) else units will be meters per second                      |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+| REVS\_DOR\_Engine()         | 'engine'                  | class\_REVS\_engine object   | If provided, an engine map will be plotted, showing areas of operation during the simulation, limited to the 'time\_range', if provided   |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+|                             | 'engine\_speed\_units'    | string                       | Engine speed units will be RPM (by default or if 'rpm' is provided) else units will be radians per second                                 |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+| REVS\_DOR\_Fuel()           | 'fuel\_plots'             | none                         | Enables fuel plots, if provided, otherwise fuel plots are disabled                                                                        |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+| REVS\_DOR\_Transmission()   | 'analyze\_ratios'         | none                         | BROKEN                                                                                                                                    |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+| REVS\_DOR\_Accessories()    | 'accessory\_plots'        | none                         | Enables accessory plots such as alternator and battery current, voltage, etc, if provided                                                 |
++-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 

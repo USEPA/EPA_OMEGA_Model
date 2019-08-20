@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ALPHA Documentation's documentation!
-===============================================
+Welcome to ALPHA Documentation!
+===============================
 
 .. toctree::
     :maxdepth: 4
@@ -12,6 +12,10 @@ Welcome to ALPHA Documentation's documentation!
 
     introduction
     overview
+    common_use_cases
+    model_inputs
+    Model_outputs
+    alpha_development
 
 
 Indices and tables

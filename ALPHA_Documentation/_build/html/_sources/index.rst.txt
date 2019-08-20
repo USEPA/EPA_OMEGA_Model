@@ -12,6 +12,7 @@ Welcome to ALPHA Documentation's documentation!
 
     introduction
     overview
+    common_use_cases
 
 
 Indices and tables
