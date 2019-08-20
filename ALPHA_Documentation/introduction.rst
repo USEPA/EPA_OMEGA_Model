@@ -99,16 +99,3 @@ Conventions and Guidelines
 --------------------------
 There are several conventions and guidelines that enhance the consistency and usability of the model, see section 6.1.1 under ALPHA Development.
 
-Overview
-========
-
-RUNNING ALPHA – QUICKSTART
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Launch Matlab and make sure that REVS_Common is on the Matlab path as described in the installation instructions above.  As a quick check you can execute the following Matlab command, if it succeeds then it should return the path to the top-level ALPHA model:
-which REVS_VM
-
-If the command fails then you need to double check your path setup.
-Change the Matlab working directory to the ALPHA DEMO folder and run run_ALPHA_quickstart.  The REVS_VM model will open up (so we can watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, \YYYY_MM_DD_hh_mm_ss_, following by sim_results.csv and sim_1_console.txt.   For example, 2019_02_01_09_36_23_sim_results.csv and 2019_02_01_09_36_23_sim_1_console.txt, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The sim_results file contains a summary of the simulation inputs, settings and outputs.  The console.txt file captures anything that would have been output to the Matlab console window.  In this case it contains the SAE J2951 Drive Quality Metrics by default.
-If you open run_ALPHA_quickstart in the Matlab editor you’ll see it only takes a handful of Matlab commands to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed below.
-
-

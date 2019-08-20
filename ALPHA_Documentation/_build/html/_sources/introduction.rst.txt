@@ -77,5 +77,25 @@ This section will lay out of the some high-level design principles that guide AL
 
 Object Oriented Design
 ----------------------
-REVS3 makes significant use of Matlab classes and objects in order to provide a well-defined, maintainable and re-usable set of data structures and model functionality.  Class defintions start with class_ and enumerated types start with enum_.  With a few exceptions, most of the classes start with class_REVS so that Matlab auto-completion provides a useful list of the available classes.
+REVS3 makes significant use of Matlab classes and objects in order to provide a well-defined, maintainable and re-usable set of data structures and model functionality.  Class definitions start with \class_ and enumerated types start with \enum_.  With a few exceptions, most of the classes start with class_REVS so that Matlab auto-completion provides a useful list of the available classes.
+
+Component Reuse
+---------------
+The use of Matlab classes and objects aids in the maintenance of the code base by allowing easier addition of new elements and behaviors to existing data structures.  Using classes (instead of structures) also ensures that data structures have known and reusable definitions.
+
+Generally speaking, model components have class definitions that correspond to the required parameters and data necessary for their intended function.  There are rare exceptions for a few legacy components that came over from REVS2 (which did not generally used Matlab classes and objects).  New components should be added to the model following the object-oriented paradigm whenever possible.
+
+Datalogging and Auditing
+------------------------
+Datalogging enables post-simulation data analysis and debugging.  Significant effort was applied to the creation of a datalogging framework that is both flexible and fast.  For that reason there are controls available to limit the amount of data logged by the model (excess datalogging significantly slows the model down and is therefore to be avoided).  For example, datalogging may be limited to the bare minimum required to calculate fuel economy, or datalogging may be limited to the bare minimum plus everything related to the engine or transmission.  It is also possible to log every available signal in the model, if desired and the associated performance slowdown is acceptable.  Datalogging should generally be limited to the signals or components required for the investigation at hand.  Datalogs are found in a workspace object named result at the end of simulation.
+
+The model is also set up to audit the energy flows throughout the model.  If auditing is enabled then a text file (or console output) is created that shows the energy sources and sinks that were simulated.  The total energy provided and absorbed should be equal if the model conserves energy.  Since the model runs at discrete time steps and since modeling is an exercise in approximation there is commonly some slight discrepancy which is noted as the Simulation Error in the audit report.  The Energy Conservation is reported as a percentage ratio between the Net Energy Provided and the Total Loss Energy.
+
+If new components are added to the model then new audit blocks need also to be added and the corresponding audit scripts will require updating in order to capture the new energy source or sink in the audit report.  Adding audits to the model is somewhat of an advanced topic, primarily because the block layout of the model and the mathematical structure of the model are not the same – except that sometimes they are!  The primary principle is to remember that the purpose of the audit is to monitor the physical energy flows and not the energy flow through the Simulink blocks which may be distinct from the physics.
+
+Auditing the energy flow in the model is a key factor in ensuring the plausibility and function of the model.
+
+Conventions and Guidelines
+--------------------------
+There are several conventions and guidelines that enhance the consistency and usability of the model, see section 6.1.1 under ALPHA Development.
 

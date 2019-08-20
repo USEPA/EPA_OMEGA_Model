@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Overview &#8212; ALPHA Documentation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="running-alpha-quickstart">
+<h2>Running ALPHA - Quickstart<a class="headerlink" href="#running-alpha-quickstart" title="Permalink to this headline">¶</a></h2>
+<p>Launch Matlab and make sure that REVS_Common is on the Matlab path as described in the installation instructions above.  As a quick check you can execute the following Matlab command, if it succeeds then it should return the path to the top-level ALPHA model:</p>
+<blockquote>
+<div><p>which REVS_VM</p>
+</div></blockquote>
+<p>If the command fails then you need to double check your path setup.</p>
+<p>Change the Matlab working directory to the ALPHA DEMO folder and run run_ALPHA_quickstart.  The REVS_VM model will open up (so we can watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, YYYY_MM_DD_hh_mm_ss_, following by sim_results.csv and sim_1_console.txt.   For example, 2019_02_01_09_36_23_sim_results.csv and 2019_02_01_09_36_23_sim_1_console.txt, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The sim_results file contains a summary of the simulation inputs, settings and outputs.  The console.txt file captures anything that would have been output to the Matlab console window.  In this case it contains the SAE J2951 Drive Quality Metrics by default.</p>
+<p>If you open run_ALPHA_quickstart in the Matlab editor you’ll see it only takes a handful of Matlab commands to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed below.</p>
+</div>
+<div class="section" id="understanding-the-modeling-process">
+<h2>Understanding the Modeling Process<a class="headerlink" href="#understanding-the-modeling-process" title="Permalink to this headline">¶</a></h2>
+<p>The fundamental modeling process consists of creating a Matlab workspace that contains all the variables necessary to run the REVS_VM (REVS Vehicle Model) Simulink model.  There are several ways to accomplish this.</p>
+<ol class="arabic simple">
+<li><p>Load a saved workspace available in a .mat file and then run the model</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Pre- and post-processing must be handled by the user, this is somewhat of an advanced use case but can be very useful under the right circumstances</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Create an ad-hoc script to load individual param files (Matlab scripts containing component data structures), manually performing pre- and post-processing</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>This was the process prior to the standardized batch process, it leads to duplication of effort and  inconsistent approaches across users and should be avoided</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>Create and execute a batch run using class_REVS_sim_batch</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Provides a consistent approach to the modeling process</p></li>
+<li><p>A sim batch may be used to run any number of simulations, even just one</p></li>
+<li><p>Automatically provides standardized output summary results</p></li>
+<li><p>Provides a framework for pre- and post-processing simulations</p></li>
+<li><p>Allows convenient capability to sweep variables and define multiple simulation scenarios</p></li>
+<li><p>Provides a framework for running “performance neutral” simulations</p></li>
+<li><p>Provides capability to run simulations in parallel, on one or multiple computers, and automatically collate the results into a single output summary file</p></li>
+<li><p>Provides a framework for controlling simulation datalogging and auditing</p></li>
+<li><p>Provides a framework for controlling the amount (“verbosity”) of output summary data</p></li>
+<li><p>Provides a framework for saving Matlab workspaces at various points in the modeling process</p></li>
+<li><p>It is easy and convenient to define and reuse sim batches across multiple projects</p></li>
+</ul>
+</div></blockquote>
+<p>The batch approach will be the primary focus of this document due to its numerous advantages.</p>
+</div>
+<div class="section" id="controlling-the-modeling-process">
+<h2>Controlling the Modeling Process<a class="headerlink" href="#controlling-the-modeling-process" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="what-is-a-sim-batch">
+<h3>What is a Sim Batch?<a class="headerlink" href="#what-is-a-sim-batch" title="Permalink to this headline">¶</a></h3>
+<p>A class_REVS_sim_batch object actually contains a vector of class_REVS_sim_case objects stored in the sim_case property.  A sim_case could be created and run without a batch but there is no advantage to doing so since the batch process provides all the necessary pre- and post-processing is much easier to use.  Typically the only reason to manipulate a particular sim_case would be to extract its local workspace to populate the top-level workspace for direct access.  This will be covered in more detail below in the discussion on working with workspaces.</p>
+</div>
+<div class="section" id="understanding-the-alpha-quickstart-script">
+<h3>Understanding the ALPHA quickstart script<a class="headerlink" href="#understanding-the-alpha-quickstart-script" title="Permalink to this headline">¶</a></h3>
+<p>The run_ALPHA_quickstart M-script demonstrates the simplest possible batch process - a single simulation run with the default settings, only the minimum required input files and minimal outputs.  Let’s take a closer look.</p>
+<blockquote>
+<div><p>run_ALPHA_quickstart.m:</p>
+</div></blockquote>
+<ol class="arabic simple">
+<li><p>clear; clear classes; clc;  % clear workspace, classes and console</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Clears the Matlab workspace, classes and console.  This is highly recommended before running a batch</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>sim_batch = class_REVS_sim_batch(REVS_log_default); % create sim_batch</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Creates sim_batch, an object of class class_REVS_sim_batch, and instructs it to log only the minimum required signals in the model.  Datalogging will be discussed in more detail below.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="3">
+<li><p>sim_batch.param_path = ‘param_files/MPW_LRL’;   % set path to param files</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>The batch needs to know where to find param files that are not in the REVS_Common folder.  In this case the param files are located in the MPW_LRL subfolder of the local param_files folder.</p></li>
+</ul>
+</div></blockquote>
+<p>4.      sim_batch.config_set = { % define config_set
+[‘VEH:vehicle_2020_MPW_LRL + ENG:engine_2013_Chevrolet_Ecotec_LCV_2L5_Reg_E10 + TRANS:TRX11_FWD + ELEC:electric_EPS + CYC:EPA_UDDS + CON:MPW_LRL_CVM_controls_param’]
+};</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The sim_batch.config_set defines the set of the simulations to be run by creating a cell array of one or more config strings.  Within the config string are the tags VEH:, ENG:, TRANS:, ELEC:, CYC: and CON:.  Following each tag is the name of a file that contains simulation inputs.  The VEH: tag loads the vehicle information such as roadload, test weight, etc.  The ENG: tag loads the engine information, in this case the engine is actually loaded from REVS_Common since it’s one of the data packet engines, the other param files are loaded from the local param file directory.  The TRANS: tag loads the transmission parameters, in this case for a 6-speed automatic.  The ELEC: tag loads parameters that define the electrical system and accessories for this vehicle.  The CYC: tag tells the simulation which drive cycle to run, in this case an EPA UDDS drive cycle.  Lastly, the CON: tag tells the simulation which controls settings to use.  In this case, the controls settings show that start-stop is disabled for this run.  The CVM in MPW_LRL_CVM_controls_param stands for Conventional Vehicle Model.  Other abbreviations that you may encounter are EVM for Electric Vehicle Model and HVM for Hybrid Vehicle Model.  Electric vehicles and hybrid vehicles have their own control parameters.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>open REVS_VM;   % optional, but allows observation of the model while running</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>This simply opens the top-level Simulink model so that the simulation progress can be observed via the vehicle speed and drive cycle plot that comes from the top-level Scope block.  This step is optional.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="6">
+<li><p>sim_batch.run_sim_cases();</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>This handles simulation pre-processing, running and post-processing</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="understanding-simulation-pre-and-post-processing">
+<h3>Understanding Simulation Pre- and Post-Processing<a class="headerlink" href="#understanding-simulation-pre-and-post-processing" title="Permalink to this headline">¶</a></h3>
+<p>The goal of simulation pre-processing is to set up the simulation workspace before simulation, including any modifications to data loaded from the specified param files.  For example, we may load a particular vehicle param file and then want to change the test weight or roadload in some manner and then run the simulation, perhaps as part of a sweep of test weight values.  Any arbitrary M-script can be run in order to prepare the simulation workspace.</p>
+<p>The REVS_VM model itself performs some post-processing to create simulation results (phase integrated results, for example), datalogs, and to perform any auditing that may be desired.  These tasks are handled by creating result, datalog and audit objects in the workspace from class_REVS_result, class_REVS_datalog and class_REVS_audit classes respectively.  These objects are created in the model’s StopFcn callback which can be seen in the model’s Model Properties dialog box.</p>
+<p>Simulation post-processing may be used to take the raw simulation outputs and calculate fuel economy or GHG emissions.  The default simulation post-processing is generally used, but any M-script may be run if desired.</p>
+<p>Batch post-processing may be used  to examine the total set of simulation results and perform additional processing such as finding performance-neutral results from among a set of runs and then outputting those to a separate file.  Any arbitrary M-script may be run if desired.</p>
+<p>There are a few class_REVS_sim_batch properties that control pre- and post-processing of the simulation data by determining which processing scripts to run.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>sim_case_preprocess_script: by default this is set to REVS_preprocess_sim_case which performs pre-processing for the most common overrides that should apply to pretty much any simulation case, regardless of the type of project you may be working on.  The overrides/modifiers come from optional config string tags.  For example, the ETW_LBS: tag may be used to override the vehicle test weight from the vehicle param file.  For application-specific pre-processing you would create a custom script that would (generally) call REVS_preprocess_sim_case and then perform additional pre-processing.  The custom script may handle user-defined application-specific config tags.  For example, for 2025 Mid-Term Evaluation work, the MTE_batch_sim_case_preprocess script calls REVS_preprocess_sim_case and then performs MTE-related overrides and defaults for things like transmission sizing or behavior.</p></li>
+<li><p>sim_case_postprocess_script: by default this is set to REVS_postprocess_sim_case which handles calculating fuel economy for the three main powertrain types (Conventional, Hybrid, and Electric).  This script calculates cold-corrected FTP and weighted FTP-HWFET results from the raw phase results, among other things.</p></li>
+<li><p>postprocess_script: by default this is set to REVS_postprocess_sim_batch which has some code for finding performance-neutral runs out of a simulation set that provides a performance baseline for one or more sets of runs.  The selected runs, if any, are output to a separate output file.</p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="understanding-config-strings-keys">
+<h3>Understanding Config Strings (Keys)<a class="headerlink" href="#understanding-config-strings-keys" title="Permalink to this headline">¶</a></h3>
+<p>Formatting for the batch config_set config strings (also known as Keys in the output summary file) is defined by class_REVS_sim_config.  The easiest way to see which config tags are available is to use this command:</p>
+<blockquote>
+<div><p>class_REVS_sim_config.show_tags</p>
+</div></blockquote>
+<p>This will display a list of tags and the name of the workspace variable associated with them which can be used in processing scripts.  A partial list, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">class_REVS_sim_config</span><span class="o">.</span><span class="n">show_tags</span>
+<span class="n">ans</span> <span class="o">=</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">87</span><span class="n">x1</span> <span class="n">cell</span> <span class="n">array</span>
+  <span class="s1">&#39;PKG:              -&gt; sim_config.tech_package&#39;</span>
+  <span class="s1">&#39;UKN:              -&gt; sim_config.unique_key_num&#39;</span>
+  <span class="s1">&#39;PTRAIN:           -&gt; sim_config.powertrain_type&#39;</span>
+  <span class="s1">&#39;CYC:              -&gt; sim_config.drive_cycle&#39;</span>
+  <span class="s1">&#39;ENG:              -&gt; sim_config.engine&#39;</span>
+  <span class="s1">&#39;TRANS:            -&gt; sim_config.transmission&#39;</span>
+  <span class="s1">&#39;VEH:              -&gt; sim_config.vehicle&#39;</span>
+  <span class="s1">&#39;ELEC:             -&gt; sim_config.electric&#39;</span>
+  <span class="s1">&#39;ACC:              -&gt; sim_config.accessory&#39;</span>
+  <span class="s1">&#39;CON:              -&gt; sim_config.controls&#39;</span>
+  <span class="s1">&#39;DRV:              -&gt; sim_config.driver&#39;</span>
+  <span class="s1">&#39;AMB:              -&gt; sim_config.ambient&#39;</span>
+  <span class="s1">&#39;VEH_LBS:          -&gt; sim_config.vehicle_lbs&#39;</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
+<p>sim_config is a variable created automatically by class_REVS_sim_batch and is made available to the simulation workspace prior to simulation. The sim_config property names give at least a preliminary understanding of what a tag means and can be further examined by taking a look at the default pre- and post-processing scripts.</p>
+<p>If we take a look at class_REVS_sim_config we can see each property is an instance of a class_REVS_config_element.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">drive_cycle</span>     <span class="o">=</span> <span class="n">class_REVS_config_element</span><span class="p">(</span><span class="s1">&#39;CYC:&#39;</span><span class="p">,</span>  <span class="s1">&#39;literal&#39;</span><span class="p">);</span>
+<span class="n">ETW_lbs</span>         <span class="o">=</span> <span class="n">class_REVS_config_element</span><span class="p">(</span><span class="s1">&#39;ETW_LBS:&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">);</span>
+<span class="n">mass_multiplier</span> <span class="o">=</span> <span class="n">class_REVS_config_element</span><span class="p">(</span><span class="s1">&#39;ETW_MLT:&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The arguments to the class_REVS_config_element constructor are the tag string, the tag type, and an optional default value.</p>
+<div class="section" id="literal-config-tags">
+<h4>Literal Config Tags<a class="headerlink" href="#literal-config-tags" title="Permalink to this headline">¶</a></h4>
+<p>In the example above, the drive_cycle property holds a ‘literal’ tag, which means that the part of the string associated with that tag will not automatically be evaluated (turned into a numeric or other value, but rather taken literally).  Typically this would be used for something like file names or other strings.  Literal tags may be evaluated in user scripts.  For example, if the literal tag was the name of script then that script may be called in the user pre- or post-processing scripts at the appropriate time to perform whatever its function is.  Literal tags can be used to hold a single value or, combined with delayed evaluation (in a user script, instead of during config string parsing) may hold multiple values.  For example, within a config string, these are possible uses of the CYC: tag:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CYC</span><span class="p">:</span><span class="n">EPA_IM240</span>
+<span class="n">CYC</span><span class="p">:{</span><span class="s1">&#39;&#39;</span><span class="n">EPA_FTP_NOSOAK</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="n">EPA_HWFET</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="n">EPA_US06</span><span class="s1">&#39;&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>In the first example, the CYC: tag refers to a single drive cycle file, EPA_IM240.mat which will used for the simulation.  In the second case, the CYC: tag used to store a string representation of a Matlab cell array of drive cycle strings.  In this case, sim_config.drive_cycle would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;{&#39;&#39;EPA_FTP_NOSOAK&#39;&#39;,&#39;&#39;EPA_HWFET&#39;&#39;,&#39;&#39;EPA_US06&#39;&#39;}&#39;</span>
+</pre></div>
+</div>
+<p>Which would evaluate (using the Matlab eval() or evalin() command) to the cell array of strings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;EPA_FTP_NOSOAK&#39;</span><span class="p">,</span><span class="s1">&#39;EPA_HWFET&#39;</span><span class="p">,</span><span class="s1">&#39;EPA_US06&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Drive cycle loading of a single cycle or the combining of multiple cycles into a single cycle is automatically handled in class_REVS_sim_case.load_drive_cycles() but the same concept can apply to user-defined literal tags used by user scripts.  Drive cycle creation and handling will be discussed in further detail below.</p>
+</div>
+<div class="section" id="eval-config-tags">
+<h4>Eval Config Tags<a class="headerlink" href="#eval-config-tags" title="Permalink to this headline">¶</a></h4>
+<p>As shown above, the class_REVS_sim_config ETW_lbs property is an ‘eval’ tag which means its value will be automatically evaluated by the class_REV_sim_config in the parse_key() method.  If the eval tag is created with a default value then that value will be used if the tag is not specified by the user.  Eval tags should be numeric or should refer to variables available in the workspace.  An eval tag may evaluate to a single value or a vector of multiple values to perform variable sweeps.  For example, the following would all be valid eval tags within a config string:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ETW_LBS</span><span class="p">:</span><span class="mi">3625</span>
+<span class="n">ETW_LBS</span><span class="p">:[</span><span class="mi">3000</span><span class="p">:</span><span class="mi">500</span><span class="p">:</span><span class="mi">5000</span><span class="p">]</span>
+<span class="n">ETW_LBS</span><span class="p">:</span><span class="mi">4454</span><span class="o">*</span><span class="p">[</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">1.2</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The first case evaluates to a single number, 3625, the second case evaluates to a vector, [3000 3500 4000 4500 5000], as does the last case which becomes [3563.2 4454 5344.8].  Any valid Matlab syntax may be used in an eval tag, including mathematical operations such as multiply, divide, etc.  If addition is used, there must not be any spaces surrounding the + sign, as ‘ + ‘ (space,plus-sign,space) is the separator used to build composite config strings and will result in an erroneously split string.</p>
+</div>
+<div class="section" id="config-string-expansion">
+<h4>Config String Expansion<a class="headerlink" href="#config-string-expansion" title="Permalink to this headline">¶</a></h4>
+<p>Each string in the sim batch config_set cell array is evaluated to determine how many simulations it defines.  As seen above, each tag may be used to define multiple values.  Each config string is expanded to a full factorial combination of all of its elements.   The expanded set of strings is stored in the sim batch expanded_config_set property after the expand_config_set() method is called.  Config set expansion is handled automatically by the class_REVS_sim_batch run_sim_cases() method but under certain circumstances it may also be useful to manually expand the config set, although this is not typically done.  Manual expansion could be used to examine the number of cases represented by a config set without having to commit to running any simulations.</p>
+<p>For example, the following tag could be used within a config string to run simulations with and without engine start-stop:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+</span> <span class="n">SS</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
+</pre></div>
+</div>
+<p>Which would turn into two strings in the expanded config set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+</span> <span class="n">SS</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span>
+<span class="o">+</span> <span class="n">SS</span><span class="p">:</span><span class="mi">0</span> <span class="o">+</span>
+</pre></div>
+</div>
+<p>An example with multiple tags with multiple values, this time for start-stop and normalized torque converter lockup:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+</span> <span class="n">SS</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">LU</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+</pre></div>
+</div>
+<p>Which would turn into four strings in the expanded config set, representing all four cases:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+</span> <span class="n">SS</span><span class="p">:</span><span class="mi">0</span> <span class="o">+</span> <span class="n">LU</span><span class="p">:</span><span class="mi">0</span> <span class="o">+</span>
+<span class="o">+</span> <span class="n">SS</span><span class="p">:</span><span class="mi">0</span> <span class="o">+</span> <span class="n">LU</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span>
+<span class="o">+</span> <span class="n">SS</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="n">LU</span><span class="p">:</span><span class="mi">0</span> <span class="o">+</span>
+<span class="o">+</span> <span class="n">SS</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="n">LU</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span>
+</pre></div>
+</div>
+<p>String expansion provides a simple and powerful method for defining entire sets of simulations within a single user-defined config string.</p>
+</div>
+<div class="section" id="config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers">
+<h4>Config String left-hand-side and right-hand-side and Unique Key Numbers<a class="headerlink" href="#config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers" title="Permalink to this headline">¶</a></h4>
+<p>A special string separator, || (double vertical bars) may be used to separate the left and right hand sides of a config string.  This is typically used for processing performance neutral runs but could also be used for any user-defined purpose.  For performance neutral runs, the left hand side of the string defines the unique simulation case, and the right hand side is used to define multiple engine scaling levels to evaluate for performance neutrality and GHG emissions.  The REVS_postprocess_sim_batch script considers all cases with the same left hand side to represent a single simulation case and then chooses the result from that set that meets performance criteria and has the lowest GHG emissions.  Each unique left hand side is assigned a unique key number through the UKN: tag by the class_REVS_sim_batch gen_unique_config_set() method.</p>
+<p>For example, this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;SS:[1,0] + LU:[0,1]&#39;</span>
+</pre></div>
+</div>
+<p>becomes this, representing four unique cases:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;UKN:1 + SS:1 + LU:0&#39;</span>
+<span class="s1">&#39;UKN:2 + SS:1 + LU:1&#39;</span>
+<span class="s1">&#39;UKN:3 + SS:0 + LU:0&#39;</span>
+<span class="s1">&#39;UKN:4 + SS:0 + LU:1&#39;</span>
+</pre></div>
+</div>
+<p>On the other hand, this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;SS:[1,0] || LU:[0,1]&#39;</span>
+</pre></div>
+</div>
+<p>becomes this, four simulations that represent two unique cases:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;UKN:1 + SS:1 || LU:0&#39;</span>
+<span class="s1">&#39;UKN:1 + SS:1 || LU:1&#39;</span>
+<span class="s1">&#39;UKN:2 + SS:0 || LU:0&#39;</span>
+<span class="s1">&#39;UKN:2 + SS:0 || LU:1&#39;</span>
+</pre></div>
+</div>
+<p>In this way, subsets of simulation batches may be considered as groups and the unique key number can be used to find these groups in the output file and then process them accordingly.  In either case above, all four simulations will be run and all four results will be available in the output summary file.</p>
+</div>
+<div class="section" id="creating-new-config-tags">
+<h4>Creating New Config Tags<a class="headerlink" href="#creating-new-config-tags" title="Permalink to this headline">¶</a></h4>
+<p>class_REVS_sim_config defines quite a few useful tags that should cover many modeling applications but it’s also very easy to add new ones.  Adding a new tag is as simple as adding a new property to class_REVS_sim_config:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_config</span>  <span class="o">=</span> <span class="n">class_REVS_config_element</span><span class="p">(</span><span class="s1">&#39;NEWTAG:&#39;</span><span class="p">,</span> <span class="s1">&#39;eval&#39;</span><span class="p">,</span> <span class="mi">42</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Which would show up as the following when calling class_REVS_sim_config.show_tags:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;NEWTAG:42  -&gt; sim_config.new_config&#39;</span>
+</pre></div>
+</div>
+<p>The default value (if provided) is shown next to the tag, in this case the default value for sim_config.new_config is 42.  The variable sim_config.new_config would now be available for use in user pre- and post-processing scripts.</p>
+</div>
+<div class="section" id="how-to-use-sim-config-values">
+<h4>How to Use sim_config Values<a class="headerlink" href="#how-to-use-sim-config-values" title="Permalink to this headline">¶</a></h4>
+<p>The value of a sim_config property is accessed through the value property.  In addition, the has_value() method can be used to check if a value has been set by the user before trying to use it in a script.  For example, from REVS_preprocess_sim_case:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">sim_config</span><span class="o">.</span><span class="n">adjust_A_lbs</span><span class="o">.</span><span class="n">has_value</span>
+    <span class="n">vehicle</span><span class="o">.</span><span class="n">coastdown_adjust_A_lbf</span> <span class="o">=</span> <span class="n">sim_config</span><span class="o">.</span><span class="n">adjust_A_lbs</span><span class="o">.</span><span class="n">value</span><span class="p">;</span>
+<span class="n">end</span>
+</pre></div>
+</div>
+<p>A default value, if provided, is always available even if the user has not provided a value (has_value() returns false).</p>
+</div>
+<div class="section" id="output-summary-file-keys">
+<h4>Output Summary File Keys<a class="headerlink" href="#output-summary-file-keys" title="Permalink to this headline">¶</a></h4>
+<p>The has_value() method is also used to cull unnecessary tags from the config string that appears in the output summary file Key column.  Culling empty or default value tags from the Key column makes the strings easier to read and understand but still specifies the correct simulation parameters.</p>
+<p>Keys from the output file can be used directly in new config sets by cutting and pasting them into user batch file config sets.  In this way, an end-user of the simulation results can select runs to examine further or may even create new config strings to be run.  Because the output summary file is a .csv file, commas in the Key column are replaced with # symbols to prevent incorrect column breaks.  Even though the # symbol is not a valid Matlab operator, these strings can still be used directly in new config sets – the batch process converts #’s to commas before parsing the strings.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">ALPHA Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-alpha-quickstart">Running ALPHA - Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-the-modeling-process">Understanding the Modeling Process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#controlling-the-modeling-process">Controlling the Modeling Process</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-a-sim-batch">What is a Sim Batch?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#understanding-the-alpha-quickstart-script">Understanding the ALPHA quickstart script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#understanding-simulation-pre-and-post-processing">Understanding Simulation Pre- and Post-Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#understanding-config-strings-keys">Understanding Config Strings (Keys)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#literal-config-tags">Literal Config Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#eval-config-tags">Eval Config Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config-string-expansion">Config String Expansion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#config-string-left-hand-side-and-right-hand-side-and-unique-key-numbers">Config String left-hand-side and right-hand-side and Unique Key Numbers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-new-config-tags">Creating New Config Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#how-to-use-sim-config-values">How to Use sim_config Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#output-summary-file-keys">Output Summary File Keys</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="introduction.html" title="previous chapter">Introduction</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, EPA.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/overview.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
