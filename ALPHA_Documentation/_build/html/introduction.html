@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Introduction &#8212; ALPHA Documentation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <img alt="https://www.epa.gov/sites/production/files/styles/medium/public/2013-06/epa_logo_horiz_verysmall.gif" src="https://www.epa.gov/sites/production/files/styles/medium/public/2013-06/epa_logo_horiz_verysmall.gif" />
+<div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-alpha">
+<h2>What is ALPHA?<a class="headerlink" href="#what-is-alpha" title="Permalink to this headline">¶</a></h2>
+<p>The Advanced Light-Duty Powertrain and Hybrid Analysis (ALPHA) tool was created by EPA to evaluate the Greenhouse Gas (GHG) emissions of Light-Duty (LD) vehicles.  ALPHA is a physics-based, forward-looking, full vehicle computer simulation capable of analyzing various vehicle types combined with different powertrain technologies. The software tool is a MATLAB/Simulink based application.</p>
+<p>EPA has developed the ALPHA model to enable the simulation of current and future vehicles, and as a tool for understanding vehicle behavior, greenhouse gas emissions and the effectiveness of various powertrain technologies.  For GHG, ALPHA calculates CO2 emissions based on test fuel properties and vehicle fuel consumption.  No other emissions are calculated at the present time but future work on other emissions is not precluded.</p>
+<p>EPA engineers utilize ALPHA as an in-house research tool to explore in detail current and future advanced vehicle technologies.  ALPHA is continually refined and updated to more accurately model light-duty vehicle behavior and to include new technologies.</p>
+<p>ALPHA a (and EPA’s Heavy-Duty compliance model, GEM) are built on a common platform known as “REVS” – Regulated Emissions Vehicle Simulation.  REVS forms the foundation of ALPHA.  This document refers to the third revision of REVS, known as REVS3.  ALPHA can be considered a tool as well as a modeling process, the components of which are defined in REVS.</p>
+<p>For more information, visit <a class="reference external" href="https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha">https://www.epa.gov/regulations-emissions-vehicles-and-engines/advanced-light-duty-powertrain-and-hybrid-analysis-alpha</a></p>
+</div>
+<div class="section" id="what-is-this-document">
+<h2>What is this Document?<a class="headerlink" href="#what-is-this-document" title="Permalink to this headline">¶</a></h2>
+<p>This documentation should provide the reader a good overview of the ALPHA modeling process and serve as a starting point for understanding some of the ALPHA implementation details.  Common use cases are covered as a way to jump start ALPHA use and techniques commonly used to control and modify the modeling process are presented.</p>
+</div>
+<div class="section" id="target-audience">
+<h2>Target Audience<a class="headerlink" href="#target-audience" title="Permalink to this headline">¶</a></h2>
+<p>The target audience for this document is anyone who is interested in learning more about how to run EPA’s ALPHA model.  Prior modeling experience or a good understanding of vehicle powertrains and some Matlab familiarity is assumed.  There are plentiful resources available to learn the basics of Matlab and Simulink in print and online from MathWorks and other third parties.</p>
+</div>
+<div class="section" id="system-requirements-for-installation">
+<h2>System Requirements for Installation<a class="headerlink" href="#system-requirements-for-installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="system-requirements">
+<h3>System Requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h3>
+<p>ALPHA REVS3 requires Matlab/Simulink with StateFlow 2016b, but should also work with later releases after library/model up-conversions.  Also required is a compiler, for compiling the StateFlow code, see www.mathworks.com/support/compilers/R2016b/index.html</p>
+</div>
+<div class="section" id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<p>Install Matlab/Simulink and the Simulink StateFlow toolbox following MathWork’s instructions.  Copy the REVS_Common folder (and Matlab Common if provided) to a suitable directory on your modeling machine.  Matlab Common is a directory of helpful Matlab scripts and functions which are commonly used for data analysis and visualization, etc.  If Matlab Common is provided, add it to your Matlab path in the same manner as REVS_Common.</p>
+<p>Launch Matlab and add REVS_Common and its subfolders to your Matlab path (from the Matlab console, select “Set Path” from the “HOME” tab of the Matlab window, then select “Add with Subfolders…” and browse to REVS_Common).  The path may be saved for future sessions or it’s also possible to write a simple script to add the required folders to your path on an as-needed basis.  For example,</p>
+<p>addpath(genpath(‘C:devREVS3 localdevREVS_Common’));</p>
+<p>addpath(genpath(‘C:devMatlab Common’));</p>
+</div>
+</div>
+<div class="section" id="directory-structure">
+<h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h2>
+<p>A high-level description of the REVS_Common directory structure follows.  Use it as a rough guide to exploring the file system.  Not all releases of ALPHA may contain all subfolders (for example, the HIL-related files) but this should still give a good idea of where common items are located.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>REVS_Common  top level</dt><dd><ul>
+<li><p>Contains REVS_VM.mdl, the top-level ALPHA model and the ALPHA logo</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>datatypes</dt><dd><ul>
+<li><p>Contains Matlab class definitions for the Matlab objects that compose REVS and various enumerated datatypes.  Also contains REVS_fuel_table.csv that holds the fuel properties for known fuel types</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>drive_cycles</dt><dd><ul>
+<li><p>Contains .mat files that represent various compliance or custom drive cycles in the form of class_REVS_drive_cycle objects with the name drive_cycle. The “sim_xxx.m” Matlab scripts are basically deprecated at this point and have been replaced by the use of tags in config strings within the batch process (more on that below)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>executable_tools</dt><dd><ul>
+<li><p>Contains tools for generating executable (binary) versions of the model.  Primarily used for developing the GEM comliance model</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>functions</dt><dd><ul>
+<li><p>Contains various Matlab functions used during the modeling process.   Also contains functionSignatures.json which Matlab can use to provide auto-completion assistance in the Editor</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>helper_scripts</dt><dd><ul>
+<li><p>Primarily contains scripts related to pre- and post-processing simulation runs</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>HIL_tools</dt><dd><ul>
+<li><p>Tools related to building executable ALPHA models for Hardware-in-the-Loop (HIL) testing</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>libraries</dt><dd><ul>
+<li><p>Contains the REVS Simulink component block models, separated into various libraries by component type</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>log_packages</dt><dd><ul>
+<li><p>Contains scripts that are used in conjunction with the batch modeling process in order to control the datalogging and post-processing of datalogs into a standardized data object</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>param_files</dt><dd><ul>
+<li><p>Contains data for common model components such as engines or batteries which can be used across multiple modeling projects.  In particular, the engine files are part of the NCAT “data packet” publishing process</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>plots</dt><dd><ul>
+<li><p>Can be used to store plots of common interest to REVS3 development</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>publish_tools</dt><dd><ul>
+<li><p>Contains tools related to publishing NCAT data packets, particularly for publishing engine data</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>python</dt><dd><ul>
+<li><p>Contains Python scripts related to the implementation of multi-core and/or multi-machine parallel modeling processes on a local network using Python packages.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="design-principles">
+<h2>Design Principles<a class="headerlink" href="#design-principles" title="Permalink to this headline">¶</a></h2>
+<p>This section will lay out of the some high-level design principles that guide ALPHA development.</p>
+<div class="section" id="object-oriented-design">
+<h3>Object Oriented Design<a class="headerlink" href="#object-oriented-design" title="Permalink to this headline">¶</a></h3>
+<p>REVS3 makes significant use of Matlab classes and objects in order to provide a well-defined, maintainable and re-usable set of data structures and model functionality.  Class defintions start with <a href="#id1"><span class="problematic" id="id2">class_</span></a> and enumerated types start with <a href="#id3"><span class="problematic" id="id4">enum_</span></a>.  With a few exceptions, most of the classes start with class_REVS so that Matlab auto-completion provides a useful list of the available classes.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">ALPHA Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, EPA.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/introduction.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
