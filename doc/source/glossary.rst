@@ -18,4 +18,6 @@ Stock                                                             On-road fleet 
 Count                                                             Population                           The number of vehicles registered at a given time
 Compliance Fleet                                                                                       The fleet of modeled vehicles with MY>Initial Year 
 Age                                                                                                    Calendar year minus model year (age 0 = MY 2020 vehicles in CY 2020)
+Powertrain Efficiency                                                                                  Ratio of usefull work to total fuel energy
+Effectiveness                                                                                          Incremental percentage reduction in CO2 emissions between two packages
 ===================== ===================== ===================== ==================================== ==================================================================================================================
