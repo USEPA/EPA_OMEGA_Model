@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>6. ALPHA Development &#8212; ALPHA Documentation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="7. Contact Information" href="contact_information.html" />
+    <link rel="prev" title="5. Model Outputs" href="model_outputs.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="contact_information.html" title="7. Contact Information"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="model_outputs.html" title="5. Model Outputs"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="alpha-development">
+<h1>6. ALPHA Development<a class="headerlink" href="#alpha-development" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="conventions-and-guidelines">
+<h2>6.1. Conventions and Guidelines<a class="headerlink" href="#conventions-and-guidelines" title="Permalink to this headline">¶</a></h2>
+<p>There are a few guidelines that cover the use of variable names within the modeling environment and other conventions.  Understanding and following the guidelines facilitates collaboration, ease of use and understanding of the modeling environment.</p>
+<ul class="simple">
+<li><p>Class definitions start with class_</p></li>
+<li><p>Enumerated datatype definitions start with enum_</p></li>
+<li><p>Physical unit conversions should be accomplished using the convert class.  For example engine_max_torque_ftlbs = engine_max_torque_Nm * convert.Nm2ftlbs.  Hard-coded conversion constants are to be avoided</p></li>
+<li><p>Any variable that has corresponding units should take the form variable_units, such as vehicle_speed_kmh or shaft_torque_Nm.  SI units are preferred whenever possible unless superseded by convention (such as roadload ABCs).  Units commonly use lowercase ‘p’ for ‘per’.  For example mps = meters per second, radps = radians per second.  Readability outweighs consistency if convention and context allows, for example vehicle_speed_mph is understood to be vehicle speed in miles per hour, not meters per hour</p></li>
+<li><p>If English units are used by a class then that class should also provide SI equivalents.  REVS provides some frameworks for and examples of automatic unit conversions that may be used</p></li>
+<li><p>Variable names should be concise but abbreviations or acronyms are generally to be avoided unless superseded by convention.  For example datalog.transmission.gearbox, not dl.trns.gbx.  Exceptions are bus signal names and the port names on Simulink blocks (long names reduce readability rather than enhancing it) – for example torque may be trq and speed may be spd. Simulink block names may also receive abbreviated names if it enhances readability</p></li>
+<li><p>The use of underscores is preferred for workspace and data structure variable names, for example selected_gear_num.  Camelcase is preferred for variables defined in Simulink masks and local block workspaces so that they may be distinguished from ordinary workspace variables</p></li>
+<li><p>Most functions that are specific to the REVS modeling platform start with REVS_</p></li>
+<li><p>The use of ‘goto’ and ‘from’ flags is to be avoided in Simulink blocks, they significantly decrease the readability and understanding of block connections.  Exceptions to this rule are the REVS_VM top-level system_bus component sub-buses, the global_stop_flag and the REVS_audit_phase_flag which must be made available throughout the model</p></li>
+<li><p>Trivial Simulink blocks (such as multiplication, addition, etc) may have their block names hidden to enhance readability, non-trivial blocks should have names which concisely and accurately describe their function</p></li>
+<li><p>Simulink blocks should have a white background and a black foreground.  Exceptions are red foreground for blocks to be deprecated or orange foreground for blocks that may be unproven or experimental</p></li>
+<li><p>Useful Simulink blocks should be added to the appropriate REVS_Common model library if it is likely they are to be reused</p></li>
+<li><p>Simulink block names are lowercase unless superseded by convention and words are separated by spaces (as opposed to underscores)</p></li>
+<li><p>Simulink blocks that take in the system bus should have system_bus as input port 1</p></li>
+<li><p>Simulink blocks that produce a signal bus should have bus_out as output port 1</p></li>
+</ul>
+</div>
+<div class="section" id="customizing-the-batch-process">
+<h2>6.2. Customizing the Batch Process<a class="headerlink" href="#customizing-the-batch-process" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="custom-pre-and-post-processing">
+<h3>6.2.1. Custom Pre- and Post-Processing<a class="headerlink" href="#custom-pre-and-post-processing" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="creating-and-using-config-string-tags">
+<h3>6.2.2. Creating and Using Config String Tags<a class="headerlink" href="#creating-and-using-config-string-tags" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="custom-output-summary-file-formats">
+<h3>6.2.3. Custom Output Summary File Formats<a class="headerlink" href="#custom-output-summary-file-formats" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="revs-vm">
+<h2>6.3. REVS_VM<a class="headerlink" href="#revs-vm" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="overview">
+<h3>6.3.1. Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="powertrain-variants">
+<h3>6.3.2. Powertrain Variants<a class="headerlink" href="#powertrain-variants" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="understanding-the-simulink-libraries">
+<h2>6.4. Understanding the Simulink Libraries<a class="headerlink" href="#understanding-the-simulink-libraries" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="accessory-lib">
+<h3>6.4.1. accessory_lib<a class="headerlink" href="#accessory-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="ambient-lib">
+<h3>6.4.2. ambient_lib<a class="headerlink" href="#ambient-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="controls-lib">
+<h3>6.4.3. controls_lib<a class="headerlink" href="#controls-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="driver-lib">
+<h3>6.4.4. driver_lib<a class="headerlink" href="#driver-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="electric-lib">
+<h3>6.4.5. electric_lib<a class="headerlink" href="#electric-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="engine-lib">
+<h3>6.4.6. engine_lib<a class="headerlink" href="#engine-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="general-lib">
+<h3>6.4.7. general_lib<a class="headerlink" href="#general-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="hil-lib">
+<h3>6.4.8. HIL_lib<a class="headerlink" href="#hil-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="logging-lib">
+<h3>6.4.9. logging_lib<a class="headerlink" href="#logging-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="powertrain-lib">
+<h3>6.4.10. powertrain_lib<a class="headerlink" href="#powertrain-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="transmission-lib">
+<h3>6.4.11. transmission_lib<a class="headerlink" href="#transmission-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="vehicle-lib">
+<h3>6.4.12. vehicle_lib<a class="headerlink" href="#vehicle-lib" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="understanding-datalogging">
+<h2>6.5. Understanding Datalogging<a class="headerlink" href="#understanding-datalogging" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="understanding-auditing">
+<h2>6.6. Understanding Auditing<a class="headerlink" href="#understanding-auditing" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="component-development">
+<h2>6.7. Component Development<a class="headerlink" href="#component-development" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="data-structures-and-classes">
+<h2>6.8. Data Structures and Classes<a class="headerlink" href="#data-structures-and-classes" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">2. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_use_cases.html">3. Common Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_inputs.html">4. Model Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_outputs.html">5. Model Outputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">6. ALPHA Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-and-guidelines">6.1. Conventions and Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#customizing-the-batch-process">6.2. Customizing the Batch Process</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-pre-and-post-processing">6.2.1. Custom Pre- and Post-Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-and-using-config-string-tags">6.2.2. Creating and Using Config String Tags</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-output-summary-file-formats">6.2.3. Custom Output Summary File Formats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#revs-vm">6.3. REVS_VM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">6.3.1. Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#powertrain-variants">6.3.2. Powertrain Variants</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-the-simulink-libraries">6.4. Understanding the Simulink Libraries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#accessory-lib">6.4.1. accessory_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ambient-lib">6.4.2. ambient_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#controls-lib">6.4.3. controls_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#driver-lib">6.4.4. driver_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#electric-lib">6.4.5. electric_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#engine-lib">6.4.6. engine_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#general-lib">6.4.7. general_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hil-lib">6.4.8. HIL_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-lib">6.4.9. logging_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#powertrain-lib">6.4.10. powertrain_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transmission-lib">6.4.11. transmission_lib</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vehicle-lib">6.4.12. vehicle_lib</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-datalogging">6.5. Understanding Datalogging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-auditing">6.6. Understanding Auditing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#component-development">6.7. Component Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-structures-and-classes">6.8. Data Structures and Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contact_information.html">7. Contact Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="company_information.html">8. Company Information</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/alpha_development.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="contact_information.html" title="7. Contact Information"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="model_outputs.html" title="5. Model Outputs"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, EPA.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+    </div>
+  </body>
+</html>
