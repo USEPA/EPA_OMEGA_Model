@@ -3,4 +3,15 @@
   <packageImport xmi:type="uml:PackageImport" xmi:id="_znz9wMRLEembs_lAYl7NMg">
     <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
   </packageImport>
+  <packagedElement xmi:type="uml:Package" xmi:id="_d13h4MTvEembs_lAYl7NMg" name="Package2">
+    <packagedElement xmi:type="uml:Component" xmi:id="_aR2qwMT-Eembs_lAYl7NMg" name="consumer_choice_module">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_dYNs0MUAEembs_lAYl7NMg" name="consumer_out" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Component" xmi:id="_jSBqwMT-Eembs_lAYl7NMg" name="compliance_module">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_lgD9sMUAEembs_lAYl7NMg" name="compliance_in" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Interface" xmi:id="_G_RxYMT_Eembs_lAYl7NMg" name="Interface3"/>
+    <packagedElement xmi:type="uml:Usage" xmi:id="_RFGx4MT_Eembs_lAYl7NMg" client="_G_RxYMT_Eembs_lAYl7NMg" supplier="_aR2qwMT-Eembs_lAYl7NMg"/>
+    <packagedElement xmi:type="uml:Usage" xmi:id="_M60wgMUEEembs_lAYl7NMg" client="_lgD9sMUAEembs_lAYl7NMg" supplier="_d13h4MTvEembs_lAYl7NMg"/>
+  </packagedElement>
 </uml:Model>
