@@ -537,7 +537,6 @@
 </pre></div>
 </div>
 <p>The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:</p>
-<p>Sample Figures from REVS_DOR_CVM()</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50%" />
@@ -556,15 +555,15 @@
 </tr>
 </tbody>
 </table>
+<div class="figure align-default" id="id1">
+<img alt="_images/blank.jpg" src="_images/blank.jpg" />
+<p class="caption"><span class="caption-number">Fig. 2.1 </span><span class="caption-text">Sample Figures from REVS_DOR_CVM()</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
 <p>The various DORs support several optional arguments, known as varargs in Matlab.  Optional arguments are passed in after the model_data and consist of strings and/or string-value pairs.  For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REVS_DOR_CVM</span><span class="p">({},</span><span class="n">model_data</span><span class="p">,</span> <span class="s1">&#39;name of some vararg&#39;</span><span class="p">,</span> <span class="n">vararg_value_if_required</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in <a class="reference internal" href="#mylabel"><span class="std std-numref">Figure 2.1</span></a>.</p>
-<div class="figure align-default" id="id1">
-<span id="mylabel"></span><img alt="_images/table_1-1.jpg" src="_images/table_1-1.jpg" />
-<p class="caption"><span class="caption-number">Fig. 2.1 </span><span class="caption-text">List of Available DOR Varargs</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
+<p>The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in <a class="reference internal" href="#mylabel"><span class="std std-numref">Figure 2.2</span></a>.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 13%" />
@@ -622,6 +621,10 @@
 </tr>
 </tbody>
 </table>
+<div class="figure align-default" id="id2">
+<span id="mylabel"></span><img alt="_images/blank.jpg" src="_images/blank.jpg" />
+<p class="caption"><span class="caption-number">Fig. 2.2 </span><span class="caption-text">List of Available DOR Varargs</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 </div>
 </div>

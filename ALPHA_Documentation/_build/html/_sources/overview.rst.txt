@@ -565,13 +565,16 @@ As mentioned above, a model_data object is created in the output workspace and m
 
 The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:
 
-Sample Figures from REVS_DOR_CVM()
-
 +---------------------------------+---------------------------------+
 | .. image:: images/table_1-1.jpg | .. image:: images/table_1-2.jpg |
 +---------------------------------+---------------------------------+
 | .. image:: images/table_1-3.jpg | .. image:: images/table_1-4.jpg |
 +---------------------------------+---------------------------------+
+
+.. figure:: images/blank.jpg
+
+    Sample Figures from REVS_DOR_CVM()
+
 
 The various DORs support several optional arguments, known as varargs in Matlab.  Optional arguments are passed in after the model_data and consist of strings and/or string-value pairs.  For example:
 
@@ -580,12 +583,6 @@ The various DORs support several optional arguments, known as varargs in Matlab.
     REVS_DOR_CVM({},model_data, 'name of some vararg', vararg_value_if_required);
 
 The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in :numref:`Figure %s <mylabel>`.
-
-.. _mylabel:
-
-.. figure:: images/table_1-1.jpg
-
-    List of Available DOR Varargs
 
 +-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
 | Vararg Target               | Vararg Name               | Value                        | Description                                                                                                                               |
@@ -606,6 +603,12 @@ The top-level DOR calls sub-DORs that are grouped by component, for example REVS
 +-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
 | REVS\_DOR\_Accessories()    | 'accessory\_plots'        | none                         | Enables accessory plots such as alternator and battery current, voltage, etc, if provided                                                 |
 +-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+
+.. _mylabel:
+
+.. figure:: images/blank.jpg
+
+    List of Available DOR Varargs
 
 
 
