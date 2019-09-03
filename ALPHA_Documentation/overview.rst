@@ -554,7 +554,7 @@ This will create a timestamped .mat file in the sim batch output folder.  The fi
 
 The workspace is saved after all post-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time and also all of the datalogs, audits, etc.  The simulation may be run again or the outputs examined directly without the need for running the simulation.  Keep in mind that, output workspaces will always be bigger than input workspaces and also take longer to save.  The workspace may be loaded by using the load command, or double-clicking the filename in the Matlab Current Folder file browser.
 
-Post-Simulation Data Analysis
+ost-Simulation Data Analysis
 -----------------------------
 
 As mentioned above, a model_data object is created in the output workspace and may contain various model outputs.  One of the easiest ways to take a look at simulation data is to run a Data Observation Report (DOR) on the model data.  There are DORs for conventional (CVM), hybrid (HVM) and electric vehicles (EVM).  To run the default conventional vehicle model DOR, use the REVS_DOR_CVM() function:
@@ -565,18 +565,8 @@ As mentioned above, a model_data object is created in the output workspace and m
 
 The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:
 
-+----------------------------------+----------------------------------+
-| .. image:: figures/table_1-1.jpg | .. image:: figures/table_1-2.jpg |
-+----------------------------------+----------------------------------+
-| .. image:: figures/table_1-3.jpg | .. image:: figures/table_1-4.jpg |
-+----------------------------------+----------------------------------+
-
-.. figure:: images/blank.jpg
-
-    Sample Figures from REVS_DOR_CVM()
-
-
-
+.. csv-table:: Sample Figures from REVS_DOR_CVM()
+    :file: tables/sample_figures.csv
 
 The various DORs support several optional arguments, known as varargs in Matlab.  Optional arguments are passed in after the model_data and consist of strings and/or string-value pairs.  For example:
 
@@ -590,9 +580,8 @@ The top-level DOR calls sub-DORs that are grouped by component, for example REVS
 
 .. csv-table:: List of Available DOR Varargs
     :file: tables/dor.csv
-    :widths: 25,25,25,50
+    :widths: 25 25 25 70
     :header-rows: 1
-
 
 
 

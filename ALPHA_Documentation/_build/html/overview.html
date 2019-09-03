@@ -530,14 +530,15 @@
 <p>The workspace is saved after all post-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time and also all of the datalogs, audits, etc.  The simulation may be run again or the outputs examined directly without the need for running the simulation.  Keep in mind that, output workspaces will always be bigger than input workspaces and also take longer to save.  The workspace may be loaded by using the load command, or double-clicking the filename in the Matlab Current Folder file browser.</p>
 </div>
 </div>
-<div class="section" id="post-simulation-data-analysis">
-<h3>2.3.7. Post-Simulation Data Analysis<a class="headerlink" href="#post-simulation-data-analysis" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="ost-simulation-data-analysis">
+<h3>2.3.7. ost-Simulation Data Analysis<a class="headerlink" href="#ost-simulation-data-analysis" title="Permalink to this headline">¶</a></h3>
 <p>As mentioned above, a model_data object is created in the output workspace and may contain various model outputs.  One of the easiest ways to take a look at simulation data is to run a Data Observation Report (DOR) on the model data.  There are DORs for conventional (CVM), hybrid (HVM) and electric vehicles (EVM).  To run the default conventional vehicle model DOR, use the REVS_DOR_CVM() function:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REVS_DOR_CVM</span><span class="p">({},</span><span class="n">model_data</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:</p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-number">Table 2.1 </span><span class="caption-text">Sample Figures from REVS_DOR_CVM()</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
 <colgroup>
 <col style="width: 50%" />
 <col style="width: 50%" />
@@ -555,22 +556,18 @@
 </tr>
 </tbody>
 </table>
-<div class="figure align-default" id="id1">
-<img alt="_images/blank.jpg" src="_images/blank.jpg" />
-<p class="caption"><span class="caption-number">Fig. 2.1 </span><span class="caption-text">Sample Figures from REVS_DOR_CVM()</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
 <p>The various DORs support several optional arguments, known as varargs in Matlab.  Optional arguments are passed in after the model_data and consist of strings and/or string-value pairs.  For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REVS_DOR_CVM</span><span class="p">({},</span><span class="n">model_data</span><span class="p">,</span> <span class="s1">&#39;name of some vararg&#39;</span><span class="p">,</span> <span class="n">vararg_value_if_required</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in <a class="reference internal" href="#mylabel"><span class="std std-numref">Table 2.1</span></a>.</p>
+<p>The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in <a class="reference internal" href="#mylabel"><span class="std std-numref">Table 2.2</span></a>.</p>
 <span id="mylabel"></span><table class="colwidths-given docutils align-default" id="id2">
-<caption><span class="caption-number">Table 2.1 </span><span class="caption-text">List of Available DOR Varargs</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
+<caption><span class="caption-number">Table 2.2 </span><span class="caption-text">List of Available DOR Varargs</span><a class="headerlink" href="#id2" title="Permalink to this table">¶</a></caption>
 <colgroup>
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 40%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 17%" />
+<col style="width: 48%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Vararg Target</p></th>
@@ -593,17 +590,17 @@
 <tr class="row-even"><td><p>REVS_DOR_Vehicle()</p></td>
 <td><p>‘vehicle_speed_units’</p></td>
 <td><p>string</p></td>
-<td><p>Vehicle speed units will be miles per hour (by default or if ‘mph’ is provided) else units will be meters per second</p></td>
+<td><p>Vehicle speed units will be miles per hour (by default or if ?mph? is provided) else units will be meters per second</p></td>
 </tr>
 <tr class="row-odd"><td><p>REVS_DOR_Engine()</p></td>
 <td><p>‘engine’</p></td>
 <td><p>class_REVS_engine object</p></td>
-<td><p>If provided, an engine map will be plotted, showing areas of operation during the simulation, limited to the ‘time_range’, if provided</p></td>
+<td><p>If provided, an engine map will be plotted, showing areas of operation during the simulation, limited to the ?time_range?, if provided</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p>‘engine_speed_units’</p></td>
 <td><p>string</p></td>
-<td><p>Engine speed units will be RPM (by default or if ‘rpm’ is provided) else units will be radians per second</p></td>
+<td><p>Engine speed units will be RPM (by default or if ?rpm? is provided) else units will be radians per second</p></td>
 </tr>
 <tr class="row-odd"><td><p>REVS_DOR_Fuel()</p></td>
 <td><p>‘fuel_plots’</p></td>
@@ -665,7 +662,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#saving-the-output-workspace">2.3.6.3. Saving the Output Workspace</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#post-simulation-data-analysis">2.3.7. Post-Simulation Data Analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ost-simulation-data-analysis">2.3.7. ost-Simulation Data Analysis</a></li>
 </ul>
 </li>
 </ul>
