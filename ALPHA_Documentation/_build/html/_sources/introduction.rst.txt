@@ -30,7 +30,7 @@ System Requirements for Installation
 
 System Requirements
 -------------------
-ALPHA REVS3 requires Matlab/Simulink with StateFlow 2016b, but should also work with later releases after library/model up-conversions.  Also required is a compiler, for compiling the StateFlow code, see www.mathworks.com/support/compilers/R2016b/index.html
+ALPHA REVS3 requires Matlab/Simulink with StateFlow 2016b, but should also work with later releases after library/model up-conversions.  Also required is a compiler, for compiling the StateFlow code, see http://www.mathworks.com/support/compilers/R2016b/index.html
 
 Installation
 ------------
@@ -100,5 +100,10 @@ Auditing the energy flow in the model is a key factor in ensuring the plausibili
 
 Conventions and Guidelines
 --------------------------
-There are several conventions and guidelines that enhance the consistency and usability of the model, see section 6.1.1 under ALPHA Development.
+There are several conventions and guidelines that enhance the consistency and usability of the model, see :ref:`ad-crossref-1` under ALPHA Development.
+
+
+
+
+
 
