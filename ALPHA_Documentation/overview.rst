@@ -565,15 +565,17 @@ As mentioned above, a model_data object is created in the output workspace and m
 
 The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:
 
-+---------------------------------+---------------------------------+
-| .. image:: images/table_1-1.jpg | .. image:: images/table_1-2.jpg |
-+---------------------------------+---------------------------------+
-| .. image:: images/table_1-3.jpg | .. image:: images/table_1-4.jpg |
-+---------------------------------+---------------------------------+
++----------------------------------+----------------------------------+
+| .. image:: figures/table_1-1.jpg | .. image:: figures/table_1-2.jpg |
++----------------------------------+----------------------------------+
+| .. image:: figures/table_1-3.jpg | .. image:: figures/table_1-4.jpg |
++----------------------------------+----------------------------------+
 
 .. figure:: images/blank.jpg
 
     Sample Figures from REVS_DOR_CVM()
+
+
 
 
 The various DORs support several optional arguments, known as varargs in Matlab.  Optional arguments are passed in after the model_data and consist of strings and/or string-value pairs.  For example:
@@ -582,33 +584,18 @@ The various DORs support several optional arguments, known as varargs in Matlab.
 
     REVS_DOR_CVM({},model_data, 'name of some vararg', vararg_value_if_required);
 
-The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in :numref:`Figure %s <mylabel>`.
-
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-| Vararg Target               | Vararg Name               | Value                        | Description                                                                                                                               |
-+=============================+===========================+==============================+===========================================================================================================================================+
-| Common                      | 'descriptor'              | string                       | A string description of the data being presented, for example ‘ALPHA Quickstart’                                                          |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-|                             | 'time\_range'             | numeric vector               | A two-element vector representing the desired start and end time in seconds for plots and analysis. For example, [505 1375]               |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-| REVS\_DOR\_Vehicle()        | 'vehicle\_speed\_units'   | string                       | Vehicle speed units will be miles per hour (by default or if 'mph' is provided) else units will be meters per second                      |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-| REVS\_DOR\_Engine()         | 'engine'                  | class\_REVS\_engine object   | If provided, an engine map will be plotted, showing areas of operation during the simulation, limited to the 'time\_range', if provided   |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-|                             | 'engine\_speed\_units'    | string                       | Engine speed units will be RPM (by default or if 'rpm' is provided) else units will be radians per second                                 |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-| REVS\_DOR\_Fuel()           | 'fuel\_plots'             | none                         | Enables fuel plots, if provided, otherwise fuel plots are disabled                                                                        |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-| REVS\_DOR\_Transmission()   | 'analyze\_ratios'         | none                         | BROKEN                                                                                                                                    |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
-| REVS\_DOR\_Accessories()    | 'accessory\_plots'        | none                         | Enables accessory plots such as alternator and battery current, voltage, etc, if provided                                                 |
-+-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
+The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in :numref:`Table %s <mylabel>`.
 
 .. _mylabel:
 
-.. figure:: images/blank.jpg
+.. csv-table:: List of Available DOR Varargs
+    :file: tables/dor.csv
+    :widths: 25,25,25,50
+    :header-rows: 1
 
-    List of Available DOR Varargs
+
+
+
 
 
 

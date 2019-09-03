@@ -1,0 +1,9 @@
+﻿Vararg Target,Vararg Name,Value,Description
+Common,'descriptor',string,"A string description of the data being presented, for example 'ALPHA Quickstart'"
+,'time_range',numeric vector,"A two-element vector representing the desired start and end time in seconds for plots and analysis. For example, [505 1375]"
+REVS_DOR_Vehicle(),'vehicle_speed_units',string,Vehicle speed units will be miles per hour (by default or if ‘mph’ is provided) else units will be meters per second
+REVS_DOR_Engine(),'engine',class_REVS_engine object,"If provided, an engine map will be plotted, showing areas of operation during the simulation, limited to the ‘time_range’, if provided"
+,'engine_speed_units',string,Engine speed units will be RPM (by default or if ‘rpm’ is provided) else units will be radians per second
+REVS_DOR_Fuel(),'fuel_plots',none,"Enables fuel plots, if provided, otherwise fuel plots are disabled"
+REVS_DOR_Transmission(),'analyze_ratios',none,BROKEN
+REVS_DOR_Accessories(),'accessory_plots',none,"Enables accessory plots such as alternator and battery current, voltage, etc, if provided"
