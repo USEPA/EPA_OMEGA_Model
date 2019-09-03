@@ -14,7 +14,7 @@ If the command fails then you need to double check your path setup.
 
 Change the Matlab working directory to the ALPHA DEMO folder and run run_ALPHA_quickstart.  The REVS_VM model will open up (so we can watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, \YYYY_MM_DD_hh_mm_ss_, following by sim_results.csv and sim_1_console.txt.  For example, 2019_02_01_09_36_23_sim_results.csv and 2019_02_01_09_36_23_sim_1_console.txt, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The sim_results file contains a summary of the simulation inputs, settings and outputs.  The console.txt file captures anything that would have been output to the Matlab console window.  In this case it contains the SAE J2951 Drive Quality Metrics by default.
 
-If you open run_ALPHA_quickstart in the Matlab editor you’ll see it only takes a handful of Matlab commands to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed below.
+If you open run_ALPHA_quickstart in the Matlab editor you will see it only takes a handful of Matlab commands to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed below.
 
 Understanding the Modeling Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -36,10 +36,10 @@ The fundamental modeling process consists of creating a Matlab workspace that co
     * Automatically provides standardized output summary results
     * Provides a framework for pre- and post-processing simulations
     * Allows convenient capability to sweep variables and define multiple simulation scenarios
-    * Provides a framework for running “performance neutral” simulations
+    * Provides a framework for running "performance neutral" simulations
     * Provides capability to run simulations in parallel, on one or multiple computers, and automatically collate the results into a single output summary file
     * Provides a framework for controlling simulation datalogging and auditing
-    * Provides a framework for controlling the amount (“verbosity”) of output summary data
+    * Provides a framework for controlling the amount ("verbosity") of output summary data
     * Provides a framework for saving Matlab workspaces at various points in the modeling process
     * It is easy and convenient to define and reuse sim batches across multiple projects
 
@@ -54,7 +54,7 @@ A class_REVS_sim_batch object actually contains a vector of class_REVS_sim_case 
 
 Understanding the ALPHA quickstart script
 -----------------------------------------
-The run_ALPHA_quickstart M-script demonstrates the simplest possible batch process - a single simulation run with the default settings, only the minimum required input files and minimal outputs.  Let’s take a closer look.
+The run_ALPHA_quickstart M-script demonstrates the simplest possible batch process - a single simulation run with the default settings, only the minimum required input files and minimal outputs.  Let's take a closer look.
 
     run_ALPHA_quickstart.m:
 
@@ -74,7 +74,7 @@ The run_ALPHA_quickstart M-script demonstrates the simplest possible batch proce
 ['VEH:vehicle_2020_MPW_LRL + ENG:engine_2013_Chevrolet_Ecotec_LCV_2L5_Reg_E10 + TRANS:TRX11_FWD + ELEC:electric_EPS + CYC:EPA_UDDS + CON:MPW_LRL_CVM_controls_param']
 };
 
-    * The sim_batch.config_set defines the set of the simulations to be run by creating a cell array of one or more config strings.  Within the config string are the tags VEH:, ENG:, TRANS:, ELEC:, CYC: and CON:.  Following each tag is the name of a file that contains simulation inputs.  The VEH: tag loads the vehicle information such as roadload, test weight, etc.  The ENG: tag loads the engine information, in this case the engine is actually loaded from REVS_Common since it’s one of the data packet engines, the other param files are loaded from the local param file directory.  The TRANS: tag loads the transmission parameters, in this case for a 6-speed automatic.  The ELEC: tag loads parameters that define the electrical system and accessories for this vehicle.  The CYC: tag tells the simulation which drive cycle to run, in this case an EPA UDDS drive cycle.  Lastly, the CON: tag tells the simulation which controls settings to use.  In this case, the controls settings show that start-stop is disabled for this run.  The CVM in MPW_LRL_CVM_controls_param stands for Conventional Vehicle Model.  Other abbreviations that you may encounter are EVM for Electric Vehicle Model and HVM for Hybrid Vehicle Model.  Electric vehicles and hybrid vehicles have their own control parameters.
+    * The sim_batch.config_set defines the set of the simulations to be run by creating a cell array of one or more config strings.  Within the config string are the tags VEH:, ENG:, TRANS:, ELEC:, CYC: and CON:.  Following each tag is the name of a file that contains simulation inputs.  The VEH: tag loads the vehicle information such as roadload, test weight, etc.  The ENG: tag loads the engine information, in this case the engine is actually loaded from REVS_Common since it is one of the data packet engines, the other param files are loaded from the local param file directory.  The TRANS: tag loads the transmission parameters, in this case for a 6-speed automatic.  The ELEC: tag loads parameters that define the electrical system and accessories for this vehicle.  The CYC: tag tells the simulation which drive cycle to run, in this case an EPA UDDS drive cycle.  Lastly, the CON: tag tells the simulation which controls settings to use.  In this case, the controls settings show that start-stop is disabled for this run.  The CVM in MPW_LRL_CVM_controls_param stands for Conventional Vehicle Model.  Other abbreviations that you may encounter are EVM for Electric Vehicle Model and HVM for Hybrid Vehicle Model.  Electric vehicles and hybrid vehicles have their own control parameters.
 
 5.	open REVS_VM;   % optional, but allows observation of the model while running
 
@@ -88,7 +88,7 @@ Understanding Simulation Pre- and Post-Processing
 -------------------------------------------------
 The goal of simulation pre-processing is to set up the simulation workspace before simulation, including any modifications to data loaded from the specified param files.  For example, we may load a particular vehicle param file and then want to change the test weight or roadload in some manner and then run the simulation, perhaps as part of a sweep of test weight values.  Any arbitrary M-script can be run in order to prepare the simulation workspace.
 
-The REVS_VM model itself performs some post-processing to create simulation results (phase integrated results, for example), datalogs, and to perform any auditing that may be desired.  These tasks are handled by creating result, datalog and audit objects in the workspace from class_REVS_result, class_REVS_datalog and class_REVS_audit classes respectively.  These objects are created in the model’s StopFcn callback which can be seen in the model’s Model Properties dialog box.
+The REVS_VM model itself performs some post-processing to create simulation results (phase integrated results, for example), datalogs, and to perform any auditing that may be desired.  These tasks are handled by creating result, datalog and audit objects in the workspace from class_REVS_result, class_REVS_datalog and class_REVS_audit classes respectively.  These objects are created in the model's StopFcn callback which can be seen in the model's Model Properties dialog box.
 
 Simulation post-processing may be used to take the raw simulation outputs and calculate fuel economy or GHG emissions.  The default simulation post-processing is generally used, but any M-script may be run if desired.
 
@@ -288,7 +288,7 @@ Output Summary File Keys
 
 The has_value() method is also used to cull unnecessary tags from the config string that appears in the output summary file Key column.  Culling empty or default value tags from the Key column makes the strings easier to read and understand but still specifies the correct simulation parameters.
 
-Keys from the output file can be used directly in new config sets by cutting and pasting them into user batch file config sets.  In this way, an end-user of the simulation results can select runs to examine further or may even create new config strings to be run.  Because the output summary file is a .csv file, commas in the Key column are replaced with # symbols to prevent incorrect column breaks.  Even though the # symbol is not a valid Matlab operator, these strings can still be used directly in new config sets – the batch process converts #’s to commas before parsing the strings.
+Keys from the output file can be used directly in new config sets by cutting and pasting them into user batch file config sets.  In this way, an end-user of the simulation results can select runs to examine further or may even create new config strings to be run.  Because the output summary file is a .csv file, commas in the Key column are replaced with # symbols to prevent incorrect column breaks.  Even though the # symbol is not a valid Matlab operator, these strings can still be used directly in new config sets – the batch process converts #'s to commas before parsing the strings.
 
 Controlling Datalogging and Auditing
 ------------------------------------
@@ -512,7 +512,7 @@ The simplest approach, for a relatively small number of simulations, is to retai
 
     sim_batch.retain_output_workspace = true;
 
-The workspace will be contained in the sim batch sim_case property which holds one or more class_REVS_sim_batch objects.  To pull the workspace into the top-level workspace, use the sim case’s extract_workspace() method:
+The workspace will be contained in the sim batch sim_case property which holds one or more class_REVS_sim_batch objects.  To pull the workspace into the top-level workspace, use the sim case's extract_workspace() method:
 
 ::
 
@@ -579,11 +579,13 @@ The various DORs support several optional arguments, known as varargs in Matlab.
 
     REVS_DOR_CVM({},model_data, 'name of some vararg', vararg_value_if_required);
 
-The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in Table 2.
+The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in :numref:`Figure %s <mylabel>`.
 
-The top-level DOR calls sub-DORs that are grouped by component, for example REVS_DOR_CVM() calls REVS_DOR_vehicle(), REVS_DOR_engine(), etc.  Each component DOR may have its own unique varargs in addition to supporting some common varargs.  Varargs passed to the top-level DOR are automatically passed to the component DORs.  Available varargs are listed in the table below.
+.. _mylabel:
 
-List of Available DOR Varargs
+.. figure:: images/table_1-1.jpg
+
+    List of Available DOR Varargs
 
 +-----------------------------+---------------------------+------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+
 | Vararg Target               | Vararg Name               | Value                        | Description                                                                                                                               |
