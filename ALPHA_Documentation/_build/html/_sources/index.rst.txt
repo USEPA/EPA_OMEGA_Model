@@ -19,6 +19,7 @@ EPA ALPHA Model Documentation
     alpha_development
     contact_information
     company_information
+    documentation_style_guide
 
 Indices and Tables
 ==================

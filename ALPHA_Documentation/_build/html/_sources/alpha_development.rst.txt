@@ -6,7 +6,6 @@ ALPHA Development
 
 Conventions and Guidelines
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 There are a few guidelines that cover the use of variable names within the modeling environment and other conventions.  Understanding and following the guidelines facilitates collaboration, ease of use and understanding of the modeling environment.
 
 * Class definitions start with \class_
