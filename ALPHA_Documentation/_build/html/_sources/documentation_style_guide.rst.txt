@@ -109,7 +109,7 @@ The simplest way to insert a table is to create the table in Excel and save it a
 
 A width is required for each column or remove the line for auto format.  Number of header rows is optional and provides column labels if needed.
 
-If the optional marker (mylabel) is included, the table can be cross referenced using the following syntax (the marker must be preceded by an underscore as shown above):
+If the optional user defined marker ("mylabel" in this case) is included, the table can be cross referenced using the following syntax (the marker must be preceded by an underscore as shown above):
 
 ::
 
