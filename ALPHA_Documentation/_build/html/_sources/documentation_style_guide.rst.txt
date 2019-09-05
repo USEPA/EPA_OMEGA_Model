@@ -37,7 +37,7 @@ The section numbers in the document are created automatically by Sphinx provided
         Name for Sub Level 3
         ++++++++++++++++++++
 
-Here are some typical chapter and other required entries into the index.rst file (Do not include the comments on the right side of the example):
+Here is a typical index.rst file including chapter and other required entries (Do not include the comments on the right side of the example):
 
 ::
 
@@ -107,7 +107,7 @@ The simplest way to insert a table is to create the table in Excel and save it a
     :widths: 25 25 25 70
     :header-rows: 1
 
-A width is required for each column or remove the line for auto format.  Number of header rows is optional and provides column labels if needed.
+A width value is required for each column or remove the line for auto format.  Number of header rows is optional and provides column labels if needed.
 
 If the optional user defined marker ("mylabel" in this case) is included, the table can be cross referenced using the following syntax (the marker must be preceded by an underscore as shown above):
 

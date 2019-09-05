@@ -1,8 +1,3 @@
-.. ALPHA Documentation documentation master file, created by
-   sphinx-quickstart on Tue Aug 20 08:03:24 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 EPA ALPHA Model Documentation
 =============================
 
@@ -20,6 +15,16 @@ EPA ALPHA Model Documentation
     contact_information
     company_information
     documentation_style_guide
+    code
+
+
+
+Indices and Tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
 
 
 

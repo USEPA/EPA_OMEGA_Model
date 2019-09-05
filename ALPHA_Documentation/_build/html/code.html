@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>10. Documentation From Code &#8212; ALPHA Documentation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="9. Documentation Style Guide" href="documentation_style_guide.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="documentation_style_guide.html" title="9. Documentation Style Guide"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-TK_Example">
+<span id="documentation-from-code"></span><h1>10. Documentation From Code<a class="headerlink" href="#module-TK_Example" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tk-example">
+<h2>10.1. TK_Example<a class="headerlink" href="#tk-example" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="TK_Example.function_with_types_in_docstring">
+<code class="sig-prename descclassname">TK_Example.</code><code class="sig-name descname">function_with_types_in_docstring</code><span class="sig-paren">(</span><em class="sig-param">param1</em>, <em class="sig-param">param2</em><span class="sig-paren">)</span><a class="headerlink" href="#TK_Example.function_with_types_in_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Document a function using a docstring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> (<em>int</em>) – The first input.</p></li>
+<li><p><strong>param2</strong> (<em>str</em>) – The second input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>param3</strong> (<em>str</em>) – The first output.</p></li>
+<li><p><strong>param4</strong> (<em>str</em>) – The second output.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="TK_Example.function_with_types_in_docstring1">
+<code class="sig-prename descclassname">TK_Example.</code><code class="sig-name descname">function_with_types_in_docstring1</code><span class="sig-paren">(</span><em class="sig-param">param1</em>, <em class="sig-param">param2</em><span class="sig-paren">)</span><a class="headerlink" href="#TK_Example.function_with_types_in_docstring1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Document a function using a docstring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> (<em>int</em>) – The first input.</p></li>
+<li><p><strong>param2</strong> (<em>str</em>) – The second input.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>param3</strong> (<em>str</em>) – The first output.</p></li>
+<li><p><strong>param4</strong> (<em>str</em>) – The second output.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<span class="target" id="module-code1"></span><p>Example NumPy style docstrings.</p>
+<p>This module demonstrates documentation as specified by the <a class="reference external" href="https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt">NumPy
+Documentation HOWTO</a>. Docstrings may extend over multiple lines. Sections
+are created with a section header followed by an underline of equal length.</p>
+<p class="rubric">Example</p>
+<p>Examples can be given using either the <code class="docutils literal notranslate"><span class="pre">Example</span></code> or <code class="docutils literal notranslate"><span class="pre">Examples</span></code>
+sections. Sections support any reStructuredText formatting, including
+literal blocks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python example_numpy.py
+</pre></div>
+</div>
+<p>Section breaks are created with two blank lines. Section breaks are also
+implicitly created anytime a new section starts. Section bodies <em>may</em> be
+indented:</p>
+<p class="rubric">Notes</p>
+<p>This is an example of an indented section. It’s like any other section,
+but the body is indented to help it stand out from surrounding text.</p>
+<p>If a section is indented, then a section break is created by
+resuming unindented text.</p>
+<dl class="attribute">
+<dt id="code1.module_level_variable1">
+<code class="sig-prename descclassname">code1.</code><code class="sig-name descname">module_level_variable1</code><a class="headerlink" href="#code1.module_level_variable1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module level variables may be documented in either the <code class="docutils literal notranslate"><span class="pre">Attributes</span></code>
+section of the module docstring, or in an inline docstring immediately
+following the variable.</p>
+<p>Either form is acceptable, but the two should not be mixed. Choose
+one convention to document module level variables and be consistent
+with it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="code1.ExampleClass">
+<em class="property">class </em><code class="sig-prename descclassname">code1.</code><code class="sig-name descname">ExampleClass</code><span class="sig-paren">(</span><em class="sig-param">param1</em>, <em class="sig-param">param2</em>, <em class="sig-param">param3</em><span class="sig-paren">)</span><a class="headerlink" href="#code1.ExampleClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>The summary line for a class docstring should fit on one line.</p>
+<p>If the class has public attributes, they may be documented here
+in an <code class="docutils literal notranslate"><span class="pre">Attributes</span></code> section and follow the same formatting as a
+function’s <code class="docutils literal notranslate"><span class="pre">Args</span></code> section. Alternatively, attributes may be documented
+inline with the attribute’s declaration (see __init__ method below).</p>
+<p>Properties created with the <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> decorator should be documented
+in the property’s getter method.</p>
+<dl class="attribute">
+<dt id="code1.ExampleClass.attr1">
+<code class="sig-name descname">attr1</code><a class="headerlink" href="#code1.ExampleClass.attr1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of <cite>attr1</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="code1.ExampleClass.attr2">
+<code class="sig-name descname">attr2</code><a class="headerlink" href="#code1.ExampleClass.attr2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description of <cite>attr2</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="code1.ExampleClass.attr3">
+<code class="sig-name descname">attr3</code><em class="property"> = None</em><a class="headerlink" href="#code1.ExampleClass.attr3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Doc comment <em>inline</em> with attribute</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="code1.ExampleClass.attr4">
+<code class="sig-name descname">attr4</code><em class="property"> = None</em><a class="headerlink" href="#code1.ExampleClass.attr4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Doc comment <em>before</em> attribute, with type specified</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="code1.ExampleClass.attr5">
+<code class="sig-name descname">attr5</code><em class="property"> = None</em><a class="headerlink" href="#code1.ExampleClass.attr5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Docstring <em>after</em> attribute, with type specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="code1.ExampleClass.example_method">
+<code class="sig-name descname">example_method</code><span class="sig-paren">(</span><em class="sig-param">param1</em>, <em class="sig-param">param2</em><span class="sig-paren">)</span><a class="headerlink" href="#code1.ExampleClass.example_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class methods are similar to regular functions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do not include the <cite>self</cite> parameter in the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> – The first parameter.</p></li>
+<li><p><strong>param2</strong> – The second parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if successful, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="code1.ExampleClass.readonly_property">
+<em class="property">property </em><code class="sig-name descname">readonly_property</code><a class="headerlink" href="#code1.ExampleClass.readonly_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Properties should be documented in their getter method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="code1.ExampleClass.readwrite_property">
+<em class="property">property </em><code class="sig-name descname">readwrite_property</code><a class="headerlink" href="#code1.ExampleClass.readwrite_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Properties with both a getter and setter
+should only be documented in their getter method.</p>
+<p>If the setter method contains notable behavior, it should be
+mentioned here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="code1.ExampleError">
+<em class="property">exception </em><code class="sig-prename descclassname">code1.</code><code class="sig-name descname">ExampleError</code><span class="sig-paren">(</span><em class="sig-param">msg</em>, <em class="sig-param">code</em><span class="sig-paren">)</span><a class="headerlink" href="#code1.ExampleError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions are documented in the same way as classes.</p>
+<p>The __init__ method may be documented in either the class level
+docstring, or as a docstring on the __init__ method itself.</p>
+<p>Either form is acceptable, but the two should not be mixed. Choose one
+convention to document the __init__ method and be consistent with it.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do not include the <cite>self</cite> parameter in the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<em>str</em>) – Human readable string describing the exception.</p></li>
+<li><p><strong>code</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, optional) – Numeric error code.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="code1.ExampleError.msg">
+<code class="sig-name descname">msg</code><a class="headerlink" href="#code1.ExampleError.msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human readable string describing the exception.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="code1.ExampleError.code">
+<code class="sig-name descname">code</code><a class="headerlink" href="#code1.ExampleError.code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numeric error code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="code1.example_generator">
+<code class="sig-prename descclassname">code1.</code><code class="sig-name descname">example_generator</code><span class="sig-paren">(</span><em class="sig-param">n</em><span class="sig-paren">)</span><a class="headerlink" href="#code1.example_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generators have a <code class="docutils literal notranslate"><span class="pre">Yields</span></code> section instead of a <code class="docutils literal notranslate"><span class="pre">Returns</span></code> section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – The upper limit of the range to generate, from 0 to <cite>n</cite> - 1.</p>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><p><em>int</em> – The next number in the range of 0 to <cite>n</cite> - 1.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Examples should be written in doctest format, and should illustrate how
+to use the function.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">example_generator</span><span class="p">(</span><span class="mi">4</span><span class="p">)])</span>
+<span class="go">[0, 1, 2, 3]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="code1.function_with_pep484_type_annotations">
+<code class="sig-prename descclassname">code1.</code><code class="sig-name descname">function_with_pep484_type_annotations</code><span class="sig-paren">(</span><em class="sig-param">param1: int</em>, <em class="sig-param">param2: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#code1.function_with_pep484_type_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example function with PEP 484 type annotations.</p>
+<p>The return type must be duplicated in the docstring to comply
+with the NumPy docstring style.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> – The first parameter.</p></li>
+<li><p><strong>param2</strong> – The second parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if successful, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="code1.function_with_types_in_docstring">
+<code class="sig-prename descclassname">code1.</code><code class="sig-name descname">function_with_types_in_docstring</code><span class="sig-paren">(</span><em class="sig-param">param1</em>, <em class="sig-param">param2</em><span class="sig-paren">)</span><a class="headerlink" href="#code1.function_with_types_in_docstring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Example function with types documented in the docstring.</p>
+<p><a href="#id1"><span class="problematic" id="id2">`PEP 484`_</span></a> type annotations are supported. If attribute, parameter, and
+return types are annotated according to <a href="#id3"><span class="problematic" id="id4">`PEP 484`_</span></a>, they do not need to be
+included in the docstring:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> (<em>int</em>) – The first parameter.</p></li>
+<li><p><strong>param2</strong> (<em>str</em>) – The second parameter.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>bool</em> – True if successful, False otherwise.</p></li>
+<li><p><em>.. _PEP 484</em> – <a class="reference external" href="https://www.python.org/dev/peps/pep-0484/">https://www.python.org/dev/peps/pep-0484/</a></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="code1.module_level_function">
+<code class="sig-prename descclassname">code1.</code><code class="sig-name descname">module_level_function</code><span class="sig-paren">(</span><em class="sig-param">param1</em>, <em class="sig-param">param2=None</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#code1.module_level_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an example of a module level function.</p>
+<p>Function parameters should be documented in the <code class="docutils literal notranslate"><span class="pre">Parameters</span></code> section.
+The name of each parameter is required. The type and description of each
+parameter is optional, but should be included if not obvious.</p>
+<p>If *args or **kwargs are accepted,
+they should be listed as <code class="docutils literal notranslate"><span class="pre">*args</span></code> and <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>.</p>
+<p>The format for a parameter is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span> <span class="p">:</span> <span class="nb">type</span>
+    <span class="n">description</span>
+
+    <span class="n">The</span> <span class="n">description</span> <span class="n">may</span> <span class="n">span</span> <span class="n">multiple</span> <span class="n">lines</span><span class="o">.</span> <span class="n">Following</span> <span class="n">lines</span>
+    <span class="n">should</span> <span class="n">be</span> <span class="n">indented</span> <span class="n">to</span> <span class="n">match</span> <span class="n">the</span> <span class="n">first</span> <span class="n">line</span> <span class="n">of</span> <span class="n">the</span> <span class="n">description</span><span class="o">.</span>
+    <span class="n">The</span> <span class="s2">&quot;: type&quot;</span> <span class="ow">is</span> <span class="n">optional</span><span class="o">.</span>
+
+    <span class="n">Multiple</span> <span class="n">paragraphs</span> <span class="n">are</span> <span class="n">supported</span> <span class="ow">in</span> <span class="n">parameter</span>
+    <span class="n">descriptions</span><span class="o">.</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> (<em>int</em>) – The first parameter.</p></li>
+<li><p><strong>param2</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, optional) – The second parameter.</p></li>
+<li><p><strong>*args</strong> – Variable length argument list.</p></li>
+<li><p><strong>**kwargs</strong> – Arbitrary keyword arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>True if successful, False otherwise.</p>
+<p>The return type is not optional. The <code class="docutils literal notranslate"><span class="pre">Returns</span></code> section may span
+multiple lines and paragraphs. Following lines should be indented to
+match the first line of the description.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Returns</span></code> section supports any reStructuredText formatting,
+including literal blocks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;param1&#39;</span><span class="p">:</span> <span class="n">param1</span><span class="p">,</span>
+    <span class="s1">&#39;param2&#39;</span><span class="p">:</span> <span class="n">param2</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AttributeError</strong> – The <code class="docutils literal notranslate"><span class="pre">Raises</span></code> section is a list of all exceptions
+    that are relevant to the interface.</p></li>
+<li><p><strong>ValueError</strong> – If <cite>param2</cite> is equal to <cite>param1</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="data">
+<dt id="code1.module_level_variable2">
+<code class="sig-prename descclassname">code1.</code><code class="sig-name descname">module_level_variable2</code><em class="property"> = 98765</em><a class="headerlink" href="#code1.module_level_variable2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module level variable documented inline.</p>
+<p>The docstring may span multiple lines. The type may optionally be specified
+on the first line, separated by a colon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">2. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="common_use_cases.html">3. Common Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_inputs.html">4. Model Inputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_outputs.html">5. Model Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="alpha_development.html">6. ALPHA Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact_information.html">7. Contact Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="company_information.html">8. Company Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation_style_guide.html">9. Documentation Style Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">10. Documentation From Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#tk-example">10.1. TK_Example</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/code.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="documentation_style_guide.html" title="9. Documentation Style Guide"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">ALPHA Documentation 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, EPA.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.0.
+    </div>
+  </body>
+</html>
