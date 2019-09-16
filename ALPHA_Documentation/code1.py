@@ -19,7 +19,7 @@ implicitly created anytime a new section starts. Section bodies *may* be
 indented:
 
 Notes
------
+=====
     This is an example of an indented section. It's like any other section,
     but the body is indented to help it stand out from surrounding text.
 
@@ -28,7 +28,7 @@ resuming unindented text.
 
 Attributes
 ----------
-module_level_variable1 : int
+module_level_variable1 : str
     Module level variables may be documented in either the ``Attributes``
     section of the module docstring, or in an inline docstring immediately
     following the variable.
