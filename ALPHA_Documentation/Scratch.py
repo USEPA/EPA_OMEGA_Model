@@ -21,3 +21,47 @@ btn = tkinter.Button(window, text="Click Me", command=clicked)
 btn.grid(column=1, row=0)
 
 window.mainloop()
+
+def function_with_types_in_docstring(param1, param2):
+    """
+    Document the function here.
+
+    Parameters
+    ----------
+    param1 : int
+        The first input.
+    param2 : str
+        The second input.
+
+    Returns
+    -------
+    param3 : str
+        The first output.
+    param4 : str
+        The second output.
+    """
+
+
+def function_with_types_in_docstring1(param1, param2):
+    """
+    Document the function here.
+    The quick brown fox jumped over the lazy dog.
+
+    Parameters
+    ----------
+    param1 : int
+        The first input.
+    param2 : str
+        The second input.
+
+    Returns
+    -------
+    param3 : str
+        The first output.
+    param4 : str
+        The second output.
+    """
+
+    """ Example NumPy style docstrings."""
+"""TK_Example
+   ----------"""
