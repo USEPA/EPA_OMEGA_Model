@@ -1,6 +1,6 @@
-Subpart B—Confidentiality of
+Subpart B-Confidentiality of
 Business Information
-§ 2.201 Definitions.
+2.201 Definitions.
 For the purposes of this subpart:
 (a) Person means an individual, partnership, corporation, association, or
 other public or private organization or
