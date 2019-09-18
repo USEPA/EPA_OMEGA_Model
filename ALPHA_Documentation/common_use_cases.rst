@@ -11,7 +11,7 @@ There are several possible approaches to running a set of performance neutral si
 2.	Run a set of alternative simulations, sweeping the engine size (or potentially other parameters) across a range
 3.	Examine the simulation results and pick out the runs that meet the baseline performance
 
-The performance baseline is defined using the PB: (Performance Baseline) tag and must be defined prior to performance neutral simulations which use the PN: (Performance-Neutral) tag.  For example:
+The performance baseline is defined using the ``PB:`` (Performance Baseline) tag and must be defined prior to performance neutral simulations which use the ``PN:`` (Performance Neutral) tag.  For example:
 
 ::
 
@@ -22,17 +22,17 @@ The performance baseline is defined using the PB: (Performance Baseline) tag and
 
 The above example is abbreviated but demonstrates several points.
 
-* The use of the PKG: tag to define a quick reference name for each case – BL for the baseline and TDS for the turbo-downsized case
+* The use of the ``PKG:`` tag to define a quick reference name for each case - ``BL`` for the baseline and ``TDS`` for the turbo-downsized case
 * The baseline is defined prior to the performance neutral case
-* The performance neutral case sweeps engine size using the ES_PCT: tag, although it is possible to use other tags
-* The ES_PCT: tag is on the right hand side of the ‘||’ separator
-* The engine names are stored as strings in two workspace variables, GDI_ENGINE and TDS12_ENGINE which keep the config set concise and improve readability
+* The performance neutral case sweeps engine size using the ``ES_PCT:`` tag, although it is possible to use other tags
+* The ``ES_PCT:`` tag is on the right hand side of the ``'||'`` separator
+* The engine names are stored as strings in two workspace variables, ``GDI_ENGINE`` and ``TDS12_ENGINE`` which keeps the config set concise and improves readability
 
-The ES in the ES_PCT: tag refers to Engine Scaling, in this case by  percent.  The unique thing about this tag is that ES_PCT:100 would be relative to an engine scaled approximately for performance neutrality, rather than an absolute scale.  The REVS_preprocess_sim_case script takes an initial guess at performance neutral engine sizing based on the engine’s rated power and torque and the transmission and axle ratios and tire size, roadload improvements, etc.  However, the approximation can’t compensate for differences in transmission efficiency or other factors that might affect vehicle performance like torque converter strategy or transmission shift times, hence the need to run a set of simulations, typically both smaller and larger than the nominal sizing.
+The ``ES`` in the ``ES_PCT:`` tag refers to Engine Scaling, in this case by  percent.  The unique thing about this tag is that ES_PCT:100 would be relative to an engine scaled approximately for performance neutrality, rather than an absolute scale.  The ``REVS_preprocess_sim_case`` script takes an initial guess at performance neutral engine sizing based on the engine's rated power and torque, the transmission and axle ratios, tire size, and roadload improvements, etc.  However, the approximation can't compensate for differences in transmission efficiency or other factors that might affect vehicle performance like torque converter strategy or transmission shift times, hence the need to run a set of simulations, typically both smaller and larger than the nominal sizing.
 
 Multiple baselines may be defined in a single batch, keeping in mind that each baseline precedes its performance neutral cases.
 
-REVS_postprocess_sim_batch, the default sim batch post-processing script, implements one possible method for picking out the “winning” performance neutral result from among a set of simulations.  It finds the unique simulation cases and picks the case that meets or exceeds the baseline performance and has the lowest CO2 result.  Other strategies could be implemented as well, such as picking the smallest engine that meets performance, regardless of CO2.
+``REVS_postprocess_sim_batch``, the default sim batch post-processing script, implements one possible method for picking out the "winning" performance neutral result from among a set of simulations.  The script finds the unique simulation cases and picks the case that meets or exceeds the baseline performance and has the lowest CO2 result.  Other strategies could be implemented as well, such as picking the smallest engine that meets performance, regardless of CO2.
 
 The default performance criteria is the total performance time, defined as the sum of zero-to-sixty time, thirty-to-fifty time, fifty-to-seventy time and quarter mile time.
 
@@ -79,7 +79,7 @@ The typical method of running several engines is simply to define the engine nam
     ...
     };
 
-In this abbreviated example, base_config refers to a workspace variable that holds a string of the config tags that all the cases have in common, for example roadload settings, drive cycle selection, fuel type, etc.  Grouping the common settings into a single variable makes it easier to change the setup and improves readability.  Matlab string concatenation does the rest (the use of brackets, [ ], tells Matlab to combine all the separate strings into one).   Another advantage of using workspace variables to hold engine definition strings is illustrated in the TNGA_ENGINE workspace variable – it not only defines the engine but also uses the ES_CYL: tag to  tell the simulation to run it as a six-cylinder regardless of any engine resizing that may take place, such as during performance neutral sizing.  Breaking a config string down into smaller substrings and workspace variables is a good technique for managing complexity in larger batches.
+In this abbreviated example, base_config refers to a workspace variable that holds a string of the config tags that all the cases have in common, for example roadload settings, drive cycle selection, fuel type, etc.  Grouping the common settings into a single variable makes it easier to change the setup and improves readability.  Matlab string concatenation does the rest (the use of brackets, [ ], tells Matlab to combine all the separate strings into one).   Another advantage of using workspace variables to hold engine definition strings is illustrated in the ``TNGA_ENGINE`` workspace variable which not only defines the engine but also uses the ``ES_CYL:`` tag to  tell the simulation to run it as a six-cylinder regardless of any engine resizing that may take place, such as during performance neutral sizing.  Breaking a config string down into smaller substrings and workspace variables is a good technique for managing complexity in larger batches.
 
 Generating ALPHA Roadload ABCs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
