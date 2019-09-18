@@ -21,3 +21,4 @@ Age                                                                             
 Powertrain Efficiency                                                                                  Ratio of usefull work to total fuel energy
 Effectiveness                                                                                          Incremental percentage reduction in CO2 emissions between two packages
 ===================== ===================== ===================== ==================================== ==================================================================================================================
+Activity Demand Response: The overall effect of policy changes on travel activity (e.g. VMT, allocation to vehicles/modes)
