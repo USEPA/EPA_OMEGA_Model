@@ -4,7 +4,7 @@ Overview
 
 Running ALPHA - Quickstart
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-Launch Matlab and make sure that REVS_Common is on the Matlab path as described in the installation instructions above.  As a quick check you can execute the following Matlab command, if it succeeds then it should return the path to the top-level ALPHA model:
+Launch Matlab and make sure that ``REVS_Common`` is on the Matlab path as described in the installation instructions.  As a quick check you can execute the following Matlab command and if successful, it should return the path to the top-level ALPHA model:
 
 ::
 
@@ -12,49 +12,41 @@ Launch Matlab and make sure that REVS_Common is on the Matlab path as described 
 
 If the command fails then you need to double check your path setup.
 
-Change the Matlab working directory to the ALPHA DEMO folder and run run_ALPHA_quickstart.  The REVS_VM model will open up (so we can watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, \YYYY_MM_DD_hh_mm_ss_, following by sim_results.csv and sim_1_console.txt.  For example, 2019_02_01_09_36_23_sim_results.csv and 2019_02_01_09_36_23_sim_1_console.txt, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The sim_results file contains a summary of the simulation inputs, settings and outputs.  The console.txt file captures anything that would have been output to the Matlab console window.  In this case it contains the SAE J2951 Drive Quality Metrics by default.
+Change the Matlab working directory to the ``ALPHA DEMO`` folder and run run_ALPHA_quickstart.  The ``REVS_VM`` model will open up (so the user may watch the vehicle speed trace in real-time), the model will compile and run an EPA UDDS drive cycle.  When the simulation is complete there will be two files in the output folder.  The file names are prefixed with a timestamp, \YYYY_MM_DD_hh_mm_ss_, followed by ``sim_results.csv`` and ``sim_1_console.txt``.  For example, ``2019_02_01_09_36_23_sim_results.csv`` and ``2019_02_01_09_36_23_sim_1_console.txt``, for files created on Feb 1st 2019, 23 seconds after 9:36 AM.  The ``sim_results`` file contains a summary of the simulation inputs, settings and outputs.  The ``console.txt`` file captures anything that would have been output to the Matlab console window.  In this case the file contains the SAE J2951 Drive Quality Metrics by default.
 
-If you open run_ALPHA_quickstart in the Matlab editor you will see it only takes a handful of Matlab commands to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed below.
+If you open ``run_ALPHA_quickstart`` in the Matlab editor you will see only a handful of Matlab commands are needed to define and run a simulation that automatically produces standardized output summary files.  Examining the Matlab workspace after the model runs reveals only a single variable, the sim_batch object.  The only outputs from this model are contained in the output files.  More information on datalogging and model outputs will be discussed later.
 
 Understanding the Modeling Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The fundamental modeling process consists of creating a Matlab workspace that contains all the variables necessary to run the REVS_VM (REVS Vehicle Model) Simulink model.  There are several ways to accomplish this.
+The fundamental modeling process consists of creating a Matlab workspace that contains all the variables necessary to run the ``REVS_VM`` (REVS Vehicle Model) Simulink model.  There are several ways to accomplish this.  
 
-1.	Load a saved workspace available in a .mat file and then run the model
+The best approach is to create and execute a batch run using ``class_REVS_sim_batch``.  The batch approach is the most efficient and will be the primary focus of this document due to its numerous advantages which are listed below:
 
-    * Pre- and post-processing must be handled by the user, this is somewhat of an advanced use case but can be very useful under the right circumstances
-
-2.	Create an ad-hoc script to load individual param files (Matlab scripts containing component data structures), manually performing pre- and post-processing
-
-    * This was the process prior to the standardized batch process, it leads to duplication of effort and  inconsistent approaches across users and should be avoided
-
-3.	Create and execute a batch run using class_REVS_sim_batch
-
-    * Provides a consistent approach to the modeling process
+    * Consistent approach to the modeling process
     * A sim batch may be used to run any number of simulations, even just one
-    * Automatically provides standardized output summary results
-    * Provides a framework for pre- and post-processing simulations
-    * Allows convenient capability to sweep variables and define multiple simulation scenarios
-    * Provides a framework for running "performance neutral" simulations
-    * Provides capability to run simulations in parallel, on one or multiple computers, and automatically collate the results into a single output summary file
-    * Provides a framework for controlling simulation datalogging and auditing
-    * Provides a framework for controlling the amount ("verbosity") of output summary data
-    * Provides a framework for saving Matlab workspaces at various points in the modeling process
-    * It is easy and convenient to define and reuse sim batches across multiple projects
+    * Standardized output summary results
+    * Framework for pre- and post-processing simulations
+    * Convenient capability to sweep variables and define multiple simulation scenarios
+    * Framework for running "performance neutral" simulations
+    * Capability to run simulations in parallel, on one or multiple computers, and automatically collate the results into a single output summary file
+    * Framework for controlling simulation datalogging and auditing
+    * Framework for controlling the amount ("verbosity") of output summary data
+    * Framework for saving Matlab workspaces at various points in the modeling process
+    * Easy and convenient method to define and reuse sim batches across multiple projects
 
-The batch approach will be the primary focus of this document due to its numerous advantages.
+A somewhat advanced use case is to load a saved workspace available in a ``.mat`` file and then run the model.  This method can be very useful under the right circumstances, however, the pre- and post-processing must be provided by the user.  Another approach is to create an ad-hoc script to load individual param files (Matlab scripts containing component data structures).  As with the previous method, the pre- and post-processing must be manually performed.  The ad hoc approach can lead to duplication of effort and inconsistent approaches across users and should therefore be avoided.
 
 Controlling the Modeling Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 What is a Sim Batch?
 --------------------
-A class_REVS_sim_batch object actually contains a vector of class_REVS_sim_case objects stored in the sim_case property.  A sim_case could be created and run without a batch but there is no advantage to doing so since the batch process provides all the necessary pre- and post-processing is much easier to use.  Typically the only reason to manipulate a particular sim_case would be to extract its local workspace to populate the top-level workspace for direct access.  This will be covered in more detail below in the discussion on working with workspaces.
+A ``class_REVS_sim_batch`` object actually contains a vector of ``class_REVS_sim_case`` objects stored in the sim_case property.  A sim_case could be created and run without a batch but there is no advantage to doing so since the batch process provides all the necessary pre- and post-processing and is much easier to use.  Typically the only reason to manipulate a particular sim_case would be to extract its local workspace to populate the top-level workspace for direct access.  This will be covered in more detail later in the discussion on working with workspaces.
 
 Understanding the ALPHA quickstart script
 -----------------------------------------
-The run_ALPHA_quickstart M-script demonstrates the simplest possible batch process - a single simulation run with the default settings, only the minimum required input files and minimal outputs.  Let's take a closer look.
+The ``run_ALPHA_quickstart`` M-script demonstrates the simplest possible batch process - a single simulation run with the default settings and only the minimum required input files and minimal outputs.  Let's take a closer look.
 
     run_ALPHA_quickstart.m:
 
@@ -64,21 +56,21 @@ The run_ALPHA_quickstart M-script demonstrates the simplest possible batch proce
 
 2.	sim_batch = class_REVS_sim_batch(REVS_log_default); % create sim_batch
 
-    * Creates sim_batch, an object of class class_REVS_sim_batch, and instructs it to log only the minimum required signals in the model.  Datalogging will be discussed in more detail below.
+    * Creates sim_batch, an object of class class_REVS_sim_batch, and instructs it to log only the minimum required signals in the model.  Datalogging will be discussed in more detail later
 
 3.	sim_batch.param_path = 'param_files/MPW_LRL';   % set path to param files
 
-    * The batch needs to know where to find param files that are not in the REVS_Common folder.  In this case the param files are located in the MPW_LRL subfolder of the local param_files folder.
+    * The batch needs to know where to find param files that are not in the REVS_Common folder.  In this case the param files are located in the MPW_LRL subfolder of the local param_files folder
 
 4.	sim_batch.config_set = { % define config_set
 ['VEH:vehicle_2020_MPW_LRL + ENG:engine_2013_Chevrolet_Ecotec_LCV_2L5_Reg_E10 + TRANS:TRX11_FWD + ELEC:electric_EPS + CYC:EPA_UDDS + CON:MPW_LRL_CVM_controls_param']
 };
 
-    * The sim_batch.config_set defines the set of the simulations to be run by creating a cell array of one or more config strings.  Within the config string are the tags VEH:, ENG:, TRANS:, ELEC:, CYC: and CON:.  Following each tag is the name of a file that contains simulation inputs.  The VEH: tag loads the vehicle information such as roadload, test weight, etc.  The ENG: tag loads the engine information, in this case the engine is actually loaded from REVS_Common since it is one of the data packet engines, the other param files are loaded from the local param file directory.  The TRANS: tag loads the transmission parameters, in this case for a 6-speed automatic.  The ELEC: tag loads parameters that define the electrical system and accessories for this vehicle.  The CYC: tag tells the simulation which drive cycle to run, in this case an EPA UDDS drive cycle.  Lastly, the CON: tag tells the simulation which controls settings to use.  In this case, the controls settings show that start-stop is disabled for this run.  The CVM in MPW_LRL_CVM_controls_param stands for Conventional Vehicle Model.  Other abbreviations that you may encounter are EVM for Electric Vehicle Model and HVM for Hybrid Vehicle Model.  Electric vehicles and hybrid vehicles have their own control parameters.
+    * The sim_batch.config_set defines the set of the simulations to be run by creating a cell array of one or more config strings.  Within the config string are the tags VEH:, ENG:, TRANS:, ELEC:, CYC: and CON:.  Following each tag is the name of a file that contains simulation inputs.  The VEH: tag loads the vehicle information such as roadload, test weight, etc.  The ENG: tag loads the engine information, in this case the engine is actually loaded from REVS_Common since it is one of the data packet engines, the other param files are loaded from the local param file directory.  The TRANS: tag loads the transmission parameters, in this case for a 6-speed automatic.  The ELEC: tag loads parameters that define the electrical system and accessories for this vehicle.  The CYC: tag tells the simulation which drive cycle to run, in this case an EPA UDDS drive cycle.  Lastly, the CON: tag tells the simulation which controls settings to use.  In this case, the controls settings show that start-stop is disabled for this run.  The CVM in MPW_LRL_CVM_controls_param stands for Conventional Vehicle Model.  Other abbreviations that you may encounter are EVM for Electric Vehicle Model and HVM for Hybrid Vehicle Model.  Electric vehicles and hybrid vehicles have their own control parameters
 
 5.	open REVS_VM;   % optional, but allows observation of the model while running
 
-    * This simply opens the top-level Simulink model so that the simulation progress can be observed via the vehicle speed and drive cycle plot that comes from the top-level Scope block.  This step is optional.
+    * This simply opens the top-level Simulink model so the simulation progress can be observed via the vehicle speed and drive cycle plot that comes from the top-level Scope block.  This step is optional
 
 6.	sim_batch.run_sim_cases();
 
@@ -92,15 +84,15 @@ The REVS_VM model itself performs some post-processing to create simulation resu
 
 Simulation post-processing may be used to take the raw simulation outputs and calculate fuel economy or GHG emissions.  The default simulation post-processing is generally used, but any M-script may be run if desired.
 
-Batch post-processing may be used  to examine the total set of simulation results and perform additional processing such as finding performance-neutral results from among a set of runs and then outputting those to a separate file.  Any arbitrary M-script may be run if desired.
+Batch post-processing may be used to examine the total set of simulation results and perform additional processing such as finding performance-neutral results from among a set of runs and then outputting those to a separate file.  Any arbitrary M-script may be run if desired.
 
 There are a few class_REVS_sim_batch properties that control pre- and post-processing of the simulation data by determining which processing scripts to run.
 
-    * sim_case_preprocess_script: by default this is set to REVS_preprocess_sim_case which performs pre-processing for the most common overrides that should apply to pretty much any simulation case, regardless of the type of project you may be working on.  The overrides/modifiers come from optional config string tags.  For example, the ETW_LBS: tag may be used to override the vehicle test weight from the vehicle param file.  For application-specific pre-processing you would create a custom script that would (generally) call REVS_preprocess_sim_case and then perform additional pre-processing.  The custom script may handle user-defined application-specific config tags.  For example, for 2025 Mid-Term Evaluation work, the MTE_batch_sim_case_preprocess script calls REVS_preprocess_sim_case and then performs MTE-related overrides and defaults for things like transmission sizing or behavior.
+    * sim_case_preprocess_script: by default this is set to REVS_preprocess_sim_case which performs pre-processing for the most common overrides that should apply to pretty much any simulation case, regardless of the type of project being worked on.  The overrides/modifiers come from optional config string tags.  For example, the ETW_LBS: tag may be used to override the vehicle test weight from the vehicle param file.  For application-specific pre-processing you would create a custom script that would (generally) call REVS_preprocess_sim_case and then perform additional pre-processing.  The custom script may handle user-defined application-specific config tags.  For example, for 2025 Mid-Term Evaluation work, the MTE_batch_sim_case_preprocess script calls REVS_preprocess_sim_case and then performs MTE-related overrides and defaults for things like transmission sizing or behavior
 
-    * sim_case_postprocess_script: by default this is set to REVS_postprocess_sim_case which handles calculating fuel economy for the three main powertrain types (Conventional, Hybrid, and Electric).  This script calculates cold-corrected FTP and weighted FTP-HWFET results from the raw phase results, among other things.
+    * sim_case_postprocess_script: by default this is set to REVS_postprocess_sim_case which handles calculating fuel economy for the three main powertrain types (Conventional, Hybrid, and Electric).  This script calculates cold-corrected FTP and weighted FTP-HWFET results from the raw phase results, among other things
 
-    * postprocess_script: by default this is set to REVS_postprocess_sim_batch which has some code for finding performance-neutral runs out of a simulation set that provides a performance baseline for one or more sets of runs.  The selected runs, if any, are output to a separate output file.
+    * postprocess_script: by default this is set to REVS_postprocess_sim_batch which has some code for finding performance-neutral runs out of a simulation set that provides a performance baseline for one or more sets of runs.  The selected runs, if any, are output to a separate output file
 
 Understanding Config Strings (Keys)
 -----------------------------------
@@ -147,31 +139,31 @@ The arguments to the class_REVS_config_element constructor are the tag string, t
 
 Literal Config Tags
 +++++++++++++++++++
-In the example above, the drive_cycle property holds a 'literal' tag, which means that the part of the string associated with that tag will not automatically be evaluated (turned into a numeric or other value, but rather taken literally).  Typically this would be used for something like file names or other strings.  Literal tags may be evaluated in user scripts.  For example, if the literal tag was the name of script then that script may be called in the user pre- or post-processing scripts at the appropriate time to perform whatever its function is.  Literal tags can be used to hold a single value or, combined with delayed evaluation (in a user script, instead of during config string parsing) may hold multiple values.  For example, within a config string, these are possible uses of the CYC: tag:
+In the example above, the drive_cycle property holds a 'literal' tag, which means the part of the string associated with that tag will not automatically be evaluated (turned into a numeric or other value, but rather taken literally).  Typically this would be used for something like file names or other strings.  Literal tags may be evaluated in user scripts.  For example, if the literal tag was the name of script then that script may be called in the user pre- or post-processing scripts at the appropriate time to perform whatever its function is.  Literal tags can be used to hold a single value or, when combined with delayed evaluation (in a user script, instead of during config string parsing) may hold multiple values.  For example, within a config string, these are possible uses of the CYC: tag:
 
 ::
 
     CYC:EPA_IM240
     CYC:{''EPA_FTP_NOSOAK'',''EPA_HWFET'',''EPA_US06''}
 
-In the first example, the CYC: tag refers to a single drive cycle file, EPA_IM240.mat which will used for the simulation.  In the second case, the CYC: tag used to store a string representation of a Matlab cell array of drive cycle strings.  In this case, sim_config.drive_cycle would be:
+In the first example, the CYC: tag refers to a single drive cycle file, EPA_IM240.mat which will be used for the simulation.  In the second case, the CYC: tag is used to store a string representation of a Matlab cell array of drive cycle strings.  In this case, sim_config.drive_cycle would be:
 
 ::
 
     '{''EPA_FTP_NOSOAK'',''EPA_HWFET'',''EPA_US06''}'
 
-Which would evaluate (using the Matlab eval() or evalin() command) to the cell array of strings:
+Which would evaluate (using the Matlab eval() or evalin() command) the cell array of strings:
 
 ::
 
     {'EPA_FTP_NOSOAK','EPA_HWFET','EPA_US06'}
 
-Drive cycle loading of a single cycle or the combining of multiple cycles into a single cycle is automatically handled in class_REVS_sim_case.load_drive_cycles() but the same concept can apply to user-defined literal tags used by user scripts.  Drive cycle creation and handling will be discussed in further detail below.
+Drive cycle loading of a single cycle or the combining of multiple cycles into a single cycle is automatically handled in class_REVS_sim_case.load_drive_cycles() but the same concept can apply to user-defined literal tags used by user scripts.  Drive cycle creation and handling will be discussed in further detail later.
 
 Eval Config Tags
 ++++++++++++++++
 
-As shown above, the class_REVS_sim_config ETW_lbs property is an 'eval' tag which means its value will be automatically evaluated by the class_REV_sim_config in the parse_key() method.  If the eval tag is created with a default value then that value will be used if the tag is not specified by the user.  Eval tags should be numeric or should refer to variables available in the workspace.  An eval tag may evaluate to a single value or a vector of multiple values to perform variable sweeps.  For example, the following would all be valid eval tags within a config string:
+As shown previously, the class_REVS_sim_config ETW_lbs property is an 'eval' tag which means its value will be automatically evaluated by the class_REV_sim_config in the parse_key() method.  If the eval tag is created with a default value then that value will be used if the tag is not specified by the user.  Eval tags should be numeric or should refer to variables available in the workspace.  An eval tag may evaluate to a single value or a vector of multiple values to perform variable sweeps.  For example, the following would all be valid eval tags within a config string:
 
 ::
 
@@ -184,7 +176,7 @@ The first case evaluates to a single number, 3625, the second case evaluates to 
 Config String Expansion
 +++++++++++++++++++++++
 
-Each string in the sim batch config_set cell array is evaluated to determine how many simulations it defines.  As seen above, each tag may be used to define multiple values.  Each config string is expanded to a full factorial combination of all of its elements.   The expanded set of strings is stored in the sim batch expanded_config_set property after the expand_config_set() method is called.  Config set expansion is handled automatically by the class_REVS_sim_batch run_sim_cases() method but under certain circumstances it may also be useful to manually expand the config set, although this is not typically done.  Manual expansion could be used to examine the number of cases represented by a config set without having to commit to running any simulations.
+Each string in the sim batch config_set cell array is evaluated to determine how many simulations are defined.  As previously explained, each tag may be used to define multiple values.  Each config string is expanded to a full factorial combination of all of its elements.   The expanded set of strings is stored in the sim batch expanded_config_set property after the expand_config_set() method is called.  Config set expansion is handled automatically by the class_REVS_sim_batch run_sim_cases() method but under certain circumstances it may also be useful to manually expand the config set, although this is not typically done.  Manual expansion could be used to examine the number of cases represented by a config set without having to commit to running any simulations.
 
 For example, the following tag could be used within a config string to run simulations with and without engine start-stop:
 
@@ -334,7 +326,7 @@ Log packages can also be combined by using the logging_config.add_log() method:
 
         Logs the minimum required signals and adds common engine and transmission datalogs
 
-Understanding the datalog and model_data objects
+Understanding the datalog and model_data Objects
 ++++++++++++++++++++++++++++++++++++++++++++++++
 
 The datalog object has hierarchical properties.  The top level should look something like this:
@@ -366,7 +358,7 @@ The datalog object is also associated with a class_test_data object called model
 
     plot(model_data.time, model_data.vehicle.speed_mps);
 
-Generally it is best to use model_data for most analysis if it contains what you need.  Datalogs are copied to the model_data object through the REVS_postprocess_XXX M-scripts in the REVS_Common/log_packages folder.
+Generally the best option is to use model_data for most analysis if it contains what you need.  Datalogs are copied to the model_data object through the REVS_postprocess_XXX M-scripts in the REVS_Common/log_packages folder.
 
 For example, REVS_postprocess_engine_basics_log.m:
 
@@ -383,7 +375,7 @@ For example, REVS_postprocess_engine_basics_log.m:
     model_data.engine.fuel.flow_rate_gps         = datalog.engine.fuel_rate_gps;
     model_data.engine.fuel.mass_g                = datalog.engine.fuel_consumed_g;
 
-In this example it can be seen that the fuel properties are pulled from multiple sources (the engine itself and also the engine datalogs) and put into a common location in the model data.  Generally, the datalogs are model-centric and may contain shorthand notation (trq versus torque) whereas the model data is more function- or component-centric and uses a better naming convention.  There is no automatic method for populating the model_data properties (scripts must be written by the user) and not all datalogs have (or should have) an associated property in the model data.  Postprocess scripts are associated with class_REVS_log_package objects through the postprocess_list property which is a cell array of scripts to run after datalogging.
+As demonstrated in this example, the fuel properties are pulled from multiple sources (the engine itself and the engine datalogs) and put into a common location in the model_data.  Generally, the datalogs are model-centric and may contain shorthand notation (trq versus torque) whereas the model data is more function- or component-centric and uses a better naming convention.  There is no automatic method for populating the model_data properties (scripts must be written by the user) and not all datalogs have (or should have) an associated property in the model data.  Postprocess scripts are associated with class_REVS_log_package objects through the postprocess_list property which is a cell array of scripts to run after datalogging.
 
 For example, the REVS_log_all package is defined like this:
 
@@ -424,7 +416,7 @@ Auditing can be controlled by setting a sim batch logging_config audit flag:
 
     logging_config.audit_total = true;
 
-        Audits the total energy flow for the entire drive cycle
+        Audits the total energy flow for the entire drive cycle.
 
 Or:
 
@@ -432,7 +424,7 @@ Or:
 
     logging_config.audit_phase = true;
 
-        Audits the total energy flow for the entire drive cycle AND also audits each drive cycle phase individually
+        Audits the total energy flow for the entire drive cycle AND also audits each drive cycle phase individually.
 
 By default both flags are set to false, only one flag or the other needs to be set.  To print the audit to the console, use the print() method:
 
@@ -552,18 +544,18 @@ This will create a timestamped .mat file in the sim batch output folder.  The fi
 
     output\2019_02_11_16_52_39_sim_1_output_workspace.mat
 
-The workspace is saved after all post-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time and also all of the datalogs, audits, etc.  The simulation may be run again or the outputs examined directly without the need for running the simulation.  Keep in mind that, output workspaces will always be bigger than input workspaces and also take longer to save.  The workspace may be loaded by using the load command, or double-clicking the filename in the Matlab Current Folder file browser.
+The workspace is saved after all post-processing scripts have been run so the workspace contains everything required to replicate the simulation at a later time and also all of the datalogs, audits, etc.  The simulation may be run again or the outputs examined directly without the need for running the simulation.  Keep in mind that output workspaces will always be bigger than input workspaces and also take longer to save.  The workspace may be loaded by using the load command or double-clicking the filename in the Matlab Current Folder file browser.
 
 ost-Simulation Data Analysis
 -----------------------------
 
-As mentioned above, a model_data object is created in the output workspace and may contain various model outputs.  One of the easiest ways to take a look at simulation data is to run a Data Observation Report (DOR) on the model data.  There are DORs for conventional (CVM), hybrid (HVM) and electric vehicles (EVM).  To run the default conventional vehicle model DOR, use the REVS_DOR_CVM() function:
+As mentioned before, a model_data object is created in the output workspace and may contain various model outputs.  One of the easiest ways to take a look at simulation data is to run a Data Observation Report (DOR) on the model data.  There are DORs for conventional (CVM), hybrid (HVM) and electric vehicles (EVM).  To run the default conventional vehicle model DOR, use the REVS_DOR_CVM() function:
 
 ::
 
     REVS_DOR_CVM({},model_data);
 
-The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data then the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:
+The first parameter (unused, in this case) allows the model outputs to be compared with one or more sets of test data in the form of class_test_data objects.  If there are multiple sets of test data, the first input would be a cell array of class_test_data objects.   The default DOR generates a number of plots representing some of the most commonly observed outputs such as vehicle speed, engine speed, transmission gear number, etc.  For example:
 
 .. csv-table:: Sample Figures from REVS_DOR_CVM()
     :file: tables/sample_figures.csv
@@ -582,10 +574,3 @@ The top-level DOR calls sub-DORs that are grouped by component, for example REVS
     :file: tables/dor.csv
     :widths: 25 25 25 70
     :header-rows: 1
-
-
-
-
-
-
-
