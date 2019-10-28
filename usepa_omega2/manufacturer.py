@@ -10,6 +10,7 @@ import copy
 
 from credits import *
 from vehicle import *
+# from copy import copy, deepcopy
 
 class Manufacturer:
     def __init__(self, name):
@@ -34,6 +35,16 @@ class Manufacturer:
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
+    def __deepcopy__(self, memodict={}):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memodict[id(self)] = result
+        result.__init__(self.name)
+        result.credit = copy.deepcopy(self.credit)
+        result.emissions_credits_running_tailpipe_co2_Mg = copy.deepcopy(self.emissions_credits_running_tailpipe_co2_Mg)
+        result.tech_production_running_cost_delta_dollars = copy.deepcopy(self.tech_production_running_cost_delta_dollars)
+        return result
+
     def calc_manufacturer_emissions_costs_sales(self, calendar_year, init=False):
         mfr_emissions_target_net_co2_Mg = 0.0
         mfr_emissions_achieved_tailpipe_co2_Mg = 0.0
@@ -54,7 +65,7 @@ class Manufacturer:
         self.tech_production_cost_dollars_per_vehicle[calendar_year] = self.tech_production_cost_delta_dollars[calendar_year] / self.sales[calendar_year]
 
         # calculate cumulative costs and credits
-        if (calendar_year - 1) in self.production:
+        if (calendar_year - 1) in self.tech_production_running_cost_delta_dollars:
             self.tech_production_running_cost_delta_dollars[calendar_year] = self.tech_production_running_cost_delta_dollars[calendar_year - 1] + self.tech_production_cost_delta_dollars[calendar_year]
             self.emissions_credits_running_tailpipe_co2_Mg[calendar_year] = self.emissions_credits_running_tailpipe_co2_Mg[calendar_year - 1] + self.emissions_credits_tailpipe_co2_Mg[calendar_year]
         else:
