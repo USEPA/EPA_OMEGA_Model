@@ -117,3 +117,4 @@ composer.lock
 
 # Mac
 *.DS_Store
+/usepa_omega2/output/*
