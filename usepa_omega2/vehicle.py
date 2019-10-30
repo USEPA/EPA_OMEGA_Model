@@ -99,9 +99,10 @@ class Vehicle:
                                                   self.lifetime_vehicle_miles_travelled * self.sales / 1e6
 
     def update_vehicle_emissions_targets(self, calendar_year):
-        # eventually this should come from the standards module (based on footprint, calendar year, etc)
-        # fixed 5% y/y reduction for now...
-        self.emissions_target_net_co2_gpmi = self.emissions_target_net_co2_gpmi * 0.95
+        if calendar_year < 2025:
+            # eventually this should come from the standards module (based on footprint, calendar year, etc)
+            # fixed 5% y/y reduction for now...
+            self.emissions_target_net_co2_gpmi = self.emissions_target_net_co2_gpmi * 0.95
         # update powertrain target efficiency
         self.update_powertrain_target_efficiency_norm(self.emissions_target_net_co2_gpmi)
         # update vehicle emissions

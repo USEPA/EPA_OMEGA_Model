@@ -33,11 +33,16 @@ def plot_graph(mfr_graph, with_labels=False):
     options = {
         'node_color': 'red',
         'edge_color': 'blue',
-        'node_size': 30,
-        'width': .5,
+        'node_size': 3,
+        'width': .25,
     }
 
-    nx.draw(mfr_graph, with_labels=with_labels)
+    print('Computing Node Layout for %d Nodes...' % mfr_graph.number_of_nodes())
+    pos = nx.nx_agraph.graphviz_layout(mfr_graph, prog='dot')
+    # pos = nx.nx_agraph.graphviz_layout(mfr_graph, prog='twopi', root='root')
+
+    print('Drawing Manufacturer Graph...')
+    nx.draw(mfr_graph, with_labels=with_labels, pos= pos, options= options)
 
 class ComplianceModel:
     def __init__(self, manufacturers_filename, initial_fleet_filename, verbose=False):
@@ -133,7 +138,7 @@ class ComplianceModel:
                     # update manufacturer emissions/compliance status
                     new_mfr.calc_manufacturer_emissions_costs_sales()
 
-                    if (not target_cost and not target_emissions_Mg) or ((new_mfr.tech_production_running_cost_delta_dollars <= target_cost * 1.01) and (new_mfr.emissions_achieved_running_tailpipe_co2_Mg <= target_emissions_Mg * 1.015) and (new_mfr.emissions_achieved_tailpipe_co2_Mg <= new_mfr.emissions_target_net_co2_Mg * 1.175)):
+                    if (not target_cost and not target_emissions_Mg) or ((new_mfr.tech_production_running_cost_delta_dollars <= target_cost * 1.01) and (new_mfr.emissions_achieved_running_tailpipe_co2_Mg <= target_emissions_Mg * 1.015) and (new_mfr.emissions_achieved_tailpipe_co2_Mg <= new_mfr.emissions_target_net_co2_Mg * 1.1)):
                         # and add to graph
                         new_mfr_node_id = '%s_%d_%d' % (mfr_node_id, compliance_year, scenario_number)
                         # print(new_mfr_node_id)
@@ -282,7 +287,7 @@ if __name__ == "__main__":
         min_cost = min(costs)
         print(mfr_name + ' min cost = %f' % min_cost)
 
-        num_winners = 1
+        num_winners = 50
         # get indexes of 5 best scenarios
         pts = [costs.index(costs_copy.pop(costs_copy.index(min(costs_copy)))) for i in range(0,num_winners)]
 
@@ -301,6 +306,13 @@ if __name__ == "__main__":
             ax2.set_title(mfr_name + ' Cumulative Credits v. Year\n' + winning_node_ids[pts[0]])
             ax2.grid()
 
+            fig3 = plt.figure()
+            ax3 = plt.gca()
+            ax3.set_xlabel('Year')
+            ax3.set_ylabel('Cumulative Costs ($)')
+            ax3.set_title(mfr_name + ' Cumulative Costs v. Year\n' + winning_node_ids[pts[0]])
+            ax3.grid()
+
         for i in pts:
             # print(credits[i])
             # print(costs[i])
@@ -314,11 +326,13 @@ if __name__ == "__main__":
             emissions_target_net_co2_Mg = {}
             emissions_achieved_tailpipe_co2_Mg = {}
             emissions_credits_running_tailpipe_co2_Mg = {}
+            tech_production_running_cost_delta_dollars = {}
             for node_id in node_path:
                 year = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].calendar_year
                 emissions_target_net_co2_Mg[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].emissions_target_net_co2_Mg
                 emissions_achieved_tailpipe_co2_Mg[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].emissions_achieved_tailpipe_co2_Mg
                 emissions_credits_running_tailpipe_co2_Mg[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].emissions_credits_running_tailpipe_co2_Mg
+                tech_production_running_cost_delta_dollars[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].tech_production_running_cost_delta_dollars
 
             if do_plots:
                 # best_final_scenario = cm.manufacturer[mfr_name].nodes[winning_node_ids[i]]['mfr']
@@ -338,6 +352,14 @@ if __name__ == "__main__":
 
                 ax2.plot(list(emissions_credits_running_tailpipe_co2_Mg.keys()), list(emissions_credits_running_tailpipe_co2_Mg.values()))
 
+                ax3.plot(list(tech_production_running_cost_delta_dollars.keys()), list(tech_production_running_cost_delta_dollars.values()))
+
+        # ax1.set_ylim(0, ax1.get_ylim()[1])
+
         if do_plots:
             fig1.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' target and achieved emissions.png')
             fig2.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' cumulative credits.png')
+            fig3.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[
+                i] + ' cumulative costs.png')
+
+        # plot_graph(cm.manufacturer[mfr_name])
