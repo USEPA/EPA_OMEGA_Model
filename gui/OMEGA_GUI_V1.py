@@ -10,7 +10,7 @@
     """
 
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
@@ -74,11 +74,28 @@ class MyApp(QMainWindow):
     def new_file(self):
         self.statusBar().showMessage("New File")
         self.ui.tab_select.setCurrentIndex(0)
+        # Better file dialog
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setNameFilter("Images (*.png *.xpm *.jpg)")
+        dialog.setViewMode(QFileDialog.Detail)
+        if dialog.exec_():
+            filenames = dialog.selectedFiles()
+            print(filenames)
+            self.ui.plainTextEdit.setPlainText(str(filenames))
         new_file_action()
 
     def open_file(self):
         self.statusBar().showMessage("Open File")
         self.ui.tab_select.setCurrentIndex(1)
+        # Open file with options
+        title = "Open File"
+        location = "c:\\"
+        filetype = "Image files (*.jpg *.gif);; All Files (*.*)"
+        fname = QFileDialog.getOpenFileName(self, title, location, filetype)
+        # Open file without options
+        # fname = QFileDialog.getOpenFileName()
+        print(fname)
         open_file_action()
 
     def save_file(self):

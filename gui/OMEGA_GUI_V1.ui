@@ -69,7 +69,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="file_1_label">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -82,7 +82,7 @@
        <string>File 1</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="file_2_label">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -92,7 +92,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>File 1</string>
+       <string>File 2</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="plainTextEdit_2">
@@ -105,7 +105,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="file_3_label">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -115,7 +115,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>File 1</string>
+       <string>File 3</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="plainTextEdit_3">
@@ -128,7 +128,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="file_4_label">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -138,7 +138,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>File 1</string>
+       <string>File 4</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="plainTextEdit_4">
@@ -151,7 +151,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_6">
+     <widget class="QLabel" name="file_5_label">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -161,7 +161,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>File 1</string>
+       <string>File 5</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="plainTextEdit_5">
@@ -174,7 +174,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_7">
+     <widget class="QLabel" name="file_6_label">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -184,7 +184,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>File 1</string>
+       <string>File 6</string>
       </property>
      </widget>
      <widget class="QPlainTextEdit" name="plainTextEdit_6">
