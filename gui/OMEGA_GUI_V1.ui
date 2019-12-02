@@ -15,12 +15,15 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tab_select">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>60</y>
-      <width>611</width>
-      <height>411</height>
+      <width>801</width>
+      <height>511</height>
      </rect>
     </property>
     <property name="font">
@@ -31,77 +34,166 @@
     <property name="toolTip">
      <string/>
     </property>
-    <property name="currentIndex">
-     <number>4</number>
+    <property name="tabPosition">
+     <enum>QTabWidget::North</enum>
     </property>
-    <widget class="QWidget" name="vehicle_type_tab">
+    <property name="tabShape">
+     <enum>QTabWidget::Triangular</enum>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="input_files_tab">
      <attribute name="title">
-      <string>Vehicle Type</string>
+      <string>Input Files</string>
      </attribute>
      <attribute name="toolTip">
       <string>Vehicle Type</string>
      </attribute>
-     <widget class="QComboBox" name="vehicle_type_select">
+     <widget class="QPlainTextEdit" name="plainTextEdit">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>71</y>
-        <width>101</width>
+        <x>20</x>
+        <y>60</y>
+        <width>761</width>
         <height>31</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Select the Vehicle Type</string>
-      </property>
-      <property name="statusTip">
-       <string/>
-      </property>
-      <property name="whatsThis">
-       <string/>
-      </property>
-      <item>
-       <property name="text">
-        <string>LPW LRL</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>MPW LRL</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>HPW</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>LPW HRL</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>MPW HRL</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Truck</string>
-       </property>
-      </item>
      </widget>
-     <widget class="QTextEdit" name="textEdit">
+     <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>60</y>
-        <width>201</width>
-        <height>71</height>
+        <x>20</x>
+        <y>40</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File 1</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File 1</string>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="plainTextEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>120</y>
+        <width>761</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>160</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File 1</string>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="plainTextEdit_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>180</y>
+        <width>761</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>220</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File 1</string>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="plainTextEdit_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>240</y>
+        <width>761</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>280</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File 1</string>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="plainTextEdit_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>761</width>
+        <height>31</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>340</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>File 1</string>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="plainTextEdit_6">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>360</y>
+        <width>761</width>
+        <height>31</height>
        </rect>
       </property>
      </widget>
@@ -775,42 +867,32 @@
      </font>
     </property>
     <property name="text">
-     <string>EPA ALPHA Model REVS3 Command File Generator</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>650</x>
-      <y>90</y>
-      <width>161</width>
-      <height>171</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap>images/alpha_logo.jpg</pixmap>
+     <string>EPA OMEGA Model</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label_3">
+   <widget class="QLabel" name="epa_logo_label">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>280</y>
-      <width>171</width>
-      <height>171</height>
+      <x>760</x>
+      <y>20</y>
+      <width>61</width>
+      <height>61</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>EPA Logo</string>
     </property>
     <property name="text">
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>images/epa_logo.jpg</pixmap>
+     <pixmap>images/green_car.jpg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -826,8 +908,39 @@
      <height>21</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuMenu1">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_new_file"/>
+    <addaction name="action_open_file"/>
+    <addaction name="separator"/>
+    <addaction name="action_save_file"/>
+    <addaction name="action_save_file_as"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>false</bool>
+    </property>
+    <addaction name="actionAbout_OMEGA_2"/>
+   </widget>
+   <addaction name="menuMenu1"/>
+   <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
   <action name="actionEngines">
    <property name="text">
     <string>Engines</string>
@@ -841,6 +954,31 @@
   <action name="actionRoad_Loads">
    <property name="text">
     <string>Road Loads</string>
+   </property>
+  </action>
+  <action name="action_open_file">
+   <property name="text">
+    <string>Open...</string>
+   </property>
+  </action>
+  <action name="action_save_file">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="action_save_file_as">
+   <property name="text">
+    <string>Save As...</string>
+   </property>
+  </action>
+  <action name="action_new_file">
+   <property name="text">
+    <string>New...</string>
+   </property>
+  </action>
+  <action name="actionAbout_OMEGA_2">
+   <property name="text">
+    <string>About OMEGA</string>
    </property>
   </action>
  </widget>

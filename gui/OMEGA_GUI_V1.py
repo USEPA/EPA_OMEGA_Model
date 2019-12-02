@@ -1,7 +1,7 @@
-"""ALPHA GUI
+"""OMEGA GUI
    ---------
 
-   This code controls the ALPHA GUI
+   This code controls the OMEGA GUI
 
        ::
 
@@ -15,13 +15,9 @@ from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
 # Import functions from other files
-# from include1 import *
+from gui.include1 import *
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType('OMEGA_GUI_V1.ui')
-
-
-# def test_routine():
-#    print("Test Routine")
 
 
 class MyApp(QMainWindow):
@@ -37,11 +33,11 @@ class MyApp(QMainWindow):
         self.ui.setupUi(self)
 
         # Sets the window title
-        self.setWindowTitle("EPA ALPHA Model REVS3 Command File Generator")
+        self.setWindowTitle("EPA OMEGA Model")
         # Sets the status bar
         self.statusBar().showMessage("Ready")
         # Sets the window icon
-        self.setWindowIcon(QIcon("images/alpha_logo.jpg"))
+        self.setWindowIcon(QIcon("images/omega2_icon.jpg"))
 
         # Sets an icon and messages in the system tray
         # icon = QIcon("images/alpha_logo.jpg")
@@ -53,12 +49,17 @@ class MyApp(QMainWindow):
         # self.tray.showMessage("ALPHA Command Generator", "Idle")
 
         # Connect routines to events and any other needed initialization
-        self.ui.vehicle_type_select.currentIndexChanged.connect(self.displayvalue)
+        # self.ui.vehicle_type_select.currentIndexChanged.connect(self.displayvalue)
         self.ui.validate_mass_reduction_button.clicked.connect(self.validate_mass_reduction)
         self.ui.validate_rolling_reduction_button.clicked.connect(self.validate_rolling_reduction)
         self.ui.validate_aero_reduction_button.clicked.connect(self.validate_aero_reduction)
         self.ui.validate_engine_sizing_button.clicked.connect(self.validate_engine_sizing)
         self.ui.calculate_iterations_button.clicked.connect(self.calculate_iterations)
+
+        self.ui.action_new_file.triggered.connect(self.new_file)
+        self.ui.action_open_file.triggered.connect(self.open_file)
+        self.ui.action_save_file.triggered.connect(self.save_file)
+        self.ui.action_save_file_as.triggered.connect(self.save_file_as)
 
         # Initialize items
         # Hide buttons not used for UI
@@ -70,8 +71,28 @@ class MyApp(QMainWindow):
 
         self.ui.number_of_iterations.setText(str(1))
 
-    def displayvalue(self):
-        self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
+    def new_file(self):
+        self.statusBar().showMessage("New File")
+        self.ui.tab_select.setCurrentIndex(0)
+        new_file_action()
+
+    def open_file(self):
+        self.statusBar().showMessage("Open File")
+        self.ui.tab_select.setCurrentIndex(1)
+        open_file_action()
+
+    def save_file(self):
+        self.statusBar().showMessage("Save File")
+        self.ui.tab_select.setCurrentIndex(2)
+        save_file_action()
+
+    def save_file_as(self):
+        self.statusBar().showMessage("Save File As")
+        self.ui.tab_select.setCurrentIndex(3)
+        save_file_as_action()
+
+    # def displayvalue(self):
+    #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
 
     # This function prevents invalid user selections on the Road Load UI page and then calculates
     # the possible step values given the valid max and min selections
@@ -192,6 +213,8 @@ class MyApp(QMainWindow):
         self.ui.number_of_iterations.setText(str(iterations))
         calculation = iterations * 15
         self.ui.calculation_time.setText(str(calculation))
+
+    import gui.include2
 
 
 if __name__ == '__main__':
