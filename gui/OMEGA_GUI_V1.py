@@ -17,7 +17,7 @@ from PyQt5.QtGui import QIcon
 # Import functions from other files
 from gui.include1 import *
 
-Ui_MainWindow, QtBaseClass = uic.loadUiType('OMEGA_GUI_V1.ui')
+Ui_MainWindow, QtBaseClass = uic.loadUiType('OMEGA_GUI_V2.ui')
 
 
 class MyApp(QMainWindow):
@@ -77,12 +77,13 @@ class MyApp(QMainWindow):
         # Better file dialog
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.AnyFile)
-        dialog.setNameFilter("Images (*.png *.xpm *.jpg)")
+        dialog.setNameFilter("Image files (*.jpg *.gif);; All Files (*.*)")
         dialog.setViewMode(QFileDialog.Detail)
         if dialog.exec_():
             filenames = dialog.selectedFiles()
+            filenames = str(filenames)[2:-2]
             print(filenames)
-            self.ui.plainTextEdit.setPlainText(str(filenames))
+            self.ui.file_1_result.setPlainText(str(filenames))
         new_file_action()
 
     def open_file(self):
