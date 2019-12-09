@@ -71,6 +71,13 @@ class MyApp(QMainWindow):
 
         self.ui.number_of_iterations.setText(str(1))
 
+        self.ui.file_1_label.setText("Input File #1")
+        self.ui.file_2_label.setText("Input File #2")
+        self.ui.file_3_label.setText("Input File #3")
+        self.ui.file_4_label.setText("Input File #4")
+        self.ui.file_5_label.setText("Input File #5")
+        self.ui.file_6_label.setText("Input File #6")
+
     def new_file(self):
         self.statusBar().showMessage("New File")
         self.ui.tab_select.setCurrentIndex(0)
@@ -231,8 +238,6 @@ class MyApp(QMainWindow):
         self.ui.number_of_iterations.setText(str(iterations))
         calculation = iterations * 15
         self.ui.calculation_time.setText(str(calculation))
-
-    import gui.include2
 
 
 if __name__ == '__main__':
