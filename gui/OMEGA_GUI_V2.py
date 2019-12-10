@@ -117,7 +117,9 @@ class MyApp(QMainWindow):
     def save_file_as(self):
         self.statusBar().showMessage("Save File As")
         self.ui.tab_select.setCurrentIndex(0)
-        file_dialog()
+        filename = ""
+        filename = file_dialog(filename)
+        print(filename)
 
     # def displayvalue(self):
     #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())

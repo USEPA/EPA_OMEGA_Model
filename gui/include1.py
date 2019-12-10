@@ -20,7 +20,7 @@ def save_file_as_action():
     print("Save File As")
 
 
-def file_dialog():
+def file_dialog(abcd):
     dialog = QFileDialog()
     dialog.setFileMode(QFileDialog.AnyFile)
     dialog.setNameFilter("Image files (*.jpg *.gif);; All Files (*.*)")
@@ -28,6 +28,5 @@ def file_dialog():
     if dialog.exec_():
         filenames = dialog.selectedFiles()
         filenames = str(filenames)[2:-2]
-        print(filenames)
         return filenames
 
