@@ -112,14 +112,18 @@ class MyApp(QMainWindow):
     def save_file(self):
         self.statusBar().showMessage("Save File")
         self.ui.tab_select.setCurrentIndex(2)
-        save_file_action()
+        file_name = "666"
+        file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_name, file_type = save_file_action(file_name, file_type)
+        print(file_name)
 
     def save_file_as(self):
         self.statusBar().showMessage("Save File As")
         self.ui.tab_select.setCurrentIndex(0)
-        filename = ""
-        filename = file_dialog(filename)
-        print(filename)
+        file_name = ""
+        # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_name = file_dialog(file_name)
+        print(file_name)
 
     # def displayvalue(self):
     #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
