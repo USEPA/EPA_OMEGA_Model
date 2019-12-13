@@ -40,7 +40,7 @@ def create_packages(compliance_start_year, compliance_end_year, powertrain_costs
                 package_cost[model_year, powertrain_efficiency, roadload_efficiency] = powertrain_costs[powertrain_efficiency] * powertrain_learning[model_year] \
                                                                                        + roadload_costs[roadload_efficiency] * roadload_learning[model_year]
                 package_co2[model_year, powertrain_efficiency, roadload_efficiency] = round(roadload_efficiency / powertrain_efficiency * gram_co2pMJ, 0)
-        return package_cost, package_co2
+    return package_cost, package_co2
 
 
 def get_increment(x_value_min, x_value_max):
@@ -109,6 +109,8 @@ tech_package_module_line_charts(learning_oem_dicts, learning_oem_dicts_names, 'C
 tech_package_module_scatter_chart(package_cost_ice, package_co2_ice, 'Package CO2 vs. Cost, ICE', 'Cost ($)', 'CO2 (g/mi)')
 tech_package_module_scatter_chart(package_cost_bev, package_co2_bev, 'Package CO2 vs. Cost, BEV', 'Cost ($)', 'CO2 (g/mi)')
 
+# min(package_co2_bev, key=package_co2_bev.get) # returns key at min CO2 value where key, right now, is a tuple of (MY, PTeff, RLeff)
+# min(package_cost_bev, key=package_cost_bev.get) # returns key at min cost value where key, right now, is a tuple of (MY, PTeff, RLeff)
 
 # # create cost figures
 # loop = 0
