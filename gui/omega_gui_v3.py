@@ -22,6 +22,8 @@ from gui.omega_gui_setup3 import *
 from gui.omega_gui_functions import *
 
 atimer = 0
+scenario_file = ""
+working_directory = ""
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType('omega_gui_v3.ui')
 
@@ -33,7 +35,7 @@ def timer3():
 
 
 timer = multitimer.MultiTimer(interval=1, function=timer3)
-# timer.start()
+timer.start()
 
 
 class MyApp(QMainWindow):
@@ -107,6 +109,7 @@ class MyApp(QMainWindow):
         dialog.setFileMode(QFileDialog.AnyFile)
         dialog.setNameFilter("Image files (*.jpg *.gif);; All Files (*.*)")
         dialog.setViewMode(QFileDialog.Detail)
+        filenames = ""
         if dialog.exec_():
             filenames = dialog.selectedFiles()
             filenames = str(filenames)[2:-2]
@@ -115,23 +118,39 @@ class MyApp(QMainWindow):
         new_file_action(filenames, 234)
 
     def open_file(self):
+        """
+        Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+
+        When complete:
+            Global variable "scenario_file" = user selected scenario file name.
+            Global variable "working_directory" = User selected path to scenario file name.
+        """
+        global scenario_file, working_directory
         self.statusBar().showMessage("Open File")
         # self.ui.tab_select.setCurrentIndex(1)
         self.ui.tab_select.setCurrentWidget(self.ui.tab_select.findChild(QWidget, "scenario_tab"))
-        file_name = "eee.eee"
+        file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Scenario Files (*.om2)"
         file_dialog_title = "Open File"
         file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
-        # print(file_name)
-        # print(file_type)
-        # print(file_dialog_title)
+        if file_name == "":
+            return
         temp1 = os.path.basename(file_name)
         temp1 = os.path.normpath(temp1)
-        self.ui.scenario_file_1_result.setPlainText(str(temp1))
+        scenario_file = temp1
+        self.ui.scenario_file_1_result.setPlainText(temp1)
         temp1 = os.path.dirname(file_name)
-        temp1 = os.path.normpath(temp1)
-        self.ui.working_directory_1_result.setPlainText(str(temp1))
+        temp1 = os.path.normpath(temp1) + '\\'
+        working_directory = temp1
+        self.ui.working_directory_1_result.setPlainText(temp1)
+        self.statusBar().showMessage("Ready")
+
+        path = working_directory + scenario_file
+        f = open(path, "r")
+        if f.mode == 'r':
+            contents = f.read()
+            print(contents)
 
     def save_file(self):
         self.statusBar().showMessage("Save File")
@@ -154,10 +173,7 @@ class MyApp(QMainWindow):
 
     def closeEvent(self, event):
         print("End Program")
-        # timer.stop()
-
-
-
+        timer.stop()
 
     # def displayvalue(self):
     #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
