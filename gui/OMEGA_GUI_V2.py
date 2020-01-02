@@ -10,6 +10,9 @@
     """
 
 import sys
+import multitimer
+import time
+
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
@@ -18,6 +21,18 @@ from PyQt5.QtGui import QIcon
 from gui.include1 import *
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType('OMEGA_GUI_V2.ui')
+
+atimer = 0
+
+
+def timer3():
+    global atimer
+    atimer = atimer + 1
+    print(atimer)
+
+
+timer = multitimer.MultiTimer(interval=1, function=timer3)
+timer.start()
 
 
 class MyApp(QMainWindow):
@@ -112,18 +127,28 @@ class MyApp(QMainWindow):
     def save_file(self):
         self.statusBar().showMessage("Save File")
         self.ui.tab_select.setCurrentIndex(2)
-        file_name = "666"
-        file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_name, file_type = save_file_action(file_name, file_type)
+        # file_name = "666"
+        file_name = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_name = save_file_action(file_name)
         print(file_name)
 
     def save_file_as(self):
         self.statusBar().showMessage("Save File As")
         self.ui.tab_select.setCurrentIndex(0)
-        file_name = ""
-        # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_name = file_dialog(file_name)
+        file_name = "eee.eee"
+        file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_dialog_title = "Save As..."
+        file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
         print(file_name)
+        print(file_type)
+        print(file_dialog_title)
+
+    def closeEvent(self, event):
+        print("End Program")
+        timer.stop()
+
+
+
 
     # def displayvalue(self):
     #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
@@ -140,4 +165,8 @@ if __name__ == '__main__':
     # aero_iterations = 1
     # engine_iterations = 1
 
+
+
     sys.exit(app.exec_())
+
+
