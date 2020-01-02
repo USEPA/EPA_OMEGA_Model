@@ -52,6 +52,81 @@
     <property name="tabBarAutoHide">
      <bool>false</bool>
     </property>
+    <widget class="QWidget" name="intro_tab">
+     <attribute name="title">
+      <string>Intro</string>
+     </attribute>
+     <widget class="QLabel" name="intro_text_1">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>22</y>
+        <width>761</width>
+        <height>451</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>This is OMEGA 2</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="scenario_tab">
+     <attribute name="title">
+      <string>Scenario</string>
+     </attribute>
+     <widget class="QPlainTextEdit" name="scenario_file_1_result">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>771</width>
+        <height>51</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="scenario_file_1_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Scenario File</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="working_directory_1_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Working Directory</string>
+      </property>
+     </widget>
+     <widget class="QPlainTextEdit" name="working_directory_1_result">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>771</width>
+        <height>51</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="input_files_tab">
      <attribute name="title">
       <string>Input Files</string>
@@ -197,11 +272,6 @@
        </rect>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="engine_tab">
-     <attribute name="title">
-      <string>Engine</string>
-     </attribute>
     </widget>
     <widget class="QWidget" name="transmission_tab">
      <attribute name="title">

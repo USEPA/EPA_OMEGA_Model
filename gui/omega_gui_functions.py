@@ -8,8 +8,8 @@ def new_file_action(var1, var2):
     print(var1, var2)
 
 
-def open_file_action():
-    print("Open File")
+# def open_file_action():
+    # print("Open File")
 
 
 def save_file_action(file_name):
@@ -28,8 +28,8 @@ def save_file_action(file_name):
         return file_name
 
 
-def save_file_as_action(file_name, file_type):
-    print("Save File As")
+# def save_file_as_action(file_name, file_type):
+    # print("Save File As")
 
 
 def file_dialog(file_name, file_type, file_dialog_title):

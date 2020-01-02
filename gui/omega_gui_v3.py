@@ -8,22 +8,22 @@
         A highlighted literal section may also be added here if needed.
 
     """
-
+import os
 import sys
 import multitimer
 import time
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
 # Import functions from other files
-from gui.gui_setup3 import *
-from gui.include3 import *
-
-Ui_MainWindow, QtBaseClass = uic.loadUiType('OMEGA_GUI_V3.ui')
+from gui.omega_gui_setup3 import *
+from gui.omega_gui_functions import *
 
 atimer = 0
+
+Ui_MainWindow, QtBaseClass = uic.loadUiType('omega_gui_v3.ui')
 
 
 def timer3():
@@ -33,7 +33,7 @@ def timer3():
 
 
 timer = multitimer.MultiTimer(interval=1, function=timer3)
-timer.start()
+# timer.start()
 
 
 class MyApp(QMainWindow):
@@ -52,12 +52,10 @@ class MyApp(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        mass_iterations = 1
-
         # Set the window title
         self.setWindowTitle("EPA OMEGA Model")
         # Set the status bar
-        self.statusBar().showMessage(str(mass_iterations))
+        self.statusBar().showMessage("Ready")
         # Set the window icon
         self.setWindowIcon(QIcon("images/omega2_icon.jpg"))
 
@@ -103,7 +101,7 @@ class MyApp(QMainWindow):
 
     def new_file(self):
         self.statusBar().showMessage("New File")
-        self.ui.tab_select.setCurrentIndex(0)
+        # self.ui.tab_select.setCurrentIndex(0)
         # Better file dialog
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.AnyFile)
@@ -118,16 +116,22 @@ class MyApp(QMainWindow):
 
     def open_file(self):
         self.statusBar().showMessage("Open File")
-        self.ui.tab_select.setCurrentIndex(1)
-        # Open file with options
-        title = "Open File"
-        location = "c:\\"
-        filetype = "Image files (*.jpg *.gif);; All Files (*.*)"
-        fname = QFileDialog.getOpenFileName(self, title, location, filetype)
-        # Open file without options
-        # fname = QFileDialog.getOpenFileName()
-        print(fname)
-        open_file_action()
+        # self.ui.tab_select.setCurrentIndex(1)
+        self.ui.tab_select.setCurrentWidget(self.ui.tab_select.findChild(QWidget, "scenario_tab"))
+        file_name = "eee.eee"
+        # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_type = "OMEGA2 Scenario Files (*.om2)"
+        file_dialog_title = "Open File"
+        file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
+        # print(file_name)
+        # print(file_type)
+        # print(file_dialog_title)
+        temp1 = os.path.basename(file_name)
+        temp1 = os.path.normpath(temp1)
+        self.ui.scenario_file_1_result.setPlainText(str(temp1))
+        temp1 = os.path.dirname(file_name)
+        temp1 = os.path.normpath(temp1)
+        self.ui.working_directory_1_result.setPlainText(str(temp1))
 
     def save_file(self):
         self.statusBar().showMessage("Save File")
@@ -150,7 +154,7 @@ class MyApp(QMainWindow):
 
     def closeEvent(self, event):
         print("End Program")
-        timer.stop()
+        # timer.stop()
 
 
 
