@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QFileDialog
+import yaml
 
 
 def new_file_action(var1, var2):
@@ -8,8 +9,27 @@ def new_file_action(var1, var2):
     print(var1, var2)
 
 
-# def open_file_action():
-    # print("Open File")
+def open_file_action(filepath):
+    data = yaml_loader(filepath)
+    print(data)
+
+
+def yaml_loader(filepath):
+    """Loads a yaml file"""
+    with open(filepath, "r") as file_descriptor:
+        data = yaml.full_load(file_descriptor)
+    return data
+
+
+def yaml_dump(filepath, data):
+    """Dumps data to a yaml file"""
+    with open(filepath, "w") as file_descriptor:
+        yaml.dump(data, file_descriptor)
+
+
+        yaml.dump(data)
+
+    print("Open File")
 
 
 def save_file_action(file_name):

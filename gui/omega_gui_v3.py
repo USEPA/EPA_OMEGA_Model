@@ -132,25 +132,39 @@ class MyApp(QMainWindow):
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Scenario Files (*.om2)"
+        # Add file dialog title
         file_dialog_title = "Open File"
+        # Call file dialog function
         file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
+        # Return if no file selected or dialog cancelled
         if file_name == "":
             return
+        # Get name of selected file
         temp1 = os.path.basename(file_name)
         temp1 = os.path.normpath(temp1)
         scenario_file = temp1
+        # Place name of selected file in gui
         self.ui.scenario_file_1_result.setPlainText(temp1)
+        # Get path of selected file
         temp1 = os.path.dirname(file_name)
         temp1 = os.path.normpath(temp1) + '\\'
         working_directory = temp1
+        # Place path in gui
         self.ui.working_directory_1_result.setPlainText(temp1)
+        # Change status bar
         self.statusBar().showMessage("Ready")
 
-        path = working_directory + scenario_file
-        f = open(path, "r")
-        if f.mode == 'r':
-            contents = f.read()
-            print(contents)
+        filepath = working_directory + scenario_file
+
+        # temp1 = self.ui.working_directory_1_result.toPlainText()
+
+        open_file_action(filepath)
+
+        # path = working_directory + scenario_file
+        # f = open(path, "r")
+        # if f.mode == 'r':
+        #    contents = f.read()
+        #    print(contents)
 
     def save_file(self):
         self.statusBar().showMessage("Save File")
@@ -190,8 +204,4 @@ if __name__ == '__main__':
     # aero_iterations = 1
     # engine_iterations = 1
 
-
-
     sys.exit(app.exec_())
-
-
