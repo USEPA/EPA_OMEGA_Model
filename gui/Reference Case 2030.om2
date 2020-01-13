@@ -1,3 +1,12 @@
-items:
-    sword: 100
-    axe: 80
+input_files:
+    Baseline_file: Baseline 2030.csv
+    Market_file: Market 2040.xls
+    Consumer_file: Consumer 2020.xls
+    Cost_file: Curves 2020.xls
+    Hybrid_cost_file: Hybrid 2020
+output_files:
+    output1: 1
+    output2: 2
+baseline:
+    test1: 1
+

@@ -11,7 +11,25 @@ def new_file_action(var1, var2):
 
 def open_file_action(filepath):
     data = yaml_loader(filepath)
-    print(data)
+    # print(data)
+    parts = data.get('input_files')
+    for item_name, item_value in parts.items():
+        print(item_name, item_value)
+    parts = data.get('output_files')
+    for item_name, item_value in parts.items():
+        print(item_name, item_value)
+    return data
+
+    # g = data.get("input_files", "")
+    # print(g)
+
+    # a = data['file_1']
+    # print(a)
+    # data['file_1'] = "hello"
+    # print(data['file_1'])
+
+    # filepath2 = "test3.om2"
+    # yaml_dump(filepath2, data)
 
 
 def yaml_loader(filepath):

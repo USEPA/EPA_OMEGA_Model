@@ -25,7 +25,7 @@ atimer = 0
 scenario_file = ""
 working_directory = ""
 
-Ui_MainWindow, QtBaseClass = uic.loadUiType('omega_gui_v3.ui')
+Ui_MainWindow, QtBaseClass = uic.loadUiType('omega_gui_v4.ui')
 
 
 def timer3():
@@ -35,7 +35,7 @@ def timer3():
 
 
 timer = multitimer.MultiTimer(interval=1, function=timer3)
-timer.start()
+# timer.start()
 
 
 class MyApp(QMainWindow):
@@ -94,12 +94,12 @@ class MyApp(QMainWindow):
         # self.ui.number_of_iterations.setText(str(1))
 
         # Read input file labels
-        self.ui.file_1_label.setText(input_file_1_label)
-        self.ui.file_2_label.setText(input_file_2_label)
-        self.ui.file_3_label.setText(input_file_3_label)
-        self.ui.file_4_label.setText(input_file_4_label)
-        self.ui.file_5_label.setText(input_file_5_label)
-        self.ui.file_6_label.setText(input_file_6_label)
+        # self.ui.file_1_label.setText(input_file_1_label)
+        # self.ui.file_2_label.setText(input_file_2_label)
+        # self.ui.file_3_label.setText(input_file_3_label)
+        # self.ui.file_4_label.setText(input_file_4_label)
+        # self.ui.file_5_label.setText(input_file_5_label)
+        # self.ui.file_6_label.setText(input_file_6_label)
 
     def new_file(self):
         self.statusBar().showMessage("New File")
@@ -157,8 +157,15 @@ class MyApp(QMainWindow):
         filepath = working_directory + scenario_file
 
         # temp1 = self.ui.working_directory_1_result.toPlainText()
+        data = open_file_action(filepath)
+        # print(data)
 
-        open_file_action(filepath)
+        parts = data.get('input_files')
+        for item_name, item_value in parts.items():
+            print(item_name, item_value)
+        parts = data.get('output_files')
+        for item_name, item_value in parts.items():
+            print(item_name, item_value)
 
         # path = working_directory + scenario_file
         # f = open(path, "r")
@@ -187,7 +194,7 @@ class MyApp(QMainWindow):
 
     def closeEvent(self, event):
         print("End Program")
-        timer.stop()
+        # timer.stop()
 
     # def displayvalue(self):
     #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
