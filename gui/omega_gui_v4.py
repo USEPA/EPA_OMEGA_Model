@@ -13,7 +13,7 @@ import sys
 import multitimer
 import time
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QListWidget, QListWidgetItem
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
@@ -164,11 +164,22 @@ class MyApp(QMainWindow):
         parts = data.get('input_files')
         for item_name, item_value in parts.items():
             print(item_name, item_value)
-            temp1 = temp1 + item_name + " = " + os.path.basename(item_value) + "\n"
+            temp1 = temp1 + item_name + ": " + os.path.basename(item_value) + "\n"
         parts = data.get('output_files')
         for item_name, item_value in parts.items():
             print(item_name, item_value)
-        self.ui.input_files_list.setPlainText(temp1)
+        # self.ui.input_files_list.setPlainText(temp1)
+
+        self.ui.input_file_table.setRowCount(5)
+        self.ui.input_file_table.setColumnCount(2)
+        self.ui.input_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
+
+        self.ui.output_file_table.setRowCount(5)
+        self.ui.output_file_table.setColumnCount(2)
+        self.ui.output_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
+        self.ui.output_file_table.resizeColumnsToContents()
+
+
         # path = working_directory + scenario_file
         # f = open(path, "r")
         # if f.mode == 'r':

@@ -41,7 +41,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="iconSize">
      <size>
@@ -140,21 +140,86 @@
      <attribute name="toolTip">
       <string>Vehicle Type</string>
      </attribute>
-     <widget class="QPlainTextEdit" name="input_files_list">
+     <widget class="QTableWidget" name="input_file_table">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>60</y>
-        <width>871</width>
-        <height>441</height>
+        <x>5</x>
+        <y>11</y>
+        <width>891</width>
+        <height>511</height>
        </rect>
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="transmission_tab">
+    <widget class="QWidget" name="output_files_tab">
      <attribute name="title">
-      <string>Transmission</string>
+      <string>Output Files</string>
      </attribute>
+     <widget class="QTableWidget" name="output_file_table">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>11</y>
+        <width>891</width>
+        <height>511</height>
+       </rect>
+      </property>
+      <row>
+       <property name="text">
+        <string>1</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>2</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>3</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>4</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>5</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>6</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>7</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
+        <string>10</string>
+       </property>
+      </row>
+      <column>
+       <property name="text">
+        <string>File Type</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>File Name</string>
+       </property>
+      </column>
+     </widget>
     </widget>
     <widget class="QWidget" name="electrification_tab">
      <attribute name="title">
@@ -742,198 +807,5 @@
   </action>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>mass_reduction_max_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_mass_reduction_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>133</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>149</x>
-     <y>340</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mass_reduction_min_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_mass_reduction_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>133</x>
-     <y>203</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>149</x>
-     <y>340</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rolling_reduction_max_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_rolling_reduction_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>273</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>374</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rolling_reduction_min_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_rolling_reduction_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>273</x>
-     <y>203</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>374</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>aero_reduction_max_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_aero_reduction_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>414</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>aero_reduction_min_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_aero_reduction_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>203</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>414</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>engine_sizing_max_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_engine_sizing_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>573</x>
-     <y>172</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>engine_sizing_min_select</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>validate_engine_sizing_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>573</x>
-     <y>203</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>162</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mass_reduction_step_select</sender>
-   <signal>activated(int)</signal>
-   <receiver>calculate_iterations_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>123</x>
-     <y>234</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>402</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rolling_reduction_step_select</sender>
-   <signal>activated(int)</signal>
-   <receiver>calculate_iterations_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>273</x>
-     <y>234</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>402</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>aero_reduction_step_select</sender>
-   <signal>activated(int)</signal>
-   <receiver>calculate_iterations_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>234</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>402</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>engine_sizing_step_select</sender>
-   <signal>activated(int)</signal>
-   <receiver>calculate_iterations_button</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>577</x>
-     <y>234</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>402</x>
-     <y>454</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
