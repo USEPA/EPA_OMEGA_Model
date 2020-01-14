@@ -13,7 +13,8 @@ import sys
 import multitimer
 import time
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QListWidget, QListWidgetItem, \
+    QTableWidgetItem
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
@@ -82,8 +83,10 @@ class MyApp(QMainWindow):
         self.ui.action_open_file.triggered.connect(self.open_file)
         self.ui.action_save_file.triggered.connect(self.save_file)
         self.ui.action_save_file_as.triggered.connect(self.save_file_as)
+        self.ui.action_exit.triggered.connect(self.exit_gui)
 
         # Initialize items
+        self.ui.tab_select.setCurrentWidget(self.ui.tab_select.findChild(QWidget, "intro_tab"))
         # Hide buttons not used for UI
         # self.ui.validate_mass_reduction_button.setVisible(0)
         # self.ui.validate_rolling_reduction_button.setVisible(0)
@@ -170,15 +173,31 @@ class MyApp(QMainWindow):
             print(item_name, item_value)
         # self.ui.input_files_list.setPlainText(temp1)
 
-        self.ui.input_file_table.setRowCount(5)
+        self.ui.input_file_table.setRowCount(15)
         self.ui.input_file_table.setColumnCount(2)
         self.ui.input_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
+        a = 0
+        parts = data.get('input_files')
+        for item_name, item_value in parts.items():
+            print(item_name, item_value)
+            # temp1 = temp1 + item_name + ": " + os.path.basename(item_value) + "\n"
+            self.ui.input_file_table.setItem(a, 0, QTableWidgetItem(str(item_name)))
+            self.ui.input_file_table.setItem(a, 1, QTableWidgetItem(str(item_value)))
+            a = a + 1
+        self.ui.input_file_table.resizeColumnsToContents()
 
-        self.ui.output_file_table.setRowCount(5)
+        self.ui.output_file_table.setRowCount(15)
         self.ui.output_file_table.setColumnCount(2)
         self.ui.output_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
+        a = 0
+        parts = data.get('output_files')
+        for item_name, item_value in parts.items():
+            print(item_name, item_value)
+            # temp1 = temp1 + item_name + ": " + os.path.basename(item_value) + "\n"
+            self.ui.output_file_table.setItem(a, 0, QTableWidgetItem(str(item_name)))
+            self.ui.output_file_table.setItem(a, 1, QTableWidgetItem(str(item_value)))
+            a = a + 1
         self.ui.output_file_table.resizeColumnsToContents()
-
 
         # path = working_directory + scenario_file
         # f = open(path, "r")
@@ -204,6 +223,9 @@ class MyApp(QMainWindow):
         print(file_name)
         print(file_type)
         print(file_dialog_title)
+
+    def exit_gui(self):
+        self.close()
 
     def closeEvent(self, event):
         print("End Program")

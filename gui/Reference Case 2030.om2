@@ -3,10 +3,10 @@ input_files:
     Market_file: Market 2040.xls
     Consumer_file: Consumer 2020.xls
     Cost_file: Curves 2020.xls
-    Hybrid_cost_file: Hybrid 2020
+    Hybrid_cost_file: Hybrid 2020.csv
 output_files:
-    output1: 1
-    output2: 2
+    Manufacturer_file: Manufacturer 2020.pdf
+    Cost_file: Cost 2020.xls
 baseline:
     test1: 1
 
