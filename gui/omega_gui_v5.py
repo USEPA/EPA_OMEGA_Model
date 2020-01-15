@@ -182,8 +182,10 @@ class Form(QObject):
         print(file_type)
         print(file_dialog_title)
 
+
     def exit_gui(self):
         self.window.close()
+
 
     def closeEvent(self):
         print("End Program")
@@ -197,12 +199,14 @@ def timer3():
     if gui_loaded == 1:
         if (atimer % 2) == 0:
             form.window.statusbar.showMessage("Hello World")
+            form.window.epa_logo_label1.setEnabled(1)
         else:
             form.window.statusbar.showMessage("Hello")
+            form.window.epa_logo_label1.setEnabled(0)
     print(atimer)
 
 
-timer = multitimer.MultiTimer(interval=1, function=timer3)
+timer = multitimer.MultiTimer(interval=0.25, function=timer3)
 timer.start()
 
 
