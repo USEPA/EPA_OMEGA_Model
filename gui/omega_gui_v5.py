@@ -13,10 +13,8 @@ import sys
 
 import multitimer
 from PySide2 import QtUiTools, QtCore, QtGui
-from PySide2.QtUiTools import QUiLoader
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem
-from PySide2.QtCore import QFile, QObject
 
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QPushButton, QLineEdit
@@ -25,39 +23,11 @@ from PySide2.QtCore import QFile, QObject
 # Import functions from other files
 from gui.omega_gui_functions import *
 
+# Initialize global variables
 atimer = 0
 scenario_file = ""
 working_directory = ""
-
-
-# Ui_MainWindow, QtBaseClass = uic.loadUiType('omega_gui_v4.ui')
-
-#def loadUiWidget(uifilename, parent=None):
-#    loader = QtUiTools.QUiLoader()
-#    uifile = QtCore.QFile(uifilename)
-#    uifile.open(QtCore.QFile.ReadOnly)
-#    ui = loader.load(uifile, parent)
-#    uifile.close()
-#    return ui
-
-
-#def timer3():
-#    global atimer
-#    atimer = atimer + 1
-#    atimer
-#    if atimer == 5:
-#        window.ui.statusbar.showMessage("rrr")
-
-    # else:
-    #    window.ui.statusbar.showMessage("Hello")
-    #    window.exit_gui()
-    #    temp = MyApp()
-    #    temp.exit_gui()
-    # print(atimer)
-
-
-# timer = multitimer.MultiTimer(interval=1, function=timer3)
-# timer.start()
+gui_loaded = 0
 
 
 class Form(QObject):
@@ -78,13 +48,15 @@ class Form(QObject):
         loader = QUiLoader()
         self.window = loader.load(ui_file)
         ui_file.close()
+        global gui_loaded
+        gui_loaded = 1
 
         # Set the window title
-        # self.setWindowTitle("EPA OMEGA Model")
+        self.window.setWindowTitle("EPA OMEGA Model")
         # Set the status bar
-        # self.statusBar().showMessage("Ready")
+        self.window.statusBar().showMessage("Ready")
         # Set the window icon
-        # self.setWindowIcon(QIcon("images/omega2_icon.jpg"))
+        self.window.setWindowIcon(QIcon("images/omega2_icon.jpg"))
 
         self.window.action_new_file.triggered.connect(self.new_file)
         self.window.action_open_file.triggered.connect(self.open_file)
@@ -92,13 +64,15 @@ class Form(QObject):
         self.window.action_save_file_as.triggered.connect(self.save_file_as)
         self.window.action_exit.triggered.connect(self.exit_gui)
 
+        app.aboutToQuit.connect(self.closeEvent)
+
         self.window.show()
 
         # Initialize items
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "intro_tab"))
 
     def new_file(self):
-        self.statusBar().showMessage("New File")
+        self.window.statusBar().showMessage("New File")
         # self.ui.tab_select.setCurrentIndex(0)
         # Better file dialog
         dialog = QFileDialog(self)
@@ -110,7 +84,7 @@ class Form(QObject):
             filenames = dialog.selectedFiles()
             filenames = str(filenames)[2:-2]
             print(filenames)
-            self.ui.file_1_result.setPlainText(str(filenames))
+            self.window.file_1_result.setPlainText(str(filenames))
         new_file_action(filenames, 234)
 
     def open_file(self):
@@ -122,8 +96,7 @@ class Form(QObject):
             Global variable "working_directory" = User selected path to scenario file name.
         """
         global scenario_file, working_directory
-        # self.statusBar().showMessage("Open File")
-        # self.ui.tab_select.setCurrentIndex(1)
+        self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "scenario_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
@@ -148,7 +121,7 @@ class Form(QObject):
         # Place path in gui
         self.window.working_directory_1_result.setPlainText(temp1)
         # Change status bar
-        # self.statusBar().showMessage("Ready")
+        self.window.statusBar().showMessage("Ready")
 
         # Create library 'data' from YAML formatted scenario file
         filepath = working_directory + scenario_file
@@ -191,16 +164,16 @@ class Form(QObject):
         self.window.output_file_table.resizeColumnsToContents()
 
     def save_file(self):
-        self.statusBar().showMessage("Save File")
-        self.ui.tab_select.setCurrentIndex(2)
+        self.window.statusBar().showMessage("Save File")
+        self.window.tab_select.setCurrentIndex(2)
         # file_name = "666"
         file_name = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_name = save_file_action(file_name)
         print(file_name)
 
     def save_file_as(self):
-        self.statusBar().showMessage("Save File As")
-        self.ui.tab_select.setCurrentIndex(0)
+        self.window.statusBar().showMessage("Save File As")
+        self.window.tab_select.setCurrentIndex(0)
         file_name = "eee.eee"
         file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_dialog_title = "Save As..."
@@ -212,9 +185,25 @@ class Form(QObject):
     def exit_gui(self):
         self.window.close()
 
-    def closeEvent(self, event):
+    def closeEvent(self):
         print("End Program")
-        # timer.stop()
+        timer.stop()
+
+
+def timer3():
+    global atimer
+    atimer = atimer + 1
+    atimer
+    if gui_loaded == 1:
+        if (atimer % 2) == 0:
+            form.window.statusbar.showMessage("Hello World")
+        else:
+            form.window.statusbar.showMessage("Hello")
+    print(atimer)
+
+
+timer = multitimer.MultiTimer(interval=1, function=timer3)
+timer.start()
 
 
 if __name__ == '__main__':
