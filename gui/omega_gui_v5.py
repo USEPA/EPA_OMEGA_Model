@@ -12,22 +12,25 @@ import os
 import sys
 
 import multitimer
-from PySide2 import QtUiTools, QtCore, QtGui
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem
+from PySide2.QtWidgets import QWidget, QTableWidgetItem
 
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QPushButton, QLineEdit
+from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
+
+from datetime import datetime, date
 
 # Import functions from other files
 from gui.omega_gui_functions import *
 
 # Initialize global variables
 atimer = 0
-scenario_file = ""
-working_directory = ""
+configuration_file = ""
+input_file_directory = ""
+project_directory = ""
 gui_loaded = 0
+status_bar_message = "Ready"
 
 
 class Form(QObject):
@@ -58,17 +61,21 @@ class Form(QObject):
         # Set the window icon
         self.window.setWindowIcon(QIcon("images/omega2_icon.jpg"))
 
+        # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
-        self.window.action_open_file.triggered.connect(self.open_file)
+        self.window.action_open_configuration_file.triggered.connect(self.open_file)
         self.window.action_save_file.triggered.connect(self.save_file)
         self.window.action_save_file_as.triggered.connect(self.save_file_as)
         self.window.action_exit.triggered.connect(self.exit_gui)
-
-        app.aboutToQuit.connect(self.closeEvent)
-
+        self.window.select_input_directory_button.clicked.connect(self.open_input_directory)
+        self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
+        # Catch close event for clean exit
+        app.aboutToQuit.connect(self.closeprogram)
+        # Show gui
         self.window.show()
 
         # Initialize items
+        # Select intro tab
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "intro_tab"))
 
     def new_file(self):
@@ -95,14 +102,14 @@ class Form(QObject):
             Global variable "scenario_file" = user selected scenario file name.
             Global variable "working_directory" = User selected path to scenario file name.
         """
-        global scenario_file, working_directory
+        global configuration_file
         self.window.statusBar().showMessage("Open File")
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "scenario_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Scenario Files (*.om2)"
+        file_type = "OMEGA2 Configuration Files (*.om2)"
         # Add file dialog title
-        file_dialog_title = "Open File"
+        file_dialog_title = "Open Configuration File"
         # Call file dialog function
         file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
         # Return if no file selected or dialog cancelled
@@ -111,57 +118,93 @@ class Form(QObject):
         # Get name of selected file
         temp1 = os.path.basename(file_name)
         temp1 = os.path.normpath(temp1)
-        scenario_file = temp1
-        # Place name of selected file in gui
-        self.window.scenario_file_1_result.setPlainText(temp1)
         # Get path of selected file
-        temp1 = os.path.dirname(file_name)
-        temp1 = os.path.normpath(temp1) + '\\'
-        working_directory = temp1
+        temp2 = os.path.dirname(file_name)
+        temp2 = os.path.normpath(temp2) + '\\'
+        # working_directory = temp2
+        configuration_file = temp2 + temp1
         # Place path in gui
-        self.window.working_directory_1_result.setPlainText(temp1)
+        self.window.configuration_file_1_result.setPlainText(configuration_file)
         # Change status bar
-        self.window.statusBar().showMessage("Ready")
 
-        # Create library 'data' from YAML formatted scenario file
-        filepath = working_directory + scenario_file
-        data = open_file_action(filepath)
+        # Create python dictionary 'scenario' from YAML formatted configuration file
+        filepath = configuration_file
+        scenario = open_file_action(filepath)
 
-        # Read dictionary 'data' into tables in gui
-        # Set row and column count
-        self.window.input_file_table.setRowCount(15)
-        self.window.input_file_table.setColumnCount(2)
-        # Set header names
-        self.window.input_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
-        # Reset line counter
-        a = 0
-        # Read 'input_file' elements in dictionary 'data'
-        parts = data.get('input_files')
-        # Load name and value for each element into input file table
+        # Get input File Directory
+        parts = scenario.get('input_file_directory')
         for item_name, item_value in parts.items():
-            self.window.input_file_table.setItem(a, 0, QTableWidgetItem(str(item_name)))
-            self.window.input_file_table.setItem(a, 1, QTableWidgetItem(str(item_value)))
-            a = a + 1
-        # Autosize column widths
-        self.window.input_file_table.resizeColumnsToContents()
-
-        # Read dictionary 'data' into tables in gui
-        # Set row and column count
-        self.window.output_file_table.setRowCount(15)
-        self.window.output_file_table.setColumnCount(2)
-        # Set header names
-        self.window.output_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
-        # Reset line counter
-        a = 0
-        # Read 'output_file' elements in dictionary 'data'
-        parts = data.get('output_files')
-        # Load name and value for each element into output file table
+            self.window.input_file_directory_1_result.setPlainText(str(item_value))
+        # Get output file directory
+        parts = scenario.get('project_directory')
         for item_name, item_value in parts.items():
-            self.window.output_file_table.setItem(a, 0, QTableWidgetItem(str(item_name)))
-            self.window.output_file_table.setItem(a, 1, QTableWidgetItem(str(item_value)))
-            a = a + 1
-        # Autosize column widths
-        self.window.output_file_table.resizeColumnsToContents()
+            self.window.project_directory_1_result.setPlainText(str(item_value))
+
+    def open_input_directory(self):
+        """
+        Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+
+        When complete:
+            Global variable "scenario_file" = user selected scenario file name.
+            Global variable "working_directory" = User selected path to scenario file name.
+        """
+        global input_file_directory
+        self.window.statusBar().showMessage("Open File")
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        file_name = ""
+        # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_type = "OMEGA2 Configuration Files (*.om2)"
+        # Add file dialog title
+        file_dialog_title = "Select Input File Directory"
+        # Call file dialog function
+        file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
+        # Return if no file selected or dialog cancelled
+        if file_name == "":
+            return
+        # Get name of selected directory
+        temp1 = os.path.basename(file_name)
+        temp1 = os.path.normpath(temp1)
+        # Get path of selected directory
+        temp2 = os.path.dirname(file_name)
+        temp2 = os.path.normpath(temp2) + '\\'
+        # working_directory = temp2
+        input_file_directory = temp2 + temp1
+        # Place path in gui
+        self.window.input_file_directory_1_result.setPlainText(input_file_directory)
+
+    def open_project_directory(self):
+        """
+        Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+
+        When complete:
+            Global variable "scenario_file" = user selected scenario file name.
+            Global variable "working_directory" = User selected path to scenario file name.
+        """
+        global project_directory
+        self.window.statusBar().showMessage("Open File")
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        file_name = ""
+        # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
+        file_type = "OMEGA2 Configuration Files (*.om2)"
+        # Add file dialog title
+        file_dialog_title = "Select Project Directory"
+        # Call file dialog function
+        file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
+        # Return if no file selected or dialog cancelled
+        if file_name == "":
+            return
+        # Get name of selected directory
+        temp1 = os.path.basename(file_name)
+        temp1 = os.path.normpath(temp1)
+        # Get path of selected directory
+        temp2 = os.path.dirname(file_name)
+        temp2 = os.path.normpath(temp2) + '\\'
+        # working_directory = temp2
+        project_directory = temp2 + temp1
+        # Place path in gui
+        self.window.project_directory_1_result.setPlainText(project_directory)
+
+
 
     def save_file(self):
         self.window.statusBar().showMessage("Save File")
@@ -182,37 +225,34 @@ class Form(QObject):
         print(file_type)
         print(file_dialog_title)
 
-
     def exit_gui(self):
         self.window.close()
 
-
-    def closeEvent(self):
-        print("End Program")
+    def closeprogram(self):
+        print("User Terminating Process")
+        # Stop timer
         timer.stop()
 
 
 def timer3():
-    global atimer
-    atimer = atimer + 1
-    atimer
+    # Make sure gui is loaded before accessing it!
     if gui_loaded == 1:
-        if (atimer % 2) == 0:
-            form.window.statusbar.showMessage("Hello World")
-            form.window.epa_logo_label1.setEnabled(1)
-        else:
-            form.window.statusbar.showMessage("Hello")
-            form.window.epa_logo_label1.setEnabled(0)
-    print(atimer)
+        # Put date, time, and message on status bar
+        time = datetime.now()
+        t1 = time.strftime("%H:%M:%S")
+        today = date.today()
+        d1 = today.strftime("%B %d, %Y")
+        form.window.statusBar().showMessage(d1 + "  " + t1 + "  " + status_bar_message)
 
 
-timer = multitimer.MultiTimer(interval=0.25, function=timer3)
+# Run the function 'timer3' in 1 second intervals
+timer = multitimer.MultiTimer(interval=1, function=timer3)
+# Start timer
 timer.start()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('omega_gui_v4.ui')
+    form = Form('omega_gui_v5.ui')
     # window = MyApp()
     # window.show()
     sys.exit(app.exec_())

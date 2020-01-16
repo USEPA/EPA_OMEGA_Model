@@ -67,7 +67,7 @@ def file_dialog(file_name, file_type, file_dialog_title):
     dialog = QFileDialog()
     dialog.selectFile(file_name)
     dialog.setWindowTitle(file_dialog_title)
-    dialog.setFileMode(QFileDialog.AnyFile)
+    dialog.setFileMode(QFileDialog.ExistingFile)
     dialog.setNameFilter(file_type)
     dialog.setViewMode(QFileDialog.Detail)
     temp = dialog.selectedFiles()
@@ -80,5 +80,31 @@ def file_dialog(file_name, file_type, file_dialog_title):
         return file_name, file_type, file_dialog_title
 
 
+def directory_dialog(file_name, file_type, file_dialog_title):
+    """
+    Opens a file dialog to select a file with extension options.
+
+    :param file_name: Default file name
+    :param file_type: Specifies extension filter type
+    :param file_dialog_title: Title for dialog box
+    ...
+    :return file_name: User selected file name
+    :return file_type: Echo input param
+    :return file_dialog_title: Echo input param
+    """
+    dialog = QFileDialog()
+    dialog.selectFile(file_name)
+    dialog.setWindowTitle(file_dialog_title)
+    dialog.setFileMode(QFileDialog.DirectoryOnly)
+    dialog.setNameFilter(file_type)
+    dialog.setViewMode(QFileDialog.Detail)
+    temp = dialog.selectedFiles()
+    if dialog.exec_():
+        file_name = dialog.selectedFiles()
+        file_name = str(file_name)[2:-2]
+        return file_name, file_type, file_dialog_title
+    else:
+        file_name = ""
+        return file_name, file_type, file_dialog_title
 
 
