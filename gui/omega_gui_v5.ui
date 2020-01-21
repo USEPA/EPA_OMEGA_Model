@@ -32,7 +32,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string/>
+     <string>The Configuration File contains all parameters for an OMEGA 2 model run</string>
     </property>
     <property name="tabPosition">
      <enum>QTabWidget::North</enum>
@@ -102,8 +102,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>The Configuration File contains all parameters for an OMEGA 2 model run 
-Load and save the Configuration File from the File Menu</string>
+       <string>The Configuration File contains all parameters for an OMEGA 2 model run</string>
       </property>
      </widget>
      <widget class="QLabel" name="configuration_file_1_label">
@@ -111,7 +110,7 @@ Load and save the Configuration File from the File Menu</string>
        <rect>
         <x>80</x>
         <y>39</y>
-        <width>151</width>
+        <width>441</width>
         <height>31</height>
        </rect>
       </property>
@@ -124,7 +123,7 @@ Load and save the Configuration File from the File Menu</string>
        <rect>
         <x>80</x>
         <y>169</y>
-        <width>151</width>
+        <width>511</width>
         <height>31</height>
        </rect>
       </property>
@@ -156,7 +155,7 @@ Load and save the Configuration File from the File Menu</string>
        <rect>
         <x>80</x>
         <y>299</y>
-        <width>151</width>
+        <width>461</width>
         <height>31</height>
        </rect>
       </property>
@@ -197,6 +196,9 @@ Load and save the Configuration File from the File Menu</string>
       </property>
      </widget>
      <widget class="QPushButton" name="select_input_directory_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -209,495 +211,20 @@ Load and save the Configuration File from the File Menu</string>
        <string>Select</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="input_files_tab">
-     <attribute name="title">
-      <string>Input Files</string>
-     </attribute>
-     <attribute name="toolTip">
-      <string>Vehicle Type</string>
-     </attribute>
-     <widget class="QTableWidget" name="input_file_table">
+     <widget class="QPushButton" name="open_configuration_file_button">
       <property name="geometry">
        <rect>
-        <x>5</x>
-        <y>11</y>
-        <width>891</width>
-        <height>511</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
-       </font>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="output_files_tab">
-     <attribute name="title">
-      <string>Output Files</string>
-     </attribute>
-     <widget class="QTableWidget" name="output_file_table">
-      <property name="geometry">
-       <rect>
-        <x>5</x>
-        <y>11</y>
-        <width>891</width>
-        <height>511</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
-       </font>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="road_load_tab">
-     <attribute name="title">
-      <string>Road Load</string>
-     </attribute>
-     <widget class="QLabel" name="mass_reduction_label">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>141</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Mass Reduction</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QWidget" name="formLayoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>105</width>
-        <height>89</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="mass_reduction_form_layout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="mass_reduction_max_label">
-         <property name="text">
-          <string>Max %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="mass_reduction_max_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="mass_reduction_min_label">
-         <property name="text">
-          <string>Min %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="mass_reduction_min_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="mass_reduction_step_label">
-         <property name="text">
-          <string>Step %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="mass_reduction_step_select">
-         <item>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="formLayoutWidget_4">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>50</y>
-        <width>105</width>
-        <height>89</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="rolling_reduction_form_layout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="rolling_reduction_max_label">
-         <property name="text">
-          <string>Max %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="rolling_reduction_max_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="rolling_reduction_min_label">
-         <property name="text">
-          <string>Min %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="rolling_reduction_min_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="rolling_reduction_step_label">
-         <property name="text">
-          <string>Step %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="rolling_reduction_step_select">
-         <item>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="formLayoutWidget_5">
-      <property name="geometry">
-       <rect>
-        <x>320</x>
-        <y>50</y>
-        <width>105</width>
-        <height>89</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="aero_reduction_form_layout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="aero_reduction_max_label">
-         <property name="text">
-          <string>Max %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="aero_reduction_max_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="aero_reduction_min_label">
-         <property name="text">
-          <string>Min %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="aero_reduction_min_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="maximum">
-          <number>30</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="aero_reduction_step_label">
-         <property name="text">
-          <string>Step %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="aero_reduction_step_select">
-         <item>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="formLayoutWidget_6">
-      <property name="geometry">
-       <rect>
-        <x>470</x>
-        <y>50</y>
-        <width>114</width>
-        <height>89</height>
-       </rect>
-      </property>
-      <layout class="QFormLayout" name="engine_sizing_form_layout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="engine_sizing_max_label">
-         <property name="text">
-          <string>Max %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QSpinBox" name="engine_sizing_max_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>50</number>
-         </property>
-         <property name="maximum">
-          <number>150</number>
-         </property>
-         <property name="value">
-          <number>100</number>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="engine_sizing_min_label">
-         <property name="text">
-          <string>Min %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="engine_sizing_min_select">
-         <property name="showGroupSeparator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="minimum">
-          <number>50</number>
-         </property>
-         <property name="maximum">
-          <number>150</number>
-         </property>
-         <property name="value">
-          <number>100</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="engine_sizing_step_label">
-         <property name="text">
-          <string>Step %</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="engine_sizing_step_select">
-         <item>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QLabel" name="rolling_reduction_label">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>20</y>
-        <width>141</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Rolling Reduction</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="aero_reduction_label">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>20</y>
-        <width>141</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Aero Reduction</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="engine_sizing_label">
-      <property name="geometry">
-       <rect>
-        <x>450</x>
-        <y>20</y>
-        <width>151</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Engine Sizing</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="validate_mass_reduction_button">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>212</y>
-        <width>221</width>
+        <x>10</x>
+        <y>80</y>
+        <width>61</width>
         <height>31</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Validate Mass Reduction</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="number_of_iterations">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>190</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="validate_rolling_reduction_button">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>250</y>
-        <width>221</width>
-        <height>31</height>
-       </rect>
+      <property name="toolTip">
+       <string>Opens an existing OMEGA 2 Configuration File</string>
       </property>
       <property name="text">
-       <string>Validate Rolling Reduction</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="validate_engine_sizing_button">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>330</y>
-        <width>221</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Validate Engine Sizing</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="validate_aero_reduction_button">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>290</y>
-        <width>221</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Validate Aero Reduction</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="calculate_iterations_button">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>330</y>
-        <width>221</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Calculate # of Iterations</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="number_of_iterations_label">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>170</y>
-        <width>151</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string># of Iterations</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QLabel" name="calculation_time_label">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>220</y>
-        <width>151</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Calculation Time</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="calculation_time">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>240</y>
-        <width>113</width>
-        <height>20</height>
-       </rect>
+       <string>Open</string>
       </property>
      </widget>
     </widget>
@@ -766,7 +293,7 @@ Load and save the Configuration File from the File Menu</string>
      <string>File</string>
     </property>
     <addaction name="action_new_file"/>
-    <addaction name="action_open_configuration_file"/>
+    <addaction name="action_select_files"/>
     <addaction name="separator"/>
     <addaction name="action_save_file"/>
     <addaction name="action_save_file_as"/>
@@ -788,7 +315,13 @@ Load and save the Configuration File from the File Menu</string>
     </property>
     <addaction name="actionAbout_OMEGA_2"/>
    </widget>
+   <widget class="QMenu" name="menuRun">
+    <property name="title">
+     <string>Run</string>
+    </property>
+   </widget>
    <addaction name="menuMenu1"/>
+   <addaction name="menuRun"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
@@ -811,9 +344,9 @@ Load and save the Configuration File from the File Menu</string>
     <string>Road Loads</string>
    </property>
   </action>
-  <action name="action_open_configuration_file">
+  <action name="action_select_files">
    <property name="text">
-    <string>Open Configuration File...</string>
+    <string>Select</string>
    </property>
   </action>
   <action name="action_save_file">

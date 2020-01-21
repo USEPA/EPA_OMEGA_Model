@@ -12,8 +12,9 @@ import os
 import sys
 
 import multitimer
+from PySide2 import QtGui
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QWidget, QTableWidgetItem
+from PySide2.QtWidgets import QWidget, QTableWidgetItem, QMessageBox
 
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
@@ -51,24 +52,23 @@ class Form(QObject):
         loader = QUiLoader()
         self.window = loader.load(ui_file)
         ui_file.close()
-        global gui_loaded
-        gui_loaded = 1
 
         # Set the window title
         self.window.setWindowTitle("EPA OMEGA Model")
         # Set the status bar
-        self.window.statusBar().showMessage("Ready")
+        # self.window.statusBar().showMessage("Ready")
         # Set the window icon
         self.window.setWindowIcon(QIcon("images/omega2_icon.jpg"))
 
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
-        self.window.action_open_configuration_file.triggered.connect(self.open_file)
+        self.window.action_select_files.triggered.connect(self.select_file_tab)
         self.window.action_save_file.triggered.connect(self.save_file)
         self.window.action_save_file_as.triggered.connect(self.save_file_as)
         self.window.action_exit.triggered.connect(self.exit_gui)
         self.window.select_input_directory_button.clicked.connect(self.open_input_directory)
         self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
+        self.window.open_configuration_file_button.clicked.connect(self.open_file)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -77,6 +77,10 @@ class Form(QObject):
         # Initialize items
         # Select intro tab
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "intro_tab"))
+
+        timer.start()
+        global gui_loaded
+        gui_loaded = 1
 
     def new_file(self):
         self.window.statusBar().showMessage("New File")
@@ -102,7 +106,7 @@ class Form(QObject):
             Global variable "scenario_file" = user selected scenario file name.
             Global variable "working_directory" = User selected path to scenario file name.
         """
-        global configuration_file
+        global configuration_file, status_bar_message
         self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
@@ -134,11 +138,33 @@ class Form(QObject):
         # Get input File Directory
         parts = scenario.get('input_file_directory')
         for item_name, item_value in parts.items():
-            self.window.input_file_directory_1_result.setPlainText(str(item_value))
+            # See if selected directory is valid
+            if os.path.isdir(item_value):
+                # Display in gui if valid
+                self.window.input_file_directory_1_result.setPlainText(str(item_value))
+                self.window.input_directory_1_label.setText("Input File Directory - Valid")
+            else:
+                # Display error message if invalid
+                temp1 = "ERROR - INVALID DIRECTORY [" + item_value + "]"
+                self.window.input_file_directory_1_result.setPlainText(str(temp1))
+                self.window.input_directory_1_label.setText("Input File Directory - ***ERROR INVALID***")
         # Get output file directory
         parts = scenario.get('project_directory')
         for item_name, item_value in parts.items():
-            self.window.project_directory_1_result.setPlainText(str(item_value))
+            # See if selected directory is valid
+            if os.path.isdir(item_value):
+                # Display in gui if valid
+                self.window.project_directory_1_result.setPlainText(str(item_value))
+                self.window.project_directory_1_label.setText("Project Directory - Valid")
+
+            else:
+                # Display error message if invalid
+                temp1 = "ERROR - INVALID DIRECTORY [" + item_value + "]"
+                self.window.project_directory_1_result.setPlainText(str(temp1))
+                self.window.project_directory_1_label.setText("Project Directory - ***ERROR INVALID***")
+                from PySide2 import QtGui
+                mb = QtGui.QMessageBox()
+                mb.setText("ddd")
 
     def open_input_directory(self):
         """
@@ -171,6 +197,7 @@ class Form(QObject):
         input_file_directory = temp2 + temp1
         # Place path in gui
         self.window.input_file_directory_1_result.setPlainText(input_file_directory)
+        self.window.input_directory_1_label.setText("Input File Directory - Valid")
 
     def open_project_directory(self):
         """
@@ -203,8 +230,7 @@ class Form(QObject):
         project_directory = temp2 + temp1
         # Place path in gui
         self.window.project_directory_1_result.setPlainText(project_directory)
-
-
+        self.window.project_directory_1_label.setText("Project Directory - Valid")
 
     def save_file(self):
         self.window.statusBar().showMessage("Save File")
@@ -225,6 +251,9 @@ class Form(QObject):
         print(file_type)
         print(file_dialog_title)
 
+    def select_file_tab(self):
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+
     def exit_gui(self):
         self.window.close()
 
@@ -235,6 +264,7 @@ class Form(QObject):
 
 
 def timer3():
+    global status_bar_message, gui_loaded
     # Make sure gui is loaded before accessing it!
     if gui_loaded == 1:
         # Put date, time, and message on status bar
@@ -248,7 +278,7 @@ def timer3():
 # Run the function 'timer3' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=timer3)
 # Start timer
-timer.start()
+# timer.start()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

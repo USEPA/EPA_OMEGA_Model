@@ -10,7 +10,7 @@ output_files:
 input_file_directory:
     Input_file_directory: C:\Users\jcherr01\Documents\Jeff Documents\OMEGA\OMEGA 2\OMEGA2 Runs\inputs
 project_directory:
-    Project_directory: C:\Users\jcherr01\Documents\Jeff Documents\OMEGA\OMEGA 2\OMEGA2 Runs\Test1
+    Project_directory: C:\Users\jcherr01\Documents\Jeff Documents\OMEGA\OMEGA 2\OMEGA2 Runs\Test10
 baseline:
     test1: 1
 
