@@ -13,7 +13,7 @@ import sys
 
 import multitimer
 from PySide2 import QtGui
-from PySide2.QtGui import QIcon
+from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QTableWidgetItem, QMessageBox
 
 from PySide2.QtUiTools import QUiLoader
@@ -69,6 +69,7 @@ class Form(QObject):
         self.window.select_input_directory_button.clicked.connect(self.open_input_directory)
         self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
         self.window.open_configuration_file_button.clicked.connect(self.open_file)
+        self.window.clear_status_monitor_button.clicked.connect(self.clear_status_monitor)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -77,6 +78,19 @@ class Form(QObject):
         # Initialize items
         # Select intro tab
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "intro_tab"))
+        # Set status monitor window options
+        self.window.status_monitor_result.setWordWrapMode(QTextOption.NoWrap)
+        self.window.status_monitor_result.setReadOnly(1)
+        # Set input file directory window options
+        self.window.input_file_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
+        self.window.input_file_directory_1_result.setReadOnly(1)
+        # Set configuration file window options
+        self.window.configuration_file_1_result.setWordWrapMode(QTextOption.NoWrap)
+        self.window.configuration_file_1_result.setReadOnly(1)
+        # Set project directory window options
+        self.window.project_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
+        self.window.project_directory_1_result.setReadOnly(1)
+        self.status_monitor("Ready", "black")
 
         timer.start()
         global gui_loaded
@@ -141,30 +155,41 @@ class Form(QObject):
             # See if selected directory is valid
             if os.path.isdir(item_value):
                 # Display in gui if valid
-                self.window.input_file_directory_1_result.setPlainText(str(item_value))
-                self.window.input_directory_1_label.setText("Input File Directory - Valid")
+                directory = item_value
+                color = "black"
+                self.window.input_file_directory_1_result.setTextColor(QColor(color))
+                self.window.input_file_directory_1_result.setPlainText(str(directory))
+                temp2 = "Input File Directory Valid [" + directory + "]"
+                self.status_monitor(temp2, color)
             else:
                 # Display error message if invalid
-                temp1 = "ERROR - INVALID DIRECTORY [" + item_value + "]"
-                self.window.input_file_directory_1_result.setPlainText(str(temp1))
-                self.window.input_directory_1_label.setText("Input File Directory - ***ERROR INVALID***")
+                directory = item_value
+                color = "red"
+                self.window.input_file_directory_1_result.setTextColor(QColor(color))
+                self.window.input_file_directory_1_result.setPlainText(str(directory))
+                temp2 = "Input File Directory Invalid [" + directory + "]"
+                self.status_monitor(temp2, color)
+
         # Get output file directory
         parts = scenario.get('project_directory')
         for item_name, item_value in parts.items():
             # See if selected directory is valid
             if os.path.isdir(item_value):
                 # Display in gui if valid
-                self.window.project_directory_1_result.setPlainText(str(item_value))
-                self.window.project_directory_1_label.setText("Project Directory - Valid")
-
+                directory = item_value
+                color = "black"
+                self.window.project_directory_1_result.setTextColor(QColor(color))
+                self.window.project_directory_1_result.setPlainText(str(directory))
+                temp2 = "Project Directory Valid [" + directory + "]"
+                self.status_monitor(temp2, color)
             else:
                 # Display error message if invalid
-                temp1 = "ERROR - INVALID DIRECTORY [" + item_value + "]"
-                self.window.project_directory_1_result.setPlainText(str(temp1))
-                self.window.project_directory_1_label.setText("Project Directory - ***ERROR INVALID***")
-                from PySide2 import QtGui
-                mb = QtGui.QMessageBox()
-                mb.setText("ddd")
+                directory = item_value
+                color = "red"
+                self.window.project_directory_1_result.setTextColor(QColor(color))
+                self.window.project_directory_1_result.setPlainText(str(directory))
+                temp2 = "Project Directory Invalid [" + directory + "]"
+                self.status_monitor(temp2, color)
 
     def open_input_directory(self):
         """
@@ -196,8 +221,12 @@ class Form(QObject):
         # working_directory = temp2
         input_file_directory = temp2 + temp1
         # Place path in gui
-        self.window.input_file_directory_1_result.setPlainText(input_file_directory)
-        self.window.input_directory_1_label.setText("Input File Directory - Valid")
+        directory = input_file_directory
+        color = "black"
+        self.window.input_file_directory_1_result.setTextColor(QColor(color))
+        self.window.input_file_directory_1_result.setPlainText(str(directory))
+        temp2 = "Input File Directory Valid [" + directory + "]"
+        self.status_monitor(temp2, color)
 
     def open_project_directory(self):
         """
@@ -229,8 +258,12 @@ class Form(QObject):
         # working_directory = temp2
         project_directory = temp2 + temp1
         # Place path in gui
-        self.window.project_directory_1_result.setPlainText(project_directory)
-        self.window.project_directory_1_label.setText("Project Directory - Valid")
+        directory = project_directory
+        color = "black"
+        self.window.project_directory_1_result.setTextColor(QColor(color))
+        self.window.project_directory_1_result.setPlainText(str(directory))
+        temp2 = "Project Directory Valid [" + directory + "]"
+        self.status_monitor(temp2, color)
 
     def save_file(self):
         self.window.statusBar().showMessage("Save File")
@@ -253,6 +286,13 @@ class Form(QObject):
 
     def select_file_tab(self):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+
+    def status_monitor(self, text, color):
+        self.window.status_monitor_result.setTextColor(QColor(color))
+        self.window.status_monitor_result.append(text)
+
+    def clear_status_monitor(self):
+        self.window.status_monitor_result.setPlainText("")
 
     def exit_gui(self):
         self.window.close()
