@@ -29,7 +29,7 @@ setup(
     ],
     packages=["usepa_omega2"],                # or something like packages=find_packages(exclude=("tests",)),
     include_package_data=True,
-    install_requires=["numpy", "matplotlib", 'PySide2'],
+    install_requires=["numpy", "matplotlib", 'PySide2', 'PyYAML'],
     entry_points={
         "console_scripts": [
             "omega2=usepa_omega2.__main__:main",

@@ -32,7 +32,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>The Configuration File contains all parameters for an OMEGA 2 model run</string>
+     <string/>
     </property>
     <property name="tabPosition">
      <enum>QTabWidget::North</enum>
@@ -311,6 +311,9 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Status Monitor records ongoing program events</string>
+    </property>
     <property name="text">
      <string>Status Monitor</string>
     </property>
@@ -329,8 +332,51 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Button clears all data</string>
+    </property>
     <property name="text">
      <string>Clear</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="wizard_result">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>150</y>
+      <width>301</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Wizard provides user assistance</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_monitor_label_2">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>120</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Wizard provides user assistance</string>
+    </property>
+    <property name="text">
+     <string>Wizard</string>
     </property>
    </widget>
   </widget>
@@ -348,10 +394,11 @@
      <string>File</string>
     </property>
     <addaction name="action_new_file"/>
-    <addaction name="action_select_files"/>
+    <addaction name="action_open_configuration_file"/>
+    <addaction name="action_save_configuration_file"/>
     <addaction name="separator"/>
-    <addaction name="action_save_file"/>
-    <addaction name="action_save_file_as"/>
+    <addaction name="action_select_input_file_directory"/>
+    <addaction name="action_select_project_directory"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
@@ -399,19 +446,19 @@
     <string>Road Loads</string>
    </property>
   </action>
-  <action name="action_select_files">
+  <action name="action_open_configuration_file">
    <property name="text">
-    <string>Select</string>
+    <string>Open Configuration File</string>
    </property>
   </action>
-  <action name="action_save_file">
+  <action name="action_save_configuration_file">
    <property name="text">
-    <string>Save</string>
+    <string>Save Configuration File</string>
    </property>
   </action>
-  <action name="action_save_file_as">
+  <action name="action_select_input_file_directory">
    <property name="text">
-    <string>Save As...</string>
+    <string>Select Input File Directory</string>
    </property>
   </action>
   <action name="action_new_file">
@@ -427,6 +474,11 @@
   <action name="action_exit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="action_select_project_directory">
+   <property name="text">
+    <string>Select Project Directory</string>
    </property>
   </action>
  </widget>
