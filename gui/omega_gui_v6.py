@@ -10,6 +10,7 @@
     """
 import os
 import sys
+import time
 
 import multitimer
 from PySide2.QtGui import QIcon, QColor, QTextOption
@@ -102,11 +103,13 @@ class Form(QObject):
         self.window.project_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.project_directory_1_result.setReadOnly(1)
 
-        self.initialize_gui()
+        # self.initialize_gui()
 
         timer.start()
+        # time.sleep(5)
         global gui_loaded
         gui_loaded = 1
+        self.initialize_gui()
 
     def new_file(self):
         self.clear_status_monitor()
@@ -347,6 +350,12 @@ class Form(QObject):
         self.wizard_logic()
 
     def status_monitor(self, text, color):
+        global date_time
+        time1 = datetime.now()
+        t1 = time1.strftime("%H:%M:%S")
+        today = date.today()
+        d2 = today.strftime("%m/%d/%y")
+        date_time = d2 + " " + t1
         text = date_time + " " + text
         self.window.status_monitor_result.setTextColor(QColor(color))
         self.window.status_monitor_result.append(text)
@@ -410,14 +419,13 @@ class Form(QObject):
 def timer3():
     global status_bar_message, gui_loaded, date_time
     # Make sure gui is loaded before accessing it!
+
     if gui_loaded == 1:
         # Put date, time, and message on status bar
-        time = datetime.now()
-        t1 = time.strftime("%H:%M:%S")
+        time1 = datetime.now()
+        t1 = time1.strftime("%H:%M:%S")
         today = date.today()
         d1 = today.strftime("%B %d, %Y")
-        d2 = today.strftime("%m/%d/%y")
-        date_time = d2 + " " + t1
         form.window.statusBar().showMessage(d1 + "  " + t1 + "  " + status_bar_message)
 
 
