@@ -1,7 +1,7 @@
 """OMEGA GUI
    ---------
 
-   This code controls the OMEGA GUI
+   This code controls the OMEGA2 GUI
 
        ::
 
@@ -12,9 +12,8 @@ import os
 import sys
 
 import multitimer
-from PySide2 import QtGui
 from PySide2.QtGui import QIcon, QColor, QTextOption
-from PySide2.QtWidgets import QWidget, QTableWidgetItem, QMessageBox
+from PySide2.QtWidgets import QWidget
 
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
@@ -31,9 +30,16 @@ configuration_file = ""
 input_file_directory = ""
 project_directory = ""
 gui_loaded = 0
-status_bar_message = "Ready"
 date_time = ""
+status_bar_message = "Ready"
 scenario = ""
+configuration_file_valid = False
+input_directory_valid = False
+project_directory_valid = False
+wizard_init = "Open a valid Configuration File or:\n"\
+              "  1) Select New Input Directory\n"\
+              "  2) Select New Project Directory\n"\
+              "  3) Save Configuration File\n"
 
 
 class Form(QObject):
@@ -73,6 +79,7 @@ class Form(QObject):
         self.window.select_input_directory_button.clicked.connect(self.open_input_directory)
         self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
         self.window.open_configuration_file_button.clicked.connect(self.open_file)
+        self.window.save_configuration_file_button.clicked.connect(self.save_file)
         self.window.clear_status_monitor_button.clicked.connect(self.clear_status_monitor)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
@@ -94,11 +101,8 @@ class Form(QObject):
         # Set project directory window options
         self.window.project_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.project_directory_1_result.setReadOnly(1)
-        # Prime the status monitor
-        self.status_monitor("Ready", "black")
-        # Prime the wizard
-        temp1 = "Open a valid Configuration File from the File Menu"
-        self.wizard(temp1, "green")
+
+        self.initialize_gui()
 
         timer.start()
         global gui_loaded
@@ -109,6 +113,7 @@ class Form(QObject):
         self.window.input_file_directory_1_result.setPlainText("")
         self.window.configuration_file_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
+        self.initialize_gui()
 
     def open_file(self):
         """
@@ -118,7 +123,8 @@ class Form(QObject):
             Global variable "scenario_file" = user selected scenario file name.
             Global variable "working_directory" = User selected path to scenario file name.
         """
-        global configuration_file, scenario
+        global configuration_file, scenario, configuration_file_valid, input_directory_valid
+        global project_directory_valid, input_file_directory, project_directory
         # self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
@@ -149,49 +155,58 @@ class Form(QObject):
         scenario = open_file_action(filepath)
         # Get input File Directory from dictionary
         item_value = scenario['input_file_directory']['Input_file_directory']
+        configuration_file_valid = True
         # See if selected directory is valid
         if os.path.isdir(item_value):
             # Display in gui if valid
-            directory = item_value
+            input_file_directory = item_value
             color = "black"
             self.window.input_file_directory_1_result.setTextColor(QColor(color))
-            self.window.input_file_directory_1_result.setPlainText(str(directory))
+            self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
             # Add to status monitor
-            temp2 = "Input File Directory Loaded [" + directory + "]"
-            self.status_monitor(temp2, color)
+            # temp2 = "Input File Directory Loaded [" + directory + "]"
+            # self.status_monitor(temp2, color)
+            input_directory_valid = True
         else:
             # Display error message if invalid
-            directory = item_value
+            input_file_directory = item_value
             color = "red"
             self.window.input_file_directory_1_result.setTextColor(QColor(color))
-            self.window.input_file_directory_1_result.setPlainText(str(directory))
+            self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
             # Add to status monitor
-            temp2 = "Input File Directory Invalid [" + directory + "]"
-            self.status_monitor(temp2, color)
+            # temp2 = "Input File Directory Invalid [" + directory + "]"
+            # self.status_monitor(temp2, color)
+            input_directory_valid = False
+            configuration_file_valid = False
 
         # Get output file directory from dictionary
         item_value = scenario['project_directory']['Project_directory']
         # See if selected directory is valid
         if os.path.isdir(item_value):
             # Display in gui if valid
-            directory = item_value
+            project_directory = item_value
             color = "black"
             self.window.project_directory_1_result.setTextColor(QColor(color))
-            self.window.project_directory_1_result.setPlainText(str(directory))
+            self.window.project_directory_1_result.setPlainText(str(project_directory))
             # Add to status monitor
-            temp2 = "Project Directory Loaded [" + directory + "]"
-            self.status_monitor(temp2, color)
+            # temp2 = "Project Directory Loaded [" + directory + "]"
+            # self.status_monitor(temp2, color)
+            project_directory_valid = True
         else:
             # Display error message if invalid
-            directory = item_value
+            project_directory = item_value
             color = "red"
             self.window.project_directory_1_result.setTextColor(QColor(color))
-            self.window.project_directory_1_result.setPlainText(str(directory))
+            self.window.project_directory_1_result.setPlainText(str(project_directory))
             # Add to status monitor
-            temp2 = "Project Directory Invalid [" + directory + "]"
-            self.status_monitor(temp2, color)
+            # temp2 = "Project Directory Invalid [" + directory + "]"
+            # self.status_monitor(temp2, color)
+            project_directory_valid = False
+            configuration_file_valid = False
+
         temp2 = " "
         self.status_monitor(temp2, color)
+        self.wizard_logic()
 
     def save_file(self):
         """
@@ -201,7 +216,8 @@ class Form(QObject):
             Global variable "scenario_file" = user selected scenario file name.
             Global variable "working_directory" = User selected path to scenario file name.
         """
-        global configuration_file, scenario
+        global configuration_file, scenario, input_file_directory, project_directory
+        global configuration_file_valid
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
@@ -232,6 +248,8 @@ class Form(QObject):
         color = "black"
         temp2 = " "
         self.status_monitor(temp2, color)
+        configuration_file_valid = True
+        self.wizard_logic()
 
     def open_input_directory(self):
         """
@@ -241,7 +259,8 @@ class Form(QObject):
             Global variable "scenario_file" = user selected scenario file name.
             Global variable "working_directory" = User selected path to scenario file name.
         """
-        global input_file_directory, scenario
+        global input_file_directory, scenario, configuration_file
+        global configuration_file_valid, input_directory_valid, project_directory_valid
         self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
@@ -262,14 +281,22 @@ class Form(QObject):
         temp2 = os.path.normpath(temp2) + '\\'
         # working_directory = temp2
         input_file_directory = temp2 + temp1
+        # Update dictionary entry
+        scenario['input_file_directory']['Input_file_directory'] = input_file_directory
         # Place path in gui
         directory = input_file_directory
-        scenario['input_file_directory']['Input_file_directory'] = directory
         color = "black"
         self.window.input_file_directory_1_result.setTextColor(QColor(color))
         self.window.input_file_directory_1_result.setPlainText(str(directory))
         temp2 = "Input File Directory Loaded [" + directory + "]"
         self.status_monitor(temp2, color)
+        # Configuration has changed so blank out configuration file
+        self.window.configuration_file_1_result.setPlainText("")
+        configuration_file = ""
+        configuration_file_valid = False
+        input_directory_valid = True
+        # User instructions to wizard
+        self.wizard_logic()
 
     def open_project_directory(self):
         """
@@ -279,7 +306,8 @@ class Form(QObject):
             Global variable "scenario_file" = user selected scenario file name.
             Global variable "working_directory" = User selected path to scenario file name.
         """
-        global project_directory, scenario
+        global project_directory, scenario, configuration_file
+        global configuration_file_valid, input_directory_valid, project_directory_valid
         self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
@@ -300,14 +328,23 @@ class Form(QObject):
         temp2 = os.path.normpath(temp2) + '\\'
         # working_directory = temp2
         project_directory = temp2 + temp1
+        # Update dictionary entry
+        scenario['project_directory']['Project_directory'] = project_directory
         # Place path in gui
         directory = project_directory
-        scenario['project_directory']['Project_directory'] = directory
         color = "black"
         self.window.project_directory_1_result.setTextColor(QColor(color))
         self.window.project_directory_1_result.setPlainText(str(directory))
         temp2 = "Project Directory Loaded [" + directory + "]"
         self.status_monitor(temp2, color)
+        # Configuration has changed so blank out configuration file
+        self.window.configuration_file_1_result.setPlainText("")
+        configuration_file = ""
+        configuration_file = ""
+        configuration_file_valid = False
+        project_directory_valid = True
+        # User instructions to wizard
+        self.wizard_logic()
 
     def status_monitor(self, text, color):
         text = date_time + " " + text
@@ -323,6 +360,43 @@ class Form(QObject):
 
     def clear_wizard(self):
         self.window.wizard_result.setPlainText("")
+
+    def wizard_logic(self):
+        if configuration_file_valid and input_directory_valid and project_directory_valid:
+            self.clear_wizard()
+            temp1 = "Configuration Loaded."
+            self.wizard(temp1, "green")
+        if not configuration_file_valid and input_directory_valid and project_directory_valid:
+            self.clear_wizard()
+            temp1 = "Configuration has changed.  Save Configuration File to continue."
+            self.wizard(temp1, "red")
+        if not configuration_file_valid and input_directory_valid and not project_directory_valid:
+            self.clear_wizard()
+            temp1 = "Elements in the Configuration are invalid.  See the Status Monitor for details."
+            self.wizard(temp1, "red")
+            temp2 = "Project Directory Invalid [" + project_directory + "]"
+            self.status_monitor(temp2, 'red')
+        if not configuration_file_valid and not input_directory_valid and project_directory_valid:
+            self.clear_wizard()
+            temp1 = "Elements in the Configuration are invalid.  See the Status Monitor for details."
+            self.wizard(temp1, "red")
+            temp2 = "Input Directory Invalid [" + input_file_directory + "]"
+            self.status_monitor(temp2, 'red')
+
+    def initialize_gui(self):
+        global scenario
+        global configuration_file_valid, input_directory_valid, project_directory_valid
+        # Prime the status monitor
+        self.status_monitor("Ready", "black")
+        # Prime the wizard
+        self.clear_wizard()
+        self.wizard(wizard_init, "green")
+        # Create 'scenario' dictionary for later reference
+        scenario = {'input_file_directory': {'Input_file_directory': 'null'},
+                    'project_directory': {'Project_directory': 'null'}}
+        configuration_file_valid = False
+        input_directory_valid = False
+        project_directory_valid = False
 
     def exit_gui(self):
         self.window.close()
@@ -345,7 +419,6 @@ def timer3():
         d2 = today.strftime("%m/%d/%y")
         date_time = d2 + " " + t1
         form.window.statusBar().showMessage(d1 + "  " + t1 + "  " + status_bar_message)
-
 
 
 # Run the function 'timer3' in 1 second intervals
