@@ -10,7 +10,6 @@
     """
 import os
 import sys
-import time
 
 import multitimer
 from PySide2.QtGui import QIcon, QColor, QTextOption
@@ -37,10 +36,7 @@ scenario = ""
 configuration_file_valid = False
 input_directory_valid = False
 project_directory_valid = False
-wizard_init = "Open a valid Configuration File or:\n"\
-              "  1) Select New Input Directory\n"\
-              "  2) Select New Project Directory\n"\
-              "  3) Save Configuration File\n"
+wizard_init = ""
 
 
 class Form(QObject):
@@ -102,6 +98,8 @@ class Form(QObject):
         # Set project directory window options
         self.window.project_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.project_directory_1_result.setReadOnly(1)
+        # Set wizard window options
+        self.window.wizard_result.setReadOnly(1)
 
         # self.initialize_gui()
 
@@ -116,6 +114,7 @@ class Form(QObject):
         self.window.input_file_directory_1_result.setPlainText("")
         self.window.configuration_file_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
+        self.window.project_description.setPlainText("")
         self.initialize_gui()
 
     def open_file(self):
@@ -151,13 +150,19 @@ class Form(QObject):
         # Place path in gui
         self.window.configuration_file_1_result.setPlainText(configuration_file)
         # Add to status monitor
-        temp1 = "Configuration File Loaded [" + configuration_file + "]"
-        self.status_monitor(temp1, "black")
+        # temp1 = "Configuration File Loaded [" + configuration_file + "]"
+        # self.status_monitor(temp1, "black")
         # Create python dictionary 'scenario' from YAML formatted configuration file
         filepath = configuration_file
         scenario = open_file_action(filepath)
         # Get input File Directory from dictionary
-        item_value = scenario['input_file_directory']['Input_file_directory']
+        item_value = ""
+        # Make sure the dictionary entry exists
+        try:
+            item_value = scenario['input_file_directory']['Input_file_directory']
+        # Add entry to dictionary if missing from file
+        except KeyError:
+            scenario.update({'input_file_directory': {'Input_file_directory': 'null'}})
         configuration_file_valid = True
         # See if selected directory is valid
         if os.path.isdir(item_value):
@@ -183,7 +188,13 @@ class Form(QObject):
             configuration_file_valid = False
 
         # Get output file directory from dictionary
-        item_value = scenario['project_directory']['Project_directory']
+        item_value = ""
+        # Make sure the dictionary entry exists
+        try:
+            item_value = scenario['project_directory']['Project_directory']
+        # Add entry to dictionary if missing from file
+        except KeyError:
+            scenario.update({'project_directory': {'Project_directory': 'null'}})
         # See if selected directory is valid
         if os.path.isdir(item_value):
             # Display in gui if valid
@@ -207,9 +218,19 @@ class Form(QObject):
             project_directory_valid = False
             configuration_file_valid = False
 
+        # Display project description from configuration file
+        item_value = ""
+        try:
+            item_value = scenario['project_description']['Project_description']
+        # Trap, add element, and display if project description element missing from file
+        except KeyError:
+            scenario.update({'project_description': {'Project_description': 'null'}})
+            temp2 = "Warning - No project description in configuration file"
+            self.status_monitor(temp2, 'red')
+        self.window.project_description.setPlainText(str(item_value))
+        self.wizard_logic()
         temp2 = " "
         self.status_monitor(temp2, color)
-        self.wizard_logic()
 
     def save_file(self):
         """
@@ -244,15 +265,18 @@ class Form(QObject):
         self.window.configuration_file_1_result.setPlainText(configuration_file)
         temp1 = "Configuration File Saved [" + configuration_file + "]"
         self.status_monitor(temp1, "black")
-        # Save YAML formatted configuration file from the 'scenario' dictionary
+        # Save text from Project Description window to dictionary
+        temp1 = self.window.project_description.toPlainText()
+        scenario['project_description']['Project_description'] = temp1
+        # Save YAML formatted configuration file
         filepath = configuration_file
         save_file_action(filepath, scenario)
 
+        configuration_file_valid = True
+        self.wizard_logic()
         color = "black"
         temp2 = " "
         self.status_monitor(temp2, color)
-        configuration_file_valid = True
-        self.wizard_logic()
 
     def open_input_directory(self):
         """
@@ -264,7 +288,7 @@ class Form(QObject):
         """
         global input_file_directory, scenario, configuration_file
         global configuration_file_valid, input_directory_valid, project_directory_valid
-        self.window.statusBar().showMessage("Open File")
+        # self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
@@ -311,7 +335,7 @@ class Form(QObject):
         """
         global project_directory, scenario, configuration_file
         global configuration_file_valid, input_directory_valid, project_directory_valid
-        self.window.statusBar().showMessage("Open File")
+        # self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
@@ -342,7 +366,6 @@ class Form(QObject):
         self.status_monitor(temp2, color)
         # Configuration has changed so blank out configuration file
         self.window.configuration_file_1_result.setPlainText("")
-        configuration_file = ""
         configuration_file = ""
         configuration_file_valid = False
         project_directory_valid = True
@@ -375,6 +398,8 @@ class Form(QObject):
             self.clear_wizard()
             temp1 = "Configuration Loaded."
             self.wizard(temp1, "green")
+            temp2 = "Configuration File Loaded [" + configuration_file + "]"
+            self.status_monitor(temp2, 'black')
         if not configuration_file_valid and input_directory_valid and project_directory_valid:
             self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
@@ -393,8 +418,12 @@ class Form(QObject):
             self.status_monitor(temp2, 'red')
 
     def initialize_gui(self):
-        global scenario
+        global scenario, wizard_init
         global configuration_file_valid, input_directory_valid, project_directory_valid
+        wizard_init = "Open a valid Configuration File or:\n" \
+                      "  1) Select New Input Directory\n" \
+                      "  2) Select New Project Directory\n" \
+                      "  3) Save Configuration File\n"
         # Prime the status monitor
         self.status_monitor("Ready", "black")
         # Prime the wizard
@@ -402,7 +431,8 @@ class Form(QObject):
         self.wizard(wizard_init, "green")
         # Create 'scenario' dictionary for later reference
         scenario = {'input_file_directory': {'Input_file_directory': 'null'},
-                    'project_directory': {'Project_directory': 'null'}}
+                    'project_directory': {'Project_directory': 'null'},
+                    'project_description': {'Project_description': 'null'}}
         configuration_file_valid = False
         input_directory_valid = False
         project_directory_valid = False

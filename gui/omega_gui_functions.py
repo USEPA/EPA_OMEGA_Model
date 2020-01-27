@@ -21,7 +21,7 @@ def yaml_dump(filepath, data):
 
         # yaml.dump(data)
 
-    print("Open File")
+    # print("Open File")
 
 
 def save_file_action(filepath, data):

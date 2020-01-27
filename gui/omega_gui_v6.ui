@@ -90,7 +90,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>70</y>
+        <y>41</y>
         <width>701</width>
         <height>51</height>
        </rect>
@@ -109,7 +109,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>39</y>
+        <y>10</y>
         <width>441</width>
         <height>31</height>
        </rect>
@@ -122,7 +122,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>129</y>
+        <y>100</y>
         <width>511</width>
         <height>31</height>
        </rect>
@@ -135,7 +135,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>160</y>
+        <y>131</y>
         <width>701</width>
         <height>51</height>
        </rect>
@@ -154,7 +154,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>219</y>
+        <y>190</y>
         <width>461</width>
         <height>31</height>
        </rect>
@@ -167,7 +167,7 @@
       <property name="geometry">
        <rect>
         <x>80</x>
-        <y>250</y>
+        <y>221</y>
         <width>701</width>
         <height>51</height>
        </rect>
@@ -186,7 +186,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>221</y>
         <width>61</width>
         <height>51</height>
        </rect>
@@ -203,7 +203,7 @@ New</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>160</y>
+        <y>131</y>
         <width>61</width>
         <height>51</height>
        </rect>
@@ -217,7 +217,7 @@ New</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>31</y>
         <width>61</width>
         <height>31</height>
        </rect>
@@ -233,7 +233,7 @@ New</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>100</y>
+        <y>71</y>
         <width>61</width>
         <height>31</height>
        </rect>
@@ -243,6 +243,38 @@ New</string>
       </property>
       <property name="text">
        <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="project_description">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>320</y>
+        <width>701</width>
+        <height>91</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Project Directory will receive a copy of the input files and all OMEGA 2 model output files</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="project_description_1_label">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>290</y>
+        <width>461</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Project Description</string>
       </property>
      </widget>
     </widget>
