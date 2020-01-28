@@ -13,7 +13,7 @@ import sys
 
 import multitimer
 from PySide2.QtGui import QIcon, QColor, QTextOption
-from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QWidget, QMessageBox
 
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
@@ -29,25 +29,15 @@ atimer = 0
 configuration_file = ""
 input_file_directory = ""
 project_directory = ""
-gui_loaded = 0
 date_time = ""
 status_bar_message = "Ready"
 scenario = ""
 configuration_file_valid = False
 input_directory_valid = False
 project_directory_valid = False
-wizard_init = ""
 
 
 class Form(QObject):
-    # Initialize global variables
-    # mass_iterations = 1
-    # rolling_iterations = 1
-    # aero_iterations = 1
-    # engine_iterations = 1
-
-    # Import setup values for gui
-    # import gui.gui_setup3
 
     def __init__(self, ui_file, parent=None):
         super(Form, self).__init__(parent)
@@ -77,7 +67,7 @@ class Form(QObject):
         self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
         self.window.open_configuration_file_button.clicked.connect(self.open_file)
         self.window.save_configuration_file_button.clicked.connect(self.save_file)
-        self.window.clear_status_monitor_button.clicked.connect(self.clear_status_monitor)
+        self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -85,10 +75,10 @@ class Form(QObject):
 
         # Initialize items
         # Select intro tab
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "intro_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         # Set status monitor window options
-        self.window.status_monitor_result.setWordWrapMode(QTextOption.NoWrap)
-        self.window.status_monitor_result.setReadOnly(1)
+        self.window.event_monitor_result.setWordWrapMode(QTextOption.NoWrap)
+        self.window.event_monitor_result.setReadOnly(1)
         # Set input file directory window options
         self.window.input_file_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.input_file_directory_1_result.setReadOnly(1)
@@ -101,16 +91,15 @@ class Form(QObject):
         # Set wizard window options
         self.window.wizard_result.setReadOnly(1)
 
-        # self.initialize_gui()
-
         timer.start()
-        # time.sleep(5)
-        global gui_loaded
-        gui_loaded = 1
         self.initialize_gui()
 
     def new_file(self):
-        self.clear_status_monitor()
+        """
+        Clears the gui and the input dictionary
+
+        """
+        self.clear_event_monitor()
         self.window.input_file_directory_1_result.setPlainText("")
         self.window.configuration_file_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
@@ -123,8 +112,9 @@ class Form(QObject):
 
         When complete:
             Global variable "scenario_file" = user selected scenario file name.
-            Global variable "working_directory" = User selected path to scenario file name.
+
         """
+
         global configuration_file, scenario, configuration_file_valid, input_directory_valid
         global project_directory_valid, input_file_directory, project_directory
         # self.window.statusBar().showMessage("Open File")
@@ -149,9 +139,6 @@ class Form(QObject):
         configuration_file = temp2 + temp1
         # Place path in gui
         self.window.configuration_file_1_result.setPlainText(configuration_file)
-        # Add to status monitor
-        # temp1 = "Configuration File Loaded [" + configuration_file + "]"
-        # self.status_monitor(temp1, "black")
         # Create python dictionary 'scenario' from YAML formatted configuration file
         filepath = configuration_file
         scenario = open_file_action(filepath)
@@ -169,8 +156,11 @@ class Form(QObject):
             except AttributeError:
                 self.initialize_gui()
                 self.clear_entries()
-                temp2 = "Configuration File Corrupt"
-                self.status_monitor(temp2, 'red')
+                message_title = "OMEGA 2 Warning Message"
+                message = "Configuration File Corrupt:\n    [" + configuration_file + "]"
+                self.showbox(message_title, message)
+                temp2 = message
+                self.event_monitor(temp2, 'red', 'dt')
                 return
         configuration_file_valid = True
         # See if selected directory is valid
@@ -180,9 +170,6 @@ class Form(QObject):
             color = "black"
             self.window.input_file_directory_1_result.setTextColor(QColor(color))
             self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
-            # Add to status monitor
-            # temp2 = "Input File Directory Loaded [" + directory + "]"
-            # self.status_monitor(temp2, color)
             input_directory_valid = True
         else:
             # Display error message if invalid
@@ -190,9 +177,6 @@ class Form(QObject):
             color = "red"
             self.window.input_file_directory_1_result.setTextColor(QColor(color))
             self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
-            # Add to status monitor
-            # temp2 = "Input File Directory Invalid [" + directory + "]"
-            # self.status_monitor(temp2, color)
             input_directory_valid = False
             configuration_file_valid = False
 
@@ -211,9 +195,6 @@ class Form(QObject):
             color = "black"
             self.window.project_directory_1_result.setTextColor(QColor(color))
             self.window.project_directory_1_result.setPlainText(str(project_directory))
-            # Add to status monitor
-            # temp2 = "Project Directory Loaded [" + directory + "]"
-            # self.status_monitor(temp2, color)
             project_directory_valid = True
         else:
             # Display error message if invalid
@@ -221,9 +202,6 @@ class Form(QObject):
             color = "red"
             self.window.project_directory_1_result.setTextColor(QColor(color))
             self.window.project_directory_1_result.setPlainText(str(project_directory))
-            # Add to status monitor
-            # temp2 = "Project Directory Invalid [" + directory + "]"
-            # self.status_monitor(temp2, color)
             project_directory_valid = False
             configuration_file_valid = False
 
@@ -235,11 +213,11 @@ class Form(QObject):
         except (KeyError, TypeError):
             scenario.update({'project_description': {'Project_description': 'null'}})
             temp2 = "Warning - No project description in configuration file"
-            self.status_monitor(temp2, 'red')
+            self.event_monitor(temp2, 'red', 'dt')
         self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
-        temp2 = " "
-        self.status_monitor(temp2, color)
+        temp2 = "----------"
+        self.event_monitor(temp2, color, "")
 
     def save_file(self):
         """
@@ -272,8 +250,8 @@ class Form(QObject):
         configuration_file = temp2 + temp1
         # Place path in gui
         self.window.configuration_file_1_result.setPlainText(configuration_file)
-        temp1 = "Configuration File Saved [" + configuration_file + "]"
-        self.status_monitor(temp1, "black")
+        temp1 = "Configuration File Saved:\n    [" + configuration_file + "]"
+        self.event_monitor(temp1, "black", 'dt')
         # Save text from Project Description window to dictionary
         temp1 = self.window.project_description.toPlainText()
         scenario['project_description']['Project_description'] = temp1
@@ -284,8 +262,8 @@ class Form(QObject):
         configuration_file_valid = True
         self.wizard_logic()
         color = "black"
-        temp2 = " "
-        self.status_monitor(temp2, color)
+        temp2 = "----------"
+        self.event_monitor(temp2, color, '')
 
     def open_input_directory(self):
         """
@@ -324,8 +302,8 @@ class Form(QObject):
         color = "black"
         self.window.input_file_directory_1_result.setTextColor(QColor(color))
         self.window.input_file_directory_1_result.setPlainText(str(directory))
-        temp2 = "Input File Directory Loaded [" + directory + "]"
-        self.status_monitor(temp2, color)
+        temp2 = "Input File Directory Loaded:\n    [" + directory + "]"
+        self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
         self.window.configuration_file_1_result.setPlainText("")
         configuration_file = ""
@@ -371,8 +349,8 @@ class Form(QObject):
         color = "black"
         self.window.project_directory_1_result.setTextColor(QColor(color))
         self.window.project_directory_1_result.setPlainText(str(directory))
-        temp2 = "Project Directory Loaded [" + directory + "]"
-        self.status_monitor(temp2, color)
+        temp2 = "Project Directory Loaded:\n    [" + directory + "]"
+        self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
         self.window.configuration_file_1_result.setPlainText("")
         configuration_file = ""
@@ -381,19 +359,20 @@ class Form(QObject):
         # User instructions to wizard
         self.wizard_logic()
 
-    def status_monitor(self, text, color):
+    def event_monitor(self, text, color, timecode):
         global date_time
-        time1 = datetime.now()
-        t1 = time1.strftime("%H:%M:%S")
-        today = date.today()
-        d2 = today.strftime("%m/%d/%y")
-        date_time = d2 + " " + t1
-        text = date_time + " " + text
-        self.window.status_monitor_result.setTextColor(QColor(color))
-        self.window.status_monitor_result.append(text)
+        if timecode == 'dt':
+            time1 = datetime.now()
+            t1 = time1.strftime("%H:%M:%S")
+            today = date.today()
+            d2 = today.strftime("%m/%d/%y")
+            date_time = d2 + " " + t1
+            text = date_time + " " + text
+        self.window.event_monitor_result.setTextColor(QColor(color))
+        self.window.event_monitor_result.append(text)
 
-    def clear_status_monitor(self):
-        self.window.status_monitor_result.setPlainText("")
+    def clear_event_monitor(self):
+        self.window.event_monitor_result.setPlainText("")
 
     def wizard(self, text, color):
         self.window.wizard_result.setTextColor(QColor(color))
@@ -405,10 +384,13 @@ class Form(QObject):
     def wizard_logic(self):
         if configuration_file_valid and input_directory_valid and project_directory_valid:
             self.clear_wizard()
-            temp1 = "Configuration Loaded."
+            temp1 = "Configuration Loaded.\n\n"
+            temp1 = temp1 + "Atomic Batteries to Power - Turbines to Speed!\n\n"
+            temp1 = temp1 + "Warp Factor Number Five Mr. Sulu\n\n"
+            temp1 = temp1 + "Punch It Chewie!"
             self.wizard(temp1, "green")
-            temp2 = "Configuration File Loaded [" + configuration_file + "]"
-            self.status_monitor(temp2, 'black')
+            temp2 = "Configuration File Loaded:\n    [" + configuration_file + "]"
+            self.event_monitor(temp2, 'black', 'dt')
         elif not configuration_file_valid and input_directory_valid and project_directory_valid:
             self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
@@ -418,21 +400,21 @@ class Form(QObject):
             temp1 = "Elements in the Configuration are invalid.  See the Status Monitor for details."
             self.wizard(temp1, "red")
             if not input_directory_valid:
-                temp2 = "Input Directory Invalid [" + input_file_directory + "]"
-                self.status_monitor(temp2, 'red')
+                temp2 = "Input Directory Invalid:\n    [" + input_file_directory + "]"
+                self.event_monitor(temp2, 'red', 'dt')
             if not project_directory_valid:
-                temp2 = "Project Directory Invalid [" + project_directory + "]"
-                self.status_monitor(temp2, 'red')
+                temp2 = "Project Directory Invalid:\n    [" + project_directory + "]"
+                self.event_monitor(temp2, 'red', 'dt')
 
     def initialize_gui(self):
-        global scenario, wizard_init
+        global scenario, status_bar_message
         global configuration_file_valid, input_directory_valid, project_directory_valid
         wizard_init = "Open a valid Configuration File or:\n" \
                       "  1) Select New Input Directory\n" \
                       "  2) Select New Project Directory\n" \
                       "  3) Save Configuration File\n"
         # Prime the status monitor
-        self.status_monitor("Ready", "black")
+        self.event_monitor("Ready", "black", 'dt')
         # Prime the wizard
         self.clear_wizard()
         self.wizard(wizard_init, "green")
@@ -443,13 +425,20 @@ class Form(QObject):
         configuration_file_valid = False
         input_directory_valid = False
         project_directory_valid = False
+        status_bar_message = "Ready"
 
     def clear_entries(self):
         self.window.configuration_file_1_result.setPlainText("")
         self.window.input_file_directory_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
-        self.clear_status_monitor()
+        self.clear_event_monitor()
+
+    def showbox(self, message_title, message):
+        msg = QMessageBox()
+        msg.setWindowTitle(message_title)
+        msg.setText(message)
+        msg.exec()
 
     def exit_gui(self):
         self.window.close()
@@ -461,26 +450,24 @@ class Form(QObject):
 
 
 def timer3():
-    global status_bar_message, gui_loaded, date_time
-    # Make sure gui is loaded before accessing it!
-
-    if gui_loaded == 1:
-        # Put date, time, and message on status bar
-        time1 = datetime.now()
-        t1 = time1.strftime("%H:%M:%S")
-        today = date.today()
-        d1 = today.strftime("%B %d, %Y")
+    global status_bar_message, date_time
+    # Put date, time, and message on status bar
+    time1 = datetime.now()
+    t1 = time1.strftime("%H:%M:%S")
+    today = date.today()
+    d1 = today.strftime("%B %d, %Y")
+    # If the form is not loaded, return
+    try:
         form.window.statusBar().showMessage(d1 + "  " + t1 + "  " + status_bar_message)
+    except NameError:
+        return
 
 
 # Run the function 'timer3' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=timer3)
-# Start timer
-# timer.start()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = Form('omega_gui_v8.ui')
-    # window = MyApp()
-    # window.show()
     sys.exit(app.exec_())
