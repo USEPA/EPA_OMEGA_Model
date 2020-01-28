@@ -222,12 +222,12 @@ class Form(QObject):
         item_value = ""
         try:
             item_value = scenario['project_description']['Project_description']
-        # Trap, add element, and display if project description element missing from file
+            # Trap, add element, and display if project description element missing from file
         except KeyError:
             scenario.update({'project_description': {'Project_description': 'null'}})
             temp2 = "Warning - No project description in configuration file"
             self.status_monitor(temp2, 'red')
-        self.window.project_description.setPlainText(str(item_value))
+            self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
         temp2 = " "
         self.status_monitor(temp2, color)
@@ -400,22 +400,20 @@ class Form(QObject):
             self.wizard(temp1, "green")
             temp2 = "Configuration File Loaded [" + configuration_file + "]"
             self.status_monitor(temp2, 'black')
-        if not configuration_file_valid and input_directory_valid and project_directory_valid:
+        elif not configuration_file_valid and input_directory_valid and project_directory_valid:
             self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
             self.wizard(temp1, "red")
-        if not configuration_file_valid and input_directory_valid and not project_directory_valid:
+        elif not configuration_file_valid and (not input_directory_valid or not project_directory_valid):
             self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid.  See the Status Monitor for details."
             self.wizard(temp1, "red")
-            temp2 = "Project Directory Invalid [" + project_directory + "]"
-            self.status_monitor(temp2, 'red')
-        if not configuration_file_valid and not input_directory_valid and project_directory_valid:
-            self.clear_wizard()
-            temp1 = "Elements in the Configuration are invalid.  See the Status Monitor for details."
-            self.wizard(temp1, "red")
-            temp2 = "Input Directory Invalid [" + input_file_directory + "]"
-            self.status_monitor(temp2, 'red')
+            if not input_directory_valid:
+                temp2 = "Input Directory Invalid [" + input_file_directory + "]"
+                self.status_monitor(temp2, 'red')
+            if not project_directory_valid:
+                temp2 = "Project Directory Invalid [" + project_directory + "]"
+                self.status_monitor(temp2, 'red')
 
     def initialize_gui(self):
         global scenario, wizard_init
