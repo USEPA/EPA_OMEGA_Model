@@ -281,18 +281,21 @@ class DriveQualityStats:
         return s
 
 
-def CFR_FTP_harmonic_average(bag123_distances, bag123_quantities):
+def CFR_FTP_harmonic_average(bag123_distances, bag123_quantities, mode='quant_per_dist'):
     # FTP_harmonic_average calculates a weighted FTP result from
     # bag1..3 quantities (gallons / grams / energy) and distances
     # weighted 43% "cold" (bags 1&2) and 57% "hot" (bags 3&2)
     # as per CFR 86.144-94
 
-    quant_per = 0.43 * ( (bag123_quantities[0] + bag123_quantities[1] ) / ( bag123_distances[0] + bag123_distances[1]) ) + \
+    quant_per_dist = 0.43 * ( (bag123_quantities[0] + bag123_quantities[1] ) / ( bag123_distances[0] + bag123_distances[1]) ) + \
                      0.57 * ( (bag123_quantities[2] + bag123_quantities[1] ) / ( bag123_distances[2] + bag123_distances[1]) )
 
-    # dist_per_quant = 1 / quant_per
+    if mode is 'dist_per_quant' or mode is 'mpg':
+        answer = 1 / quant_per_dist
+    else:
+        answer = quant_per_dist
 
-    return quant_per # , dist_per_quant
+    return answer
 
 
 def CFR_city_highway_weighted_combined(city, highway, mode='quant_per_dist'):
@@ -461,6 +464,6 @@ if __name__ == "__main__":
     ftp_EngCErlt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.EngCErlt_J, dqs_ftp2.EngCErlt_J, dqs_ftp1.EngCErlt_J))
     ftp_EngCE_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.CEt_J, dqs_ftp2.CEt_J, dqs_ftp1.CEt_J))
 
-    weighted_combined_IWt_Jpm = CFR_city_highway_weighted_combined(ftp_IWt_Jpm, dqs_hwfet.IWt_Jpm, mode='quant_per')
-    weighted_combined_EngCErlt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCErlt_Jpm, dqs_hwfet.EngCErlt_Jpm, mode='quant_per')
-    weighted_combined_EngCE_Jpm = CFR_city_highway_weighted_combined(ftp_EngCE_Jpm, dqs_hwfet.CEt_Jpm, mode='quant_per')
+    weighted_combined_IWt_Jpm = CFR_city_highway_weighted_combined(ftp_IWt_Jpm, dqs_hwfet.IWt_Jpm, mode='quant_per_dist')
+    weighted_combined_EngCErlt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCErlt_Jpm, dqs_hwfet.EngCErlt_Jpm, mode='quant_per_dist')
+    weighted_combined_EngCEt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCE_Jpm, dqs_hwfet.CEt_Jpm, mode='quant_per_dist')
