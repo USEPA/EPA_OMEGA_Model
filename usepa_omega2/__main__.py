@@ -27,7 +27,7 @@ pd.set_option('chained_assignment', 'raise')
 output_folder = 'output/'
 
 node_count = 0
-
+near_term_targets = {}
 
 def plot_graph(mfr_graph, with_labels=False):
     options = {
@@ -43,6 +43,23 @@ def plot_graph(mfr_graph, with_labels=False):
 
     print('Drawing Manufacturer Graph...')
     nx.draw(mfr_graph, with_labels=with_labels, pos= pos, options= options)
+
+
+def get_node_history(mfr_graph, node_id):
+    history = {}
+    mfr = mfr_graph.nodes[node_id]['mfr']
+    for k in mfr.__dict__:
+        history[k] = {}
+
+    node_path = mfr_graph.nodes[node_id]['node_path']
+    for node_path_node_id in node_path:
+        mfr = mfr_graph.nodes[node_path_node_id]['mfr']
+        year = mfr.calendar_year
+        for k in mfr.__dict__:
+            history[k][year] = mfr.__dict__[k]
+
+    return history
+
 
 class ComplianceModel:
     def __init__(self, manufacturers_filename, initial_fleet_filename, verbose=False):
@@ -113,15 +130,20 @@ class ComplianceModel:
                     if quickrun:
                         vehicle_powertrain_efficiency_scenarios_set.add(base_new_v.powertrain_target_efficiency_norm)  # the comply scenario
                     else:
+                        vehicle_powertrain_efficiency_scenarios_set.add(max(base_new_v.powertrain_target_efficiency_norm, base_new_v.powertrain_efficiency_norm) / 1.05) # the backslide scenario
                         vehicle_powertrain_efficiency_scenarios_set.add(base_new_v.powertrain_efficiency_norm)   # the do-nothing scenario
                         vehicle_powertrain_efficiency_scenarios_set.add(max(base_new_v.powertrain_target_efficiency_norm, base_new_v.powertrain_efficiency_norm))  # the comply or over-comply scenario
-                        vehicle_powertrain_efficiency_scenarios_set.add(max(base_new_v.powertrain_target_efficiency_norm, base_new_v.powertrain_efficiency_norm) * 1.15) # the over-comply or more-over-comply scenario
+                        vehicle_powertrain_efficiency_scenarios_set.add(max(base_new_v.powertrain_target_efficiency_norm, base_new_v.powertrain_efficiency_norm) * 1.10) # the over-comply or more-over-comply scenario
+
+                        # vehicle_powertrain_efficiency_scenarios_set.add(base_new_v.powertrain_target_efficiency_norm)  # the comply or over-comply scenario
+                        # vehicle_powertrain_efficiency_scenarios_set.add(base_new_v.powertrain_efficiency_norm * 1.075) # the over-comply or more-over-comply scenario
+                        # vehicle_powertrain_efficiency_scenarios_set.add(base_new_v.powertrain_efficiency_norm * 1.150) # the over-comply or more-over-comply scenario
 
                     unique_powertrain_efficiency_options = list(vehicle_powertrain_efficiency_scenarios_set)
                     new_vehicles = []
                     for o in unique_powertrain_efficiency_options:
                         new_v = copy.copy(base_new_v)
-                        new_v.update_powertrain_efficiency_costs_emissions(o)
+                        new_v.update_powertrain_efficiency_costs_emissions(new_powertrain_efficiency_norm=o, calendar_year=compliance_year)
                         new_vehicles.append(new_v)
                     production_scenarios_list.append(new_vehicles)
 
@@ -138,7 +160,17 @@ class ComplianceModel:
                     # update manufacturer emissions/compliance status
                     new_mfr.calc_manufacturer_emissions_costs_sales()
 
-                    if (not target_cost and not target_emissions_Mg) or ((new_mfr.tech_production_running_cost_delta_dollars <= target_cost * 1.01) and (new_mfr.emissions_achieved_running_tailpipe_co2_Mg <= target_emissions_Mg * 1.015) and (new_mfr.emissions_achieved_tailpipe_co2_Mg <= new_mfr.emissions_target_net_co2_Mg * 1.1)):
+                    # if (not target_cost and not target_emissions_Mg) or (
+                    #         (new_mfr.tech_production_running_cost_delta_dollars <= target_cost * 1.01) and
+                    #         (new_mfr.emissions_achieved_running_tailpipe_co2_Mg <= target_emissions_Mg * 1.015) and
+                    #         (new_mfr.emissions_achieved_tailpipe_co2_Mg <= new_mfr.emissions_target_net_co2_Mg * 1.1)
+                    #         ):
+                    if (not target_cost and not target_emissions_Mg) or (
+                            (new_mfr.emissions_achieved_tailpipe_co2_Mg <= new_mfr.emissions_target_net_co2_Mg * 1.1) and
+                            (new_mfr.emissions_achieved_tailpipe_co2_Mg >= new_mfr.emissions_target_net_co2_Mg / 1.1) and
+                            ((new_mfr.tech_production_running_cost_delta_dollars <= 0) or (new_mfr.tech_production_running_cost_delta_dollars <= target_cost * 1.01)) and
+                            (new_mfr.emissions_achieved_running_tailpipe_co2_Mg <= target_emissions_Mg * 1.015)
+                            ):
                         # and add to graph
                         new_mfr_node_id = '%s_%d_%d' % (mfr_node_id, compliance_year, scenario_number)
                         # print(new_mfr_node_id)
@@ -178,11 +210,16 @@ class ComplianceModel:
         print('\nStarting Near Term Compliance...')
         for mfr_name in self.manufacturer:
             print(mfr_name + ' Starting Pass 1...')
+            mfr_graph = cm.manufacturer[mfr_name]
             self.create_compliance_scenarios(mfr_name, self.manufacturer[mfr_name], self.compliance_start_year, self.compliance_mid_year, mfr_node_ids=['root'], quickrun=True)
-            target_year_node = cm.find_nodes_ids_by_year(cm.manufacturer[mfr_name], self.compliance_mid_year - 1)[0]
-            target_cost = cm.manufacturer[mfr_name].nodes[target_year_node]['mfr'].tech_production_running_cost_delta_dollars
-            target_emissions_Mg = cm.manufacturer[mfr_name].nodes[target_year_node]['mfr'].emissions_achieved_running_tailpipe_co2_Mg
+
+            target_year_node = cm.find_nodes_ids_by_year(mfr_graph, self.compliance_mid_year - 1)[0]
+            target_cost = mfr_graph.nodes[target_year_node]['mfr'].tech_production_running_cost_delta_dollars
+            target_emissions_Mg = mfr_graph.nodes[target_year_node]['mfr'].emissions_achieved_running_tailpipe_co2_Mg
             print('Target Cost to %d = %f' % (self.compliance_mid_year - 1, target_cost))
+
+            # global near_term_targets
+            near_term_targets[mfr_name] = get_node_history(mfr_graph, target_year_node)
 
             print(mfr_name + ' Starting Pass 2...')
             self.create_compliance_scenarios(mfr_name, self.manufacturer[mfr_name], self.compliance_start_year, self.compliance_mid_year, mfr_node_ids=['root'], quickrun=False, target_cost= target_cost, target_emissions_Mg= target_emissions_Mg)
@@ -252,6 +289,7 @@ if __name__ == "__main__":
         credits = [cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg for n in target_year_nodes]
         winning_node_ids = [n for n in target_year_nodes]
 
+        print('%d %s total nodes' % (cm.manufacturer[mfr_name].number_of_nodes(), mfr_name))
         print('%d %s target year nodes' % (len(winning_node_ids), mfr_name))
         # print(winning_node_ids)
         if do_plots:
@@ -263,103 +301,128 @@ if __name__ == "__main__":
             plt.grid()
             plt.savefig(output_folder + 'mfr ' + mfr_name + 'credits versus compliance costs.png')
 
+    winners_only = True
     for mfr_name in cm.manufacturer:
         target_year_nodes = cm.find_nodes_ids_by_year(cm.manufacturer[mfr_name], target_year)
         print(len(target_year_nodes))
 
-        costs = [cm.manufacturer[mfr_name].nodes[n]['mfr'].tech_production_running_cost_delta_dollars for n in target_year_nodes if cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg > 0]
-        credits = [cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg for n in target_year_nodes if cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg > 0]
-        winning_node_ids = [n for n in target_year_nodes if cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg > 0]
+        if winners_only:
+            winning = "cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg > 0"
+            winning = "(cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg >= 0) and " \
+                      "(cm.manufacturer[mfr_name].nodes[n]['mfr'].tech_production_running_cost_delta_dollars <= near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'][target_year])"
+            costs = [cm.manufacturer[mfr_name].nodes[n]['mfr'].tech_production_running_cost_delta_dollars for n in target_year_nodes if eval(winning)]
+            credits = [cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg for n in target_year_nodes if eval(winning)]
+            winning_node_ids = [n for n in target_year_nodes if eval(winning)]
+            num_winners = min(3, len(winning_node_ids))
+            # num_winners = len(winning_node_ids)
+        else:
+            costs = [cm.manufacturer[mfr_name].nodes[n]['mfr'].tech_production_running_cost_delta_dollars for n in target_year_nodes]
+            credits = [cm.manufacturer[mfr_name].nodes[n]['mfr'].emissions_credits_running_tailpipe_co2_Mg for n in target_year_nodes]
+            winning_node_ids = [n for n in target_year_nodes]
+            num_winners = len(winning_node_ids)
 
-        print('%d %s compliant nodes' % (len(winning_node_ids), mfr_name))
-        # print(winning_node_ids)
-        if do_plots:
-            plt.figure()
-            plt.title(mfr_name + ' tech_production_cost_delta_dollars Versus emissions_credits_tailpipe_co2_Mg\n')
-            plt.plot(credits, costs, '.')
-            plt.xlabel('Credits (Mg)')
-            plt.ylabel('Costs ($)')
-            plt.grid()
-            plt.savefig(output_folder + 'mfr ' + mfr_name + 'credits versus compliance costs.png')
+        if costs:
+            print('%d %s compliant nodes' % (len(winning_node_ids), mfr_name))
+            # print(winning_node_ids)
+            if do_plots:
+                plt.figure()
+                plt.title(mfr_name + ' tech_production_cost_delta_dollars Versus emissions_credits_tailpipe_co2_Mg\n')
+                plt.plot(credits, costs, '.')
+                plt.xlabel('Credits (Mg)')
+                plt.ylabel('Costs ($)')
+                plt.grid()
+                plt.savefig(output_folder + 'mfr ' + mfr_name + 'credits versus compliance costs.png')
 
-        costs_copy = copy.copy(costs)
+            costs_copy = copy.copy(costs)
 
-        min_cost = min(costs)
-        print(mfr_name + ' min cost = %f' % min_cost)
+            min_cost = min(costs)
+            print(mfr_name + ' min cost = %f' % min_cost)
 
-        num_winners = 50
-        # get indexes of 5 best scenarios
-        pts = [costs.index(costs_copy.pop(costs_copy.index(min(costs_copy)))) for i in range(0,num_winners)]
-
-        if do_plots:
-            fig1 = plt.figure()
-            ax1 = plt.gca()
-            ax1.set_title(mfr_name + ' Target and Achieved Emissions v. Year\n' + winning_node_ids[pts[0]])
-            ax1.grid()
-            ax1.set_xlabel('Year')
-            ax1.set_ylabel('Emissions (Mg)')
-
-            fig2 = plt.figure()
-            ax2 = plt.gca()
-            ax2.set_xlabel('Year')
-            ax2.set_ylabel('Cumulative Credits (Mg)')
-            ax2.set_title(mfr_name + ' Cumulative Credits v. Year\n' + winning_node_ids[pts[0]])
-            ax2.grid()
-
-            fig3 = plt.figure()
-            ax3 = plt.gca()
-            ax3.set_xlabel('Year')
-            ax3.set_ylabel('Cumulative Costs ($)')
-            ax3.set_title(mfr_name + ' Cumulative Costs v. Year\n' + winning_node_ids[pts[0]])
-            ax3.grid()
-
-        for i in pts:
-            # print(credits[i])
-            # print(costs[i])
-            # print(winning_node_ids[i])
-
-            node_path = cm.manufacturer[mfr_name].nodes[winning_node_ids[i]]['node_path']
-
-            print(node_path)
-
-            # reconstruct history from node path:
-            emissions_target_net_co2_Mg = {}
-            emissions_achieved_tailpipe_co2_Mg = {}
-            emissions_credits_running_tailpipe_co2_Mg = {}
-            tech_production_running_cost_delta_dollars = {}
-            for node_id in node_path:
-                year = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].calendar_year
-                emissions_target_net_co2_Mg[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].emissions_target_net_co2_Mg
-                emissions_achieved_tailpipe_co2_Mg[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].emissions_achieved_tailpipe_co2_Mg
-                emissions_credits_running_tailpipe_co2_Mg[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].emissions_credits_running_tailpipe_co2_Mg
-                tech_production_running_cost_delta_dollars[year] = cm.manufacturer[mfr_name].nodes[node_id]['mfr'].tech_production_running_cost_delta_dollars
+            # get indexes of 5 best scenarios
+            pts = [costs.index(costs_copy.pop(costs_copy.index(min(costs_copy)))) for i in range(0,num_winners)]
 
             if do_plots:
-                # best_final_scenario = cm.manufacturer[mfr_name].nodes[winning_node_ids[i]]['mfr']
-                ax1.plot(list(emissions_target_net_co2_Mg.keys()),
-                         list(emissions_target_net_co2_Mg.values()), 'b')
-                ax1.plot(list(emissions_target_net_co2_Mg.keys()),
-                         np.array(list(emissions_target_net_co2_Mg.values())) * 1.1, 'r--')
-                ax1.plot(list(emissions_target_net_co2_Mg.keys()),
-                         np.array(list(emissions_target_net_co2_Mg.values())) * 1.15, 'm--')
-                ax1.plot(list(emissions_target_net_co2_Mg.keys()),
-                         np.array(list(emissions_target_net_co2_Mg.values())) * 1.20, 'y--')
-                # print(best_final_scenario)
-                # print(best_final_scenario.production[target_year][0])
-                # print(best_final_scenario.production[target_year][1])
+                fig1 = plt.figure()
+                ax1 = plt.gca()
+                ax1.set_title(mfr_name + ' Target and Achieved Emissions v. Year\n' + winning_node_ids[pts[0]])
+                ax1.grid()
+                ax1.set_xlabel('Year')
+                ax1.set_ylabel('Emissions (Mg)')
 
-                ax1.plot(list(emissions_achieved_tailpipe_co2_Mg.keys()), list(emissions_achieved_tailpipe_co2_Mg.values()))
+                fig2 = plt.figure()
+                ax2 = plt.gca()
+                ax2.set_xlabel('Year')
+                ax2.set_ylabel('Cumulative Credits (Mg)')
+                ax2.set_title(mfr_name + ' Cumulative Credits v. Year\n' + winning_node_ids[pts[0]])
+                ax2.grid()
 
-                ax2.plot(list(emissions_credits_running_tailpipe_co2_Mg.keys()), list(emissions_credits_running_tailpipe_co2_Mg.values()))
+                fig3 = plt.figure()
+                ax3 = plt.gca()
+                ax3.set_xlabel('Year')
+                ax3.set_ylabel('Cumulative Costs ($)')
+                ax3.set_title(mfr_name + ' Cumulative Costs v. Year\n' + winning_node_ids[pts[0]])
+                ax3.grid()
 
-                ax3.plot(list(tech_production_running_cost_delta_dollars.keys()), list(tech_production_running_cost_delta_dollars.values()))
+                fig4 = plt.figure()
+                ax4 = plt.gca()
+                ax4.set_xlabel('Year')
+                ax4.set_ylabel('Cumulative Emissions (Mg)')
+                ax4.set_title(mfr_name + ' Cumulative Emissions Mg v. Year\n' + winning_node_ids[pts[0]])
+                ax4.grid()
 
-        # ax1.set_ylim(0, ax1.get_ylim()[1])
+                fig5 = plt.figure()
+                ax5 = plt.gca()
+                ax5.set_xlabel('Year')
+                ax5.set_ylabel('Tech Cost per Vehicle ($)')
+                ax5.set_title(mfr_name + ' tech_production_cost_dollars_per_vehicle v. Year\n' + winning_node_ids[pts[0]])
+                ax5.grid()
 
-        if do_plots:
-            fig1.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' target and achieved emissions.png')
-            fig2.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' cumulative credits.png')
-            fig3.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[
-                i] + ' cumulative costs.png')
+            for i in pts:
+                print(winning_node_ids[i])
 
-        # plot_graph(cm.manufacturer[mfr_name])
+                node_history = get_node_history(cm.manufacturer[mfr_name], winning_node_ids[i])
+
+                if do_plots:
+                    ax1.plot(list(node_history['emissions_target_net_co2_Mg'].keys()),
+                             list(node_history['emissions_target_net_co2_Mg'].values()), 'b')
+                    ax1.plot(list(node_history['emissions_target_net_co2_Mg'].keys()),
+                             np.array(list(node_history['emissions_target_net_co2_Mg'].values())) / 1.1, 'r--')
+                    ax1.plot(list(node_history['emissions_target_net_co2_Mg'].keys()),
+                             np.array(list(node_history['emissions_target_net_co2_Mg'].values())) * 1.1, 'r--')
+                    # ax1.plot(list(node_history['emissions_target_net_co2_Mg'].keys()),
+                    #          np.array(list(node_history['emissions_target_net_co2_Mg'].values())) * 1.15, 'm--')
+                    # ax1.plot(list(node_history['emissions_target_net_co2_Mg'].keys()),
+                    #          np.array(list(node_history['emissions_target_net_co2_Mg'].values())) * 1.20, 'y--')
+
+                    ax1.plot(list(node_history['emissions_achieved_tailpipe_co2_Mg'].keys()), list(node_history['emissions_achieved_tailpipe_co2_Mg'].values()))
+
+                    ax2.plot(list(node_history['emissions_credits_running_tailpipe_co2_Mg'].keys()), list(node_history['emissions_credits_running_tailpipe_co2_Mg'].values()))
+
+                    ax3.plot(list(node_history['tech_production_running_cost_delta_dollars'].keys()), list(node_history['tech_production_running_cost_delta_dollars'].values()))
+
+                    ax4.plot(list(node_history['emissions_achieved_running_tailpipe_co2_Mg'].keys()), list(node_history['emissions_achieved_running_tailpipe_co2_Mg'].values()))
+
+                    ax5.plot(list(node_history['tech_production_cost_dollars_per_vehicle'].keys()), list(node_history['tech_production_cost_dollars_per_vehicle'].values()))
+
+            # ax1.set_ylim(0, ax1.get_ylim()[1])
+
+            ax3.plot(list(near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'].keys()),
+                 list(near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'].values()), 'r--')
+            ax3.plot(list(near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'].keys()),
+                 np.array(list(near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'].values()))*2, 'm--')
+            ax3.plot(list(near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'].keys()),
+                 np.array(list(near_term_targets[mfr_name]['tech_production_running_cost_delta_dollars'].values()))/2, 'm--')
+
+            ax4.plot(list(near_term_targets[mfr_name]['emissions_achieved_running_tailpipe_co2_Mg'].keys()),
+                     list(near_term_targets[mfr_name]['emissions_achieved_running_tailpipe_co2_Mg'].values()), 'r--')
+
+            ax5.plot(list(near_term_targets[mfr_name]['tech_production_cost_dollars_per_vehicle'].keys()),
+                     list(near_term_targets[mfr_name]['tech_production_cost_dollars_per_vehicle'].values()), 'r--')
+
+
+            if do_plots:
+                fig1.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' target and achieved emissions.png')
+                fig2.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' cumulative credits.png')
+                fig3.savefig(output_folder + 'mfr top ' + str(num_winners) + ' ' + mfr_name + ' ' + winning_node_ids[i] + ' cumulative costs.png')
+
+            # plot_graph(cm.manufacturer[mfr_name])
