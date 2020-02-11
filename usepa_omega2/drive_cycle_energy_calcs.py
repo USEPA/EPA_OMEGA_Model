@@ -447,6 +447,9 @@ def SAEJ2951_target_inertia_and_roadload_calcs(A_LBSF, B_LBSF, C_LBSF, ETW_LBS, 
     # ABSOLUTE POWER CHANGE PER TIME
     drive_quality_stats.time_secs = len(time) * 0.1  # Sample period is 0.1 seconds.
 
+    if verbose:
+        print(drive_quality_stats)
+
     return drive_quality_stats
 
 
@@ -456,9 +459,9 @@ if __name__ == "__main__":
     C = 0.021146
     ETW = 3625
 
-    dqs_ftp1 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase1_speed_mph, ftp_phase1_time, do_plots=False)
-    dqs_ftp2 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase2_speed_mph, ftp_phase2_time, do_plots=False)
-    dqs_hwfet = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, hwfet_speed_mph, hwfet_time, do_plots=False)
+    dqs_ftp1 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase1_speed_mph, ftp_phase1_time, do_plots=False, verbose=True)
+    dqs_ftp2 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase2_speed_mph, ftp_phase2_time, do_plots=False, verbose=True)
+    dqs_hwfet = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, hwfet_speed_mph, hwfet_time, do_plots=False, verbose=True)
 
     ftp_IWt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.IWt_J, dqs_ftp2.IWt_J, dqs_ftp1.IWt_J))
     ftp_EngCErlt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.EngCErlt_J, dqs_ftp2.EngCErlt_J, dqs_ftp1.EngCErlt_J))
