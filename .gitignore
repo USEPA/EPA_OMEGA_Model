@@ -3,6 +3,8 @@ venv
 env
 build
 dist
+/usepa_omega2/output/*
+outputs
 .pytest_cache
 .coverage
 
@@ -117,4 +119,3 @@ composer.lock
 
 # Mac
 *.DS_Store
-/usepa_omega2/output/*
