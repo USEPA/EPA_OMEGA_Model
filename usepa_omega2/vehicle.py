@@ -108,7 +108,7 @@ class Vehicle:
         # update vehicle emissions
         self.calc_vehicle_emissions_Mg()
 
-    def update_powertrain_efficiency_costs_emissions(self, new_powertrain_efficiency_norm=None):
+    def update_powertrain_efficiency_costs_emissions(self, new_powertrain_efficiency_norm=None, calendar_year=None, ):
         """
 
         :param new_powertrain_efficiency_norm:
@@ -121,7 +121,15 @@ class Vehicle:
 
         # update tech package costs
         self.tech_package_cost_dollars = self.powertrain_efficiency_norm * 10000
+
+        # poor man's "learning" cost reduction!
+        if calendar_year:
+            self.tech_package_cost_dollars = self.tech_package_cost_dollars * 0.97**(calendar_year-2019)
+
+        self.tech_package_cost_dollars = round(self.tech_package_cost_dollars)  # you got penny??
+
         self.tech_package_cost_delta_dollars = self.tech_package_cost_dollars - self.tech_package_cost_initial_dollars
+
 
         # update tech production costs
         self.tech_package_cost_production_dollars = self.tech_package_cost_dollars * self.sales
@@ -153,7 +161,7 @@ class Vehicle:
         # populate derived values
         self.lifetime_vehicle_miles_travelled = lifetime_vmt_miles[self.regulatory_class]
 
-        self.tech_package_cost_initial_dollars = self.powertrain_efficiency_norm * 10000
+        self.tech_package_cost_initial_dollars = round(self.powertrain_efficiency_norm * 10000)
         self.tech_package_cost_production_initial_dollars = self.tech_package_cost_initial_dollars * self.sales
 
         self.update_powertrain_efficiency_costs_emissions()
