@@ -453,15 +453,10 @@ def SAEJ2951_target_inertia_and_roadload_calcs(A_LBSF, B_LBSF, C_LBSF, ETW_LBS, 
     return drive_quality_stats
 
 
-if __name__ == "__main__":
-    A = 49.0198
-    B = -0.34687
-    C = 0.021146
-    ETW = 3625
-
-    dqs_ftp1 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase1_speed_mph, ftp_phase1_time, do_plots=False, verbose=True)
-    dqs_ftp2 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase2_speed_mph, ftp_phase2_time, do_plots=False, verbose=True)
-    dqs_hwfet = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, hwfet_speed_mph, hwfet_time, do_plots=False, verbose=True)
+def SAEJ2951_target_inertia_and_roadload_weight_combined_calcs(A_LBSF, B_LBSF, C_LBSF, ETW_LBS, do_plots=False, verbose=False):
+    dqs_ftp1 = SAEJ2951_target_inertia_and_roadload_calcs(A_LBSF, B_LBSF, C_LBSF, ETW_LBS, ftp_phase1_speed_mph, ftp_phase1_time, do_plots=do_plots, verbose=verbose)
+    dqs_ftp2 = SAEJ2951_target_inertia_and_roadload_calcs(A_LBSF, B_LBSF, C_LBSF, ETW_LBS, ftp_phase2_speed_mph, ftp_phase2_time, do_plots=do_plots, verbose=verbose)
+    dqs_hwfet = SAEJ2951_target_inertia_and_roadload_calcs(A_LBSF, B_LBSF, C_LBSF, ETW_LBS, hwfet_speed_mph, hwfet_time, do_plots=do_plots, verbose=verbose)
 
     ftp_IWt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.IWt_J, dqs_ftp2.IWt_J, dqs_ftp1.IWt_J))
     ftp_EngCErlt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.EngCErlt_J, dqs_ftp2.EngCErlt_J, dqs_ftp1.EngCErlt_J))
@@ -470,3 +465,28 @@ if __name__ == "__main__":
     weighted_combined_IWt_Jpm = CFR_city_highway_weighted_combined(ftp_IWt_Jpm, dqs_hwfet.IWt_Jpm, mode='quant_per_dist')
     weighted_combined_EngCErlt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCErlt_Jpm, dqs_hwfet.EngCErlt_Jpm, mode='quant_per_dist')
     weighted_combined_EngCEt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCE_Jpm, dqs_hwfet.CEt_Jpm, mode='quant_per_dist')
+
+    return {'Inertial_Work_J/m' : weighted_combined_IWt_Jpm, 'Net_RoadLoad_Work_J/m' : weighted_combined_EngCErlt_Jpm}
+
+
+if __name__ == "__main__":
+    A = 49.0198
+    B = -0.34687
+    C = 0.021146
+    ETW = 3625
+
+    # dqs_ftp1 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase1_speed_mph, ftp_phase1_time, do_plots=False, verbose=True)
+    # dqs_ftp2 = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, ftp_phase2_speed_mph, ftp_phase2_time, do_plots=False, verbose=True)
+    # dqs_hwfet = SAEJ2951_target_inertia_and_roadload_calcs(A, B, C, ETW, hwfet_speed_mph, hwfet_time, do_plots=False, verbose=True)
+    #
+    # ftp_IWt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.IWt_J, dqs_ftp2.IWt_J, dqs_ftp1.IWt_J))
+    # ftp_EngCErlt_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.EngCErlt_J, dqs_ftp2.EngCErlt_J, dqs_ftp1.EngCErlt_J))
+    # ftp_EngCE_Jpm = CFR_FTP_harmonic_average((dqs_ftp1.Dt_m, dqs_ftp2.Dt_m, dqs_ftp1.Dt_m), (dqs_ftp1.CEt_J, dqs_ftp2.CEt_J, dqs_ftp1.CEt_J))
+    #
+    # weighted_combined_IWt_Jpm = CFR_city_highway_weighted_combined(ftp_IWt_Jpm, dqs_hwfet.IWt_Jpm, mode='quant_per_dist')
+    # weighted_combined_EngCErlt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCErlt_Jpm, dqs_hwfet.EngCErlt_Jpm, mode='quant_per_dist')
+    # weighted_combined_EngCEt_Jpm = CFR_city_highway_weighted_combined(ftp_EngCE_Jpm, dqs_hwfet.CEt_Jpm, mode='quant_per_dist')
+
+    results = SAEJ2951_target_inertia_and_roadload_weight_combined_calcs(A, B, C, ETW)
+
+    print(results)
