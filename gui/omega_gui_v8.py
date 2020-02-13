@@ -13,9 +13,11 @@ import sys
 from distutils.dir_util import copy_tree
 
 import multitimer
+
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 
+# import PySide2.QtXml
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
