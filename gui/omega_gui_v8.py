@@ -10,6 +10,7 @@
     """
 import os
 import sys
+from distutils.dir_util import copy_tree
 
 import multitimer
 from PySide2.QtGui import QIcon, QColor, QTextOption
@@ -25,13 +26,17 @@ from datetime import datetime, date
 from gui.omega_gui_functions import *
 
 # Initialize global variables
-atimer = 0
+# Contains the complete path (including filename) to the configuration file
 configuration_file = ""
+# Contains the directory path to the input file directory
 input_file_directory = ""
+# Contains the directory path to the project directory
 project_directory = ""
-date_time = ""
+# Output to the status bar every timer cycle
 status_bar_message = "Ready"
+# Python dictionary containing contents of the configuration file
 scenario = ""
+# Logic elements for program control
 configuration_file_valid = False
 input_directory_valid = False
 project_directory_valid = False
@@ -61,20 +66,20 @@ class Form(QObject):
         self.window.action_select_input_file_directory.triggered.connect(self.open_input_directory)
         self.window.action_select_project_directory.triggered.connect(self.open_project_directory)
         self.window.action_save_configuration_file.triggered.connect(self.save_file)
-        # self.window.action_save_file_as.triggered.connect(self.save_file_as)
         self.window.action_exit.triggered.connect(self.exit_gui)
         self.window.select_input_directory_button.clicked.connect(self.open_input_directory)
         self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
         self.window.open_configuration_file_button.clicked.connect(self.open_file)
         self.window.save_configuration_file_button.clicked.connect(self.save_file)
         self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
+        self.window.copy_files_button.clicked.connect(self.copy_files)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
         self.window.show()
 
         # Initialize items
-        # Select intro tab
+        # Select file path tab
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         # Set status monitor window options
         self.window.event_monitor_result.setWordWrapMode(QTextOption.NoWrap)
@@ -91,7 +96,9 @@ class Form(QObject):
         # Set wizard window options
         self.window.wizard_result.setReadOnly(1)
 
+        # Timer start
         timer.start()
+        # Setup the gui
         self.initialize_gui()
 
     def new_file(self):
@@ -360,14 +367,12 @@ class Form(QObject):
         self.wizard_logic()
 
     def event_monitor(self, text, color, timecode):
-        global date_time
         if timecode == 'dt':
             time1 = datetime.now()
             t1 = time1.strftime("%H:%M:%S")
             today = date.today()
-            d2 = today.strftime("%m/%d/%y")
-            date_time = d2 + " " + t1
-            text = date_time + " " + text
+            d2 = today.strftime("%m/%d/%Y")
+            text = d2 + " " + t1 + " " + text
         self.window.event_monitor_result.setTextColor(QColor(color))
         self.window.event_monitor_result.append(text)
 
@@ -412,7 +417,9 @@ class Form(QObject):
         wizard_init = "Open a valid Configuration File or:\n" \
                       "  1) Select New Input Directory\n" \
                       "  2) Select New Project Directory\n" \
-                      "  3) Save Configuration File\n"
+                      "  3) Save Configuration File\n\n" \
+                      "All files from the Input Directory will be copied to the Project Directory.\n\n" \
+                      "Any common files will be overwritten."
         # Prime the status monitor
         self.event_monitor("Ready", "black", 'dt')
         # Prime the wizard
@@ -434,6 +441,9 @@ class Form(QObject):
         self.window.project_description.setPlainText("")
         self.clear_event_monitor()
 
+    def copy_files(self):
+        copy_tree(input_file_directory, project_directory)
+
     def showbox(self, message_title, message):
         msg = QMessageBox()
         msg.setWindowTitle(message_title)
@@ -450,12 +460,12 @@ class Form(QObject):
 
 
 def timer3():
-    global status_bar_message, date_time
+    global status_bar_message
     # Put date, time, and message on status bar
     time1 = datetime.now()
     t1 = time1.strftime("%H:%M:%S")
     today = date.today()
-    d1 = today.strftime("%B %d, %Y")
+    d1 = today.strftime("%m/%d/%Y")
     # If the form is not loaded, return
     try:
         form.window.statusBar().showMessage(d1 + "  " + t1 + "  " + status_bar_message)
