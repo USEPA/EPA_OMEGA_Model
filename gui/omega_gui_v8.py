@@ -17,7 +17,7 @@ import multitimer
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 
-# import PySide2.QtXml
+import PySide2.QtXml
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
@@ -25,7 +25,7 @@ from PySide2.QtCore import QFile, QObject
 from datetime import datetime, date
 
 # Import functions from other files
-from gui.omega_gui_functions import *
+from omega_gui_functions import *
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
