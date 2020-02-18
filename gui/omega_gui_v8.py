@@ -17,6 +17,7 @@ import multitimer
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 
+# PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 import PySide2.QtXml
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
@@ -47,10 +48,14 @@ project_directory_valid = False
 class Form(QObject):
 
     def __init__(self, ui_file, parent=None):
+        """
+        This function runs once upon program start.
+        Loads the gui and defines all connections and element defaults.
+        """
+        # Load the gui.
         super(Form, self).__init__(parent)
         ui_file = QFile(ui_file)
         ui_file.open(QFile.ReadOnly)
-
         loader = QUiLoader()
         self.window = loader.load(ui_file)
         ui_file.close()
@@ -444,20 +449,41 @@ class Form(QObject):
         self.clear_event_monitor()
 
     def copy_files(self):
+        """
+        Copies all files from the input directory to the project directory.
+
+        :return: N/A
+        """
         copy_tree(input_file_directory, project_directory)
 
     def showbox(self, message_title, message):
+        """
+        Displays a popup message box.
+
+        :param message_title: Title for message box
+        :param message: Text for message box.
+        :return: N/A
+        """
         msg = QMessageBox()
         msg.setWindowTitle(message_title)
         msg.setText(message)
         msg.exec()
 
     def exit_gui(self):
+        """
+        Runs when the user requests gui close.
+        """
+        # Close the gui.
         self.window.close()
 
     def closeprogram(self):
+        """
+        Runs after the user closes the gui.
+        Close any processes that are running outside the gui.
+        """
+        # Message to the terminal.
         print("User Terminating Process")
-        # Stop timer
+        # Stop timer process
         timer.stop()
 
 

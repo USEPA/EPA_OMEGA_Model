@@ -8,14 +8,27 @@ def open_file_action(filepath):
 
 
 def yaml_loader(filepath):
-    """Loads a yaml file"""
+    """
+    Loads a yaml formatted file and converts to a Python formatted dictionary.
+
+    :param filepath: Full path to source file
+
+    :return: Python formatted dictionary
+    """
     with open(filepath, "r") as file_descriptor:
         data = yaml.full_load(file_descriptor)
     return data
 
 
 def yaml_dump(filepath, data):
-    """Dumps data to a yaml file"""
+    """
+    Dumps data to a yaml file.
+
+    :param filepath: Full path to destination file
+    :param data: Dictionary to save
+
+    :return: N/A
+    """
     with open(filepath, "w") as file_descriptor:
         yaml.dump(data, file_descriptor)
 
@@ -27,7 +40,12 @@ def yaml_dump(filepath, data):
 def save_file_action(filepath, data):
     yaml_dump(filepath, data)
     """
-    Doc Stub
+    Dumps data to a yaml file.
+
+    :param filepath: Full path to destination file
+    :param data: Dictionary to save
+    
+    :return: N/A
     """
 
 
@@ -38,10 +56,8 @@ def file_dialog_save(file_name, file_type, file_dialog_title):
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
-    ...
-    :return file_name: User selected file name
-    :return file_type: Echo input param
-    :return file_dialog_title: Echo input param
+
+    :return: User selected file name, Echo file_type, Echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -68,10 +84,8 @@ def file_dialog(file_name, file_type, file_dialog_title):
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
-    ...
-    :return file_name: User selected file name
-    :return file_type: Echo input param
-    :return file_dialog_title: Echo input param
+
+    :return: User selected file name, echo file_type, echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -97,10 +111,8 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
-    ...
-    :return file_name: User selected file name
-    :return file_type: Echo input param
-    :return file_dialog_title: Echo input param
+
+    :return: User selected file name, echo file_type, echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
