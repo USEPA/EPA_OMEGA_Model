@@ -65,7 +65,7 @@ class Form(QObject):
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
-        self.window.setWindowIcon(QIcon("images/omega2_icon.jpg"))
+        self.window.setWindowIcon(QIcon("elements/omega2_icon.jpg"))
 
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
@@ -102,6 +102,8 @@ class Form(QObject):
         self.window.project_directory_1_result.setReadOnly(1)
         # Set wizard window options
         self.window.wizard_result.setReadOnly(1)
+        self.window.intro_text_1.setPixmap("elements/This Is OMEGA 2.jpg")
+        self.window.epa_logo_label1.setPixmap("elements/green_car.jpg")
 
         # Timer start
         timer.start()
@@ -454,7 +456,14 @@ class Form(QObject):
 
         :return: N/A
         """
+        color = "Black"
+        temp = "[" + input_file_directory + "]" + " to [" + project_directory + "]"
+        self.event_monitor("Copying Files From\n    " + temp + " ...", color, 'dt')
+        self.window.repaint()
         copy_tree(input_file_directory, project_directory)
+        self.event_monitor("Copying Files From\n    " + temp + " Complete", color, 'dt')
+        temp2 = "----------"
+        self.event_monitor(temp2, color, '')
 
     def showbox(self, message_title, message):
         """
@@ -507,5 +516,5 @@ timer = multitimer.MultiTimer(interval=1, function=timer3)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('omega_gui_v8.ui')
+    form = Form('elements/omega_gui_v9.ui')
     sys.exit(app.exec_())

@@ -67,7 +67,7 @@ def file_dialog_save(file_name, file_type, file_dialog_title):
     dialog.setFileMode(QFileDialog.AnyFile)
     dialog.setNameFilter(file_type)
     dialog.setViewMode(QFileDialog.Detail)
-    temp = dialog.selectedFiles()
+    # temp = dialog.selectedFiles()
     if dialog.exec_():
         file_name = dialog.selectedFiles()
         file_name = str(file_name)[2:-2]
@@ -94,7 +94,7 @@ def file_dialog(file_name, file_type, file_dialog_title):
     # dialog.setFileMode(QFileDialog.AnyFile)
     dialog.setNameFilter(file_type)
     dialog.setViewMode(QFileDialog.Detail)
-    temp = dialog.selectedFiles()
+    # temp = dialog.selectedFiles()
     if dialog.exec_():
         file_name = dialog.selectedFiles()
         file_name = str(file_name)[2:-2]
@@ -120,7 +120,7 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     dialog.setFileMode(QFileDialog.DirectoryOnly)
     dialog.setNameFilter(file_type)
     dialog.setViewMode(QFileDialog.Detail)
-    temp = dialog.selectedFiles()
+    # temp = dialog.selectedFiles()
     if dialog.exec_():
         file_name = dialog.selectedFiles()
         file_name = str(file_name)[2:-2]
@@ -128,7 +128,3 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     else:
         file_name = ""
         return file_name, file_type, file_dialog_title
-
-
-
-
