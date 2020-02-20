@@ -103,7 +103,7 @@ class Form(QObject):
         # Set wizard window options
         self.window.wizard_result.setReadOnly(1)
         self.window.intro_text_1.setPixmap("elements/This Is OMEGA 2.jpg")
-        self.window.epa_logo_label1.setPixmap("elements/green_car.jpg")
+        # self.window.epa_logo_label1.setPixmap("elements/green_car.jpg")
 
         # Timer start
         timer.start()
@@ -226,14 +226,13 @@ class Form(QObject):
             configuration_file_valid = False
 
         # Display project description from configuration file
-        item_value = ""
         try:
             item_value = scenario['project_description']['Project_description']
             # Trap, add element, and display if project description element missing from file
         except (KeyError, TypeError):
             scenario.update({'project_description': {'Project_description': ''}})
+            item_value = scenario['project_description']['Project_description']
 
-        item_value = scenario['project_description']['Project_description']
         if item_value == "":
             temp2 = "Warning - No project description in configuration file"
             self.event_monitor(temp2, 'orange', 'dt')
