@@ -1,1 +1,1 @@
-pyinstaller --windowed --onefile omega_gui_v8.py
+pyinstaller --windowed --onefile omega_gui_v9.py

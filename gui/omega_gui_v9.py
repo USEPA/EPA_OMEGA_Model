@@ -154,6 +154,8 @@ class Form(QObject):
         # working_directory = temp2
         configuration_file = temp2 + temp1
         # Place path in gui
+        color = "green"
+        self.window.configuration_file_1_result.setTextColor(QColor(color))
         self.window.configuration_file_1_result.setPlainText(configuration_file)
         # Create python dictionary 'scenario' from YAML formatted configuration file
         filepath = configuration_file
@@ -177,13 +179,15 @@ class Form(QObject):
                 self.showbox(message_title, message)
                 temp2 = message
                 self.event_monitor(temp2, 'red', 'dt')
+                temp2 = "----------"
+                self.event_monitor(temp2, 'red', "")
                 return
         configuration_file_valid = True
         # See if selected directory is valid
         if os.path.isdir(item_value):
             # Display in gui if valid
             input_file_directory = item_value
-            color = "black"
+            color = "green"
             self.window.input_file_directory_1_result.setTextColor(QColor(color))
             self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
             input_directory_valid = True
@@ -208,7 +212,7 @@ class Form(QObject):
         if os.path.isdir(item_value):
             # Display in gui if valid
             project_directory = item_value
-            color = "black"
+            color = "green"
             self.window.project_directory_1_result.setTextColor(QColor(color))
             self.window.project_directory_1_result.setPlainText(str(project_directory))
             project_directory_valid = True
@@ -227,9 +231,13 @@ class Form(QObject):
             item_value = scenario['project_description']['Project_description']
             # Trap, add element, and display if project description element missing from file
         except (KeyError, TypeError):
-            scenario.update({'project_description': {'Project_description': 'null'}})
+            scenario.update({'project_description': {'Project_description': ''}})
+
+        item_value = scenario['project_description']['Project_description']
+        if item_value == "":
             temp2 = "Warning - No project description in configuration file"
-            self.event_monitor(temp2, 'red', 'dt')
+            self.event_monitor(temp2, 'orange', 'dt')
+
         self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
         temp2 = "----------"
@@ -267,7 +275,7 @@ class Form(QObject):
         # Place path in gui
         self.window.configuration_file_1_result.setPlainText(configuration_file)
         temp1 = "Configuration File Saved:\n    [" + configuration_file + "]"
-        self.event_monitor(temp1, "black", 'dt')
+        self.event_monitor(temp1, "green", 'dt')
         # Save text from Project Description window to dictionary
         temp1 = self.window.project_description.toPlainText()
         scenario['project_description']['Project_description'] = temp1
@@ -277,7 +285,7 @@ class Form(QObject):
 
         configuration_file_valid = True
         self.wizard_logic()
-        color = "black"
+        color = "green"
         temp2 = "----------"
         self.event_monitor(temp2, color, '')
 
@@ -315,7 +323,7 @@ class Form(QObject):
         scenario['input_file_directory']['Input_file_directory'] = input_file_directory
         # Place path in gui
         directory = input_file_directory
-        color = "black"
+        color = "green"
         self.window.input_file_directory_1_result.setTextColor(QColor(color))
         self.window.input_file_directory_1_result.setPlainText(str(directory))
         temp2 = "Input File Directory Loaded:\n    [" + directory + "]"
@@ -327,6 +335,9 @@ class Form(QObject):
         input_directory_valid = True
         # User instructions to wizard
         self.wizard_logic()
+        color = "green"
+        temp2 = "----------"
+        self.event_monitor(temp2, color, '')
 
     def open_project_directory(self):
         """
@@ -362,7 +373,7 @@ class Form(QObject):
         scenario['project_directory']['Project_directory'] = project_directory
         # Place path in gui
         directory = project_directory
-        color = "black"
+        color = "green"
         self.window.project_directory_1_result.setTextColor(QColor(color))
         self.window.project_directory_1_result.setPlainText(str(directory))
         temp2 = "Project Directory Loaded:\n    [" + directory + "]"
@@ -374,6 +385,9 @@ class Form(QObject):
         project_directory_valid = True
         # User instructions to wizard
         self.wizard_logic()
+        color = "green"
+        temp2 = "----------"
+        self.event_monitor(temp2, color, '')
 
     def event_monitor(self, text, color, timecode):
         if timecode == 'dt':
@@ -399,12 +413,12 @@ class Form(QObject):
         if configuration_file_valid and input_directory_valid and project_directory_valid:
             self.clear_wizard()
             temp1 = "Configuration Loaded.\n\n"
-            temp1 = temp1 + "Atomic Batteries to Power - Turbines to Speed!\n\n"
-            temp1 = temp1 + "Warp Factor Number Five Mr. Sulu\n\n"
+            # temp1 = temp1 + "Atomic Batteries to Power - Turbines to Speed!\n\n"
+            # temp1 = temp1 + "Warp Factor Number Five Mr. Sulu\n\n"
             temp1 = temp1 + "Punch It Chewie!"
             self.wizard(temp1, "green")
             temp2 = "Configuration File Loaded:\n    [" + configuration_file + "]"
-            self.event_monitor(temp2, 'black', 'dt')
+            self.event_monitor(temp2, 'green', 'dt')
         elif not configuration_file_valid and input_directory_valid and project_directory_valid:
             self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
@@ -430,7 +444,10 @@ class Form(QObject):
                       "All files from the Input Directory will be copied to the Project Directory.\n\n" \
                       "Any common files will be overwritten."
         # Prime the status monitor
-        self.event_monitor("Ready", "black", 'dt')
+        color = "green"
+        self.event_monitor("Ready", color, 'dt')
+        temp2 = "----------"
+        self.event_monitor(temp2, color, '')
         # Prime the wizard
         self.clear_wizard()
         self.wizard(wizard_init, "green")
@@ -444,6 +461,11 @@ class Form(QObject):
         status_bar_message = "Ready"
 
     def clear_entries(self):
+        """
+            Clears all fields in the gui.
+
+            :return: N/A
+            """
         self.window.configuration_file_1_result.setPlainText("")
         self.window.input_file_directory_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
@@ -456,12 +478,12 @@ class Form(QObject):
 
         :return: N/A
         """
-        color = "Black"
+        color = "green"
         temp = "[" + input_file_directory + "]" + " to [" + project_directory + "]"
-        self.event_monitor("Copying Files From\n    " + temp + " ...", color, 'dt')
+        self.event_monitor("Copying Files ...\n    " + temp, color, 'dt')
         self.window.repaint()
         copy_tree(input_file_directory, project_directory)
-        self.event_monitor("Copying Files From\n    " + temp + " Complete", color, 'dt')
+        self.event_monitor("Copying Files Complete\n    " + temp, color, 'dt')
         temp2 = "----------"
         self.event_monitor(temp2, color, '')
 

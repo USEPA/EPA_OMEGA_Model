@@ -41,7 +41,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -503,21 +503,6 @@ Files</string>
     <bool>true</bool>
    </property>
   </widget>
-  <action name="actionEngines">
-   <property name="text">
-    <string>Engines</string>
-   </property>
-  </action>
-  <action name="actionTransmissions">
-   <property name="text">
-    <string>Transmissions</string>
-   </property>
-  </action>
-  <action name="actionRoad_Loads">
-   <property name="text">
-    <string>Road Loads</string>
-   </property>
-  </action>
   <action name="action_open_configuration_file">
    <property name="text">
     <string>Open Configuration File</string>
