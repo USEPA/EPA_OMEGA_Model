@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>main_window</class>
+ <widget class="QMainWindow" name="main_window">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -12,6 +12,9 @@
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tab_select">
@@ -33,6 +36,9 @@
     </property>
     <property name="toolTip">
      <string/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">alternate-background-color: rgb(85, 255, 127);</string>
     </property>
     <property name="tabPosition">
      <enum>QTabWidget::North</enum>
@@ -111,6 +117,11 @@
         <height>31</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
       <property name="text">
        <string>Configuration File</string>
       </property>
@@ -123,6 +134,11 @@
         <width>581</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
       </property>
       <property name="text">
        <string>Input Directory</string>
@@ -156,6 +172,11 @@
         <height>31</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
       <property name="text">
        <string>Project Directory</string>
       </property>
@@ -188,6 +209,11 @@
         <height>31</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
       <property name="toolTip">
        <string>Selects a new Project Directory</string>
       </property>
@@ -206,6 +232,11 @@
         <width>101</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
       </property>
       <property name="toolTip">
        <string>Selects a new Input Directory</string>
@@ -244,6 +275,11 @@
         <height>31</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
       <property name="toolTip">
        <string>Saves an OMEGA 2 Configuration File</string>
       </property>
@@ -278,6 +314,11 @@
         <width>531</width>
         <height>31</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
       </property>
       <property name="text">
        <string>Project Description</string>
@@ -367,6 +408,9 @@
     </property>
     <property name="toolTip">
      <string>Clears the Event Monitor</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>Clear</string>

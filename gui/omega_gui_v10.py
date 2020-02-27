@@ -113,7 +113,7 @@ class Form(QObject):
         # Disable run model button
         # self.enable_run_button(False)
 
-        # Define stylesheet for tab control
+        # Load stylesheet for tab control
         stylesheet = ""
         stylesheet = tab_stylesheet(stylesheet)
         self.window.tab_select.setStyleSheet(stylesheet)
