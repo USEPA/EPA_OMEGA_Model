@@ -14,8 +14,8 @@ from distutils.dir_util import copy_tree
 
 import multitimer
 
-from PySide2.QtGui import QIcon, QColor, QTextOption
-from PySide2.QtWidgets import QWidget, QMessageBox
+from PySide2.QtGui import QIcon, QColor, QTextOption, QPalette
+from PySide2.QtWidgets import QWidget, QMessageBox, QTabBar
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 import PySide2.QtXml
@@ -27,9 +27,12 @@ from datetime import datetime, date
 
 # Import functions from other files
 from omega_gui_functions import *
+from omega_gui_stylesheets import *
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
+
+
 configuration_file = ""
 # Contains the directory path to the input file directory
 input_file_directory = ""
@@ -43,6 +46,11 @@ scenario = ""
 configuration_file_valid = False
 input_directory_valid = False
 project_directory_valid = False
+# Images for model run button
+run_button_image_disabled = ""
+run_button_image_enabled = "elements/green_car_1"
+# Common spacer between events
+event_separator = "----------"
 
 
 class Form(QObject):
@@ -79,7 +87,7 @@ class Form(QObject):
         self.window.open_configuration_file_button.clicked.connect(self.open_file)
         self.window.save_configuration_file_button.clicked.connect(self.save_file)
         self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
-        self.window.copy_files_button.clicked.connect(self.copy_files)
+        self.window.run_model_button.clicked.connect(self.run_model)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -101,9 +109,14 @@ class Form(QObject):
         self.window.project_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.project_directory_1_result.setReadOnly(1)
         # Set wizard window options
-        self.window.wizard_result.setReadOnly(1)
-        self.window.intro_text_1.setPixmap("elements/This Is OMEGA 2.jpg")
-        # self.window.epa_logo_label1.setPixmap("elements/green_car.jpg")
+        # self.window.wizard_result.setReadOnly(1)
+        # Disable run model button
+        # self.enable_run_button(False)
+
+        # Define stylesheet for tab control
+        stylesheet = ""
+        stylesheet = tab_stylesheet(stylesheet)
+        self.window.tab_select.setStyleSheet(stylesheet)
 
         # Timer start
         timer.start()
@@ -121,6 +134,8 @@ class Form(QObject):
         self.window.project_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
         self.initialize_gui()
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.enable_run_button(False)
 
     def open_file(self):
         """
@@ -179,8 +194,7 @@ class Form(QObject):
                 self.showbox(message_title, message)
                 temp2 = message
                 self.event_monitor(temp2, 'red', 'dt')
-                temp2 = "----------"
-                self.event_monitor(temp2, 'red', "")
+                self.event_monitor(event_separator, 'red', "")
                 return
         configuration_file_valid = True
         # See if selected directory is valid
@@ -239,8 +253,7 @@ class Form(QObject):
 
         self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
-        temp2 = "----------"
-        self.event_monitor(temp2, color, "")
+        self.event_monitor(event_separator, "black", "")
 
     def save_file(self):
         """
@@ -272,6 +285,8 @@ class Form(QObject):
         # working_directory = temp2
         configuration_file = temp2 + temp1
         # Place path in gui
+        color = "green"
+        self.window.configuration_file_1_result.setTextColor(QColor(color))
         self.window.configuration_file_1_result.setPlainText(configuration_file)
         temp1 = "Configuration File Saved:\n    [" + configuration_file + "]"
         self.event_monitor(temp1, "green", 'dt')
@@ -284,9 +299,8 @@ class Form(QObject):
 
         configuration_file_valid = True
         self.wizard_logic()
-        color = "green"
-        temp2 = "----------"
-        self.event_monitor(temp2, color, '')
+        color = "black"
+        self.event_monitor(event_separator, color, '')
 
     def open_input_directory(self):
         """
@@ -334,9 +348,8 @@ class Form(QObject):
         input_directory_valid = True
         # User instructions to wizard
         self.wizard_logic()
-        color = "green"
-        temp2 = "----------"
-        self.event_monitor(temp2, color, '')
+        color = "black"
+        self.event_monitor(event_separator, color, '')
 
     def open_project_directory(self):
         """
@@ -384,9 +397,8 @@ class Form(QObject):
         project_directory_valid = True
         # User instructions to wizard
         self.wizard_logic()
-        color = "green"
-        temp2 = "----------"
-        self.event_monitor(temp2, color, '')
+        color = "black"
+        self.event_monitor(event_separator, color, '')
 
     def event_monitor(self, text, color, timecode):
         if timecode == 'dt':
@@ -401,55 +413,63 @@ class Form(QObject):
     def clear_event_monitor(self):
         self.window.event_monitor_result.setPlainText("")
 
-    def wizard(self, text, color):
-        self.window.wizard_result.setTextColor(QColor(color))
-        self.window.wizard_result.append(text)
+    # def wizard(self, text, color):
+    # self.window.wizard_result.setTextColor(QColor(color))
+    # self.window.wizard_result.append(text)
 
-    def clear_wizard(self):
-        self.window.wizard_result.setPlainText("")
+    # def clear_wizard(self):
+    # self.window.wizard_result.setPlainText("")
 
     def wizard_logic(self):
         if configuration_file_valid and input_directory_valid and project_directory_valid:
-            self.clear_wizard()
-            temp1 = "Configuration Loaded.\n\n"
+            # self.clear_wizard()
+            # temp1 = "Configuration Loaded.\n\n"
             # temp1 = temp1 + "Atomic Batteries to Power - Turbines to Speed!\n\n"
             # temp1 = temp1 + "Warp Factor Number Five Mr. Sulu\n\n"
-            temp1 = temp1 + "Punch It Chewie!"
-            self.wizard(temp1, "green")
+            # temp1 = temp1 + "Punch It Chewie!"
+            # self.wizard(temp1, "green")
+
             temp2 = "Configuration File Loaded:\n    [" + configuration_file + "]"
             self.event_monitor(temp2, 'green', 'dt')
+
+            temp1 = "Configuration Loaded.\n"
+            temp1 = temp1 + "Punch It Chewie!"
+            self.event_monitor(temp1, 'black', '')
+
         elif not configuration_file_valid and input_directory_valid and project_directory_valid:
-            self.clear_wizard()
+            # self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
-            self.wizard(temp1, "red")
+            self.event_monitor(temp1, 'black', '')
         elif not configuration_file_valid and (not input_directory_valid or not project_directory_valid):
-            self.clear_wizard()
-            temp1 = "Elements in the Configuration are invalid.  See the Status Monitor for details."
-            self.wizard(temp1, "red")
+            # self.clear_wizard()
+            temp1 = "Elements in the Configuration are invalid:"
+            self.event_monitor(temp1, 'black', '')
             if not input_directory_valid:
                 temp2 = "Input Directory Invalid:\n    [" + input_file_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
             if not project_directory_valid:
                 temp2 = "Project Directory Invalid:\n    [" + project_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
+        if configuration_file_valid and input_directory_valid and project_directory_valid:
+            self.enable_run_button(True)
+        else:
+            self.enable_run_button(False)
 
     def initialize_gui(self):
         global scenario, status_bar_message
         global configuration_file_valid, input_directory_valid, project_directory_valid
         wizard_init = "Open a valid Configuration File or:\n" \
-                      "  1) Select New Input Directory\n" \
-                      "  2) Select New Project Directory\n" \
-                      "  3) Save Configuration File\n\n" \
-                      "All files from the Input Directory will be copied to the Project Directory.\n\n" \
-                      "Any common files will be overwritten."
+                      "    Select New Input Directory," \
+                      " Select New Project Directory," \
+                      " and Save Configuration File\n" \
+                      "----------"
         # Prime the status monitor
-        color = "green"
+        color = "black"
         self.event_monitor("Ready", color, 'dt')
-        temp2 = "----------"
-        self.event_monitor(temp2, color, '')
+        self.event_monitor(event_separator, color, '')
         # Prime the wizard
-        self.clear_wizard()
-        self.wizard(wizard_init, "green")
+        # self.clear_wizard()
+        self.event_monitor(wizard_init, 'black', '')
         # Create 'scenario' dictionary for later reference
         scenario = {'input_file_directory': {'Input_file_directory': 'null'},
                     'project_directory': {'Project_directory': 'null'},
@@ -458,6 +478,7 @@ class Form(QObject):
         input_directory_valid = False
         project_directory_valid = False
         status_bar_message = "Ready"
+        self.enable_run_button(False)
 
     def clear_entries(self):
         """
@@ -471,20 +492,22 @@ class Form(QObject):
         self.window.project_description.setPlainText("")
         self.clear_event_monitor()
 
-    def copy_files(self):
+    def run_model(self):
         """
         Copies all files from the input directory to the project directory.
 
         :return: N/A
         """
+        self.event_monitor("Start Model Run ...", "black", 'dt')
+        # Copy all files from the input directory to the project directory.
         color = "green"
         temp = "[" + input_file_directory + "]" + " to [" + project_directory + "]"
         self.event_monitor("Copying Files ...\n    " + temp, color, 'dt')
         self.window.repaint()
-        copy_tree(input_file_directory, project_directory)
+        copy_files(input_file_directory, project_directory)
         self.event_monitor("Copying Files Complete\n    " + temp, color, 'dt')
-        temp2 = "----------"
-        self.event_monitor(temp2, color, '')
+        self.event_monitor("End Model Run", "black", 'dt')
+        self.event_monitor(event_separator, "black", '')
 
     def showbox(self, message_title, message):
         """
@@ -516,6 +539,20 @@ class Form(QObject):
         # Stop timer process
         timer.stop()
 
+    def enable_run_button(self, enable):
+        """
+        Enables and disables the run model button.
+
+        :param enable: Boolean to enable or disable run model button and display appropriate button image
+        :return: N/A
+        """
+        if enable:
+            self.window.run_model_button.setIcon(QIcon(run_button_image_enabled))
+            self.window.run_model_button.setEnabled(1)
+        else:
+            self.window.run_model_button.setIcon(QIcon(run_button_image_disabled))
+            self.window.run_model_button.setEnabled(0)
+
 
 def timer3():
     global status_bar_message
@@ -534,8 +571,7 @@ def timer3():
 # Run the function 'timer3' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=timer3)
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('elements/omega_gui_v9.ui')
+    form = Form('elements/omega_gui_v10.ui')
     sys.exit(app.exec_())

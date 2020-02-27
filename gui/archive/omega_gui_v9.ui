@@ -291,9 +291,9 @@ New</string>
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>20</y>
+      <y>10</y>
       <width>961</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -363,7 +363,7 @@ New</string>
      </font>
     </property>
     <property name="toolTip">
-     <string>Clear the Event Monitor</string>
+     <string>Clears the Event Monitor</string>
     </property>
     <property name="text">
      <string>Clear</string>
@@ -409,27 +409,22 @@ New</string>
      <string>Wizard</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="copy_files_button">
+   <widget class="QPushButton" name="run_model_button">
     <property name="geometry">
      <rect>
-      <x>880</x>
-      <y>40</y>
-      <width>51</width>
-      <height>51</height>
+      <x>1000</x>
+      <y>30</y>
+      <width>110</width>
+      <height>110</height>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Selects a new Project Directory</string>
-    </property>
-    <property name="icon">
-     <iconset>
-      <normaloff>green_car.jpg</normaloff>
-      <activeoff>green_car.jpg</activeoff>green_car.jpg</iconset>
+     <string>Run Model</string>
     </property>
     <property name="iconSize">
      <size>
-      <width>55</width>
-      <height>52</height>
+      <width>100</width>
+      <height>100</height>
      </size>
     </property>
    </widget>
@@ -440,7 +435,7 @@ New</string>
      <x>0</x>
      <y>0</y>
      <width>1115</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu1">

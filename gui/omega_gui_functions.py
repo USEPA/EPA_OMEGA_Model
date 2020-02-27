@@ -1,3 +1,5 @@
+from distutils.dir_util import copy_tree
+
 from PySide2.QtWidgets import QFileDialog
 import yaml
 
@@ -11,7 +13,7 @@ def yaml_loader(filepath):
     """
     Loads a yaml formatted file and converts to a Python formatted dictionary.
 
-    :param filepath: Full path to source file
+    :param filepath: Full path to yaml formatted source file
 
     :return: Python formatted dictionary
     """
@@ -128,3 +130,7 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     else:
         file_name = ""
         return file_name, file_type, file_dialog_title
+
+
+def copy_files(source, destination):
+    copy_tree(source, destination)
