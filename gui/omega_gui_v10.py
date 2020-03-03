@@ -47,10 +47,12 @@ configuration_file_valid = False
 input_directory_valid = False
 project_directory_valid = False
 # Images for model run button
-run_button_image_disabled = ""
-run_button_image_enabled = "elements/green_car_1"
+run_button_image_disabled = "elements/green_car_1.jpg"
+run_button_image_enabled = "elements/green_car_1.jpg"
 # Common spacer between events
 event_separator = "----------"
+
+
 
 
 class Form(QObject):
@@ -88,6 +90,9 @@ class Form(QObject):
         self.window.save_configuration_file_button.clicked.connect(self.save_file)
         self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
         self.window.run_model_button.clicked.connect(self.run_model)
+        self.window.action_run_model.triggered.connect(self.run_model)
+        self.window.action_documentation.triggered.connect(self.launch_documentation)
+        self.window.action_about_omega.triggered.connect(self.launch_about)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -118,6 +123,11 @@ class Form(QObject):
         stylesheet = tab_stylesheet(stylesheet)
         self.window.tab_select.setStyleSheet(stylesheet)
 
+        # Load stylesheet for background
+        stylesheet = ""
+        stylesheet = background_stylesheet(stylesheet)
+        self.window.background_widget.setStyleSheet(stylesheet)
+
         # Timer start
         timer.start()
         # Setup the gui
@@ -125,8 +135,9 @@ class Form(QObject):
 
     def new_file(self):
         """
-        Clears the gui and the input dictionary
+            Clears the gui and the input dictionary.
 
+            :return: N/A
         """
         self.clear_event_monitor()
         self.window.input_file_directory_1_result.setPlainText("")
@@ -139,13 +150,13 @@ class Form(QObject):
 
     def open_file(self):
         """
-        Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
 
-        When complete:
-            Global variable "scenario_file" = user selected scenario file name.
+            When complete:
+                Global variable "scenario_file" = user selected scenario file name.
 
+            :return: N/A
         """
-
         global configuration_file, scenario, configuration_file_valid, input_directory_valid
         global project_directory_valid, input_file_directory, project_directory
         # self.window.statusBar().showMessage("Open File")
@@ -257,11 +268,13 @@ class Form(QObject):
 
     def save_file(self):
         """
-        Opens a Windows dialog to save an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to save an OMEGA2 (.om2) Scenario file.
 
-        When complete:
-            Global variable "scenario_file" = user selected scenario file name.
-            Global variable "working_directory" = User selected path to scenario file name.
+            When complete:
+                Global variable "scenario_file" = user selected scenario file name.
+                Global variable "working_directory" = User selected path to scenario file name.
+
+            :return: N/A
         """
         global configuration_file, scenario, input_file_directory, project_directory
         global configuration_file_valid
@@ -304,11 +317,12 @@ class Form(QObject):
 
     def open_input_directory(self):
         """
-        Opens a Windows dialog to select an OMEGA2 input directory.
+            Opens a Windows dialog to select an OMEGA2 input directory.
 
-        When complete:
-            Global variable "scenario_file" = user selected scenario file name.
-            Global variable "working_directory" = User selected path to scenario file name.
+            When complete:
+                Global variable "input_file_directory" = user selected input file directory.
+
+            :return: N/A
         """
         global input_file_directory, scenario, configuration_file
         global configuration_file_valid, input_directory_valid, project_directory_valid
@@ -353,11 +367,12 @@ class Form(QObject):
 
     def open_project_directory(self):
         """
-        Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
 
-        When complete:
-            Global variable "scenario_file" = user selected scenario file name.
-            Global variable "working_directory" = User selected path to scenario file name.
+            When complete:
+                Global variable "project_directory" = user selected project directory.
+
+            :return: N/A
         """
         global project_directory, scenario, configuration_file
         global configuration_file_valid, input_directory_valid, project_directory_valid
@@ -401,16 +416,27 @@ class Form(QObject):
         self.event_monitor(event_separator, color, '')
 
     def event_monitor(self, text, color, timecode):
+        """
+        Appends text to event monitor textbox.
+
+        :param text: Text to append to event monitor textbox
+        :param color: Color to display text
+        :param timecode: 'dt' will display date and time before text
+        :return: N/A
+        """
         if timecode == 'dt':
-            time1 = datetime.now()
-            t1 = time1.strftime("%H:%M:%S")
-            today = date.today()
-            d2 = today.strftime("%m/%d/%Y")
-            text = d2 + " " + t1 + " " + text
+            now = datetime.now()
+            date_time = now.strftime("%m/%d/%Y %H:%M:%S")
+            text = date_time + "  " + text
         self.window.event_monitor_result.setTextColor(QColor(color))
         self.window.event_monitor_result.append(text)
 
     def clear_event_monitor(self):
+        """
+        Clears the event monitor textbox.
+
+        :return: N/A
+        """
         self.window.event_monitor_result.setPlainText("")
 
     # def wizard(self, text, color):
@@ -420,14 +446,31 @@ class Form(QObject):
     # def clear_wizard(self):
     # self.window.wizard_result.setPlainText("")
 
+    def launch_documentation(self):
+        """
+        Opens the OMEGA documentation website in browser window.
+
+        :return: N/A
+        """
+        os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
+
+    def launch_about(self):
+        """
+        Displays the OMEGA version in a popup box.
+
+        :return: N/A
+        """
+        message_title = "About OMEGA"
+        message = "OMEGA Version 10.1.2"
+        self.showbox(message_title, message)
+
     def wizard_logic(self):
+        """
+        Handles the gui logic to enable and disable various controls and launch event monitor messages.
+
+        :return: N/A
+        """
         if configuration_file_valid and input_directory_valid and project_directory_valid:
-            # self.clear_wizard()
-            # temp1 = "Configuration Loaded.\n\n"
-            # temp1 = temp1 + "Atomic Batteries to Power - Turbines to Speed!\n\n"
-            # temp1 = temp1 + "Warp Factor Number Five Mr. Sulu\n\n"
-            # temp1 = temp1 + "Punch It Chewie!"
-            # self.wizard(temp1, "green")
 
             temp2 = "Configuration File Loaded:\n    [" + configuration_file + "]"
             self.event_monitor(temp2, 'green', 'dt')
@@ -456,6 +499,11 @@ class Form(QObject):
             self.enable_run_button(False)
 
     def initialize_gui(self):
+        """
+        Initialize various program functions.
+
+        :return: N/A
+        """
         global scenario, status_bar_message
         global configuration_file_valid, input_directory_valid, project_directory_valid
         wizard_init = "Open a valid Configuration File or:\n" \
@@ -482,10 +530,10 @@ class Form(QObject):
 
     def clear_entries(self):
         """
-            Clears all fields in the gui.
+        Clears all fields in the gui.
 
-            :return: N/A
-            """
+        :return: N/A
+        """
         self.window.configuration_file_1_result.setPlainText("")
         self.window.input_file_directory_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
@@ -549,21 +597,25 @@ class Form(QObject):
         if enable:
             self.window.run_model_button.setIcon(QIcon(run_button_image_enabled))
             self.window.run_model_button.setEnabled(1)
+            self.window.action_run_model.setEnabled(1)
         else:
             self.window.run_model_button.setIcon(QIcon(run_button_image_disabled))
             self.window.run_model_button.setEnabled(0)
+            self.window.action_run_model.setEnabled(0)
 
 
 def timer3():
+    """
+    Called once per second to display the date, time, and global variable "status_bar_message" in the status bar.
+
+    :return: N/A
+    """
     global status_bar_message
     # Put date, time, and message on status bar
-    time1 = datetime.now()
-    t1 = time1.strftime("%H:%M:%S")
-    today = date.today()
-    d1 = today.strftime("%m/%d/%Y")
-    # If the form is not loaded, return
+    now = datetime.now()
+    date_time = now.strftime("%B %d, %Y  %H:%M:%S")
     try:
-        form.window.statusBar().showMessage(d1 + "  " + t1 + "  " + status_bar_message)
+        form.window.statusBar().showMessage(date_time + "  " + status_bar_message)
     except NameError:
         return
 

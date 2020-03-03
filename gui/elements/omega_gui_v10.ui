@@ -31,6 +31,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Arial</family>
       <pointsize>12</pointsize>
      </font>
     </property>
@@ -38,7 +39,7 @@
      <string/>
     </property>
     <property name="styleSheet">
-     <string notr="true">alternate-background-color: rgb(85, 255, 127);</string>
+     <string notr="true"/>
     </property>
     <property name="tabPosition">
      <enum>QTabWidget::North</enum>
@@ -47,7 +48,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <property name="iconSize">
      <size>
@@ -119,6 +120,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -137,6 +139,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -174,6 +177,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -211,6 +215,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -235,6 +240,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -256,6 +262,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -277,6 +284,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -317,6 +325,7 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
        </font>
       </property>
@@ -334,14 +343,15 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>10</x>
       <y>10</y>
-      <width>961</width>
+      <width>791</width>
       <height>41</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Arial</family>
       <pointsize>22</pointsize>
      </font>
     </property>
@@ -382,6 +392,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Arial</family>
       <pointsize>12</pointsize>
      </font>
     </property>
@@ -403,6 +414,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Arial</family>
       <pointsize>12</pointsize>
      </font>
     </property>
@@ -435,6 +447,26 @@
      </size>
     </property>
    </widget>
+   <widget class="QWidget" name="background_widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>-1</x>
+      <y>-1</y>
+      <width>1131</width>
+      <height>741</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+   </widget>
+   <zorder>background_widget</zorder>
+   <zorder>label</zorder>
+   <zorder>event_monitor_result</zorder>
+   <zorder>event_monitor_label</zorder>
+   <zorder>clear_event_monitor_button</zorder>
+   <zorder>tab_select</zorder>
+   <zorder>run_model_button</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -471,12 +503,14 @@
     <property name="toolTipsVisible">
      <bool>false</bool>
     </property>
-    <addaction name="actionAbout_OMEGA_2"/>
+    <addaction name="action_about_omega"/>
+    <addaction name="action_documentation"/>
    </widget>
    <widget class="QMenu" name="menuRun">
     <property name="title">
      <string>Run</string>
     </property>
+    <addaction name="action_run_model"/>
    </widget>
    <addaction name="menuMenu1"/>
    <addaction name="menuRun"/>
@@ -491,35 +525,90 @@
    <property name="text">
     <string>Open Configuration File</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
   </action>
   <action name="action_save_configuration_file">
    <property name="text">
     <string>Save Configuration File</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
   </action>
   <action name="action_select_input_file_directory">
    <property name="text">
     <string>Select Input File Directory</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
   </action>
   <action name="action_new_file">
    <property name="text">
     <string>New...</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
   </action>
-  <action name="actionAbout_OMEGA_2">
+  <action name="action_about_omega">
    <property name="text">
     <string>About OMEGA</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
   </action>
   <action name="action_exit">
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
   </action>
   <action name="action_select_project_directory">
    <property name="text">
     <string>Select Project Directory</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_run_model">
+   <property name="text">
+    <string>Run Model</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
+   </property>
+  </action>
+  <action name="action_documentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+    </font>
    </property>
   </action>
  </widget>
