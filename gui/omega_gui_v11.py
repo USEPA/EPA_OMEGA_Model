@@ -10,12 +10,11 @@
     """
 import os
 import sys
-from distutils.dir_util import copy_tree
 
 import multitimer
 
-from PySide2.QtGui import QIcon, QColor, QTextOption, QPalette
-from PySide2.QtWidgets import QWidget, QMessageBox, QTabBar
+from PySide2.QtGui import QIcon, QColor, QTextOption
+from PySide2.QtWidgets import QWidget, QMessageBox
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 import PySide2.QtXml
@@ -23,7 +22,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
 
-from datetime import datetime, date
+from datetime import datetime
 
 # Import functions from other files
 from omega_gui_functions import *
@@ -31,8 +30,6 @@ from omega_gui_stylesheets import *
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
-
-
 configuration_file = ""
 # Contains the directory path to the input file directory
 input_file_directory = ""
@@ -51,8 +48,6 @@ run_button_image_disabled = "elements/green_car_1.jpg"
 run_button_image_enabled = "elements/green_car_1.jpg"
 # Common spacer between events
 event_separator = "----------"
-
-
 
 
 class Form(QObject):
@@ -127,6 +122,15 @@ class Form(QObject):
         stylesheet = ""
         stylesheet = background_stylesheet(stylesheet)
         self.window.background_widget.setStyleSheet(stylesheet)
+
+        # Load stylesheet for buttons
+        stylesheet = ""
+        stylesheet = button_stylesheet(stylesheet)
+        self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
+        self.window.open_configuration_file_button.setStyleSheet(stylesheet)
+        self.window.save_configuration_file_button.setStyleSheet(stylesheet)
+        self.window.select_input_directory_button.setStyleSheet(stylesheet)
+        self.window.select_project_directory_button.setStyleSheet(stylesheet)
 
         # Timer start
         timer.start()
@@ -417,11 +421,11 @@ class Form(QObject):
 
     def event_monitor(self, text, color, timecode):
         """
-        Appends text to event monitor textbox.
+        Appends text to event monitor window.
 
-        :param text: Text to append to event monitor textbox
+        :param text: Text to append to event monitor window
         :param color: Color to display text
-        :param timecode: 'dt' will display date and time before text
+        :param timecode: 'dt' will display current date and time before text
         :return: N/A
         """
         if timecode == 'dt':
@@ -479,14 +483,18 @@ class Form(QObject):
             temp1 = temp1 + "Punch It Chewie!"
             self.event_monitor(temp1, 'black', '')
 
+            self.window.save_configuration_file_button.setEnabled(1)
+
         elif not configuration_file_valid and input_directory_valid and project_directory_valid:
             # self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
             self.event_monitor(temp1, 'black', '')
+            self.window.save_configuration_file_button.setEnabled(1)
         elif not configuration_file_valid and (not input_directory_valid or not project_directory_valid):
             # self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid:"
             self.event_monitor(temp1, 'black', '')
+            self.window.save_configuration_file_button.setEnabled(0)
             if not input_directory_valid:
                 temp2 = "Input Directory Invalid:\n    [" + input_file_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
@@ -527,6 +535,7 @@ class Form(QObject):
         project_directory_valid = False
         status_bar_message = "Ready"
         self.enable_run_button(False)
+        self.window.save_configuration_file_button.setEnabled(0)
 
     def clear_entries(self):
         """
@@ -546,16 +555,25 @@ class Form(QObject):
 
         :return: N/A
         """
+        global status_bar_message
         self.event_monitor("Start Model Run ...", "black", 'dt')
+        status_bar_message = "Model Running ..."
+        status_bar()
+        self.window.progress_bar.setValue(0)
         # Copy all files from the input directory to the project directory.
         color = "green"
         temp = "[" + input_file_directory + "]" + " to [" + project_directory + "]"
         self.event_monitor("Copying Files ...\n    " + temp, color, 'dt')
         self.window.repaint()
         copy_files(input_file_directory, project_directory)
+        self.window.progress_bar.setValue(50)
+        copy_files(input_file_directory, project_directory)
         self.event_monitor("Copying Files Complete\n    " + temp, color, 'dt')
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
+        status_bar_message = "Ready"
+        status_bar()
+        self.window.progress_bar.setValue(100)
 
     def showbox(self, message_title, message):
         """
@@ -604,7 +622,7 @@ class Form(QObject):
             self.window.action_run_model.setEnabled(0)
 
 
-def timer3():
+def status_bar():
     """
     Called once per second to display the date, time, and global variable "status_bar_message" in the status bar.
 
@@ -621,9 +639,9 @@ def timer3():
 
 
 # Run the function 'timer3' in 1 second intervals
-timer = multitimer.MultiTimer(interval=1, function=timer3)
+timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('elements/omega_gui_v10.ui')
+    form = Form('elements/omega_gui_v11.ui')
     sys.exit(app.exec_())

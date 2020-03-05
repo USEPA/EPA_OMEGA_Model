@@ -21,7 +21,7 @@ def tab_stylesheet(stylesheet):
             left: 15px;             /* Moves the tabs to the right */
             }    
         QTabWidget {
-            background: lightgray;  /* Sets the color of the unselected tabs */
+            background: rgb(170,170,170);  /* Sets the color of the unselected tabs */
             }
         QTabWidget::pane {
             border-top: 4px solid gray;     /* Sets the border color and thickness of the tab area */
@@ -49,6 +49,28 @@ def background_stylesheet(stylesheet):
         QWidget {
         background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                     stop: 0 rgb(181, 232, 181), stop: 1.0 rgb(147, 188, 147));
+        }
+     """
+    return stylesheet
+
+
+def button_stylesheet(stylesheet):
+    """
+        Loads the stylesheet for the main window of the gui.
+
+        :param stylesheet: Not used.
+
+        :return: String containing stylesheet.
+        """
+    stylesheet = """
+        QPushButton {
+        background-color: rgb(170,170,170);
+        }
+        QPushButton:hover {
+        background-color: rgb(200,200,200);
+        }
+        QPushButton:pressed {
+        background-color: rgb(230,230,230);
         }
      """
     return stylesheet
