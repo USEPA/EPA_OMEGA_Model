@@ -115,7 +115,8 @@ class Form(QObject):
 
         # Load stylesheet for tab control
         stylesheet = ""
-        stylesheet = tab_stylesheet(stylesheet)
+        # stylesheet = tab_stylesheet(stylesheet)
+        stylesheet = test1(stylesheet)
         self.window.tab_select.setStyleSheet(stylesheet)
 
         # Load stylesheet for background

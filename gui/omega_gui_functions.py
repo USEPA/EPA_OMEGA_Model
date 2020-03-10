@@ -108,13 +108,13 @@ def file_dialog(file_name, file_type, file_dialog_title):
 
 def directory_dialog(file_name, file_type, file_dialog_title):
     """
-    Opens a file dialog to select a file with extension options.
+    Opens a file dialog to select a directory.
 
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
 
-    :return: User selected file name, echo file_type, echo file_dialog_title
+    :return: User selected directory name, echo file_type, echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
