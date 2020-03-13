@@ -10,9 +10,6 @@ compliance_end_year = 2050 # end year of modeling which would come from an input
 PATH_PROJECT = Path.cwd()
 PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
 
-GRAM_CO2_per_MJ_ice = 8887 / 131.76
-GRAM_CO2_per_MJ_bev = 250 / 3.6
-
 techcost_curves_file = pd.ExcelFile(PATH_INPUTS.joinpath('techcost_curves.xlsx'))
 techcost_curves_roadload = pd.read_excel(techcost_curves_file, 'roadload')
 techcost_curves_powertrain = pd.read_excel(techcost_curves_file, 'powertrain')
@@ -107,14 +104,15 @@ def tech_package_module_scatter_chart(x_dictionary, y_dictionary, plot_title, x_
 
 def package_cost_co2_scatter_chart(pkg_cost_co2, model_year, vehicle_classification, x_axis_name, y_axis_name):
     plt.figure()
-    plt.scatter(pkg_cost_co2['cost'], pkg_cost_co2['co2'])
+    plt.scatter(pkg_cost_co2[x_axis_name], pkg_cost_co2[y_axis_name])
+    # plt.scatter(pkg_cost_co2['cost'], pkg_cost_co2['co2'])
     plt.title(vehicle_classification + '; ' + str(model_year))
     plt.xlabel(x_axis_name)
     plt.ylabel(y_axis_name)
     plt.grid()
     return
 
-
+# TODO we need nonaero_roadload, aero_roadload and curbweight techcosts with each in the package designation tuple
 roadload_techcosts = dict()
 roadload_learning = dict()
 for index, row in techcost_curves_roadload.iterrows():
@@ -183,32 +181,3 @@ for index, row in techcost_curves_powertrain.iterrows():
         package_costs_co2[vehicle_classification, model_year] = \
             PackageCosts(vehicle_classification, powertrain, compliance_start_year, compliance_end_year)\
                 .create_packages(powertrain_techcosts[vehicle_classification], powertrain_learning[vehicle_classification], roadload_techcosts[vehicle_classification], roadload_learning[vehicle_classification], model_year)
-
-
-# create lists for figures
-# cost_dicts = [roadload_techcost_ice, roadload_techcost_bev, powertrain_techcost_ice, powertrain_techcost_bev]
-# cost_dicts_names = ['Cost, Road load, ICE', 'Cost, Road load, BEV', 'Cost, Powertrain, ICE', 'Cost, Powertrain, BEV']
-
-# cost_vs_efficiency_dicts = [powertrain_techcost_ice, powertrain_techcost_bev]
-# cost_vs_energypermile_dicts = [roadload_techcost_ice, roadload_techcost_bev]
-# cost_vs_efficiency_dicts_names = ['Cost, Powertrain, ICE', 'Cost, Powertrain, BEV']
-# cost_vs_energypermile_dicts_names = ['Cost, Road load, ICE', 'Cost, Road load, BEV']
-#
-# learning_oem_dicts = [roadload_learning_oem_ice, roadload_learning_oem_bev, powertrain_learning_oem_ice, powertrain_learning_oem_bev]
-# learning_oem_dicts_names = ['OEM learning, Road load, ICE', 'OEM learning, Road load, BEV', 'OEM learning, Powertrain, ICE', 'OEM learning, Powertrain, BEV']
-#
-# package_cost_dicts = [package_cost_ice, package_cost_bev]
-# package_cost_dicts_names = ['Package costs, ICE', 'Package costs, BEV']
-#
-# package_co2_dicts = [package_co2_ice, package_co2_bev]
-# package_co2_dicts_names = ['Package CO2, ICE', 'Package CO2, BEV']
-#
-# # create figures
-# # tech_package_module_line_charts(cost_dicts, cost_dicts_names, 'Efficiency', 'Cost ($)')
-# tech_package_module_line_charts(cost_vs_efficiency_dicts, cost_vs_efficiency_dicts_names, 'Efficiency', 'Cost ($)')
-# tech_package_module_line_charts(cost_vs_energypermile_dicts, cost_vs_energypermile_dicts_names, 'MJ/mile', 'Cost ($)')
-# tech_package_module_line_charts(learning_oem_dicts, learning_oem_dicts_names, 'Calendar year', 'Learning scalar')
-#
-# tech_package_module_scatter_chart(package_cost_ice, package_co2_ice, 'Package CO2 vs. Cost, ICE', 'Cost ($)', 'CO2 (g/mi)')
-# tech_package_module_scatter_chart(package_cost_bev, package_co2_bev, 'Package CO2 vs. Cost, BEV', 'Cost ($)', 'CO2 (g/mi)')
-
