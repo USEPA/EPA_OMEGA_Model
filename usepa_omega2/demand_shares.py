@@ -1,9 +1,10 @@
-import pandas as pd
 import numpy as np
 
 # this dict would be an input rather than hardcoded here but the point is to show that these coefficients could change year-over-year, if desired
-coefficients = {2021: {'a': 1, 'b1': 1, 'b2': 2, 'b3': 3, 'b4': 4, 'b5': 5},
-                2022: {'a': 1, 'b1': 1.1, 'b2': .9, 'b3': .8, 'b4': .7, 'b5': .6}}
+coefficients = {'a': .1, 'b1': 1, 'b2': .8, 'b3': 1, 'b4': 1.1, 'b5': .5}
+pmt_metrics_dict = {2018: {'cost_per_mile_other': .1, 'avg_income': 50000, 'population': 300000000, 'cost_of_time': 30},
+                    2019: {'cost_per_mile_other': .11, 'avg_income': 51000, 'population': 301000000, 'cost_of_time': 31},
+                    2020: {'cost_per_mile_other': .12, 'avg_income': 52000, 'population': 302000000, 'cost_of_time': 32}}
 
 
 class DemandShares:
@@ -11,17 +12,31 @@ class DemandShares:
     Calculate the light-duty PMT demand; the share of hauling vs non-hauling; the share of private vs shared; the share of ICE vs BEV
 
     :param: coefficients: a dictionary of constants and beta coefficients by calendar year
+    :param: calendar_year: the calendar year for which demand is requested
     """
-    def __init__(self, coefficients):
-        self.coefficients = coefficients
 
-    def pmt_lightduty(self, calendar_years, cost_per_mile_lightduty, cost_per_mile_other, avg_income, population, cost_of_time):
+    def __init__(self, coefficients, calendar_year):
+        self.coefficients = coefficients
+        self.calendar_year = calendar_year
+
+    def pmt_lightduty(self, cost_per_mile_lightduty, pmt_metrics_dict):
+        """
+
+        :param cost_per_mile_lightduty: a single value of fleetwide light-duty cost/mile for the prior year
+        :param pmt_metrics_dict:  a dictionary of input parameters providing calendar year-by-calendar year cost/mile for non-light-duty forms of mobility,
+        average income, population, the value of individual's time
+        :return: a dictionary having a key=calendar_year and a value=demanded mile of travel for the given year
+        """
         pmt = dict()
-        for calendar_year in calendar_years:
-            pmt[calendar_year] = np.exp((self.coefficients[calendar_year]['a'])
-                                        + self.coefficients[calendar_year]['b1'] * np.log(cost_per_mile_lightduty)
-                                        + self.coefficients[calendar_year]['b2'] * np.log(cost_per_mile_other)
-                                        + self.coefficients[calendar_year]['b3'] * np.log(avg_income)
-                                        + self.coefficients[calendar_year]['b4'] * np.log(population)
-                                        + self.coefficients[calendar_year]['b5'] * np.log(cost_of_time))
+        pmt[self.calendar_year] = np.exp(self.coefficients['a']
+                                         + self.coefficients['b1'] * np.log(cost_per_mile_lightduty)
+                                         + self.coefficients['b2'] * np.log(pmt_metrics_dict[self.calendar_year]['cost_per_mile_other'])
+                                         + self.coefficients['b3'] * np.log(pmt_metrics_dict[self.calendar_year]['avg_income'])
+                                         + self.coefficients['b4'] * np.log(pmt_metrics_dict[self.calendar_year]['population'])
+                                         + self.coefficients['b5'] * np.log(pmt_metrics_dict[self.calendar_year]['cost_of_time']))
         return pmt
+
+
+pmt_dict = dict()
+for calendar_year in [2018, 2019, 2020]:
+    pmt_dict.update(DemandShares(coefficients, calendar_year).pmt_lightduty(.12, pmt_metrics_dict))
