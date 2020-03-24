@@ -16,6 +16,8 @@ class DemandShares:
     Calculate the light-duty PMT demand; the share of hauling vs non-hauling; the share of private vs shared; the share of ICE vs BEV
 
     :param: coefficients_pmt: a dictionary of constants and beta coefficients_pmt by calendar year
+    :param pmt_metrics_dict:  a dictionary of input parameters providing calendar year-by-calendar year cost/mile for non-light-duty forms of mobility,
+    average income, population, the value of individual's time
     :param: calendar_year: the calendar year for which demand is requested
     """
 
@@ -28,8 +30,6 @@ class DemandShares:
         """
 
         :param cost_per_mile_lightduty: a single value of fleetwide light-duty cost/mile for the prior year
-        :param pmt_metrics_dict:  a dictionary of input parameters providing calendar year-by-calendar year cost/mile for non-light-duty forms of mobility,
-        average income, population, the value of individual's time
         :return: a dictionary having a key=calendar_year and a value=demanded mile of travel for the given year
         """
         pmt = dict()
@@ -42,6 +42,12 @@ class DemandShares:
         return pmt
 
     def shared_vs_private(self, cost_per_mile_shared, cost_per_mile_private):
+        """
+
+        :param cost_per_mile_shared:
+        :param cost_per_mile_private:
+        :return:
+        """
         proportion_shared = dict()
         exponent = self.coefficients['a'] \
                    + self.coefficients['b1'] * np.log(cost_per_mile_shared) \
