@@ -59,8 +59,64 @@ class DemandShares:
         return proportion_shared
 
 
-if __name__ == '__main__':
-    data = pd.read_excel(PATH_INPUTS.joinpath('PMT_Parameters.xlsx'), index_col=0)
+class DealWithParameters:
+    def __init__(self, parameters_df):
+        self.parameters_df = parameters_df
+
+    def adjust_units(self, list_of_metrics, multiplier):
+        temp_df = self.parameters_df.copy()
+        temp_df[list_of_metrics] = temp_df[list_of_metrics] * multiplier
+        return temp_df
+
+
+class GetFuelPrices:
+    """
+    The GetFuelPrices class grabs the appropriate fuel prices from the aeo folder, cleans up some naming and creates a fuel_prices DataFrame for use in operating costs.
+
+    :param _path_project: Well, this is the path of the project and the parent of the aeo directory.
+    """
+
+    def __init__(self, list_of_metrics):
+        self.list_of_metrics = list_of_metrics
+
+    def get_fuel_prices(self, aeo_case):
+        """
+
+        :param _aeo_case: From the BCA inputs sheet - the AEO fuel case to use (a CSV of fuel prices must exist in the aeo directory).
+        :param _metrics: A list of fuel prices to gather (i.e., gasoline, diesel, retail, pre-tax, etc.)
+        :return: A fuel_prices DataFrame.
+        """
+        fuel_prices_file = PATH_INPUTS.joinpath('Components_of_Selected_Petroleum_Product_Prices_' + aeo_case + '.csv')
+        fuel_prices_full = pd.read_csv(fuel_prices_file, skiprows=4)
+        fuel_prices_full = fuel_prices_full[fuel_prices_full.columns[:-1]]
+        fuel_prices_full.drop(labels=['full name', 'api key', 'units'], axis=1, inplace=True)
+        fuel_prices = fuel_prices_full.dropna(axis=0, how='any')
+        diesel = fuel_prices.loc[fuel_prices['Unnamed: 0'].str.contains('diesel', case=False)]
+        gasoline = fuel_prices.loc[fuel_prices['Unnamed: 0'].str.contains('gasoline', case=False)]
+        fuel_prices = gasoline.append(diesel)
+        fuel_prices.rename(columns={'Unnamed: 0': ''}, inplace=True)
+        fuel_prices.set_index(keys=[''], inplace=True)
+        fuel_prices = fuel_prices.transpose()
+        fuel_prices.insert(0, 'calendar_year', fuel_prices.index)
+        fuel_prices['calendar_year'] = pd.to_numeric(fuel_prices['calendar_year'])
+        fuel_prices.set_index('calendar_year', drop=True, inplace=True)
+        for fuel in ['gasoline', 'diesel']:
+            fuel_prices.insert(len(fuel_prices.columns), fuel + '_pretax', fuel_prices[fuel + '_distribution'] + fuel_prices[fuel + '_wholesale'])
+        # fuel_prices = fuel_prices[['calendar_year'] + self.list_of_metrics]
+        fuel_prices = fuel_prices[self.list_of_metrics]
+        return fuel_prices
+
+
+def main():
+    fuel_prices = GetFuelPrices(['gasoline_retail', 'gasoline_pretax', 'diesel_retail', 'diesel_pretax']).get_fuel_prices('Reference')
+    fuel_prices_dict = fuel_prices.to_dict('index')
+
+    data = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_EconomicParameters_20200324.xlsx'), index_col=0, skiprows=1)
+    data = DealWithParameters(data).adjust_units(['Income', 'NumberofHouseholds'], 1000)
+    data = DealWithParameters(data).adjust_units('Population', 1000000)
+
+    data.insert(len(data.columns), 'cost_per_mile_lightduty', )
+
     pmt_parameters_dict = data.to_dict('index')
 
     # calculate demand for personal miles traveled
@@ -82,3 +138,7 @@ if __name__ == '__main__':
     shared_vs_private_df.insert(0, 'Calendar_Year', shared_vs_private_df.index)
     shared_vs_private_df.reset_index(drop=True, inplace=True)
     shared_vs_private_df.to_csv(PATH_PROJECT.joinpath('outputs/proportion_shared.csv'), index=False)
+
+
+if __name__ == '__main__':
+    main()
