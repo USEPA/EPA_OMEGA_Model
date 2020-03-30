@@ -147,31 +147,18 @@ class FleetMetrics:
     def __init__(self, fleet):
         self.fleet = fleet
 
-    def fleet_fuel_class(self, fuel_class):
-        fleet_fuel_class_df = self.fleet.loc[(self.fleet['FuelClass'] == fuel_class) & (self.fleet['Volume'] > 0), :]
-        return fleet_fuel_class_df
+    def fleet_class(self, class_name, class_value):
+        return_df = self.fleet.loc[(self.fleet[class_name] == class_value) & (self.fleet['Volume'] > 0), :]
+        return return_df
 
-    def fleet_ownership_class(self, ownership_class):
-        fleet_ownership_class_df = self.fleet.loc[(self.fleet['OwnershipClass'] == ownership_class) & (self.fleet['Volume'] > 0), :]
-        return fleet_ownership_class_df
+    def fleet_metric_weighted(self, metric_to_weight, metric_to_weightby):
+        weighted_value = self.fleet[[metric_to_weightby, metric_to_weight]].product(axis=1).sum(axis=0) \
+                   / self.fleet[metric_to_weightby].sum(axis=0)
+        return weighted_value
 
-    def wtd_energy_consump_rate(self, consumption_metric):
-        wtd_rate = self.fleet[['VehicleMilesTraveled', consumption_metric]].product(axis=1).sum(axis=0) \
-                   / self.fleet['VehicleMilesTraveled'].sum(axis=0)
-        return wtd_rate
-
-    def fleet_vmt(self):
-        vmt = self.fleet['VehicleMilesTraveled'].sum(axis=0)
-        return vmt
-
-    def fleet_volume(self):
-        volume = self.fleet['Volume'].sum(axis=0)
-        return volume
-    
-    def wtd_transaction_price(self):
-        wtd_price = self.fleet[['Volume', 'TransactionPrice']].product(axis=1).sum(axis=0) \
-                   / self.fleet['Volume'].sum(axis=0)
-        return wtd_price
+    def fleet_metric_sum(self, metric_to_sum):
+        summed_value = self.fleet[metric_to_sum].sum(axis=0)
+        return summed_value
 
 
 class DealWithParameters:
@@ -261,43 +248,43 @@ def main():
 
     # read initial fleet file & create DataFrames of subfleets
     fleet_initial = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_InitialFleet_20200327.xlsx'))
-    fleet_ice = FleetMetrics(fleet_initial).fleet_fuel_class('Petroleum')
-    fleet_bev = FleetMetrics(fleet_initial).fleet_fuel_class('Electricity')
-    # fleet_shared = FleetMetrics(fleet_initial).fleet_ownership_class('Shared')
-    # fleet_private = FleetMetrics(fleet_initial).fleet_ownership_class('Private')
-    fleet_ice_shared = FleetMetrics(fleet_ice).fleet_ownership_class('Shared')
-    fleet_ice_private = FleetMetrics(fleet_ice).fleet_ownership_class('Private')
-    fleet_bev_shared = FleetMetrics(fleet_bev).fleet_ownership_class('Shared')
-    fleet_bev_private = FleetMetrics(fleet_bev).fleet_ownership_class('Private')
+    fleet_ice = FleetMetrics(fleet_initial).fleet_class('FuelClass', 'Petroleum')
+    fleet_bev = FleetMetrics(fleet_initial).fleet_class('FuelClass', 'Electricity')
+    fleet_hauling = FleetMetrics(fleet_initial).fleet_class('HaulingClass', 'Hauling')
+    fleet_nonhauling = FleetMetrics(fleet_initial).fleet_class('HaulingClass', 'NonHauling')
+    fleet_ice_shared = FleetMetrics(fleet_ice).fleet_class('OwnershipClass', 'Shared')
+    fleet_ice_private = FleetMetrics(fleet_ice).fleet_class('OwnershipClass', 'Private')
+    fleet_bev_shared = FleetMetrics(fleet_bev).fleet_class('OwnershipClass', 'Shared')
+    fleet_bev_private = FleetMetrics(fleet_bev).fleet_class('OwnershipClass', 'Private')
 
     # calculate weighted energy consumption rates (ecr) and other necessary metrics
-    ecr_ice = FleetMetrics(fleet_ice).wtd_energy_consump_rate('FC')
-    ecr_bev = FleetMetrics(fleet_bev).wtd_energy_consump_rate('kWh_per_mile')
-    ecr_ice_shared = FleetMetrics(fleet_ice_shared).wtd_energy_consump_rate('FC')
-    ecr_bev_shared = FleetMetrics(fleet_bev_shared).wtd_energy_consump_rate('kWh_per_mile')
-    ecr_ice_private = FleetMetrics(fleet_ice_private).wtd_energy_consump_rate('FC')
-    ecr_bev_private = FleetMetrics(fleet_bev_private).wtd_energy_consump_rate('kWh_per_mile')
+    ecr_ice = FleetMetrics(fleet_ice).fleet_metric_weighted('FC', 'VehicleMilesTraveled')
+    ecr_bev = FleetMetrics(fleet_bev).fleet_metric_weighted('kWh_per_mile', 'VehicleMilesTraveled')
+    ecr_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_weighted('FC', 'VehicleMilesTraveled')
+    ecr_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_weighted('kWh_per_mile', 'VehicleMilesTraveled')
+    ecr_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_weighted('FC', 'VehicleMilesTraveled')
+    ecr_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_weighted('kWh_per_mile', 'VehicleMilesTraveled')
 
-    vmt_ice = FleetMetrics(fleet_ice).fleet_vmt()
-    vmt_bev = FleetMetrics(fleet_bev).fleet_vmt()
-    vmt_ice_shared = FleetMetrics(fleet_ice_shared).fleet_vmt()
-    vmt_bev_shared = FleetMetrics(fleet_bev_shared).fleet_vmt()
-    vmt_ice_private = FleetMetrics(fleet_ice_private).fleet_vmt()
-    vmt_bev_private = FleetMetrics(fleet_bev_private).fleet_vmt()
+    vmt_ice = FleetMetrics(fleet_ice).fleet_metric_sum('VehicleMilesTraveled')
+    vmt_bev = FleetMetrics(fleet_bev).fleet_metric_sum('VehicleMilesTraveled')
+    vmt_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_sum('VehicleMilesTraveled')
+    vmt_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_sum('VehicleMilesTraveled')
+    vmt_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_sum('VehicleMilesTraveled')
+    vmt_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_sum('VehicleMilesTraveled')
 
     # volume_ice = FleetMetrics(fleet_ice).fleet_volume()
     # volume_bev = FleetMetrics(fleet_bev).fleet_volume()
-    volume_ice_shared = FleetMetrics(fleet_ice_shared).fleet_volume()
-    volume_bev_shared = FleetMetrics(fleet_bev_shared).fleet_volume()
-    volume_ice_private = FleetMetrics(fleet_ice_private).fleet_volume()
-    volume_bev_private = FleetMetrics(fleet_bev_private).fleet_volume()
+    volume_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_sum('Volume')
+    volume_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_sum('Volume')
+    volume_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_sum('Volume')
+    volume_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_sum('Volume')
     
-    price_ice = FleetMetrics(fleet_ice).wtd_transaction_price()
-    price_bev = FleetMetrics(fleet_bev).wtd_transaction_price()
-    price_ice_shared = FleetMetrics(fleet_ice_shared).wtd_transaction_price()
-    price_bev_shared = FleetMetrics(fleet_bev_shared).wtd_transaction_price()
-    price_ice_private = FleetMetrics(fleet_ice_private).wtd_transaction_price()
-    price_bev_private = FleetMetrics(fleet_bev_private).wtd_transaction_price()
+    price_ice = FleetMetrics(fleet_ice).fleet_metric_weighted('TransactionPrice', 'Volume')
+    price_bev = FleetMetrics(fleet_bev).fleet_metric_weighted('TransactionPrice', 'Volume')
+    price_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_weighted('TransactionPrice', 'Volume')
+    price_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_weighted('TransactionPrice', 'Volume')
+    price_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_weighted('TransactionPrice', 'Volume')
+    price_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_weighted('TransactionPrice', 'Volume')
 
     # calculate needed cost per mile metrics for given calendar year
     pmt_dict = dict()
