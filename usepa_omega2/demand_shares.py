@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
+# from usepa_omega2.fuel_prices import GetFuelPrices
+from usepa_omega2.fleet_metrics import FleetMetrics
 
 
 PATH_PROJECT = Path.cwd()
@@ -8,9 +10,10 @@ PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
 
 # this dict would be an input rather than hardcoded here but the point is to show that these coefficients_pmt could change year-over-year, if desired
 coefficients_pmt = {'a': .1, 'b1': 1, 'b2': .8, 'b3': 1, 'b4': 1.1, 'b5': .5}
-coefficients_shared_vs_private = {'a': .1, 'b1': 1, 'b2': -1, 'b3': 0.5, 'b4': -0.5, 'b5': -.1}
-coefficients_bev_vs_ice = {'a': .1, 'b1': .1, 'b2': -.1, 'b3': 0.2, 'b4': -0.2, 'b5': .01}
+coefficients_shared_vs_private = {'a': .1, 'b1': .1, 'b2': -2, 'b3': .1, 'b4': -.05, 'b5': -.00001}
+coefficients_bev_vs_ice = {'a': .1, 'b1': -1, 'b2': -2, 'b3': .1, 'b4': -.2, 'b5': .0001}
 tco_divisor = 50000 # units are miles
+
 
 class DemandShares:
     """
@@ -21,7 +24,7 @@ class DemandShares:
     average income, population, the value of individual's time
     :param: calendar_year: the calendar year for which demand is requested
     """
-
+# TODO should the income metric used in this class be personal income or mean household income?
     def __init__(self, coefficients, economic_parameters_dict, calendar_year):
         self.coefficients = coefficients
         self.calendar_year = calendar_year
@@ -76,89 +79,121 @@ class CalcDemandShareMetrics:
     def __init__(self, calendar_year):
         self.calendar_year = calendar_year
 
-    def calc_cost_per_mile_lightduty(self, fuel_prices_dict, 
-                                     energy_consumption_rate_ice, vmt_ice, 
-                                     energy_consumption_rate_bev, vmt_bev):
+    def calc_cost_per_mile_lightduty(self, economic_parameters_dict, energy_consump_rates, vmts):
         # cost per mile LD ($/mile) = EnergyConsumptionRate (gal/mi or kWh/mi) * EnergyPrice ($/gal or $/kWh)
-        cost_per_mile_lightduty = (energy_consumption_rate_ice * fuel_prices_dict[self.calendar_year]['gasoline_retail'] * vmt_ice
-                                   + energy_consumption_rate_bev * fuel_prices_dict[self.calendar_year]['electricity_residential'] * vmt_bev) \
-                                   / (vmt_ice + vmt_bev)
-        return cost_per_mile_lightduty
+        cpm_numerator = 0
+        cpm_denominator = 0
+        for hauling_class in ['Hauling', 'NonHauling']:
+            for ownership_class in ['Private', 'Shared']:
+                for fuel_class in ['Petroleum']:
+                    cpm_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                     * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                     * economic_parameters_dict[self.calendar_year]['GasolinePrice']
+                for fuel_class in ['Electricity']:
+                    cpm_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                     * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                     * economic_parameters_dict[self.calendar_year]['ElectricityPrice']
+                for fuel_class in ['Petroleum', 'Electricity']:
+                    cpm_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
+        cpm = cpm_numerator / cpm_denominator
+        return cpm
 
-    def calc_cost_per_mile_shared(self, fuel_prices_dict, economic_parameters_dict,
-                                  energy_consumption_rate_ice, cost_ice, vmt_ice, volume_ice,
-                                  energy_consumption_rate_bev, cost_bev, vmt_bev, volume_bev, divisor):
+    def calc_cost_per_mile_shared(self, economic_parameters_dict, energy_consump_rates, vmts, prices, volumes, divisor):
         # cost per mile of shared ($/mile) = [SharedLaborCost($/hr) / AverageTripSpeed(miles/hour)
         #                                    * (1+SharedDeadheadFraction)]
         #                                    + [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
         #                                    + [EnergyConsumptionRate (gal/mi or kWh/mi)
         #                                    * EnergyPrice ($/gal or $/kWh)]
-        cost_per_mile_shared = (economic_parameters_dict[self.calendar_year]['SharedLaborCost'] / economic_parameters_dict[self.calendar_year]['AverageTripSpeed'] \
-                               * (1 + economic_parameters_dict[self.calendar_year]['SharedDeadheadFraction'])) \
-                               + (cost_ice * volume_ice / divisor + cost_bev * volume_bev / divisor) \
-                               / (volume_ice + volume_bev) \
-                               + (energy_consumption_rate_ice * fuel_prices_dict[self.calendar_year]['gasoline_retail'] * vmt_ice \
-                                  + energy_consumption_rate_bev * fuel_prices_dict[self.calendar_year]['electricity_residential'] * vmt_bev) \
-                               / (vmt_ice + vmt_bev)
-        return cost_per_mile_shared
+        cpm_price_numerator = 0
+        cpm_price_denominator = 0
+        cpm_fuel_numerator = 0
+        cpm_fuel_denominator = 0
+        for hauling_class in ['Hauling', 'NonHauling']:
+            for ownership_class in ['Shared']:
+                for fuel_class in ['Petroleum', 'Electricity']:
+                    cpm_price_numerator += prices[(fuel_class, hauling_class, ownership_class)] * volumes[(fuel_class, hauling_class, ownership_class)] / divisor
+                    cpm_price_denominator += volumes[(fuel_class, hauling_class, ownership_class)]
+                for fuel_class in ['Petroleum']:
+                    cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                          * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                          * economic_parameters_dict[self.calendar_year]['GasolinePrice']
+                for fuel_class in ['Electricity']:
+                    cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                          * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                          * economic_parameters_dict[self.calendar_year]['ElectricityPrice']
+                for fuel_class in ['Petroleum', 'Electricity']:
+                    cpm_fuel_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
+        cpm = (economic_parameters_dict[self.calendar_year]['SharedLaborCost'] / economic_parameters_dict[self.calendar_year]['AverageTripSpeed']
+               * (1 + economic_parameters_dict[self.calendar_year]['SharedDeadheadFraction'])) \
+              + cpm_price_numerator / cpm_price_denominator \
+              + cpm_fuel_numerator / cpm_fuel_denominator
+        return cpm
 
-    def calc_cost_per_mile_private(self, fuel_prices_dict,
-                                   energy_consumption_rate_ice, cost_ice, vmt_ice, volume_ice,
-                                   energy_consumption_rate_bev, cost_bev, vmt_bev, volume_bev, divisor):
+    def calc_cost_per_mile_private(self, economic_parameters_dict, energy_consump_rates, vmts, prices, volumes, divisor):
         # cost per mile of private = [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
         #                            + [EnergyConsumptionRate (gal/mi or kWh/mi)
         #                            * EnergyPrice ($/gal or $/kWh)]
-        cost_per_mile_private = (cost_ice * volume_ice / divisor + cost_bev * volume_bev / divisor) \
-                                 / (volume_ice + volume_bev) \
-                                 + (energy_consumption_rate_ice * fuel_prices_dict[self.calendar_year]['gasoline_retail'] * vmt_ice \
-                                    + energy_consumption_rate_bev * fuel_prices_dict[self.calendar_year]['electricity_residential'] * vmt_bev) \
-                                 / (vmt_ice + vmt_bev)
-        return cost_per_mile_private
+        cpm_price_numerator = 0
+        cpm_price_denominator = 0
+        cpm_fuel_numerator = 0
+        cpm_fuel_denominator = 0
+        for hauling_class in ['Hauling', 'NonHauling']:
+            for ownership_class in ['Private']:
+                for fuel_class in ['Petroleum', 'Electricity']:
+                    cpm_price_numerator += prices[(fuel_class, hauling_class, ownership_class)] * volumes[(fuel_class, hauling_class, ownership_class)] / divisor
+                    cpm_price_denominator += volumes[(fuel_class, hauling_class, ownership_class)]
+                for fuel_class in ['Petroleum']:
+                    cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                          * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                          * economic_parameters_dict[self.calendar_year]['GasolinePrice']
+                for fuel_class in ['Electricity']:
+                    cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                          * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                          * economic_parameters_dict[self.calendar_year]['ElectricityPrice']
+                for fuel_class in ['Petroleum', 'Electricity']:
+                    cpm_fuel_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
+        cpm = cpm_price_numerator / cpm_price_denominator \
+              + cpm_fuel_numerator / cpm_fuel_denominator
+        return cpm
 
-    def calc_cost_per_mile_ice(self, fuel_prices_dict, energy_consumption_rate_ice, cost_ice, divisor):
+    def calc_cost_per_mile_fuel_class(self, economic_parameters_dict, energy_consump_rates, vmts, prices, volumes, fuel_class_value, divisor):
         # cost per mile of ICE ($/mile) = [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
         #                                 + [EnergyConsumptionRate (gal/mile) * EnergyPrice ($/gal)]
-        cost_per_mile_ice = (cost_ice / divisor) + energy_consumption_rate_ice * fuel_prices_dict[self.calendar_year]['gasoline_retail']
-        return cost_per_mile_ice
-
-    def calc_cost_per_mile_bev(self, fuel_prices_dict, energy_consumption_rate_bev, cost_bev, divisor):
-        # cost per mile of EV ($/mile) =  [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
-        #                                 + [EnergyConsumptionRate (kWh/mi) * EnergyPrice ($/kWh)]
-        cost_per_mile_bev = (cost_bev / divisor) + energy_consumption_rate_bev * fuel_prices_dict[self.calendar_year]['electricity_residential']
-        return cost_per_mile_bev
+        cpm_price_numerator = 0
+        cpm_price_denominator = 0
+        cpm_fuel_numerator = 0
+        cpm_fuel_denominator = 0
+        if fuel_class_value == 'Petroleum':
+            fuel_price_value = 'GasolinePrice'
+        else:
+            fuel_price_value = 'ElectricityPrice'
+        for hauling_class in ['Hauling', 'NonHauling']:
+            for ownership_class in ['Shared', 'Private']:
+                for fuel_class in [fuel_class_value]:
+                    cpm_price_numerator += prices[(fuel_class, hauling_class, ownership_class)] * volumes[(fuel_class, hauling_class, ownership_class)] / divisor
+                    cpm_price_denominator += volumes[(fuel_class, hauling_class, ownership_class)]
+                    cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
+                                          * vmts[(fuel_class, hauling_class, ownership_class)] \
+                                          * economic_parameters_dict[self.calendar_year][fuel_price_value]
+                    cpm_fuel_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
+        cpm = cpm_price_numerator / cpm_price_denominator \
+              + cpm_fuel_numerator / cpm_fuel_denominator
+        return cpm
 
     def calc_timecost_private(self, economic_parameters_dict):
         # time cost of private ($/mile) = [PrivateOverheadTime(minutes / mile) * 1 / 60 * TimeCost($ / hr)]
-        cost_per_mile_privatetime = economic_parameters_dict[self.calendar_year]['PrivateOverheadTime'] \
-                                    * (1 / 60) \
-                                    * economic_parameters_dict[self.calendar_year]['TimeCost']
-        return cost_per_mile_privatetime
+        cpm = economic_parameters_dict[self.calendar_year]['PrivateOverheadTime'] \
+              * (1 / 60) \
+              * economic_parameters_dict[self.calendar_year]['TimeCost']
+        return cpm
 
     def calc_timecost_shared(self, economic_parameters_dict):
         # time cost of shared ($/mile) = SharedWaitTime (minutes/trip) * 1/60 * TimeCost ($/hr) * 1 / AverageTripLength (mile/trip)
-        cost_per_mile_sharedtime = economic_parameters_dict[self.calendar_year]['SharedWaitTime'] \
-                                   * (1 / 60) \
-                                   * economic_parameters_dict[self.calendar_year]['TimeCost'] \
-                                   * (1 / economic_parameters_dict[self.calendar_year]['AverageTripLength'])
-        return cost_per_mile_sharedtime
-
-
-class FleetMetrics:
-    def __init__(self, fleet):
-        self.fleet = fleet
-
-    def fleet_class(self, class_name, class_value):
-        return_df = self.fleet.loc[(self.fleet[class_name] == class_value) & (self.fleet['Volume'] > 0), :]
-        return return_df
-
-    def fleet_metric_weighted(self, metric_to_weight, metric_to_weightby):
-        weighted_value = self.fleet[[metric_to_weightby, metric_to_weight]].product(axis=1).sum(axis=0) \
-                   / self.fleet[metric_to_weightby].sum(axis=0)
-        return weighted_value
-
-    def fleet_metric_sum(self, metric_to_sum):
-        summed_value = self.fleet[metric_to_sum].sum(axis=0)
-        return summed_value
+        cpm = economic_parameters_dict[self.calendar_year]['SharedWaitTime'] \
+              * (1 / 60) \
+              * economic_parameters_dict[self.calendar_year]['TimeCost'] \
+              * (1 / economic_parameters_dict[self.calendar_year]['AverageTripLength'])
+        return cpm
 
 
 class DealWithParameters:
@@ -171,140 +206,83 @@ class DealWithParameters:
         return temp_df
 
 
-class GetFuelPrices:
-    """
-    The GetFuelPrices class grabs the appropriate fuel prices from the aeo folder, cleans up some naming and creates a fuel_prices DataFrame for use in operating costs.
-
-    :param list_of_metrics: A list of fuel price metrics to gather.
-    """
-
-    def __init__(self, list_of_metrics):
-        self.list_of_metrics = list_of_metrics
-
-    def get_petrol_prices(self, aeo_case):
-        """
-
-        :param aeo_case: This should be set via an input file.
-        :return: A fuel_prices DataFrame.
-        """
-        fuel_prices_file = PATH_INPUTS.joinpath('Components_of_Selected_Petroleum_Product_Prices_' + aeo_case + '.csv')
-        fuel_prices_full = pd.read_csv(fuel_prices_file, skiprows=4)
-        fuel_prices_full = fuel_prices_full[fuel_prices_full.columns[:-1]]
-        fuel_prices_full.drop(labels=['full name', 'api key', 'units'], axis=1, inplace=True)
-        fuel_prices = fuel_prices_full.dropna(axis=0, how='any')
-        diesel = fuel_prices.loc[fuel_prices['Unnamed: 0'].str.contains('diesel', case=False)]
-        gasoline = fuel_prices.loc[fuel_prices['Unnamed: 0'].str.contains('gasoline', case=False)]
-        fuel_prices = gasoline.append(diesel)
-        fuel_prices.rename(columns={'Unnamed: 0': ''}, inplace=True)
-        fuel_prices.set_index(keys=[''], inplace=True)
-        fuel_prices = fuel_prices.transpose()
-        fuel_prices.insert(0, 'calendar_year', fuel_prices.index)
-        fuel_prices['calendar_year'] = pd.to_numeric(fuel_prices['calendar_year'])
-        fuel_prices.set_index('calendar_year', drop=True, inplace=True)
-        for fuel in ['gasoline', 'diesel']:
-            fuel_prices.insert(len(fuel_prices.columns), fuel + '_pretax', fuel_prices[fuel + '_distribution'] + fuel_prices[fuel + '_wholesale'])
-        # fuel_prices = fuel_prices[['calendar_year'] + self.list_of_metrics]
-        fuel_prices = fuel_prices[self.list_of_metrics]
-        return fuel_prices
-
-    def get_electricity_prices(self, aeo_case):
-        """
-
-        :param aeo_case: This should be set via an input file.
-        :return: A fuel_prices DataFrame.
-        """
-        fuel_prices_file = PATH_INPUTS.joinpath('Electricity_Supply_Disposition_Prices_and_Emissions_' + aeo_case + '.csv')
-        fuel_prices_full = pd.read_csv(fuel_prices_file, skiprows=4)
-        fuel_prices_full = fuel_prices_full[fuel_prices_full.columns[:-1]]
-        fuel_prices_full.drop(labels=['full name', 'api key', 'units'], axis=1, inplace=True)
-        fuel_prices = fuel_prices_full.dropna(axis=0, how='any')
-        fuel_prices = fuel_prices.loc[fuel_prices['Unnamed: 0'].str.contains('electricity', case=False)]
-        fuel_prices.rename(columns={'Unnamed: 0': ''}, inplace=True)
-        fuel_prices.set_index(keys=[''], inplace=True)
-        fuel_prices = fuel_prices.transpose()
-        fuel_prices.insert(0, 'calendar_year', fuel_prices.index)
-        fuel_prices['calendar_year'] = pd.to_numeric(fuel_prices['calendar_year'])
-        fuel_prices.set_index('calendar_year', drop=True, inplace=True)
-        fuel_prices = fuel_prices[self.list_of_metrics]
-        return fuel_prices
-
-
 def main():
-    # read fuel prices file and create dictionary (unless it's already been done)
-    try:
-        fuel_prices
-    except:
-        fuel_prices_petrol = GetFuelPrices(['gasoline_retail', 'gasoline_pretax', 'diesel_retail', 'diesel_pretax']).get_petrol_prices('Reference')
-        fuel_prices_electricity = GetFuelPrices('electricity_residential').get_electricity_prices('Reference')
-    fuel_prices = pd.concat([fuel_prices_petrol, fuel_prices_electricity], axis=1)
-    fuel_prices = DealWithParameters(fuel_prices).adjust_units('electricity_residential', .01)
-    fuel_prices_dict = fuel_prices.to_dict('index')
+    # read fuel prices file and create dictionary (unless it's already been done and unless fuel prices are in the economic parameters file)
+    # try:
+    #     fuel_prices
+    # except:
+    #     fuel_prices_petrol = GetFuelPrices(['gasoline_retail', 'gasoline_pretax', 'diesel_retail', 'diesel_pretax'], PATH_INPUTS).get_petrol_prices('Reference')
+    #     fuel_prices_electricity = GetFuelPrices('electricity_residential', PATH_INPUTS).get_electricity_prices('Reference')
+    # fuel_prices = pd.concat([fuel_prices_petrol, fuel_prices_electricity], axis=1)
+    # fuel_prices = DealWithParameters(fuel_prices).adjust_units('electricity_residential', .01)
+    # fuel_prices_dict = fuel_prices.to_dict('index')
 
     # read and adjust some elements of the economic parameters file
-    economic_parameters = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_EconomicParameters_20200324.xlsx'), index_col=0, skiprows=1)
-    economic_parameters = DealWithParameters(economic_parameters).adjust_units(['Income', 'NumberofHouseholds'], 1000)
+    economic_parameters = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_EconomicParameters.xlsx'), index_col=0, skiprows=1)
+    economic_parameters = DealWithParameters(economic_parameters).adjust_units(['Income', 'NumberOfHouseholds'], 1000)
     economic_parameters = DealWithParameters(economic_parameters).adjust_units('Population', 1000000)
     economic_parameters_dict = economic_parameters.to_dict('index')
 
-    # read initial fleet file & create DataFrames of subfleets
-    fleet_initial = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_InitialFleet_20200327.xlsx'))
-    fleet_ice = FleetMetrics(fleet_initial).fleet_class('FuelClass', 'Petroleum')
-    fleet_bev = FleetMetrics(fleet_initial).fleet_class('FuelClass', 'Electricity')
-    fleet_hauling = FleetMetrics(fleet_initial).fleet_class('HaulingClass', 'Hauling')
-    fleet_nonhauling = FleetMetrics(fleet_initial).fleet_class('HaulingClass', 'NonHauling')
-    fleet_ice_shared = FleetMetrics(fleet_ice).fleet_class('OwnershipClass', 'Shared')
-    fleet_ice_private = FleetMetrics(fleet_ice).fleet_class('OwnershipClass', 'Private')
-    fleet_bev_shared = FleetMetrics(fleet_bev).fleet_class('OwnershipClass', 'Shared')
-    fleet_bev_private = FleetMetrics(fleet_bev).fleet_class('OwnershipClass', 'Private')
+    # read initial fleet file & create a dictionary of DataFrames of subfleets
+    fleet_initial = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_InitialFleet.xlsx'))
+    fleet_initial.insert(0, 'FC_HC_OC', pd.Series(zip(fleet_initial['FuelClass'], fleet_initial['HaulingClass'], fleet_initial['OwnershipClass'])))
+    fleets = dict()
+    for fuel_class in ['Petroleum', 'Electricity']:
+        for hauling_class in ['Hauling', 'NonHauling']:
+            for ownership_class in ['Private', 'Shared']:
+                fleets[(fuel_class, hauling_class, ownership_class)] = fleet_initial.loc[(fleet_initial['FC_HC_OC'] == (fuel_class, hauling_class, ownership_class))
+                                                                                         & (fleet_initial['Volume'] > 0), :]
+                fleets[(fuel_class, hauling_class, ownership_class)].reset_index(drop=True, inplace=True)
 
-    # calculate weighted energy consumption rates (ecr) and other necessary metrics
-    ecr_ice = FleetMetrics(fleet_ice).fleet_metric_weighted('FC', 'VehicleMilesTraveled')
-    ecr_bev = FleetMetrics(fleet_bev).fleet_metric_weighted('kWh_per_mile', 'VehicleMilesTraveled')
-    ecr_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_weighted('FC', 'VehicleMilesTraveled')
-    ecr_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_weighted('kWh_per_mile', 'VehicleMilesTraveled')
-    ecr_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_weighted('FC', 'VehicleMilesTraveled')
-    ecr_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_weighted('kWh_per_mile', 'VehicleMilesTraveled')
+    # calculate needed metrics for each of the subfleets
+    energy_consump_rates = dict()
+    vmts = dict()
+    volumes = dict()
+    prices = dict()
+    for fuel_class in ['Petroleum', 'Electricity']:
+        for hauling_class in ['Hauling', 'NonHauling']:
+            for ownership_class in ['Private', 'Shared']:
+                fleet = FleetMetrics(fleets[(fuel_class, hauling_class, ownership_class)])
+                energy_consump_rates[(fuel_class, hauling_class, ownership_class)] = fleet.fleet_metric_weighted('FC', 'VehicleMilesTraveled')
+                vmts[(fuel_class, hauling_class, ownership_class)] = fleet.fleet_metric_sum('VehicleMilesTraveled')
+                volumes[(fuel_class, hauling_class, ownership_class)] = fleet.fleet_metric_sum('Volume')
+                prices[(fuel_class, hauling_class, ownership_class)] = fleet.fleet_metric_weighted('TransactionPrice', 'Volume')
 
-    vmt_ice = FleetMetrics(fleet_ice).fleet_metric_sum('VehicleMilesTraveled')
-    vmt_bev = FleetMetrics(fleet_bev).fleet_metric_sum('VehicleMilesTraveled')
-    vmt_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_sum('VehicleMilesTraveled')
-    vmt_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_sum('VehicleMilesTraveled')
-    vmt_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_sum('VehicleMilesTraveled')
-    vmt_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_sum('VehicleMilesTraveled')
-
-    # volume_ice = FleetMetrics(fleet_ice).fleet_volume()
-    # volume_bev = FleetMetrics(fleet_bev).fleet_volume()
-    volume_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_sum('Volume')
-    volume_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_sum('Volume')
-    volume_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_sum('Volume')
-    volume_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_sum('Volume')
-    
-    price_ice = FleetMetrics(fleet_ice).fleet_metric_weighted('TransactionPrice', 'Volume')
-    price_bev = FleetMetrics(fleet_bev).fleet_metric_weighted('TransactionPrice', 'Volume')
-    price_ice_shared = FleetMetrics(fleet_ice_shared).fleet_metric_weighted('TransactionPrice', 'Volume')
-    price_bev_shared = FleetMetrics(fleet_bev_shared).fleet_metric_weighted('TransactionPrice', 'Volume')
-    price_ice_private = FleetMetrics(fleet_ice_private).fleet_metric_weighted('TransactionPrice', 'Volume')
-    price_bev_private = FleetMetrics(fleet_bev_private).fleet_metric_weighted('TransactionPrice', 'Volume')
-
-    # calculate needed cost per mile metrics for given calendar year
+    # calculate needed cost per mile metrics for every calendar year
     pmt_dict = dict()
     shared_vs_private_dict = dict()
     bev_vs_ice_dict = dict()
-    for calendar_year in fuel_prices_dict.keys():
+    for calendar_year in range(fleet_initial['CalendarYear'].max() + 1, list(economic_parameters_dict.keys())[-1] + 1):
         # note: cpm refers to 'cost per mile'
-        cpm_lightduty = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_lightduty(fuel_prices_dict,
-                                                                                           ecr_ice, vmt_ice,
-                                                                                           ecr_bev, vmt_bev)
-        cpm_shared = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_shared(fuel_prices_dict, economic_parameters_dict,
-                                                                                     ecr_ice_shared, price_ice_shared, vmt_ice_shared, volume_ice_shared,
-                                                                                     ecr_bev_shared, price_bev_shared, vmt_bev_shared, volume_bev_shared,
+        cpm_lightduty = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_lightduty(economic_parameters_dict,
+                                                                                           energy_consump_rates,
+                                                                                           vmts)
+        cpm_shared = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_shared(economic_parameters_dict,
+                                                                                     energy_consump_rates,
+                                                                                     vmts,
+                                                                                     prices,
+                                                                                     volumes,
                                                                                      tco_divisor)
-        cpm_private = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_private(fuel_prices_dict,
-                                                                                       ecr_ice_private, price_ice_private, vmt_ice_private, volume_ice_private,
-                                                                                       ecr_bev_private, price_bev_private, vmt_bev_private, volume_bev_private,
+        cpm_private = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_private(economic_parameters_dict,
+                                                                                       energy_consump_rates,
+                                                                                       vmts,
+                                                                                       prices,
+                                                                                       volumes,
                                                                                        tco_divisor)
-        cpm_ice = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_ice(fuel_prices_dict, ecr_ice, price_ice, tco_divisor)
-        cpm_bev = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_bev(fuel_prices_dict, ecr_bev, price_bev, tco_divisor)
+        cpm_ice = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_fuel_class(economic_parameters_dict,
+                                                                                      energy_consump_rates,
+                                                                                      vmts,
+                                                                                      prices,
+                                                                                      volumes,
+                                                                                      'Petroleum',
+                                                                                      tco_divisor)
+        cpm_bev = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_fuel_class(economic_parameters_dict,
+                                                                                      energy_consump_rates,
+                                                                                      vmts,
+                                                                                      prices,
+                                                                                      volumes,
+                                                                                      'Electricity',
+                                                                                      tco_divisor)
         cpm_privatetime = CalcDemandShareMetrics(calendar_year).calc_timecost_private(economic_parameters_dict)
         cpm_sharedtime = CalcDemandShareMetrics(calendar_year).calc_timecost_shared(economic_parameters_dict)
 
@@ -315,7 +293,7 @@ def main():
 
     # the following is only to create a DataFrame for write/save
     demand_shares_df = pd.DataFrame()
-    demand_shares_df.insert(0, 'Calendar_Year', [item for item in fuel_prices_dict.keys()])
+    demand_shares_df.insert(0, 'Calendar_Year', [item for item in pmt_dict.keys()])
     demand_shares_df.set_index('Calendar_Year', inplace=True)
     pmt_df = pd.DataFrame([item for item in pmt_dict.values()], [item for item in pmt_dict.keys()])
     pmt_df.rename(columns={0: 'PMT_Demand'}, inplace=True)
