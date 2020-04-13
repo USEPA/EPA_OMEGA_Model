@@ -76,10 +76,11 @@ class DemandShares:
 
 
 class CalcDemandShareMetrics:
-    def __init__(self, calendar_year):
+    def __init__(self, calendar_year, economic_parameters_dict):
         self.calendar_year = calendar_year
+        self.economic_parameters_dict = economic_parameters_dict
 
-    def calc_cost_per_mile_lightduty(self, economic_parameters_dict, energy_consump_rates, vmts):
+    def calc_cost_per_mile_lightduty(self, energy_consump_rates, vmts):
         # cost per mile LD ($/mile) = EnergyConsumptionRate (gal/mi or kWh/mi) * EnergyPrice ($/gal or $/kWh)
         cpm_numerator = 0
         cpm_denominator = 0
@@ -88,17 +89,17 @@ class CalcDemandShareMetrics:
                 for fuel_class in ['Petroleum']:
                     cpm_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                      * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                     * economic_parameters_dict[self.calendar_year]['GasolinePrice']
+                                     * self.economic_parameters_dict[self.calendar_year]['GasolinePrice']
                 for fuel_class in ['Electricity']:
                     cpm_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                      * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                     * economic_parameters_dict[self.calendar_year]['ElectricityPrice']
+                                     * self.economic_parameters_dict[self.calendar_year]['ElectricityPrice']
                 for fuel_class in ['Petroleum', 'Electricity']:
                     cpm_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
         cpm = cpm_numerator / cpm_denominator
         return cpm
 
-    def calc_cost_per_mile_shared(self, economic_parameters_dict, energy_consump_rates, vmts, prices, volumes, divisor):
+    def calc_cost_per_mile_shared(self, energy_consump_rates, vmts, prices, volumes, divisor):
         # cost per mile of shared ($/mile) = [SharedLaborCost($/hr) / AverageTripSpeed(miles/hour)
         #                                    * (1+SharedDeadheadFraction)]
         #                                    + [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
@@ -116,20 +117,20 @@ class CalcDemandShareMetrics:
                 for fuel_class in ['Petroleum']:
                     cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                           * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                          * economic_parameters_dict[self.calendar_year]['GasolinePrice']
+                                          * self.economic_parameters_dict[self.calendar_year]['GasolinePrice']
                 for fuel_class in ['Electricity']:
                     cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                           * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                          * economic_parameters_dict[self.calendar_year]['ElectricityPrice']
+                                          * self.economic_parameters_dict[self.calendar_year]['ElectricityPrice']
                 for fuel_class in ['Petroleum', 'Electricity']:
                     cpm_fuel_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
-        cpm = (economic_parameters_dict[self.calendar_year]['SharedLaborCost'] / economic_parameters_dict[self.calendar_year]['AverageTripSpeed']
-               * (1 + economic_parameters_dict[self.calendar_year]['SharedDeadheadFraction'])) \
+        cpm = (self.economic_parameters_dict[self.calendar_year]['SharedLaborCost'] / self.economic_parameters_dict[self.calendar_year]['AverageTripSpeed']
+               * (1 + self.economic_parameters_dict[self.calendar_year]['SharedDeadheadFraction'])) \
               + cpm_price_numerator / cpm_price_denominator \
               + cpm_fuel_numerator / cpm_fuel_denominator
         return cpm
 
-    def calc_cost_per_mile_private(self, economic_parameters_dict, energy_consump_rates, vmts, prices, volumes, divisor):
+    def calc_cost_per_mile_private(self, energy_consump_rates, vmts, prices, volumes, divisor):
         # cost per mile of private = [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
         #                            + [EnergyConsumptionRate (gal/mi or kWh/mi)
         #                            * EnergyPrice ($/gal or $/kWh)]
@@ -145,18 +146,18 @@ class CalcDemandShareMetrics:
                 for fuel_class in ['Petroleum']:
                     cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                           * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                          * economic_parameters_dict[self.calendar_year]['GasolinePrice']
+                                          * self.economic_parameters_dict[self.calendar_year]['GasolinePrice']
                 for fuel_class in ['Electricity']:
                     cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                           * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                          * economic_parameters_dict[self.calendar_year]['ElectricityPrice']
+                                          * self.economic_parameters_dict[self.calendar_year]['ElectricityPrice']
                 for fuel_class in ['Petroleum', 'Electricity']:
                     cpm_fuel_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
         cpm = cpm_price_numerator / cpm_price_denominator \
               + cpm_fuel_numerator / cpm_fuel_denominator
         return cpm
 
-    def calc_cost_per_mile_fuel_class(self, economic_parameters_dict, energy_consump_rates, vmts, prices, volumes, fuel_class_value, divisor):
+    def calc_cost_per_mile_fuel_class(self, energy_consump_rates, vmts, prices, volumes, fuel_class_value, divisor):
         # cost per mile of ICE ($/mile) = [VehicleCost ($'s, from ProducerModule or IniitalFleet file) / 50,000 (miles)]
         #                                 + [EnergyConsumptionRate (gal/mile) * EnergyPrice ($/gal)]
         cpm_price_numerator = 0
@@ -174,25 +175,25 @@ class CalcDemandShareMetrics:
                     cpm_price_denominator += volumes[(fuel_class, hauling_class, ownership_class)]
                     cpm_fuel_numerator += energy_consump_rates[(fuel_class, hauling_class, ownership_class)] \
                                           * vmts[(fuel_class, hauling_class, ownership_class)] \
-                                          * economic_parameters_dict[self.calendar_year][fuel_price_value]
+                                          * self.economic_parameters_dict[self.calendar_year][fuel_price_value]
                     cpm_fuel_denominator += vmts[(fuel_class, hauling_class, ownership_class)]
         cpm = cpm_price_numerator / cpm_price_denominator \
               + cpm_fuel_numerator / cpm_fuel_denominator
         return cpm
 
-    def calc_timecost_private(self, economic_parameters_dict):
+    def calc_timecost_private(self):
         # time cost of private ($/mile) = [PrivateOverheadTime(minutes / mile) * 1 / 60 * TimeCost($ / hr)]
-        cpm = economic_parameters_dict[self.calendar_year]['PrivateOverheadTime'] \
+        cpm = self.economic_parameters_dict[self.calendar_year]['PrivateOverheadTime'] \
               * (1 / 60) \
-              * economic_parameters_dict[self.calendar_year]['TimeCost']
+              * self.economic_parameters_dict[self.calendar_year]['TimeCost']
         return cpm
 
-    def calc_timecost_shared(self, economic_parameters_dict):
+    def calc_timecost_shared(self):
         # time cost of shared ($/mile) = SharedWaitTime (minutes/trip) * 1/60 * TimeCost ($/hr) * 1 / AverageTripLength (mile/trip)
-        cpm = economic_parameters_dict[self.calendar_year]['SharedWaitTime'] \
+        cpm = self.economic_parameters_dict[self.calendar_year]['SharedWaitTime'] \
               * (1 / 60) \
-              * economic_parameters_dict[self.calendar_year]['TimeCost'] \
-              * (1 / economic_parameters_dict[self.calendar_year]['AverageTripLength'])
+              * self.economic_parameters_dict[self.calendar_year]['TimeCost'] \
+              * (1 / self.economic_parameters_dict[self.calendar_year]['AverageTripLength'])
         return cpm
 
 
@@ -218,7 +219,7 @@ def main():
     # fuel_prices_dict = fuel_prices.to_dict('index')
 
     # read and adjust some elements of the economic parameters file
-    economic_parameters = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_EconomicParameters.xlsx'), index_col=0, skiprows=1)
+    economic_parameters = pd.read_excel(PATH_INPUTS.joinpath('OMEGA2ToyModel_EconomicParameters_20200324.xlsx'), index_col=0, skiprows=1)
     economic_parameters = DealWithParameters(economic_parameters).adjust_units(['Income', 'NumberOfHouseholds'], 1000)
     economic_parameters = DealWithParameters(economic_parameters).adjust_units('Population', 1000000)
     economic_parameters_dict = economic_parameters.to_dict('index')
@@ -254,42 +255,21 @@ def main():
     bev_vs_ice_dict = dict()
     for calendar_year in range(fleet_initial['CalendarYear'].max() + 1, list(economic_parameters_dict.keys())[-1] + 1):
         # note: cpm refers to 'cost per mile'
-        cpm_lightduty = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_lightduty(economic_parameters_dict,
-                                                                                           energy_consump_rates,
-                                                                                           vmts)
-        cpm_shared = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_shared(economic_parameters_dict,
-                                                                                     energy_consump_rates,
-                                                                                     vmts,
-                                                                                     prices,
-                                                                                     volumes,
-                                                                                     tco_divisor)
-        cpm_private = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_private(economic_parameters_dict,
-                                                                                       energy_consump_rates,
-                                                                                       vmts,
-                                                                                       prices,
-                                                                                       volumes,
-                                                                                       tco_divisor)
-        cpm_ice = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_fuel_class(economic_parameters_dict,
-                                                                                      energy_consump_rates,
-                                                                                      vmts,
-                                                                                      prices,
-                                                                                      volumes,
-                                                                                      'Petroleum',
-                                                                                      tco_divisor)
-        cpm_bev = CalcDemandShareMetrics(calendar_year).calc_cost_per_mile_fuel_class(economic_parameters_dict,
-                                                                                      energy_consump_rates,
-                                                                                      vmts,
-                                                                                      prices,
-                                                                                      volumes,
-                                                                                      'Electricity',
-                                                                                      tco_divisor)
-        cpm_privatetime = CalcDemandShareMetrics(calendar_year).calc_timecost_private(economic_parameters_dict)
-        cpm_sharedtime = CalcDemandShareMetrics(calendar_year).calc_timecost_shared(economic_parameters_dict)
+        cpm_object = CalcDemandShareMetrics(calendar_year, economic_parameters_dict)
+        cpm_lightduty = cpm_object.calc_cost_per_mile_lightduty(energy_consump_rates, vmts)
+        cpm_shared = cpm_object.calc_cost_per_mile_shared(energy_consump_rates, vmts, prices, volumes, tco_divisor)
+        cpm_private = cpm_object.calc_cost_per_mile_private(energy_consump_rates, vmts, prices, volumes, tco_divisor)
+        cpm_ice = cpm_object.calc_cost_per_mile_fuel_class(energy_consump_rates, vmts, prices, volumes, 'Petroleum', tco_divisor)
+        cpm_bev = cpm_object.calc_cost_per_mile_fuel_class(energy_consump_rates, vmts, prices, volumes, 'Electricity', tco_divisor)
+        cpm_privatetime = cpm_object.calc_timecost_private()
+        cpm_sharedtime = cpm_object.calc_timecost_shared()
 
-        pmt_dict.update(DemandShares(coefficients_pmt, economic_parameters_dict, calendar_year).pmt_lightduty(cpm_lightduty))
-        shared_vs_private_dict.update(DemandShares(coefficients_shared_vs_private, economic_parameters_dict, calendar_year)
-                                      .shared_vs_private(cpm_shared, cpm_private, cpm_sharedtime, cpm_privatetime))
-        bev_vs_ice_dict.update(DemandShares(coefficients_bev_vs_ice, economic_parameters_dict, calendar_year).bev_vs_ice(cpm_ice, cpm_bev))
+        pmt_object = DemandShares(coefficients_pmt, economic_parameters_dict, calendar_year)
+        shared_vs_private_object = DemandShares(coefficients_shared_vs_private, economic_parameters_dict, calendar_year)
+        bev_vs_ice_object = DemandShares(coefficients_bev_vs_ice, economic_parameters_dict, calendar_year)
+        pmt_dict.update(pmt_object.pmt_lightduty(cpm_lightduty))
+        shared_vs_private_dict.update(shared_vs_private_object.shared_vs_private(cpm_shared, cpm_private, cpm_sharedtime, cpm_privatetime))
+        bev_vs_ice_dict.update(bev_vs_ice_object.bev_vs_ice(cpm_ice, cpm_bev))
 
     # the following is only to create a DataFrame for write/save
     demand_shares_df = pd.DataFrame()

@@ -15,7 +15,7 @@ price_fuelsavings_dict = {('Petroleum', 'Hauling', 'Private'): {'TechCost': 500,
 elasticity = -1
 
 
-class ScrappageMetrics:
+class RegistrationMetrics:
 
     def __init__(self, calendar_year, economic_parameters_dict):
         self.calendar_year = calendar_year
@@ -40,8 +40,8 @@ class ScrappageMetrics:
         for fuel_class in ['Petroleum', 'Electricity']:
             for hauling_class in ['Hauling', 'NonHauling']:
                 for ownership_class in ['Private', 'Shared']:
-                    increased_sales += (fleet_age1_dict[(fuel_class, hauling_class, ownership_class)]['TransactionPrice'] \
-                                        + price_fuelsavings_dict[(fuel_class, hauling_class, ownership_class)]['TechCost'] \
+                    increased_sales += (fleet_age1_dict[(fuel_class, hauling_class, ownership_class)]['TransactionPrice']
+                                        + price_fuelsavings_dict[(fuel_class, hauling_class, ownership_class)]['TechCost']
                                         - price_fuelsavings_dict[(fuel_class, hauling_class, ownership_class)]['FuelSavings']) \
                                        * (1 + elasticity / 100)
         sales_new = fleet_age1_sales + increased_sales
@@ -51,6 +51,7 @@ class ScrappageMetrics:
         pass
 
 
-# vehs_per_hh = ScrappageMetrics(2018, economic_parameters_dict).calc_vehs_per_household(shared_vs_private_dict, .25)
-# stock = ScrappageMetrics(2018, economic_parameters_dict).calc_fleet_stock(vehs_per_hh)
-# sales = ScrappageMetrics(2018, economic_parameters_dict).calc_new_sales(fleet_initial, price_fuelsavings_dict, elasticity)
+# registration_metrics = RegistrationMetrics(2018, economic_parameters_dict)
+# vehs_per_hh = registration_metrics.calc_vehs_per_household(shared_vs_private_dict, .25)
+# stock = registration_metrics.calc_fleet_stock(vehs_per_hh)
+# sales = registration_metrics.calc_new_sales(fleet_initial, price_fuelsavings_dict, elasticity)
