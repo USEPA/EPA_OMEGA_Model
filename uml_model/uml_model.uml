@@ -3,7 +3,7 @@
   <packageImport xmi:type="uml:PackageImport" xmi:id="_znz9wMRLEembs_lAYl7NMg">
     <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
   </packageImport>
-  <packagedElement xmi:type="uml:Package" xmi:id="_d13h4MTvEembs_lAYl7NMg" name="Package2">
+  <packagedElement xmi:type="uml:Package" xmi:id="_d13h4MTvEembs_lAYl7NMg" name="OMEGA2">
     <packagedElement xmi:type="uml:Component" xmi:id="_aR2qwMT-Eembs_lAYl7NMg" name="consumer_choice_module">
       <ownedAttribute xmi:type="uml:Port" xmi:id="_dYNs0MUAEembs_lAYl7NMg" name="consumer_out" aggregation="composite"/>
     </packagedElement>
@@ -14,12 +14,16 @@
     <packagedElement xmi:type="uml:Usage" xmi:id="_RFGx4MT_Eembs_lAYl7NMg" client="_G_RxYMT_Eembs_lAYl7NMg" supplier="_aR2qwMT-Eembs_lAYl7NMg"/>
     <packagedElement xmi:type="uml:Usage" xmi:id="_M60wgMUEEembs_lAYl7NMg" client="_lgD9sMUAEembs_lAYl7NMg" supplier="_d13h4MTvEembs_lAYl7NMg"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_Y6z_EJUiEeq1MNw_X5quEQ" name="Vehicles">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_zBkskJUiEeq1MNw_X5quEQ" name="Vehicle_ID"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_zBkskJUiEeq1MNw_X5quEQ" name="Vehicle_ID">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_r0DggZUjEeq1MNw_X5quEQ" name="manufacturers" type="_gRvJUJUiEeq1MNw_X5quEQ" association="_r0BrUJUjEeq1MNw_X5quEQ">
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_r0DggpUjEeq1MNw_X5quEQ"/>
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_r0EHkJUjEeq1MNw_X5quEQ" value="1"/>
       </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_RdXccJUqEeq1MNw_X5quEQ" name="CO2gpmi"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_RdXccJUqEeq1MNw_X5quEQ" name="CO2gpmi">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
+      </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_bJJlQJUqEeq1MNw_X5quEQ" name="reg_class"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_QjjtUJUvEeq1MNw_X5quEQ" name="fueling_class"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_ppKqYJUwEeq1MNw_X5quEQ" name="model_year"/>
@@ -32,14 +36,18 @@
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_jL4w0JUjEeq1MNw_X5quEQ" value="1"/>
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_gibIUJUwEeq1MNw_X5quEQ" name="ownership_class"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_k66ykJUwEeq1MNw_X5quEQ" name="Calendar_Year"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_k66ykJUwEeq1MNw_X5quEQ" name="calendar_year">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_gRvJUJUiEeq1MNw_X5quEQ" name="Manufacturers">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_m-swkJUiEeq1MNw_X5quEQ" name="vehicle_history" type="_ayCmcJUiEeq1MNw_X5quEQ">
         <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_m-y3MJUiEeq1MNw_X5quEQ"/>
         <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_m-2hkJUiEeq1MNw_X5quEQ" value="1"/>
       </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_9RQXMJUjEeq1MNw_X5quEQ" name="Manufacturer_ID"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_9RQXMJUjEeq1MNw_X5quEQ" name="Manufacturer_ID">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_jLtxsJUjEeq1MNw_X5quEQ" memberEnd="_jLvm4JUjEeq1MNw_X5quEQ _jL7NEJUjEeq1MNw_X5quEQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jLu_0JUjEeq1MNw_X5quEQ" source="org.eclipse.papyrus">
@@ -54,7 +62,9 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_r0EuoJUjEeq1MNw_X5quEQ" name="vehicles" type="_Y6z_EJUiEeq1MNw_X5quEQ" association="_r0BrUJUjEeq1MNw_X5quEQ"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_g4Xx4JUqEeq1MNw_X5quEQ" name="RegClasses">
-      <ownedAttribute xmi:type="uml:Port" xmi:id="_sVhKoJUqEeq1MNw_X5quEQ" name="RegClass_ID"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_1uwQQJU9Eeq1MNw_X5quEQ" name="RegClass_ID">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_UD9KkJUyEeq1MNw_X5quEQ" name="CostCurves">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_bqooEJUyEeq1MNw_X5quEQ" name="fueling_class"/>
@@ -63,6 +73,23 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_o37IwJUyEeq1MNw_X5quEQ" name="calendar_year"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_qehTIJUyEeq1MNw_X5quEQ" name="cost"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_skW-QJUyEeq1MNw_X5quEQ" name="CO2gpmi"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_kKCm4JU-Eeq1MNw_X5quEQ" memberEnd="_kKDN8pU-Eeq1MNw_X5quEQ _kKD1ApU-Eeq1MNw_X5quEQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_kKDN8JU-Eeq1MNw_X5quEQ" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kKDN8ZU-Eeq1MNw_X5quEQ" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_kKD1ApU-Eeq1MNw_X5quEQ" name="vehicles" type="_Y6z_EJUiEeq1MNw_X5quEQ" association="_kKCm4JU-Eeq1MNw_X5quEQ"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_kKDN8pU-Eeq1MNw_X5quEQ" name="regclasses" type="_g4Xx4JUqEeq1MNw_X5quEQ" association="_kKCm4JU-Eeq1MNw_X5quEQ">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_kKD1AJU-Eeq1MNw_X5quEQ"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_kKD1AZU-Eeq1MNw_X5quEQ" value="1"/>
+      </ownedEnd>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_VTFu0JVAEeq1MNw_X5quEQ" memberEnd="_VTG88pVAEeq1MNw_X5quEQ _VTHkAJVAEeq1MNw_X5quEQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VTG88JVAEeq1MNw_X5quEQ" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VTG88ZVAEeq1MNw_X5quEQ" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_VTHkAJVAEeq1MNw_X5quEQ" name="costcurves" type="_UD9KkJUyEeq1MNw_X5quEQ" association="_VTFu0JVAEeq1MNw_X5quEQ"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_VTG88pVAEeq1MNw_X5quEQ" name="vehicles" type="_Y6z_EJUiEeq1MNw_X5quEQ" association="_VTFu0JVAEeq1MNw_X5quEQ"/>
     </packagedElement>
   </packagedElement>
 </uml:Model>
