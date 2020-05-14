@@ -1,7 +1,9 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
+from pathlib import Path, PurePath
+from datetime import datetime
+import shutil
 
 
 compliance_start_year = 2020 # start year of modeling which would come from an input file or selection
@@ -9,9 +11,15 @@ compliance_end_year = 2050 # end year of modeling which would come from an input
 
 PATH_PROJECT = Path.cwd()
 PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
+PATH_OUTPUTS = PATH_PROJECT.joinpath('outputs')
+PATH_OUTPUTS.mkdir(exist_ok=True)
 
-GRAM_CO2_per_MJ_ice = 8887 / 131.76
-GRAM_CO2_per_MJ_bev = 250 / 3.6
+start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
+print(f'\nStart date and time:  {start_time_readable}\n')
+RUN_FOLDER_IDENTIFIER = input('Provide a run folder ID\n')
+RUN_FOLDER_IDENTIFIER = RUN_FOLDER_IDENTIFIER if RUN_FOLDER_IDENTIFIER != '' else 'test'
+path_of_run_folder = PATH_OUTPUTS.joinpath(start_time_readable + '_' + RUN_FOLDER_IDENTIFIER)
+path_of_run_folder.mkdir(exist_ok=False)
 
 techcost_curves_file = pd.ExcelFile(PATH_INPUTS.joinpath('techcost_curves.xlsx'))
 techcost_curves_roadload = pd.read_excel(techcost_curves_file, 'roadload')
@@ -31,7 +39,7 @@ class TechCosts:
     def log_tech_cost(self, a_coeff, b_coeff, metric_value_min, metric_value_max):
         increment = self.get_increment(metric_value_min, metric_value_max)
         metric_values = range(int(metric_value_min * 1000), int(metric_value_max * 1000 + 1), int(increment * 1000))
-        tech_cost = dict((metric_value / 1000, a_coeff * np.log((metric_value - metric_value_min * 1000) / 1000) + b_coeff) for metric_value in metric_values)
+        tech_cost = dict((metric_value / 1000, a_coeff * np.log((metric_value + 1 - metric_value_min * 1000) / 1000) + b_coeff) for metric_value in metric_values)
         return tech_cost
 
     def exponential_tech_cost(self, a_coeff, b_coeff, c_coeff, metric_value_min, metric_value_max):
@@ -72,13 +80,13 @@ class PackageCosts:
                 package_cost[powertrain_metric, roadload_metric] = powertrain_costs[powertrain_metric] * powertrain_learning_scalars[model_year] \
                                                                    + roadload_costs[roadload_metric] * roadload_learning_scalars[model_year]
                 package_co2[powertrain_metric, roadload_metric] = round(roadload_metric / powertrain_metric * co2_perMJ[model_year], 0)
-        package_cost_df = pd.DataFrame().from_dict(package_cost, orient='index', columns=['cost'])
+        package_cost_df = pd.DataFrame().from_dict(package_cost, orient='index', columns=[f'cost_{model_year}'])
         package_cost_df.reset_index(drop=False, inplace=True)
         package_cost_df.rename(columns={'index': 'powertrain_roadload_metrics'}, inplace=True)
         package_co2_df = pd.DataFrame().from_dict(package_co2, orient='index', columns=['co2'])
         package_co2_df.reset_index(drop=False, inplace=True)
         package_co2_df.rename(columns={'index': 'powertrain_roadload_metrics'}, inplace=True)
-        package_cost_co2 = pd.concat([package_cost_df, package_co2_df['co2']], axis=1, ignore_index=False)
+        package_cost_co2 = pd.concat([package_co2_df, package_cost_df[f'cost_{model_year}']], axis=1, ignore_index=False)
         return package_cost_co2
 
 
@@ -107,14 +115,15 @@ def tech_package_module_scatter_chart(x_dictionary, y_dictionary, plot_title, x_
 
 def package_cost_co2_scatter_chart(pkg_cost_co2, model_year, vehicle_classification, x_axis_name, y_axis_name):
     plt.figure()
-    plt.scatter(pkg_cost_co2['cost'], pkg_cost_co2['co2'])
+    plt.scatter(pkg_cost_co2[x_axis_name], pkg_cost_co2[y_axis_name])
+    # plt.scatter(pkg_cost_co2['cost'], pkg_cost_co2['co2'])
     plt.title(vehicle_classification + '; ' + str(model_year))
     plt.xlabel(x_axis_name)
     plt.ylabel(y_axis_name)
     plt.grid()
     return
 
-
+# TODO we need nonaero_roadload, aero_roadload and curbweight techcosts with each in the package designation tuple
 roadload_techcosts = dict()
 roadload_learning = dict()
 for index, row in techcost_curves_roadload.iterrows():
@@ -175,6 +184,7 @@ for index, row in co2_perMJ_bev_df.iterrows():
     co2_perMJ_bev.update({key: value})
 
 package_costs_co2 = dict()
+package_costs_co2_df = dict()
 for index, row in techcost_curves_powertrain.iterrows():
     vehicle_classification = row['vehicle_classification']
     powertrain = row['powertrain']
@@ -183,32 +193,22 @@ for index, row in techcost_curves_powertrain.iterrows():
         package_costs_co2[vehicle_classification, model_year] = \
             PackageCosts(vehicle_classification, powertrain, compliance_start_year, compliance_end_year)\
                 .create_packages(powertrain_techcosts[vehicle_classification], powertrain_learning[vehicle_classification], roadload_techcosts[vehicle_classification], roadload_learning[vehicle_classification], model_year)
+        if model_year == compliance_start_year:
+            package_costs_co2_df[vehicle_classification] = package_costs_co2[vehicle_classification, model_year].copy()
+        else:
+            package_costs_co2_df[vehicle_classification] = package_costs_co2_df[vehicle_classification].merge(package_costs_co2[vehicle_classification, model_year], on=['powertrain_roadload_metrics', 'co2'])
+    s = vehicle_classification.split('_')
+    filename = '_'.join([s[0], s[1]])
+    package_costs_co2_df[vehicle_classification].insert(1, 'CWC', s[2])
+    if s[2] == 'CWC1':
+        package_costs_co2_df[filename] = package_costs_co2_df[vehicle_classification].copy()
+    else:
+        package_costs_co2_df[filename] = pd.concat([package_costs_co2_df[filename], package_costs_co2_df[vehicle_classification]], axis=0, ignore_index=True)
+    package_costs_co2_df[filename].to_csv(path_of_run_folder.joinpath(f'{filename}.csv'))
 
-
-# create lists for figures
-# cost_dicts = [roadload_techcost_ice, roadload_techcost_bev, powertrain_techcost_ice, powertrain_techcost_bev]
-# cost_dicts_names = ['Cost, Road load, ICE', 'Cost, Road load, BEV', 'Cost, Powertrain, ICE', 'Cost, Powertrain, BEV']
-
-# cost_vs_efficiency_dicts = [powertrain_techcost_ice, powertrain_techcost_bev]
-# cost_vs_energypermile_dicts = [roadload_techcost_ice, roadload_techcost_bev]
-# cost_vs_efficiency_dicts_names = ['Cost, Powertrain, ICE', 'Cost, Powertrain, BEV']
-# cost_vs_energypermile_dicts_names = ['Cost, Road load, ICE', 'Cost, Road load, BEV']
-#
-# learning_oem_dicts = [roadload_learning_oem_ice, roadload_learning_oem_bev, powertrain_learning_oem_ice, powertrain_learning_oem_bev]
-# learning_oem_dicts_names = ['OEM learning, Road load, ICE', 'OEM learning, Road load, BEV', 'OEM learning, Powertrain, ICE', 'OEM learning, Powertrain, BEV']
-#
-# package_cost_dicts = [package_cost_ice, package_cost_bev]
-# package_cost_dicts_names = ['Package costs, ICE', 'Package costs, BEV']
-#
-# package_co2_dicts = [package_co2_ice, package_co2_bev]
-# package_co2_dicts_names = ['Package CO2, ICE', 'Package CO2, BEV']
-#
-# # create figures
-# # tech_package_module_line_charts(cost_dicts, cost_dicts_names, 'Efficiency', 'Cost ($)')
-# tech_package_module_line_charts(cost_vs_efficiency_dicts, cost_vs_efficiency_dicts_names, 'Efficiency', 'Cost ($)')
-# tech_package_module_line_charts(cost_vs_energypermile_dicts, cost_vs_energypermile_dicts_names, 'MJ/mile', 'Cost ($)')
-# tech_package_module_line_charts(learning_oem_dicts, learning_oem_dicts_names, 'Calendar year', 'Learning scalar')
-#
-# tech_package_module_scatter_chart(package_cost_ice, package_co2_ice, 'Package CO2 vs. Cost, ICE', 'Cost ($)', 'CO2 (g/mi)')
-# tech_package_module_scatter_chart(package_cost_bev, package_co2_bev, 'Package CO2 vs. Cost, BEV', 'Cost ($)', 'CO2 (g/mi)')
-
+input_files_list = [techcost_curves_file, co2_perMJ_file]
+filename_list = [PurePath(path).name for path in input_files_list]
+for file in filename_list:
+    path_source = PATH_INPUTS.joinpath(file)
+    path_destination = path_of_run_folder.joinpath(file)
+    shutil.copy(path_source, path_destination)

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from datetime import datetime
+from usepa_omega2.drive_cycle_energy_calcs import SAEJ2951_target_inertia_and_roadload_weight_combined_calcs
 
 PATH_PROJECT = Path.cwd()
 PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
@@ -49,6 +50,8 @@ METRICS = ['Configuration',
            'Engine Cylinders',
            'Combined GHG gCO2/mi',
            'Combined Target Total Efficiency %',
+           'Inertial_Work_J/m',
+           'Net_RoadLoad_Work_J/m',
            ]
 
 
@@ -160,6 +163,23 @@ class CalcCosts:
         return self.df
 
 
+def get_energy_consumption_metrics(file, file_num, folder_num):
+    a_coeff = pd.Series(file[['RL A lbf', 'RL_ADJ A lbf']].sum(axis=1))
+    b_coeff = pd.Series(file[['RL B lbf/mph', 'RL_ADJ B lbf/mph']].sum(axis=1))
+    c_coeff = pd.Series(file[['RL C lbf/mph2', 'RL_ADJ C lbf/mph2']].sum(axis=1))
+    etw = pd.Series(file['Test Weight lbs'])
+    inertial_work = []
+    roadload_work = []
+    for index_location in range(0, len(a_coeff)):
+        print(f'Row {index_location} of {len(a_coeff)} rows in ALPHA file {file_num} of folder {folder_num}')
+        new_energy_consumption_metrics = SAEJ2951_target_inertia_and_roadload_weight_combined_calcs(a_coeff[index_location], b_coeff[index_location], c_coeff[index_location], etw[index_location])
+        inertial_work.append(new_energy_consumption_metrics.get('Inertial_Work_J/m'))
+        roadload_work.append(new_energy_consumption_metrics.get('Net_RoadLoad_Work_J/m'))
+    file['Inertial_Work_J/m'] = inertial_work
+    file['Net_RoadLoad_Work_J/m'] = roadload_work
+    return file
+
+
 start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 techcosts_file = pd.ExcelFile(PATH_INPUTS.joinpath('TechCosts.xlsx'))
 techcosts_engine = pd.read_excel(techcosts_file, 'engine')
@@ -183,6 +203,15 @@ for file_num in range(0, len(alpha_files[0])):
     alpha_file[file_num] = pd.DataFrame()
     for folder_num in range(0, len(ALPHA_FOLDERS)):
         alpha_file_temp = pd.read_csv(alpha_files[folder_num][file_num], skiprows=range(1, 2))
+        # check for necessary energy consumptions in ALPHA files - if there, pass; if not then calculate, add to file and save (overwrite) file to same path
+        if 'Inertial_Work_J/m' in alpha_file_temp.columns.tolist():
+            pass
+        else:
+            print(f'Getting energy consumption metrics for ALPHA file {file_num} of {len(alpha_files[0])} in folder {folder_num} of {len(ALPHA_FOLDERS)}')
+            alpha_file_temp.insert(len(alpha_file_temp.columns), 'Inertial_Work_J/m', 0)
+            alpha_file_temp.insert(len(alpha_file_temp.columns), 'Net_RoadLoad_Work_J/m', 0)
+            alpha_file_temp = get_energy_consumption_metrics(alpha_file_temp, file_num, folder_num)
+            alpha_file_temp.to_csv(alpha_files[folder_num][file_num], index=False)
         alpha_file_temp = alpha_file_temp[METRICS]
         alpha_file_temp = alpha_file_temp.loc[:, ~alpha_file_temp.columns.duplicated()]
         alpha_file_temp['Engine Cylinders'] = alpha_file_temp['Engine Cylinders'].astype(int)
@@ -211,6 +240,7 @@ for file_num in range(0, len(alpha_files[0])):
         alpha_file_temp = alpha_file_temp.join(temp[['weight_reduction']])
         # concat files into a single large file for the effectiveness class
         alpha_file[file_num] = pd.concat([alpha_file[file_num], alpha_file_temp], axis=0, ignore_index=True)
+    # create an ALPHA_engine, #Cylinders column for merging necessary engine cost metrics into file
     alpha_file[file_num].insert(len(alpha_file[file_num].columns), 'ALPHA_engine, Cylinders',
                                 list(zip(alpha_file[file_num]['Engine'], alpha_file[file_num]['Engine Cylinders'])))
     alpha_file[file_num] = alpha_file[file_num].merge(techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost']],
@@ -228,6 +258,7 @@ for file_num in range(0, len(alpha_files[0])):
     aero_improvements = CreatePackageDictTuple(alpha_file[file_num]).aero_improvement()
     nonaero_improvements = CreatePackageDictTuple(alpha_file[file_num]).nonaero_improvement()
     work_class = CreatePackageDictTuple(alpha_file[file_num]).work_class_identifier()
+    # the following lines are useful to determine the unique engines for which costs are needed in the TechCosts input file but are not needed for a general run
     # temp = pd.Series(alpha_file['ALPHA_engine, Cylinders']).unique()
     # temp = pd.DataFrame(temp)
     # temp.to_csv(PATH_ALPHA_INPUTS.joinpath('file_num' + str(file_num) + '.csv'))
@@ -242,7 +273,7 @@ for file_num in range(0, len(alpha_files[0])):
                                                    & (alpha_file[file_num]['nonaero'] == nonaero_improvement)]
                     package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class]\
                         .reset_index(drop=True, inplace=True)
-                    # insert new columns
+                    # insert and calculate new cost columns
                     temp_df = package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class].copy()
                     temp_df.insert(len(temp_df.columns), 'deac_cost', 0)
                     temp_df = CalcCosts(temp_df).deac_cost(techcosts_deac)
@@ -264,33 +295,6 @@ for file_num in range(0, len(alpha_files[0])):
                     temp_df = CalcCosts(temp_df).package_cost()
                     temp_df = CalcCosts(temp_df).year_over_year_cost(FUTURE_YEARS)
                     effectiveness_class_dict[effectiveness_class] = pd.concat([effectiveness_class_dict[effectiveness_class], temp_df], axis=0, ignore_index=True, sort=False)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0]) \
-                    #     .deac_cost(techcosts_deac)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0])\
-                    #     .trans_cost(techcosts_trans)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0])\
-                    #     .accessory_cost(techcosts_accessories)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0])\
-                    #     .startstop_cost(techcosts_startstop)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0])\
-                    #     .aero_cost(techcosts_aero, work_class)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0]) \
-                    #     .nonaero_cost(techcosts_nonaero)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0])\
-                    #     .weight_cost(techcosts_weight, work_class)
-                    # package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0] \
-                    #     = CalcCosts(package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class, 0])\
-                    #     .package_cost()
-                    # effectiveness_class_dict[effectiveness_class] \
-                    #     = pd.concat([effectiveness_class_dict[effectiveness_class], package_dict[effectiveness_class, engine_architecture, percent_weight_reduction,
-                    #                                                                              aero_improvement, nonaero_improvement, work_class, 0]], axis=0, ignore_index=True, sort=False)
 
 # save output files
 PATH_OUTPUTS.mkdir(exist_ok=True)
