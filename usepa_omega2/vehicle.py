@@ -48,7 +48,7 @@ class Vehicle:
         self.nameplate = ''
         self.regulatory_class = ''
         self.footprint_ft2 = 0.0
-        self.sales = 0
+        self.sales = 0  # count in age 0
         self.lifetime_vehicle_miles_travelled = 0
 
         self.emissions_target_net_co2_gpmi = 0.0
@@ -74,6 +74,7 @@ class Vehicle:
         self.test_weight = []
         self.engine_power_kW = 0
         self.ALPHA_class = ''
+        self.count = 0  # how many are left
 
     def __repr__(self):
         s = '\n<vehicle.Vehicle object at %#x>' % id(self)

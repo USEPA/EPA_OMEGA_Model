@@ -490,3 +490,4 @@ if __name__ == "__main__":
     results = SAEJ2951_target_inertia_and_roadload_weight_combined_calcs(A, B, C, ETW)
 
     print(results)
+    
