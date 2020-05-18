@@ -5,60 +5,6 @@ from datetime import datetime
 import shutil
 from usepa_omega2.drive_cycle_energy_calcs import SAEJ2951_target_inertia_and_roadload_weight_combined_calcs
 
-PATH_PROJECT = Path.cwd()
-PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
-PATH_ALPHA_INPUTS = PATH_INPUTS.joinpath('ALPHA')
-PATH_OUTPUTS = PATH_PROJECT.joinpath('outputs')
-START_YEAR = 2020
-YEARS = [year for year in range(START_YEAR, START_YEAR + 11)]
-FUTURE_YEARS = [year for year in range(START_YEAR + 1, START_YEAR + 11)]
-LEARNING_FACTOR_ICE = 0.02
-LEARNING_FACTOR_BEV = 0.05
-BEV_WR_RANGE = [x/2 for x in range(0, 41, 1)]
-
-
-ALPHA_FOLDERS = [folder for folder in PATH_ALPHA_INPUTS.iterdir()]
-METRICS = ['Configuration',
-           'Vehicle Type',
-           'Package',
-           'Network Path',
-           'Filename',
-           'Key',
-           'Unique Key',
-           'Test Weight lbs',
-           'RL A lbf',
-           'RL B lbf/mph',
-           'RL C lbf/mph2',
-           'RL_ADJ A lbf',
-           'RL_ADJ B lbf/mph',
-           'RL_ADJ C lbf/mph2',
-           'RL hp @ 50 mph',
-           'Perf Baseline',
-           'Perf Neutral',
-           'Shift Norm',
-           'Transient Penalty',
-           'Weight Reduction %',
-           'Aero Improvement %',
-           'Crr Improvement %',
-           'Start Stop',
-           'Var Val',
-           'DEAC D Cyl.',
-           'DEAC C Cyl.',
-           'DEAC Time',
-           'Electric',
-           'Accessory',
-           'Transmission',
-           'Transmission Vintage',
-           'Engine',
-           'Engine',
-           'Engine Displacement L',
-           'Engine Cylinders',
-           'Combined GHG gCO2/mi',
-           'Combined Target Total Efficiency %',
-           'Inertial_Work_J/m',
-           'Net_RoadLoad_Work_J/m',
-           ]
-
 
 class CreatePackageDictTuple:
     """
@@ -141,8 +87,8 @@ class CalcCosts:
         self.df = self.df.merge(techcosts_nonaero[['nonaero', 'nonaero_cost']], on='nonaero', how='left')
         return self.df
 
-    def weight_cost(self, techcosts_weight, work_class):
-        year = START_YEAR
+    def weight_cost(self, start_year, techcosts_weight, work_class):
+        year = start_year
         base_weight_cost = techcosts_weight.at[work_class, 'cost_per_pound']
         dmc_ln_coeff = techcosts_weight.at[work_class, 'DMC_ln_coefficient']
         dmc_constant = techcosts_weight.at[work_class, 'DMC_constant']
@@ -155,18 +101,18 @@ class CalcCosts:
                                                                                * (self.df['weight_reduction'] / 100)
         return self.df
 
-    def package_cost(self):
-        self.df[f'powertrain_cost_{START_YEAR}'] = \
+    def package_cost(self, start_year):
+        self.df[f'powertrain_cost_{start_year}'] = \
             self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost']].sum(axis=1)
-        self.df[f'roadload_cost_{START_YEAR}'] = self.df[['aero_cost', 'nonaero_cost']].sum(axis=1)
-        self.df[f'package_cost_{START_YEAR}'] = \
-            self.df[[f'powertrain_cost_{START_YEAR}', f'roadload_cost_{START_YEAR}', f'weight_cost_{START_YEAR}']].sum(axis=1)
+        self.df[f'roadload_cost_{start_year}'] = self.df[['aero_cost', 'nonaero_cost']].sum(axis=1)
+        self.df[f'package_cost_{start_year}'] = \
+            self.df[[f'powertrain_cost_{start_year}', f'roadload_cost_{start_year}', f'weight_cost_{start_year}']].sum(axis=1)
         return self.df
 
-    def year_over_year_cost(self, future_years, metrics, learning_factor):
+    def year_over_year_cost(self, start_year, future_years, metrics, learning_factor):
         for year in future_years:
             for metric in metrics:
-                self.df[metric + f'_{year}'] = self.df[metric + f'_{START_YEAR}'] * (1 - learning_factor) ** (year - START_YEAR)
+                self.df[metric + f'_{year}'] = self.df[metric + f'_{start_year}'] * (1 - learning_factor) ** (year - start_year)
         return self.df
 
 
@@ -224,6 +170,54 @@ def get_energy_consumption_metrics(file, file_num, folder_num):
 
 
 def main():
+    PATH_PROJECT = Path.cwd()
+    PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
+    PATH_ALPHA_INPUTS = PATH_INPUTS.joinpath('ALPHA')
+    PATH_OUTPUTS = PATH_PROJECT.joinpath('outputs')
+    BEV_WR_RANGE = [x / 2 for x in range(0, 41, 1)]
+
+    ALPHA_FOLDERS = [folder for folder in PATH_ALPHA_INPUTS.iterdir()]
+    METRICS = ['Configuration',
+               'Vehicle Type',
+               'Package',
+               'Network Path',
+               'Filename',
+               'Key',
+               'Unique Key',
+               'Test Weight lbs',
+               'RL A lbf',
+               'RL B lbf/mph',
+               'RL C lbf/mph2',
+               'RL_ADJ A lbf',
+               'RL_ADJ B lbf/mph',
+               'RL_ADJ C lbf/mph2',
+               'RL hp @ 50 mph',
+               'Perf Baseline',
+               'Perf Neutral',
+               'Shift Norm',
+               'Transient Penalty',
+               'Weight Reduction %',
+               'Aero Improvement %',
+               'Crr Improvement %',
+               'Start Stop',
+               'Var Val',
+               'DEAC D Cyl.',
+               'DEAC C Cyl.',
+               'DEAC Time',
+               'Electric',
+               'Accessory',
+               'Transmission',
+               'Transmission Vintage',
+               'Engine',
+               'Engine',
+               'Engine Displacement L',
+               'Engine Cylinders',
+               'Combined GHG gCO2/mi',
+               'Combined Target Total Efficiency %',
+               'Inertial_Work_J/m',
+               'Net_RoadLoad_Work_J/m',
+               ]
+
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
     techcosts_file = pd.ExcelFile(PATH_INPUTS.joinpath('alpha_package_costs_module_inputs.xlsx'))
     techcosts_engine = pd.read_excel(techcosts_file, 'engine')
@@ -240,6 +234,16 @@ def main():
     upstream = upstream.to_dict('index')
     coefficients = pd.read_excel(techcosts_file, 'coefficients', index_col=0)
     coefficients = coefficients.to_dict('index')
+
+    # set inputs
+    inputs = pd.read_excel(techcosts_file, 'inputs_code', index_col=0)
+    inputs = inputs.to_dict('index')
+    START_YEAR = int(inputs['start_year']['value'])
+    END_YEAR = int(inputs['end_year']['value'])
+    YEARS = range(START_YEAR, END_YEAR + 1)
+    FUTURE_YEARS = range(START_YEAR + 1, END_YEAR + 1)
+    LEARNING_RATE_ICE = inputs['learning_rate_ice']['value']
+    LEARNING_RATE_BEV = inputs['learning_rate_bev']['value']
 
     techcosts_engine.insert(0, 'ALPHA_engine, Cylinders', list(zip(techcosts_engine['ALPHA_engine'], techcosts_engine['actual_cylinders'])))
 
@@ -343,9 +347,9 @@ def main():
                             temp_df.insert(len(temp_df.columns), f'roadload_cost_{year}', 0)
                         for year in YEARS:
                             temp_df.insert(len(temp_df.columns), f'package_cost_{year}', 0)
-                        temp_df = cost_object.weight_cost(techcosts_weight, work_class)
-                        temp_df = cost_object.package_cost()
-                        temp_df = cost_object.year_over_year_cost(FUTURE_YEARS, ['weight_cost', 'powertrain_cost', 'roadload_cost', 'package_cost'], LEARNING_FACTOR_ICE)
+                        temp_df = cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
+                        temp_df = cost_object.package_cost(START_YEAR)
+                        temp_df = cost_object.year_over_year_cost(START_YEAR, FUTURE_YEARS, ['weight_cost', 'powertrain_cost', 'roadload_cost', 'package_cost'], LEARNING_RATE_ICE)
                         effectiveness_class_dict[effectiveness_class] = pd.concat([effectiveness_class_dict[effectiveness_class], temp_df], axis=0, ignore_index=True, sort=False)
 
     # save ALPHA-based output files
@@ -359,7 +363,6 @@ def main():
     # work on BEVs
     print('Working on BEVs')
     bev_cost_co2 = dict()
-    bev_cost_co2_df = pd.DataFrame()
     for key in techcosts_bev:
         bev = techcosts_bev[key]
         eff_class = bev['effectiveness_class']
@@ -370,7 +373,7 @@ def main():
         etw = bev['Test Weight lbs']
         reg_class = bev['reg_class']
         fp = bev['footprint']
-        range = bev['range']
+        bev_range = bev['range']
         kWh_pack_slope = bev['kWh_pack_slope']
         kWh_pack_intercept = bev['kWh_pack_intercept']
         cost_slope = bev['cost_slope']
@@ -380,27 +383,30 @@ def main():
         loss_charging = bev['loss_charging']
         utility_factor = bev['utility_factor']
 
-        print(f'Working on bev_{range}_{eff_class}')
-        bev_cost_co2[key] = pd.DataFrame({'effectiveness_class': eff_class, 'weight_reduction': pd.Series(BEV_WR_RANGE), 'Test Weight lbs': etw})
+        print(f'Working on bev_{bev_range}_{eff_class}')
+        bev_cost_co2[key] = pd.DataFrame({'effectiveness_class': eff_class, 'weight_reduction': pd.Series(BEV_WR_RANGE), 'Test Weight lbs': etw,
+                                          'Reg_Class': reg_class, 'Hauling_Class': work_class, 'bev_tech': f'bev_{bev_range}'})
+
+        # calc the pack size and energy consumption
+        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'kWh_pack',
+                                      kWh_pack_slope * bev_cost_co2[key]['weight_reduction'] / 100 + kWh_pack_intercept)
+        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'kWhpMi_cycle', 0)
+        bev_cost_co2[key]['kWhpMi_cycle'] = bev_cost_co2[key]['kWh_pack'] * usuable_SOC * (1 - gap) * utility_factor / (bev_range * (1 - loss_charging))
+
+        # start work on costs
         cost_object = CalcCosts(bev_cost_co2[key])
-        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'bev_tech', f'bev_{range}')
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), f'weight_cost_{year}', 0)
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), f'bev_cost_{year}', 0)
-        bev_cost_co2[key] = cost_object.weight_cost(techcosts_weight, work_class)
-        bev_cost_co2[key] = cost_object.year_over_year_cost(FUTURE_YEARS, ['weight_cost'], LEARNING_FACTOR_ICE)
+        bev_cost_co2[key] = cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
+        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, FUTURE_YEARS, ['weight_cost'], LEARNING_RATE_ICE)
         bev_cost_co2[key][f'bev_cost_{START_YEAR}'] = cost_slope * bev_cost_co2[key]['weight_reduction'] / 100 + cost_intercept
-        bev_cost_co2[key] = cost_object.year_over_year_cost(FUTURE_YEARS, ['bev_cost'], LEARNING_FACTOR_BEV)
+        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, FUTURE_YEARS, ['bev_cost'], LEARNING_RATE_BEV)
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
                                           f'package_cost_{year}',
                                           bev_cost_co2[key][[f'weight_cost_{year}', f'bev_cost_{year}']].sum(axis=1))
-        # calc the energy consumption
-        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'kWh_pack',
-                                      kWh_pack_slope * bev_cost_co2[key]['weight_reduction'] / 100 + kWh_pack_intercept)
-        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'kWhpMi_cycle', 0)
-        bev_cost_co2[key]['kWhpMi_cycle'] = bev_cost_co2[key]['kWh_pack'] * usuable_SOC * (1 - gap) * utility_factor / (range * (1 - loss_charging))
 
         # calc targets and upstream petroleum CO2 (CO2_refinery)
         targets = Targets(reg_class, fp, coefficients, upstream)
