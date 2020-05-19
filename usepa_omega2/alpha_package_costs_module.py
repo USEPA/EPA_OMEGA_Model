@@ -61,7 +61,9 @@ class CalcCosts:
             curb_weight_min = row['curb_weight_min']
             curb_weight_max = row['curb_weight_max']
             startstop_cost = row['start-stop_cost']
-            self.df.loc[(self.df['Test Weight lbs'] - 300 > curb_weight_min) & (self.df['Test Weight lbs'] - 300 <= curb_weight_max) & (self.df['Start Stop'] == 1), 'start-stop_cost'] = startstop_cost
+            self.df.loc[(self.df['Test Weight lbs'] - 300 > curb_weight_min)
+                        & (self.df['Test Weight lbs'] - 300 <= curb_weight_max)
+                        & (self.df['Start Stop'] == 1), 'start-stop_cost'] = startstop_cost
         self.df.loc[self.df['Start Stop'] == 0, 'start-stop_cost'] = 0
         return self.df
 
@@ -101,16 +103,23 @@ class CalcCosts:
                                                                                * (self.df['weight_reduction'] / 100)
         return self.df
 
-    def package_cost(self, start_year):
+    def powertrain_cost(self, start_year):
         self.df[f'powertrain_cost_{start_year}'] = \
             self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost']].sum(axis=1)
-        self.df[f'roadload_cost_{start_year}'] = self.df[['aero_cost', 'nonaero_cost']].sum(axis=1)
-        self.df[f'package_cost_{start_year}'] = \
-            self.df[[f'powertrain_cost_{start_year}', f'roadload_cost_{start_year}', f'weight_cost_{start_year}']].sum(axis=1)
         return self.df
 
-    def year_over_year_cost(self, start_year, future_years, metrics, learning_factor):
-        for year in future_years:
+    def roadload_cost(self, start_year):
+        self.df[f'roadload_cost_{start_year}'] = self.df[['aero_cost', 'nonaero_cost']].sum(axis=1)
+        return self.df
+
+    def vehicle_cost(self, years):
+        for year in years:
+            self.df[f'vehicle_cost_{year}'] = \
+                self.df[[f'powertrain_cost_{year}', f'roadload_cost_{year}', f'weight_cost_{year}']].sum(axis=1)
+        return self.df
+
+    def year_over_year_cost(self, start_year, years, metrics, learning_factor):
+        for year in years:
             for metric in metrics:
                 self.df[metric + f'_{year}'] = self.df[metric + f'_{start_year}'] * (1 - learning_factor) ** (year - start_year)
         return self.df
@@ -241,8 +250,9 @@ def main():
     START_YEAR = int(inputs['start_year']['value'])
     END_YEAR = int(inputs['end_year']['value'])
     YEARS = range(START_YEAR, END_YEAR + 1)
-    FUTURE_YEARS = range(START_YEAR + 1, END_YEAR + 1)
-    LEARNING_RATE_ICE = inputs['learning_rate_ice']['value']
+    LEARNING_RATE_WEIGHT = inputs['learning_rate_weight']['value']
+    LEARNING_RATE_POWERTRAIN = inputs['learning_rate_powertrain']['value']
+    LEARNING_RATE_ROADLOAD = inputs['learning_rate_roadload']['value']
     LEARNING_RATE_BEV = inputs['learning_rate_bev']['value']
 
     techcosts_engine.insert(0, 'ALPHA_engine, Cylinders', list(zip(techcosts_engine['ALPHA_engine'], techcosts_engine['actual_cylinders'])))
@@ -251,7 +261,7 @@ def main():
     for folder_num in range(0, len(ALPHA_FOLDERS)):
         alpha_files[folder_num] = [file for file in ALPHA_FOLDERS[folder_num].iterdir() if file.name.__contains__('.csv')]
 
-    # this loop concatenates 2016 and future files for each ALPHA class into a single ALPHA file containing both 2016 and future results
+    # this loop vertically concatenates 2016 and future files for each ALPHA class into a single ALPHA file containing both 2016 and future results
     alpha_file = dict()
     for file_num in range(0, len(alpha_files[0])):
         alpha_file[file_num] = pd.DataFrame()
@@ -301,6 +311,7 @@ def main():
                                                           on=['ALPHA_engine, Cylinders'], how='left')
 
     # this loop breaks each ALPHA file into package dictionaries identified by the identifying tuple
+    # the inner loop then uses the CalcCosts class to calculate package costs
     package_dict = dict()
     effectiveness_class_dict = dict()
     for file_num in range(0, len(alpha_files[0])):
@@ -346,10 +357,16 @@ def main():
                         for year in YEARS:
                             temp_df.insert(len(temp_df.columns), f'roadload_cost_{year}', 0)
                         for year in YEARS:
-                            temp_df.insert(len(temp_df.columns), f'package_cost_{year}', 0)
-                        temp_df = cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
-                        temp_df = cost_object.package_cost(START_YEAR)
-                        temp_df = cost_object.year_over_year_cost(START_YEAR, FUTURE_YEARS, ['weight_cost', 'powertrain_cost', 'roadload_cost', 'package_cost'], LEARNING_RATE_ICE)
+                            temp_df.insert(len(temp_df.columns), f'vehicle_cost_{year}', 0)
+                        cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
+                        # sum individual techs into system-level costs (powertrain, roadload)
+                        cost_object.powertrain_cost(START_YEAR)
+                        cost_object.roadload_cost(START_YEAR)
+                        # apply learning
+                        cost_object.year_over_year_cost(START_YEAR, YEARS, ['weight_cost'], LEARNING_RATE_WEIGHT)
+                        cost_object.year_over_year_cost(START_YEAR, YEARS, ['powertrain_cost'], LEARNING_RATE_POWERTRAIN)
+                        cost_object.year_over_year_cost(START_YEAR, YEARS, ['roadload_cost'], LEARNING_RATE_ROADLOAD)
+                        cost_object.vehicle_cost(YEARS)
                         effectiveness_class_dict[effectiveness_class] = pd.concat([effectiveness_class_dict[effectiveness_class], temp_df], axis=0, ignore_index=True, sort=False)
 
     # save ALPHA-based output files
@@ -400,12 +417,12 @@ def main():
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), f'bev_cost_{year}', 0)
         bev_cost_co2[key] = cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
-        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, FUTURE_YEARS, ['weight_cost'], LEARNING_RATE_ICE)
+        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, ['weight_cost'], LEARNING_RATE_WEIGHT)
         bev_cost_co2[key][f'bev_cost_{START_YEAR}'] = cost_slope * bev_cost_co2[key]['weight_reduction'] / 100 + cost_intercept
-        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, FUTURE_YEARS, ['bev_cost'], LEARNING_RATE_BEV)
+        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, ['bev_cost'], LEARNING_RATE_BEV)
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
-                                          f'package_cost_{year}',
+                                          f'vehicle_cost_{year}',
                                           bev_cost_co2[key][[f'weight_cost_{year}', f'bev_cost_{year}']].sum(axis=1))
 
         # calc targets and upstream petroleum CO2 (CO2_refinery)
