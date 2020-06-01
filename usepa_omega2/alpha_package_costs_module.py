@@ -44,6 +44,10 @@ class CreatePackageDictTuple:
 
 
 class CalcCosts:
+    """
+    This class largely merges input costs into the working DataFrames (the passed objects) on the appropriate metrics, although the weight_cost method calculates
+    actual weight costs and merges those into the working DataFrames.
+    """
     def __init__(self, df):
         self.df = df
 
@@ -90,6 +94,13 @@ class CalcCosts:
         return self.df
 
     def weight_cost(self, start_year, techcosts_weight, work_class):
+        """
+        Weight costs are calculated as an absolute cost associated with the curb weight of the vehicle and are then adjusted according to the weight reduction.
+        :param start_year: First year to calc costs.
+        :param techcosts_weight: The input DataFrame associated with weight costs.
+        :param work_class: Hauling vs Non-hauling work class designation.
+        :return: The passed DataFrame with weight costs merged in.
+        """
         year = start_year
         base_weight_cost = techcosts_weight.at[work_class, 'cost_per_pound']
         dmc_ln_coeff = techcosts_weight.at[work_class, 'DMC_ln_coefficient']
@@ -104,11 +115,21 @@ class CalcCosts:
         return self.df
 
     def powertrain_cost(self, start_year):
+        """
+        A summation of powertrain elements into a powertrain cost in start_year (year-over-year costs are calculated in the year_over_year_cost method.
+        :param start_year: The first year to calc costs.
+        :return:
+        """
         self.df[f'powertrain_cost_{start_year}'] = \
             self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost']].sum(axis=1)
         return self.df
 
     def roadload_cost(self, start_year):
+        """
+        A summation of roadload elements into a roadload cost in start_year (year-over-year costs are calculated in the year_over_year_cost method.
+        :param start_year:
+        :return:
+        """
         self.df[f'roadload_cost_{start_year}'] = self.df[['aero_cost', 'nonaero_cost']].sum(axis=1)
         return self.df
 
@@ -118,10 +139,26 @@ class CalcCosts:
                 self.df[[f'powertrain_cost_{year}', f'roadload_cost_{year}', f'weight_cost_{year}']].sum(axis=1)
         return self.df
 
-    def year_over_year_cost(self, start_year, years, metrics, learning_factor):
+    def year_over_year_cost(self, start_year, years, learning_factor, *args):
+        """
+        Applying learning effects to calculate year-over-year costs from start_year.
+        :param start_year: The first year to calc costs.
+        :param years: The years for which to calc costs.
+        :param args: The metrics for which to calc year-over-year costs.
+        :param learning_factor: The learning rate factors entered in the inputs sheet.
+        :return: The passed DataFrame with year-over-yar costs for each metric passed.
+        """
         for year in years:
-            for metric in metrics:
-                self.df[metric + f'_{year}'] = self.df[metric + f'_{start_year}'] * (1 - learning_factor) ** (year - start_year)
+            for arg in args:
+                self.df[arg + f'_{year}'] = self.df[arg + f'_{start_year}'] * (1 - learning_factor) ** (year - start_year)
+        return self.df
+
+    def convert_dollars_to_analysis_basis(self, deflators, dollar_basis, *args):
+        dollar_years = pd.Series(self.df['dollar_basis']).unique()
+        for year in dollar_years:
+            for arg in args:
+                self.df.loc[self.df['dollar_basis'] == year, arg] = self.df[arg] * deflators[year]['adjustment']
+        self.df['dollar_basis'] = dollar_basis
         return self.df
 
 
@@ -237,12 +274,14 @@ def main():
     techcosts_weight = pd.read_excel(techcosts_file, 'weight', index_col=0)
     techcosts_aero = pd.read_excel(techcosts_file, 'aero')
     techcosts_nonaero = pd.read_excel(techcosts_file, 'nonaero')
-    techcosts_bev = pd.read_excel(techcosts_file, 'bev_curves', index_col=0)
-    techcosts_bev = techcosts_bev.to_dict('index')
+    techcosts_bev = pd.read_excel(techcosts_file, 'bev', index_col=0)
     upstream = pd.read_excel(techcosts_file, 'upstream', index_col=0)
     upstream = upstream.to_dict('index')
     coefficients = pd.read_excel(techcosts_file, 'coefficients', index_col=0)
     coefficients = coefficients.to_dict('index')
+    gdp_deflators = pd.read_excel(techcosts_file, 'gdp_deflators', index_col=0)
+    gdp_deflators.insert(len(gdp_deflators.columns), 'adjustment', 0) # adjustment values are filled below
+    gdp_deflators = gdp_deflators.to_dict('index')
 
     # set inputs
     inputs = pd.read_excel(techcosts_file, 'inputs_code', index_col=0)
@@ -254,8 +293,25 @@ def main():
     LEARNING_RATE_POWERTRAIN = inputs['learning_rate_powertrain']['value']
     LEARNING_RATE_ROADLOAD = inputs['learning_rate_roadload']['value']
     LEARNING_RATE_BEV = inputs['learning_rate_bev']['value']
+    DOLLAR_BASIS = int(inputs['analysis_dollar_basis']['value'])
+
+    # update gdp_deflators dict with adjustment values
+    for key in gdp_deflators:
+        gdp_deflators[key]['adjustment'] = gdp_deflators[DOLLAR_BASIS]['factor'] / gdp_deflators[key]['factor']
 
     techcosts_engine.insert(0, 'ALPHA_engine, Cylinders', list(zip(techcosts_engine['ALPHA_engine'], techcosts_engine['actual_cylinders'])))
+
+    # convert all dollars in to consistent, analysis dollars
+    techcosts_engine = CalcCosts(techcosts_engine).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'engine_cost')
+    techcosts_deac = CalcCosts(techcosts_deac).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'deac_cost')
+    techcosts_trans = CalcCosts(techcosts_trans).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'trans_cost')
+    techcosts_accessories = CalcCosts(techcosts_accessories).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'accessory_cost')
+    techcosts_startstop = CalcCosts(techcosts_startstop).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'start-stop_cost')
+    techcosts_weight = CalcCosts(techcosts_weight).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'cost_per_pound', 'DMC_ln_coefficient', 'DMC_constant', 'IC_slope')
+    techcosts_aero = CalcCosts(techcosts_aero).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'aero_cost')
+    techcosts_nonaero = CalcCosts(techcosts_nonaero).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'nonaero_cost')
+    techcosts_bev = CalcCosts(techcosts_bev).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'bev_cost_slope', 'bev_cost_intercept')
+    techcosts_bev = techcosts_bev.to_dict('index')
 
     alpha_files = dict()
     for folder_num in range(0, len(ALPHA_FOLDERS)):
@@ -363,15 +419,15 @@ def main():
                         cost_object.powertrain_cost(START_YEAR)
                         cost_object.roadload_cost(START_YEAR)
                         # apply learning
-                        cost_object.year_over_year_cost(START_YEAR, YEARS, ['weight_cost'], LEARNING_RATE_WEIGHT)
-                        cost_object.year_over_year_cost(START_YEAR, YEARS, ['powertrain_cost'], LEARNING_RATE_POWERTRAIN)
-                        cost_object.year_over_year_cost(START_YEAR, YEARS, ['roadload_cost'], LEARNING_RATE_ROADLOAD)
+                        cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_WEIGHT, 'weight_cost')
+                        cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_POWERTRAIN, 'powertrain_cost')
+                        cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_ROADLOAD, 'roadload_cost')
                         cost_object.vehicle_cost(YEARS)
                         effectiveness_class_dict[effectiveness_class] = pd.concat([effectiveness_class_dict[effectiveness_class], temp_df], axis=0, ignore_index=True, sort=False)
 
     # save ALPHA-based output files
     PATH_OUTPUTS.mkdir(exist_ok=True)
-    path_of_run_folder = PATH_OUTPUTS.joinpath(start_time_readable)
+    path_of_run_folder = PATH_OUTPUTS.joinpath(f'{start_time_readable}_O2-TechCosts')
     path_of_run_folder.mkdir(exist_ok=False)
     for effectiveness_class in [*effectiveness_class_dict]:
         print(f'Saving {effectiveness_class}.csv')
@@ -393,8 +449,8 @@ def main():
         bev_range = bev['range']
         kWh_pack_slope = bev['kWh_pack_slope']
         kWh_pack_intercept = bev['kWh_pack_intercept']
-        cost_slope = bev['cost_slope']
-        cost_intercept = bev['cost_intercept']
+        cost_slope = bev['bev_cost_slope']
+        cost_intercept = bev['bev_cost_intercept']
         usuable_SOC = bev['usable_SOC']
         gap = bev['gap']
         loss_charging = bev['loss_charging']
@@ -417,9 +473,9 @@ def main():
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), f'bev_cost_{year}', 0)
         bev_cost_co2[key] = cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
-        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, ['weight_cost'], LEARNING_RATE_WEIGHT)
+        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_WEIGHT, 'weight_cost')
         bev_cost_co2[key][f'bev_cost_{START_YEAR}'] = cost_slope * bev_cost_co2[key]['weight_reduction'] / 100 + cost_intercept
-        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, ['bev_cost'], LEARNING_RATE_BEV)
+        bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_BEV, 'bev_cost')
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
                                           f'vehicle_cost_{year}',
@@ -432,6 +488,21 @@ def main():
         calc_bev_co2(bev_cost_co2[key], YEARS, targets_dict, upstream)
         print(f'Saving {key}')
         bev_cost_co2[key].to_csv(path_of_run_folder.joinpath(f'{key}.csv'), index=False)
+
+    modified_costs = pd.ExcelWriter(path_of_run_folder.joinpath(f'techcosts_in_{DOLLAR_BASIS}_dollars.xlsx'))
+    techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='engine', index=False)
+    techcosts_deac[['Tech', 'deac_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='deac', index=False)
+    techcosts_trans[['trans', 'trans_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='trans', index=False)
+    techcosts_aero[['work_class', 'aero', 'aero_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='aero', index=False)
+    techcosts_nonaero[['Tech', 'nonaero_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='nonaero', index=False)
+    techcosts_accessories[['Accessory', 'accessory_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='accessories', index=False)
+    techcosts_startstop[['curb_weight_min', 'curb_weight_max', 'start-stop_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='start-stop', index=False)
+    techcosts_weight.to_excel(modified_costs, sheet_name='weight', index=True)
+    techcosts_bev = pd.DataFrame(techcosts_bev)  # from dict to df
+    techcosts_bev.to_excel(modified_costs, sheet_name='bev', index=True)
+    gdp_deflators = pd.DataFrame(gdp_deflators) # from dict to df
+    gdp_deflators.to_excel(modified_costs, sheet_name='gdp_deflators', index=True)
+    modified_costs.save()
 
     input_files_list = [techcosts_file]
     filename_list = [PurePath(path).name for path in input_files_list]
