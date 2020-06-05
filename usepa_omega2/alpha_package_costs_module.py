@@ -293,7 +293,7 @@ def main():
     LEARNING_RATE_POWERTRAIN = inputs['learning_rate_powertrain']['value']
     LEARNING_RATE_ROADLOAD = inputs['learning_rate_roadload']['value']
     LEARNING_RATE_BEV = inputs['learning_rate_bev']['value']
-    DOLLAR_BASIS = int(inputs['analysis_dollar_basis']['value'])
+    DOLLAR_BASIS = int(inputs['analysis_year_dollars']['value'])
 
     # update gdp_deflators dict with adjustment values
     for key in gdp_deflators:
@@ -310,7 +310,7 @@ def main():
     techcosts_weight = CalcCosts(techcosts_weight).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'cost_per_pound', 'DMC_ln_coefficient', 'DMC_constant', 'IC_slope')
     techcosts_aero = CalcCosts(techcosts_aero).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'aero_cost')
     techcosts_nonaero = CalcCosts(techcosts_nonaero).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'nonaero_cost')
-    techcosts_bev = CalcCosts(techcosts_bev).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'bev_cost_slope', 'bev_cost_intercept')
+    techcosts_bev = CalcCosts(techcosts_bev).convert_dollars_to_analysis_basis(gdp_deflators, DOLLAR_BASIS, 'bev_cost_slope', 'bev_cost_intercept', 'dollar/kWh_0WR', 'dollar/kWh_20WR')
     techcosts_bev = techcosts_bev.to_dict('index')
 
     alpha_files = dict()
