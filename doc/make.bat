@@ -4,7 +4,7 @@ pushd %~dp0
 
 REM Command file for Sphinx documentation
 
-C:\Users\Public\OMEGA2\Python3.6.7\Scripts\sphinx-apidoc -o source "C:\Users\KNewman\Documents\GitHub\EPA_OMEGA_Model\omega2" -f -a -H omega2 -V 0.0.1 --tocfile code
+C:\Users\Public\OMEGA2\Python3.6.7\Scripts\sphinx-apidoc -o source "C:\Users\tsherwoo\Documents\GitHub\EPA_OMEGA_Model\omega2" -f -a -H omega2 -V 0.0.1 --tocfile code
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD="C:\Users\Public\OMEGA2\Python3.6.7\Scripts\sphinx-build"
