@@ -79,9 +79,10 @@
     <packagedElement xmi:type="uml:Class" xmi:id="_7dEM4JktEeq1MNw_X5quEQ" name="scenarios">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_TJ1kMJkuEeq1MNw_X5quEQ"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_GLNFoKdHEeqRUoM6l8Mfgg" name="scenario_id" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_OB7xUKdHEeqRUoM6l8Mfgg" name="fuel_input_dollar_year" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_OB7xUKdHEeqRUoM6l8Mfgg" name="fuel_scenario_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_TimkkKdHEeqRUoM6l8Mfgg" name="cost_curve_input_ dollar_year" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_9Zo3cKdIEeqRUoM6l8Mfgg" name="analysis_dollar_year" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_sQ3KYLJFEeq-nMqFB8F3vg" name="fuel_scenario_id" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_spB7YJkuEeq1MNw_X5quEQ" isAbstract="true" memberEnd="_zBkskJUiEeq1MNw_X5quEQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_spDwkJkuEeq1MNw_X5quEQ" source="org.eclipse.papyrus">
@@ -98,11 +99,11 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_s_gkIKdEEeqRUoM6l8Mfgg" name="calendar_year"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_4FlgsKdEEeqRUoM6l8Mfgg" name="fuel_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_KSuxIKdGEeqRUoM6l8Mfgg" name="cost_dollars_per_unit"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_WXp7kKdGEeqRUoM6l8Mfgg" name="upstream_co2_per_unit"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="scenario_id" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_WXp7kKdGEeqRUoM6l8Mfgg" name="upstream_co2_grams_per_unit" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="fuel_scenario_id" visibility="public" association="_PwfaALJtEeq-nMqFB8F3vg"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_p2KHsKhvEeqRUoM6l8Mfgg" memberEnd="_eG-sgJUjEeq1MNw_X5quEQ"/>
-    <packagedElement xmi:type="uml:Class" xmi:id="_8geagKscEeq6oJG-GxIr5g" name="ghg_standards">
+    <packagedElement xmi:type="uml:Class" xmi:id="_8geagKscEeq6oJG-GxIr5g" name="ghg_standards (flat standard)">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_AGRcgKsdEeq6oJG-GxIr5g" name="model_year"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_k8obEKsvEeq6oJG-GxIr5g" name="reg_class_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_qLd3cKsvEeq6oJG-GxIr5g" name="footprint_sqft"/>
@@ -142,6 +143,14 @@
     <packagedElement xmi:type="uml:Association" xmi:id="_Vz16ELGdEeqot_EVL7aS4w" memberEnd="_fqJkwJkbEeq1MNw_X5quEQ"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_yG9xcLGdEeqot_EVL7aS4w"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_6BmswLGdEeqot_EVL7aS4w" name="" memberEnd="_ab4EAKstEeq6oJG-GxIr5g"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_IfxRILI7Eeq-nMqFB8F3vg" name="ghg_standards (footprint based)">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Mt-W8LI7Eeq-nMqFB8F3vg" name="a_coeff" visibility="public"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_-NuG0LJsEeq-nMqFB8F3vg" name="fuel_scenarios">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_GV_OcLJtEeq-nMqFB8F3vg" name="fuel_scenario_id" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_JSWR4LJtEeq-nMqFB8F3vg" name="dollar_year" visibility="public"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_PwfaALJtEeq-nMqFB8F3vg" memberEnd="_9sRxgKdGEeqRUoM6l8Mfgg"/>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_jYTvAK8IEeqO0d-UmaSoow">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jYWLQK8IEeqO0d-UmaSoow" source="http://www.eclipse.org/uml2/2.0.0/UML">
