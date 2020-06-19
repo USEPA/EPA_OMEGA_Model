@@ -21,7 +21,7 @@ from showroom_annual_data import *
 
 if __name__ == "__main__":
 
-    print('OMEGA2 greeets you, version %s' % version)
+    print('OMEGA2 greeets you, version %s' % code_version)
     print('from %s with love' % fileio.get_filenameext(__file__))
 
     fileio.validate_folder(omega2_output_folder)

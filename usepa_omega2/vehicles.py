@@ -23,7 +23,7 @@ class Vehicle(SQABase):
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
     cost_dollars = Column(Float)
-    showroom_fuel_ID = Column('shworoom_fuel_id', Integer, ForeignKey('fuels.fuel_id'))
+    showroom_fuel_ID = Column('showroom_fuel_id', Integer, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', Integer, ForeignKey('market_classes.market_class_id'))
 
     def __repr__(self):

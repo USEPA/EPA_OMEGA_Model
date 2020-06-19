@@ -12,7 +12,7 @@ class Fuel(SQABase):
     # --- database table properties ---
     __tablename__ = 'fuels'
     fuel_ID = Column('fuel_id', Integer, primary_key=True)
-    unit = Column('unit', Enum(*fuel_units, validate_strings=True))
+    unit = Column(Enum(*fuel_units, validate_strings=True))
     energy_density_MJ_per_unit = Column('energy_density_megajoules_per_unit', Float)
 
 
