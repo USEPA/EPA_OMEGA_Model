@@ -150,7 +150,7 @@ class CalcCosts:
         """
         for year in years:
             for arg in args:
-                self.df[arg + f'_{year}'] = self.df[arg + f'_{start_year}'] * (1 - learning_factor) ** (year - start_year)
+                self.df[f'{arg}_{year}'] = self.df[f'{arg}_{start_year}'] * (1 - learning_factor) ** (year - start_year)
         return self.df
 
     def convert_dollars_to_analysis_basis(self, deflators, dollar_basis, *args):
