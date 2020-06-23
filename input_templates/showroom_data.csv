@@ -1,5 +1,6 @@
-input_template_name,input_template_version,market_class_id,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate
-showroom_data,0.0001,BEV non hauling,12000,5,10,0.5,0.1
-,,BEV hauling,12000,5,10,0.5,0.1
-,,ICE non hauling,12000,5,10,1,0.1
-,,ICE hauling,12000,5,10,1,0.1
+input_template_name:,showroom_data,input_template_version:,0.0002,,
+market_class_id,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate
+BEV non hauling,12000,5,10,0.5,0.1
+BEV hauling,12000,5,10,0.5,0.1
+ICE non hauling,12000,5,10,1,0.1
+ICE hauling,12000,5,10,1,0.1

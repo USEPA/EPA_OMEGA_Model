@@ -23,7 +23,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_sLey8KslEeq6oJG-GxIr5g" name="cert_fuel_ID"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_t-_X8KslEeq6oJG-GxIr5g" name="cert_test_cycle"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_U8qtgKsmEeq6oJG-GxIr5g" name="cert_co2_grams_per_mile"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_rJLL8KsmEeq6oJG-GxIr5g" name="cost_dollars" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_rJLL8KsmEeq6oJG-GxIr5g" name="new_vehicle_cost_dollars" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_tsjx4KsqEeq6oJG-GxIr5g" name="showroom_fuel_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_vrzlcKstEeq6oJG-GxIr5g" name="market_class_id"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_AlDlEKsvEeq6oJG-GxIr5g" name="manufacturer_id"/>
@@ -44,9 +44,9 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_yqEzoJk1Eeq1MNw_X5quEQ" name="name" isUnique="false"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_UD9KkJUyEeq1MNw_X5quEQ" name="cost_curves">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_o37IwJUyEeq1MNw_X5quEQ" name="calendar_year"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_qehTIJUyEeq1MNw_X5quEQ" name="cost_dollars"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_skW-QJUyEeq1MNw_X5quEQ" name="co2_grams_per_mile"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_o37IwJUyEeq1MNw_X5quEQ" name="model_year" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_qehTIJUyEeq1MNw_X5quEQ" name="new_vehicle_cost_dollars" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_skW-QJUyEeq1MNw_X5quEQ" name="cert_co2_grams_per_mile" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKBoKdBEeqRUoM6l8Mfgg" name="cost_curve_class"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_7ScRQLGXEeqot_EVL7aS4w" name="index"/>
       <ownedOperation xmi:type="uml:Operation" xmi:id="_WUJWcKspEeq6oJG-GxIr5g" name="calculate_generalized_cost">
@@ -64,13 +64,9 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Jz3L8JkxEeq1MNw_X5quEQ" name="vehicle_id" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_ecoowJkbEeq1MNw_X5quEQ" name="fuels">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_fqJkwJkbEeq1MNw_X5quEQ" name="fuel_id" visibility="public" association="_Vz16ELGdEeqot_EVL7aS4w">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_fqJkwJkbEeq1MNw_X5quEQ" name="fuel_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_SjUq4K80EeqO0d-UmaSoow" name="unit" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_T0fX0K80EeqO0d-UmaSoow" name="energy_density_megajoules_per_unit" visibility="public">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EFloat"/>
-      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_T0fX0K80EeqO0d-UmaSoow" name="energy_density_megajoules_per_unit" visibility="public"/>
       <nestedClassifier xmi:type="uml:Enumeration" xmi:id="_37H6sLGYEeqot_EVL7aS4w" name="fuel_units">
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_37H6sbGYEeqot_EVL7aS4w" name="gallon"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_37H6srGYEeqot_EVL7aS4w" name="kwh"/>
@@ -79,7 +75,7 @@
     <packagedElement xmi:type="uml:Class" xmi:id="_7dEM4JktEeq1MNw_X5quEQ" name="scenarios">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_TJ1kMJkuEeq1MNw_X5quEQ"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_GLNFoKdHEeqRUoM6l8Mfgg" name="scenario_id" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_OB7xUKdHEeqRUoM6l8Mfgg" name="fuel_input_dollar_year" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_OB7xUKdHEeqRUoM6l8Mfgg" name="fuel_scenario_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_TimkkKdHEeqRUoM6l8Mfgg" name="cost_curve_input_ dollar_year" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_9Zo3cKdIEeqRUoM6l8Mfgg" name="analysis_dollar_year" visibility="public"/>
     </packagedElement>
@@ -99,7 +95,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_4FlgsKdEEeqRUoM6l8Mfgg" name="fuel_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_KSuxIKdGEeqRUoM6l8Mfgg" name="cost_dollars_per_unit"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_WXp7kKdGEeqRUoM6l8Mfgg" name="upstream_co2_per_unit"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="scenario_id" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="fuel_scenario_id" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_p2KHsKhvEeqRUoM6l8Mfgg" memberEnd="_eG-sgJUjEeq1MNw_X5quEQ"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_8geagKscEeq6oJG-GxIr5g" name="ghg_standards">
@@ -135,13 +131,22 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_7IkJEK8REeqO0d-UmaSoow" name="calendar_year" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_8smDcK8YEeqO0d-UmaSoow" name="showroom_annual_data">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="__O1WsK8YEeqO0d-UmaSoow" name="market_class_id" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="__O1WsK8YEeqO0d-UmaSoow" name="market_class_id" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_CxRisK8ZEeqO0d-UmaSoow" name="calendar_year" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_F8BAYK8ZEeqO0d-UmaSoow" name="demanded_sales_count" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_F8BAYK8ZEeqO0d-UmaSoow" name="demanded_sales_count" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EFloat"/>
+      </ownedAttribute>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_Vz16ELGdEeqot_EVL7aS4w" memberEnd="_fqJkwJkbEeq1MNw_X5quEQ"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_yG9xcLGdEeqot_EVL7aS4w"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_6BmswLGdEeqot_EVL7aS4w" name="" memberEnd="_ab4EAKstEeq6oJG-GxIr5g"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_n4AHMLTLEeq3n4Y_x_vtYQ" name="cost_clouds">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Gtra4LTMEeq3n4Y_x_vtYQ" name="model_year" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_TCNuoLTMEeq3n4Y_x_vtYQ" name="cert_co2_grams_per_mile" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_xVCM4LTMEeq3n4Y_x_vtYQ" name="cost_curve_class" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_7dMvsLTMEeq3n4Y_x_vtYQ" name="new_vehicle_cost_dollars" visibility="public"/>
+    </packagedElement>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_jYTvAK8IEeqO0d-UmaSoow">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jYWLQK8IEeqO0d-UmaSoow" source="http://www.eclipse.org/uml2/2.0.0/UML">

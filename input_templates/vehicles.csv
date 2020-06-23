@@ -1,5 +1,6 @@
-input_template_name,input_template_version,vehicle_id,manufacturer_id,model_year,reg_class_id,hauling_class,showroom_fuel_id,market_class_id,sales
-vehicles,0.0001,BEV non hauling,USA Motors,2020,car,non hauling,US electricity,BEV non hauling,0
-,,BEV hauling,USA Motors,2020,truck,hauling,US electricity,BEV hauling,0
-,,ICE non hauling,USA Motors,2020,car,non hauling,pump gasoline,ICE non hauling,1000000
-,,ICE hauling,USA Motors,2020,truck,hauling,pump gasoline,ICE hauling,750000
+input_template_name:,vehicles,input_template_version:,0.0002,,,,,
+vehicle_id,manufacturer_id,model_year,reg_class_id,hauling_class,cost_curve_class,showroom_fuel_id,market_class_id,sales
+BEV non hauling,USA Motors,2020,car,non hauling,bev_300_MPW_LRL,US electricity,BEV non hauling,0
+BEV hauling,USA Motors,2020,truck,hauling,bev_300_Truck,US electricity,BEV hauling,0
+ICE non hauling,USA Motors,2020,car,non hauling,ice_300_MPW_LRL,pump gasoline,ICE non hauling,1000000
+ICE hauling,USA Motors,2020,truck,hauling,ice_300_Truck,pump gasoline,ICE hauling,750000
