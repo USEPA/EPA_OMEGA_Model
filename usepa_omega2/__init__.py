@@ -4,14 +4,12 @@ __init.py__
 
 """
 
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Enum, Float
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, Session
-
 import pandas as pd
 pd.set_option('chained_assignment', 'raise')
 
+from omega_db import *
 import file_eye_oh as fileio
+from input_validation import *
 
 import matplotlib.pyplot as plt
 
@@ -23,8 +21,6 @@ import matplotlib.pyplot as plt
 # import time
 
 # --- OMEGA2 globals ---
-SQABase = declarative_base()
-engine = create_engine('sqlite:///:memory:', echo=True)
 
 # enumerated values
 fueling_classes = ['BEV', 'ICE']

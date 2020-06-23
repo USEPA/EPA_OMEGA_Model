@@ -7,6 +7,7 @@ OMEGA2 top level code
 """
 
 from usepa_omega2 import *
+
 from manufacturers import *
 from vehicles import *
 from vehicle_annual_data import *
@@ -28,3 +29,5 @@ if __name__ == "__main__":
 
     session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
+
+    init_fail = Fuel.init_database('input_templates/fuels.csv', session, verbose=True)
