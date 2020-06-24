@@ -1,5 +1,5 @@
 """
-cost_curves.py
+cost_clouds.py
 ==============
 
 
@@ -8,15 +8,15 @@ cost_curves.py
 from usepa_omega2 import *
 
 
-class CostCurvePoint(SQABase):
+class CostCloudPoint(SQABase):
     # --- database table properties ---
-    __tablename__ = 'cost_curves'
+    __tablename__ = 'cost_clouds'
     index = Column('index', Integer, primary_key=True)
 
     cost_curve_class = Column(String)
     calendar_year = Column(Numeric)
-    cost_dollars = Column(Float)  # TODO:should this be a pickled list or array or just a single point??
-    CO2_grams_per_mile = Column('co2_grams_per_mile', Float)  # TODO:should this be a pickled list or array or just a single point??
+    cost_dollars = Column(Float)
+    CO2_grams_per_mile = Column('co2_grams_per_mile', Float)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -31,7 +31,7 @@ class CostCurvePoint(SQABase):
     def init_database(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'cost_curves'
+        input_template_name = 'cost_clouds'
         input_template_version = 0.0001
         input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'new_vehicle_cost'}
 
@@ -45,9 +45,9 @@ class CostCurvePoint(SQABase):
 
             if not template_errors:
                 obj_list = []
-                # load data into database TODO: need to calculate frontier first...
+                # load data into database
                 for i in df.index:
-                    obj_list.append(CostCurvePoint(
+                    obj_list.append(CostCloudPoint(
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         calendar_year=df.loc[i, 'model_year'],
                         cost_dollars=df.loc[i, 'new_vehicle_cost'],
@@ -67,8 +67,9 @@ if __name__ == '__main__':
 
     SQABase.metadata.create_all(engine)
 
-    # TODO: use actual cost_curve file.  For now... using same file as cost_clouds
-    init_fail = CostCurvePoint.init_database('input_templates/cost_clouds.csv', session, verbose=True)
+    init_fail = CostCloudPoint.init_database('input_templates/cost_clouds.csv', session, verbose=True)
+
+    # TODO:convert cost clouds to cost curves...
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')

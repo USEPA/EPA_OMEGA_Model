@@ -66,3 +66,5 @@ def validate_template_columns(filename, input_template_columns, columns, verbose
         if verbose:
             for e in error_list:
                 print(e)
+
+    return error_list

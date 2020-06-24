@@ -27,7 +27,6 @@ if __name__ == "__main__":
 
     fileio.validate_folder(omega2_output_folder)
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = Fuel.init_database('input_templates/fuels.csv', session, verbose=True)
+    # TODO: need to update self-test here:

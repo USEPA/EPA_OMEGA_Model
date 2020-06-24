@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 
 # enumerated values
 fueling_classes = ['BEV', 'ICE']
-hauling_classes = ['hauling', 'non_hauling']
+hauling_classes = ['hauling', 'non hauling']
 ownership_classes = ['shared', 'private']
 reg_classes = ['car', 'truck']
 fuel_units = ['gallon', 'kWh']

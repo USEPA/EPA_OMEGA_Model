@@ -1,6 +1,6 @@
 """
 showroom_annual_data.py
-==========
+=======================
 
 
 """
@@ -40,5 +40,4 @@ class ShowroomData(SQABase):
 if __name__ == '__main__':
     print(fileio.get_filenameext(__file__))
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)

@@ -14,7 +14,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 
 SQABase = declarative_base()
+
 engine = create_engine('sqlite:///:memory:', echo=True)
+session = Session(bind=engine)
+session.execute(
+    'pragma foreign_keys=on')  # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
 
 
 def dump_database_to_csv(engine, output_folder):

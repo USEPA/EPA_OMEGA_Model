@@ -7,10 +7,6 @@ GHG_standards_flat.py
 
 from usepa_omega2 import *
 
-input_template_name = 'ghg_standards-flat'
-input_template_version = 0.0002
-input_template_columns = {'model_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
-
 
 class GHGStandardFlat(SQABase):
     # --- database table properties ---
@@ -33,6 +29,10 @@ class GHGStandardFlat(SQABase):
     # noinspection PyMethodParameters
     def init_database(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
+
+        input_template_name = 'ghg_standards-flat'
+        input_template_version = 0.0002
+        input_template_columns = {'model_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -61,10 +61,9 @@ class GHGStandardFlat(SQABase):
 if __name__ == '__main__':
     print(fileio.get_filenameext(__file__))
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = GHGStandardFlat.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = GHGStandardFlat.init_database('input_templates/ghg_standards-flat.csv', session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')

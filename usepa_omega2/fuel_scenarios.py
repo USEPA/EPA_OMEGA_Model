@@ -7,10 +7,6 @@ fuel_scenarios.py
 
 from usepa_omega2 import *
 
-input_template_name = 'fuel_scenarios'
-input_template_version = 0.0002
-input_template_columns = {'fuel_scenario_id', 'dollar_year'}
-
 
 class FuelScenario(SQABase):
     # --- database table properties ---
@@ -27,6 +23,10 @@ class FuelScenario(SQABase):
     # noinspection PyMethodParameters
     def init_database(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
+
+        input_template_name = 'fuel_scenarios'
+        input_template_version = 0.0002
+        input_template_columns = {'fuel_scenario_id', 'dollar_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -53,10 +53,9 @@ class FuelScenario(SQABase):
 if __name__ == '__main__':
     print(fileio.get_filenameext(__file__))
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = FuelScenario.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = FuelScenario.init_database('input_templates/fuel_scenarios.csv', session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')

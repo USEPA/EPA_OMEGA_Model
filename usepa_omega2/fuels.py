@@ -7,10 +7,6 @@ fuels.py
 
 from usepa_omega2 import *
 
-input_template_name = 'fuels'
-input_template_version = 0.0002
-input_template_columns = {'fuel_id', 'unit', 'energy_density_megajoules_per_unit'}
-
 
 class Fuel(SQABase):
     # --- database table properties ---
@@ -28,6 +24,10 @@ class Fuel(SQABase):
     # noinspection PyMethodParameters
     def init_database(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
+
+        input_template_name = 'fuels'
+        input_template_version = 0.0002
+        input_template_columns = {'fuel_id', 'unit', 'energy_density_megajoules_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -55,10 +55,9 @@ class Fuel(SQABase):
 if __name__ == '__main__':
     print(fileio.get_filenameext(__file__))
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = Fuel.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = Fuel.init_database('input_templates/fuels.csv', session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')

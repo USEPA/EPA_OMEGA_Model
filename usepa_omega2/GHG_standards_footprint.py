@@ -7,10 +7,6 @@ GHG_standards_footprint.py
 
 from usepa_omega2 import *
 
-input_template_name = 'ghg_standards-footprint'
-input_template_version = 0.0002
-input_template_columns = {'model_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff', 'd_coeff', 'lifetime_vmt'}
-
 
 class GHGStandardFootprint(SQABase):
     # --- database table properties ---
@@ -38,6 +34,11 @@ class GHGStandardFootprint(SQABase):
     # noinspection PyMethodParameters
     def init_database(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
+
+        input_template_name = 'ghg_standards-footprint'
+        input_template_version = 0.0002
+        input_template_columns = {'model_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
+                                  'd_coeff', 'lifetime_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -71,10 +72,9 @@ class GHGStandardFootprint(SQABase):
 if __name__ == '__main__':
     print(fileio.get_filenameext(__file__))
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = GHGStandardFootprint.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = GHGStandardFootprint.init_database('input_templates/ghg_standards-footprint.csv', session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')

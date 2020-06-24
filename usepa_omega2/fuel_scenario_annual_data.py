@@ -1,15 +1,11 @@
 """
 fuel_scenario_data.py
-==========
+=====================
 
 
 """
 
 from usepa_omega2 import *
-
-input_template_name = 'fuel_scenario_annual_data'
-input_template_version = 0.0002
-input_template_columns = {'fuel_id', 'fuel_scenario_id', 'calendar_year', 'cost_dollars_per_unit', 'upstream_co2_grams_per_unit'}
 
 
 class FuelScenarioAnnualData(SQABase):
@@ -34,6 +30,11 @@ class FuelScenarioAnnualData(SQABase):
     # noinspection PyMethodParameters
     def init_database(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
+
+        input_template_name = 'fuel_scenario_annual_data'
+        input_template_version = 0.0002
+        input_template_columns = {'fuel_id', 'fuel_scenario_id', 'calendar_year', 'cost_dollars_per_unit',
+                                  'upstream_co2_grams_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -65,10 +66,9 @@ class FuelScenarioAnnualData(SQABase):
 if __name__ == '__main__':
     print(fileio.get_filenameext(__file__))
 
-    session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = FuelScenarioAnnualData.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = FuelScenarioAnnualData.init_database('input_templates/fuel_scenario_annual_data.csv', session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')
