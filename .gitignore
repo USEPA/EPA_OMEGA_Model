@@ -119,3 +119,4 @@ composer.lock
 
 # Mac
 *.DS_Store
+/__dump/*

@@ -9,7 +9,7 @@ import file_eye_oh as fileio
 
 import pandas as pd
 
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, Enum, Float
+from sqlalchemy import Column, String, create_engine, ForeignKey, Enum, Float, Integer, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 

@@ -11,7 +11,7 @@ from usepa_omega2 import *
 from manufacturers import *
 from vehicles import *
 from vehicle_annual_data import *
-from GHG_standards import  *
+from GHG_standards_flat import  *
 from market_classes import *
 from cost_curves import *
 from fuels import *

@@ -1,26 +1,25 @@
 """
-fuel_scenario_data.py
-==========
+GHG_standards_flat.py
+=====================
 
 
 """
 
 from usepa_omega2 import *
 
-input_template_name = 'fuel_scenario_annual_data'
+input_template_name = 'ghg_standards-flat'
 input_template_version = 0.0002
-input_template_columns = {'fuel_id', 'fuel_scenario_id', 'calendar_year', 'cost_dollars_per_unit', 'upstream_co2_grams_per_unit'}
+input_template_columns = {'model_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
 
 
-class FuelScenarioAnnualData(SQABase):
+class GHGStandardFlat(SQABase):
     # --- database table properties ---
-    __tablename__ = 'fuel_scenario_annual_data'
-    index = Column('index', Integer, primary_key=True)
-    fuel_ID = Column('fuel_id', String)
-    scenario_ID = Column('scenario_id', String)
-    calendar_year = Column(Numeric)
-    cost_dollars_per_unit = Column(Float)
-    upstream_CO2_per_unit = Column('upstream_co2_per_unit', Float)
+    __tablename__ = 'ghg_standards'
+    index = Column(Integer, primary_key=True)
+    model_year = Column(Numeric)
+    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    GHG_target_CO2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)
+    lifetime_VMT = Column('lifetime_vmt', Float)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -43,18 +42,15 @@ class FuelScenarioAnnualData(SQABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            # TODO: do we need to validate no missing years, years in sequential order?
-
             if not template_errors:
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(FuelScenarioAnnualData(
-                        fuel_ID=df.loc[i, 'fuel_id'],
-                        scenario_ID=df.loc[i, 'fuel_scenario_id'],
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        cost_dollars_per_unit=df.loc[i, 'cost_dollars_per_unit'],
-                        upstream_CO2_per_unit=df.loc[i, 'upstream_co2_grams_per_unit'],
+                    obj_list.append(GHGStandardFlat(
+                        model_year=df.loc[i, 'model_year'],
+                        reg_class_ID=df.loc[i, 'reg_class_id'],
+                        GHG_target_CO2_grams_per_mile=df.loc[i, 'ghg_target_co2_grams_per_mile'],
+                        lifetime_VMT=df.loc[i, 'lifetime_vmt'],
                     ))
                 session.add_all(obj_list)
                 session.flush()
@@ -68,7 +64,7 @@ if __name__ == '__main__':
     session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = FuelScenarioAnnualData.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = GHGStandardFlat.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')

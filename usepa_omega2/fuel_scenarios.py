@@ -1,23 +1,22 @@
 """
-fuels.py
-========
+fuel_scenarios.py
+=================
 
 
 """
 
 from usepa_omega2 import *
 
-input_template_name = 'fuels'
+input_template_name = 'fuel_scenarios'
 input_template_version = 0.0002
-input_template_columns = {'fuel_id', 'unit', 'energy_density_megajoules_per_unit'}
+input_template_columns = {'fuel_scenario_id', 'dollar_year'}
 
 
-class Fuel(SQABase):
+class FuelScenario(SQABase):
     # --- database table properties ---
-    __tablename__ = 'fuels'
-    fuel_ID = Column('fuel_id', String, primary_key=True)
-    unit = Column(Enum(*fuel_units, validate_strings=True))
-    energy_density_MJ_per_unit = Column('energy_density_megajoules_per_unit', Float)
+    __tablename__ = 'fuel_scenarios'
+    fuel_scenario_ID = Column('fuel_scenario_id', String, primary_key=True)
+    dollar_year = Column('dollar_year', Numeric)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -41,10 +40,9 @@ class Fuel(SQABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(Fuel(
-                        fuel_ID=df.loc[i, 'fuel_id'],
-                        unit=df.loc[i, 'unit'],
-                        energy_density_MJ_per_unit=df.loc[i, 'energy_density_megajoules_per_unit'],
+                    obj_list.append(FuelScenario(
+                        fuel_scenario_ID=df.loc[i, 'fuel_scenario_id'],
+                        dollar_year=df.loc[i, 'dollar_year'],
                     ))
                 session.add_all(obj_list)
                 session.flush()
@@ -58,7 +56,7 @@ if __name__ == '__main__':
     session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
 
-    init_fail = Fuel.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
+    init_fail = FuelScenario.init_database('input_templates/%s.csv' % input_template_name, session, verbose=True)
 
     if not init_fail:
         dump_database_to_csv(engine, '__dump')
