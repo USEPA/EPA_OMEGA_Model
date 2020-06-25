@@ -14,6 +14,7 @@ from vehicle_annual_data import *
 from GHG_standards_flat import  *
 from market_classes import *
 from cost_curves import *
+from cost_clouds import *
 from fuels import *
 from fuel_scenario_annual_data import *
 from showroom_data import *

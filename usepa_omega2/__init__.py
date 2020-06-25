@@ -52,6 +52,7 @@ class OMEGA2RuntimeOptions(object):
         self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'
         self.cost_curves_file = 'input_templates/cost_curves_TEMP.csv'
         self.cost_clouds_file = 'input_templates/cost_clouds.csv'
+        self.cost_curve_frontier_affinity_factor = 0.75
 
 
 o2_options = OMEGA2RuntimeOptions()

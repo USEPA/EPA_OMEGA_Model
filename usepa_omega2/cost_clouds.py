@@ -47,7 +47,7 @@ class CostCloudPoint(SQABase):
 
             if not template_errors:
                 obj_list = []
-                # load data into database
+                # load cloud data into database
                 for i in df.index:
                     obj_list.append(CostCloudPoint(
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
@@ -56,7 +56,66 @@ class CostCloudPoint(SQABase):
                         CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 session.add_all(obj_list)
+                oringal_echo = engine.echo
+                engine.echo = False  # cloud has a lot of points... turn off echo
+                if verbose:
+                    print('\nAdding cost cloud to database...')
                 session.flush()
+                engine.echo = oringal_echo
+
+            # convert cost clouds into curves and set up cost_curves table...
+            cost_curve_classes = df['cost_curve_class'].unique()
+            # for each cost curve class
+            for cost_curve_class in cost_curve_classes:
+                print(cost_curve_class)
+                class_cloud = df[df['cost_curve_class'] == cost_curve_class]
+                cloud_model_years = class_cloud['model_year'].unique()
+                # for each model year
+                for model_year in cloud_model_years:
+                    print(model_year)
+                    cloud = class_cloud[class_cloud['model_year'] == model_year]
+
+                    # vars to hold column names
+                    combined_GHG_gpmi = 'cert_co2_grams_per_mile'
+                    combined_GHG_cost = 'new_vehicle_cost'
+
+                    if verbose and model_year == cloud_model_years.min():
+                        plt.figure()
+                        plt.plot(cloud[combined_GHG_gpmi], cloud[combined_GHG_cost], '.')
+                        plt.title('Cost versus CO2 %s' % cost_curve_class)
+                        plt.xlabel('Combined GHG CO2 [g/mi]')
+                        plt.ylabel('Combined GHG Cost [$]')
+                        plt.grid()
+
+                    # define frontier lists
+                    min_co2_gpmi = []
+                    min_co2_cost = []
+                    # find frontier starting point, lowest GHGs, and add to frontier lists
+                    min_co2_gpmi_index = cloud[combined_GHG_gpmi].idxmin()
+                    min_co2_gpmi.append(cloud[combined_GHG_gpmi].loc[min_co2_gpmi_index])
+                    min_co2_cost.append(cloud[combined_GHG_cost].loc[min_co2_gpmi_index])
+
+                    # keep lower cost points
+                    cloud = cloud[cloud[combined_GHG_cost] < min_co2_cost[-1]]
+                    while len(cloud):
+                        # calculate frontier factor (more negative is more better) = slope of each point relative
+                        # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
+                        cloud['frontier_factor'] = (cloud[combined_GHG_cost] - min_co2_cost[-1]) / (
+                                    cloud[combined_GHG_gpmi] - min_co2_gpmi[-1]) ** o2_options.cost_curve_frontier_affinity_factor
+
+                        # find next frontier point, lowest slope, and add to frontier lists
+                        min_co2_gpmi_index = cloud['frontier_factor'].idxmin()
+                        min_co2_gpmi.append(cloud[combined_GHG_gpmi].loc[min_co2_gpmi_index])
+                        min_co2_cost.append(cloud[combined_GHG_cost].loc[min_co2_gpmi_index])
+
+                        # keep lower cost points
+                        cloud = cloud[cloud[combined_GHG_cost] < min_co2_cost[-1]]
+
+                    if verbose and model_year == cloud_model_years.min():
+                        plt.plot(min_co2_gpmi, min_co2_cost, 'r-')
+                    CostCurvePoint.init_database_from_lists(cost_curve_class, model_year, min_co2_gpmi, min_co2_cost, session, verbose=False)
+
+            plt.show()
 
         return template_errors
 
@@ -68,13 +127,13 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    from cost_curves import *
+
     SQABase.metadata.create_all(engine)
 
     init_fail = []
     init_fail = init_fail + CostCloudPoint.init_database(o2_options.cost_clouds_file, session,
                                                          verbose=o2_options.verbose)
-
-    # TODO:convert cost clouds to cost curves...
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
