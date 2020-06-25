@@ -41,9 +41,9 @@ class Vehicle(SQABase):
         print('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.0002
+        input_template_version = 0.0003
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'hauling_class',
-                                  'cost_curve_class', 'showroom_fuel_id', 'market_class_id', 'sales'}
+                                  'cost_curve_class', 'showroom_fuel_id', 'market_class_id', 'sales', 'cert_co2_grams_per_mile'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -66,6 +66,7 @@ class Vehicle(SQABase):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         showroom_fuel_ID=df.loc[i, 'showroom_fuel_id'],
                         market_class_ID=df.loc[i, 'market_class_id'],
+                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                     # TODO: fueling_class??
                     # TODO: cost_dollars = lookup from cost curve based on CO2 and cost_curve class...
@@ -83,6 +84,8 @@ if __name__ == '__main__':
     from manufacturers import *  # needed for manufacturers table
     from market_classes import *  # needed for market class ID
     from fuels import *  # needed for showroom fuel ID
+    from cost_curves import *  # needed for vehicle cost from CO2
+    from cost_clouds import *  # needed for vehicle cost from CO2
 
     SQABase.metadata.create_all(engine)
 
@@ -90,8 +93,12 @@ if __name__ == '__main__':
     init_fail = init_fail + Manufacturer.init_database(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
     init_fail = init_fail + MarketClass.init_database(o2_options.market_classes_file, session, verbose=o2_options.verbose)
     init_fail = init_fail + Fuel.init_database(o2_options.fuels_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + CostCloudPoint.init_database(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
 
     init_fail = init_fail + Vehicle.init_database(o2_options.vehicles_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+
+
+

@@ -7,6 +7,7 @@ cost_clouds.py
 
 from usepa_omega2 import *
 
+import cost_curves
 
 class CostCloudPoint(SQABase):
     # --- database table properties ---
@@ -113,7 +114,7 @@ class CostCloudPoint(SQABase):
 
                     if verbose and model_year == cloud_model_years.min():
                         plt.plot(min_co2_gpmi, min_co2_cost, 'r-')
-                    CostCurvePoint.init_database_from_lists(cost_curve_class, model_year, min_co2_gpmi, min_co2_cost, session, verbose=False)
+                    cost_curves.CostCurvePoint.init_database_from_lists(cost_curve_class, model_year, min_co2_gpmi, min_co2_cost, session, verbose=False)
 
             plt.show()
 
@@ -126,8 +127,6 @@ class CostCloudPoint(SQABase):
 if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
-
-    from cost_curves import *
 
     SQABase.metadata.create_all(engine)
 
