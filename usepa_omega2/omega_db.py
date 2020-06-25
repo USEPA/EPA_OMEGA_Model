@@ -21,9 +21,12 @@ session.execute(
     'pragma foreign_keys=on')  # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
 
 
-def dump_database_to_csv(engine, output_folder):
+def dump_database_to_csv(engine, output_folder, verbose=False):
     # validate output folder
     fileio.validate_folder(output_folder)
+
+    if verbose:
+        print('\ndumping %s database to %s...' % (engine.name, output_folder))
 
     # dump tables to .csv files using pandas!
     for table in engine.table_names():

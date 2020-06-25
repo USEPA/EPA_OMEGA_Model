@@ -38,6 +38,9 @@ class ShowroomData(SQABase):
 
 
 if __name__ == '__main__':
-    print(fileio.get_filenameext(__file__))
+    if '__file__' in locals():
+        print(fileio.get_filenameext(__file__))
 
     SQABase.metadata.create_all(engine)
+
+    # dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)

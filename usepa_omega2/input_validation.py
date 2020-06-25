@@ -24,7 +24,7 @@ def validate_template_version_info(filename, input_template_name, input_template
     template_name = version_data[name_index + 1]
     if not template_name == input_template_name:
         error_list.append(
-            'Wrong input template name, got "%s", was expecting "%s"' % (input_template_name, template_name))
+            'Wrong input template name, got "%s", was expecting "%s"' % (template_name, input_template_name))
     elif verbose:
         print('Template name OK')
 
@@ -36,7 +36,7 @@ def validate_template_version_info(filename, input_template_name, input_template
     template_version = version_data[version_index + 1]
     if not template_version == input_template_version:
         error_list.append(
-            'Wrong input template version, got "%f", was expecting "%f"' % (input_template_version, template_version))
+            'Wrong input template version, got "%f", was expecting "%f"' % (template_version, input_template_version))
     elif verbose:
         print('Template version OK')
 

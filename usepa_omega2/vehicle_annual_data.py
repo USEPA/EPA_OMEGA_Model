@@ -17,7 +17,8 @@ class VehicleAnnualData(SQABase):
 
 
 if __name__ == '__main__':
-    print(fileio.get_filenameext(__file__))
+    if '__file__' in locals():
+        print(fileio.get_filenameext(__file__))
 
     from manufacturers import *  # required by vehicles
     from fuels import *  # required by vehicles
@@ -26,3 +27,5 @@ if __name__ == '__main__':
 
     session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
+
+    # dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)

@@ -63,12 +63,13 @@ class CostCurvePoint(SQABase):
 
 
 if __name__ == '__main__':
-    print(fileio.get_filenameext(__file__))
+    if '__file__' in locals():
+        print(fileio.get_filenameext(__file__))
 
     SQABase.metadata.create_all(engine)
 
-    # TODO: use actual cost_curve file.  For now... using same file as cost_clouds
-    init_fail = CostCurvePoint.init_database('input_templates/cost_clouds.csv', session, verbose=True)
+    init_fail = []
+    init_fail = init_fail + CostCurvePoint.init_database(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, '__dump')
+        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)

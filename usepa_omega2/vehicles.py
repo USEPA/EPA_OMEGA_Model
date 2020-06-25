@@ -77,7 +77,8 @@ class Vehicle(SQABase):
 
 
 if __name__ == '__main__':
-    print(fileio.get_filenameext(__file__))
+    if '__file__' in locals():
+        print(fileio.get_filenameext(__file__))
 
     from manufacturers import *  # needed for manufacturers table
     from market_classes import *  # needed for market class ID
@@ -86,11 +87,11 @@ if __name__ == '__main__':
     SQABase.metadata.create_all(engine)
 
     init_fail = []
-    init_fail = init_fail + Manufacturer.init_database('input_templates/manufacturers.csv', session, verbose=True)
-    init_fail = init_fail + MarketClass.init_database('input_templates/market_classes.csv', session, verbose=True)
-    init_fail = init_fail + Fuel.init_database('input_templates/fuels.csv', session, verbose=True)
+    init_fail = init_fail + Manufacturer.init_database(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + MarketClass.init_database(o2_options.market_classes_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Fuel.init_database(o2_options.fuels_file, session, verbose=o2_options.verbose)
 
-    init_fail = init_fail + Vehicle.init_database('input_templates/vehicles.csv', session, verbose=True)
+    init_fail = init_fail + Vehicle.init_database(o2_options.vehicles_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, '__dump')
+        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
