@@ -72,6 +72,15 @@ class CostCurvePoint(SQABase):
         session.add_all(obj_list)
         session.flush()
 
+    def get_cost(session, cost_curve_class, model_year, co2_gpmi):
+        result = session.query(CostCurvePoint.cost_dollars, CostCurvePoint.CO2_grams_per_mile).filter(CostCurvePoint.calendar_year == model_year).filter(CostCurvePoint.cost_curve_class == cost_curve_class)
+        curve_cost_dollars = [r[0] for r in result]
+        curve_co2_gpmi = [r[1] for r in result]
+
+        cost_curve = scipy.interpolate.interp1d(curve_co2_gpmi, curve_cost_dollars, fill_value='extrapolate')
+
+        return cost_curve(co2_gpmi).item()
+
     def calculate_generalized_cost(self, market_class_ID):
         print(market_class_ID)
 

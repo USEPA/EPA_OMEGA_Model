@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 
 # from copy import copy, deepcopy
 # import numpy as np
+import scipy
 # import networkx as nx
 # import itertools
 # import cProfile
