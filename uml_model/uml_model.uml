@@ -65,7 +65,6 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_ecoowJkbEeq1MNw_X5quEQ" name="fuels">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_fqJkwJkbEeq1MNw_X5quEQ" name="fuel_id" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_SjUq4K80EeqO0d-UmaSoow" name="unit" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_T0fX0K80EeqO0d-UmaSoow" name="energy_density_megajoules_per_unit" visibility="public"/>
       <nestedClassifier xmi:type="uml:Enumeration" xmi:id="_37H6sLGYEeqot_EVL7aS4w" name="fuel_units">
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_37H6sbGYEeqot_EVL7aS4w" name="gallon"/>
@@ -105,13 +104,15 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_z1shEKsvEeq6oJG-GxIr5g" name="ghg_target_co2_grams_per_mile"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_mNXNsKswEeq6oJG-GxIr5g" name="lifetime_vmt"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_Q9NG8KspEeq6oJG-GxIr5g" name="showroom_data">
+    <packagedElement xmi:type="uml:Class" xmi:id="_Q9NG8KspEeq6oJG-GxIr5g" name="demanded_sales_annual_data">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_kypDgKstEeq6oJG-GxIr5g" name="market_class_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_muJt8KstEeq6oJG-GxIr5g" name="annual_vmt"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_-ql48KstEeq6oJG-GxIr5g" name="payback_years"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_tNKWcK8XEeqO0d-UmaSoow" name="price_amortization_period" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_gKYnMK8YEeqO0d-UmaSoow" name="share_weight" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_zi9lcK8YEeqO0d-UmaSoow" name="discount_rate" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_EepNsLpBEeqITOQjKacqMg" name="demanded_sales_count" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MKuIkLpBEeqITOQjKacqMg" name="calendar_year" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_YXJMIKstEeq6oJG-GxIr5g" name="market_classes">
       <ownedAttribute xmi:type="uml:Property" xmi:id="__O2R4LGWEeqot_EVL7aS4w" name="index"/>
@@ -129,15 +130,6 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_B5I-oK8KEeqO0d-UmaSoow" name="population_count" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_z955MK8REeqO0d-UmaSoow" name="avg_income_dollars" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_7IkJEK8REeqO0d-UmaSoow" name="calendar_year" visibility="public"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Class" xmi:id="_8smDcK8YEeqO0d-UmaSoow" name="showroom_annual_data">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="__O1WsK8YEeqO0d-UmaSoow" name="market_class_id" visibility="public">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_CxRisK8ZEeqO0d-UmaSoow" name="calendar_year" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_F8BAYK8ZEeqO0d-UmaSoow" name="demanded_sales_count" visibility="public">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EFloat"/>
-      </ownedAttribute>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_yG9xcLGdEeqot_EVL7aS4w"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_6BmswLGdEeqot_EVL7aS4w" name="" memberEnd="_ab4EAKstEeq6oJG-GxIr5g"/>
