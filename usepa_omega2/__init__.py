@@ -50,7 +50,7 @@ class OMEGA2RuntimeOptions(object):
         self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'  # or ghg_standards-footprint.csv
         self.fuel_scenarios_file = 'input_templates/fuel_scenarios.csv'
         self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'
-        self.cost_curves_file = 'input_templates/cost_curves_TEMP.csv'
+        self.cost_curves_file = 'input_templates/cost_curves.csv'
         self.cost_clouds_file = 'input_templates/cost_clouds.csv'
         self.cost_curve_frontier_affinity_factor = 0.75
 

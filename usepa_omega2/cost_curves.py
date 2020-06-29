@@ -15,8 +15,8 @@ class CostCurvePoint(SQABase):
 
     cost_curve_class = Column(String)
     calendar_year = Column(Numeric)
-    cost_dollars = Column(Float)  # TODO:should this be a pickled list or array or just a single point??
-    CO2_grams_per_mile = Column('co2_grams_per_mile', Float)  # TODO:should this be a pickled list or array or just a single point??
+    cost_dollars = Column(Float)
+    CO2_grams_per_mile = Column('co2_grams_per_mile', Float)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -45,7 +45,7 @@ class CostCurvePoint(SQABase):
 
             if not template_errors:
                 obj_list = []
-                # load data into database TODO: need to calculate frontier first...
+
                 for i in df.index:
                     obj_list.append(CostCurvePoint(
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
