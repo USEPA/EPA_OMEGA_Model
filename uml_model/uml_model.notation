@@ -154,7 +154,7 @@
           <element xmi:type="uml:Property" href="uml_model.uml#_ppKqYJUwEeq1MNw_X5quEQ"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_JG7cUZUyEeq1MNw_X5quEQ"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_pyurgJUvEeq1MNw_X5quEQ" type="Property_ClassAttributeLabel" fontName="Segoe UI">
+        <children xmi:type="notation:Shape" xmi:id="_pyurgJUvEeq1MNw_X5quEQ" type="Property_ClassAttributeLabel" fontName="Segoe UI" bold="true">
           <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_REMLpKscEeq6oJG-GxIr5g" source="PapyrusCSSForceValue">
             <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_REMLpascEeq6oJG-GxIr5g" key="fontHeight" value="true"/>
             <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_REOA0ascEeq6oJG-GxIr5g" key="bold" value="true"/>
