@@ -605,22 +605,40 @@
         <layoutConstraint xmi:type="notation:Location" xmi:id="_7do0oZktEeq1MNw_X5quEQ" y="15"/>
       </children>
       <children xmi:type="notation:BasicCompartment" xmi:id="_7do0opktEeq1MNw_X5quEQ" type="Class_AttributeCompartment">
-        <children xmi:type="notation:Shape" xmi:id="_GLuqEKdHEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel" fillColor="12632256" gradient="8421504, 16777215, 0">
+        <children xmi:type="notation:Shape" xmi:id="_GLuqEKdHEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel" fontColor="255" fontName="Segoe UI" fillColor="12632256" gradient="8421504, 16777215, 0">
           <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5vLUYKsYEeq6oJG-GxIr5g" source="PapyrusCSSForceValue">
             <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5vNwoKsYEeq6oJG-GxIr5g" key="gradient" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66ZJ0Lr8EeqonKUP3N2Jqg" key="fontHeight" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66eCUrr8EeqonKUP3N2Jqg" key="bold" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66fQcbr8EeqonKUP3N2Jqg" key="italic" value="true"/>
           </eAnnotations>
           <element xmi:type="uml:Property" href="uml_model.uml#_GLNFoKdHEeqRUoM6l8Mfgg"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_GLuqEadHEeqRUoM6l8Mfgg"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_OCa5gKdHEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel">
+        <children xmi:type="notation:Shape" xmi:id="_OCa5gKdHEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel" fontColor="255" fontName="Segoe UI">
+          <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_66cNILr8EeqonKUP3N2Jqg" source="PapyrusCSSForceValue">
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66c0MLr8EeqonKUP3N2Jqg" key="fontHeight" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66epYLr8EeqonKUP3N2Jqg" key="bold" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66f3gLr8EeqonKUP3N2Jqg" key="italic" value="true"/>
+          </eAnnotations>
           <element xmi:type="uml:Property" href="uml_model.uml#_OB7xUKdHEeqRUoM6l8Mfgg"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_OCa5gadHEeqRUoM6l8Mfgg"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_TjGT0KdHEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel">
+        <children xmi:type="notation:Shape" xmi:id="_TjGT0KdHEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel" fontColor="255" fontName="Segoe UI">
+          <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_66dbQLr8EeqonKUP3N2Jqg" source="PapyrusCSSForceValue">
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66dbQbr8EeqonKUP3N2Jqg" key="fontHeight" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66epYbr8EeqonKUP3N2Jqg" key="bold" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66iTwLr8EeqonKUP3N2Jqg" key="italic" value="true"/>
+          </eAnnotations>
           <element xmi:type="uml:Property" href="uml_model.uml#_TimkkKdHEeqRUoM6l8Mfgg"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_TjGT0adHEeqRUoM6l8Mfgg"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_9aGxgKdIEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel">
+        <children xmi:type="notation:Shape" xmi:id="_9aGxgKdIEeqRUoM6l8Mfgg" type="Property_ClassAttributeLabel" fontColor="255" fontName="Segoe UI">
+          <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_66eCULr8EeqonKUP3N2Jqg" source="PapyrusCSSForceValue">
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66eCUbr8EeqonKUP3N2Jqg" key="fontHeight" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66fQcLr8EeqonKUP3N2Jqg" key="bold" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_66iTwbr8EeqonKUP3N2Jqg" key="italic" value="true"/>
+          </eAnnotations>
           <element xmi:type="uml:Property" href="uml_model.uml#_9Zo3cKdIEeqRUoM6l8Mfgg"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_9aGxgadIEeqRUoM6l8Mfgg"/>
         </children>
