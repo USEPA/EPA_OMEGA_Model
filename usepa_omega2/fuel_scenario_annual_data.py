@@ -13,7 +13,7 @@ class FuelScenarioAnnualData(SQABase):
     __tablename__ = 'fuel_scenario_annual_data'
     index = Column('index', Integer, primary_key=True)
     fuel_ID = Column('fuel_id', String)
-    scenario_ID = Column('scenario_id', String)
+    fuel_scenario_ID = Column('fuel_scenario_id', String)
     calendar_year = Column(Numeric)
     cost_dollars_per_unit = Column(Float)
     upstream_CO2_per_unit = Column('upstream_co2_per_unit', Float)
@@ -28,7 +28,7 @@ class FuelScenarioAnnualData(SQABase):
         return s
 
     # noinspection PyMethodParameters
-    def init_database(filename, session, verbose=False):
+    def init_database_from_file(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
 
         input_template_name = 'fuel_scenario_annual_data'
@@ -52,7 +52,7 @@ class FuelScenarioAnnualData(SQABase):
                 for i in df.index:
                     obj_list.append(FuelScenarioAnnualData(
                         fuel_ID=df.loc[i, 'fuel_id'],
-                        scenario_ID=df.loc[i, 'fuel_scenario_id'],
+                        fuel_scenario_ID=df.loc[i, 'fuel_scenario_id'],
                         calendar_year=df.loc[i, 'calendar_year'],
                         cost_dollars_per_unit=df.loc[i, 'cost_dollars_per_unit'],
                         upstream_CO2_per_unit=df.loc[i, 'upstream_co2_grams_per_unit'],
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     SQABase.metadata.create_all(engine)
 
     init_fail = []
-    init_fail = init_fail + FuelScenarioAnnualData.init_database(o2_options.fuel_scenario_annual_data_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + FuelScenarioAnnualData.init_database_from_file(o2_options.fuel_scenario_annual_data_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)

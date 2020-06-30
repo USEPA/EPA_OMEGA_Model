@@ -2,6 +2,7 @@
 __init.py__
 ===========
 
+
 """
 
 import pandas as pd
@@ -15,7 +16,7 @@ import matplotlib.pyplot as plt
 
 # from copy import copy, deepcopy
 # import numpy as np
-import scipy
+import scipy.interpolate
 # import networkx as nx
 # import itertools
 # import cProfile
@@ -47,8 +48,9 @@ class OMEGA2RuntimeOptions(object):
         self.manufacturers_file = 'input_templates/manufacturers.csv'
         self.market_classes_file = 'input_templates/market_classes.csv'
         self.vehicles_file = 'input_templates/vehicles.csv'
-        self.showroom_data_file = 'input_templates/showroom_data.csv'
-        self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'  # or ghg_standards-footprint.csv
+        self.demanded_sales_annual_data_file = 'input_templates/demanded_sales_annual_data.csv'
+        # self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
+        self.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
         self.fuel_scenarios_file = 'input_templates/fuel_scenarios.csv'
         self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'
         self.cost_curves_file = 'input_templates/cost_curves.csv'

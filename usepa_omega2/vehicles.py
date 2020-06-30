@@ -24,7 +24,7 @@ class Vehicle(SQABase):
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
-    cost_dollars = Column(Float)
+    new_vehicle_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
 
@@ -37,7 +37,7 @@ class Vehicle(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
-    def init_database(filename, session, verbose=False):
+    def init_database_from_file(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
@@ -69,7 +69,10 @@ class Vehicle(SQABase):
                         cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                     # TODO: fueling_class??
-                    # TODO: cost_dollars = lookup from cost curve based on CO2 and cost_curve class...
+                    obj_list[i].new_vehicle_cost_dollars = CostCurve.get_cost(session,
+                                                                              cost_curve_class=obj_list[i].cost_curve_class,
+                                                                              model_year=obj_list[i].model_year,
+                                                                              target_co2_gpmi=obj_list[i].cert_CO2_grams_per_mile)
                     # TODO: vehicle_ID=df.loc[i, 'sales'], # need to create age 0 entry in vehicle annual data...
                 session.add_all(obj_list)
                 session.flush()
@@ -90,15 +93,13 @@ if __name__ == '__main__':
     SQABase.metadata.create_all(engine)
 
     init_fail = []
-    init_fail = init_fail + Manufacturer.init_database(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + MarketClass.init_database(o2_options.market_classes_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + Fuel.init_database(o2_options.fuels_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + CostCloudPoint.init_database(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
+    # init_fail = init_fail + CostCloud.init_database_from_file(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + CostCurve.init_database_from_file(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
 
-    init_fail = init_fail + Vehicle.init_database(o2_options.vehicles_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
-
-
-

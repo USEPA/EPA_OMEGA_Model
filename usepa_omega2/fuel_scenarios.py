@@ -21,7 +21,7 @@ class FuelScenario(SQABase):
         return "<Fuel('%s', %f MJ/%s)>" % (self.name, self.energy_density_MJ_per_unit, self.unit)
 
     # noinspection PyMethodParameters
-    def init_database(filename, session, verbose=False):
+    def init_database_from_file(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
 
         input_template_name = 'fuel_scenarios'
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     SQABase.metadata.create_all(engine)
 
     init_fail = []
-    init_fail = init_fail + FuelScenario.init_database(o2_options.fuel_scenarios_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + FuelScenario.init_database_from_file(o2_options.fuel_scenarios_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)

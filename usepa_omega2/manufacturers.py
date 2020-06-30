@@ -26,7 +26,7 @@ class Manufacturer(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
-    def init_database(filename, session, verbose=False):
+    def init_database_from_file(filename, session, verbose=False):
         print('\nInitializing database from %s...' % filename)
 
         input_template_name = 'manufacturers'
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     SQABase.metadata.create_all(engine)
 
     init_fail = []
-    init_fail = init_fail + Manufacturer.init_database(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)

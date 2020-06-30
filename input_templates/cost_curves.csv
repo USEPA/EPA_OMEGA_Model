@@ -1,5 +1,5 @@
-input_template_name:,cost_curves,input_template_version:,0.0001
-cost_curve_class,model_year,new_vehicle_cost,cert_co2_grams_per_mile
+input_template_name:,cost_curves,input_template_version:,0.0002
+cost_curve_class,model_year,new_vehicle_cost_dollars,cert_co2_grams_per_mile
 ice_MPW_LRL,2020,29888.85714,139.212063
 ice_MPW_LRL,2020,29372.12588,141.924498
 ice_MPW_LRL,2020,28571.68211,152.132802
