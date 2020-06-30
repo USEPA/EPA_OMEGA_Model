@@ -1,6 +1,6 @@
 """
 vehicles.py
-==========
+===========
 
 
 """
@@ -19,7 +19,7 @@ class Vehicle(SQABase):
     # --- static properties ---
     # vehicle_nameplate = Column(String, default='USALDV')
     model_year = Column(Numeric)
-    # fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
+    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
@@ -57,7 +57,7 @@ class Vehicle(SQABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(Vehicle(
+                    veh = Vehicle(
                         vehicle_ID=df.loc[i, 'vehicle_id'],
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
@@ -67,12 +67,20 @@ class Vehicle(SQABase):
                         showroom_fuel_ID=df.loc[i, 'showroom_fuel_id'],
                         market_class_ID=df.loc[i, 'market_class_id'],
                         cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
-                    ))
-                    # TODO: fueling_class??
-                    obj_list[i].new_vehicle_cost_dollars = CostCurve.get_cost(session,
-                                                                              cost_curve_class=obj_list[i].cost_curve_class,
-                                                                              model_year=obj_list[i].model_year,
-                                                                              target_co2_gpmi=obj_list[i].cert_CO2_grams_per_mile)
+                    )
+
+                    if 'BEV' in veh.market_class_ID:
+                        veh.fueling_class = 'BEV'
+                    else:
+                        veh.fueling_class = 'ICE'
+
+                    veh.new_vehicle_cost_dollars = CostCurve.get_cost(session,
+                                                                        cost_curve_class=veh.cost_curve_class,
+                                                                        model_year=veh.model_year,
+                                                                        target_co2_gpmi=veh.cert_CO2_grams_per_mile)
+
+                    obj_list.append(veh)
+
                     # TODO: vehicle_ID=df.loc[i, 'sales'], # need to create age 0 entry in vehicle annual data...
                 session.add_all(obj_list)
                 session.flush()
