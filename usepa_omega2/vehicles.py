@@ -11,8 +11,11 @@ from usepa_omega2 import *
 class Vehicle(SQABase):
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    index = Column('index', Integer, primary_key=True)
-    vehicle_ID = Column('vehicle_id', String)
+    # index = Column('index', Integer, primary_key=True)
+    # vehicle_ID = Column('vehicle_id', String)
+
+    vehicle_ID = Column('vehicle_id', Integer, primary_key=True)
+    name = Column('name', String)
     manufacturer_ID = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
     manufacturer = relationship('Manufacturer', back_populates='vehicles')
 
@@ -54,11 +57,11 @@ class Vehicle(SQABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
+                # obj_list = []
                 # load data into database
                 for i in df.index:
                     veh = Vehicle(
-                        vehicle_ID=df.loc[i, 'vehicle_id'],
+                        name=df.loc[i, 'vehicle_id'],
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
@@ -79,11 +82,12 @@ class Vehicle(SQABase):
                                                                         model_year=veh.model_year,
                                                                         target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
-                    obj_list.append(veh)
+                    session.add(veh)    # update database so vehicle_annual_data foreign key succeeds...
+                    session.flush()
 
-                    # TODO: vehicle_ID=df.loc[i, 'sales'], # need to create age 0 entry in vehicle annual data...
-                session.add_all(obj_list)
-                session.flush()
+                    VehicleAnnualData.update_registered_count(session, vehicle_ID=veh.vehicle_ID,
+                                                              calendar_year=veh.model_year,
+                                                              registered_count=df.loc[i, 'sales'])
 
         return template_errors
 
@@ -97,6 +101,7 @@ if __name__ == '__main__':
     from fuels import *  # needed for showroom fuel ID
     from cost_curves import *  # needed for vehicle cost from CO2
     from cost_clouds import *  # needed for vehicle cost from CO2
+    from vehicle_annual_data import *   # needed for vehicle annual data (age zero registered count)
 
     SQABase.metadata.create_all(engine)
 

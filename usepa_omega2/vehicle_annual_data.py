@@ -11,9 +11,15 @@ from usepa_omega2 import *
 class VehicleAnnualData(SQABase):
     # --- database table properties ---
     __tablename__ = 'vehicle_annual_data'
-    vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'), primary_key=True)
-    calendar_year = Column(Integer)
-    registered_count = Column(Integer)
+    index = Column('index', Integer, primary_key=True)
+    # vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.index'))
+    vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
+    calendar_year = Column(Numeric)
+    registered_count = Column(Numeric)
+
+    def update_registered_count(session, vehicle_ID, calendar_year, registered_count):
+        session.add(VehicleAnnualData(vehicle_ID=vehicle_ID, calendar_year=calendar_year, registered_count=registered_count))
+        session.flush()
 
 
 if __name__ == '__main__':
@@ -27,5 +33,3 @@ if __name__ == '__main__':
 
     session = Session(bind=engine)
     SQABase.metadata.create_all(engine)
-
-    # dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
