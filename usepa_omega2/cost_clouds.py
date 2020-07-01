@@ -121,8 +121,8 @@ class CostCloud(SQABase):
 
         return template_errors
 
-    def calculate_generalized_cost(self, market_class_ID):
-        print(market_class_ID)
+    def calculate_generalized_cost(self, cost_curve_class):
+        print(cost_curve_class)
 
 
 if __name__ == '__main__':

@@ -120,3 +120,4 @@ composer.lock
 # Mac
 *.DS_Store
 /__dump/*
+/usepa_omega2/_sequester/

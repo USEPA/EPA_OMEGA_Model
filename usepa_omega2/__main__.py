@@ -8,17 +8,17 @@ OMEGA2 top level code
 
 from usepa_omega2 import *
 
-from manufacturers import *
-from vehicles import *
-from vehicle_annual_data import *
-from GHG_standards_flat import  *
+from fuels import *
+from fuel_scenarios import *
+from fuel_scenario_annual_data import *
 from market_classes import *
 from cost_curves import *
 from cost_clouds import *
-from fuels import *
-from fuel_scenario_annual_data import *
-from showroom_data import *
+from GHG_standards_flat import *
 from demanded_sales_annual_data import *
+from manufacturers import *
+from vehicles import *
+from vehicle_annual_data import *
 
 
 if __name__ == "__main__":
@@ -31,6 +31,20 @@ if __name__ == "__main__":
 
     SQABase.metadata.create_all(engine)
 
-    # TODO: need to update self-test here:
-    # init_fail = []
-    # init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+    init_fail = []
+    init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + FuelScenario.init_database_from_file(o2_options.fuel_scenarios_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + FuelScenarioAnnualData.init_database_from_file(o2_options.fuel_scenario_annual_data_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + CostCurve.init_database_from_file(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
+    # init_fail = init_fail + CostCloud.init_database_from_file(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+    # init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(o2_options.demanded_sales_annual_data_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
+
+    if not init_fail:
+        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+    else:
+        print("#FAIL")

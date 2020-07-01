@@ -7,8 +7,6 @@ vehicle_annual_data.py
 
 from usepa_omega2 import *
 
-# import vehicles
-
 
 class VehicleAnnualData(SQABase):
     # --- database table properties ---
@@ -20,7 +18,7 @@ class VehicleAnnualData(SQABase):
     age = Column(Numeric)
 
     def update_registered_count(session, vehicle_ID, calendar_year, registered_count):
-        # num_vehicle_records = session.query(func.count()).filter(VehicleAnnualData.vehicle_ID == vehicle_ID).scalar()
+        from vehicles import Vehicle
 
         age = calendar_year - session.query(Vehicle.model_year).filter(Vehicle.vehicle_ID == vehicle_ID).scalar()
 

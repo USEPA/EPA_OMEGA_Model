@@ -81,9 +81,6 @@ class CostCurve(SQABase):
 
         return cost_curve(target_co2_gpmi).item()
 
-    def calculate_generalized_cost(self, market_class_ID):
-        print(market_class_ID)
-
 
 if __name__ == '__main__':
     if '__file__' in locals():

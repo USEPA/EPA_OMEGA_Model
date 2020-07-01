@@ -7,8 +7,6 @@ vehicles.py
 
 from usepa_omega2 import *
 
-# import vehicle_annual_data
-
 
 class Vehicle(SQABase):
     # --- database table properties ---
@@ -40,6 +38,9 @@ class Vehicle(SQABase):
         return s
 
     def init_database_from_file(filename, session, verbose=False):
+        from cost_curves import CostCurve
+        from vehicle_annual_data import VehicleAnnualData
+
         print('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
