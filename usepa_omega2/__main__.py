@@ -44,6 +44,9 @@ if __name__ == "__main__":
     init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
     init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
 
+    # initial year = initial fleet model year (latest year of data)
+    o2_options.analysis_inital_year = session.query(func.max(Vehicle.model_year)).scalar()
+
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
     else:

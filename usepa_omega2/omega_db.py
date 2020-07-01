@@ -5,6 +5,9 @@ omega_db.py
 
 """
 
+from usepa_omega2 import *
+import omega_log
+
 import file_eye_oh as fileio
 
 import pandas as pd
@@ -28,10 +31,10 @@ def dump_database_to_csv(engine, output_folder, verbose=False):
     fileio.validate_folder(output_folder)
 
     if verbose:
-        print('\ndumping %s database to %s...' % (engine.name, output_folder))
+        omega_log.logwrite('\ndumping %s database to %s...' % (engine.name, output_folder))
 
     # dump tables to .csv files using pandas!
     for table in engine.table_names():
-        print(table)
+        omega_log.logwrite(table)
         sql_df = pd.read_sql("SELECT * FROM %s" % table, con=engine)
         sql_df.to_csv('%s/%s.csv' % (output_folder, table), index=False)

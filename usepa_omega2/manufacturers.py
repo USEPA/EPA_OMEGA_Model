@@ -27,7 +27,7 @@ class Manufacturer(SQABase):
         return s
 
     def init_database_from_file(filename, session, verbose=False):
-        print('\nInitializing database from %s...' % filename)
+        omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'manufacturers'
         input_template_version = 0.0003

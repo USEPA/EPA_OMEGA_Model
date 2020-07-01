@@ -22,7 +22,7 @@ class FuelScenario(SQABase):
 
     # noinspection PyMethodParameters
     def init_database_from_file(filename, session, verbose=False):
-        print('\nInitializing database from %s...' % filename)
+        omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'fuel_scenarios'
         input_template_version = 0.0002

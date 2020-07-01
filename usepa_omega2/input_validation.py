@@ -7,6 +7,8 @@ Routines to validate input file formats and/or values
 
 """
 
+from usepa_omega2 import *
+
 import pandas as pd
 
 
@@ -14,6 +16,8 @@ def validate_template_version_info(filename, input_template_name, input_template
 
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=-1, nrows=1).values.tolist()[0]
+
+    omega_log.logwrite('Validating Template Version [%s]' % filename)
 
     error_list = []
     # check template name
@@ -26,7 +30,7 @@ def validate_template_version_info(filename, input_template_name, input_template
         error_list.append(
             'Wrong input template name, got "%s", was expecting "%s"' % (template_name, input_template_name))
     elif verbose:
-        print('Template name OK')
+        omega_log.logwrite('Template name OK')
 
     # check template version
     if 'input_template_version:' not in version_data:
@@ -38,13 +42,13 @@ def validate_template_version_info(filename, input_template_name, input_template
         error_list.append(
             'Wrong input template version, got "%f", was expecting "%f"' % (template_version, input_template_version))
     elif verbose:
-        print('Template version OK')
+        omega_log.logwrite('Template version OK')
 
     if error_list:
         error_list.insert(0, '\nDetected errors in %s:' % filename)
-        if verbose:
-            for e in error_list:
-                print(e)
+        omega_log.logwrite(error_list)
+    else:
+        omega_log.logwrite('')
 
     return error_list
 
@@ -54,17 +58,18 @@ def validate_template_columns(filename, input_template_columns, columns, verbose
     error_list = []
     columns_set = set(columns)
 
+    omega_log.logwrite('Validating Columns [%s]' % filename)
     if input_template_columns.intersection(columns_set) == input_template_columns:
         if verbose:
-            print('Input columns OK')
+            omega_log.logwrite('Input columns OK')
     else:
         for c in input_template_columns.difference(columns_set):
             error_list.append('Missing column "%s" in input template' % c)
 
     if error_list:
         error_list.insert(0, '\nDetected errors in %s:' % filename)
-        if verbose:
-            for e in error_list:
-                print(e)
+        omega_log.logwrite(error_list)
+    else:
+        omega_log.logwrite('')
 
     return error_list

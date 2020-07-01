@@ -31,7 +31,7 @@ class CostCloud(SQABase):
 
     # noinspection PyMethodParameters
     def init_database_from_file(filename, session, verbose=False):
-        print('\nInitializing database from %s...' % filename)
+        omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'cost_clouds'
         input_template_version = 0.0002
@@ -69,12 +69,14 @@ class CostCloud(SQABase):
             cost_curve_classes = df['cost_curve_class'].unique()
             # for each cost curve class
             for cost_curve_class in cost_curve_classes:
-                print(cost_curve_class)
+                if verbose:
+                    print(cost_curve_class)
                 class_cloud = df[df['cost_curve_class'] == cost_curve_class]
                 cloud_model_years = class_cloud['model_year'].unique()
                 # for each model year
                 for model_year in cloud_model_years:
-                    print(model_year)
+                    if verbose:
+                        print(model_year)
                     cloud = class_cloud[class_cloud['model_year'] == model_year]
 
                     # vars to hold column names

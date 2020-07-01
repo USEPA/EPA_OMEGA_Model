@@ -26,7 +26,7 @@ class DemandedSalesAnnualData(SQABase):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
     def init_database_from_file(filename, session, verbose=False):
-        print('\nInitializing database from %s...' % filename)
+        omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'demanded_sales_annual_data'
         input_template_version = 0.0001

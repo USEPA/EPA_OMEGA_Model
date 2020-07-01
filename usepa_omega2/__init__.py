@@ -9,11 +9,14 @@ import pandas as pd
 pd.set_option('chained_assignment', 'raise')
 
 from omega_db import *
+import omega_log
 import file_eye_oh as fileio
 from input_validation import *
 
 import matplotlib.pyplot as plt
 import scipy.interpolate
+
+import os
 
 # from copy import copy, deepcopy
 # import numpy as np
@@ -56,6 +59,11 @@ class OMEGA2RuntimeOptions(object):
         self.cost_curves_file = 'input_templates/cost_curves.csv'
         self.cost_clouds_file = 'input_templates/cost_clouds.csv'
         self.cost_curve_frontier_affinity_factor = 0.75
+        self.analysis_inital_year = None
+        self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
+        self.logfilename = ''
 
 
 o2_options = OMEGA2RuntimeOptions()
+
+omega_log.init_logfile(o2_options)
