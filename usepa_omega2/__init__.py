@@ -31,6 +31,9 @@ ownership_classes = ['shared', 'private']
 reg_classes = ['car', 'truck']
 fuel_units = ['gallon', 'kWh']
 
+# import vehicles
+# import vehicle_annual_data
+
 # OMEGA2 code version number
 code_version = "phase0.0.0"
 # OMEGA2 input file format version number

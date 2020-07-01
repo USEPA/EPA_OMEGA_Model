@@ -7,13 +7,12 @@ vehicles.py
 
 from usepa_omega2 import *
 
+# import vehicle_annual_data
+
 
 class Vehicle(SQABase):
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    # index = Column('index', Integer, primary_key=True)
-    # vehicle_ID = Column('vehicle_id', String)
-
     vehicle_ID = Column('vehicle_id', Integer, primary_key=True)
     name = Column('name', String)
     manufacturer_ID = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
@@ -101,7 +100,7 @@ if __name__ == '__main__':
     from fuels import *  # needed for showroom fuel ID
     from cost_curves import *  # needed for vehicle cost from CO2
     from cost_clouds import *  # needed for vehicle cost from CO2
-    from vehicle_annual_data import *   # needed for vehicle annual data (age zero registered count)
+    # from vehicle_annual_data import *   # needed for vehicle annual data (age zero registered count)
 
     SQABase.metadata.create_all(engine)
 

@@ -27,7 +27,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_tsjx4KsqEeq6oJG-GxIr5g" name="showroom_fuel_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_vrzlcKstEeq6oJG-GxIr5g" name="market_class_id"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_AlDlEKsvEeq6oJG-GxIr5g" name="manufacturer_id"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_QQXbILr4EeqR6PiF084V6A" name="index"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_QQXbILr4EeqR6PiF084V6A" name="name" visibility="public"/>
       <ownedOperation xmi:type="uml:Operation" xmi:id="_Irvj4KslEeq6oJG-GxIr5g" name="calculateCertCO2pmi"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_ayCmcJUiEeq1MNw_X5quEQ" name="vehicle_annual_data">
@@ -40,6 +40,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Y0Q_wKd5EeqRUoM6l8Mfgg" name="VMT"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_ZHwHgKseEeq6oJG-GxIr5g" name="tailpipe_CO2gpmi"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_oQTbAKseEeq6oJG-GxIr5g" name="upstream_CO2gpmi"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MqBV0LsUEeqR6PiF084V6A" name="index"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_gRvJUJUiEeq1MNw_X5quEQ" name="manufacturers"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_UD9KkJUyEeq1MNw_X5quEQ" name="cost_curves">
@@ -162,6 +163,12 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_fw5bsLr2EeqR6PiF084V6A" name="footprint_max_sqft"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_hMTCsLr2EeqR6PiF084V6A" name="footprint_min_sqft"/>
     </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_kfn98LuhEeqijc4sJTwzXQ" name="fuel_scenarios">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_qy_ZcLuhEeqijc4sJTwzXQ" name="fuel_scenario_id" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_tnSGALuhEeqijc4sJTwzXQ" name="dollar_year" visibility="public"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_2g05kLuhEeqijc4sJTwzXQ" name="fuel_scenario_id" client="_d13h4MTvEembs_lAYl7NMg" supplier="_kfn98LuhEeqijc4sJTwzXQ"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="__dNlwLuhEeqijc4sJTwzXQ" name="fuel_id" client="_ZWk1sKdEEeqRUoM6l8Mfgg" supplier="_ecoowJkbEeq1MNw_X5quEQ"/>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_jYTvAK8IEeqO0d-UmaSoow">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jYWLQK8IEeqO0d-UmaSoow" source="http://www.eclipse.org/uml2/2.0.0/UML">

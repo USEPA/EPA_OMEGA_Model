@@ -9,6 +9,7 @@ from usepa_omega2 import *
 
 import cost_curves
 
+
 class CostCloud(SQABase):
     # --- database table properties ---
     __tablename__ = 'cost_clouds'

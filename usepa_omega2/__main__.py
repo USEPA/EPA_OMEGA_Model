@@ -24,10 +24,13 @@ from demanded_sales_annual_data import *
 if __name__ == "__main__":
 
     print('OMEGA2 greeets you, version %s' % code_version)
-    print('from %s with love' % fileio.get_filenameext(__file__))
+    if '__file__' in locals():
+        print('from %s with love' % fileio.get_filenameext(__file__))
 
     fileio.validate_folder(o2_options.output_folder)
 
     SQABase.metadata.create_all(engine)
 
     # TODO: need to update self-test here:
+    # init_fail = []
+    # init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
