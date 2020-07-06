@@ -50,4 +50,4 @@ if __name__ == "__main__":
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
     else:
-        print("#FAIL")
+        omega_log.logwrite("#FAIL")

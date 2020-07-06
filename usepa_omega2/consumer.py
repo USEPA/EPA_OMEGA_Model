@@ -9,8 +9,14 @@ Consumer module stub (for now)
 from usepa_omega2 import *
 
 
-def demand_sales(session):
-    #  hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
+def demand_sales(session, model_year):
+    """
+    :param session: database session
+    :param model_year: not used, for now
+    :return: dict of sales by consumer (market) categories
+    """
+
+    #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
     sales_dict = dict()
 
