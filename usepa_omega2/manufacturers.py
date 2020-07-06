@@ -15,7 +15,6 @@ class Manufacturer(SQABase):
     vehicles = relationship('Vehicle', back_populates='manufacturer')
 
     # --- static properties ---
-    # name = Column(String, default='USA Motors')
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -47,7 +46,6 @@ class Manufacturer(SQABase):
                 for i in df.index:
                     obj_list.append(Manufacturer(
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
-                        # name=df.loc[i, 'name'],
                     ))
                 session.add_all(obj_list)
                 session.flush()

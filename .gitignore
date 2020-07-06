@@ -121,3 +121,4 @@ composer.lock
 *.DS_Store
 /__dump/*
 /usepa_omega2/_sequester/
+/output/
