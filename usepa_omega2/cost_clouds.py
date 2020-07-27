@@ -17,7 +17,7 @@ class CostCloud(SQABase):
 
     cost_curve_class = Column(String)
     model_year = Column(Numeric)
-    new_vehicle_cost_dollars = Column(Float)
+    actual_new_vehicle_cost_dollars = Column(Float)
     cert_co2_grams_per_mile = Column(Float)
 
     def __repr__(self):
@@ -35,7 +35,7 @@ class CostCloud(SQABase):
 
         input_template_name = 'cost_clouds'
         input_template_version = 0.0002
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'new_vehicle_cost_dollars'}
+        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'actual_new_vehicle_cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -54,7 +54,7 @@ class CostCloud(SQABase):
                     obj_list.append(CostCloud(
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
-                        new_vehicle_cost_dollars=df.loc[i, 'new_vehicle_cost_dollars'],
+                        actual_new_vehicle_cost_dollars=df.loc[i, 'actual_new_vehicle_cost_dollars'],
                         cert_co2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 session.add_all(obj_list)
@@ -81,7 +81,7 @@ class CostCloud(SQABase):
 
                     # vars to hold column names
                     combined_GHG_gpmi = 'cert_co2_grams_per_mile'
-                    combined_GHG_cost = 'new_vehicle_cost_dollars'
+                    combined_GHG_cost = 'actual_new_vehicle_cost_dollars'
 
                     if verbose and model_year == cloud_model_years.min():
                         plt.figure()

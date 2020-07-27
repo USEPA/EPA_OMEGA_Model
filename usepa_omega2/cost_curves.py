@@ -15,7 +15,7 @@ class CostCurve(SQABase):
 
     cost_curve_class = Column(String)
     model_year = Column(Numeric)
-    new_vehicle_cost_dollars = Column(Float)
+    cost_dollars = Column(Float)
     cert_co2_grams_per_mile = Column(Float)
 
     def __repr__(self):
@@ -33,7 +33,7 @@ class CostCurve(SQABase):
 
         input_template_name = 'cost_curves'
         input_template_version = 0.0002
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'new_vehicle_cost_dollars'}
+        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -50,7 +50,7 @@ class CostCurve(SQABase):
                     obj_list.append(CostCurve(
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
-                        new_vehicle_cost_dollars=df.loc[i, 'new_vehicle_cost_dollars'],
+                        cost_dollars=df.loc[i, 'cost_dollars'],
                         cert_co2_grams_per_mile= df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 session.add_all(obj_list)
@@ -66,7 +66,7 @@ class CostCurve(SQABase):
             obj_list.append(CostCurve(
                 cost_curve_class=cost_curve_class,
                 model_year=model_year,
-                new_vehicle_cost_dollars=cost,
+                cost_dollars=cost,
                 cert_co2_grams_per_mile=co2_gpmi,
             ))
         session.add_all(obj_list)
@@ -84,13 +84,13 @@ class CostCurve(SQABase):
             omega_log.logwrite("\n### WARNING: Attempt to access %s cost curve for year (%d) above maximum (%d) ###\n" % (cost_curve_class, model_year, max_cost_curve_year))
             model_year = min_cost_curve_year
 
-        result = session.query(CostCurve.new_vehicle_cost_dollars, CostCurve.cert_co2_grams_per_mile).filter(CostCurve.model_year == model_year).filter(CostCurve.cost_curve_class == cost_curve_class)
+        result = session.query(CostCurve.cost_dollars, CostCurve.cert_co2_grams_per_mile).filter(CostCurve.model_year == model_year).filter(CostCurve.cost_curve_class == cost_curve_class)
         curve_cost_dollars = [r[0] for r in result]
         curve_co2_gpmi = [r[1] for r in result]
 
         cost_curve = scipy.interpolate.interp1d(curve_co2_gpmi, curve_cost_dollars, fill_value='extrapolate')
 
-        return cost_curve(target_co2_gpmi).item()
+        return cost_curve(target_co2_gpmi).tolist()
 
 
 if __name__ == '__main__':
@@ -105,6 +105,6 @@ if __name__ == '__main__':
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
 
-        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, 500))
+        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, [100, 200, 300, 400, 500]))
         print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, 150))
         print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, 0))

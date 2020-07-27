@@ -37,4 +37,4 @@ def dump_database_to_csv(engine, output_folder, verbose=False):
     for table in engine.table_names():
         omega_log.logwrite(table)
         sql_df = pd.read_sql("SELECT * FROM %s" % table, con=engine)
-        sql_df.to_csv('%s/%s.csv' % (output_folder, table), index=False)
+        sql_df.to_csv('%s/%s_table.csv' % (output_folder, table), index=False)

@@ -25,7 +25,11 @@ def logwrite(message):
     from usepa_omega2 import o2_options
 
     log = open(o2_options.logfilename, 'a')
-    log.write(message + '\n')
+    if type(message) is list:
+        for m in message:
+            log.write(m + '\n')
+    else:
+        log.write(message + '\n')
     if o2_options.verbose:
         print(message)
     log.close()
