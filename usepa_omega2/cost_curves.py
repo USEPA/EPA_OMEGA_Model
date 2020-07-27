@@ -105,6 +105,5 @@ if __name__ == '__main__':
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
 
-        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, [100, 200, 300, 400, 500]))
-        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, 150))
-        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, 0))
+        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, 100))
+        print(CostCurve.get_cost(session, 'ice_MPW_LRL', 2020, [0, 100, 200, 300, 400, 500, 1000]))
