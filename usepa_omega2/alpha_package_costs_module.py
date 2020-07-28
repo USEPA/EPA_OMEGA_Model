@@ -419,19 +419,9 @@ def main():
                                            & (alpha_file[file_num]['weight_reduction'] == pwr)
                                            & (alpha_file[file_num]['aero'] == ai)
                                            & (alpha_file[file_num]['nonaero'] == nai)]
-            package_dict[effectiveness_class, ea, pwr, ai, nai, work_class] .reset_index(drop=True, inplace=True)
-        # for engine_architecture in engine_architectures:
-        #     for percent_weight_reduction in percent_weight_reductions:
-        #         for aero_improvement in aero_improvements:
-        #             for nonaero_improvement in nonaero_improvements:
-        #                 package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class] \
-        #                     = alpha_file[file_num].loc[(alpha_file[file_num]['engine_architecture'] == engine_architecture)
-        #                                                & (alpha_file[file_num]['weight_reduction'] == percent_weight_reduction)
-        #                                                & (alpha_file[file_num]['aero'] == aero_improvement)
-        #                                                & (alpha_file[file_num]['nonaero'] == nonaero_improvement)]
-        #                 package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class]\
-        #                     .reset_index(drop=True, inplace=True)
-                        # insert and calculate new cost columns
+            package_dict[effectiveness_class, ea, pwr, ai, nai, work_class].reset_index(drop=True, inplace=True)
+
+            # insert and calculate new cost columns
             temp_df = package_dict[effectiveness_class, ea, pwr, ai, nai, work_class].copy()
             # temp_df = package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class].copy()
             temp_df.insert(len(temp_df.columns), 'deac_cost', 0)
