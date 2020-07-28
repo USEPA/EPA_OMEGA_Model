@@ -59,7 +59,8 @@ class OMEGA2RuntimeOptions(object):
         self.cost_curves_file = 'input_templates/cost_curves.csv'
         self.cost_clouds_file = 'input_templates/cost_clouds.csv'
         self.cost_curve_frontier_affinity_factor = 0.75
-        self.analysis_inital_year = None
+        self.analysis_initial_year = None
+        self.analysis_final_year = None
         self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
         self.logfilename = ''
 

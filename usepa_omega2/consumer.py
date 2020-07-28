@@ -17,21 +17,22 @@ def demand_sales(session, model_year):
     """
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
+    from vehicle_annual_data import VehicleAnnualData
 
     sales_dict = dict()
 
     # get sales numbers from initial fleet
     initial_ICE_sales = session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.fueling_class == 'ICE').filter(VehicleAnnualData.calendar_year == o2_options.analysis_inital_year).scalar()
+        Vehicle.fueling_class == 'ICE').filter(VehicleAnnualData.calendar_year == o2_options.analysis_initial_year).scalar()
 
     initial_BEV_sales = session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.fueling_class == 'BEV').filter(VehicleAnnualData.calendar_year == o2_options.analysis_inital_year).scalar()
+        Vehicle.fueling_class == 'BEV').filter(VehicleAnnualData.calendar_year == o2_options.analysis_initial_year).scalar()
 
     initial_hauling_sales = session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.hauling_class == 'hauling').filter(VehicleAnnualData.calendar_year == o2_options.analysis_inital_year).scalar()
+        Vehicle.hauling_class == 'hauling').filter(VehicleAnnualData.calendar_year == o2_options.analysis_initial_year).scalar()
 
     initial_non_hauling_sales = session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.hauling_class == 'non hauling').filter(VehicleAnnualData.calendar_year == o2_options.analysis_inital_year).scalar()
+        Vehicle.hauling_class == 'non hauling').filter(VehicleAnnualData.calendar_year == o2_options.analysis_initial_year).scalar()
 
     sales_dict['hauling'] = initial_hauling_sales
     sales_dict['non hauling'] = initial_non_hauling_sales
@@ -66,6 +67,6 @@ if __name__ == '__main__':
     init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
 
     if not init_fail:
-        o2_options.analysis_inital_year = session.query(func.max(Vehicle.model_year)).scalar()
+        o2_options.analysis_initial_year = session.query(func.max(Vehicle.model_year)).scalar()
 
-        sales_demand = demand_sales(session)
+        sales_demand = demand_sales(session, o2_options.analysis_initial_year)

@@ -20,7 +20,7 @@ def calc_reg_class_demand(session, model_year):
     :return: dict of sales by reg class
     """
 
-    consumer_sales = consumer.sales_demand(session, model_year)
+    consumer_sales = consumer.demand_sales(session, model_year)
 
     producer_sales = dict()
 
@@ -29,9 +29,6 @@ def calc_reg_class_demand(session, model_year):
     producer_sales['truck'] = consumer_sales['hauling']
 
     return producer_sales
-
-
-
 
 
 if __name__ == '__main__':
