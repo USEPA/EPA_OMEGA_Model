@@ -3,10 +3,11 @@ import math
 
 def PHEVT_Consumer():
     rootdir = 'C:/Users/KBolon/Documents/ma3t_python_version/'
-    YearOnMarket = np.loadtxt(rootdir + 'tech_yearonmarket.csv', delimiter=',', skiprows=0, usecols=range(1,2))
+    YearOnMarket = np.loadtxt(rootdir + 'tech_yearonmarket_allowEV300_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,6))
     dBeta = np.loadtxt(rootdir + 'consumer_beta.csv', delimiter=',', skiprows=0, usecols=range(1,136))
-    bDummyFlag = np.loadtxt(rootdir + 'tech_nestheterogeneity.csv', delimiter=',', skiprows=0, usecols=range(1,406))
-    generalizedcost = np.loadtxt(rootdir + 'generalizedcosts.csv', delimiter=',', skiprows=1, usecols=range(1,47))
+    bDummyFlag = np.transpose(np.loadtxt(rootdir + 'tech_nestheterogeneity_zeroH2andCI_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,10)))
+    choiceNames = np.loadtxt(rootdir + 'tech_choicenames.csv', delimiter=',', skiprows=0, usecols=range(1, 406), dtype=str)
+    generalizedcost = np.loadtxt(rootdir + 'generalizedcosts_wPEVlearning_Same2050GeneralizedCosts.csv', delimiter=',', skiprows=1, usecols=range(1,47))
     generalizedcostchoicenames = np.loadtxt(rootdir + 'generalizedcosts.csv', delimiter=',', skiprows=1, usecols=range(0, 1), dtype=str)
     iNestLayerNum = 5
     iLastNestLayerIdx = iNestLayerNum - 1
@@ -18,14 +19,22 @@ def PHEVT_Consumer():
     firstAnalysisYear = 2005
     lastAnalysisYear = 2050
     iStepNum = lastAnalysisYear - firstAnalysisYear + 1
-    dProbNestLayer5 = [generalizedcostchoicenames]
+    dProbNestLayer1 = [choiceNames[0,]] # dProbNestLayer1 = [list(range(0, 5))]
+    dProbNestLayer2 = [choiceNames[1,]] # dProbNestLayer2 = [list(range(0, 14))]
+    dProbNestLayer3 = [choiceNames[2,]] # dProbNestLayer3 = [list(range(0, 40))]
+    dProbNestLayer4 = [choiceNames[3,]] # dProbNestLayer4 = [list(range(0, 100))]
+    dProbNestLayer5 = [choiceNames[4,]] # dProbNestLayer5 = [generalizedcostchoicenames]
+    choiceProb = np.zeros([iChoiceNum[iLastNestLayerIdx], ])
+    choiceGeneralizedCost = np.zeros([iChoiceNum[iLastNestLayerIdx], ])
+    #choiceProbAllYears = np.vstack((choiceNames[0,], choiceNames[1,], choiceNames[2,], choiceNames[3,], choiceNames[4,]))
+    choiceProbAllYears =['Nest1', 'Nest2', 'Nest3', 'Nest4', 'Nest5', 'Year', 'ChoiceProb', 'GeneralizedCost']
 
     for iStepIndex in range(0, iStepNum):
         #Calculate choice probability of each technology by each consumer---objConsumer(iConsumer).ChoiceProb(iChoice)
-        dCost = np.empty([iNestLayerNum, iChoiceNum[iLastNestLayerIdx]])
-        dEtoU = np.empty([iNestLayerNum, iChoiceNum[iLastNestLayerIdx]])
-        dSumEtoU = np.empty([iNestLayerNum, iChoiceNum[iLastNestLayerIdx - 1]])
-        dProb = np.empty([iNestLayerNum, iChoiceNum[iLastNestLayerIdx]])
+        dCost = np.zeros([iNestLayerNum, iChoiceNum[iLastNestLayerIdx]])
+        dEtoU = np.zeros([iNestLayerNum, iChoiceNum[iLastNestLayerIdx]])
+        dSumEtoU = np.zeros([iNestLayerNum, iChoiceNum[iLastNestLayerIdx - 1]])
+        dProb = np.zeros([iNestLayerNum, iChoiceNum[iLastNestLayerIdx]])
 
         for iConsumer in range(0, iIndividualNum[iGroupDimNum - 1]):
             #1
@@ -36,7 +45,8 @@ def PHEVT_Consumer():
                     dCost[iLastNestLayerIdx, iChoice] = dExtremeHighPrice
                     dEtoU[iLastNestLayerIdx, iChoice] = 0
                 else:
-                    if YearOnMarket[iRealChoice] <= iStepIndex + firstAnalysisYear:
+                    # if YearOnMarket[iRealChoice] <= iStepIndex + firstAnalysisYear:
+                    if YearOnMarket[iChoice] <= iStepIndex + firstAnalysisYear:
                         dCost[iLastNestLayerIdx, iChoice] = generalizedcost[iRealChoice, iStepIndex]
                     else:
                         dCost[iLastNestLayerIdx, iChoice] = dExtremeHighPrice
@@ -50,8 +60,8 @@ def PHEVT_Consumer():
                     iRealChoice = iRealChoice + 1
             #calculate dProb(iNestLayerNum, i)
             for iChoice in range(0, iChoiceNum[iLastNestLayerIdx]):
-                iTemp = math.trunc((iChoice - 1) / iNestPerNestNum[iLastNestLayerIdx]) + 1
-                #iTemp = math.trunc((iChoice) / iNestPerNestNum[iLastNestLayerIdx])
+                #iTemp = math.trunc((iChoice - 1) / iNestPerNestNum[iLastNestLayerIdx]) + 1
+                iTemp = math.trunc((iChoice) / iNestPerNestNum[iLastNestLayerIdx])
                 if bDummyFlag[iLastNestLayerIdx, iChoice] == 0:
                     dProb[iLastNestLayerIdx, iChoice] = 0
                 elif bDummyFlag[iLastNestLayerIdx, iChoice] == 100:
@@ -59,8 +69,9 @@ def PHEVT_Consumer():
                 elif dSumEtoU[iLastNestLayerIdx, iTemp] == 0:
                     dTemp = 0
                     for iTemp2 in range(0, iNestPerNestNum[iLastNestLayerIdx]):
-                        dTemp = dTemp + bDummyFlag[iLastNestLayerIdx, (iTemp - 1) * iNestPerNestNum[iLastNestLayerIdx] + iTemp2]
-                    dProb[iLastNestLayerIdx, iChoice] = 1 / (dTemp + 1) / 11
+                        # dTemp = dTemp + bDummyFlag[iLastNestLayerIdx, (iTemp - 1) * iNestPerNestNum[iLastNestLayerIdx] + iTemp2]
+                        dTemp = dTemp + bDummyFlag[iLastNestLayerIdx, iTemp * iNestPerNestNum[iLastNestLayerIdx] + iTemp2]
+                    dProb[iLastNestLayerIdx, iChoice] = 1 / dTemp / 11
                 else:
                     dProb[iLastNestLayerIdx, iChoice] = dEtoU[iLastNestLayerIdx, iChoice] / dSumEtoU[iLastNestLayerIdx, iTemp]
             for iLayer in range((iLastNestLayerIdx - 1), -1, - 1):
@@ -77,8 +88,8 @@ def PHEVT_Consumer():
                         except:
                             dCost = 0
                         #calculate dEtoU(iLayer, iNest)
-                        iTemp = math.trunc((iNest - 1) / iNestPerNestNum[iLayer]) + 1
-                        #iTemp = math.trunc((iNest) / iNestPerNestNum[iLayer])
+                        #iTemp = math.trunc((iNest - 1) / iNestPerNestNum[iLayer]) + 1
+                        iTemp = math.trunc((iNest) / iNestPerNestNum[iLayer])
                         dEtoU[iLayer, iNest] = math.exp(dBeta[iLayer, iTemp] * dCost[iLayer, iNest])
                         #calculate dSumEtoU(iNestLayerNum, i)
                         dSumEtoU[iLayer, iTemp] = dSumEtoU[iLayer, iTemp] + dEtoU[iLayer, iNest]
@@ -94,22 +105,43 @@ def PHEVT_Consumer():
                     elif dSumEtoU[iLayer, iTemp] == 0:
                         dTemp = 0
                         for iTemp2 in range(0, iNestPerNestNum[iLayer]):
-                            dTemp = dTemp + bDummyFlag[iLayer, (iTemp - 1) * iNestPerNestNum[iLayer] + iTemp2]
-                        dProb[iLayer, iNest] = 1 / (dTemp + 1) / 11
+                            #dTemp = dTemp + bDummyFlag[iLayer, (iTemp - 1) * iNestPerNestNum[iLayer] + iTemp2]
+                            dTemp = dTemp + bDummyFlag[iLayer, iTemp * iNestPerNestNum[iLayer] + iTemp2]
+                        dProb[iLayer, iNest] = 1 / dTemp / 11
                     else:
                         dProb[iLayer, iNest] = dEtoU[iLayer, iNest] / dSumEtoU[iLayer, iTemp]
                 #2
             #1
-            #dProbNestLayer1 = np.concatenate(dProbNestLayer1, dProb[0,bDummyFlag[0,]!=0], axis=1)
-            #dProbNestLayer2 = np.concatenate(dProbNestLayer2, dProb[1, bDummyFlag[1,] != 0], axis=1)
-            #dProbNestLayer3 = np.concatenate(dProbNestLayer3, dProb[2, bDummyFlag[2,] != 0], axis=1)
-            #dProbNestLayer4 = np.concatenate(dProbNestLayer4, dProb[3, bDummyFlag[3,] != 0], axis=1)
-            dProbNestLayer5 = np.append(dProbNestLayer5, [dProb[4, bDummyFlag[4,] != 0]], axis=0)
-    #np.savetxt(rootdir + 'dProbNestLayer1.csv', np.transpose(dProbNestLayer1), delimiter=',')
-    #np.savetxt(rootdir + 'dProbNestLayer2.csv', np.transpose(dProbNestLayer2), delimiter=',')
-    #np.savetxt(rootdir + 'dProbNestLayer3.csv', np.transpose(dProbNestLayer3), delimiter=',')
-    #np.savetxt(rootdir + 'dProbNestlayer4.csv', np.transpose(dProbNestLayer4), delimiter=',')
+
+            iRealChoice = 0
+            for iTemp in range(0, iChoiceNum[iLastNestLayerIdx]):
+                if bDummyFlag[iLastNestLayerIdx, iTemp] > 0:
+                    dTemp = 1
+                    for iLayer in range(0, iNestLayerNum):
+                        iNest = math.trunc(iTemp / (iChoiceNum[iLastNestLayerIdx] / iChoiceNum[iLayer]))
+                        dTemp = dTemp * dProb[iLayer, iNest]
+                    choiceProb[iTemp] = dTemp
+                    choiceGeneralizedCost[iTemp] = generalizedcost[iRealChoice, iStepIndex]
+                    iRealChoice = iRealChoice + 1
+
+            # Output results
+            dProbNestLayer1 = np.append(dProbNestLayer1, [dProb[0, ]], axis=0)
+            # dProbNestLayer1 = np.append(dProbNestLayer1, [dProb[0, bDummyFlag[0,] != 0]], axis=0)
+            dProbNestLayer2 = np.append(dProbNestLayer2, [dProb[1, ]], axis=0)
+            # dProbNestLayer2 = np.append(dProbNestLayer2, [dProb[1, bDummyFlag[1,] != 0]], axis=0)
+            dProbNestLayer3 = np.append(dProbNestLayer3, [dProb[2, ]], axis=0)
+            # dProbNestLayer3 = np.append(dProbNestLayer3, [dProb[2, bDummyFlag[2,] != 0]], axis=0)
+            dProbNestLayer4 = np.append(dProbNestLayer4, [dProb[3, ]], axis=0)
+            # dProbNestLayer4 = np.append(dProbNestLayer4, [dProb[3, bDummyFlag[3,] != 0]], axis=0)
+            dProbNestLayer5 = np.append(dProbNestLayer5, [dProb[4, ]], axis=0)
+            # dProbNestLayer5 = np.append(dProbNestLayer5, [dProb[4, bDummyFlag[4,] != 0]], axis=0)
+            choiceProbAllYears = np.vstack((choiceProbAllYears, np.transpose(np.append(choiceNames, np.append([(iStepIndex + firstAnalysisYear) * np.ones([iChoiceNum[iLastNestLayerIdx], ])], np.append([choiceProb], [choiceGeneralizedCost], axis=0), axis=0), axis=0))))
+    np.savetxt(rootdir + 'dProbNestLayer1.csv', np.transpose(dProbNestLayer1), delimiter=',', fmt='%s')
+    np.savetxt(rootdir + 'dProbNestLayer2.csv', np.transpose(dProbNestLayer2), delimiter=',', fmt='%s')
+    np.savetxt(rootdir + 'dProbNestLayer3.csv', np.transpose(dProbNestLayer3), delimiter=',', fmt='%s')
+    np.savetxt(rootdir + 'dProbNestLayer4.csv', np.transpose(dProbNestLayer4), delimiter=',', fmt='%s')
     np.savetxt(rootdir + 'dProbNestLayer5.csv', np.transpose(dProbNestLayer5), delimiter=',', fmt='%s')
+    np.savetxt(rootdir + 'choiceProbAllYears.csv', choiceProbAllYears, delimiter=',', fmt='%s')
 
 def AssignValueToArray(LcTargetArray, iLcRowL, iLcRowU, iLcColL, iLcColU, LcSourceArray):
     if isinstance(LcSourceArray, np.ndarray):
