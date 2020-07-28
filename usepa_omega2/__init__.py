@@ -5,8 +5,7 @@ __init.py__
 
 """
 
-from enum import Enum, auto
-
+import enum
 import pandas as pd
 pd.set_option('chained_assignment', 'raise')
 
@@ -33,14 +32,21 @@ import os
 fueling_classes = ['BEV', 'ICE']
 hauling_classes = ['hauling', 'non hauling']
 ownership_classes = ['shared', 'private']
-reg_classes = ['car', 'truck']
+# reg_classes = ['car', 'truck']
 fuel_units = ['gallon', 'kWh']
 
+# class RegClass(enum.Enum):
+#     car = 'car'
+#     truck = 'truck'
+#
+#     @classmethod
+#     def values(cls):
+#         return [cls[k].value for k in cls.__members__.keys()]
 
-class RegClass(Enum):
-    car = 'car'
-    truck = 'truck'
-
+RegClass = enum.Enum('RegClass', 'car truck')
+# RegClass = enum.Enum('reg_classes', 'car truck')
+# RegClass = enum.Enum('RegClass', ['car', 'truck'])
+# reg_classes = enum.Enum('RegClass', ['car', 'truck'])
 
 # OMEGA2 code version number
 code_version = "phase0.0.0"

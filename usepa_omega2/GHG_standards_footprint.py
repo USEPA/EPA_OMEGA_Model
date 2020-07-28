@@ -13,7 +13,8 @@ class GHGStandardFootprint(SQABase):
     __tablename__ = 'ghg_standards'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
     footprint_min_sqft = Column('footprint_min_sqft', Float)
     footprint_max_sqft = Column('footprint_max_sqft', Float)
     coeff_a = Column('coeff_a', Float)
@@ -114,12 +115,12 @@ if __name__ == '__main__':
 
         car_vehicle = dummyVehicle()
         car_vehicle.model_year = 2021
-        car_vehicle.reg_class_ID = RegClass.car
+        car_vehicle.reg_class_ID = RegClass.car.name
         car_vehicle.footprint_ft2 = 41
 
         truck_vehicle = dummyVehicle()
         truck_vehicle.model_year = 2021
-        truck_vehicle.reg_class_ID = RegClass.truck
+        truck_vehicle.reg_class_ID = RegClass.truck.name
         truck_vehicle.footprint_ft2 = 41
 
         car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)

@@ -6,6 +6,8 @@ OMEGA2 top level code
 
 """
 
+import traceback
+
 from usepa_omega2 import *
 
 from fuels import Fuel
@@ -67,4 +69,4 @@ if __name__ == "__main__":
         else:
             omega_log.logwrite("\#INIT FAIL")
     except Exception as e:
-        omega_log.logwrite("\n#RUNTIME FAIL\n%s" % e)
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

@@ -13,7 +13,8 @@ class GHGStandardFlat(SQABase):
     __tablename__ = 'ghg_standards'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
     GHG_target_CO2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)
     lifetime_VMT = Column('lifetime_vmt', Float)
 
@@ -92,11 +93,11 @@ if __name__ == '__main__':
 
         car_vehicle = dummyVehicle()
         car_vehicle.model_year = 2021
-        car_vehicle.reg_class_ID = RegClass.car
+        car_vehicle.reg_class_ID = RegClass.car.name
 
         truck_vehicle = dummyVehicle()
         truck_vehicle.model_year = 2021
-        truck_vehicle.reg_class_ID = RegClass.truck
+        truck_vehicle.reg_class_ID = RegClass.truck.name
 
         car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
         truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
