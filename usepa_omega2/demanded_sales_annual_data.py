@@ -64,7 +64,7 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    from market_classes import *  # needed for market class ID
+    from market_classes import MarketClass  # needed for market class ID
 
     SQABase.metadata.create_all(engine)
 

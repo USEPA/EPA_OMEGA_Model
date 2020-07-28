@@ -57,9 +57,9 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    from fuels import *
-    from market_classes import *
-    from vehicles import *
+    from fuels import Fuel
+    from market_classes import MarketClass
+    from vehicles import Vehicle
 
     SQABase.metadata.create_all(engine)
 
