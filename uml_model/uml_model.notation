@@ -1320,16 +1320,20 @@
         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_feAxZbr1EeqR6PiF084V6A"/>
       </children>
       <children xmi:type="notation:BasicCompartment" xmi:id="_feAxZrr1EeqR6PiF084V6A" type="Class_OperationCompartment">
-        <children xmi:type="notation:Shape" xmi:id="_j6HfsMqgEeqfDrL7faTSqQ" type="Operation_ClassOperationLabel" fontColor="255" fontName="Segoe UI" bold="true">
+        <children xmi:type="notation:Shape" xmi:id="_j6HfsMqgEeqfDrL7faTSqQ" type="Operation_ClassOperationLabel" fontName="Segoe UI" bold="true">
           <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ujM-QMqgEeqfDrL7faTSqQ" source="PapyrusCSSForceValue">
             <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ujNlUMqgEeqfDrL7faTSqQ" key="fontHeight" value="true"/>
             <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ujOMYMqgEeqfDrL7faTSqQ" key="bold" value="true"/>
             <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ujOzcMqgEeqfDrL7faTSqQ" key="italic" value="true"/>
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yQIucNEAEeqzVL8A1ZovNA" key="fontColor" value="true"/>
           </eAnnotations>
           <element xmi:type="uml:Operation" href="uml_model.uml#_j5VckMqgEeqfDrL7faTSqQ"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_j6HfscqgEeqfDrL7faTSqQ"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_jD0lANDvEeqzVL8A1ZovNA" type="Operation_ClassOperationLabel" fontColor="255" bold="true">
+        <children xmi:type="notation:Shape" xmi:id="_jD0lANDvEeqzVL8A1ZovNA" type="Operation_ClassOperationLabel" bold="true">
+          <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_y3oMQNEAEeqzVL8A1ZovNA" source="PapyrusCSSForceValue">
+            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y3ozUNEAEeqzVL8A1ZovNA" key="fontColor" value="true"/>
+          </eAnnotations>
           <element xmi:type="uml:Operation" href="uml_model.uml#_jCcE8NDvEeqzVL8A1ZovNA"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_jD0lAdDvEeqzVL8A1ZovNA"/>
         </children>
@@ -1345,7 +1349,7 @@
         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_feAxb7r1EeqR6PiF084V6A"/>
       </children>
       <element xmi:type="uml:Class" href="uml_model.uml#_fd-VILr1EeqR6PiF084V6A"/>
-      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_feAKUbr1EeqR6PiF084V6A" x="1460" y="220" width="661" height="261"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_feAKUbr1EeqR6PiF084V6A" x="1460" y="220" width="501" height="261"/>
     </children>
     <children xmi:type="notation:Shape" xmi:id="_kf6R0LuhEeqijc4sJTwzXQ" type="Class_Shape" bold="true">
       <children xmi:type="notation:DecorationNode" xmi:id="_kf-jQLuhEeqijc4sJTwzXQ" type="Class_NameLabel"/>
