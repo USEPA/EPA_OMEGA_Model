@@ -109,8 +109,10 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_mNXNsKswEeq6oJG-GxIr5g" name="lifetime_vmt"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_14hsELr0EeqR6PiF084V6A" name="index"/>
       <ownedOperation xmi:type="uml:Operation" xmi:id="_RdVbUMqgEeqfDrL7faTSqQ" name="calculate_target_co2_Mg">
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_Wrm3AMqgEeqfDrL7faTSqQ" name="reg_class_id"/>
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_cj7VQMqgEeqfDrL7faTSqQ" name="model_year"/>
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_Wrm3AMqgEeqfDrL7faTSqQ" name="vehicle"/>
+      </ownedOperation>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_dfW24NDvEeqzVL8A1ZovNA" name="calculate_target_co2_gpmi">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_h8M1oNDvEeqzVL8A1ZovNA" name="vehicle"/>
       </ownedOperation>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_Q9NG8KspEeq6oJG-GxIr5g" name="demanded_sales_annual_data">
@@ -185,9 +187,10 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_fw5bsLr2EeqR6PiF084V6A" name="footprint_max_sqft"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_hMTCsLr2EeqR6PiF084V6A" name="footprint_min_sqft"/>
       <ownedOperation xmi:type="uml:Operation" xmi:id="_j5VckMqgEeqfDrL7faTSqQ" name="calculate_target_co2_Mg">
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_msjLEMqgEeqfDrL7faTSqQ" name="reg_class_id"/>
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_n1P4gMqgEeqfDrL7faTSqQ" name="model_year"/>
-        <ownedParameter xmi:type="uml:Parameter" xmi:id="_pRkskMqgEeqfDrL7faTSqQ" name="footprint"/>
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_pRkskMqgEeqfDrL7faTSqQ" name="vehicle"/>
+      </ownedOperation>
+      <ownedOperation xmi:type="uml:Operation" xmi:id="_jCcE8NDvEeqzVL8A1ZovNA" name="calculate_target_co2_gpmi">
+        <ownedParameter xmi:type="uml:Parameter" xmi:id="_jCcE8dDvEeqzVL8A1ZovNA" name="vehicle"/>
       </ownedOperation>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_kfn98LuhEeqijc4sJTwzXQ" name="fuel_scenarios">
