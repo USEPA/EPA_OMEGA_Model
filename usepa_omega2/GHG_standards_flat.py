@@ -27,6 +27,7 @@ class GHGStandardFlat(SQABase):
         return s
 
     # noinspection PyMethodParameters
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -57,11 +58,13 @@ class GHGStandardFlat(SQABase):
 
         return template_errors
 
+    @staticmethod
     def calculate_target_co2_gpmi(vehicle):
         return session.query(GHGStandardFlat.GHG_target_CO2_grams_per_mile). \
             filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
             filter(GHGStandardFlat.model_year == vehicle.model_year).scalar()
 
+    @staticmethod
     def calculate_target_co2_Mg(vehicle):
         return session.query(GHGStandardFlat.lifetime_VMT). \
             filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
@@ -89,11 +92,11 @@ if __name__ == '__main__':
 
         car_vehicle = dummyVehicle()
         car_vehicle.model_year = 2021
-        car_vehicle.reg_class_ID = 'car'
+        car_vehicle.reg_class_ID = RegClass.car
 
         truck_vehicle = dummyVehicle()
         truck_vehicle.model_year = 2021
-        truck_vehicle.reg_class_ID = 'truck'
+        truck_vehicle.reg_class_ID = RegClass.truck
 
         car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
         truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)

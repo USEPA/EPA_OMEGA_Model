@@ -39,6 +39,7 @@ class Vehicle(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         from cost_curves import CostCurve
         from vehicle_annual_data import VehicleAnnualData
@@ -66,6 +67,7 @@ class Vehicle(SQABase):
                         name=df.loc[i, 'vehicle_id'],
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
+                        # reg_class_ID=RegClass[df.loc[i, 'reg_class_id']],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],

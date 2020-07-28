@@ -27,7 +27,7 @@ class CostCurve(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
-    # noinspection PyMethodParameters
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -58,6 +58,7 @@ class CostCurve(SQABase):
 
         return template_errors
 
+    @staticmethod
     def init_database_from_lists(cost_curve_class, model_year, frontier_co2_gpmi, frontier_cost, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s frontier...' % cost_curve_class)
 
@@ -72,6 +73,7 @@ class CostCurve(SQABase):
         session.add_all(obj_list)
         session.flush()
 
+    @staticmethod
     def get_cost(session, cost_curve_class, model_year, target_co2_gpmi):
         min_cost_curve_year = session.query(func.min(CostCurve.model_year)).scalar()
         max_cost_curve_year = session.query(func.max(CostCurve.model_year)).scalar()

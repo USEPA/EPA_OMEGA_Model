@@ -5,6 +5,8 @@ __init.py__
 
 """
 
+from enum import Enum, auto
+
 import pandas as pd
 pd.set_option('chained_assignment', 'raise')
 
@@ -34,6 +36,12 @@ ownership_classes = ['shared', 'private']
 reg_classes = ['car', 'truck']
 fuel_units = ['gallon', 'kWh']
 
+
+class RegClass(Enum):
+    car = 'car'
+    truck = 'truck'
+
+
 # OMEGA2 code version number
 code_version = "phase0.0.0"
 # OMEGA2 input file format version number
@@ -60,7 +68,7 @@ class OMEGA2RuntimeOptions(object):
         self.analysis_final_year = None
         self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
         self.logfilename = ''
-        self.GHG_standard = 'flat'
+        self.GHG_standard = 'footprint'
         if self.GHG_standard == 'flat':
             self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
         else:
