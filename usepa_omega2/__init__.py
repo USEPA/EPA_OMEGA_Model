@@ -51,8 +51,6 @@ class OMEGA2RuntimeOptions(object):
         self.market_classes_file = 'input_templates/market_classes.csv'
         self.vehicles_file = 'input_templates/vehicles.csv'
         self.demanded_sales_annual_data_file = 'input_templates/demanded_sales_annual_data.csv'
-        # self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
-        self.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
         self.fuel_scenarios_file = 'input_templates/fuel_scenarios.csv'
         self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'
         self.cost_curves_file = 'input_templates/cost_curves.csv'
@@ -62,7 +60,12 @@ class OMEGA2RuntimeOptions(object):
         self.analysis_final_year = None
         self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
         self.logfilename = ''
-        self.GHG_standard = None
+        self.GHG_standard = 'flat'
+        if self.GHG_standard == 'flat':
+            self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
+        else:
+            self.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
+
 
 o2_options = OMEGA2RuntimeOptions()
 

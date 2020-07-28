@@ -28,6 +28,7 @@ class Vehicle(SQABase):
     new_vehicle_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
+    footprint_ft2 = 100 # placeholder, for now, will come from vehicles file eventually
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -83,7 +84,7 @@ class Vehicle(SQABase):
                                                                         model_year=veh.model_year,
                                                                         target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
-                    veh.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(veh.model_year, veh.reg_class_ID)
+                    veh.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(veh)
 
                     session.add(veh)    # update database so vehicle_annual_data foreign key succeeds...
                     session.flush()

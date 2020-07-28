@@ -8,18 +8,16 @@ OMEGA2 top level code
 
 from usepa_omega2 import *
 
-from fuels import *
-from fuel_scenarios import *
-from fuel_scenario_annual_data import *
-from market_classes import *
-from cost_curves import *
-from cost_clouds import *
-from GHG_standards_flat import *
-from GHG_standards_footprint import *
-from demanded_sales_annual_data import *
-from manufacturers import *
-from vehicles import *
-from vehicle_annual_data import *
+from fuels import Fuel
+from fuel_scenarios import FuelScenario
+from fuel_scenario_annual_data import FuelScenarioAnnualData
+from market_classes import MarketClass
+from cost_curves import CostCurve
+from cost_clouds import CostCloud
+from demanded_sales_annual_data import DemandedSalesAnnualData
+from manufacturers import Manufacturer
+from vehicles import Vehicle
+from vehicle_annual_data import VehicleAnnualData
 import consumer
 import producer
 
@@ -31,6 +29,11 @@ if __name__ == "__main__":
 
     fileio.validate_folder(o2_options.output_folder)
 
+    if o2_options.GHG_standard == 'flat':
+        from GHG_standards_flat import GHGStandardFlat
+    else:
+        from GHG_standards_footprint import GHGStandardFootprint
+
     SQABase.metadata.create_all(engine)
 
     try:
@@ -41,11 +44,13 @@ if __name__ == "__main__":
         init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
         init_fail = init_fail + CostCurve.init_database_from_file(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
         # init_fail = init_fail + CostCloud.init_database_from_file(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
-        # init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
-        # o2_options.GHG_standard = GHGStandardFlat
 
-        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
-        o2_options.GHG_standard = GHGStandardFootprint
+        if o2_options.GHG_standard == 'flat':
+            init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+            o2_options.GHG_standard = GHGStandardFlat
+        else:
+            init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+            o2_options.GHG_standard = GHGStandardFootprint
 
         init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(o2_options.demanded_sales_annual_data_file, session, verbose=o2_options.verbose)
         init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
@@ -61,5 +66,5 @@ if __name__ == "__main__":
             producer.run_compliance_model(session)
         else:
             omega_log.logwrite("\#INIT FAIL")
-    except:
-        omega_log.logwrite("\n#RUNTIME FAIL")
+    except Exception as e:
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s" % e)
