@@ -33,10 +33,10 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    from manufacturers import *  # required by vehicles
-    from fuels import *  # required by vehicles
-    from market_classes import *  # required by vehicles
-    from vehicles import *  # for foreign key vehicle_ID
+    from manufacturers import Manufacturer  # required by vehicles
+    from fuels import Fuel  # required by vehicles
+    from market_classes import MarketClass  # required by vehicles
+    from vehicles import Vehicle  # for foreign key vehicle_ID
 
     session = Session(bind=engine)
     SQABase.metadata.create_all(engine)

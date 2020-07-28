@@ -13,7 +13,8 @@ class GHGStandardFlat(SQABase):
     __tablename__ = 'ghg_standards'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
     GHG_target_CO2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)
     lifetime_VMT = Column('lifetime_vmt', Float)
 
@@ -27,6 +28,7 @@ class GHGStandardFlat(SQABase):
         return s
 
     # noinspection PyMethodParameters
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -57,6 +59,19 @@ class GHGStandardFlat(SQABase):
 
         return template_errors
 
+    @staticmethod
+    def calculate_target_co2_gpmi(vehicle):
+        return session.query(GHGStandardFlat.GHG_target_CO2_grams_per_mile). \
+            filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFlat.model_year == vehicle.model_year).scalar()
+
+    @staticmethod
+    def calculate_target_co2_Mg(vehicle):
+        return session.query(GHGStandardFlat.lifetime_VMT). \
+            filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFlat.model_year == vehicle.model_year).scalar() * \
+            GHGStandardFlat.calculate_target_co2_gpmi(vehicle) / 1e6
+
 
 if __name__ == '__main__':
     if '__file__' in locals():
@@ -69,3 +84,20 @@ if __name__ == '__main__':
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+
+        o2_options.GHG_standard = GHGStandardFlat
+
+        class dummyVehicle():
+            model_year = None
+            reg_class_ID = None
+
+        car_vehicle = dummyVehicle()
+        car_vehicle.model_year = 2021
+        car_vehicle.reg_class_ID = RegClass.car.name
+
+        truck_vehicle = dummyVehicle()
+        truck_vehicle.model_year = 2021
+        truck_vehicle.reg_class_ID = RegClass.truck.name
+
+        car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
+        truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)

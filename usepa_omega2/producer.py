@@ -31,6 +31,25 @@ def calc_reg_class_demand(session, model_year):
     return producer_sales
 
 
+def run_compliance_model(session):
+    from manufacturers import Manufacturer
+    from vehicles import Vehicle
+
+    for manufacturer in session.query(Manufacturer.manufacturer_ID).all():
+
+        manufacturer_ID = manufacturer[0]
+        print(manufacturer_ID)
+        manufacturer_vehicles = session.query(Vehicle).filter(Vehicle.manufacturer_ID == manufacturer_ID).all()
+
+        for veh in manufacturer_vehicles:
+            print(veh.name)
+
+        for calendar_year in range(o2_options.analysis_initial_year+1, o2_options.analysis_final_year+1):
+            print(calendar_year)
+            # calculate compliance target for each vehicle
+            
+
+
 if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))

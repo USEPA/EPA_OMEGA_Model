@@ -25,6 +25,7 @@ class DemandedSalesAnnualData(SQABase):
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -64,7 +65,7 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    from market_classes import *  # needed for market class ID
+    from market_classes import MarketClass  # needed for market class ID
 
     SQABase.metadata.create_all(engine)
 

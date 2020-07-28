@@ -20,7 +20,7 @@ class FuelScenario(SQABase):
     def __str__(self):
         return "<Fuel('%s', %f MJ/%s)>" % (self.name, self.energy_density_MJ_per_unit, self.unit)
 
-    # noinspection PyMethodParameters
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 

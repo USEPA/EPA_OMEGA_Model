@@ -13,7 +13,8 @@ class GHGStandardFootprint(SQABase):
     __tablename__ = 'ghg_standards'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
     footprint_min_sqft = Column('footprint_min_sqft', Float)
     footprint_max_sqft = Column('footprint_max_sqft', Float)
     coeff_a = Column('coeff_a', Float)
@@ -31,7 +32,7 @@ class GHGStandardFootprint(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
-    # noinspection PyMethodParameters
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -68,6 +69,30 @@ class GHGStandardFootprint(SQABase):
 
         return template_errors
 
+    @staticmethod
+    def calculate_target_co2_gpmi(vehicle):
+        coefficients = session.query(GHGStandardFootprint). \
+            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFootprint.model_year == vehicle.model_year).one()
+
+        target_co2_gpmi = None
+
+        if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
+            target_co2_gpmi = coefficients.coeff_a
+        elif vehicle.footprint_ft2 > coefficients.footprint_max_sqft:
+            target_co2_gpmi = coefficients.coeff_b
+        else:
+            target_co2_gpmi = vehicle.footprint_ft2 * coefficients.coeff_c + coefficients.coeff_d
+
+        return target_co2_gpmi
+
+    @staticmethod
+    def calculate_target_co2_Mg(vehicle):
+        return session.query(GHGStandardFootprint.lifetime_VMT). \
+            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar() * \
+            GHGStandardFootprint.calculate_target_co2_gpmi(vehicle) / 1e6
+
 
 if __name__ == '__main__':
     if '__file__' in locals():
@@ -80,3 +105,23 @@ if __name__ == '__main__':
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+
+        o2_options.GHG_standard = GHGStandardFootprint
+
+        class dummyVehicle():
+            model_year = None
+            reg_class_ID = None
+            footprint_ft2 = None
+
+        car_vehicle = dummyVehicle()
+        car_vehicle.model_year = 2021
+        car_vehicle.reg_class_ID = RegClass.car.name
+        car_vehicle.footprint_ft2 = 41
+
+        truck_vehicle = dummyVehicle()
+        truck_vehicle.model_year = 2021
+        truck_vehicle.reg_class_ID = RegClass.truck.name
+        truck_vehicle.footprint_ft2 = 41
+
+        car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
+        truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)

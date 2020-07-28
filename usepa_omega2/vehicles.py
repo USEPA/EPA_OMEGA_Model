@@ -22,11 +22,14 @@ class Vehicle(SQABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
+    cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     new_vehicle_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
+    footprint_ft2 = 100 # placeholder, for now, will come from vehicles file eventually
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -37,6 +40,7 @@ class Vehicle(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         from cost_curves import CostCurve
         from vehicle_annual_data import VehicleAnnualData
@@ -82,6 +86,8 @@ class Vehicle(SQABase):
                                                                         model_year=veh.model_year,
                                                                         target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
+                    veh.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(veh)
+
                     session.add(veh)    # update database so vehicle_annual_data foreign key succeeds...
                     session.flush()
 
@@ -96,11 +102,11 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    from manufacturers import *  # needed for manufacturers table
-    from market_classes import *  # needed for market class ID
-    from fuels import *  # needed for showroom fuel ID
-    from cost_curves import *  # needed for vehicle cost from CO2
-    from cost_clouds import *  # needed for vehicle cost from CO2
+    from manufacturers import Manufacturer  # needed for manufacturers table
+    from market_classes import MarketClass  # needed for market class ID
+    from fuels import Fuel  # needed for showroom fuel ID
+    from cost_curves import CostCurve  # needed for vehicle cost from CO2
+    from cost_clouds import CostCloud  # needed for vehicle cost from CO2
     # from vehicle_annual_data import *   # needed for vehicle annual data (age zero registered count)
 
     SQABase.metadata.create_all(engine)

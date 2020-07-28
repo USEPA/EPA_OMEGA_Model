@@ -25,6 +25,7 @@ class Manufacturer(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
+    @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -57,9 +58,9 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    from fuels import *
-    from market_classes import *
-    from vehicles import *
+    from fuels import Fuel
+    from market_classes import MarketClass
+    from vehicles import Vehicle
 
     SQABase.metadata.create_all(engine)
 
