@@ -41,7 +41,6 @@ input_format_version = '0.0'
 
 print('loading usepa_omega2 version %s' % code_version)
 
-
 class OMEGA2RuntimeOptions(object):
     def __init__(self):
         self.verbose = True
@@ -63,7 +62,7 @@ class OMEGA2RuntimeOptions(object):
         self.analysis_final_year = None
         self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
         self.logfilename = ''
-
+        self.GHG_standard = None
 
 o2_options = OMEGA2RuntimeOptions()
 

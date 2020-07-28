@@ -57,6 +57,17 @@ class GHGStandardFlat(SQABase):
 
         return template_errors
 
+    def calculate_target_co2_gpmi(vehicle):
+        return session.query(GHGStandardFlat.GHG_target_CO2_grams_per_mile). \
+            filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFlat.model_year == vehicle.model_year).scalar()
+
+    def calculate_target_co2_Mg(vehicle):
+        return session.query(GHGStandardFlat.lifetime_VMT). \
+            filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFlat.model_year == vehicle.model_year).scalar() * \
+            GHGStandardFlat.calculate_target_co2_gpmi(vehicle)
+
 
 if __name__ == '__main__':
     if '__file__' in locals():
@@ -69,3 +80,20 @@ if __name__ == '__main__':
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+
+        o2_options.GHG_standard = GHGStandardFlat
+
+        class dummyVehicle():
+            model_year = None
+            reg_class_ID = None
+
+        car_vehicle = dummyVehicle()
+        car_vehicle.model_year = 2021
+        car_vehicle.reg_class_ID = 'car'
+
+        truck_vehicle = dummyVehicle()
+        truck_vehicle.model_year = 2021
+        truck_vehicle.reg_class_ID = 'truck'
+
+        car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
+        truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)

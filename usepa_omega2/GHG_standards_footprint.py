@@ -68,6 +68,16 @@ class GHGStandardFootprint(SQABase):
 
         return template_errors
 
+    def calculate_target_co2_gpmi(vehicle):
+        # insert vehicle attribute-based calculations here:
+        return 0
+
+    def calculate_target_co2_Mg(vehicle):
+        return session.query(GHGStandardFootprint.lifetime_VMT). \
+            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar() * \
+            GHGStandardFootprint.calculate_target_co2_gpmi(vehicle)
+
 
 if __name__ == '__main__':
     if '__file__' in locals():

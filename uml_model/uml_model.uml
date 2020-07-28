@@ -28,6 +28,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_vrzlcKstEeq6oJG-GxIr5g" name="market_class_id"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_AlDlEKsvEeq6oJG-GxIr5g" name="manufacturer_id"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_QQXbILr4EeqR6PiF084V6A" name="name" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Fpr1gNDfEeqzVL8A1ZovNA" name="cert_target_co2_grams_per_mile"/>
       <ownedOperation xmi:type="uml:Operation" xmi:id="_Irvj4KslEeq6oJG-GxIr5g" name="calculateCertCO2pmi"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_ayCmcJUiEeq1MNw_X5quEQ" name="vehicle_annual_data">
