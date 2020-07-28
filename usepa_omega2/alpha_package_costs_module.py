@@ -179,9 +179,9 @@ class Targets:
         fp_max = f'{self.reg_class}_fp_max'
         for year in years:
             if self.fp <= self.coefficients[year][fp_min]:
-                return_dict[year] = {'CO2_target': self.coefficients[year][fp_min]}
+                return_dict[year] = {'CO2_target': self.coefficients[year][a]}
             elif self.fp > self.coefficients[year][fp_max]:
-                return_dict[year] = {'CO2_target': self.coefficients[year][fp_max]}
+                return_dict[year] = {'CO2_target': self.coefficients[year][b]}
             else:
                 return_dict[year] = {'CO2_target': self.coefficients[year][c] * self.fp + self.coefficients[year][d]}
             return_dict[year].update({'CO2_refinery': return_dict[year]['CO2_target']
