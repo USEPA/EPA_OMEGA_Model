@@ -66,7 +66,7 @@ class GHGStandardFlat(SQABase):
         return session.query(GHGStandardFlat.lifetime_VMT). \
             filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
             filter(GHGStandardFlat.model_year == vehicle.model_year).scalar() * \
-            GHGStandardFlat.calculate_target_co2_gpmi(vehicle)
+            GHGStandardFlat.calculate_target_co2_gpmi(vehicle) / 1e6
 
 
 if __name__ == '__main__':

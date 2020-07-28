@@ -15,6 +15,7 @@ from market_classes import *
 from cost_curves import *
 from cost_clouds import *
 from GHG_standards_flat import *
+from GHG_standards_footprint import *
 from demanded_sales_annual_data import *
 from manufacturers import *
 from vehicles import *
@@ -40,11 +41,11 @@ if __name__ == "__main__":
         init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
         init_fail = init_fail + CostCurve.init_database_from_file(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
         # init_fail = init_fail + CostCloud.init_database_from_file(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
-        init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
-        o2_options.GHG_standard = GHGStandardFlat
+        # init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+        # o2_options.GHG_standard = GHGStandardFlat
 
-        # init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
-        # o2_options.GHG_standard = GHGStandardFootprint
+        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+        o2_options.GHG_standard = GHGStandardFootprint
 
         init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(o2_options.demanded_sales_annual_data_file, session, verbose=o2_options.verbose)
         init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
