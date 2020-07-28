@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path, PurePath
 from datetime import datetime
+from itertools import product
 import shutil
 from usepa_omega2.drive_cycle_energy_calcs import SAEJ2951_target_inertia_and_roadload_weight_combined_calcs
 
@@ -135,7 +136,7 @@ class CalcCosts:
 
     def vehicle_cost(self, years):
         for year in years:
-            self.df[f'vehicle_cost_{year}'] = \
+            self.df[f'new_vehicle_cost_dollars_{year}'] = \
                 self.df[[f'powertrain_cost_{year}', f'roadload_cost_{year}', f'weight_cost_{year}']].sum(axis=1)
         return self.df
 
@@ -179,9 +180,9 @@ class Targets:
         fp_max = f'{self.reg_class}_fp_max'
         for year in years:
             if self.fp <= self.coefficients[year][fp_min]:
-                return_dict[year] = {'CO2_target': self.coefficients[year][fp_min]}
+                return_dict[year] = {'CO2_target': self.coefficients[year][a]}
             elif self.fp > self.coefficients[year][fp_max]:
-                return_dict[year] = {'CO2_target': self.coefficients[year][fp_max]}
+                return_dict[year] = {'CO2_target': self.coefficients[year][b]}
             else:
                 return_dict[year] = {'CO2_target': self.coefficients[year][c] * self.fp + self.coefficients[year][d]}
             return_dict[year].update({'CO2_refinery': return_dict[year]['CO2_target']
@@ -191,8 +192,8 @@ class Targets:
 
 def calc_bev_co2(df, years, targets_dict, upstream):
     for year in years:
-        df.insert(len(df.columns), f'CO2_cycle_{year}', 0)
-        df[f'CO2_cycle_{year}'] = df['kWhpMi_cycle'] \
+        df.insert(len(df.columns), f'cert_co2_grams_per_mile_{year}', 0)
+        df[f'cert_co2_grams_per_mile_{year}'] = df['kWhpMi_cycle'] \
                                   * upstream[year]['GHGpkWh'] / (1 - upstream[year]['grid_loss']) \
                                   - targets_dict[year]['CO2_refinery']
     return df
@@ -215,10 +216,36 @@ def get_energy_consumption_metrics(file, file_num, folder_num):
     return file
 
 
+def reshape_ice_df_for_cloud_file(df_source, effectiveness_class, years):
+    df_source.rename(columns={'Combined GHG gCO2/mi': 'cert_co2_grams_per_mile'}, inplace=True)
+    df_return = pd.DataFrame()
+    for year in years:
+        temp = pd.melt(df_source[['cert_co2_grams_per_mile', f'new_vehicle_cost_dollars_{year}']], id_vars='cert_co2_grams_per_mile', value_vars=f'new_vehicle_cost_dollars_{year}', value_name='new_vehicle_cost_dollars')
+        temp.insert(0, 'model_year', year)
+        temp.drop(columns='variable', inplace=True)
+        df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
+    df_return.insert(0, 'cost_curve_class', f'ice_{effectiveness_class}')
+    return df_return
+
+
+def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
+    df_return = pd.DataFrame()
+    for year in years:
+        temp = pd.melt(df_source[[f'cert_co2_grams_per_mile_{year}']], value_vars=f'cert_co2_grams_per_mile_{year}', value_name='cert_co2_grams_per_mile')
+        temp.drop(columns='variable', inplace=True)
+        temp = temp.join(pd.melt(df_source[[f'new_vehicle_cost_dollars_{year}']], value_vars=f'new_vehicle_cost_dollars_{year}', value_name='new_vehicle_cost_dollars'))
+        temp.drop(columns='variable', inplace=True)
+        temp.insert(0, 'model_year', year)
+        df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
+    df_return.insert(0, 'cost_curve_class', f'{bev_key}')
+    return df_return
+
+
 def main():
     PATH_PROJECT = Path.cwd()
     PATH_INPUTS = PATH_PROJECT.joinpath('inputs')
-    PATH_ALPHA_INPUTS = PATH_INPUTS.joinpath('ALPHA')
+    PATH_ALPHA_INPUTS = PATH_INPUTS.joinpath('ALPHA_ToyModel')
+    PATH_INPUT_TEMPLATES = PATH_PROJECT.joinpath('input_templates')
     PATH_OUTPUTS = PATH_PROJECT.joinpath('outputs')
     BEV_WR_RANGE = [x / 2 for x in range(0, 41, 1)]
 
@@ -255,9 +282,10 @@ def main():
                'Transmission',
                'Transmission Vintage',
                'Engine',
-               'Engine',
+               'Engine.1',
                'Engine Displacement L',
                'Engine Cylinders',
+               'Engine Max Power kW',
                'Combined GHG gCO2/mi',
                'Combined Target Total Efficiency %',
                'Inertial_Work_J/m',
@@ -265,6 +293,7 @@ def main():
                ]
 
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
+    cost_clouds_input_template_file = 'cost_clouds.csv'
     techcosts_file = pd.ExcelFile(PATH_INPUTS.joinpath('alpha_package_costs_module_inputs.xlsx'))
     techcosts_engine = pd.read_excel(techcosts_file, 'engine')
     techcosts_deac = pd.read_excel(techcosts_file, 'deac', index_col='Cylinders')
@@ -384,54 +413,66 @@ def main():
         # temp = pd.Series(alpha_file['ALPHA_engine, Cylinders']).unique()
         # temp = pd.DataFrame(temp)
         # temp.to_csv(PATH_ALPHA_INPUTS.joinpath('file_num' + str(file_num) + '.csv'))
-        for engine_architecture in engine_architectures:
-            for percent_weight_reduction in percent_weight_reductions:
-                for aero_improvement in aero_improvements:
-                    for nonaero_improvement in nonaero_improvements:
-                        package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class] \
-                            = alpha_file[file_num].loc[(alpha_file[file_num]['engine_architecture'] == engine_architecture)
-                                                       & (alpha_file[file_num]['weight_reduction'] == percent_weight_reduction)
-                                                       & (alpha_file[file_num]['aero'] == aero_improvement)
-                                                       & (alpha_file[file_num]['nonaero'] == nonaero_improvement)]
-                        package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class]\
-                            .reset_index(drop=True, inplace=True)
+        for ea, pwr, ai, nai in product(engine_architectures, percent_weight_reductions, aero_improvements, nonaero_improvements):
+            package_dict[effectiveness_class, ea, pwr, ai, nai, work_class] \
+                = alpha_file[file_num].loc[(alpha_file[file_num]['engine_architecture'] == ea)
+                                           & (alpha_file[file_num]['weight_reduction'] == pwr)
+                                           & (alpha_file[file_num]['aero'] == ai)
+                                           & (alpha_file[file_num]['nonaero'] == nai)]
+            package_dict[effectiveness_class, ea, pwr, ai, nai, work_class] .reset_index(drop=True, inplace=True)
+        # for engine_architecture in engine_architectures:
+        #     for percent_weight_reduction in percent_weight_reductions:
+        #         for aero_improvement in aero_improvements:
+        #             for nonaero_improvement in nonaero_improvements:
+        #                 package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class] \
+        #                     = alpha_file[file_num].loc[(alpha_file[file_num]['engine_architecture'] == engine_architecture)
+        #                                                & (alpha_file[file_num]['weight_reduction'] == percent_weight_reduction)
+        #                                                & (alpha_file[file_num]['aero'] == aero_improvement)
+        #                                                & (alpha_file[file_num]['nonaero'] == nonaero_improvement)]
+        #                 package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class]\
+        #                     .reset_index(drop=True, inplace=True)
                         # insert and calculate new cost columns
-                        temp_df = package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class].copy()
-                        temp_df.insert(len(temp_df.columns), 'deac_cost', 0)
-                        cost_object = CalcCosts(temp_df)
-                        temp_df = cost_object.deac_cost(techcosts_deac)
-                        temp_df = cost_object.trans_cost(techcosts_trans)
-                        temp_df = cost_object.accessory_cost(techcosts_accessories)
-                        temp_df.insert(len(temp_df.columns), 'start-stop_cost', 0)
-                        temp_df = cost_object.startstop_cost(techcosts_startstop)
-                        temp_df = cost_object.aero_cost(techcosts_aero, work_class)
-                        temp_df = cost_object.nonaero_cost(techcosts_nonaero)
-                        for year in YEARS:
-                            temp_df.insert(len(temp_df.columns), f'weight_cost_{year}', 0)
-                        for year in YEARS:
-                            temp_df.insert(len(temp_df.columns), f'powertrain_cost_{year}', 0)
-                        for year in YEARS:
-                            temp_df.insert(len(temp_df.columns), f'roadload_cost_{year}', 0)
-                        for year in YEARS:
-                            temp_df.insert(len(temp_df.columns), f'vehicle_cost_{year}', 0)
-                        cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
-                        # sum individual techs into system-level costs (powertrain, roadload)
-                        cost_object.powertrain_cost(START_YEAR)
-                        cost_object.roadload_cost(START_YEAR)
-                        # apply learning
-                        cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_WEIGHT, 'weight_cost')
-                        cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_POWERTRAIN, 'powertrain_cost')
-                        cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_ROADLOAD, 'roadload_cost')
-                        cost_object.vehicle_cost(YEARS)
-                        effectiveness_class_dict[effectiveness_class] = pd.concat([effectiveness_class_dict[effectiveness_class], temp_df], axis=0, ignore_index=True, sort=False)
+            temp_df = package_dict[effectiveness_class, ea, pwr, ai, nai, work_class].copy()
+            # temp_df = package_dict[effectiveness_class, engine_architecture, percent_weight_reduction, aero_improvement, nonaero_improvement, work_class].copy()
+            temp_df.insert(len(temp_df.columns), 'deac_cost', 0)
+            cost_object = CalcCosts(temp_df)
+            temp_df = cost_object.deac_cost(techcosts_deac)
+            temp_df = cost_object.trans_cost(techcosts_trans)
+            temp_df = cost_object.accessory_cost(techcosts_accessories)
+            temp_df.insert(len(temp_df.columns), 'start-stop_cost', 0)
+            temp_df = cost_object.startstop_cost(techcosts_startstop)
+            temp_df = cost_object.aero_cost(techcosts_aero, work_class)
+            temp_df = cost_object.nonaero_cost(techcosts_nonaero)
+            for year in YEARS:
+                temp_df.insert(len(temp_df.columns), f'weight_cost_{year}', 0)
+            for year in YEARS:
+                temp_df.insert(len(temp_df.columns), f'powertrain_cost_{year}', 0)
+            for year in YEARS:
+                temp_df.insert(len(temp_df.columns), f'roadload_cost_{year}', 0)
+            for year in YEARS:
+                temp_df.insert(len(temp_df.columns), f'new_vehicle_cost_dollars_{year}', 0)
+            cost_object.weight_cost(START_YEAR, techcosts_weight, work_class)
+            # sum individual techs into system-level costs (powertrain, roadload)
+            cost_object.powertrain_cost(START_YEAR)
+            cost_object.roadload_cost(START_YEAR)
+            # apply learning
+            cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_WEIGHT, 'weight_cost')
+            cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_POWERTRAIN, 'powertrain_cost')
+            cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_ROADLOAD, 'roadload_cost')
+            cost_object.vehicle_cost(YEARS)
+            effectiveness_class_dict[effectiveness_class] = pd.concat([effectiveness_class_dict[effectiveness_class], temp_df], axis=0, ignore_index=True, sort=False)
 
     # save ALPHA-based output files
     PATH_OUTPUTS.mkdir(exist_ok=True)
     path_of_run_folder = PATH_OUTPUTS.joinpath(f'{start_time_readable}_O2-TechCosts')
     path_of_run_folder.mkdir(exist_ok=False)
+    cost_clouds_df = pd.DataFrame()
     for effectiveness_class in [*effectiveness_class_dict]:
         print(f'Saving {effectiveness_class}.csv')
         effectiveness_class_dict[effectiveness_class].to_csv(path_of_run_folder.joinpath(f'ice_{effectiveness_class}.csv'), index=False)
+        print(f'Adding ice_{effectiveness_class} results to cost_clouds DataFrame for inclusion in the input template.')
+        reshaped_df = reshape_ice_df_for_cloud_file(effectiveness_class_dict[effectiveness_class], effectiveness_class, YEARS)
+        cost_clouds_df = pd.concat([cost_clouds_df, reshaped_df], ignore_index=True, axis=0)
 
     # work on BEVs
     print('Working on BEVs')
@@ -478,8 +519,8 @@ def main():
         bev_cost_co2[key] = cost_object.year_over_year_cost(START_YEAR, YEARS, LEARNING_RATE_BEV, 'bev_cost')
         for year in YEARS:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
-                                          f'vehicle_cost_{year}',
-                                          bev_cost_co2[key][[f'weight_cost_{year}', f'bev_cost_{year}']].sum(axis=1))
+                                     f'new_vehicle_cost_dollars_{year}',
+                                     bev_cost_co2[key][[f'weight_cost_{year}', f'bev_cost_{year}']].sum(axis=1))
 
         # calc targets and upstream petroleum CO2 (CO2_refinery)
         targets = Targets(reg_class, fp, coefficients, upstream)
@@ -488,6 +529,9 @@ def main():
         calc_bev_co2(bev_cost_co2[key], YEARS, targets_dict, upstream)
         print(f'Saving {key}')
         bev_cost_co2[key].to_csv(path_of_run_folder.joinpath(f'{key}.csv'), index=False)
+        print(f'Adding bev_{eff_class} results to cost_clouds DataFrame for inclusion in the input template.')
+        reshaped_df = reshape_bev_df_for_cloud_file(bev_cost_co2[key], key, YEARS)
+        cost_clouds_df = pd.concat([cost_clouds_df, reshaped_df], ignore_index=True, axis=0)
 
     modified_costs = pd.ExcelWriter(path_of_run_folder.joinpath(f'techcosts_in_{DOLLAR_BASIS}_dollars.xlsx'))
     techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='engine', index=False)
@@ -505,11 +549,22 @@ def main():
     modified_costs.save()
 
     input_files_list = [techcosts_file]
-    filename_list = [PurePath(path).name for path in input_files_list]
+    filename_list = [PurePath(path).name for path in input_files_list] + [cost_clouds_input_template_file]
     for file in filename_list:
         path_source = PATH_INPUTS.joinpath(file)
         path_destination = path_of_run_folder.joinpath(file)
-        shutil.copy(path_source, path_destination)
+        shutil.copy2(path_source, path_destination) # copy2 should maintain date/timestamps
+
+    # open the 'cost_clouds.csv' input template into which results will be placed.
+    cost_clouds_template_info = pd.read_csv(path_of_run_folder.joinpath('cost_clouds.csv'), 'b', nrows=0)
+    temp = ' '.join((item for item in cost_clouds_template_info))
+    temp2 = temp.split(',')
+    df = pd.DataFrame(columns=temp2)
+    df.to_csv(path_of_run_folder.joinpath('cost_clouds.csv'), index=False)
+
+    with open(path_of_run_folder.joinpath('cost_clouds.csv'), 'a', newline='') as cloud_file:
+        cost_clouds_df.to_csv(cloud_file, index=False)
+
 
 if __name__ == '__main__':
     main()
