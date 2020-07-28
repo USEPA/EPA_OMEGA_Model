@@ -75,7 +75,7 @@ class GHGStandardFootprint(SQABase):
 
         target_co2_gpmi = None
 
-        if vehicle.footprint_ft2 < coefficients.footprint_min_sqft:
+        if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
             target_co2_gpmi = coefficients.coeff_a
         elif vehicle.footprint_ft2 > coefficients.footprint_max_sqft:
             target_co2_gpmi = coefficients.coeff_b
