@@ -18,6 +18,7 @@ def demand_sales(session, model_year):
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
+    from vehicles import Vehicle
 
     sales_dict = dict()
 

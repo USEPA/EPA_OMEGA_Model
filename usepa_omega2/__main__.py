@@ -19,7 +19,7 @@ from demanded_sales_annual_data import *
 from manufacturers import *
 from vehicles import *
 from vehicle_annual_data import *
-
+import consumer
 
 if __name__ == "__main__":
 
