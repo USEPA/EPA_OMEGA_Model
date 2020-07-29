@@ -100,6 +100,20 @@ class GHGStandardFootprint(SQABase):
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
 
+    @staticmethod
+    def calculate_cert_co2_Mg(vehicle):
+        from vehicle_annual_data import VehicleAnnualData
+
+        lifetime_VMT = session.query(GHGStandardFootprint.lifetime_VMT). \
+            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
+            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar()
+
+        co2_gpmi = vehicle.cert_CO2_grams_per_mile
+
+        sales = vehicle.get_initial_registered_count()
+
+        return co2_gpmi * lifetime_VMT * sales / 1e6
+
 
 if __name__ == '__main__':
     if '__file__' in locals():
@@ -119,16 +133,26 @@ if __name__ == '__main__':
             model_year = None
             reg_class_ID = None
             footprint_ft2 = None
+            initial_registered_count = None
+
+            def get_initial_registered_count(self):
+                return self.initial_registered_count
+
 
         car_vehicle = dummyVehicle()
         car_vehicle.model_year = 2021
         car_vehicle.reg_class_ID = RegClass.car.name
         car_vehicle.footprint_ft2 = 41
+        car_vehicle.initial_registered_count = 1
 
         truck_vehicle = dummyVehicle()
         truck_vehicle.model_year = 2021
         truck_vehicle.reg_class_ID = RegClass.truck.name
         truck_vehicle.footprint_ft2 = 41
+        truck_vehicle.initial_registered_count = 1
 
         car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
+        car_target_co2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
+
         truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
+        truck_target_co2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)

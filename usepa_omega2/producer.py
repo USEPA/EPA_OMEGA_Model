@@ -56,11 +56,14 @@ def run_compliance_model(session):
                 new_veh = Vehicle()
                 new_veh.inherit_vehicle(prior_veh)
                 new_veh.model_year = calendar_year
-                new_veh.get_cert_target_CO2_grams_per_mile()
                 new_veh.set_initial_registered_count(prior_veh.get_initial_registered_count())
-                print(prior_veh)
-                print(new_veh)
+                new_veh.get_cert_target_CO2_grams_per_mile()
+                new_veh.set_cert_target_CO2_Mg()
                 manufacturer_new_vehicles.append(new_veh)
+
+            # TODO: determine new CO2 g/mi for this model year
+            # new_veh.cert_CO2_grams_per_mile = SOMETHING
+            # new_veh.set_cert_CO2_Mg()
 
             # session.add_all(manufacturer_new_vehicles)
             session.flush()
