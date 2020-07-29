@@ -28,6 +28,13 @@ class VehicleAnnualData(SQABase):
                                       age=age))
         session.flush()
 
+    def get_registered_count(session, vehicle_ID, age):
+        from vehicles import Vehicle
+
+        return session.query(VehicleAnnualData.registered_count). \
+            filter(VehicleAnnualData.vehicle_ID==vehicle_ID). \
+            filter(VehicleAnnualData.age==age).scalar()
+
 
 if __name__ == '__main__':
     if '__file__' in locals():
