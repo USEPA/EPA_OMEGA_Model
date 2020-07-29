@@ -107,7 +107,6 @@ if __name__ == '__main__':
     from fuels import Fuel  # needed for showroom fuel ID
     from cost_curves import CostCurve  # needed for vehicle cost from CO2
     from cost_clouds import CostCloud  # needed for vehicle cost from CO2
-    # from vehicle_annual_data import *   # needed for vehicle annual data (age zero registered count)
 
     SQABase.metadata.create_all(engine)
 
