@@ -7,6 +7,7 @@ dist
 outputs
 .pytest_cache
 .coverage
+input_templates/.*
 
 # Distribution / packaging
 .Python
