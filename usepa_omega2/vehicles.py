@@ -29,7 +29,7 @@ class Vehicle(SQABase):
     new_vehicle_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    footprint_ft2 = 100 # placeholder, for now, will come from vehicles file eventually
+    footprint_ft2 = Column(Float)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -40,17 +40,43 @@ class Vehicle(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
+    def get_cert_target_CO2_grams_per_mile(self):
+        self.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(self)
+
+    def set_initial_registered_count(self, sales):
+        from vehicle_annual_data import VehicleAnnualData
+
+        session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
+        session.flush()
+
+        VehicleAnnualData.update_registered_count(session, vehicle_ID=self.vehicle_ID,
+                                                  calendar_year=self.model_year,
+                                                  registered_count=sales)
+
+    def get_initial_registered_count(self):
+        from vehicle_annual_data import VehicleAnnualData
+
+        return VehicleAnnualData.get_registered_count(session, vehicle_ID=self.vehicle_ID, age=0)
+
+    def inherit_vehicle(self, vehicle):
+        inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
+                              'cost_curve_class', 'reg_class_ID', 'showroom_fuel_ID', 'market_class_ID',
+                              'footprint_ft2'}
+        for p in inherit_properties:
+            self.__setattr__(p, vehicle.__getattribute__(p))
+
     @staticmethod
     def init_database_from_file(filename, session, verbose=False):
         from cost_curves import CostCurve
-        from vehicle_annual_data import VehicleAnnualData
+
 
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.0003
+        input_template_version = 0.0004
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'hauling_class',
-                                  'cost_curve_class', 'showroom_fuel_id', 'market_class_id', 'sales', 'cert_co2_grams_per_mile'}
+                                  'cost_curve_class', 'showroom_fuel_id', 'market_class_id', 'sales',
+                                  'cert_co2_grams_per_mile', 'footprint_ft2'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -74,6 +100,7 @@ class Vehicle(SQABase):
                         showroom_fuel_ID=df.loc[i, 'showroom_fuel_id'],
                         market_class_ID=df.loc[i, 'market_class_id'],
                         cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
+                        footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
                     if 'BEV' in veh.market_class_ID:
@@ -86,14 +113,17 @@ class Vehicle(SQABase):
                                                                         model_year=veh.model_year,
                                                                         target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
-                    veh.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(veh)
+                    # veh.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(veh)
+                    veh.get_cert_target_CO2_grams_per_mile()
 
-                    session.add(veh)    # update database so vehicle_annual_data foreign key succeeds...
-                    session.flush()
+                    # session.add(veh)    # update database so vehicle_annual_data foreign key succeeds...
+                    # session.flush()
+                    #
+                    # VehicleAnnualData.update_registered_count(session, vehicle_ID=veh.vehicle_ID,
+                    #                                           calendar_year=veh.model_year,
+                    #                                           registered_count=df.loc[i, 'sales'])
 
-                    VehicleAnnualData.update_registered_count(session, vehicle_ID=veh.vehicle_ID,
-                                                              calendar_year=veh.model_year,
-                                                              registered_count=df.loc[i, 'sales'])
+                    veh.set_initial_registered_count(df.loc[i, 'sales'])
 
         return template_errors
 
@@ -107,7 +137,6 @@ if __name__ == '__main__':
     from fuels import Fuel  # needed for showroom fuel ID
     from cost_curves import CostCurve  # needed for vehicle cost from CO2
     from cost_clouds import CostCloud  # needed for vehicle cost from CO2
-    # from vehicle_annual_data import *   # needed for vehicle annual data (age zero registered count)
 
     SQABase.metadata.create_all(engine)
 

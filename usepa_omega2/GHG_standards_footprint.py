@@ -88,10 +88,17 @@ class GHGStandardFootprint(SQABase):
 
     @staticmethod
     def calculate_target_co2_Mg(vehicle):
-        return session.query(GHGStandardFootprint.lifetime_VMT). \
+        from vehicle_annual_data import VehicleAnnualData
+
+        lifetime_VMT = session.query(GHGStandardFootprint.lifetime_VMT). \
             filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
-            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar() * \
-            GHGStandardFootprint.calculate_target_co2_gpmi(vehicle) / 1e6
+            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar()
+
+        co2_gpmi = GHGStandardFootprint.calculate_target_co2_gpmi(vehicle)
+
+        sales = vehicle.get_initial_registered_count()
+
+        return co2_gpmi * lifetime_VMT * sales / 1e6
 
 
 if __name__ == '__main__':

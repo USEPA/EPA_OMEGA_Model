@@ -1,14 +1,18 @@
 import numpy as np
 import math
+from pathlib import Path
 
 def PHEVT_Consumer():
-    rootdir = 'C:/Users/KBolon/Documents/ma3t_python_version/'
-    YearOnMarket = np.loadtxt(rootdir + 'tech_yearonmarket_allowEV300_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,6))
-    dBeta = np.loadtxt(rootdir + 'consumer_beta.csv', delimiter=',', skiprows=0, usecols=range(1,136))
-    bDummyFlag = np.transpose(np.loadtxt(rootdir + 'tech_nestheterogeneity_zeroH2andCI_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,10)))
-    choiceNames = np.loadtxt(rootdir + 'tech_choicenames.csv', delimiter=',', skiprows=0, usecols=range(1, 406), dtype=str)
-    generalizedcost = np.loadtxt(rootdir + 'generalizedcosts_wPEVlearning_Same2050GeneralizedCosts.csv', delimiter=',', skiprows=1, usecols=range(1,47))
-    generalizedcostchoicenames = np.loadtxt(rootdir + 'generalizedcosts.csv', delimiter=',', skiprows=1, usecols=range(0, 1), dtype=str)
+    path_code = Path(__file__).parent
+    path_project = Path(path_code).parent
+    path_inputs = path_project / 'inputs' / 'ma3t'
+    path_outputs = path_project / 'outputs' / 'ma3t'
+    YearOnMarket = np.loadtxt(path_inputs / 'tech_yearonmarket_allowEV300_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,6))
+    dBeta = np.loadtxt(path_inputs / 'consumer_beta.csv', delimiter=',', skiprows=0, usecols=range(1,136))
+    bDummyFlag = np.transpose(np.loadtxt(path_inputs / 'tech_nestheterogeneity_zeroH2andCI_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,10)))
+    choiceNames = np.loadtxt(path_inputs / 'tech_choicenames_orig20190404.csv', delimiter=',', skiprows=0, usecols=range(1, 406), dtype=str)
+    generalizedcost = np.loadtxt(path_inputs / 'generalizedcosts_wPEVlearning_Same2050GeneralizedCosts_20200728.csv', delimiter=',', skiprows=1, usecols=range(1,47))
+    # generalizedcostchoicenames = np.loadtxt(path_inputs + 'generalizedcosts.csv', delimiter=',', skiprows=1, usecols=range(0, 1), dtype=str)
     iNestLayerNum = 5
     iLastNestLayerIdx = iNestLayerNum - 1
     iNestPerNestNum = [5, 3, 3, 3, 3]
@@ -136,12 +140,12 @@ def PHEVT_Consumer():
             dProbNestLayer5 = np.append(dProbNestLayer5, [dProb[4, ]], axis=0)
             # dProbNestLayer5 = np.append(dProbNestLayer5, [dProb[4, bDummyFlag[4,] != 0]], axis=0)
             choiceProbAllYears = np.vstack((choiceProbAllYears, np.transpose(np.append(choiceNames, np.append([(iStepIndex + firstAnalysisYear) * np.ones([iChoiceNum[iLastNestLayerIdx], ])], np.append([choiceProb], [choiceGeneralizedCost], axis=0), axis=0), axis=0))))
-    np.savetxt(rootdir + 'dProbNestLayer1.csv', np.transpose(dProbNestLayer1), delimiter=',', fmt='%s')
-    np.savetxt(rootdir + 'dProbNestLayer2.csv', np.transpose(dProbNestLayer2), delimiter=',', fmt='%s')
-    np.savetxt(rootdir + 'dProbNestLayer3.csv', np.transpose(dProbNestLayer3), delimiter=',', fmt='%s')
-    np.savetxt(rootdir + 'dProbNestLayer4.csv', np.transpose(dProbNestLayer4), delimiter=',', fmt='%s')
-    np.savetxt(rootdir + 'dProbNestLayer5.csv', np.transpose(dProbNestLayer5), delimiter=',', fmt='%s')
-    np.savetxt(rootdir + 'choiceProbAllYears.csv', choiceProbAllYears, delimiter=',', fmt='%s')
+    np.savetxt(path_outputs / 'dProbNestLayer1.csv', np.transpose(dProbNestLayer1), delimiter=',', fmt='%s')
+    np.savetxt(path_outputs / 'dProbNestLayer2.csv', np.transpose(dProbNestLayer2), delimiter=',', fmt='%s')
+    np.savetxt(path_outputs / 'dProbNestLayer3.csv', np.transpose(dProbNestLayer3), delimiter=',', fmt='%s')
+    np.savetxt(path_outputs / 'dProbNestLayer4.csv', np.transpose(dProbNestLayer4), delimiter=',', fmt='%s')
+    np.savetxt(path_outputs / 'dProbNestLayer5.csv', np.transpose(dProbNestLayer5), delimiter=',', fmt='%s')
+    np.savetxt(path_outputs / 'choiceProbAllYears.csv', choiceProbAllYears, delimiter=',', fmt='%s')
 
 def AssignValueToArray(LcTargetArray, iLcRowL, iLcRowU, iLcColL, iLcColU, LcSourceArray):
     if isinstance(LcSourceArray, np.ndarray):
