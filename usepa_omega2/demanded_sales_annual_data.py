@@ -21,6 +21,7 @@ class DemandedSalesAnnualData(SQABase):
     discount_rate = Column(Float)
     share_weight = Column(Float)
     demanded_sales_count = Column(Numeric)
+    consumer_generalized_cost_dollars = Column(Float)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))

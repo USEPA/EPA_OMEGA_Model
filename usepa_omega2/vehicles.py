@@ -28,7 +28,8 @@ class Vehicle(SQABase):
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
     cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
-    new_vehicle_cost_dollars = Column(Float)
+    new_vehicle_mfr_cost_dollars = Column(Float)
+    manufactuer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
@@ -116,10 +117,10 @@ class Vehicle(SQABase):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.new_vehicle_cost_dollars = CostCurve.get_cost(session,
-                                                                        cost_curve_class=veh.cost_curve_class,
-                                                                        model_year=veh.model_year,
-                                                                        target_co2_gpmi=veh.cert_CO2_grams_per_mile)
+                    veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
+                                                                          cost_curve_class=veh.cost_curve_class,
+                                                                          model_year=veh.model_year,
+                                                                          target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
                     veh.set_initial_registered_count(df.loc[i, 'sales'])
                     veh.set_cert_target_CO2_grams_per_mile()
