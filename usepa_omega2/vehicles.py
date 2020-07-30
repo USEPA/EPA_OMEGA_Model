@@ -42,7 +42,7 @@ class Vehicle(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
-    def get_cert_target_CO2_grams_per_mile(self):
+    def set_cert_target_CO2_grams_per_mile(self):
         self.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(self)
 
     def set_cert_target_CO2_Mg(self):
@@ -122,7 +122,7 @@ class Vehicle(SQABase):
                                                                         target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
                     veh.set_initial_registered_count(df.loc[i, 'sales'])
-                    veh.get_cert_target_CO2_grams_per_mile()
+                    veh.set_cert_target_CO2_grams_per_mile()
                     veh.set_cert_target_CO2_Mg()
                     veh.set_cert_CO2_Mg()
 
