@@ -9,6 +9,11 @@ Consumer module stub (for now)
 from usepa_omega2 import *
 
 
+# placeholder for consumer generalized vehicle cost:
+def calculate_generalized_cost(cost_factors):
+    pass
+
+
 def demand_sales(session, model_year):
     """
     :param session: database session

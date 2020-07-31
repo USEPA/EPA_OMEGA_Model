@@ -13,7 +13,15 @@ import file_eye_oh as fileio
 import pandas as pd
 
 from sqlalchemy import create_engine
-from sqlalchemy import Column, String, ForeignKey, Enum, Float, Integer, Numeric
+
+# NOTE:
+# INTEGERS get stored in sqlite as byte strings:i.e.:
+# >>int.from_bytes(b'\xe4\x07\x00\x00\x00\x00\x00\x00', 'little') equals 2020, so we need to use Numeric if we want
+# to be able to easily use them and see them in database dumps, so model_year is Numeric, not Integer
+# The only place where Integer works as expected is for primary keys
+
+from sqlalchemy import Column, String, ForeignKey, Enum, Float, Numeric, Integer
+
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
@@ -24,6 +32,37 @@ engine = create_engine('sqlite:///:memory:', echo=True)
 session = Session(bind=engine)
 session.execute(
     'pragma foreign_keys=on')  # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
+
+
+def get_column_names(table_name, exclude=None):
+    """
+    For creating arguments to SQL expressions that need a list of column names
+    :param table_name: name of database table to query
+    :param exclude: column name or list of column names to exclude
+    :return: comma separated list of column names string
+    """
+
+    # get table row data:
+    result = session.execute('PRAGMA table_info(%s)' % table_name)
+
+    # make list of column names:
+    columns = [r[1] for r in result.fetchall()]
+
+    # remove excluded column names
+    if exclude:
+        if type(exclude) is not list:
+            columns.remove(exclude)
+        else:
+            for e in exclude:
+                columns.remove(e)
+
+    # create string with no quotes or parentheses
+    columns_str = str(tuple(columns)).replace("'", "").replace('(','').replace(')','')
+
+    # table_columns = [table_name + '.' + c for c in columns]
+    # table_columns_str = str(tuple(table_columns)).replace("'", "").replace('(','').replace(')','')
+
+    return columns_str  # , table_columns_str
 
 
 def dump_database_to_csv(engine, output_folder, verbose=False):

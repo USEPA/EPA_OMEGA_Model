@@ -57,6 +57,9 @@ print('loading usepa_omega2 version %s' % code_version)
 
 class OMEGA2RuntimeOptions(object):
     def __init__(self):
+        import producer
+        import consumer
+
         self.verbose = True
         self.output_folder = 'output/'
         self.database_dump_folder = '__dump'
@@ -74,6 +77,8 @@ class OMEGA2RuntimeOptions(object):
         self.analysis_final_year = None
         self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
         self.logfilename = ''
+        self.producer_calculate_generalized_cost = producer.calculate_generalized_cost
+        self.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
         self.GHG_standard = 'footprint'
         if self.GHG_standard == 'flat':
             self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'

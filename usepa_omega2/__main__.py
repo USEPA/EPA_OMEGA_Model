@@ -18,6 +18,7 @@ from cost_curves import CostCurve
 from cost_clouds import CostCloud
 from demanded_sales_annual_data import DemandedSalesAnnualData
 from manufacturers import Manufacturer
+from manufacturer_annual_data import ManufacturerAnnualData
 from vehicles import Vehicle
 from vehicle_annual_data import VehicleAnnualData
 import consumer
@@ -73,3 +74,11 @@ if __name__ == "__main__":
         if init_fail:
             omega_log.logwrite("\#INIT FAIL")
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+
+# from sqlalchemy.sql import text
+# sel = Vehicle.__table__.select().where(text('model_year==2020 AND manufacturer_id=="USA Motors"'))
+# ins = Vehicle.__table__.insert().from_select(Vehicle.__table__.columns, sel)
+# print(ins)
+# engine.execute(ins)
+# session.execute('INSERT INTO vehicles (name, manufacturer_id, model_year) SELECT vehicles.name, vehicles.manufacturer_id, vehicles.model_year FROM vehicles WHERE model_year==2020 AND manufacturer_id=="USA Motors"')
+# session.execute('INSERT INTO vehicles SELECT * FROM vehicles WHERE model_year==2020 AND manufacturer_id=="USA Motors"')

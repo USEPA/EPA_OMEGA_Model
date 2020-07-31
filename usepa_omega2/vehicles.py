@@ -26,7 +26,10 @@ class Vehicle(SQABase):
     reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
-    new_vehicle_cost_dollars = Column(Float)
+    cert_CO2_Mg = Column('cert_co2_megagrams', Float)
+    cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
+    new_vehicle_mfr_cost_dollars = Column(Float)
+    manufactuer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
@@ -40,8 +43,14 @@ class Vehicle(SQABase):
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s
 
-    def get_cert_target_CO2_grams_per_mile(self):
+    def set_cert_target_CO2_grams_per_mile(self):
         self.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(self)
+
+    def set_cert_target_CO2_Mg(self):
+        self.cert_target_CO2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(self)
+
+    def set_cert_CO2_Mg(self):
+        self.cert_CO2_Mg = o2_options.GHG_standard.calculate_cert_co2_Mg(self)
 
     def set_initial_registered_count(self, sales):
         from vehicle_annual_data import VehicleAnnualData
@@ -108,22 +117,15 @@ class Vehicle(SQABase):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.new_vehicle_cost_dollars = CostCurve.get_cost(session,
-                                                                        cost_curve_class=veh.cost_curve_class,
-                                                                        model_year=veh.model_year,
-                                                                        target_co2_gpmi=veh.cert_CO2_grams_per_mile)
-
-                    # veh.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(veh)
-                    veh.get_cert_target_CO2_grams_per_mile()
-
-                    # session.add(veh)    # update database so vehicle_annual_data foreign key succeeds...
-                    # session.flush()
-                    #
-                    # VehicleAnnualData.update_registered_count(session, vehicle_ID=veh.vehicle_ID,
-                    #                                           calendar_year=veh.model_year,
-                    #                                           registered_count=df.loc[i, 'sales'])
+                    veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
+                                                                          cost_curve_class=veh.cost_curve_class,
+                                                                          model_year=veh.model_year,
+                                                                          target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
                     veh.set_initial_registered_count(df.loc[i, 'sales'])
+                    veh.set_cert_target_CO2_grams_per_mile()
+                    veh.set_cert_target_CO2_Mg()
+                    veh.set_cert_CO2_Mg()
 
         return template_errors
 
