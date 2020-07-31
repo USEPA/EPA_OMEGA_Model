@@ -55,6 +55,11 @@ def calculate_cert_co2_Mg(model_year, manufacturer_id):
         Vehicle.model_year == model_year).scalar()
 
 
+# placeholder for producer deemed generalized vehicle cost:
+def calculate_generalized_cost(cost_factors):
+    pass
+
+
 def run_compliance_model(session):
     from manufacturers import Manufacturer
     from manufacturer_annual_data import ManufacturerAnnualData
