@@ -37,6 +37,9 @@ if __name__ == "__main__":
     else:
         from GHG_standards_footprint import GHGStandardFootprint
 
+    o2_options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
+    o2_options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
+
     SQABase.metadata.create_all(engine)
 
     try:
