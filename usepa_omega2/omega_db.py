@@ -34,6 +34,13 @@ session.execute(
     'pragma foreign_keys=on')  # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
 
 
+def sql_format_list_str(list_in):
+    return str(tuple(list_in)).replace("'", ""). \
+        replace('(', '').replace(')', ''). \
+        replace('{', '').replace('}', ''). \
+        replace('[', '').replace(']', '')
+
+
 def get_column_names(table_name, exclude=None):
     """
     For creating arguments to SQL expressions that need a list of column names
@@ -57,7 +64,7 @@ def get_column_names(table_name, exclude=None):
                 columns.remove(e)
 
     # create string with no quotes or parentheses
-    columns_str = str(tuple(columns)).replace("'", "").replace('(','').replace(')','')
+    columns_str = sql_format_list_str(columns)  # str(tuple(columns)).replace("'", "").replace('(','').replace(')','')
 
     # table_columns = [table_name + '.' + c for c in columns]
     # table_columns_str = str(tuple(table_columns)).replace("'", "").replace('(','').replace(')','')

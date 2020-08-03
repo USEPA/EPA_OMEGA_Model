@@ -94,6 +94,18 @@ class CostCurve(SQABase):
 
         return cost_curve(target_co2_gpmi).tolist()
 
+    @staticmethod
+    def get_min_co2_gpmi(cost_curve_class, model_year):
+        return session.query(func.min(CostCurve.cert_co2_grams_per_mile)). \
+            filter(CostCurve.cost_curve_class==cost_curve_class). \
+            filter(CostCurve.model_year==model_year).scalar()
+
+    @staticmethod
+    def get_max_co2_gpmi(cost_curve_class, model_year):
+        return session.query(func.max(CostCurve.cert_co2_grams_per_mile)). \
+            filter(CostCurve.cost_curve_class==cost_curve_class). \
+            filter(CostCurve.model_year==model_year).scalar()
+
 
 if __name__ == '__main__':
     if '__file__' in locals():
