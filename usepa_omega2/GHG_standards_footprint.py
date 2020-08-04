@@ -87,12 +87,16 @@ class GHGStandardFootprint(SQABase):
         return target_co2_gpmi
 
     @staticmethod
+    def calculate_cert_lifetime_vmt(reg_class_id, model_year):
+        return session.query(GHGStandardFootprint.lifetime_VMT). \
+            filter(GHGStandardFootprint.reg_class_ID == reg_class_id). \
+            filter(GHGStandardFootprint.model_year == model_year).scalar()
+
+    @staticmethod
     def calculate_target_co2_Mg(vehicle):
         from vehicle_annual_data import VehicleAnnualData
 
-        lifetime_VMT = session.query(GHGStandardFootprint.lifetime_VMT). \
-            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
-            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar()
+        lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
         co2_gpmi = GHGStandardFootprint.calculate_target_co2_gpmi(vehicle)
 
@@ -104,9 +108,7 @@ class GHGStandardFootprint(SQABase):
     def calculate_cert_co2_Mg(vehicle):
         from vehicle_annual_data import VehicleAnnualData
 
-        lifetime_VMT = session.query(GHGStandardFootprint.lifetime_VMT). \
-            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
-            filter(GHGStandardFootprint.model_year == vehicle.model_year).scalar()
+        lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
         co2_gpmi = vehicle.cert_CO2_grams_per_mile
 

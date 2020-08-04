@@ -41,7 +41,18 @@ def sql_format_list_str(list_in):
         replace('[', '').replace(']', '')
 
 
-def get_column_names(table_name, exclude=None):
+def sql_format_value_list_str(list_in):
+    values_str = ''
+    for li in list_in:
+        if type(li) is not tuple:
+            li = (li,)
+        values_str = values_str + '%s,' % str(li)
+    values_str = values_str.replace(',)', ')')  # remove trailing tuple commas
+    values_str = values_str[:-1]
+    return values_str
+
+
+def sql_get_column_names(table_name, exclude=None):
     """
     For creating arguments to SQL expressions that need a list of column names
     :param table_name: name of database table to query
@@ -70,6 +81,10 @@ def get_column_names(table_name, exclude=None):
     # table_columns_str = str(tuple(table_columns)).replace("'", "").replace('(','').replace(')','')
 
     return columns_str  # , table_columns_str
+
+
+def sql_valid_name(name_str):
+    return name_str.replace(' ', '_')
 
 
 def dump_database_to_csv(engine, output_folder, verbose=False):
