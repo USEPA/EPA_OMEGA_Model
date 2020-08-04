@@ -198,6 +198,18 @@
       <ownedOperation xmi:type="uml:Operation" xmi:id="_KbOoQNKoEeqXgOJvvQp2mg" name="update_cert_target_co2_Mg"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_Tjw6ENKoEeqXgOJvvQp2mg" name="manufacturer_id"/>
+    <packagedElement xmi:type="uml:Class" xmi:id="_IPS0UNZaEeqxT4IWw4575Q" name="reregistration_fixed_byage">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_UcLn8NZaEeqxT4IWw4575Q" name="index" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_XzaCcNZaEeqxT4IWw4575Q" name="reregistered_proportion" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_skwxgNZaEeqxT4IWw4575Q" name="age" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_3qODANZaEeqxT4IWw4575Q" name="market_class_id" visibility="public"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_jJO48NZfEeqxT4IWw4575Q" name="annual_vmt_fixed_byage">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_GqpjANZgEeqxT4IWw4575Q" name="index"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_MlwPgNZgEeqxT4IWw4575Q" name="annual_vmt" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_P0qbgNZgEeqxT4IWw4575Q" name="age" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_TVvVkNZgEeqxT4IWw4575Q" name="market_class_id"/>
+    </packagedElement>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_jYTvAK8IEeqO0d-UmaSoow">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jYWLQK8IEeqO0d-UmaSoow" source="http://www.eclipse.org/uml2/2.0.0/UML">
