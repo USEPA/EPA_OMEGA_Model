@@ -1,4 +1,4 @@
-input_template_name:,reregistration_fixed_byage,input_template_version:,0.0001
+input_template_name:,reregistration_fixed_by_age,input_template_version:,0.0001
 age,market_class_id,reregistered_proportion,
 0,BEV non hauling,1,
 1,BEV non hauling,0.987841531,

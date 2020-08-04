@@ -81,6 +81,8 @@ class OMEGA2RuntimeOptions(object):
             self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
         else:
             self.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
+        self.reregistration_fixed_by_age_file = 'input_templates/reregistration_fixed_by_age.csv'
+        self.annual_vmt_fixed_by_age_file = 'input_templates/annual_vmt_fixed_by_age.csv'
 
 
 o2_options = OMEGA2RuntimeOptions()

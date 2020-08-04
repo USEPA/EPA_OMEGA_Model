@@ -21,6 +21,8 @@ from manufacturers import Manufacturer
 from manufacturer_annual_data import ManufacturerAnnualData
 from vehicles import Vehicle
 from vehicle_annual_data import VehicleAnnualData
+from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
+from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
 import consumer
 import producer
 
@@ -61,6 +63,8 @@ if __name__ == "__main__":
         init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(o2_options.demanded_sales_annual_data_file, session, verbose=o2_options.verbose)
         init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
         init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
+        init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(o2_options.reregistration_fixed_by_age_file, session, verbose=o2_options.verbose)
+        init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2_options.annual_vmt_fixed_by_age_file, session, verbose=o2_options.verbose)
 
         # initial year = initial fleet model year (latest year of data)
         o2_options.analysis_initial_year = int(session.query(func.max(Vehicle.model_year)).scalar()) + 1
