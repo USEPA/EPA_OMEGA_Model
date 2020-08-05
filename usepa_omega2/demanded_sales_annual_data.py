@@ -53,8 +53,8 @@ class DemandedSalesAnnualData(SQABase):
                         annual_VMT=df.loc[i, 'annual_vmt'],
                         payback_years=df.loc[i, 'payback_years'],
                         price_amortization_period=df.loc[i, 'price_amortization_period'],
-                        discount_rate=df.loc[i, 'share_weight'],
-                        share_weight=df.loc[i, 'discount_rate'],
+                        discount_rate=df.loc[i, 'discount_rate'],
+                        share_weight=df.loc[i, 'share_weight'],
                     ))
                 session.add_all(obj_list)
                 session.flush()
