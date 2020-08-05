@@ -11,7 +11,7 @@ from usepa_omega2 import *
 
 import numpy as np
 
-import consumer
+import  consumer.sales as consumer
 import copy
 
 

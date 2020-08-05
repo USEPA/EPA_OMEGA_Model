@@ -1,6 +1,6 @@
 """
-consumer.py
-===========
+sales.py
+========
 
 Consumer module stub (for now)
 

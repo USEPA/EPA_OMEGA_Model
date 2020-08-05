@@ -23,7 +23,7 @@ from vehicles import Vehicle
 from vehicle_annual_data import VehicleAnnualData
 from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
 from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
-import consumer
+import  consumer.sales as consumer
 import producer
 
 if __name__ == "__main__":
