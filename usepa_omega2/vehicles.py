@@ -29,7 +29,7 @@ class Vehicle(SQABase):
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
     cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
     new_vehicle_mfr_cost_dollars = Column(Float)
-    manufactuer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
+    manufacturer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
