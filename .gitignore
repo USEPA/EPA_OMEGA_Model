@@ -123,3 +123,4 @@ composer.lock
 /__dump/*
 /usepa_omega2/_sequester/
 /output/
+/usepa_omega2/consumer/output/
