@@ -93,29 +93,17 @@ def run_compliance_model(session):
     from vehicles import Vehicle
     from cost_curves import CostCurve
 
-    for manufacturer in session.query(Manufacturer.manufacturer_ID).all():
+    for hc in hauling_classes:
+        session.execute('CREATE TABLE bev_shares_%s (bev_share_%s_frac FLOAT)' % (sql_valid_name(hc),
+                                                                                  sql_valid_name(hc)))
 
+    for manufacturer in session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
 
-        # for calendar_year in range(o2_options.analysis_initial_year, o2_options.analysis_final_year + 1):
-        for calendar_year in range(o2_options.analysis_initial_year, o2_options.analysis_initial_year + 1):
+        for calendar_year in range(o2_options.analysis_initial_year, o2_options.analysis_final_year + 1):
+        # for calendar_year in range(o2_options.analysis_initial_year, o2_options.analysis_initial_year + 1):
             print(calendar_year)
-
-            # inherit_vehicles(calendar_year-1, calendar_year, manufacturer_ID)
-            #
-            # # pull in new vehicles:
-            # manufacturer_new_vehicles = session.query(Vehicle). \
-            #     filter(Vehicle.manufacturer_ID == manufacturer_ID). \
-            #     filter(Vehicle.model_year == calendar_year). \
-            #     all()
-            #
-            # for new_veh in manufacturer_new_vehicles:
-            #     new_vehicle_sales = 1e6  # has to come from somewhere...
-            #     new_veh.set_initial_registered_count(sales=new_vehicle_sales)
-            #     new_veh.get_cert_target_CO2_grams_per_mile()
-            #     new_veh.set_cert_target_CO2_Mg()
-
             # pull in last year's vehicles:
             manufacturer_prior_vehicles = session.query(Vehicle). \
                 filter(Vehicle.manufacturer_ID == manufacturer_ID). \
@@ -140,8 +128,10 @@ def run_compliance_model(session):
             # TODO: determine new CO2 g/mi for this model year
             # new_veh.cert_CO2_grams_per_mile = SOMETHING
             # new_veh.set_cert_CO2_Mg()
-            num_tech_points = 10
-            bev_shares_frac = np.linspace(0, 100, 11) / 100
+            num_tech_options = 10
+            bev_shares_frac = dict()
+            bev_shares_frac['hauling'] = np.unique(np.linspace(0, 1, 10))
+            bev_shares_frac['non hauling'] = np.unique(np.linspace(0, 1, 10))
 
             vehicle_tables = dict()
             tech_table_columns = dict()
@@ -152,11 +142,9 @@ def run_compliance_model(session):
                 new_vehicles_by_hauling_class[hc] = dict()
                 for fc in fueling_classes:
                     new_vehicles_by_hauling_class[hc][fc] = []
-                session.execute('CREATE TABLE bev_shares_%s (bev_share_%s_frac FLOAT)' % (sql_valid_name(hc),
-                                                                                          sql_valid_name(hc)))
+                session.execute('DELETE FROM bev_shares_%s' % sql_valid_name(hc))  # clear table
                 session.execute('INSERT INTO bev_shares_%s VALUES %s' %
-                                (sql_valid_name(hc), sql_format_value_list_str(bev_shares_frac)))
-
+                                (sql_valid_name(hc), sql_format_value_list_str(bev_shares_frac[hc])))
 
             # create tech package options, for each vehicle, by hauling class
             for new_veh in manufacturer_new_vehicles:
@@ -167,7 +155,7 @@ def run_compliance_model(session):
                 co2_gpmi_options = np.linspace(
                     CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
                     CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
-                    num=num_tech_points).tolist()
+                    num=num_tech_options).tolist()
                 tech_cost_options = CostCurve.get_cost(session,
                                                        cost_curve_class=new_veh.cost_curve_class,
                                                        model_year=new_veh.model_year,
@@ -283,17 +271,60 @@ def run_compliance_model(session):
                                  sql_valid_name(hc), sql_valid_name(hc))
                                 )
 
+                # remove duplicate Mg outcomes and costs
+                # (this cuts down on the full factorial combinations by a significant amount)
+                # TODO: there's a SQL way to do this, involving partitioning data and assigning row numbers, but I couldn't understand it
+                megagrams_set = set()
+                unique_data = []
+                res = session.execute('SELECT %s_combo_co2_megagrams, %s_combo_cost_dollars, * FROM %s' %
+                                      (sql_valid_name(hc), sql_valid_name(hc), tech_share_combos_table_name)).fetchall()
+                for r in res:
+                    combo_co2_megagrams = r[0]
+                    combo_cost_dollars = r[1]
+                    combo_data = r[2:]
+                    if (combo_co2_megagrams, combo_cost_dollars) not in megagrams_set:
+                        megagrams_set.add((combo_co2_megagrams, combo_cost_dollars))
+                        unique_data.append(combo_data)
+                # clear table
+                session.execute('DELETE FROM %s' % tech_share_combos_table_name)
+                # toss unique data back in
+                for ud in unique_data:
+                    session.execute('INSERT INTO %s (%s) VALUES %s' %
+                                    (tech_share_combos_table_name,
+                                     sql_get_column_names(tech_share_combos_table_name),
+                                     ud))
+
             # if False:
             session.execute(
-                'CREATE TABLE tech_share_combos_total AS SELECT %s, %s FROM tech_share_combos_2021_hauling, tech_share_combos_2021_non_hauling' % (
-                    sql_get_column_names('tech_share_combos_2021_hauling'),
-                    sql_get_column_names('tech_share_combos_2021_non_hauling')))
+                'CREATE TABLE tech_share_combos_total_%d AS SELECT %s, %s FROM tech_share_combos_%d_hauling, tech_share_combos_%d_non_hauling' % (
+                    calendar_year,
+                    sql_get_column_names('tech_share_combos_%d_hauling' % calendar_year),
+                    sql_get_column_names('tech_share_combos_%d_non_hauling' % calendar_year),
+                    calendar_year, calendar_year))
 
-            session.execute('ALTER TABLE tech_share_combos_total ADD COLUMN total_combo_co2_megagrams')
-            session.execute('UPDATE tech_share_combos_total SET total_combo_co2_megagrams=non_hauling_combo_co2_megagrams+hauling_combo_co2_megagrams')
+            session.execute('ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_co2_megagrams' % calendar_year)
+            session.execute('UPDATE tech_share_combos_total_%d SET total_combo_co2_megagrams=non_hauling_combo_co2_megagrams+hauling_combo_co2_megagrams' % calendar_year)
 
-            session.execute('ALTER TABLE tech_share_combos_total ADD COLUMN total_combo_cost_dollars')
-            session.execute('UPDATE tech_share_combos_total SET total_combo_cost_dollars=non_hauling_combo_cost_dollars+hauling_combo_cost_dollars')
+            session.execute('ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_cost_dollars' % calendar_year)
+            session.execute('UPDATE tech_share_combos_total_%d SET total_combo_cost_dollars=non_hauling_combo_cost_dollars+hauling_combo_cost_dollars' % calendar_year)
+
+            # pick a winner!!
+            sel = 'SELECT * FROM tech_share_combos_total_%d WHERE ' \
+                  'total_combo_co2_megagrams<=%f ORDER BY total_combo_cost_dollars LIMIT 1' % (calendar_year, cert_target_co2_Mg)
+            winning_combo = session.execute(sel).fetchone()
+
+            # assign co2 values to vehicles...
+            if calendar_year==o2_options.analysis_initial_year:
+                session.execute('CREATE TABLE winners AS %s' % sel)
+                session.execute('ALTER TABLE winners ADD COLUMN calendar_year')
+                session.execute('ALTER TABLE winners ADD COLUMN cert_target_co2_megagrams')
+                session.execute('UPDATE winners SET calendar_year=%d' % calendar_year)
+                session.execute('UPDATE winners SET cert_target_co2_megagrams=%d' % cert_target_co2_Mg)
+            else:
+                winning_combo = list(winning_combo)
+                winning_combo.append(calendar_year)
+                winning_combo.append(cert_target_co2_Mg)
+                session.execute('INSERT INTO winners (%s) VALUES %s' % (sql_get_column_names('winners'), tuple(winning_combo)))
 
             session.add_all(manufacturer_new_vehicles)
             session.flush()
