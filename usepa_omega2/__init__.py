@@ -91,6 +91,7 @@ class OMEGA2RuntimeOptions(object):
             self.annual_vmt_fixed_by_age_file = 'input_templates/annual_vmt_fixed_by_age.csv'
         else:
             pass
+        self.slice_tech_combo_cloud_tables = True
 
 
 o2_options = OMEGA2RuntimeOptions()

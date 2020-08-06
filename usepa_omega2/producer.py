@@ -332,6 +332,11 @@ def run_compliance_model(session):
                 winning_combo.append(cert_target_co2_Mg)
                 session.execute('INSERT INTO winners (%s) VALUES %s' % (sql_get_column_names('winners'), tuple(winning_combo)))
 
+            if o2_options.slice_tech_combo_cloud_tables:
+                slice_width = 0.01 * cert_target_co2_Mg
+                session.execute('DELETE FROM tech_share_combos_total_%d WHERE total_combo_co2_megagrams NOT BETWEEN %f AND %f' %
+                                (calendar_year, cert_target_co2_Mg-slice_width, cert_target_co2_Mg + slice_width))
+
             if not o2_options.verbose:
                 # drop big ass table
                 session.execute('DROP TABLE tech_share_combos_total_%d' % (calendar_year))
