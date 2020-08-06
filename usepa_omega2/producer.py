@@ -125,9 +125,7 @@ def run_compliance_model(session):
             cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
             ManufacturerAnnualData.update_cert_target_co2_Mg(manufacturer_ID, calendar_year, cert_target_co2_Mg)
 
-            # TODO: determine new CO2 g/mi for this model year
-            # new_veh.cert_CO2_grams_per_mile = SOMETHING
-            # new_veh.set_cert_CO2_Mg()
+            # set up number of tech options and BEV shares
             num_tech_options = 10
             bev_shares_frac = dict()
             bev_shares_frac['hauling'] = np.unique(np.linspace(0, 1, 10))
@@ -147,6 +145,7 @@ def run_compliance_model(session):
                                 (sql_valid_name(hc), sql_format_value_list_str(bev_shares_frac[hc])))
 
             # create tech package options, for each vehicle, by hauling class
+            new_vehicle_co2_dict = dict()
             for new_veh in manufacturer_new_vehicles:
                 new_vehicles_by_hauling_class[new_veh.hauling_class][new_veh.fueling_class].append(new_veh)
                 tech_table_name = 'tech_options_%d_' % new_veh.model_year + new_veh.cost_curve_class
@@ -169,6 +168,7 @@ def run_compliance_model(session):
                 tech_table_columns[new_veh.hauling_class].add(tech_table_co2_gpmi_col)
                 tech_table_columns[new_veh.hauling_class].add(tech_table_cost_dollars)
                 vehicle_tables[new_veh.hauling_class].append(tech_table_name)
+                new_vehicle_co2_dict[new_veh] = tech_table_co2_gpmi_col
 
             # combine tech package options, by hauling class
             for hc in hauling_classes:
@@ -313,6 +313,12 @@ def run_compliance_model(session):
                   'total_combo_co2_megagrams<=%f ORDER BY total_combo_cost_dollars LIMIT 1' % (calendar_year, cert_target_co2_Mg)
             winning_combo = session.execute(sel).fetchone()
 
+            for new_veh, co2_gpmi_col in new_vehicle_co2_dict.items():
+                new_veh.set_cert_co2_grams_per_mile(winning_combo[co2_gpmi_col])
+                print(new_veh.cert_CO2_grams_per_mile)
+                new_veh.set_cert_CO2_Mg()
+                print(new_veh.cert_CO2_Mg)
+
             # assign co2 values to vehicles...
             if calendar_year==o2_options.analysis_initial_year:
                 session.execute('CREATE TABLE winners AS %s' % sel)
@@ -325,6 +331,10 @@ def run_compliance_model(session):
                 winning_combo.append(calendar_year)
                 winning_combo.append(cert_target_co2_Mg)
                 session.execute('INSERT INTO winners (%s) VALUES %s' % (sql_get_column_names('winners'), tuple(winning_combo)))
+
+            if not o2_options.verbose:
+                # drop big ass table
+                session.execute('DROP TABLE tech_share_combos_total_%d' % (calendar_year))
 
             session.add_all(manufacturer_new_vehicles)
             session.flush()

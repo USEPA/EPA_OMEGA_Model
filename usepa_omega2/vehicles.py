@@ -49,6 +49,14 @@ class Vehicle(SQABase):
     def set_cert_target_CO2_Mg(self):
         self.cert_target_CO2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(self)
 
+    def set_cert_co2_grams_per_mile(self, cert_co2_grams_per_mile):
+        from cost_curves import CostCurve
+        self.cert_CO2_grams_per_mile = cert_co2_grams_per_mile
+        self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
+                                                              cost_curve_class=self.cost_curve_class,
+                                                              model_year=self.model_year,
+                                                              target_co2_gpmi=self.cert_CO2_grams_per_mile)
+
     def set_cert_CO2_Mg(self):
         self.cert_CO2_Mg = o2_options.GHG_standard.calculate_cert_co2_Mg(self)
 
@@ -76,9 +84,6 @@ class Vehicle(SQABase):
 
     @staticmethod
     def init_database_from_file(filename, session, verbose=False):
-        from cost_curves import CostCurve
-
-
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
@@ -108,7 +113,6 @@ class Vehicle(SQABase):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         showroom_fuel_ID=df.loc[i, 'showroom_fuel_id'],
                         market_class_ID=df.loc[i, 'market_class_id'],
-                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
@@ -117,10 +121,11 @@ class Vehicle(SQABase):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
-                                                                          cost_curve_class=veh.cost_curve_class,
-                                                                          model_year=veh.model_year,
-                                                                          target_co2_gpmi=veh.cert_CO2_grams_per_mile)
+                    veh.set_cert_co2_grams_per_mile(df.loc[i, 'cert_co2_grams_per_mile'])
+                    # veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
+                    #                                                       cost_curve_class=veh.cost_curve_class,
+                    #                                                       model_year=veh.model_year,
+                    #                                                       target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
                     veh.set_initial_registered_count(df.loc[i, 'sales'])
                     veh.set_cert_target_CO2_grams_per_mile()
