@@ -29,22 +29,6 @@ class ManufacturerAnnualData(SQABase):
                                            ))
         session.flush()
 
-    # @staticmethod
-    # def update_cert_target_co2_Mg(calendar_year, manufacturer_ID, cert_target_co2_Mg):
-    #     session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
-    #                                   calendar_year=calendar_year,
-    #                                   cert_target_co2_Mg=cert_target_co2_Mg,
-    #                                   ))
-    #     session.flush()
-
-    # @staticmethod
-    # def update_cert_co2_Mg(calendar_year, manufacturer_ID, cert_co2_Mg):
-    #     mad = session.query(ManufacturerAnnualData)\
-    #         .filter(manufacturer_ID==manufacturer_ID)\
-    #         .filter(calendar_year==calendar_year).scalar()
-    #     mad.cert_co2_Mg = cert_co2_Mg
-    #     session.flush()
-
 
 if __name__ == '__main__':
     if '__file__' in locals():

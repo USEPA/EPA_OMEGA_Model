@@ -329,20 +329,6 @@ def run_compliance_model(session):
                                                                    winning_combo['total_combo_co2_megagrams'],
                                                                    winning_combo['total_combo_cost_dollars'])
 
-            # yeah... this doesn't work!! Columns don't come in a predictable order
-            # if calendar_year==o2_options.analysis_initial_year:
-            #     session.execute('CREATE TABLE winners AS %s' % sel)
-            #     session.execute('ALTER TABLE winners ADD COLUMN calendar_year')
-            #     session.execute('ALTER TABLE winners ADD COLUMN cert_target_co2_megagrams')
-            #     session.execute('UPDATE winners SET calendar_year=%d' % calendar_year)
-            #     session.execute('UPDATE winners SET cert_target_co2_megagrams=%d' % cert_target_co2_Mg)
-            # else:
-            #     winning_combo_list = list(winning_combo)
-            #     winning_combo_list.append(calendar_year)
-            #     winning_combo_list.append(cert_target_co2_Mg)
-            #     session.execute('INSERT INTO winners (%s, calendar_year, cert_target_co2_Mg) VALUES %s' %
-            #                     (winning_combo.keys(), tuple(winning_combo_list)))
-
             if not o2_options.verbose:
                 # drop big ass table
                 session.execute('DROP TABLE tech_share_combos_total_%d' % (calendar_year))
