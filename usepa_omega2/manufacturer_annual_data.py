@@ -16,14 +16,34 @@ class ManufacturerAnnualData(SQABase):
     calendar_year = Column(Numeric)
     cert_co2_Mg = Column('cert_co2_megagrams', Numeric)
     cert_target_co2_Mg = Column('cert_target_co2_megagrams', Numeric)
+    manufacturer_vehicle_cost_dollars = Column('manufacturer_vehicle_cost_dollars', Numeric)
 
     @staticmethod
-    def update_cert_target_co2_Mg(manufacturer_ID, calendar_year, cert_target_co2_Mg):
+    def update_manufacturer_annual_data(calendar_year, manufacturer_ID, cert_target_co2_Mg,
+                                        cert_co2_Mg, manufacturer_vehicle_cost_dollars):
         session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
-                                      calendar_year=calendar_year,
-                                      cert_target_co2_Mg=cert_target_co2_Mg,
-                                      ))
+                                           calendar_year=calendar_year,
+                                           cert_target_co2_Mg=cert_target_co2_Mg,
+                                           cert_co2_Mg=cert_co2_Mg,
+                                           manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars
+                                           ))
         session.flush()
+
+    # @staticmethod
+    # def update_cert_target_co2_Mg(calendar_year, manufacturer_ID, cert_target_co2_Mg):
+    #     session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
+    #                                   calendar_year=calendar_year,
+    #                                   cert_target_co2_Mg=cert_target_co2_Mg,
+    #                                   ))
+    #     session.flush()
+
+    # @staticmethod
+    # def update_cert_co2_Mg(calendar_year, manufacturer_ID, cert_co2_Mg):
+    #     mad = session.query(ManufacturerAnnualData)\
+    #         .filter(manufacturer_ID==manufacturer_ID)\
+    #         .filter(calendar_year==calendar_year).scalar()
+    #     mad.cert_co2_Mg = cert_co2_Mg
+    #     session.flush()
 
 
 if __name__ == '__main__':

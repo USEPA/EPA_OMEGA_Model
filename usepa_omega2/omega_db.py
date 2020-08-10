@@ -20,9 +20,9 @@ from sqlalchemy import create_engine
 # to be able to easily use them and see them in database dumps, so model_year is Numeric, not Integer
 # The only place where Integer works as expected is for primary keys
 
-from sqlalchemy import Column, String, ForeignKey, Enum, Float, Numeric, Integer
-
+from sqlalchemy import String, ForeignKey, Enum, Float, Numeric, Integer
 from sqlalchemy import func
+from sqlalchemy import MetaData, Table, Column
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 
@@ -84,7 +84,7 @@ def sql_get_column_names(table_name, exclude=None):
 
 
 def sql_valid_name(name_str):
-    return name_str.replace(' ', '_')
+    return name_str.replace(' ', '_').lower()
 
 
 def dump_database_to_csv(engine, output_folder, verbose=False):

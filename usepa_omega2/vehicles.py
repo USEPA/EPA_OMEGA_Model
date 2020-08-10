@@ -78,7 +78,7 @@ class Vehicle(SQABase):
     def inherit_vehicle(self, vehicle):
         inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'showroom_fuel_ID', 'market_class_ID',
-                              'footprint_ft2'}
+                              'cert_CO2_grams_per_mile', 'footprint_ft2'}
         for p in inherit_properties:
             self.__setattr__(p, vehicle.__getattribute__(p))
 

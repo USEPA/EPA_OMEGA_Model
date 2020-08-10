@@ -92,6 +92,7 @@ class OMEGA2RuntimeOptions(object):
         else:
             pass
         self.slice_tech_combo_cloud_tables = True
+        self.allow_backsliding = False
 
 
 o2_options = OMEGA2RuntimeOptions()

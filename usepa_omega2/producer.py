@@ -11,17 +11,7 @@ from usepa_omega2 import *
 
 import numpy as np
 
-import  consumer.sales as consumer
-import copy
-
-
-# class BEVNonHaulingTech(SQABase):
-#     # --- database table properties ---
-#     __tablename__ = 'BEV_non_hauling'
-#     name = Column('BEV_non_hauling_co2_gpmi', Float)
-#
-#     def clear(self):
-#         session.execute('DELETE FROM %s' % self.__tablename__)
+import consumer.sales as consumer
 
 
 def calc_reg_class_demand(session, model_year):
@@ -93,10 +83,6 @@ def run_compliance_model(session):
     from vehicles import Vehicle
     from cost_curves import CostCurve
 
-    for hc in hauling_classes:
-        session.execute('CREATE TABLE bev_shares_%s (bev_share_%s_frac FLOAT)' % (sql_valid_name(hc),
-                                                                                  sql_valid_name(hc)))
-
     for manufacturer in session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
@@ -123,13 +109,22 @@ def run_compliance_model(session):
 
             # calculate this year's target Mg
             cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
-            ManufacturerAnnualData.update_cert_target_co2_Mg(manufacturer_ID, calendar_year, cert_target_co2_Mg)
 
             # set up number of tech options and BEV shares
             num_tech_options = 10
-            bev_shares_frac = dict()
-            bev_shares_frac['hauling'] = np.unique(np.linspace(0, 1, 10))
-            bev_shares_frac['non hauling'] = np.unique(np.linspace(0, 1, 10))
+            market_shares_frac = dict()
+            market_shares_frac['hauling'] = dict()
+            market_shares_frac['non hauling'] = dict()
+            market_shares_frac['hauling']['BEV'] = np.unique(np.linspace(0, 1, 10))
+            market_shares_frac['non hauling']['BEV'] = np.unique(np.linspace(0, 1, 10))
+            market_share_groups = dict()
+            market_share_groups['hauling'] = fueling_classes
+            market_share_groups['non hauling'] = fueling_classes
+
+            # WAS WORKING ON DE-HAND-CODING THE SWEEP FACTORS... HAD AN IDEA ABOUT HAVING BOTH ICE AND BEV SHARES
+            # IN THE MARKET SHARE TABLE, BUT THEY HAVE TO ADD UP TO ONE... FACTORIAL THEM AND THROW OUT COMBOS THAT
+            # EXCEED 1.0?  SOME OTHER METHOD?  THEN USE EACH VEHICLES MARKET CLASS TO LOOK UP IT'S SHARE...?
+            # NOT REALLY SURE, EXACTLY...
 
             vehicle_tables = dict()
             tech_table_columns = dict()
@@ -140,20 +135,29 @@ def run_compliance_model(session):
                 new_vehicles_by_hauling_class[hc] = dict()
                 for fc in fueling_classes:
                     new_vehicles_by_hauling_class[hc][fc] = []
-                session.execute('DELETE FROM bev_shares_%s' % sql_valid_name(hc))  # clear table
-                session.execute('INSERT INTO bev_shares_%s VALUES %s' %
-                                (sql_valid_name(hc), sql_format_value_list_str(bev_shares_frac[hc])))
+                for ms in ['BEV']:
+                    market_share_table_name = sql_valid_name('%s_shares_%s' % (ms, hc))
+                    session.execute('DROP TABLE IF EXISTS %s' % market_share_table_name)
+                    session.execute('CREATE TABLE %s (%s_share_%s_frac FLOAT)' % (market_share_table_name, sql_valid_name(ms),
+                                                                                                  sql_valid_name(hc)))
+                    session.execute('DELETE FROM %s' % market_share_table_name)  # clear table
+                    session.execute('INSERT INTO %s VALUES %s' %
+                                    (market_share_table_name, sql_format_value_list_str(market_shares_frac[hc][ms])))
 
-            # create tech package options, for each vehicle, by hauling class
+            # create tech package options, for each vehicle
             new_vehicle_co2_dict = dict()
             for new_veh in manufacturer_new_vehicles:
                 new_vehicles_by_hauling_class[new_veh.hauling_class][new_veh.fueling_class].append(new_veh)
-                tech_table_name = 'tech_options_%d_' % new_veh.model_year + new_veh.cost_curve_class
-                tech_table_co2_gpmi_col = new_veh.cost_curve_class + '_co2_gpmi'
-                tech_table_cost_dollars = new_veh.cost_curve_class + '_cost_dollars'
+                tech_table_name = 'tech_options_veh_%d_%d' % (new_veh.vehicle_ID, new_veh.model_year)
+                tech_table_co2_gpmi_col = 'veh_%d_co2_gpmi' % new_veh.vehicle_ID
+                tech_table_cost_dollars = 'veh_%d_cost_dollars' % new_veh.vehicle_ID
+                if o2_options.allow_backsliding:
+                    max_co2_gpmi = CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year)
+                else:
+                    max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
                 co2_gpmi_options = np.linspace(
                     CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
-                    CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+                    max_co2_gpmi,
                     num=num_tech_options).tolist()
                 tech_cost_options = CostCurve.get_cost(session,
                                                        cost_curve_class=new_veh.cost_curve_class,
@@ -203,10 +207,10 @@ def run_compliance_model(session):
                                 consumer.demand_sales(session, calendar_year)[hc]))
 
                 # tally up BEV vehicle costs
-                bev_vehicles_by_cost_curve_class = [v.cost_curve_class for v in
+                bev_vehicles_by_market_class = ['veh_' + str(v.vehicle_ID) for v in
                                                     new_vehicles_by_hauling_class[hc]['BEV']]
                 cost_str = '('
-                for bev in bev_vehicles_by_cost_curve_class:
+                for bev in bev_vehicles_by_market_class:
                     cost_str = cost_str + bev + '_cost_dollars*bev_%s_sales' % sql_valid_name(hc) + '+'
                 cost_str = cost_str[:-1]
                 cost_str = cost_str + ')'
@@ -222,7 +226,7 @@ def run_compliance_model(session):
 
                 # tally up fake-o BEV Mg
                 co2_Mg_str = '('
-                for bev in bev_vehicles_by_cost_curve_class:
+                for bev in bev_vehicles_by_market_class:
                     co2_Mg_str = co2_Mg_str + bev + '_co2_gpmi*bev_%s_sales*%f/1e6' % (sql_valid_name(hc), lifetime_vmt) + '+'
                 co2_Mg_str = co2_Mg_str[:-1]
                 co2_Mg_str = co2_Mg_str + ')'
@@ -232,10 +236,10 @@ def run_compliance_model(session):
                                 (tech_share_combos_table_name, sql_valid_name(hc), co2_Mg_str))
 
                 # tally up ICE vehicle costs
-                ice_vehicles_by_cost_curve_class = [v.cost_curve_class for v in
+                ice_vehicles_by_market_class = ['veh_' + str(v.vehicle_ID) for v in
                                                     new_vehicles_by_hauling_class[hc]['ICE']]
                 cost_str = '('
-                for ice in ice_vehicles_by_cost_curve_class:
+                for ice in ice_vehicles_by_market_class:
                     cost_str = cost_str + ice + '_cost_dollars*ice_%s_sales' % sql_valid_name(hc) + '+'
                 cost_str = cost_str[:-1]
                 cost_str = cost_str + ')'
@@ -246,7 +250,7 @@ def run_compliance_model(session):
 
                 # tally up fake-o ICE Mg
                 co2_Mg_str = '('
-                for ice in ice_vehicles_by_cost_curve_class:
+                for ice in ice_vehicles_by_market_class:
                     co2_Mg_str = co2_Mg_str + ice + '_co2_gpmi*ice_%s_sales*%f/1e6' % (sql_valid_name(hc), lifetime_vmt) + '+'
                 co2_Mg_str = co2_Mg_str[:-1]
                 co2_Mg_str = co2_Mg_str + ')'
@@ -279,8 +283,8 @@ def run_compliance_model(session):
                 res = session.execute('SELECT %s_combo_co2_megagrams, %s_combo_cost_dollars, * FROM %s' %
                                       (sql_valid_name(hc), sql_valid_name(hc), tech_share_combos_table_name)).fetchall()
                 for r in res:
-                    combo_co2_megagrams = r[0]
-                    combo_cost_dollars = r[1]
+                    combo_co2_megagrams = r['%s_combo_co2_megagrams' % sql_valid_name(hc)]
+                    combo_cost_dollars = r['%s_combo_cost_dollars' % sql_valid_name(hc)]
                     combo_data = r[2:]
                     if (combo_co2_megagrams, combo_cost_dollars) not in megagrams_set:
                         megagrams_set.add((combo_co2_megagrams, combo_cost_dollars))
@@ -313,33 +317,40 @@ def run_compliance_model(session):
                   'total_combo_co2_megagrams<=%f ORDER BY total_combo_cost_dollars LIMIT 1' % (calendar_year, cert_target_co2_Mg)
             winning_combo = session.execute(sel).fetchone()
 
+            # assign co2 values to vehicles...
             for new_veh, co2_gpmi_col in new_vehicle_co2_dict.items():
                 new_veh.set_cert_co2_grams_per_mile(winning_combo[co2_gpmi_col])
                 print(new_veh.cert_CO2_grams_per_mile)
                 new_veh.set_cert_CO2_Mg()
                 print(new_veh.cert_CO2_Mg)
 
-            # assign co2 values to vehicles...
-            if calendar_year==o2_options.analysis_initial_year:
-                session.execute('CREATE TABLE winners AS %s' % sel)
-                session.execute('ALTER TABLE winners ADD COLUMN calendar_year')
-                session.execute('ALTER TABLE winners ADD COLUMN cert_target_co2_megagrams')
-                session.execute('UPDATE winners SET calendar_year=%d' % calendar_year)
-                session.execute('UPDATE winners SET cert_target_co2_megagrams=%d' % cert_target_co2_Mg)
-            else:
-                winning_combo = list(winning_combo)
-                winning_combo.append(calendar_year)
-                winning_combo.append(cert_target_co2_Mg)
-                session.execute('INSERT INTO winners (%s) VALUES %s' % (sql_get_column_names('winners'), tuple(winning_combo)))
+            ManufacturerAnnualData.update_manufacturer_annual_data(calendar_year,
+                                                                   manufacturer_ID, cert_target_co2_Mg,
+                                                                   winning_combo['total_combo_co2_megagrams'],
+                                                                   winning_combo['total_combo_cost_dollars'])
 
-            if o2_options.slice_tech_combo_cloud_tables:
-                slice_width = 0.01 * cert_target_co2_Mg
-                session.execute('DELETE FROM tech_share_combos_total_%d WHERE total_combo_co2_megagrams NOT BETWEEN %f AND %f' %
-                                (calendar_year, cert_target_co2_Mg-slice_width, cert_target_co2_Mg + slice_width))
+            # yeah... this doesn't work!! Columns don't come in a predictable order
+            # if calendar_year==o2_options.analysis_initial_year:
+            #     session.execute('CREATE TABLE winners AS %s' % sel)
+            #     session.execute('ALTER TABLE winners ADD COLUMN calendar_year')
+            #     session.execute('ALTER TABLE winners ADD COLUMN cert_target_co2_megagrams')
+            #     session.execute('UPDATE winners SET calendar_year=%d' % calendar_year)
+            #     session.execute('UPDATE winners SET cert_target_co2_megagrams=%d' % cert_target_co2_Mg)
+            # else:
+            #     winning_combo_list = list(winning_combo)
+            #     winning_combo_list.append(calendar_year)
+            #     winning_combo_list.append(cert_target_co2_Mg)
+            #     session.execute('INSERT INTO winners (%s, calendar_year, cert_target_co2_Mg) VALUES %s' %
+            #                     (winning_combo.keys(), tuple(winning_combo_list)))
 
             if not o2_options.verbose:
                 # drop big ass table
                 session.execute('DROP TABLE tech_share_combos_total_%d' % (calendar_year))
+            elif o2_options.slice_tech_combo_cloud_tables:
+                # only preserve points within a range of target, to make a small ass table
+                slice_width = 0.005 * cert_target_co2_Mg
+                session.execute('DELETE FROM tech_share_combos_total_%d WHERE total_combo_co2_megagrams NOT BETWEEN %f AND %f' %
+                                (calendar_year, cert_target_co2_Mg-slice_width, cert_target_co2_Mg + slice_width))
 
             session.add_all(manufacturer_new_vehicles)
             session.flush()
