@@ -7,6 +7,7 @@ OMEGA2 top level code
 """
 
 import traceback
+import time
 
 from usepa_omega2 import *
 
@@ -28,6 +29,8 @@ import producer
 
 if __name__ == "__main__":
 
+    start = time.time()
+
     print('OMEGA2 greets you, version %s' % code_version)
     if '__file__' in locals():
         print('from %s with love' % fileio.get_filenameext(__file__))
@@ -41,6 +44,8 @@ if __name__ == "__main__":
 
     o2_options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
     o2_options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
+
+    engine.echo = o2_options.verbose
 
     SQABase.metadata.create_all(engine)
 
@@ -91,6 +96,10 @@ if __name__ == "__main__":
         if init_fail:
             omega_log.logwrite("\#INIT FAIL")
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+
+    end = time.time()
+
+    print('\nElapsed Time %.2f Seconds' % (end - start))
 
 # from sqlalchemy.sql import text
 # sel = Vehicle.__table__.select().where(text('model_year==2020 AND manufacturer_id=="USA Motors"'))

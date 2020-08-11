@@ -49,15 +49,13 @@ RegClass = enum.Enum('RegClass', 'car truck')
 # reg_classes = enum.Enum('RegClass', ['car', 'truck'])
 
 # OMEGA2 code version number
-code_version = "phase0.0.0"
-# OMEGA2 input file format version number
-input_format_version = '0.0'
+code_version = "phase0.1"
 
 print('loading usepa_omega2 version %s' % code_version)
 
 class OMEGA2RuntimeOptions(object):
     def __init__(self):
-        self.verbose = True
+        self.verbose = False
         self.output_folder = 'output/'
         self.database_dump_folder = '__dump'
         self.fuels_file = 'input_templates/fuels.csv'
@@ -92,7 +90,7 @@ class OMEGA2RuntimeOptions(object):
         else:
             pass
         self.slice_tech_combo_cloud_tables = True
-        self.allow_backsliding = False
+        self.allow_backsliding = True
 
 
 o2_options = OMEGA2RuntimeOptions()

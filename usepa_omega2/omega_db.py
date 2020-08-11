@@ -28,10 +28,10 @@ from sqlalchemy.orm import relationship, Session
 
 SQABase = declarative_base()
 
-engine = create_engine('sqlite:///:memory:', echo=True)
+engine = create_engine('sqlite:///:memory:', echo=False)
 session = Session(bind=engine)
-session.execute(
-    'pragma foreign_keys=on')  # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
+# !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
+session.execute('pragma foreign_keys=on')
 
 
 def sql_format_list_str(list_in):

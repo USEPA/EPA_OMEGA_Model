@@ -195,6 +195,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_6l4gMNKnEeqXgOJvvQp2mg" name="manufacturer_id"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Bo_9oNKoEeqXgOJvvQp2mg" name="cert_co2_megagrams"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_EZST8NKoEeqXgOJvvQp2mg" name="cert_target_co2_megagrams"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_-xSHINtOEeq4OsvceDvSPA" name="manufacturer_vehicle_cost_dollars" visibility="public"/>
       <ownedOperation xmi:type="uml:Operation" xmi:id="_KbOoQNKoEeqXgOJvvQp2mg" name="update_cert_target_co2_Mg"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_Tjw6ENKoEeqXgOJvvQp2mg" name="manufacturer_id"/>

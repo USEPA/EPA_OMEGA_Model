@@ -127,10 +127,12 @@ def run_compliance_model(session):
             # NOT REALLY SURE, EXACTLY...
 
             vehicle_tables = dict()
+            vehicle_combo_tables = dict()
             tech_table_columns = dict()
             new_vehicles_by_hauling_class = dict()
             for hc in hauling_classes:
                 vehicle_tables[hc] = []
+                vehicle_combo_tables[hc] = []
                 tech_table_columns[hc] = set()
                 new_vehicles_by_hauling_class[hc] = dict()
                 for fc in fueling_classes:
@@ -149,6 +151,7 @@ def run_compliance_model(session):
             for new_veh in manufacturer_new_vehicles:
                 new_vehicles_by_hauling_class[new_veh.hauling_class][new_veh.fueling_class].append(new_veh)
                 tech_table_name = 'tech_options_veh_%d_%d' % (new_veh.vehicle_ID, new_veh.model_year)
+                vehicle_tables[new_veh.hauling_class].append(tech_table_name)
                 tech_table_co2_gpmi_col = 'veh_%d_co2_gpmi' % new_veh.vehicle_ID
                 tech_table_cost_dollars = 'veh_%d_cost_dollars' % new_veh.vehicle_ID
                 if o2_options.allow_backsliding:
@@ -171,12 +174,12 @@ def run_compliance_model(session):
 
                 tech_table_columns[new_veh.hauling_class].add(tech_table_co2_gpmi_col)
                 tech_table_columns[new_veh.hauling_class].add(tech_table_cost_dollars)
-                vehicle_tables[new_veh.hauling_class].append(tech_table_name)
                 new_vehicle_co2_dict[new_veh] = tech_table_co2_gpmi_col
 
             # combine tech package options, by hauling class
             for hc in hauling_classes:
                 tech_combo_table_name = 'tech_combos_%d_%s' % (calendar_year, sql_valid_name(hc))
+                vehicle_combo_tables[hc].append(tech_combo_table_name)
                 session.execute(
                     'CREATE TABLE %s AS SELECT %s FROM %s' % (tech_combo_table_name,
                                                               sql_format_list_str(tech_table_columns[hc]),
@@ -184,6 +187,7 @@ def run_compliance_model(session):
                                                               ))
                 # combine tech combos with bev shares
                 tech_share_combos_table_name = 'tech_share_combos_%d_%s' % (calendar_year, sql_valid_name(hc))
+                vehicle_combo_tables[hc].append(tech_share_combos_table_name)
                 session.execute(
                     'CREATE TABLE %s AS SELECT %s, bev_share_%s_frac FROM %s, bev_shares_%s' %
                     (tech_share_combos_table_name,
@@ -320,9 +324,7 @@ def run_compliance_model(session):
             # assign co2 values to vehicles...
             for new_veh, co2_gpmi_col in new_vehicle_co2_dict.items():
                 new_veh.set_cert_co2_grams_per_mile(winning_combo[co2_gpmi_col])
-                print(new_veh.cert_CO2_grams_per_mile)
                 new_veh.set_cert_CO2_Mg()
-                print(new_veh.cert_CO2_Mg)
 
             ManufacturerAnnualData.update_manufacturer_annual_data(calendar_year,
                                                                    manufacturer_ID, cert_target_co2_Mg,
@@ -332,6 +334,13 @@ def run_compliance_model(session):
             if not o2_options.verbose:
                 # drop big ass table
                 session.execute('DROP TABLE tech_share_combos_total_%d' % (calendar_year))
+                # drop vehicle tech options tables
+                for k, tables in vehicle_tables.items():
+                    for t in tables:
+                        session.execute('DROP TABLE %s' % t)
+                for k, tables in vehicle_combo_tables.items():
+                    for t in tables:
+                        session.execute('DROP TABLE %s' % t)
             elif o2_options.slice_tech_combo_cloud_tables:
                 # only preserve points within a range of target, to make a small ass table
                 slice_width = 0.005 * cert_target_co2_Mg
