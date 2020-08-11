@@ -13,8 +13,7 @@ class GHGStandardFlat(SQABase):
     __tablename__ = 'ghg_standards'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
-    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
-    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     GHG_target_CO2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)
     lifetime_VMT = Column('lifetime_vmt', Float)
 

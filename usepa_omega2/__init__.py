@@ -10,6 +10,7 @@ import pandas as pd
 pd.set_option('chained_assignment', 'raise')
 
 from omega_db import *
+from omega_types import *
 import omega_log
 import file_eye_oh as fileio
 from input_validation import *
@@ -29,24 +30,11 @@ import os
 # --- OMEGA2 globals ---
 
 # enumerated values
-fueling_classes = ['BEV', 'ICE']
-hauling_classes = ['hauling', 'non hauling']
-ownership_classes = ['shared', 'private']
-# reg_classes = ['car', 'truck']
-fuel_units = ['gallon', 'kWh']
-
-# class RegClass(enum.Enum):
-#     car = 'car'
-#     truck = 'truck'
-#
-#     @classmethod
-#     def values(cls):
-#         return [cls[k].value for k in cls.__members__.keys()]
-
-RegClass = enum.Enum('RegClass', 'car truck')
-# RegClass = enum.Enum('reg_classes', 'car truck')
-# RegClass = enum.Enum('RegClass', ['car', 'truck'])
-# reg_classes = enum.Enum('RegClass', ['car', 'truck'])
+fueling_classes = OmegaEnum(['BEV', 'ICE'])
+hauling_classes = OmegaEnum(['hauling', 'non hauling'])
+ownership_classes = OmegaEnum(['shared', 'private'])
+reg_classes = OmegaEnum(['car', 'truck'])
+fuel_units = OmegaEnum(['gallon', 'kWh'])
 
 # OMEGA2 code version number
 code_version = "phase0.1"

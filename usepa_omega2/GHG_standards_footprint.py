@@ -13,8 +13,7 @@ class GHGStandardFootprint(SQABase):
     __tablename__ = 'ghg_standards'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
-    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
-    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     footprint_min_sqft = Column('footprint_min_sqft', Float)
     footprint_max_sqft = Column('footprint_max_sqft', Float)
     coeff_a = Column('coeff_a', Float)

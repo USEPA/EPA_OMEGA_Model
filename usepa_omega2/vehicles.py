@@ -22,8 +22,7 @@ class Vehicle(SQABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
-    # reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
-    reg_class_ID = Column('reg_class_id', Enum(*list(RegClass.__members__), validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
