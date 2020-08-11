@@ -27,6 +27,27 @@ from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
 import consumer.sales as consumer
 import producer
 
+def run_postproc():
+    import matplotlib.pyplot as plt
+    mad = session.query(ManufacturerAnnualData.calendar_year,
+                        ManufacturerAnnualData.cert_target_co2_Mg,
+                        ManufacturerAnnualData.cert_co2_Mg,
+                        ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)
+
+    calendar_year = session.query(ManufacturerAnnualData.calendar_year).all()
+    cert_target_co2_Mg = session.query(ManufacturerAnnualData.cert_target_co2_Mg).all()
+    cert_co2_Mg = session.query(ManufacturerAnnualData.cert_co2_Mg).all()
+    total_cost_billions = float(session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar())/1e9
+
+    plt.figure()
+    plt.plot(calendar_year, cert_target_co2_Mg, '.-')
+    plt.plot(calendar_year, cert_co2_Mg, '.-')
+    plt.title('Compliance Versus Calendar Year\n Total Cost $%.2f Billion' % total_cost_billions)
+    plt.xlabel('Year')
+    plt.ylabel('CO2 Mg')
+    plt.grid()
+
+
 if __name__ == "__main__":
 
     start = time.time()
@@ -100,6 +121,7 @@ if __name__ == "__main__":
     end = time.time()
 
     print('\nElapsed Time %.2f Seconds' % (end - start))
+    run_postproc()
 
 # from sqlalchemy.sql import text
 # sel = Vehicle.__table__.select().where(text('model_year==2020 AND manufacturer_id=="USA Motors"'))
