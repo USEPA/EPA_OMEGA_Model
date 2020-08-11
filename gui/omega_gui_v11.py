@@ -27,6 +27,7 @@ from datetime import datetime
 # Import functions from other files
 from omega_gui_functions import *
 from omega_gui_stylesheets import *
+from external_functions import *
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
