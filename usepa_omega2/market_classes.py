@@ -28,11 +28,11 @@ def parse_market_classes(market_class_list, market_class_dict=None):
                 market_class_dict[prefix] = ''
             else:
                 # create new dictionary
-                return {prefix:''}
+                return {prefix: ''}
         else:
             if prefix in market_class_dict:
                 # update existing dictionary
-                market_class_dict[prefix] = parse_market_classes(suffix, market_class_dict=market_class_dict[prefix])
+                parse_market_classes(suffix, market_class_dict=market_class_dict[prefix])
             else:
                 # new entry, create dictionary
                 market_class_dict[prefix] = parse_market_classes(suffix)
@@ -110,8 +110,8 @@ if __name__ == '__main__':
 
     market_class_list = [
         'hauling.ice',
-        'hauling.bev.bev300.bev300_base',
-        'hauling.bev.bev300.bev300_sport',
+        'hauling.bev.bev300.base',
+        'hauling.bev.bev300.sport',
         'hauling.bev.bev100',
         'non_hauling.ice',
         'non_hauling.bev',
