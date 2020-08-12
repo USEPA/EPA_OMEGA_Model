@@ -111,7 +111,7 @@ def run_compliance_model(session):
             cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
             # set up number of tech options and BEV shares
-            num_tech_options = 10
+            num_tech_options = 5
             market_shares_frac = dict()
             market_shares_frac['hauling'] = dict()
             market_shares_frac['non hauling'] = dict()
@@ -325,14 +325,23 @@ def run_compliance_model(session):
 
             # pick a winner!!
             sel = 'SELECT * FROM tech_share_combos_total_%d WHERE ' \
-                  'total_combo_co2_megagrams<=%f ORDER BY total_combo_cost_dollars LIMIT 1' % (
-                  calendar_year, cert_target_co2_Mg)
+                  'total_combo_co2_megagrams<=%f ORDER BY total_combo_cost_dollars LIMIT 1' % \
+                  (calendar_year, cert_target_co2_Mg * 1.0033)
             winning_combo = session.execute(sel).fetchone()
 
-            # assign co2 values to vehicles...
+            # assign co2 values and sales to vehicles...
             for new_veh, co2_gpmi_col in new_vehicle_co2_dict.items():
                 new_veh.set_cert_co2_grams_per_mile(winning_combo[co2_gpmi_col])
                 new_veh.set_cert_CO2_Mg()
+                # # *** THIS IS NOT THE RIGHT WAY TO DO THIS ***
+                # if new_veh.market_class_ID == 'BEV non hauling':
+                #     new_veh.set_initial_registered_count(winning_combo['bev_non_hauling_sales'])
+                # elif new_veh.market_class_ID == 'BEV hauling':
+                #     new_veh.set_initial_registered_count(winning_combo['bev_hauling_sales'])
+                # elif new_veh.market_class_ID == 'ICE non hauling':
+                #     new_veh.set_initial_registered_count(winning_combo['ice_non_hauling_sales'])
+                # else:
+                #     new_veh.set_initial_registered_count(winning_combo['ice_hauling_sales'])
 
             ManufacturerAnnualData.update_manufacturer_annual_data(calendar_year,
                                                                    manufacturer_ID, cert_target_co2_Mg,

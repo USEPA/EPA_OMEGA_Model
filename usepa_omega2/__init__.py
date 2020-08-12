@@ -30,21 +30,21 @@ import os
 # --- OMEGA2 globals ---
 
 # enumerated values
-fueling_classes = OmegaEnum(['BEV', 'ICE'])
-hauling_classes = OmegaEnum(['hauling', 'non hauling'])
-ownership_classes = OmegaEnum(['shared', 'private'])
-reg_classes = OmegaEnum(['car', 'truck'])
-fuel_units = OmegaEnum(['gallon', 'kWh'])
+fueling_classes = OMEGAEnum(['BEV', 'ICE'])
+hauling_classes = OMEGAEnum(['hauling', 'non hauling'])
+ownership_classes = OMEGAEnum(['shared', 'private'])
+reg_classes = OMEGAEnum(['car', 'truck'])
+fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
 # OMEGA2 code version number
 code_version = "phase0.1"
 
 print('loading usepa_omega2 version %s' % code_version)
 
-class OMEGA2RuntimeOptions(object):
+class OMEGARuntimeOptions(object):
     def __init__(self):
         self.verbose = False
-        self.output_folder = 'output/'
+        self.output_folder = 'output'
         self.database_dump_folder = '__dump'
         self.fuels_file = 'input_templates/fuels.csv'
         self.manufacturers_file = 'input_templates/manufacturers.csv'
@@ -81,6 +81,6 @@ class OMEGA2RuntimeOptions(object):
         self.allow_backsliding = False
 
 
-o2_options = OMEGA2RuntimeOptions()
+o2_options = OMEGARuntimeOptions()
 
 omega_log.init_logfile(o2_options)
