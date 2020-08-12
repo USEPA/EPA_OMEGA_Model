@@ -8,6 +8,51 @@ market_classes.py
 from usepa_omega2 import *
 
 
+def parse_market_classes(market_class_list, market_class_dict=None):
+    """
+    Returns a nested dictionary of market classes from a dot-formatted list of market class names
+    :param market_class_list:
+    :param market_class_dict:
+    :return:
+    """
+    if market_class_dict is None:
+        market_class_dict = dict()
+    for market_class in market_class_list:
+        substrs = market_class.split('.', maxsplit=1)
+        prefix = substrs[0]
+        suffix = substrs[1:]
+        if not suffix:
+            # end of the string
+            if market_class_dict:
+                # if dict not empty, add new entry
+                market_class_dict[prefix] = ''
+            else:
+                # create new dictionary
+                return {prefix: ''}
+        else:
+            if prefix in market_class_dict:
+                # update existing dictionary
+                parse_market_classes(suffix, market_class_dict=market_class_dict[prefix])
+            else:
+                # new entry, create dictionary
+                market_class_dict[prefix] = parse_market_classes(suffix)
+
+    return market_class_dict
+
+
+def print_market_class_dict(mc_dict, num_tabs=0):
+    """
+    pretty-print a market class dict...
+    :param mc_dict:
+    :param num_tabs:
+    :return:
+    """
+    for k in mc_dict.keys():
+        print('\t' * num_tabs + k)
+        if mc_dict[k]:
+            print_market_class_dict(mc_dict[k], num_tabs+1)
+
+
 class MarketClass(SQABase):
     # --- database table properties ---
     __tablename__ = 'market_classes'
@@ -62,3 +107,16 @@ if __name__ == '__main__':
 
     if not init_fail:
         dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+
+    market_class_list = [
+        'hauling.ice',
+        'hauling.bev.bev300.base',
+        'hauling.bev.bev300.sport',
+        'hauling.bev.bev100',
+        'non_hauling.ice',
+        'non_hauling.bev',
+    ]
+
+    market_class_dict = parse_market_classes(market_class_list)
+
+    print_market_class_dict(market_class_dict)
