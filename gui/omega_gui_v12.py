@@ -645,5 +645,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('elements/omega_gui_v11.ui')
+    form = Form('elements/omega_gui_v12.ui')
     sys.exit(app.exec_())
