@@ -15,7 +15,7 @@ class AnnualVMTFixedByAge(SQABase):
 
     age = Column('age', Numeric)
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    reregistered_proportion = Column('annual_vmt', Float)
+    annual_vmt = Column('annual_vmt', Numeric)
 
     def __repr__(self):
         return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
@@ -43,7 +43,7 @@ class AnnualVMTFixedByAge(SQABase):
                     obj_list.append(AnnualVMTFixedByAge(
                         age=df.loc[i, 'age'],
                         market_class_ID=df.loc[i, 'market_class_id'],
-                        reregistered_proportion=df.loc[i, 'annual_vmt'],
+                        annual_vmt=df.loc[i, 'annual_vmt'],
                     ))
                 session.add_all(obj_list)
                 session.flush()
