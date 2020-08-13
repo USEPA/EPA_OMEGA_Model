@@ -117,6 +117,7 @@ if __name__ == "__main__":
         if init_fail:
             omega_log.logwrite("\#INIT FAIL")
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
 
     end = time.time()

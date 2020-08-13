@@ -12,7 +12,7 @@ def make_valid_python_identifier(s):
     return s
 
 
-class OmegaEnum:
+class OMEGAEnum:
     """
     Simple enumerated value class, which acts like a list of strings and also has named properties which contain the
     property name as a string, also acts like a dictionary, just for good measure
@@ -44,7 +44,7 @@ class OmegaEnum:
 
 if __name__ == "__main__":
 
-    test_enum = OmegaEnum(['foo', 'bar', 'space force!'])
+    test_enum = OMEGAEnum(['foo', 'bar', 'space force!'])
 
     for i in test_enum:
         print(i)
