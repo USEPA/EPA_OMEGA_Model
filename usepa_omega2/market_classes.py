@@ -5,6 +5,7 @@ market_classes.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -65,7 +66,7 @@ class MarketClass(SQABase):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'market_classes'
@@ -90,8 +91,8 @@ class MarketClass(SQABase):
                         hauling_class=df.loc[i, 'hauling_class'],
                         ownership_class=df.loc[i, 'ownership_class'],
                     ))
-                session.add_all(obj_list)
-                session.flush()
+                o2.session.add_all(obj_list)
+                o2.session.flush()
 
         return template_errors
 
@@ -100,13 +101,17 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    SQABase.metadata.create_all(engine)
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)
 
     market_class_list = [
         'hauling.ice',

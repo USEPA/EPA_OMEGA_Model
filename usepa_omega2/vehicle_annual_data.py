@@ -5,6 +5,7 @@ vehicle_annual_data.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -17,21 +18,19 @@ class VehicleAnnualData(SQABase):
     registered_count = Column(Numeric)
     age = Column(Numeric)
 
-    def update_registered_count(session, vehicle_ID, calendar_year, registered_count):
+    def update_registered_count(vehicle_ID, calendar_year, registered_count):
         from vehicles import Vehicle
 
-        age = calendar_year - session.query(Vehicle.model_year).filter(Vehicle.vehicle_ID == vehicle_ID).scalar()
+        age = calendar_year - o2.session.query(Vehicle.model_year).filter(Vehicle.vehicle_ID == vehicle_ID).scalar()
 
-        session.add(VehicleAnnualData(vehicle_ID=vehicle_ID,
+        o2.session.add(VehicleAnnualData(vehicle_ID=vehicle_ID,
                                       calendar_year=calendar_year,
                                       registered_count=registered_count,
                                       age=age))
-        session.flush()
+        o2.session.flush()
 
-    def get_registered_count(session, vehicle_ID, age):
-        from vehicles import Vehicle
-
-        return float(session.query(VehicleAnnualData.registered_count). \
+    def get_registered_count(vehicle_ID, age):
+        return float(o2.session.query(VehicleAnnualData.registered_count). \
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID). \
             filter(VehicleAnnualData.age==age).scalar())
 
@@ -40,10 +39,13 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
     from manufacturers import Manufacturer  # required by vehicles
     from fuels import Fuel  # required by vehicles
     from market_classes import MarketClass  # required by vehicles
     from vehicles import Vehicle  # for foreign key vehicle_ID
 
-    session = Session(bind=engine)
-    SQABase.metadata.create_all(engine)
+    SQABase.metadata.create_all(o2.engine)

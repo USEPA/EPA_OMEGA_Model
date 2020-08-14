@@ -6,30 +6,28 @@ Functions to log diagnostic data
 
 """
 
-import usepa_omega2
-import file_eye_oh as fileio
+import o2  # import global variables
 
 
-def init_logfile(o2_options):
-    import os
+def init_logfile():
     import time, datetime
+    import file_eye_oh as fileio
+    from usepa_omega2 import code_version
 
-    fileio.validate_folder(o2_options.output_folder)
-    o2_options.logfilename = '%s%s.txt' % (o2_options.logfile_prefix, time.strftime('%Y%m%d_%H%M%S'))
-    log = open(o2_options.logfilename, 'w')
-    log.write('OMEGA2 %s run started at %s %s\n\n' % (usepa_omega2.code_version, datetime.date.today(), time.strftime('%H:%M:%S')))
+    fileio.validate_folder(o2.options.output_folder)
+    o2.options.logfilename = '%s%s.txt' % (o2.options.output_folder + o2.options.logfile_prefix, time.strftime('%Y%m%d_%H%M%S'))
+    log = open(o2.options.logfilename, 'w')
+    log.write('OMEGA2 %s run started at %s %s\n\n' % (code_version, datetime.date.today(), time.strftime('%H:%M:%S')))
     log.close()
 
 
 def logwrite(message):
-    from usepa_omega2 import o2_options
-
-    log = open(o2_options.logfilename, 'a')
+    log = open(o2.options.logfilename, 'a')
     if type(message) is list:
         for m in message:
             log.write(m + '\n')
     else:
         log.write(message + '\n')
-    if o2_options.verbose:
+    if o2.options.verbose:
         print(message)
     log.close()

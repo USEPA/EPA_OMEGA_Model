@@ -2,16 +2,14 @@
 omega_db.py
 ===========
 
-
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
+
 import omega_log
-
 import file_eye_oh as fileio
-
 import pandas as pd
-
 from sqlalchemy import create_engine
 
 # NOTE:
@@ -28,10 +26,13 @@ from sqlalchemy.orm import relationship, Session
 
 SQABase = declarative_base()
 
-engine = create_engine('sqlite:///:memory:', echo=False)
-session = Session(bind=engine)
-# !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
-session.execute('pragma foreign_keys=on')
+
+def init_db():
+    engine = create_engine('sqlite:///:memory:', echo=False)
+    session = Session(bind=engine)
+    # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
+    session.execute('pragma foreign_keys=on')
+    return engine, session
 
 
 def sql_format_list_str(list_in):
@@ -61,7 +62,7 @@ def sql_get_column_names(table_name, exclude=None):
     """
 
     # get table row data:
-    result = session.execute('PRAGMA table_info(%s)' % table_name)
+    result = o2.session.execute('PRAGMA table_info(%s)' % table_name)
 
     # make list of column names:
     columns = [r[1] for r in result.fetchall()]

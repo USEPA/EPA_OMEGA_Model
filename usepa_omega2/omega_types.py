@@ -22,7 +22,6 @@ class OMEGAEnum:
         self.__identifier_list = [make_valid_python_identifier(i) for i in self.__value_list]
         self.__dict = dict()
         for i, j in zip(self.__identifier_list, self.__value_list):
-            print(i, j)
             exec("self.%s='%s'" % (i, j))
             self.__dict[i]=j
 
