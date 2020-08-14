@@ -103,8 +103,8 @@
       </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_bRd7YNZzEeqxT4IWw4575Q" name="Consumer">
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_qx-b4NZzEeqxT4IWw4575Q" client="_bRd7YNZzEeqxT4IWw4575Q" supplier="_gKLWwNZzEeqxT4IWw4575Q"/>
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_zjwakNZzEeqxT4IWw4575Q" client="_bRd7YNZzEeqxT4IWw4575Q" supplier="_wGebYNZzEeqxT4IWw4575Q"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_qx-b4NZzEeqxT4IWw4575Q" client="_bRd7YNZzEeqxT4IWw4575Q" supplier="_qzpAsN2CEeqZEda3BAeEzA"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_zjwakNZzEeqxT4IWw4575Q" name="vehicle_annual_data" client="_qzpAsN2CEeqZEda3BAeEzA" supplier="_wGebYNZzEeqxT4IWw4575Q"/>
       <packagedElement xmi:type="uml:Package" xmi:id="_HchvANcoEeqxT4IWw4575Q" name="Sales">
         <packagedElement xmi:type="uml:Package" xmi:id="_mzQRMNvREeqZEda3BAeEzA" name="Sales Volume"/>
         <packagedElement xmi:type="uml:Package" xmi:id="_sn2GANvREeqZEda3BAeEzA" name="Sales Share"/>
@@ -115,7 +115,7 @@
       </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_gKLWwNZzEeqxT4IWw4575Q" name="Producer">
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_h1BvANZzEeqxT4IWw4575Q" client="_gKLWwNZzEeqxT4IWw4575Q" supplier="_bRd7YNZzEeqxT4IWw4575Q"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_h1BvANZzEeqxT4IWw4575Q" client="_gKLWwNZzEeqxT4IWw4575Q" supplier="_qzpAsN2CEeqZEda3BAeEzA"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_wGebYNZzEeqxT4IWw4575Q" name="Effects"/>
     <packagedElement xmi:type="uml:Package" xmi:id="_H0PRMNZ0EeqxT4IWw4575Q" name="Producer">
@@ -234,6 +234,34 @@
       <nestedClassifier xmi:type="uml:Class" xmi:id="_PYynwNZ0EeqxT4IWw4575Q" name="Class9"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Activity" xmi:id="_AaGIgNvSEeqZEda3BAeEzA" name="Activity23"/>
+    <packagedElement xmi:type="uml:Package" xmi:id="_qzpAsN2CEeqZEda3BAeEzA" name="Iterator">
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_x1w_oN2CEeqZEda3BAeEzA" client="_qzpAsN2CEeqZEda3BAeEzA" supplier="_bRd7YNZzEeqxT4IWw4575Q"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_zXB-EN2CEeqZEda3BAeEzA" client="_qzpAsN2CEeqZEda3BAeEzA" supplier="_gKLWwNZzEeqxT4IWw4575Q"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Activity" xmi:id="_Nu-MEN2MEeqZEda3BAeEzA" name="Activity25" visibility="protected" node="_T_1GIN2MEeqZEda3BAeEzA _lCwboN2MEeqZEda3BAeEzA _NWEHYN2NEeqZEda3BAeEzA _KPvaMN2OEeqZEda3BAeEzA _OFCQwN2OEeqZEda3BAeEzA _kWKB0N4wEeqZEda3BAeEzA _DvmJ4N4xEeqZEda3BAeEzA _bjn_wN4xEeqZEda3BAeEzA _nUPHEN4xEeqZEda3BAeEzA _5IaTUN4xEeqZEda3BAeEzA">
+      <edge xmi:type="uml:ControlFlow" xmi:id="_UKE8YN2OEeqZEda3BAeEzA" target="_NWEHYN2NEeqZEda3BAeEzA" source="_T_1GIN2MEeqZEda3BAeEzA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_Bf1twN4xEeqZEda3BAeEzA" target="_lCwboN2MEeqZEda3BAeEzA" source="_NWEHYN2NEeqZEda3BAeEzA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_jeNQsN4xEeqZEda3BAeEzA" name="No" target="_bjn_wN4xEeqZEda3BAeEzA" source="_DvmJ4N4xEeqZEda3BAeEzA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_ouA9cN4xEeqZEda3BAeEzA" name="Yes" target="_nUPHEN4xEeqZEda3BAeEzA" source="_DvmJ4N4xEeqZEda3BAeEzA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_wsblgN4xEeqZEda3BAeEzA" name="No" target="_DvmJ4N4xEeqZEda3BAeEzA" source="_lCwboN2MEeqZEda3BAeEzA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_GyHDMN4yEeqZEda3BAeEzA" name="Yes" target="_5IaTUN4xEeqZEda3BAeEzA" source="_lCwboN2MEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:InitialNode" xmi:id="_T_1GIN2MEeqZEda3BAeEzA" outgoing="_UKE8YN2OEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:DecisionNode" xmi:id="_lCwboN2MEeqZEda3BAeEzA" name="Are market class shares are within tolerance?" incoming="_Bf1twN4xEeqZEda3BAeEzA" outgoing="_wsblgN4xEeqZEda3BAeEzA _GyHDMN4yEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_NWEHYN2NEeqZEda3BAeEzA" name="Get sales mix by market class" incoming="_UKE8YN2OEeqZEda3BAeEzA" outgoing="_Bf1twN4xEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:ActivityParameterNode" xmi:id="_KPvaMN2OEeqZEda3BAeEzA" name="Sales Volumes from Consumer Module">
+        <upperBound xmi:type="uml:LiteralInteger" xmi:id="_KPwoUN2OEeqZEda3BAeEzA" value="1"/>
+      </node>
+      <node xmi:type="uml:ActivityParameterNode" xmi:id="_OFCQwN2OEeqZEda3BAeEzA" name="Sales Volumes from Producer Module">
+        <upperBound xmi:type="uml:LiteralInteger" xmi:id="_OFCQwd2OEeqZEda3BAeEzA" value="1"/>
+      </node>
+      <node xmi:type="uml:ActivityParameterNode" xmi:id="_kWKB0N4wEeqZEda3BAeEzA" name="Tolerance Definitions">
+        <upperBound xmi:type="uml:LiteralInteger" xmi:id="_kWPhYN4wEeqZEda3BAeEzA" value="1"/>
+      </node>
+      <node xmi:type="uml:DecisionNode" xmi:id="_DvmJ4N4xEeqZEda3BAeEzA" name="Exceeds iteration limit?" incoming="_wsblgN4xEeqZEda3BAeEzA" outgoing="_jeNQsN4xEeqZEda3BAeEzA _ouA9cN4xEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_bjn_wN4xEeqZEda3BAeEzA" name="Rerun Producer Module" incoming="_jeNQsN4xEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_nUPHEN4xEeqZEda3BAeEzA" name="Terminate Run" incoming="_ouA9cN4xEeqZEda3BAeEzA"/>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_5IaTUN4xEeqZEda3BAeEzA" name="Run Effects Module" incoming="_GyHDMN4yEeqZEda3BAeEzA"/>
+    </packagedElement>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_jYTvAK8IEeqO0d-UmaSoow">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jYWLQK8IEeqO0d-UmaSoow" source="http://www.eclipse.org/uml2/2.0.0/UML">

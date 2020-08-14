@@ -16,7 +16,7 @@ class ReregistrationFixedByAge(SQABase):
 
     age = Column('age', Numeric)
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    reregistered_proportion = Column('reregistered_proportion', Float)
+    reregistered_proportion = Column('reregistered_proportion', Numeric)
 
     def __repr__(self):
         return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
