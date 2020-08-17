@@ -29,6 +29,7 @@ def run_postproc():
     plt.ylabel('CO2 Mg')
     plt.grid()
     plt.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_name)
+    plt.show()
 
 
 def run_omega(o2_options):

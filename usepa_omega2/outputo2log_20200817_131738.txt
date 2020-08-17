@@ -1,0 +1,28 @@
+OMEGA2 phase0.1 run started at 2020-08-17 13:17:38
+
+
+Initializing database from input_templates/fuels.csv...
+
+#RUNTIME FAIL
+Traceback (most recent call last):
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\usepa_omega2\omega2.py", line 81, in run_omega
+    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\usepa_omega2\fuels.py", line 34, in init_database_from_file
+    verbose=verbose)
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\usepa_omega2\input_validation.py", line 18, in validate_template_version_info
+    version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\venv\lib\site-packages\pandas\io\parsers.py", line 686, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\venv\lib\site-packages\pandas\io\parsers.py", line 452, in _read
+    parser = TextFileReader(fp_or_buf, **kwds)
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\venv\lib\site-packages\pandas\io\parsers.py", line 936, in __init__
+    self._make_engine(self.engine)
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\venv\lib\site-packages\pandas\io\parsers.py", line 1168, in _make_engine
+    self._engine = CParserWrapper(self.f, **self.options)
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\venv\lib\site-packages\pandas\io\parsers.py", line 1998, in __init__
+    self._reader = parsers.TextReader(src, **kwds)
+  File "pandas\_libs\parsers.pyx", line 361, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas\_libs\parsers.pyx", line 653, in pandas._libs.parsers.TextReader._setup_parser_source
+FileNotFoundError: [Errno 2] No such file or directory: 'input_templates/fuels.csv'
+
+
