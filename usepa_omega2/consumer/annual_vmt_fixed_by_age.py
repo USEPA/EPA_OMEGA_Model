@@ -5,6 +5,7 @@ annual_vmt_fixed_by_age.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -15,20 +16,21 @@ class AnnualVMTFixedByAge(SQABase):
 
     age = Column('age', Numeric)
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    reregistered_proportion = Column('annual_vmt', Float)
+    annual_vmt = Column('annual_vmt', Numeric)
 
     def __repr__(self):
         return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
 
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'annual_vmt_fixed_by_age'
         input_template_version = 0.0001
         input_template_columns = {'age', 'market_class_id', 'annual_vmt'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
@@ -43,10 +45,10 @@ class AnnualVMTFixedByAge(SQABase):
                     obj_list.append(AnnualVMTFixedByAge(
                         age=df.loc[i, 'age'],
                         market_class_ID=df.loc[i, 'market_class_id'],
-                        reregistered_proportion=df.loc[i, 'annual_vmt'],
+                        annual_vmt=df.loc[i, 'annual_vmt'],
                     ))
-                session.add_all(obj_list)
-                session.flush()
+                o2.session.add_all(obj_list)
+                o2.session.flush()
 
         return template_errors
 
@@ -55,14 +57,20 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
     from usepa_omega2.market_classes import MarketClass  # needed for market class ID
 
-    SQABase.metadata.create_all(engine)
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+                                                                verbose=o2.options.verbose)
 
-    init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2_options.annual_vmt_fixed_by_age_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
+                                                                        verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)

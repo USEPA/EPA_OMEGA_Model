@@ -5,6 +5,7 @@ vehicles.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -43,36 +44,35 @@ class Vehicle(SQABase):
         return s
 
     def set_cert_target_CO2_grams_per_mile(self):
-        self.cert_target_CO2_grams_per_mile = o2_options.GHG_standard.calculate_target_co2_gpmi(self)
+        self.cert_target_CO2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
 
     def set_cert_target_CO2_Mg(self):
-        self.cert_target_CO2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(self)
+        self.cert_target_CO2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
 
     def set_cert_co2_grams_per_mile(self, cert_co2_grams_per_mile):
         from cost_curves import CostCurve
         self.cert_CO2_grams_per_mile = cert_co2_grams_per_mile
-        self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
-                                                              cost_curve_class=self.cost_curve_class,
+        self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
                                                               model_year=self.model_year,
                                                               target_co2_gpmi=self.cert_CO2_grams_per_mile)
 
     def set_cert_CO2_Mg(self):
-        self.cert_CO2_Mg = o2_options.GHG_standard.calculate_cert_co2_Mg(self)
+        self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
 
     def set_initial_registered_count(self, sales):
         from vehicle_annual_data import VehicleAnnualData
 
-        session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
-        session.flush()
+        o2.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
+        o2.session.flush()
 
-        VehicleAnnualData.update_registered_count(session, vehicle_ID=self.vehicle_ID,
+        VehicleAnnualData.update_registered_count(vehicle_ID=self.vehicle_ID,
                                                   calendar_year=self.model_year,
                                                   registered_count=sales)
 
     def get_initial_registered_count(self):
         from vehicle_annual_data import VehicleAnnualData
 
-        return VehicleAnnualData.get_registered_count(session, vehicle_ID=self.vehicle_ID, age=0)
+        return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
 
     def inherit_vehicle(self, vehicle):
         inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
@@ -82,7 +82,7 @@ class Vehicle(SQABase):
             self.__setattr__(p, vehicle.__getattribute__(p))
 
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
@@ -121,8 +121,7 @@ class Vehicle(SQABase):
                         veh.fueling_class = 'ICE'
 
                     veh.set_cert_co2_grams_per_mile(df.loc[i, 'cert_co2_grams_per_mile'])
-                    # veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(session,
-                    #                                                       cost_curve_class=veh.cost_curve_class,
+                    # veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=veh.cost_curve_class,
                     #                                                       model_year=veh.model_year,
                     #                                                       target_co2_gpmi=veh.cert_CO2_grams_per_mile)
 
@@ -138,22 +137,26 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
     from manufacturers import Manufacturer  # needed for manufacturers table
     from market_classes import MarketClass  # needed for market class ID
     from fuels import Fuel  # needed for showroom fuel ID
     from cost_curves import CostCurve  # needed for vehicle cost from CO2
     from cost_clouds import CostCloud  # needed for vehicle cost from CO2
 
-    SQABase.metadata.create_all(engine)
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
-    # init_fail = init_fail + CostCloud.init_database_from_file(o2_options.cost_clouds_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + CostCurve.init_database_from_file(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
+    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+    # init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_clouds_file, verbose=o2.options.verbose)
+    init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_curves_file, verbose=o2.options.verbose)
 
-    init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)

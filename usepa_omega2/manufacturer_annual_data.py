@@ -5,6 +5,7 @@ manufacturer_annual_data.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -21,20 +22,23 @@ class ManufacturerAnnualData(SQABase):
     @staticmethod
     def update_manufacturer_annual_data(calendar_year, manufacturer_ID, cert_target_co2_Mg,
                                         cert_co2_Mg, manufacturer_vehicle_cost_dollars):
-        session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
+        o2.session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
                                            calendar_year=calendar_year,
                                            cert_target_co2_Mg=cert_target_co2_Mg,
                                            cert_co2_Mg=cert_co2_Mg,
                                            manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars
                                            ))
-        session.flush()
+        o2.session.flush()
 
 
 if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
     from manufacturers import Manufacturer  # required by vehicles
 
-    session = Session(bind=engine)
-    SQABase.metadata.create_all(engine)
+    SQABase.metadata.create_all(o2.engine)

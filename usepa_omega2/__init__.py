@@ -5,7 +5,6 @@ __init.py__
 
 """
 
-import enum
 import pandas as pd
 pd.set_option('chained_assignment', 'raise')
 
@@ -15,19 +14,11 @@ import omega_log
 import file_eye_oh as fileio
 from input_validation import *
 
-import matplotlib.pyplot as plt
 import scipy.interpolate
 
 import os
 
-# from copy import copy, deepcopy
-# import numpy as np
-# import networkx as nx
-# import itertools
-# import cProfile
-# import time
-
-# --- OMEGA2 globals ---
+# --- OMEGA2 global constants ---
 
 # enumerated values
 fueling_classes = OMEGAEnum(['BEV', 'ICE'])
@@ -41,24 +32,26 @@ code_version = "phase0.1"
 
 print('loading usepa_omega2 version %s' % code_version)
 
+
 class OMEGARuntimeOptions(object):
     def __init__(self):
+        self.session_name = 'default'
         self.verbose = False
         self.output_folder = 'output'
         self.database_dump_folder = '__dump'
-        self.fuels_file = 'input_templates/fuels.csv'
         self.manufacturers_file = 'input_templates/manufacturers.csv'
         self.market_classes_file = 'input_templates/market_classes.csv'
         self.vehicles_file = 'input_templates/vehicles.csv'
         self.demanded_sales_annual_data_file = 'input_templates/demanded_sales_annual_data.csv'
+        self.fuels_file = 'input_templates/fuels.csv'
         self.fuel_scenarios_file = 'input_templates/fuel_scenarios.csv'
         self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'
-        self.cost_curves_file = 'input_templates/cost_curves.csv'
-        self.cost_clouds_file = 'input_templates/cost_clouds.csv'
+        self.cost_file_type = 'curves'
+        self.cost_file = 'input_templates/cost_curves.csv'
         self.cost_curve_frontier_affinity_factor = 0.75
         self.analysis_initial_year = None
         self.analysis_final_year = None
-        self.logfile_prefix = self.output_folder + os.sep + 'o2log_'
+        self.logfile_prefix = 'o2log_'
         self.logfilename = ''
         self.producer_calculate_generalized_cost = None
         self.consumer_calculate_generalized_cost = None
@@ -79,8 +72,7 @@ class OMEGARuntimeOptions(object):
             pass
         self.slice_tech_combo_cloud_tables = True
         self.allow_backsliding = False
+        self.num_tech_options_per_vehicle = 5
 
 
-o2_options = OMEGARuntimeOptions()
-
-omega_log.init_logfile(o2_options)
+from omega2 import run_omega

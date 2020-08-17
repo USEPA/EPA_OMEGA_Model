@@ -136,7 +136,7 @@ class CalcCosts:
 
     def vehicle_cost(self, years):
         for year in years:
-            self.df[f'new_vehicle_cost_dollars_{year}'] = \
+            self.df[f'new_vehicle_mfr_cost_dollars_{year}'] = \
                 self.df[[f'powertrain_cost_{year}', f'roadload_cost_{year}', f'weight_cost_{year}']].sum(axis=1)
         return self.df
 
@@ -220,7 +220,7 @@ def reshape_ice_df_for_cloud_file(df_source, effectiveness_class, years):
     df_source.rename(columns={'Combined GHG gCO2/mi': 'cert_co2_grams_per_mile'}, inplace=True)
     df_return = pd.DataFrame()
     for year in years:
-        temp = pd.melt(df_source[['cert_co2_grams_per_mile', f'new_vehicle_cost_dollars_{year}']], id_vars='cert_co2_grams_per_mile', value_vars=f'new_vehicle_cost_dollars_{year}', value_name='new_vehicle_cost_dollars')
+        temp = pd.melt(df_source[['cert_co2_grams_per_mile', f'new_vehicle_mfr_cost_dollars_{year}']], id_vars='cert_co2_grams_per_mile', value_vars=f'new_vehicle_mfr_cost_dollars_{year}', value_name='new_vehicle_mfr_cost_dollars')
         temp.insert(0, 'model_year', year)
         temp.drop(columns='variable', inplace=True)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
@@ -233,7 +233,7 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
     for year in years:
         temp = pd.melt(df_source[[f'cert_co2_grams_per_mile_{year}']], value_vars=f'cert_co2_grams_per_mile_{year}', value_name='cert_co2_grams_per_mile')
         temp.drop(columns='variable', inplace=True)
-        temp = temp.join(pd.melt(df_source[[f'new_vehicle_cost_dollars_{year}']], value_vars=f'new_vehicle_cost_dollars_{year}', value_name='new_vehicle_cost_dollars'))
+        temp = temp.join(pd.melt(df_source[[f'new_vehicle_mfr_cost_dollars_{year}']], value_vars=f'new_vehicle_mfr_cost_dollars_{year}', value_name='new_vehicle_mfr_cost_dollars'))
         temp.drop(columns='variable', inplace=True)
         temp.insert(0, 'model_year', year)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
@@ -242,7 +242,8 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
 
 
 def main():
-    path_project = Path.cwd()
+    path_cwd = Path.cwd()
+    path_project = path_cwd.parent
     path_inputs = path_project.joinpath('inputs')
     path_alpha_inputs = path_inputs.joinpath('ALPHA_ToyModel')
     path_input_templates = path_project.joinpath('input_templates')
@@ -438,7 +439,7 @@ def main():
             for year in years:
                 temp_df.insert(len(temp_df.columns), f'roadload_cost_{year}', 0)
             for year in years:
-                temp_df.insert(len(temp_df.columns), f'new_vehicle_cost_dollars_{year}', 0)
+                temp_df.insert(len(temp_df.columns), f'new_vehicle_mfr_cost_dollars_{year}', 0)
             cost_object.weight_cost(start_year, techcosts_weight, work_class)
             # sum individual techs into system-level costs (powertrain, roadload)
             cost_object.powertrain_cost(start_year)
@@ -507,7 +508,7 @@ def main():
         bev_cost_co2[key] = cost_object.year_over_year_cost(start_year, years, learning_rate_bev, 'bev_cost')
         for year in years:
             bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
-                                     f'new_vehicle_cost_dollars_{year}',
+                                     f'new_vehicle_mfr_cost_dollars_{year}',
                                      bev_cost_co2[key][[f'weight_cost_{year}', f'bev_cost_{year}']].sum(axis=1))
 
         # calc targets and upstream petroleum CO2 (CO2_refinery)

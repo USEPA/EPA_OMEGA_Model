@@ -5,6 +5,7 @@ fuels.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -16,20 +17,21 @@ class Fuel(SQABase):
     energy_density_MJ_per_unit = Column('energy_density_megajoules_per_unit', Float)
 
     def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
+        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
 
     def __str__(self):
         return "<Fuel('%s', %f MJ/%s)>" % (self.name, self.energy_density_MJ_per_unit, self.unit)
 
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'fuels'
         input_template_version = 0.0002
         input_template_columns = {'fuel_id', 'unit', 'energy_density_megajoules_per_unit'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
@@ -46,8 +48,8 @@ class Fuel(SQABase):
                         unit=df.loc[i, 'unit'],
                         energy_density_MJ_per_unit=df.loc[i, 'energy_density_megajoules_per_unit'],
                     ))
-                session.add_all(obj_list)
-                session.flush()
+                o2.session.add_all(obj_list)
+                o2.session.flush()
 
         return template_errors
 
@@ -56,10 +58,14 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    SQABase.metadata.create_all(engine)
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)

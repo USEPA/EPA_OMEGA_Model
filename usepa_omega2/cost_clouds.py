@@ -5,6 +5,7 @@ cost_clouds.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 import cost_curves
@@ -31,12 +32,15 @@ class CostCloud(SQABase):
         return s
 
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
+        import matplotlib.pyplot as plt
+
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'cost_clouds'
-        input_template_version = 0.0002
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars'}
+        input_template_version = 0.0003
+        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
+                                  'new_vehicle_mfr_cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -55,16 +59,16 @@ class CostCloud(SQABase):
                     obj_list.append(CostCloud(
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
-                        actual_new_vehicle_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
+                        new_vehicle_mfr_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
                         cert_co2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
-                session.add_all(obj_list)
-                oringal_echo = engine.echo
-                engine.echo = False  # cloud has a lot of points... turn off echo
+                o2.session.add_all(obj_list)
+                original_echo = o2.engine.echo
+                o2.engine.echo = False  # cloud has a lot of points... turn off echo
                 if verbose:
                     print('\nAdding cost cloud to database...')
-                session.flush()
-                engine.echo = oringal_echo
+                o2.session.flush()
+                o2.engine.echo = original_echo
 
             # convert cost clouds into curves and set up cost_curves table...
             cost_curve_classes = df['cost_curve_class'].unique()
@@ -106,7 +110,8 @@ class CostCloud(SQABase):
                         # calculate frontier factor (more negative is more better) = slope of each point relative
                         # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
                         cloud['frontier_factor'] = (cloud[combined_GHG_cost] - min_co2_cost[-1]) / (
-                                    cloud[combined_GHG_gpmi] - min_co2_gpmi[-1]) ** o2_options.cost_curve_frontier_affinity_factor
+                                cloud[combined_GHG_gpmi] - min_co2_gpmi[
+                            -1]) ** o2.options.cost_curve_frontier_affinity_factor
 
                         # find next frontier point, lowest slope, and add to frontier lists
                         min_co2_gpmi_index = cloud['frontier_factor'].idxmin()
@@ -118,7 +123,9 @@ class CostCloud(SQABase):
 
                     if verbose and model_year == cloud_model_years.min():
                         plt.plot(min_co2_gpmi, min_co2_cost, 'r-')
-                    cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year, min_co2_gpmi, min_co2_cost, session, verbose=False)
+                        plt.savefig(o2.options.output_folder + 'Cost versus CO2 %s' % cost_curve_class)
+                    cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year, min_co2_gpmi,
+                                                                   min_co2_cost)
 
             plt.show()
 
@@ -132,11 +139,15 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    SQABase.metadata.create_all(engine)
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+    o2.cost_file = 'input_templates/cost_clouds.csv'
+
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + CostCloud.init_database_from_file(o2_options.cost_clouds_file, session,
-                                                    verbose=o2_options.verbose)
+    init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)

@@ -5,12 +5,13 @@ GHG_standards_flat.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
 class GHGStandardFlat(SQABase):
     # --- database table properties ---
-    __tablename__ = 'ghg_standards'
+    __tablename__ = 'ghg_standards_flat'
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
@@ -18,7 +19,7 @@ class GHGStandardFlat(SQABase):
     lifetime_VMT = Column('lifetime_vmt', Float)
 
     def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
+        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
 
     def __str__(self):
         s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
@@ -28,14 +29,15 @@ class GHGStandardFlat(SQABase):
 
     # noinspection PyMethodParameters
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'ghg_standards-flat'
         input_template_version = 0.0002
         input_template_columns = {'model_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
@@ -53,20 +55,20 @@ class GHGStandardFlat(SQABase):
                         GHG_target_CO2_grams_per_mile=df.loc[i, 'ghg_target_co2_grams_per_mile'],
                         lifetime_VMT=df.loc[i, 'lifetime_vmt'],
                     ))
-                session.add_all(obj_list)
-                session.flush()
+                o2.session.add_all(obj_list)
+                o2.session.flush()
 
         return template_errors
 
     @staticmethod
     def calculate_target_co2_gpmi(vehicle):
-        return session.query(GHGStandardFlat.GHG_target_CO2_grams_per_mile). \
+        return o2.session.query(GHGStandardFlat.GHG_target_CO2_grams_per_mile). \
             filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
             filter(GHGStandardFlat.model_year == vehicle.model_year).scalar()
 
     @staticmethod
     def calculate_cert_lifetime_vmt(reg_class_id, model_year):
-        return session.query(GHGStandardFlat.lifetime_VMT). \
+        return o2.session.query(GHGStandardFlat.lifetime_VMT). \
             filter(GHGStandardFlat.reg_class_ID == reg_class_id). \
             filter(GHGStandardFlat.model_year == model_year).scalar()
 
@@ -95,17 +97,23 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
-    SQABase.metadata.create_all(engine)
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
+                                                                    verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)
 
-        o2_options.GHG_standard = GHGStandardFlat
+        o2.options.GHG_standard = GHGStandardFlat
 
-        class dummyVehicle():
+
+        class dummyVehicle:
             model_year = None
             reg_class_ID = None
             initial_registered_count = None
@@ -113,18 +121,19 @@ if __name__ == '__main__':
             def get_initial_registered_count(self):
                 return self.initial_registered_count
 
-        car_vehicle = dummyVehicle()
+
+        car_vehicle = dummyVehicle
         car_vehicle.model_year = 2021
-        car_vehicle.reg_class_ID = RegClass.car.name
+        car_vehicle.reg_class_ID = reg_classes.car
         car_vehicle.initial_registered_count = 1
 
-        truck_vehicle = dummyVehicle()
+        truck_vehicle = dummyVehicle
         truck_vehicle.model_year = 2021
-        truck_vehicle.reg_class_ID = RegClass.truck.name
+        truck_vehicle.reg_class_ID = reg_classes.truck
         truck_vehicle.initial_registered_count = 1
 
-        car_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
-        car_target_co2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
+        car_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
+        car_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
 
-        truck_target_co2_gpmi = o2_options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
-        truck_target_co2_Mg = o2_options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)
+        truck_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
+        truck_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)

@@ -5,6 +5,7 @@ manufacturers.py
 
 """
 
+import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -26,7 +27,7 @@ class Manufacturer(SQABase):
         return s
 
     @staticmethod
-    def init_database_from_file(filename, session, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'manufacturers'
@@ -48,8 +49,8 @@ class Manufacturer(SQABase):
                     obj_list.append(Manufacturer(
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
                     ))
-                session.add_all(obj_list)
-                session.flush()
+                o2.session.add_all(obj_list)
+                o2.session.flush()
 
         return template_errors
 
@@ -58,14 +59,18 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    (o2.engine, o2.session) = init_db()
+
     from fuels import Fuel
     from market_classes import MarketClass
     from vehicles import Vehicle
 
-    SQABase.metadata.create_all(engine)
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)
