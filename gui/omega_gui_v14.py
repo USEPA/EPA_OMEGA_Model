@@ -14,6 +14,7 @@ import subprocess
 
 import multitimer
 
+
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 
@@ -577,6 +578,8 @@ class Form(QObject):
 
         # This call works but gui freezes until new process ends
         # os.system("python usepa_omega2/__main__.py")
+
+        subprocess.Popen(['python', os.path.realpath('gui/sound.py'), '0'], close_fds=True)
 
         # This call works and runs a completely separate process
         subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
