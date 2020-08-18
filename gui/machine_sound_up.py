@@ -8,6 +8,4 @@ MP3 Sound Test
 
 from playsound import playsound
 
-playsound('gui/elements/machine.mp3')
-
-
+playsound('gui/elements/machine_up.mp3')

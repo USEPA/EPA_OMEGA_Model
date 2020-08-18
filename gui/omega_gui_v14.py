@@ -588,10 +588,12 @@ class Form(QObject):
         file.truncate(0)
         file.close()
         file1 = open("gui/comm_file.txt", "a")  # append mode
-        file1.write("start_model_run \n")
+        file1.write("1 start_model_run \n")
         file1.close()
 
-        machine_sound = subprocess.Popen(['python', os.path.realpath('gui/machine_sound.py'), '0'], close_fds=True)
+        machine_sound = subprocess.Popen(['python', os.path.realpath('gui/machine_sound_up.py'), '0'], close_fds=True)
+        machine_sound1 = subprocess.Popen(['python', os.path.realpath('gui/machine_sound_down.py'), '0'],
+                                          close_fds=True)
         # machine_sound.terminate()
 
         # This call works and runs a completely separate process
@@ -604,6 +606,11 @@ class Form(QObject):
             with open('gui/comm_file.txt') as f:
                 if 'end_model_run' in f.read():
                     a = 1
+
+        machine_sound1 = subprocess.Popen(['python', os.path.realpath('gui/machine_sound_down.py'), '0'],
+                                          close_fds=True)
+        time.sleep(1)
+        machine_sound.terminate()
 
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
