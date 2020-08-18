@@ -580,12 +580,30 @@ class Form(QObject):
         # This call works but gui freezes until new process ends
         # os.system("python usepa_omega2/__main__.py")
 
-        p = subprocess.Popen(['python', os.path.realpath('gui/machine_sound.py'), '0'], close_fds=True)
-        # p.terminate()
+        # Delete contents of comm_file.txt used to communicate with other processes
+        file1 = open("gui/comm_file.txt", "a")  # append mode
+        file1.write("Today \n")
+        file1.close()
+        file = open("gui/comm_file.txt", "r+")
+        file.truncate(0)
+        file.close()
+        file1 = open("gui/comm_file.txt", "a")  # append mode
+        file1.write("start_model_run \n")
+        file1.close()
+
+        machine_sound = subprocess.Popen(['python', os.path.realpath('gui/machine_sound.py'), '0'], close_fds=True)
+        # machine_sound.terminate()
 
         # This call works and runs a completely separate process
-        t = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
-        # t.terminate()
+        omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
+        # omega2.terminate()
+
+        a = 0
+        while a == 0:
+            time.sleep(1)
+            with open('gui/comm_file.txt') as f:
+                if 'end_model_run' in f.read():
+                    a = 1
 
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')

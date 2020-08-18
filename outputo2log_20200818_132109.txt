@@ -1,4 +1,4 @@
-OMEGA2 phase0.1 run started at 2020-08-18 08:35:12
+OMEGA2 phase0.1 run started at 2020-08-18 13:21:09
 
 
 Initializing database from input_templates/fuels.csv...
