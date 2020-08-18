@@ -2,12 +2,11 @@
 sound.py
 ===========
 
-Sound Test
+MP3 Sound Test
 
 """
 
 from playsound import playsound
-
 
 playsound('gui/elements/machine.mp3')
 

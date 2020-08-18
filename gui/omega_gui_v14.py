@@ -13,7 +13,7 @@ import sys
 import subprocess
 
 import multitimer
-
+import time
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
@@ -29,6 +29,7 @@ from datetime import datetime
 # Import functions from other files
 from omega_gui_functions import *
 from omega_gui_stylesheets import *
+
 # from external_functions import *
 
 # Initialize global variables
@@ -579,10 +580,12 @@ class Form(QObject):
         # This call works but gui freezes until new process ends
         # os.system("python usepa_omega2/__main__.py")
 
-        subprocess.Popen(['python', os.path.realpath('gui/sound.py'), '0'], close_fds=True)
+        p = subprocess.Popen(['python', os.path.realpath('gui/machine_sound.py'), '0'], close_fds=True)
+        # p.terminate()
 
         # This call works and runs a completely separate process
-        subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
+        t = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
+        # t.terminate()
 
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
