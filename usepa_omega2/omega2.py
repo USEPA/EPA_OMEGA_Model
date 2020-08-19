@@ -98,7 +98,7 @@ def run_postproc():
 
     label_xyt(ax1, 'Year', 'Average Vehicle Cert CO2 [g/mi]','%s\nAverage Vehicle Cert CO2 g/mi v Year' % o2.options.session_name)
     ax1.legend(average_co2_gpmi_data.keys())
-    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 g/mi' % o2.options.session_name)
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi' % o2.options.session_name)
 
 
 
