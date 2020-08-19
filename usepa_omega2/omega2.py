@@ -8,27 +8,65 @@ OMEGA2 top level code
 
 import o2  # import global variables
 from usepa_omega2 import *
-
+from omega_plot import *
 
 def run_postproc():
     from manufacturer_annual_data import ManufacturerAnnualData
-    import matplotlib.pyplot as plt
+    from vehicles import Vehicle
+    from vehicle_annual_data import VehicleAnnualData
 
-    calendar_year = o2.session.query(ManufacturerAnnualData.calendar_year).all()
+    calendar_year = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
     cert_target_co2_Mg = o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all()
     cert_co2_Mg = o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all()
     total_cost_billions = float(
         o2.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar()) / 1e9
 
-    plt.figure()
-    plt.plot(calendar_year, cert_target_co2_Mg, '.-')
-    plt.plot(calendar_year, cert_co2_Mg, '.-')
-    plt.title('%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
-        o2.options.session_name, total_cost_billions))
-    plt.xlabel('Year')
-    plt.ylabel('CO2 Mg')
-    plt.grid()
-    plt.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_name)
+    fig, ax1 = fplothg(calendar_year, cert_target_co2_Mg, '.-')
+    ax1.plot(calendar_year, cert_co2_Mg, '.-')
+    label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (o2.options.session_name, total_cost_billions))
+    fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_name)
+
+    bev_non_hauling_share_frac = o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all()
+    ice_non_hauling_share_frac = o2.session.query(ManufacturerAnnualData.ice_non_hauling_share_frac).all()
+    bev_hauling_share_frac = o2.session.query(ManufacturerAnnualData.bev_hauling_share_frac).all()
+    ice_hauling_share_frac = o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all()
+
+    fig, ax1 = fplothg(calendar_year, bev_non_hauling_share_frac, '.-')
+    ax1.plot(calendar_year, ice_non_hauling_share_frac, '.-')
+    ax1.plot(calendar_year, bev_hauling_share_frac, '.-')
+    ax1.plot(calendar_year, ice_hauling_share_frac, '.-')
+    label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_name)
+    ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling'])
+    fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_name)
+
+    fig, ax1 = figure()
+    average_cost_data = dict()
+    for hc in hauling_classes:
+        average_cost_data[hc] = []
+        for cy in calendar_year:
+            average_cost_data[hc].append(o2.session.query(
+                func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleAnnualData.registered_count)). \
+                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                         filter(Vehicle.model_year == cy). \
+                                         filter(Vehicle.hauling_class == hc). \
+                                         filter(VehicleAnnualData.age == 0).scalar())
+        ax1.plot(calendar_year, average_cost_data[hc])
+
+    average_cost_data['total'] = []
+    for cy in calendar_year:
+        average_cost_data['total'].append(o2.session.query(
+            func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+            func.sum(VehicleAnnualData.registered_count)). \
+                                     filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                     filter(Vehicle.model_year == cy). \
+                                     filter(VehicleAnnualData.age == 0).scalar())
+    ax1.plot(calendar_year, average_cost_data['total'])
+
+    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]','%s\nAverage Vehicle Cost v Year' % o2.options.session_name)
+    ax1.set_ylim(15e3, 50e3)
+    ax1.legend(average_cost_data.keys())
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_name)
 
 
 def run_omega(o2_options):
@@ -43,8 +81,9 @@ def run_omega(o2_options):
 
     # set up global variables:
     o2.options = o2_options
-    (o2.engine, o2.session) = init_db()
+    init_omega_db()
     o2.engine.echo = o2.options.verbose
+    omega_log.init_logfile()
 
     from fuels import Fuel
     from fuel_scenarios import FuelScenario
@@ -61,8 +100,6 @@ def run_omega(o2_options):
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
     import consumer.sales as consumer
     import producer
-
-    omega_log.init_logfile()
 
     fileio.validate_folder(o2.options.output_folder)
 
@@ -128,7 +165,7 @@ def run_omega(o2_options):
         if not init_fail:
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
-            dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=False)
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
             end = time.time()
 
             print('\nElapsed Time %.2f Seconds' % (end - start))

@@ -73,22 +73,32 @@ class GHGStandardFlat(SQABase):
             filter(GHGStandardFlat.model_year == model_year).scalar()
 
     @staticmethod
-    def calculate_target_co2_Mg(vehicle):
+    def calculate_target_co2_Mg(vehicle, sales_variants=None):
+        import numpy as np
+
         lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
         co2_gpmi = GHGStandardFlat.calculate_target_co2_gpmi(vehicle)
 
-        sales = vehicle.get_initial_registered_count()
+        if sales_variants:
+            sales = np.array(sales_variants)
+        else:
+            sales = vehicle.get_initial_registered_count()
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
 
     @staticmethod
-    def calculate_cert_co2_Mg(vehicle):
+    def calculate_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+        import numpy as np
+
         lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
-        co2_gpmi = vehicle.cert_CO2_grams_per_mile
-
-        sales = vehicle.get_initial_registered_count()
+        if co2_gpmi_variants:
+            sales = np.array(sales_variants)
+            co2_gpmi = np.array(co2_gpmi_variants)
+        else:
+            sales = vehicle.get_initial_registered_count()
+            co2_gpmi = vehicle.cert_CO2_grams_per_mile
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
 
@@ -99,7 +109,9 @@ if __name__ == '__main__':
 
     # set up global variables:
     o2.options = OMEGARuntimeOptions()
-    (o2.engine, o2.session) = init_db()
+    o2.options.ghg_standards_file = 'input_templates\\ghg_standards-flat.csv'
+    init_omega_db()
+    omega_log.init_logfile()
 
     SQABase.metadata.create_all(o2.engine)
 
@@ -108,10 +120,9 @@ if __name__ == '__main__':
                                                                     verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)
+        dump_omega_db_to_csv(o2.options.database_dump_folder)
 
         o2.options.GHG_standard = GHGStandardFlat
-
 
         class dummyVehicle:
             model_year = None
@@ -122,18 +133,26 @@ if __name__ == '__main__':
                 return self.initial_registered_count
 
 
-        car_vehicle = dummyVehicle
+        car_vehicle = dummyVehicle()
         car_vehicle.model_year = 2021
         car_vehicle.reg_class_ID = reg_classes.car
         car_vehicle.initial_registered_count = 1
 
-        truck_vehicle = dummyVehicle
+        truck_vehicle = dummyVehicle()
         truck_vehicle.model_year = 2021
         truck_vehicle.reg_class_ID = reg_classes.truck
         truck_vehicle.initial_registered_count = 1
 
         car_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
         car_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
+        car_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
+                                                                         co2_gpmi_variants=[0, 50, 100, 150])
+        car_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
+                                                                               co2_gpmi_variants=[0, 50, 100, 150],
+                                                                               sales_variants=[1, 2, 3, 4])
 
         truck_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
         truck_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)
+        truck_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
+        truck_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                                 sales_variants=[1, 2, 3, 4])

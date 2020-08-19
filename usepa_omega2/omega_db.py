@@ -27,12 +27,15 @@ from sqlalchemy.orm import relationship, Session
 SQABase = declarative_base()
 
 
-def init_db():
-    engine = create_engine('sqlite:///:memory:', echo=False)
-    session = Session(bind=engine)
+def init_omega_db():
+    o2.engine = create_engine('sqlite:///:memory:', echo=False)
+    o2.session = Session(bind=o2.engine)
     # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
-    session.execute('pragma foreign_keys=on')
-    return engine, session
+    o2.session.execute('pragma foreign_keys=on')
+
+
+def sql_unpack_result(query_result_tuples, index=0):
+    return [r[index] for r in query_result_tuples]
 
 
 def sql_format_list_str(list_in):
@@ -88,15 +91,17 @@ def sql_valid_name(name_str):
     return name_str.replace(' ', '_').lower()
 
 
-def dump_database_to_csv(engine, output_folder, verbose=False):
+def dump_omega_db_to_csv(output_folder, verbose=False):
     # validate output folder
     fileio.validate_folder(output_folder)
 
+    o2.session.flush()  # make sure database is up to date
+
     if verbose:
-        omega_log.logwrite('\ndumping %s database to %s...' % (engine.name, output_folder))
+        omega_log.logwrite('\ndumping %s database to %s...' % (o2.engine.name, output_folder))
 
     # dump tables to .csv files using pandas!
-    for table in engine.table_names():
+    for table in o2.engine.table_names():
         omega_log.logwrite(table)
-        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=engine)
+        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=o2.engine)
         sql_df.to_csv('%s/%s_table.csv' % (output_folder, table), index=False)

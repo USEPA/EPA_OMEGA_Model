@@ -30,19 +30,19 @@ def demand_sales(model_year):
     # get sales numbers from initial fleet
     initial_ICE_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
         Vehicle.fueling_class == 'ICE').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year).scalar()
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
     initial_BEV_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
         Vehicle.fueling_class == 'BEV').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year).scalar()
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
     initial_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
         Vehicle.hauling_class == 'hauling').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year).scalar()
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
     initial_non_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
         Vehicle.hauling_class == 'non hauling').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year).scalar()
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
     sales_dict['hauling'] = initial_hauling_sales
     sales_dict['non hauling'] = initial_non_hauling_sales
@@ -58,7 +58,8 @@ if __name__ == '__main__':
 
     # set up global variables:
     o2.options = OMEGARuntimeOptions()
-    (o2.engine, o2.session) = init_db()
+    init_omega_db()
+    omega_log.init_logfile()
 
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData

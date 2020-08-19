@@ -18,16 +18,26 @@ class ManufacturerAnnualData(SQABase):
     cert_co2_Mg = Column('cert_co2_megagrams', Numeric)
     cert_target_co2_Mg = Column('cert_target_co2_megagrams', Numeric)
     manufacturer_vehicle_cost_dollars = Column('manufacturer_vehicle_cost_dollars', Numeric)
+    bev_non_hauling_share_frac = Column('bev_non_hauling_share_frac', Numeric)
+    ice_non_hauling_share_frac = Column('ice_non_hauling_share_frac', Numeric)
+    bev_hauling_share_frac = Column('bev_hauling_share_frac', Numeric)
+    ice_hauling_share_frac = Column('ice_hauling_share_frac', Numeric)
 
     @staticmethod
-    def update_manufacturer_annual_data(calendar_year, manufacturer_ID, cert_target_co2_Mg,
-                                        cert_co2_Mg, manufacturer_vehicle_cost_dollars):
+    def create_manufacturer_annual_data(calendar_year, manufacturer_ID, cert_target_co2_Mg,
+                                        cert_co2_Mg, manufacturer_vehicle_cost_dollars,
+                                        bev_non_hauling_share_frac, ice_non_hauling_share_frac,
+                                        bev_hauling_share_frac, ice_hauling_share_frac):
         o2.session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
-                                           calendar_year=calendar_year,
-                                           cert_target_co2_Mg=cert_target_co2_Mg,
-                                           cert_co2_Mg=cert_co2_Mg,
-                                           manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars
-                                           ))
+                                              calendar_year=calendar_year,
+                                              cert_target_co2_Mg=cert_target_co2_Mg,
+                                              cert_co2_Mg=cert_co2_Mg,
+                                              manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
+                                              bev_non_hauling_share_frac=bev_non_hauling_share_frac,
+                                              ice_non_hauling_share_frac=ice_non_hauling_share_frac,
+                                              bev_hauling_share_frac=bev_hauling_share_frac,
+                                              ice_hauling_share_frac=ice_hauling_share_frac,
+                                              ))
         o2.session.flush()
 
 
@@ -37,7 +47,7 @@ if __name__ == '__main__':
 
     # set up global variables:
     o2.options = OMEGARuntimeOptions()
-    (o2.engine, o2.session) = init_db()
+    init_omega_db()
 
     from manufacturers import Manufacturer  # required by vehicles
 

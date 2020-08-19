@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # set up global variables:
     o2.options = OMEGARuntimeOptions()
-    (o2.engine, o2.session) = init_db()
+    init_omega_db()
 
     from fuels import Fuel
     from market_classes import MarketClass
@@ -73,4 +73,4 @@ if __name__ == '__main__':
     init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)
+        dump_omega_db_to_csv(o2.options.database_dump_folder)

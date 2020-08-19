@@ -64,30 +64,35 @@ if __name__ == '__main__':
     if '__file__' in locals():
         print(fileio.get_filenameext(__file__))
 
+    # set up global variables:
+    o2.options = OMEGARuntimeOptions()
+    init_omega_db()
+    omega_log.init_logfile()
+
     from manufacturers import Manufacturer  # needed for manufacturers table
     from market_classes import MarketClass  # needed for market class ID
     from fuels import Fuel  # needed for showroom fuel ID
     from demanded_sales_annual_data import DemandedSalesAnnualData
     from cost_curves import CostCurve
     from GHG_standards_footprint import GHGStandardFootprint
-    o2_options.GHG_standard = GHGStandardFootprint
+    o2.options.GHG_standard = GHGStandardFootprint
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData
 
-    SQABase.metadata.create_all(engine)
+    SQABase.metadata.create_all(o2.engine)
 
     init_fail = []
-    init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(o2_options.demanded_sales_annual_data_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + CostCurve.init_database_from_file(o2_options.cost_curves_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2_options.ghg_standards_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
-    init_fail = init_fail + Vehicle.init_database_from_file(o2_options.vehicles_file, session, verbose=o2_options.verbose)
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
+    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+    init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(o2.options.demanded_sales_annual_data_file, verbose=o2.options.verbose)
+    init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_curves_file, verbose=o2.options.verbose)
+    init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file, verbose=o2.options.verbose)
+    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+    init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
     if not init_fail:
-        o2_options.analysis_initial_year = 2021
-        o2_options.analysis_final_year = 2050
-        o2_options.database_dump_folder = '__dump'
-        sales_demand = demand_sales(session, o2_options.analysis_initial_year)
-        dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=False)
+        o2.options.analysis_initial_year = 2021
+        o2.options.analysis_final_year = 2050
+        o2.options.database_dump_folder = '__dump'
+        sales_demand = demand_sales(o2.options.analysis_initial_year)
+        dump_omega_db_to_csv(o2.options.database_dump_folder)

@@ -73,7 +73,8 @@ if __name__ == '__main__':
 
     # set up global variables:
     o2.options = OMEGARuntimeOptions()
-    (o2.engine, o2.session) = init_db()
+    init_omega_db()
+    omega_log.init_logfile()
 
     SQABase.metadata.create_all(o2.engine)
 
@@ -85,4 +86,4 @@ if __name__ == '__main__':
                                                                             verbose=o2.options.verbose)
 
     if not init_fail:
-        dump_database_to_csv(o2.engine, o2.options.database_dump_folder, verbose=o2.options.verbose)
+        dump_omega_db_to_csv(o2.options.database_dump_folder)
