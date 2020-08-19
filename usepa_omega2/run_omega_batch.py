@@ -10,8 +10,9 @@ example usage:
 
 from usepa_omega2 import *
 
-
 # noinspection PyPackageRequirements
+
+
 class OMEGABatchObject(object):
     def __init__(self, name='', **kwargs):
         self.name = name

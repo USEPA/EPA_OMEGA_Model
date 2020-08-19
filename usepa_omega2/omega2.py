@@ -8,7 +8,7 @@ OMEGA2 top level code
 
 import o2  # import global variables
 from usepa_omega2 import *
-
+import os
 
 def run_postproc():
     from manufacturer_annual_data import ManufacturerAnnualData

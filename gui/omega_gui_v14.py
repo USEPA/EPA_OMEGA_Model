@@ -596,11 +596,11 @@ class Form(QObject):
         sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
         # This call works and runs a completely separate process
-        omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
+        # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
 
-        # omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
-                                        # '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
+        omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
+                                        '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
 
         a = 0
         while a == 0:
