@@ -1,0 +1,93 @@
+OMEGA2 phase0.1 run started at 2020-08-19 11:44:48
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuels.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuels.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuels.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuel_scenarios.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuel_scenarios.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuel_scenarios.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuel_scenario_annual_data.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuel_scenario_annual_data.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\fuel_scenario_annual_data.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\market_classes.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\market_classes.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\market_classes.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\cost_curves.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\cost_curves.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\cost_curves.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\ghg_standards-flat.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\ghg_standards-flat.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\ghg_standards-flat.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\demanded_sales_annual_data.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\demanded_sales_annual_data.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\demanded_sales_annual_data.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\manufacturers.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\manufacturers.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\manufacturers.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\vehicles.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\vehicles.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_44_10_phase0_demo_batch\ActionAlternative-NTO=10-ABS=1\\vehicles.csv]
+Input columns OK
+
+
+#RUNTIME FAIL
+Traceback (most recent call last):
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\usepa_omega2\omega2.py", line 134, in run_omega
+    producer.run_compliance_model()
+  File "C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\usepa_omega2\producer.py", line 91, in run_compliance_model
+    print(calendar_year)
+OSError: [Errno 22] Invalid argument
+
+

@@ -1,0 +1,65 @@
+vehicle_id,name,manufacturer_id,model_year,fueling_class,hauling_class,cost_curve_class,reg_class_id,cert_co2_grams_per_mile,cert_target_co2_grams_per_mile,cert_co2_megagrams,cert_target_co2_megagrams,new_vehicle_mfr_cost_dollars,manufacturer_deemed_new_vehicle_generalized_cost_dollars,showroom_fuel_id,market_class_id,footprint_ft2
+1,BEV non hauling,USA Motors,2020,BEV,non hauling,bev_300_MPW_LRL,car,40.0,210.0,328.04352,1722.22848,30766.244606687447,,US electricity,BEV non hauling,48.5
+2,BEV hauling,USA Motors,2020,BEV,hauling,bev_300_Truck,truck,61.0,280.0,330.66636,1517.8128,52242.064022356564,,US electricity,BEV hauling,54.65
+3,ICE non hauling,USA Motors,2020,ICE,non hauling,ice_MPW_LRL,car,250.0,210.0,48816000.0,41005440.0,26228.40563241222,,pump gasoline,ICE non hauling,48.5
+4,ICE hauling,USA Motors,2020,ICE,hauling,ice_Truck,truck,375.0,280.0,63524531.25,47431650.0,41508.30307334472,,pump gasoline,ICE hauling,54.65
+5,BEV non hauling,USA Motors,2021,BEV,non hauling,bev_300_MPW_LRL,car,32.07185966,203.7,263.0241433953101,1670.5616255999998,35054.09556,,US electricity,BEV non hauling,48.5
+6,BEV hauling,USA Motors,2021,BEV,hauling,bev_300_Truck,truck,40.31002081,271.6,218.51094840601561,1472.2784160000003,61003.75408,,US electricity,BEV hauling,54.65
+7,ICE non hauling,USA Motors,2021,ICE,non hauling,ice_MPW_LRL,car,194.6060315,203.7,37999552.134816,39775276.8,27006.271557123528,,pump gasoline,ICE non hauling,48.5
+8,ICE hauling,USA Motors,2021,ICE,hauling,ice_Truck,truck,271.953189,271.6,46068530.27511375,46008700.50000001,42709.3327569652,,pump gasoline,ICE hauling,54.65
+9,BEV non hauling,USA Motors,2022,BEV,non hauling,bev_300_MPW_LRL,car,32.9920127,197.6,270.5703994498176,1620.5349888,34643.42186,,US electricity,BEV non hauling,48.5
+10,BEV hauling,USA Motors,2022,BEV,hauling,bev_300_Truck,truck,41.70419207,263.5,226.06841620537315,1428.37026,60347.35944,,US electricity,BEV hauling,54.65
+11,ICE non hauling,USA Motors,2022,ICE,non hauling,ice_MPW_LRL,car,194.6060315,197.6,37999552.134816,38584166.4,26823.60544832644,,pump gasoline,ICE non hauling,48.5
+12,ICE hauling,USA Motors,2022,ICE,hauling,ice_Truck,truck,263.36595475,263.5,44613863.52720656,44636570.625,42695.88661666439,,pump gasoline,ICE hauling,54.65
+13,BEV non hauling,USA Motors,2023,BEV,non hauling,bev_300_MPW_LRL,car,33.82851545,191.7,277.43063211480955,1572.1485696,34240.6866,,US electricity,BEV non hauling,48.5
+14,BEV hauling,USA Motors,2023,BEV,hauling,bev_300_Truck,truck,42.90317936,255.6,232.56783854751362,1385.546256,59703.031160000006,,US electricity,BEV hauling,54.65
+15,ICE non hauling,USA Motors,2023,ICE,non hauling,ice_MPW_LRL,car,180.757539375,191.7,35295440.16852,37432108.8,27024.911992015477,,pump gasoline,ICE non hauling,48.5
+16,ICE hauling,USA Motors,2023,ICE,hauling,ice_Truck,truck,263.36595475,255.6,44613863.52720656,43298320.5,42426.15186771558,,pump gasoline,ICE hauling,54.65
+17,BEV non hauling,USA Motors,2024,BEV,non hauling,bev_300_MPW_LRL,car,34.69290164,185.9,284.5195393249843,1524.5822592,33845.70297,,US electricity,BEV non hauling,48.5
+18,BEV hauling,USA Motors,2024,BEV,hauling,bev_300_Truck,truck,44.2694672,247.9,239.974157019072,1343.806404,59070.489310000004,,US electricity,BEV hauling,54.65
+19,ICE non hauling,USA Motors,2024,ICE,non hauling,ice_MPW_LRL,car,170.37117028125,185.9,33267356.193798,36299577.6,27184.980933972383,,pump gasoline,ICE non hauling,48.5
+20,ICE hauling,USA Motors,2024,ICE,hauling,ice_Truck,truck,263.36595475,247.9,44613863.52720656,41993950.125,42158.351741634615,,pump gasoline,ICE hauling,54.65
+21,BEV non hauling,USA Motors,2025,BEV,non hauling,bev_300_MPW_LRL,car,35.64093809,180.3,292.2944696786419,1478.6561664,33458.28876,,US electricity,BEV non hauling,48.5
+22,BEV hauling,USA Motors,2025,BEV,hauling,bev_300_Truck,truck,45.44057106,240.5,246.3224299792056,1303.69278,58449.46084,,US electricity,BEV hauling,54.65
+23,ICE non hauling,USA Motors,2025,ICE,non hauling,ice_MPW_LRL,car,162.58139346093748,180.3,31746293.212756496,35206099.2,27254.48377737615,,pump gasoline,ICE non hauling,48.5
+24,ICE hauling,USA Motors,2025,ICE,hauling,ice_Truck,truck,256.9255290625,240.5,43522863.46627617,40740399.375,42130.66907815661,,pump gasoline,ICE hauling,54.65
+25,BEV non hauling,USA Motors,2026,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,174.9,299.3833768068058,1434.3702912,33078.26627,,US electricity,BEV non hauling,48.5
+26,BEV hauling,USA Motors,2026,BEV,hauling,bev_300_Truck,truck,46.80685889,233.3,253.7287483965564,1264.663308,57839.679410000004,,US electricity,BEV hauling,54.65
+27,ICE non hauling,USA Motors,2026,ICE,non hauling,ice_MPW_LRL,car,150.89672823046874,174.9,29464698.74119425,34151673.6,27500.65728232175,,pump gasoline,ICE non hauling,48.5
+28,ICE hauling,USA Motors,2026,ICE,hauling,ice_Truck,truck,256.9255290625,233.3,43522863.46627617,39520728.375,41865.1763867627,,pump gasoline,ICE hauling,54.65
+29,BEV non hauling,USA Motors,2027,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,169.7,299.3833768068058,1391.7246335999998,32705.46217,,US electricity,BEV non hauling,48.5
+30,BEV hauling,USA Motors,2027,BEV,hauling,bev_300_Truck,truck,46.80685889,226.3,253.7287483965564,1226.717988,57240.885239999996,,US electricity,BEV hauling,54.65
+31,ICE non hauling,USA Motors,2027,ICE,non hauling,ice_MPW_LRL,car,147.97556192285157,169.7,28894300.12330369,33136300.799999997,27532.467363696134,,pump gasoline,ICE non hauling,48.5
+32,ICE hauling,USA Motors,2027,ICE,hauling,ice_Truck,truck,252.095209796875,226.3,42704613.42057838,38334937.125,42183.40483302385,,pump gasoline,ICE hauling,54.65
+33,BEV non hauling,USA Motors,2028,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,164.6,299.3833768068058,1349.8990847999999,32339.707410000003,,US electricity,BEV non hauling,48.5
+34,BEV hauling,USA Motors,2028,BEV,hauling,bev_300_Truck,truck,46.80685889,219.5,253.7287483965564,1189.85682,56652.82494,,US electricity,BEV hauling,54.65
+35,ICE non hauling,USA Motors,2028,ICE,non hauling,ice_MPW_LRL,car,143.59381246142578,164.6,28038702.196467843,32140454.4,27673.572764474262,,pump gasoline,ICE non hauling,48.5
+36,ICE hauling,USA Motors,2028,ICE,hauling,ice_Truck,truck,244.84973089843749,219.5,41477238.352031685,37183025.625,43072.864952155454,,pump gasoline,ICE hauling,54.65
+37,BEV non hauling,USA Motors,2029,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,159.7,299.3833768068058,1309.7137536,31980.8371,,US electricity,BEV non hauling,48.5
+38,BEV hauling,USA Motors,2029,BEV,hauling,bev_300_Truck,truck,46.80685889,212.9,253.7287483965564,1154.079804,56075.25132999999,,US electricity,BEV hauling,54.65
+39,ICE non hauling,USA Motors,2029,ICE,non hauling,ice_MPW_LRL,car,143.59381246142578,159.7,28038702.196467843,31183660.799999997,27484.43041233049,,pump gasoline,ICE non hauling,48.5
+40,ICE hauling,USA Motors,2029,ICE,hauling,ice_Truck,truck,244.84973089843749,212.9,41477238.352031685,36064993.875,42801.965805985004,,pump gasoline,ICE hauling,54.65
+41,BEV non hauling,USA Motors,2030,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,154.9,299.3833768068058,1270.3485312,31628.69045,,US electricity,BEV non hauling,48.5
+42,BEV hauling,USA Motors,2030,BEV,hauling,bev_300_Truck,truck,46.80685889,206.5,253.7287483965564,1119.38694,55507.92333,,US electricity,BEV hauling,54.65
+43,ICE non hauling,USA Motors,2030,ICE,non hauling,ice_MPW_LRL,car,143.59381246142578,154.9,28038702.196467843,30246393.6,27296.75853886856,,pump gasoline,ICE non hauling,48.5
+44,ICE hauling,USA Motors,2030,ICE,hauling,ice_Truck,truck,244.84973089843749,206.5,41477238.352031685,34980841.875,42532.99788166558,,pump gasoline,ICE hauling,54.65
+45,BEV non hauling,USA Motors,2031,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,150.3,299.3833768068058,1232.6235264000002,31283.11058,,US electricity,BEV non hauling,48.5
+46,BEV hauling,USA Motors,2031,BEV,hauling,bev_300_Truck,truck,46.80685889,200.3,253.7287483965564,1085.778228,54950.60577,,US electricity,BEV hauling,54.65
+47,ICE non hauling,USA Motors,2031,ICE,non hauling,ice_MPW_LRL,car,141.4029377307129,150.3,27610903.23304992,29348179.200000003,27323.375652695355,,pump gasoline,ICE non hauling,48.5
+48,ICE hauling,USA Motors,2031,ICE,hauling,ice_Truck,truck,241.22699144921876,200.3,40863550.817758344,33930569.625,42835.562436737615,,pump gasoline,ICE hauling,54.65
+49,BEV non hauling,USA Motors,2032,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,145.8,299.3833768068058,1195.7186304000002,30943.94453,,US electricity,BEV non hauling,48.5
+50,BEV hauling,USA Motors,2032,BEV,hauling,bev_300_Truck,truck,46.80685889,194.3,253.7287483965564,1053.253668,54403.06924,,US electricity,BEV hauling,54.65
+51,ICE non hauling,USA Motors,2032,ICE,non hauling,ice_MPW_LRL,car,141.4029377307129,145.8,27610903.23304992,28469491.200000003,27137.097338568343,,pump gasoline,ICE non hauling,48.5
+52,ICE hauling,USA Motors,2032,ICE,hauling,ice_Truck,truck,241.22699144921876,194.3,40863550.817758344,32914177.125,42567.5617724373,,pump gasoline,ICE hauling,54.65
+53,BEV non hauling,USA Motors,2033,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,141.4,299.3833768068058,1159.6338432,30611.04307,,US electricity,BEV non hauling,48.5
+54,BEV hauling,USA Motors,2033,BEV,hauling,bev_300_Truck,truck,46.80685889,188.5,253.7287483965564,1021.81326,53865.08998,,US electricity,BEV hauling,54.65
+55,ICE non hauling,USA Motors,2033,ICE,non hauling,ice_MPW_LRL,car,141.4029377307129,141.4,27610903.23304992,27610329.6,26952.263299540406,,pump gasoline,ICE non hauling,48.5
+56,ICE hauling,USA Motors,2033,ICE,hauling,ice_Truck,truck,241.22699144921876,188.5,40863550.817758344,31931664.375,42301.45976746872,,pump gasoline,ICE hauling,54.65
+57,BEV non hauling,USA Motors,2034,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,137.2,299.3833768068058,1125.1892736,30284.260660000004,,US electricity,BEV non hauling,48.5
+58,BEV hauling,USA Motors,2034,BEV,hauling,bev_300_Truck,truck,46.80685889,182.8,253.7287483965564,990.914928,53336.44971,,US electricity,BEV hauling,54.65
+59,ICE non hauling,USA Motors,2034,ICE,non hauling,ice_MPW_LRL,car,141.4029377307129,137.2,27610903.23304992,26790220.799999997,26768.86093908334,,pump gasoline,ICE non hauling,48.5
+60,ICE hauling,USA Motors,2034,ICE,hauling,ice_Truck,truck,239.41562172460937,182.8,40556707.05062167,30966091.5,42317.798740684346,,pump gasoline,ICE hauling,54.65
+61,BEV non hauling,USA Motors,2035,BEV,non hauling,bev_300_MPW_LRL,car,36.50532427,133.1,299.3833768068058,1091.5648128,29963.455339999997,,US electricity,BEV non hauling,48.5
+62,BEV hauling,USA Motors,2035,BEV,hauling,bev_300_Truck,truck,46.80685889,177.3,253.7287483965564,961.100748,52816.93552,,US electricity,BEV hauling,54.65
+63,ICE non hauling,USA Motors,2035,ICE,non hauling,ice_MPW_LRL,car,141.4029377307129,133.1,27610903.23304992,25989638.4,26586.877786823246,,pump gasoline,ICE non hauling,48.5
+64,ICE hauling,USA Motors,2035,ICE,hauling,ice_Truck,truck,239.41562172460937,177.3,40556707.05062167,30034398.375,42054.045249234885,,pump gasoline,ICE hauling,54.65

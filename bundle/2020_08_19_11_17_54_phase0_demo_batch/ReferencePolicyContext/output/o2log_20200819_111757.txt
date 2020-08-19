@@ -1,0 +1,83 @@
+OMEGA2 phase0.1 run started at 2020-08-19 11:17:57
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuels.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuels.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuels.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuel_scenarios.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuel_scenarios.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuel_scenarios.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuel_scenario_annual_data.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuel_scenario_annual_data.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\fuel_scenario_annual_data.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\market_classes.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\market_classes.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\market_classes.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\cost_curves.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\cost_curves.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\cost_curves.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\ghg_standards-footprint.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\ghg_standards-footprint.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\ghg_standards-footprint.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\demanded_sales_annual_data.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\demanded_sales_annual_data.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\demanded_sales_annual_data.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\manufacturers.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\manufacturers.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\manufacturers.csv]
+Input columns OK
+
+
+Initializing database from C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\vehicles.csv...
+Validating Template Version [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\vehicles.csv]
+Template name OK
+Template version OK
+
+Validating Columns [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\GitHub\EPA_OMEGA_Model\bundle\2020_08_19_11_17_54_phase0_demo_batch\ReferencePolicyContext\\vehicles.csv]
+Input columns OK
+
