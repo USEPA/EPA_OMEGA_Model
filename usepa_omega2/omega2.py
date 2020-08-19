@@ -9,6 +9,7 @@ OMEGA2 top level code
 import o2  # import global variables
 from usepa_omega2 import *
 from omega_plot import *
+import os
 
 def run_postproc():
     from manufacturer_annual_data import ManufacturerAnnualData
@@ -183,6 +184,13 @@ def run_omega(o2_options):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
+
+
+def gui_comm(text):
+    num_lines = sum(1 for line in open('gui/comm_file.txt'))
+    file1 = open("gui/comm_file.txt", "a")  # append mode
+    file1.write(str(num_lines + 1) + " " + text + " \n")
+    file1.close()
 
 
 if __name__ == "__main__":

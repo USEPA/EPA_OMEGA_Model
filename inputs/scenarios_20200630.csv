@@ -1,5 +1,0 @@
-input_template_name:,scenarios,input_template_version:,0.0001
-scenario_id,fuel_scenario_id,cost_curve_input_dollar_year,analysis_dollar_year
-ref fuel price,2020 AEO reference,2018,2019
-low fuel price,2020 AEO low,2018,2019
-high fuel price,2020 AEO high,2018,2019

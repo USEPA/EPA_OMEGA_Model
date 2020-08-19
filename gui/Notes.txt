@@ -1,0 +1,31 @@
+# Adding items to QListWidget
+    a = QListWidgetItem("Geek")
+    self.ui.output_file_list.addItem(a)
+    a = QListWidgetItem("Geek1")
+    self.ui.output_file_list.addItem(a)
+
+
+# Example YAML dump
+    g = data.get("input_files", "")
+    print(g)
+
+    a = data['file_1']
+    print(a)
+    data['file_1'] = "hello"
+    print(data['file_1'])
+
+    filepath2 = "test3.om2"
+    yaml_dump(filepath2, data)
+
+# Writing to plain text gui
+    temp1 = self.ui.working_directory_1_result.toPlainText()
+
+# Example CRLF at end of string
+    temp1 = temp1 + item_name + ": " + os.path.basename(item_value) + "\n"
+
+# Read file and print contents
+     path = working_directory + scenario_file
+     f = open(path, "r")
+     if f.mode == 'r':
+         contents = f.read()
+         print(contents)
