@@ -600,8 +600,7 @@ class Form(QObject):
         # omega2.terminate()
 
         # omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
-                                        # '--batch_file inputs\phase0_default_batch_file.xlsx',
-                                        # 'dddddddddddddddddddd'], close_fds=True)
+                                        # '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
 
         a = 0
         while a == 0:
