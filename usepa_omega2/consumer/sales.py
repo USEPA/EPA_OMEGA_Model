@@ -15,7 +15,7 @@ def calculate_generalized_cost(cost_factors):
     pass
 
 
-def demand_sales(model_year):
+def demanded_shares(model_year):
     """
     :param model_year: not used, for now
     :return: dict of sales by consumer (market) categories
