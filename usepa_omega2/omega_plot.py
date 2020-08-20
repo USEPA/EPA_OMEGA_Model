@@ -32,6 +32,7 @@ def vlineat(ax, x, *args, **kwargs):
 def figure():
     fig, ax1 = plt.subplots()
     ax1.grid(True, which='both')
+    fig.show()
     return fig, ax1
 
 
@@ -39,6 +40,7 @@ def fplothg(x, y, *args, **kwargs):
     fig, ax1 = plt.subplots()
     ax1.plot(x, y, *args, **kwargs)
     ax1.grid(True, which='both')
+    fig.show()
     return fig, ax1
 
 
@@ -49,6 +51,7 @@ def fplotyyhg(x, y, ylinespec, y2, y2linespec):
     ax2.plot(x, y2, y2linespec)
     ax1.grid(True)
     # ax2.grid(True)
+    fig.show()
     return fig, ax1, ax2
 
 
