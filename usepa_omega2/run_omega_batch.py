@@ -220,7 +220,7 @@ class OMEGASessionObject(object):
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
-        self.settings.demanded_sales_annual_data_file = self.read_parameter('Demanded Annual Sales File')
+        self.settings.demanded_shares_file = self.read_parameter('Demanded Shares File')
         self.settings.fuels_file = self.read_parameter('Fuels File')
         self.settings.fuel_scenarios_file = self.read_parameter('Fuel Scenarios File')
         self.settings.fuel_scenario_annual_data_file = self.read_parameter('Fuel Scenario Annual Data File')
@@ -488,7 +488,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     pythonpath = sys.exec_prefix
     if pythonpath.__contains__('envs'):
         pythonpath = pythonpath + "\\scripts"
-    cmd = '{}\\python "{}\\{}\\run_oemga_batch.py" --bundle_path "{}"  \
+    cmd = '{}\\python "{}\\{}\\run_omega_batch.py" --bundle_path "{}"  \
             --batch_file "{}.csv" --session_num {} --no_validate'.format(
         pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
     sysprint('.')
@@ -761,22 +761,16 @@ if __name__ == '__main__':
             for s in range(0, batch.num_sessions()):
                 session = batch.sessions[s]
                 print("\nValidating Session %d ('%s') Files..." % (s, session.name))
-                for i in batch.dataframe.index:
-                    if str(i).endswith(' Folder Name') or str(i).endswith(' File'):
-                        print(i)
-                        if options.verbose:
-                            print('validating %s' % i)
-                        validate_folder(session.read_parameter(i))
-                # validate_folder(session.read_parameter('Database Dump Folder Name'))
-                # validate_file(session.read_parameter('Manufacturers File'))
-                # validate_file(session.read_parameter('Market Classes File'))
-                # validate_file(session.read_parameter('Vehicles File'))
-                # validate_file(session.read_parameter('Demanded Annual Sales File'))
-                # validate_file(session.read_parameter('Fuels File'))
-                # validate_file(session.read_parameter('Fuel Scenarios File'))
-                # validate_file(session.read_parameter('Fuel Scenario Annual Data File'))
-                # validate_file(session.read_parameter('Cost File'))
-                # validate_file(session.read_parameter('GHG Standards File'))
+                validate_folder(session.read_parameter('Database Dump Folder Name'))
+                validate_file(session.read_parameter('Manufacturers File'))
+                validate_file(session.read_parameter('Market Classes File'))
+                validate_file(session.read_parameter('Vehicles File'))
+                validate_file(session.read_parameter('Demanded Shares File'))
+                validate_file(session.read_parameter('Fuels File'))
+                validate_file(session.read_parameter('Fuel Scenarios File'))
+                validate_file(session.read_parameter('Fuel Scenario Annual Data File'))
+                validate_file(session.read_parameter('Cost File'))
+                validate_file(session.read_parameter('GHG Standards File'))
                 print('Validating Session %d Parameters...' % s)
                 session.init(validate_only=True)
 

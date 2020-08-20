@@ -197,7 +197,7 @@ def run_omega(o2_options):
             o2.options.GHG_standard = GHGStandardFootprint
 
         init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
-            o2.options.demanded_sales_annual_data_file, verbose=o2.options.verbose)
+            o2.options.demanded_shares_file, verbose=o2.options.verbose)
         init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
                                                                      verbose=o2.options.verbose)
         init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
@@ -246,11 +246,11 @@ def run_omega(o2_options):
         print("### Check OMEGA log for error messages ###")
 
 
-def gui_comm(text):
-    num_lines = sum(1 for line in open('gui/comm_file.txt'))
-    file1 = open("gui/comm_file.txt", "a")  # append mode
-    file1.write(str(num_lines + 1) + " " + text + " \n")
-    file1.close()
+# def gui_comm(text):
+#     num_lines = sum(1 for line in open('../../gui/comm_file.txt'))
+#     file1 = open("../../gui/comm_file.txt", "a")  # append mode
+#     file1.write(str(num_lines + 1) + " " + text + " \n")
+#     file1.close()
 
 
 if __name__ == "__main__":
