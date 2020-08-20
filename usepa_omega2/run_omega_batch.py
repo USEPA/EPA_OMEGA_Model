@@ -10,8 +10,9 @@ example usage:
 
 from usepa_omega2 import *
 
-
 # noinspection PyPackageRequirements
+
+
 class OMEGABatchObject(object):
     def __init__(self, name='', **kwargs):
         self.name = name
@@ -202,7 +203,7 @@ class OMEGASessionObject(object):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
         self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
-        self.output_path = self.read_parameter('Session Output Path')
+        self.output_path = self.read_parameter('Session Output Folder Name')
 
     def get_io_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
@@ -216,7 +217,7 @@ class OMEGASessionObject(object):
             self.settings.output_folder = self.output_path + "\\" + self.name
 
         self.settings.session_name = self.name
-        self.settings.database_dump_folder = self.read_parameter('Database Dump Path',
+        self.settings.database_dump_folder = self.read_parameter('Database Dump Folder Name',
                                                                  default_value=self.settings.database_dump_folder)
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
@@ -762,7 +763,7 @@ if __name__ == '__main__':
             for s in range(0, batch.num_sessions()):
                 session = batch.sessions[s]
                 print("\nValidating Session %d ('%s') Files..." % (s, session.name))
-                validate_folder(session.read_parameter('Database Dump Path'))
+                validate_folder(session.read_parameter('Database Dump Folder Name'))
                 validate_file(session.read_parameter('Manufacturers File'))
                 validate_file(session.read_parameter('Market Classes File'))
                 validate_file(session.read_parameter('Vehicles File'))
@@ -797,9 +798,9 @@ if __name__ == '__main__':
                     session = batch.sessions[s]
                     options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
                                                            session_name=session.name)
-                    batch.dataframe.loc['Session Output Path'][session.num] = options.session_path + os.sep + 'output'
-                    batch.dataframe.loc['Database Dump Path'][session.num] = options.session_path + \
-                        batch.dataframe.loc['Database Dump Path'][session.num]
+                    batch.dataframe.loc['Session Output Folder Name'][session.num] = options.session_path + os.sep + 'output'
+                    batch.dataframe.loc['Database Dump Folder Name'][session.num] = options.session_path + \
+                        batch.dataframe.loc['Database Dump Folder Name'][session.num]
                     batch.dataframe.loc['Manufacturers File'][
                         session.num] = options.session_path + os.sep + relocate_file(options.session_path,
                                                                                      session.read_parameter(

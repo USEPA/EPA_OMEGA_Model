@@ -560,6 +560,8 @@ class Form(QObject):
 
         :return: N/A
         """
+        model_sound_start = 'gui/elements/model_start.mp3'
+        model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         self.event_monitor("Start Model Run ...", "black", 'dt')
         status_bar_message = "Model Running ..."
@@ -591,14 +593,14 @@ class Form(QObject):
         file1.write("1 start_model_run \n")
         file1.close()
 
-        machine_sound = subprocess.Popen(['python', os.path.realpath('gui/machine_sound_up.py'), '0'], close_fds=True)
-        machine_sound1 = subprocess.Popen(['python', os.path.realpath('gui/machine_sound_down.py'), '0'],
-                                          close_fds=True)
-        # machine_sound.terminate()
+        sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
         # This call works and runs a completely separate process
-        omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), '0'], close_fds=True)
+        # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
+
+        omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
+                                        '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
 
         a = 0
         while a == 0:
@@ -607,10 +609,9 @@ class Form(QObject):
                 if 'end_model_run' in f.read():
                     a = 1
 
-        machine_sound1 = subprocess.Popen(['python', os.path.realpath('gui/machine_sound_down.py'), '0'],
-                                          close_fds=True)
-        time.sleep(1)
-        machine_sound.terminate()
+        sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
+        # time.sleep(2)
+        sound1.terminate()
 
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')

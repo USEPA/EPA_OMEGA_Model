@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     # set up global variables:
     o2.options = OMEGARuntimeOptions()
-    (o2.engine, o2.session) = init_db()
+    init_omega_db()
 
     from manufacturers import Manufacturer  # required by vehicles
     from fuels import Fuel  # required by vehicles

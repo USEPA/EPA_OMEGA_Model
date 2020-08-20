@@ -35,10 +35,10 @@ print('loading usepa_omega2 version %s' % code_version)
 
 class OMEGARuntimeOptions(object):
     def __init__(self):
-        self.session_name = 'default'
-        self.verbose = False
-        self.output_folder = 'output'
-        self.database_dump_folder = '__dump'
+        self.session_name = 'OMEGA2 Demo'
+        self.verbose = True
+        self.output_folder = 'output' + os.sep
+        self.database_dump_folder = '__dump'  + os.sep
         self.manufacturers_file = 'input_templates/manufacturers.csv'
         self.market_classes_file = 'input_templates/market_classes.csv'
         self.vehicles_file = 'input_templates/vehicles.csv'
@@ -55,7 +55,7 @@ class OMEGARuntimeOptions(object):
         self.logfilename = ''
         self.producer_calculate_generalized_cost = None
         self.consumer_calculate_generalized_cost = None
-        self.GHG_standard = 'footprint'
+        self.GHG_standard = 'flat'
         if self.GHG_standard == 'flat':
             self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
         else:
@@ -70,7 +70,7 @@ class OMEGARuntimeOptions(object):
             self.annual_vmt_fixed_by_age_file = 'input_templates/annual_vmt_fixed_by_age.csv'
         else:
             pass
-        self.slice_tech_combo_cloud_tables = True
+        self.slice_tech_combo_cloud_tables = False
         self.allow_backsliding = False
         self.num_tech_options_per_vehicle = 5
 
