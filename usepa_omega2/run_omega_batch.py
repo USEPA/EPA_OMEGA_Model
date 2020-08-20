@@ -761,16 +761,22 @@ if __name__ == '__main__':
             for s in range(0, batch.num_sessions()):
                 session = batch.sessions[s]
                 print("\nValidating Session %d ('%s') Files..." % (s, session.name))
-                validate_folder(session.read_parameter('Database Dump Folder Name'))
-                validate_file(session.read_parameter('Manufacturers File'))
-                validate_file(session.read_parameter('Market Classes File'))
-                validate_file(session.read_parameter('Vehicles File'))
-                validate_file(session.read_parameter('Demanded Annual Sales File'))
-                validate_file(session.read_parameter('Fuels File'))
-                validate_file(session.read_parameter('Fuel Scenarios File'))
-                validate_file(session.read_parameter('Fuel Scenario Annual Data File'))
-                validate_file(session.read_parameter('Cost File'))
-                validate_file(session.read_parameter('GHG Standards File'))
+                for i in batch.dataframe.index:
+                    if str(i).endswith(' Folder Name') or str(i).endswith(' File'):
+                        print(i)
+                        if options.verbose:
+                            print('validating %s' % i)
+                        validate_folder(session.read_parameter(i))
+                # validate_folder(session.read_parameter('Database Dump Folder Name'))
+                # validate_file(session.read_parameter('Manufacturers File'))
+                # validate_file(session.read_parameter('Market Classes File'))
+                # validate_file(session.read_parameter('Vehicles File'))
+                # validate_file(session.read_parameter('Demanded Annual Sales File'))
+                # validate_file(session.read_parameter('Fuels File'))
+                # validate_file(session.read_parameter('Fuel Scenarios File'))
+                # validate_file(session.read_parameter('Fuel Scenario Annual Data File'))
+                # validate_file(session.read_parameter('Cost File'))
+                # validate_file(session.read_parameter('GHG Standards File'))
                 print('Validating Session %d Parameters...' % s)
                 session.init(validate_only=True)
 

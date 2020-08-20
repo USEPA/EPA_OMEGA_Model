@@ -126,6 +126,7 @@ def run_postproc():
 
     session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
+    return session_results
 
 def run_omega(o2_options):
     import traceback
@@ -224,10 +225,12 @@ def run_omega(o2_options):
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
             dump_omega_db_to_csv(o2.options.database_dump_folder)
-            end = time.time()
 
+            end = time.time()
             print('\nElapsed Time %.2f Seconds' % (end - start))
-            run_postproc()
+
+            session_summary_results = run_postproc()
+
             # o2.session.close()
             o2.engine.dispose()
             o2.engine = None
