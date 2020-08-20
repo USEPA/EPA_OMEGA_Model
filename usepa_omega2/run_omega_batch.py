@@ -808,13 +808,16 @@ if __name__ == '__main__':
                     # automatically rename and relocate source files
                     for i in batch.dataframe.index:
                         if str(i).endswith(' Folder Name'):
-                            print('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
-                                                         session.name + os.sep + batch.dataframe.loc[i][session.num]))
+                            if options.verbose:
+                                print('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
+                                                             session.name + os.sep + batch.dataframe.loc[i][
+                                                                 session.num]))
                             batch.dataframe.loc[i][session.num] = \
                                 session.name + os.sep + batch.dataframe.loc[i][session.num]
                         elif str(i).endswith(' File'):
-                            print('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
-                                  options.session_path + session.read_parameter(i)))
+                            if options.verbose:
+                                print('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
+                                                               options.session_path + session.read_parameter(i)))
                             batch.dataframe.loc[i][session.num] = \
                                 session.name + os.sep + relocate_file(options.session_path, session.read_parameter(i))
 

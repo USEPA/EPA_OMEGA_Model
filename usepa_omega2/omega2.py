@@ -11,32 +11,37 @@ from usepa_omega2 import *
 from omega_plot import *
 import os
 
+
 def run_postproc():
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData
+    import pandas as pd
 
-    calendar_year = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
-    cert_target_co2_Mg = o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all()
-    cert_co2_Mg = o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all()
+    calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
+    cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
+    cert_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all())
     total_cost_billions = float(
         o2.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar()) / 1e9
 
     # compliance chart
-    fig, ax1 = fplothg(calendar_year, cert_target_co2_Mg, '.-')
-    ax1.plot(calendar_year, cert_co2_Mg, '.-')
-    label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (o2.options.session_name, total_cost_billions))
+    fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, '.-')
+    ax1.plot(calendar_years, cert_co2_Mg, '.-')
+    label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
+    o2.options.session_name, total_cost_billions))
     fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_name)
 
-    bev_non_hauling_share_frac = o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all()
-    ice_non_hauling_share_frac = o2.session.query(ManufacturerAnnualData.ice_non_hauling_share_frac).all()
-    bev_hauling_share_frac = o2.session.query(ManufacturerAnnualData.bev_hauling_share_frac).all()
-    ice_hauling_share_frac = o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all()
+    bev_non_hauling_share_frac = sql_unpack_result(
+        o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all())
+    ice_non_hauling_share_frac = sql_unpack_result(
+        o2.session.query(ManufacturerAnnualData.ice_non_hauling_share_frac).all())
+    bev_hauling_share_frac = sql_unpack_result(o2.session.query(ManufacturerAnnualData.bev_hauling_share_frac).all())
+    ice_hauling_share_frac = sql_unpack_result(o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all())
 
-    fig, ax1 = fplothg(calendar_year, bev_non_hauling_share_frac, '.-')
-    ax1.plot(calendar_year, ice_non_hauling_share_frac, '.-')
-    ax1.plot(calendar_year, bev_hauling_share_frac, '.-')
-    ax1.plot(calendar_year, ice_hauling_share_frac, '.-')
+    fig, ax1 = fplothg(calendar_years, bev_non_hauling_share_frac, '.-')
+    ax1.plot(calendar_years, ice_non_hauling_share_frac, '.-')
+    ax1.plot(calendar_years, bev_hauling_share_frac, '.-')
+    ax1.plot(calendar_years, ice_hauling_share_frac, '.-')
     label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_name)
     ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling'])
     fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_name)
@@ -46,7 +51,7 @@ def run_postproc():
     average_cost_data = dict()
     for hc in hauling_classes:
         average_cost_data[hc] = []
-        for cy in calendar_year:
+        for cy in calendar_years:
             average_cost_data[hc].append(o2.session.query(
                 func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)). \
@@ -54,19 +59,19 @@ def run_postproc():
                                          filter(Vehicle.model_year == cy). \
                                          filter(Vehicle.hauling_class == hc). \
                                          filter(VehicleAnnualData.age == 0).scalar())
-        ax1.plot(calendar_year, average_cost_data[hc])
+        ax1.plot(calendar_years, average_cost_data[hc])
 
     average_cost_data['total'] = []
-    for cy in calendar_year:
+    for cy in calendar_years:
         average_cost_data['total'].append(o2.session.query(
             func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)). \
-                                     filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
-                                     filter(Vehicle.model_year == cy). \
-                                     filter(VehicleAnnualData.age == 0).scalar())
-    ax1.plot(calendar_year, average_cost_data['total'])
+                                          filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                          filter(Vehicle.model_year == cy). \
+                                          filter(VehicleAnnualData.age == 0).scalar())
+    ax1.plot(calendar_years, average_cost_data['total'])
 
-    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]','%s\nAverage Vehicle Cost v Year' % o2.options.session_name)
+    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]', '%s\nAverage Vehicle Cost v Year' % o2.options.session_name)
     ax1.set_ylim(15e3, 50e3)
     ax1.legend(average_cost_data.keys())
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_name)
@@ -76,31 +81,50 @@ def run_postproc():
     average_co2_gpmi_data = dict()
     for hc in hauling_classes:
         average_co2_gpmi_data[hc] = []
-        for cy in calendar_year:
+        for cy in calendar_years:
             average_co2_gpmi_data[hc].append(o2.session.query(
                 func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)). \
-                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
-                                         filter(Vehicle.model_year == cy). \
-                                         filter(Vehicle.hauling_class == hc). \
-                                         filter(VehicleAnnualData.age == 0).scalar())
-        ax1.plot(calendar_year, average_co2_gpmi_data[hc])
+                                             filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                             filter(Vehicle.model_year == cy). \
+                                             filter(Vehicle.hauling_class == hc). \
+                                             filter(VehicleAnnualData.age == 0).scalar())
+        ax1.plot(calendar_years, average_co2_gpmi_data[hc])
 
     average_co2_gpmi_data['total'] = []
-    for cy in calendar_year:
+    for cy in calendar_years:
         average_co2_gpmi_data['total'].append(o2.session.query(
             func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)). \
-                                     filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
-                                     filter(Vehicle.model_year == cy). \
-                                     filter(VehicleAnnualData.age == 0).scalar())
-    ax1.plot(calendar_year, average_co2_gpmi_data['total'])
+                                              filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                              filter(Vehicle.model_year == cy). \
+                                              filter(VehicleAnnualData.age == 0).scalar())
+    ax1.plot(calendar_years, average_co2_gpmi_data['total'])
 
-    label_xyt(ax1, 'Year', 'Average Vehicle Cert CO2 [g/mi]','%s\nAverage Vehicle Cert CO2 g/mi v Year' % o2.options.session_name)
+    label_xyt(ax1, 'Year', 'Average Vehicle Cert CO2 [g/mi]',
+              '%s\nAverage Vehicle Cert CO2 g/mi v Year' % o2.options.session_name)
     ax1.set_ylim(0, 500)
     ax1.legend(average_co2_gpmi_data.keys())
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi' % o2.options.session_name)
 
+    session_results = pd.DataFrame()
+    session_results['calendar_year'] = calendar_years
+    session_results['cert_target_co2_Mg'] = cert_target_co2_Mg
+    session_results['cert_co2_Mg'] = cert_co2_Mg
+    session_results['total_cost_billions'] = total_cost_billions
+
+    session_results['bev_non_hauling_share_frac'] = bev_non_hauling_share_frac
+    session_results['ice_non_hauling_share_frac'] = ice_non_hauling_share_frac
+    session_results['bev_hauling_share_frac'] = bev_hauling_share_frac
+    session_results['ice_hauling_share_frac'] = ice_hauling_share_frac
+    for hc in hauling_classes:
+        session_results['average_%s_cost' % sql_valid_name(hc)] = average_cost_data[hc]
+    session_results['average_vehicle_cost'] = average_cost_data['total']
+    for hc in hauling_classes:
+        session_results['average_%s_co2_gpmi' % sql_valid_name(hc)] = average_co2_gpmi_data[hc]
+    session_results['average_vehicle_co2_gpmi'] = average_co2_gpmi_data['total']
+
+    session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
 
 def run_omega(o2_options):
