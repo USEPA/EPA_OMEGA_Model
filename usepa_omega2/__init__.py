@@ -42,7 +42,7 @@ class OMEGARuntimeOptions(object):
         self.manufacturers_file = 'input_templates/manufacturers.csv'
         self.market_classes_file = 'input_templates/market_classes.csv'
         self.vehicles_file = 'input_templates/vehicles.csv'
-        self.demanded_sales_annual_data_file = 'input_templates/demanded_sales_annual_data.csv'
+        self.demanded_sales_annual_data_file = 'input_templates/demanded_shares-gcam.csv'
         self.fuels_file = 'input_templates/fuels.csv'
         self.fuel_scenarios_file = 'input_templates/fuel_scenarios.csv'
         self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'

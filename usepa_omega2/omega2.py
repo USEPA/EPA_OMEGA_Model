@@ -125,7 +125,7 @@ def run_omega(o2_options):
     from market_classes import MarketClass
     from cost_curves import CostCurve
     from cost_clouds import CostCloud
-    from demanded_sales_annual_data import DemandedSalesAnnualData
+    from demanded_shares_gcam import DemandedSharesGCAM
     from manufacturers import Manufacturer
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
@@ -171,7 +171,7 @@ def run_omega(o2_options):
                                                                                  verbose=o2.options.verbose)
             o2.options.GHG_standard = GHGStandardFootprint
 
-        init_fail = init_fail + DemandedSalesAnnualData.init_database_from_file(
+        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
             o2.options.demanded_sales_annual_data_file, verbose=o2.options.verbose)
         init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
                                                                      verbose=o2.options.verbose)
