@@ -761,16 +761,16 @@ if __name__ == '__main__':
             for s in range(0, batch.num_sessions()):
                 session = batch.sessions[s]
                 print("\nValidating Session %d ('%s') Files..." % (s, session.name))
-                validate_folder(session.read_parameter('Database Dump Folder Name'))
-                validate_file(session.read_parameter('Manufacturers File'))
-                validate_file(session.read_parameter('Market Classes File'))
-                validate_file(session.read_parameter('Vehicles File'))
-                validate_file(session.read_parameter('Demanded Shares File'))
-                validate_file(session.read_parameter('Fuels File'))
-                validate_file(session.read_parameter('Fuel Scenarios File'))
-                validate_file(session.read_parameter('Fuel Scenario Annual Data File'))
-                validate_file(session.read_parameter('Cost File'))
-                validate_file(session.read_parameter('GHG Standards File'))
+
+                # automatically validate files and folders based on parameter naming convention
+                for i in batch.dataframe.index:
+                    if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
+                        print('validating %s=%s' % (i, session.read_parameter(i)))
+                    if str(i).endswith(' Folder Name'):
+                        validate_folder(session.read_parameter(i))
+                    elif str(i).endswith(' File'):
+                        validate_file(session.read_parameter(i))
+
                 print('Validating Session %d Parameters...' % s)
                 session.init(validate_only=True)
 
