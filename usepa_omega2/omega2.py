@@ -255,7 +255,7 @@ def run_omega(o2_options):
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
             session_summary_results = run_postproc()
-            get_demanded_shares(session_summary_results)
+            # get_demanded_shares(session_summary_results)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             end = time.time()
