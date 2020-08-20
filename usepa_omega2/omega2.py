@@ -243,11 +243,11 @@ def run_omega(o2_options):
         print("### Check OMEGA log for error messages ###")
 
 
-def gui_comm(text):
-    num_lines = sum(1 for line in open('gui/comm_file.txt'))
-    file1 = open("gui/comm_file.txt", "a")  # append mode
-    file1.write(str(num_lines + 1) + " " + text + " \n")
-    file1.close()
+# def gui_comm(text):
+#     num_lines = sum(1 for line in open('../../gui/comm_file.txt'))
+#     file1 = open("../../gui/comm_file.txt", "a")  # append mode
+#     file1.write(str(num_lines + 1) + " " + text + " \n")
+#     file1.close()
 
 
 if __name__ == "__main__":
