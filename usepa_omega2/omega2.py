@@ -196,7 +196,7 @@ def run_omega(o2_options):
             o2.options.GHG_standard = GHGStandardFootprint
 
         init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
-            o2.options.demanded_sales_annual_data_file, verbose=o2.options.verbose)
+            o2.options.demanded_shares_file, verbose=o2.options.verbose)
         init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
                                                                      verbose=o2.options.verbose)
         init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)

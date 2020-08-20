@@ -11,7 +11,7 @@ from usepa_omega2 import *
 
 class DemandedSharesGCAM(SQABase):
     # --- database table properties ---
-    __tablename__ = 'demanded_sales_annual_data'
+    __tablename__ = 'demanded_shares_gcam'
     index = Column('index', Integer, primary_key=True)
 
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
@@ -21,7 +21,7 @@ class DemandedSharesGCAM(SQABase):
     price_amortization_period = Column(Float)
     discount_rate = Column(Float)
     share_weight = Column(Float)
-    demanded_sales_count = Column(Numeric)
+    demanded_share= Column(Numeric)
     consumer_generalized_cost_dollars = Column(Float)
 
     def __repr__(self):
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                 verbose=o2.options.verbose)
 
-    init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_sales_annual_data_file,
+    init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file,
                                                                        verbose=o2.options.verbose)
 
     if not init_fail:
