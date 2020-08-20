@@ -125,3 +125,5 @@ composer.lock
 /output/
 /usepa_omega2/consumer/output/
 /dev/*
+/bundle/*
+*log*.txt

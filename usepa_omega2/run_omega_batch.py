@@ -10,8 +10,6 @@ example usage:
 
 from usepa_omega2 import *
 
-# noinspection PyPackageRequirements
-
 
 class OMEGABatchObject(object):
     def __init__(self, name='', **kwargs):
@@ -490,7 +488,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     pythonpath = sys.exec_prefix
     if pythonpath.__contains__('envs'):
         pythonpath = pythonpath + "\\scripts"
-    cmd = '{}\\python "{}\\{}\\run_dse2_batch.py" --bundle_path "{}"  \
+    cmd = '{}\\python "{}\\{}\\run_oemga_batch.py" --bundle_path "{}"  \
             --batch_file "{}.csv" --session_num {} --no_validate'.format(
         pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
     sysprint('.')
@@ -798,39 +796,93 @@ if __name__ == '__main__':
                     session = batch.sessions[s]
                     options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
                                                            session_name=session.name)
-                    batch.dataframe.loc['Session Output Folder Name'][session.num] = options.session_path + os.sep + 'output'
-                    batch.dataframe.loc['Database Dump Folder Name'][session.num] = options.session_path + \
-                        batch.dataframe.loc['Database Dump Folder Name'][session.num]
-                    batch.dataframe.loc['Manufacturers File'][
-                        session.num] = options.session_path + os.sep + relocate_file(options.session_path,
-                                                                                     session.read_parameter(
-                                                                                         'Manufacturers File'))
-                    batch.dataframe.loc['Market Classes File'][
-                        session.num] = options.session_path + os.sep + relocate_file(options.session_path,
-                                                                                     session.read_parameter(
-                                                                                         'Market Classes File'))
-                    batch.dataframe.loc['Vehicles File'][session.num] = options.session_path + os.sep + relocate_file(
+                    # batch.dataframe.loc['Session Output Folder Name'][session.num] = options.session_path + os.sep + 'output'
+                    # batch.dataframe.loc['Database Dump Folder Name'][session.num] = options.session_path + \
+                    #     batch.dataframe.loc['Database Dump Folder Name'][session.num]
+                    # batch.dataframe.loc['Manufacturers File'][
+                    #     session.num] = options.session_path + os.sep + relocate_file(options.session_path,
+                    #                                                                  session.read_parameter(
+                    #                                                                      'Manufacturers File'))
+                    # batch.dataframe.loc['Market Classes File'][
+                    #     session.num] = options.session_path + os.sep + relocate_file(options.session_path,
+                    #                                                                  session.read_parameter(
+                    #                                                                      'Market Classes File'))
+                    # batch.dataframe.loc['Vehicles File'][session.num] = options.session_path + os.sep + relocate_file(
+                    #     options.session_path, session.read_parameter('Vehicles File'))
+                    # batch.dataframe.loc['Demanded Annual Sales File'][
+                    #     session.num] = options.session_path + os.sep + relocate_file(options.session_path,
+                    #                                                                  session.read_parameter(
+                    #                                                                      'Demanded Annual Sales File'))
+                    # batch.dataframe.loc['Fuels File'][session.num] = options.session_path + os.sep + relocate_file(
+                    #     options.session_path, session.read_parameter('Fuels File'))
+                    # batch.dataframe.loc['Fuel Scenarios File'][
+                    #     session.num] = options.session_path + os.sep + relocate_file(options.session_path,
+                    #                                                                  session.read_parameter(
+                    #                                                                      'Fuel Scenarios File'))
+                    # batch.dataframe.loc['Fuel Scenario Annual Data File'][
+                    #     session.num] = options.session_path + os.sep + relocate_file(options.session_path,
+                    #                                                                  session.read_parameter(
+                    #                                                                  'Fuel Scenario Annual Data File'))
+                    # batch.dataframe.loc['Cost File'][session.num] = options.session_path + os.sep + relocate_file(
+                    #     options.session_path, session.read_parameter('Cost File'))
+                    # batch.dataframe.loc['GHG Standards File'][
+                    #     session.num] = options.session_path + os.sep + relocate_file(options.session_path,
+                    #                                                                  session.read_parameter(
+                    #                                                                      'GHG Standards File'))
+
+                    # indicate source batch
+                    if ':' in args.batch_file:
+                        # batch file path is absolute
+                        batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % args.batch_file
+                    else:
+                        # batch file path is relative
+                        batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (os.getcwd() + os.sep + args.batch_file)
+
+                    batch.dataframe.loc['Session Output Folder Name'][session.num] = session.name + os.sep + \
+                                                                                     batch.dataframe.loc[
+                                                                                         'Session Output Folder Name'][
+                                                                                         session.num]
+
+                    batch.dataframe.loc['Database Dump Folder Name'][session.num] = session.name + os.sep + \
+                                                                                    batch.dataframe.loc[
+                                                                                        'Database Dump Folder Name'][
+                                                                                        session.num]
+
+                    batch.dataframe.loc['Manufacturers File'][session.num] = session.name + os.sep + relocate_file(
+                        options.session_path,
+                        session.read_parameter(
+                            'Manufacturers File'))
+                    batch.dataframe.loc['Market Classes File'][session.num] = session.name + os.sep + relocate_file(
+                        options.session_path,
+                        session.read_parameter(
+                            'Market Classes File'))
+                    batch.dataframe.loc['Vehicles File'][session.num] = session.name + os.sep + relocate_file(
                         options.session_path, session.read_parameter('Vehicles File'))
+
                     batch.dataframe.loc['Demanded Annual Sales File'][
-                        session.num] = options.session_path + os.sep + relocate_file(options.session_path,
-                                                                                     session.read_parameter(
-                                                                                         'Demanded Annual Sales File'))
-                    batch.dataframe.loc['Fuels File'][session.num] = options.session_path + os.sep + relocate_file(
+                        session.num] = session.name + os.sep + relocate_file(options.session_path,
+                                                                             session.read_parameter(
+                                                                                 'Demanded Annual Sales File'))
+
+                    batch.dataframe.loc['Fuels File'][session.num] = session.name + os.sep + relocate_file(
                         options.session_path, session.read_parameter('Fuels File'))
+
                     batch.dataframe.loc['Fuel Scenarios File'][
-                        session.num] = options.session_path + os.sep + relocate_file(options.session_path,
-                                                                                     session.read_parameter(
-                                                                                         'Fuel Scenarios File'))
+                        session.num] = session.name + os.sep + relocate_file(options.session_path,
+                                                                             session.read_parameter(
+                                                                                 'Fuel Scenarios File'))
                     batch.dataframe.loc['Fuel Scenario Annual Data File'][
-                        session.num] = options.session_path + os.sep + relocate_file(options.session_path,
-                                                                                     session.read_parameter(
-                                                                                     'Fuel Scenario Annual Data File'))
-                    batch.dataframe.loc['Cost File'][session.num] = options.session_path + os.sep + relocate_file(
+                        session.num] = session.name + os.sep + relocate_file(options.session_path,
+                                                                             session.read_parameter(
+                                                                                 'Fuel Scenario Annual Data File'))
+
+                    batch.dataframe.loc['Cost File'][session.num] = session.name + os.sep + relocate_file(
                         options.session_path, session.read_parameter('Cost File'))
+
                     batch.dataframe.loc['GHG Standards File'][
-                        session.num] = options.session_path + os.sep + relocate_file(options.session_path,
-                                                                                     session.read_parameter(
-                                                                                         'GHG Standards File'))
+                        session.num] = session.name + os.sep + relocate_file(options.session_path,
+                                                                             session.read_parameter(
+                                                                                 'GHG Standards File'))
 
         import time
 
