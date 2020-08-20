@@ -173,10 +173,10 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Input File Directory contains all input files for an OMEGA 2 model run</string>
+       <string>Input Batch File</string>
       </property>
      </widget>
-     <widget class="QLabel" name="project_directory_1_label">
+     <widget class="QLabel" name="output_batch_directory_1_label">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -194,10 +194,10 @@
        </font>
       </property>
       <property name="text">
-       <string>Project Directory</string>
+       <string>Output Batch Directory</string>
       </property>
      </widget>
-     <widget class="QTextEdit" name="project_directory_1_result">
+     <widget class="QTextEdit" name="output_batch_directory_1_result">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -215,10 +215,10 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Project Directory will receive a copy of the input files and all OMEGA 2 model output files</string>
+       <string>Output Batch Directory</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="select_project_directory_button">
+     <widget class="QPushButton" name="select_output_batch_directory_button">
       <property name="geometry">
        <rect>
         <x>190</x>
@@ -236,7 +236,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Selects a new Project Directory</string>
+       <string>Selects a new Output Batch Directory</string>
       </property>
       <property name="text">
        <string>Select</string>
@@ -263,7 +263,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Selects a new Input Directory</string>
+       <string>Selects a new Input Batch File</string>
       </property>
       <property name="text">
        <string>Select</string>
@@ -537,7 +537,7 @@
     <addaction name="action_save_configuration_file"/>
     <addaction name="separator"/>
     <addaction name="action_select_input_batch_file"/>
-    <addaction name="action_select_project_directory"/>
+    <addaction name="action_select_output_batch_directory"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
@@ -594,7 +594,7 @@
   </action>
   <action name="action_select_input_batch_file">
    <property name="text">
-    <string>Select Input File Directory</string>
+    <string>Select Input Batch File</string>
    </property>
    <property name="font">
     <font>
@@ -632,9 +632,9 @@
     </font>
    </property>
   </action>
-  <action name="action_select_project_directory">
+  <action name="action_select_output_batch_directory">
    <property name="text">
-    <string>Select Project Directory</string>
+    <string>Select Output Batch Directory</string>
    </property>
    <property name="font">
     <font>
