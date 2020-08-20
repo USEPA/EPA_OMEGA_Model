@@ -61,6 +61,19 @@ def run_postproc():
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[hc])
 
+    for mc in o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct():
+        average_cost_data[mc[0]] = []
+        for cy in calendar_years:
+            average_cost_data[mc[0]].append(o2.session.query(
+                func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleAnnualData.registered_count)). \
+                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                         filter(Vehicle.model_year == cy). \
+                                         filter(Vehicle.market_class_ID == mc[0]). \
+                                         filter(VehicleAnnualData.age == 0).scalar())
+        ax1.plot(calendar_years, average_cost_data[mc[0]])
+
+
     average_cost_data['total'] = []
     for cy in calendar_years:
         average_cost_data['total'].append(o2.session.query(
@@ -90,6 +103,19 @@ def run_postproc():
                                              filter(Vehicle.hauling_class == hc). \
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[hc])
+
+    for mc in o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct():
+        average_co2_gpmi_data[mc[0]] = []
+        for cy in calendar_years:
+            average_co2_gpmi_data[mc[0]].append(o2.session.query(
+                func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleAnnualData.registered_count)). \
+                                             filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
+                                             filter(Vehicle.model_year == cy). \
+                                             filter(Vehicle.market_class_ID == mc[0]). \
+                                             filter(VehicleAnnualData.age == 0).scalar())
+        ax1.plot(calendar_years, average_co2_gpmi_data[mc[0]])
+
 
     average_co2_gpmi_data['total'] = []
     for cy in calendar_years:
@@ -123,6 +149,9 @@ def run_postproc():
     for hc in hauling_classes:
         session_results['average_%s_co2_gpmi' % sql_valid_name(hc)] = average_co2_gpmi_data[hc]
     session_results['average_vehicle_co2_gpmi'] = average_co2_gpmi_data['total']
+    for mc in o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct():
+        session_results['average_%s_co2_gpmi' % sql_valid_name(mc[0])] = average_co2_gpmi_data[mc[0]]
+        session_results['average_%s_cost' % sql_valid_name(mc[0])] = average_cost_data[mc[0]]
 
     session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
@@ -159,6 +188,7 @@ def run_omega(o2_options):
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
     import consumer.sales as consumer
     import producer
+    from consumer.sales_gcam import get_demanded_shares
 
     fileio.validate_folder(o2.options.output_folder)
 
@@ -224,12 +254,14 @@ def run_omega(o2_options):
         if not init_fail:
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
+            session_summary_results = run_postproc()
+            get_demanded_shares(session_summary_results)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             end = time.time()
             print('\nElapsed Time %.2f Seconds' % (end - start))
 
-            session_summary_results = run_postproc()
+
 
             # o2.session.close()
             o2.engine.dispose()
