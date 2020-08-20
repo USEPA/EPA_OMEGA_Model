@@ -23,7 +23,7 @@ def calc_reg_class_demand(model_year):
     :return: dict of sales by reg class
     """
 
-    consumer_sales = consumer.sales.demanded_shares(model_year)
+    consumer_sales = consumer.sales.get_demanded_shares(model_year)
 
     producer_sales = dict()
 
@@ -42,7 +42,7 @@ def calc_hauling_class_demand(model_year):
     :return: dict of sales by reg class
     """
 
-    return consumer.sales.demanded_shares(model_year)
+    return consumer.sales.demand_sales(model_year)
 
 
 def inherit_vehicles(from_year, to_year, manufacturer_id):
@@ -208,7 +208,7 @@ def run_compliance_model():
                                        (tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
                     o2.session.execute('UPDATE %s SET %s_%s_sales=%s_%s_share_frac*%f' % (
                         tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc), sql_valid_name(ms), sql_valid_name(hc),
-                        consumer.sales.demanded_shares(calendar_year)[hc]))
+                        consumer.sales.demand_sales(calendar_year)[hc]))
 
                     # tally up costs by market share
                     veh_prefixes_by_ms = ['veh_' + str(v.vehicle_ID) for v in
