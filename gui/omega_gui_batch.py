@@ -36,7 +36,7 @@ from omega_gui_stylesheets import *
 # Contains the complete path (including filename) to the configuration file
 configuration_file = ""
 # Contains the directory path to the input file directory
-input_file_directory = ""
+input_batch_file = ""
 # Contains the directory path to the project directory
 project_directory = ""
 # Output to the status bar every timer cycle
@@ -79,11 +79,11 @@ class Form(QObject):
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
         self.window.action_open_configuration_file.triggered.connect(self.open_file)
-        self.window.action_select_input_file_directory.triggered.connect(self.open_input_directory)
+        self.window.action_select_input_batch_file.triggered.connect(self.open_input_batch_file)
         self.window.action_select_project_directory.triggered.connect(self.open_project_directory)
         self.window.action_save_configuration_file.triggered.connect(self.save_file)
         self.window.action_exit.triggered.connect(self.exit_gui)
-        self.window.select_input_directory_button.clicked.connect(self.open_input_directory)
+        self.window.select_input_batch_file_button.clicked.connect(self.open_input_batch_file)
         self.window.select_project_directory_button.clicked.connect(self.open_project_directory)
         self.window.open_configuration_file_button.clicked.connect(self.open_file)
         self.window.save_configuration_file_button.clicked.connect(self.save_file)
@@ -104,8 +104,8 @@ class Form(QObject):
         self.window.event_monitor_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.event_monitor_result.setReadOnly(1)
         # Set input file directory window options
-        self.window.input_file_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
-        self.window.input_file_directory_1_result.setReadOnly(1)
+        self.window.input_batch_file_1_result.setWordWrapMode(QTextOption.NoWrap)
+        self.window.input_batch_file_1_result.setReadOnly(1)
         # Set configuration file window options
         self.window.configuration_file_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.configuration_file_1_result.setReadOnly(1)
@@ -134,7 +134,7 @@ class Form(QObject):
         self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
         self.window.open_configuration_file_button.setStyleSheet(stylesheet)
         self.window.save_configuration_file_button.setStyleSheet(stylesheet)
-        self.window.select_input_directory_button.setStyleSheet(stylesheet)
+        self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_project_directory_button.setStyleSheet(stylesheet)
 
         # Timer start
@@ -149,7 +149,7 @@ class Form(QObject):
             :return: N/A
         """
         self.clear_event_monitor()
-        self.window.input_file_directory_1_result.setPlainText("")
+        self.window.input_batch_file_1_result.setPlainText("")
         self.window.configuration_file_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
@@ -167,7 +167,7 @@ class Form(QObject):
             :return: N/A
         """
         global configuration_file, scenario, configuration_file_valid, input_directory_valid
-        global project_directory_valid, input_file_directory, project_directory
+        global project_directory_valid, input_batch_file, project_directory
         # self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
@@ -199,12 +199,12 @@ class Form(QObject):
         item_value = ""
         # Make sure the dictionary entry exists
         try:
-            item_value = scenario['input_file_directory']['Input_file_directory']
+            item_value = scenario['input_batch_file']['input_batch_file']
         # Add entry to dictionary if missing from file
         except (KeyError, TypeError):
             try:
                 # Try to add replacement dictionary element
-                scenario.update({'input_file_directory': {'Input_file_directory': 'null'}})
+                scenario.update({'input_batch_file': {'input_batch_file': 'null'}})
             # If unable to add element, file is corrupt so clear everything and start over
             except AttributeError:
                 self.initialize_gui()
@@ -218,19 +218,19 @@ class Form(QObject):
                 return
         configuration_file_valid = True
         # See if selected directory is valid
-        if os.path.isdir(item_value):
+        if os.path.isfile(item_value):
             # Display in gui if valid
-            input_file_directory = item_value
+            input_batch_file = item_value
             color = "green"
-            self.window.input_file_directory_1_result.setTextColor(QColor(color))
-            self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
+            self.window.input_batch_file_1_result.setTextColor(QColor(color))
+            self.window.input_batch_file_1_result.setPlainText(str(input_batch_file))
             input_directory_valid = True
         else:
             # Display error message if invalid
-            input_file_directory = item_value
+            input_batch_file = item_value
             color = "red"
-            self.window.input_file_directory_1_result.setTextColor(QColor(color))
-            self.window.input_file_directory_1_result.setPlainText(str(input_file_directory))
+            self.window.input_batch_file_1_result.setTextColor(QColor(color))
+            self.window.input_batch_file_1_result.setPlainText(str(input_batch_file))
             input_directory_valid = False
             configuration_file_valid = False
 
@@ -285,7 +285,7 @@ class Form(QObject):
 
             :return: N/A
         """
-        global configuration_file, scenario, input_file_directory, project_directory
+        global configuration_file, scenario, input_batch_file, project_directory
         global configuration_file_valid
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
@@ -324,26 +324,26 @@ class Form(QObject):
         color = "black"
         self.event_monitor(event_separator, color, '')
 
-    def open_input_directory(self):
+    def open_input_batch_file(self):
         """
             Opens a Windows dialog to select an OMEGA2 input directory.
 
             When complete:
-                Global variable "input_file_directory" = user selected input file directory.
+                Global variable "input_batch_file" = user selected input file directory.
 
             :return: N/A
         """
-        global input_file_directory, scenario, configuration_file
+        global input_batch_file, scenario, configuration_file
         global configuration_file_valid, input_directory_valid, project_directory_valid
         # self.window.statusBar().showMessage("Open File")
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA2 Batch Files (*.xlsx)"
         # Add file dialog title
-        file_dialog_title = "Select Input File Directory"
+        file_dialog_title = "Select OMEGA2 Batch File"
         # Call file dialog function
-        file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
+        file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
         # Return if no file selected or dialog cancelled
         if file_name == "":
             return
@@ -354,14 +354,14 @@ class Form(QObject):
         temp2 = os.path.dirname(file_name)
         temp2 = os.path.normpath(temp2) + '\\'
         # working_directory = temp2
-        input_file_directory = temp2 + temp1
+        input_batch_file = temp2 + temp1
         # Update dictionary entry
-        scenario['input_file_directory']['Input_file_directory'] = input_file_directory
+        scenario['input_batch_file']['input_batch_file'] = input_batch_file
         # Place path in gui
-        directory = input_file_directory
+        directory = input_batch_file
         color = "green"
-        self.window.input_file_directory_1_result.setTextColor(QColor(color))
-        self.window.input_file_directory_1_result.setPlainText(str(directory))
+        self.window.input_batch_file_1_result.setTextColor(QColor(color))
+        self.window.input_batch_file_1_result.setPlainText(str(directory))
         temp2 = "Input File Directory Loaded:\n    [" + directory + "]"
         self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
@@ -501,7 +501,7 @@ class Form(QObject):
             self.event_monitor(temp1, 'black', '')
             self.window.save_configuration_file_button.setEnabled(0)
             if not input_directory_valid:
-                temp2 = "Input Directory Invalid:\n    [" + input_file_directory + "]"
+                temp2 = "Input Directory Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
             if not project_directory_valid:
                 temp2 = "Project Directory Invalid:\n    [" + project_directory + "]"
@@ -532,7 +532,7 @@ class Form(QObject):
         # self.clear_wizard()
         self.event_monitor(wizard_init, 'black', '')
         # Create 'scenario' dictionary for later reference
-        scenario = {'input_file_directory': {'Input_file_directory': 'null'},
+        scenario = {'input_batch_file': {'input_batch_file': 'null'},
                     'project_directory': {'Project_directory': 'null'},
                     'project_description': {'Project_description': 'null'}}
         configuration_file_valid = False
@@ -549,7 +549,7 @@ class Form(QObject):
         :return: N/A
         """
         self.window.configuration_file_1_result.setPlainText("")
-        self.window.input_file_directory_1_result.setPlainText("")
+        self.window.input_batch_file_1_result.setPlainText("")
         self.window.project_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
         self.clear_event_monitor()
@@ -571,12 +571,12 @@ class Form(QObject):
         self.window.repaint()
         # Copy all files from the input directory to the project directory.
         # color = "green"
-        # temp = "[" + input_file_directory + "]" + " to [" + project_directory + "]"
+        # temp = "[" + input_batch_file + "]" + " to [" + project_directory + "]"
         # self.event_monitor("Copying Files ...\n    " + temp, color, 'dt')
         # self.window.repaint()
-        # copy_files(input_file_directory, project_directory)
+        # copy_files(input_batch_file, project_directory)
         # self.window.progress_bar.setValue(50)
-        # copy_files(input_file_directory, project_directory)
+        # copy_files(input_batch_file, project_directory)
         # self.event_monitor("Copying Files Complete\n    " + temp, color, 'dt')
 
         # This call works but gui freezes until new process ends
@@ -697,5 +697,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('gui/elements/omega_gui_v14.ui')
+    form = Form('gui/elements/omega_gui_v15.ui')
     sys.exit(app.exec_())
