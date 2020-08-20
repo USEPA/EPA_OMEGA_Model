@@ -7,48 +7,68 @@ sales_gcam.py
 """
 
 from usepa_omega2 import *
+import numpy as np
 
-def demanded_shares(model_year):
+def get_demanded_shares(df):
     """
     :param session: database session
     :param model_year: not used, for now
     :return: dict of sales by consumer (market) categories
     """
+    from demanded_shares_gcam import DemandedSharesGCAM
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
-    for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
+    df = df.fillna(value=np.nan) # not sure why the df has 'None' values and nan values
+
+    # ToDo: These fuels items should be populated from the fuels class
+    fuel_cost_gasoline = 3.5 # dollars per gallon
+    fuel_cost_electricity = 0.12 # dollars per kWh
+    carbon_intensity_gasoline = 8887 # g per CO2 per gallon
+    carbon_intensity_electricity = 534 # g per kWh generated
+
+    for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
         tmp_sales_share_denominator_all_hauling = 0
         tmp_sales_share_denominator_all_nonhauling = 0
-        print(calendar_year)
-        market_class_ids = o2.session.query(DemandedSharesGCAM.market_class_ID).filter(DemandedSharesGCAM.calendar_year == calendar_year).distinct()
+        print(cy)
+        market_class_ids = o2.session.query(DemandedSharesGCAM.market_class_ID).filter(DemandedSharesGCAM.calendar_year == cy).distinct()
         for pass_num in range(1,3):
             for market_class_id in market_class_ids:
                 # for testing purposes, assign a dummy cost that increases over time. This will come from a generalized cost function
-                vehicle_demanded_share = o2.session.query(DemandedSharesGCAM).filter(DemandedSharesGCAM.calendar_year == calendar_year).filter(DemandedSharesGCAM.market_class_ID == market_class_id[0])
+                vehicle_demanded_share = []
+                vehicle_demanded_share = o2.session.query(DemandedSharesGCAM).filter(DemandedSharesGCAM.calendar_year == cy).filter(DemandedSharesGCAM.market_class_ID == market_class_id[0])
                 tmp_pap = vehicle_demanded_share[0].price_amortization_period
                 tmp_dr = vehicle_demanded_share[0].discount_rate
                 tmp_annualization_factor = tmp_pap + tmp_pap/(((1 + tmp_pap)**tmp_dr) - 1)
                 # this cost assignment below is temporary -- will be replaced with vehicle costs from producer module
                 if (market_class_id[0]=='BEV non hauling'):
-                    tmp_total_capital_costs = 45000 + 500 * (calendar_year - o2.options.analysis_initial_year)
+                    tmp_total_capital_costs = df[df.calendar_year == cy].average_bev_non_hauling_cost
+                    tmp_fuel_cost_per_VMT = fuel_cost_electricity * df[df.calendar_year == cy].average_bev_non_hauling_co2_gpmi / carbon_intensity_electricity
+                    #tmp_total_capital_costs = 45000 + 500 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 1600
-                    tmp_fuel_cost_per_VMT = 0.03
+                    #tmp_fuel_cost_per_VMT = 0.03
                 elif (market_class_id[0] == 'BEV hauling'):
-                    tmp_total_capital_costs = 65000 + 500 * (calendar_year - o2.options.analysis_initial_year)
+                    tmp_total_capital_costs = df[df.calendar_year == cy].average_bev_hauling_cost
+                    tmp_fuel_cost_per_VMT = fuel_cost_electricity * df[df.calendar_year == cy].average_bev_hauling_co2_gpmi / carbon_intensity_electricity
+                    #tmp_total_capital_costs = 65000 + 500 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 1600
-                    tmp_fuel_cost_per_VMT = 0.04
+                    #tmp_fuel_cost_per_VMT = 0.04
                 elif (market_class_id[0] == 'ICE non hauling'):
-                    tmp_total_capital_costs = 35000 + 1000 * (calendar_year - o2.options.analysis_initial_year)
+                    tmp_total_capital_costs = df[df.calendar_year == cy].average_ice_non_hauling_cost
+                    tmp_fuel_cost_per_VMT = fuel_cost_gasoline * df[df.calendar_year == cy].average_ice_non_hauling_co2_gpmi / carbon_intensity_gasoline
+                    #tmp_total_capital_costs = 35000 + 1000 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 2000
-                    tmp_fuel_cost_per_VMT = 0.10
+                    #tmp_fuel_cost_per_VMT = 0.10
                 elif (market_class_id[0] == 'ICE hauling'):
-                    tmp_total_capital_costs = 50000 + 1000 * (calendar_year - o2.options.analysis_initial_year)
+                    tmp_total_capital_costs = df[df.calendar_year == cy].average_ice_hauling_cost
+                    tmp_fuel_cost_per_VMT = fuel_cost_gasoline * df[df.calendar_year == cy].average_ice_hauling_co2_gpmi / carbon_intensity_gasoline
+                    #tmp_total_capital_costs = 50000 + 1000 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 2000
-                    tmp_fuel_cost_per_VMT = 0.10
+                    #tmp_fuel_cost_per_VMT = 0.10
                 vehicle_demanded_share[0].consumer_generalized_cost_dollars = tmp_total_capital_costs
                 tmp_annualized_capital_costs = tmp_annualization_factor * tmp_total_capital_costs
-                tmp_annual_VMT = vehicle_demanded_share[0].annual_VMT
+                tmp_annual_VMT = 12000
+                #tmp_annual_VMT = vehicle_demanded_share[0].annual_VMT
                 tmp_total_non_fuel_costs_per_VMT = (tmp_annualized_capital_costs + tmp_annual_o_m_costs)/1.383/float(tmp_annual_VMT)
                 tmp_total_cost_w_fuel_per_VMT = tmp_total_non_fuel_costs_per_VMT + tmp_fuel_cost_per_VMT
                 tmp_total_cost_w_fuel_per_PMT = tmp_total_cost_w_fuel_per_VMT / 1.58
@@ -101,7 +121,7 @@ if __name__ == '__main__':
 
     if not init_fail:
         o2.options.analysis_initial_year = 2021
-        o2.options.analysis_final_year = 2050
+        o2.options.analysis_final_year = 2035
         o2.options.database_dump_folder = '__dump'
-        share_demand = demanded_shares(o2.options.analysis_initial_year)
+        share_demand = get_demanded_shares(o2.options.analysis_initial_year)
         dump_omega_db_to_csv(o2.options.database_dump_folder)
