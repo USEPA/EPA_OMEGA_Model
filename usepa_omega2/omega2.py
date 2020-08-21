@@ -18,6 +18,8 @@ def run_postproc():
     from vehicle_annual_data import VehicleAnnualData
     import pandas as pd
 
+    gui_comm('Post_Process')
+
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
     cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
     cert_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all())
@@ -278,11 +280,13 @@ def run_omega(o2_options):
         print("### Check OMEGA log for error messages ###")
 
 
-# def gui_comm(text):
-#     num_lines = sum(1 for line in open('../../gui/comm_file.txt'))
-#     file1 = open("../../gui/comm_file.txt", "a")  # append mode
-#     file1.write(str(num_lines + 1) + " " + text + " \n")
-#     file1.close()
+def gui_comm(text):
+    file1 = open("../comm_file.txt", "a")  # append mode
+    file1.close()
+    num_lines = sum(1 for line in open('../comm_file.txt'))
+    file1 = open("../comm_file.txt", "a")  # append mode
+    file1.write(str(num_lines + 1) + " " + text + " \n")
+    file1.close()
 
 
 if __name__ == "__main__":

@@ -511,6 +511,10 @@ class Form(QObject):
         else:
             self.enable_run_button(False)
 
+        print('*****', configuration_file)
+        print('*****', input_batch_file)
+        print('*****', output_batch_directory)
+
     def initialize_gui(self):
         """
         Initialize various program functions.
@@ -593,14 +597,18 @@ class Form(QObject):
         # file1.write("1 start_model_run \n")
         # file1.close()
 
-        sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
+        # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
         # This call works and runs a completely separate process
         # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
+        a = '--batch_file ' + '"' + input_batch_file + '"'
+        b = ' --bundle_path ' + '"' + output_batch_directory + '"'
+        c = a + b
 
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
-                                        '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
+                                        c], close_fds=True)
+                                        # '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
 
         poll = None
         while poll is None:
@@ -621,7 +629,7 @@ class Form(QObject):
 
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
         # time.sleep(2)
-        sound1.terminate()
+        # sound1.terminate()
 
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')

@@ -13,3 +13,5 @@ if not len(sys.argv) > 1:
 else:
     a = "python usepa_omega2/run_omega_batch.py " + sys.argv[1]
     os.system(a)
+
+
