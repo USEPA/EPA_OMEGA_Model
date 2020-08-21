@@ -583,15 +583,15 @@ class Form(QObject):
         # os.system("python usepa_omega2/__main__.py")
 
         # Delete contents of comm_file.txt used to communicate with other processes
-        # file1 = open("gui/comm_file.txt", "a")  # append mode
-        # file1.write("Today \n")
-        # file1.close()
-        # file = open("gui/comm_file.txt", "r+")
-        # file.truncate(0)
-        # file.close()
-        # file1 = open("gui/comm_file.txt", "a")  # append mode
-        # file1.write("1 start_model_run \n")
-        # file1.close()
+        file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
+        file1.write("Today \n")
+        file1.close()
+        file = open(output_batch_directory + "/comm_file.txt", "r+")
+        file.truncate(0)
+        file.close()
+        file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
+        file1.write("1 start_model_run \n")
+        file1.close()
 
         sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
@@ -604,7 +604,6 @@ class Form(QObject):
 
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
                                         c], close_fds=True)
-                                        # '--batch_file inputs\phase0_default_batch_file.xlsx'], close_fds=True)
 
         # poll = None
         # while poll is None:
