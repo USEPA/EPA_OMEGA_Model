@@ -20,7 +20,7 @@ def run_postproc():
     from vehicle_annual_data import VehicleAnnualData
     import pandas as pd
 
-    gui_comm('Post_Process')
+    gui_comm('Post Processing...')
 
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
     cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())

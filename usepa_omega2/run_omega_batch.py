@@ -860,7 +860,7 @@ if __name__ == '__main__':
                 # process sessions:
                 for s_index in session_list:
                     print("Processing Session %d:" % s_index, end='')
-                    gui_comm("% Complete " + str((s_index + 1) / batch.num_sessions()))
+                    gui_comm("Running Session " + str(s_index + 1) + ' of ' + str(batch.num_sessions()) + '...')
 
                     if not batch.sessions[s_index].enabled:
                         print("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)

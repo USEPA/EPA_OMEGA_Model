@@ -563,7 +563,7 @@ class Form(QObject):
         model_sound_start = 'gui/elements/model_start.mp3'
         model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
-        self.event_monitor("Start Model Run ...", "black", 'dt')
+        # self.event_monitor("Start Model Run ...", "black", 'dt')
         status_bar_message = "Model Running ..."
         status_bar()
         self.window.progress_bar.setValue(0)
@@ -590,7 +590,7 @@ class Form(QObject):
         file.truncate(0)
         file.close()
         file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
-        file1.write("line1 start_model_run \n")
+        file1.write("Start Model Run \n")
         file1.close()
 
         # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
@@ -616,8 +616,10 @@ class Form(QObject):
             while line_counter < num_lines:
                 f = open(status_file)
                 lines = f.readlines()
-                print(lines[line_counter])
-                self.event_monitor(lines[line_counter], "black", 'dt')
+                g = lines[line_counter]
+                g = g.rstrip("\n")
+                print(g)
+                self.event_monitor(g, "black", 'dt')
                 self.window.repaint()
 
                 line_counter = line_counter + 1
