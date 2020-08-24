@@ -590,10 +590,10 @@ class Form(QObject):
         file.truncate(0)
         file.close()
         file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
-        file1.write("1 start_model_run \n")
+        file1.write("line1 start_model_run \n")
         file1.close()
 
-        sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
+        # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
         # This call works and runs a completely separate process
         # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
@@ -605,14 +605,30 @@ class Form(QObject):
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
                                         c], close_fds=True)
 
-        # poll = None
-        # while poll is None:
-        #     time.sleep(1)
-        #     print('******1', poll)
-        #     poll = omega_batch.poll()
-        #     print('******2', poll)
+        line_counter = 0
+        status_file = output_batch_directory + '/comm_file.txt'
+        poll = None
+        while poll is None:
+            time.sleep(1)
+            poll = omega_batch.poll()
+            # print('****** Running', poll)
+            num_lines = sum(1 for line in open(status_file))
+            while line_counter < num_lines:
+                f = open(status_file)
+                lines = f.readlines()
+                print(lines[line_counter])
+                self.event_monitor(lines[line_counter], "black", 'dt')
+                self.window.repaint()
 
-        # print('******3', poll)
+                line_counter = line_counter + 1
+                # print('*****', line_counter, num_lines)
+
+
+            #  with open(status_file) as f:
+            #      if '5' in f.read():
+            #          print('***** Found')
+
+        print('****** Complete', poll)
 
         # a = 0
         # while a == 0:
