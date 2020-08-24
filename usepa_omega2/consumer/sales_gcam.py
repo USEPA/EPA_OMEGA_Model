@@ -20,7 +20,7 @@ def get_demanded_shares(df):
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
     df = df.fillna(value=np.nan) # not sure why the df has 'None' values and nan values
-
+    demanded_share_data = dict()
     # ToDo: These fuels items should be populated from the fuels class
     fuel_cost_gasoline = 3.5 # dollars per gallon
     fuel_cost_electricity = 0.12 # dollars per kWh
@@ -87,6 +87,15 @@ def get_demanded_shares(df):
                     elif (market_class_id[0] == 'ICE non hauling' or market_class_id[0] == 'BEV non hauling'):
                         vehicle_demanded_share[0].demanded_share = tmp_sales_share_numerator / tmp_sales_share_denominator_all_nonhauling
                     o2.session.commit()
+                    if market_class_id[0] not in demanded_share_data:
+                        demanded_share_data[market_class_id[0]] = []
+                    demanded_share_data[market_class_id[0]].append(o2.session.query(DemandedSharesGCAM.demanded_share).filter(DemandedSharesGCAM.calendar_year == cy).filter(DemandedSharesGCAM.market_class_ID == market_class_id[0]).scalar())
+                    o2.session.commit()
+    # write to summary file
+    for market_class_id in market_class_ids:
+        df['demanded_%s_share-gcam' % sql_valid_name(market_class_id[0])] = demanded_share_data[market_class_id[0]]
+        o2.session.commit()
+    return df
 
 if __name__ == '__main__':
     if '__file__' in locals():

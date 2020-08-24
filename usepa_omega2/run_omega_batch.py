@@ -9,6 +9,7 @@ example usage:
 """
 
 from usepa_omega2 import *
+from usepa_omega2.file_eye_oh import gui_comm
 
 
 class OMEGABatchObject(object):
@@ -629,7 +630,6 @@ class DispyCluster(object):
         session_jobs = []
         for session_num in session_list:
             print("Processing Session %d: " % session_num, end='')
-
             if not batch.sessions[session_num].enabled:
                 print("Skipping Disabled Session '%s'" % batch.sessions[session_num].name)
                 # print('')
@@ -865,6 +865,7 @@ if __name__ == '__main__':
                 # process sessions:
                 for s_index in session_list:
                     print("Processing Session %d:" % s_index, end='')
+                    gui_comm("Running Session " + str(s_index + 1) + ' of ' + str(batch.num_sessions()) + '...')
 
                     if not batch.sessions[s_index].enabled:
                         print("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
@@ -873,3 +874,4 @@ if __name__ == '__main__':
                         batch.sessions[s_index].run()
 
     # sys.exit(0)
+

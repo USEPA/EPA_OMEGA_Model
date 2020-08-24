@@ -11,12 +11,16 @@ from usepa_omega2 import *
 from omega_plot import *
 import os
 
+from usepa_omega2.file_eye_oh import gui_comm
+
 
 def run_postproc():
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData
     import pandas as pd
+
+    gui_comm('Post Processing...')
 
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
     cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
@@ -135,6 +139,7 @@ def run_postproc():
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = calendar_years
+    session_results['session_name'] = o2.options.session_name
     session_results['cert_target_co2_Mg'] = cert_target_co2_Mg
     session_results['cert_co2_Mg'] = cert_co2_Mg
     session_results['total_cost_billions'] = total_cost_billions
@@ -153,7 +158,7 @@ def run_postproc():
         session_results['average_%s_co2_gpmi' % sql_valid_name(mc[0])] = average_co2_gpmi_data[mc]
         session_results['average_%s_cost' % sql_valid_name(mc[0])] = average_cost_data[mc]
 
-    session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
+    # session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
     return session_results
 
@@ -255,7 +260,9 @@ def run_omega(o2_options):
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
             session_summary_results = run_postproc()
-            get_demanded_shares(session_summary_results)
+            session_summary_results = get_demanded_shares(session_summary_results)
+            session_summary_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
+            session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a') # ToDo: need to add check if file exists so that header is only written once
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             end = time.time()
@@ -276,13 +283,6 @@ def run_omega(o2_options):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
-
-
-# def gui_comm(text):
-#     num_lines = sum(1 for line in open('../../gui/comm_file.txt'))
-#     file1 = open("../../gui/comm_file.txt", "a")  # append mode
-#     file1.write(str(num_lines + 1) + " " + text + " \n")
-#     file1.close()
 
 
 if __name__ == "__main__":
