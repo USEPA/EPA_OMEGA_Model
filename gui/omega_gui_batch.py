@@ -613,17 +613,20 @@ class Form(QObject):
             poll = omega_batch.poll()
             # print('****** Running', poll)
             num_lines = sum(1 for line in open(status_file))
+
             while line_counter < num_lines:
                 f = open(status_file)
                 lines = f.readlines()
+                f.close()
                 g = lines[line_counter]
                 g = g.rstrip("\n")
-                print(g)
+                # print(g)
                 self.event_monitor(g, "black", 'dt')
-                self.window.repaint()
-
+                # self.window.repaint()
                 line_counter = line_counter + 1
                 # print('*****', line_counter, num_lines)
+                # self.window.repaint()
+                app.processEvents()
 
 
             #  with open(status_file) as f:
