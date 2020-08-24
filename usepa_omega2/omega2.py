@@ -139,6 +139,7 @@ def run_postproc():
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = calendar_years
+    session_results['session_name'] = o2.options.session_name
     session_results['cert_target_co2_Mg'] = cert_target_co2_Mg
     session_results['cert_co2_Mg'] = cert_co2_Mg
     session_results['total_cost_billions'] = total_cost_billions
@@ -157,7 +158,7 @@ def run_postproc():
         session_results['average_%s_co2_gpmi' % sql_valid_name(mc[0])] = average_co2_gpmi_data[mc]
         session_results['average_%s_cost' % sql_valid_name(mc[0])] = average_cost_data[mc]
 
-    session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
+    # session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
     return session_results
 
@@ -259,7 +260,9 @@ def run_omega(o2_options):
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
             session_summary_results = run_postproc()
-            get_demanded_shares(session_summary_results)
+            session_summary_results = get_demanded_shares(session_summary_results)
+            session_summary_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
+            session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a') # ToDo: need to add check if file exists so that header is only written once
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             end = time.time()
