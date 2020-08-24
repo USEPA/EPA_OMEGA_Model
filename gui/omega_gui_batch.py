@@ -583,6 +583,7 @@ class Form(QObject):
         # os.system("python usepa_omega2/__main__.py")
 
         # Delete contents of comm_file.txt used to communicate with other processes
+        # and place the first line 'Start Model Run'
         file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
         file1.write("Today \n")
         file1.close()
@@ -593,25 +594,31 @@ class Form(QObject):
         file1.write("Start Model Run \n")
         file1.close()
 
+        # Play a model start sound
         # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
         # This call works and runs a completely separate process
         # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
+
+        # Prepare command line options for OMEGA2 batch process
         a = '--batch_file ' + '"' + input_batch_file + '"'
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
         c = a + b
 
+        # Call OMEGA2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
                                         c], close_fds=True)
 
+        # While the subprocess is running, output communication from the batch process to the event monitor
         line_counter = 0
         status_file = output_batch_directory + '/comm_file.txt'
         poll = None
         while poll is None:
             time.sleep(1)
             poll = omega_batch.poll()
-            # print('****** Running', poll)
+            # This command allows the GUI to catch up and repaint itself
+            app.processEvents()
             num_lines = sum(1 for line in open(status_file))
 
             while line_counter < num_lines:
@@ -620,30 +627,13 @@ class Form(QObject):
                 f.close()
                 g = lines[line_counter]
                 g = g.rstrip("\n")
-                # print(g)
                 self.event_monitor(g, "black", 'dt')
-                # self.window.repaint()
                 line_counter = line_counter + 1
-                # print('*****', line_counter, num_lines)
-                # self.window.repaint()
-                app.processEvents()
+                # This command allows the GUI to catch up and repaint itself
+                # app.processEvents()
 
-
-            #  with open(status_file) as f:
-            #      if '5' in f.read():
-            #          print('***** Found')
-
-        print('****** Complete', poll)
-
-        # a = 0
-        # while a == 0:
-        #     time.sleep(1)
-        #     with open('gui/comm_file.txt') as f:
-        #         if 'end_model_run' in f.read():
-        #             a = 1
-
+        # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
-        # time.sleep(2)
         # sound1.terminate()
 
         self.event_monitor("End Model Run", "black", 'dt')
