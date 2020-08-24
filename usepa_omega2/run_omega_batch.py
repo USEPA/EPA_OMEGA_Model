@@ -413,16 +413,14 @@ def status_cb(status, node, job):
 
     dispy_debug = options.dispy_debug
 
-    # SOMETIMES job comes in as an "int" instead of an object, then it throws an error here... not sure why!
-    # SEEMS to be associated with those jobs that run fine but don't finish by adding the "_"
-    # NOT all jobs have this problem... keep an eye on this and see if we have the same problem in the cluster...
+    # job comes in as an int before the job.id is initialized
     if job is not None:
         try:
             job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id[
                 'session_name'] + ': #' + str(
                 job.id['session_num'])
         except:
-            sysprint('#### job_id object FAIL ### "%s"\n' % str(job))
+            # sysprint('#### job_id object FAIL ### "%s"\n' % str(job)) # not really a fail
             job_id_str = str(job)
             pass
     else:
@@ -559,9 +557,10 @@ class DispyCluster(object):
 
         if options.dispy_exclusive:
             print('Starting JobCluster...')
-            cluster = dispy.JobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip,
+            cluster = dispy.JobCluster(dispy_node_setup, nodes=self.desired_node_list,
                                        pulse_interval=60, reentrant=True,
                                        ping_interval=10, loglevel=self.loglevel, depends=[sysprint])
+
         else:
             print('Starting SharedJobCluster...')
             cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip,
