@@ -15,6 +15,41 @@ import numpy as np
 import consumer
 
 
+def unique(vector):
+    """
+
+    :param vector:
+    :return:
+    """
+    indexes = np.unique(vector, return_index=True)[1]
+    return [vector[index] for index in sorted(indexes)]
+
+
+def partition(num_columns, num_levels, verbose=False):
+    """
+    Returns a set of columns, the rows of which add up to 1.0, with num_levels between 0-1
+    ex: >>> partition(num_columns=2, num_levels=3, verbose=True)
+            1.00	0.00
+            0.50	0.50
+            0.00	1.00
+
+    :param num_columns: number of columns in the output
+    :param num_levels: number of values from 0-1
+    :param verbose: if True then result is printed to the console
+    :return: a set of columns, the rows of which add up to 1.0
+    """
+    from pyDOE2 import fullfact
+    permutations = fullfact([num_levels]*num_columns) / (num_levels-1)
+    ans = [permutation for permutation in permutations if sum(permutation) == 1.0]
+    if verbose:
+        for i in ans:
+            s = ''
+            for e in i:
+                s = s + '\t%.2f' % e
+            print(s)
+    return ans
+
+
 def calc_reg_class_demand(model_year):
     """
     This is really a placeholder but somehow we need reg class demand from market class demand...
@@ -116,10 +151,10 @@ def run_compliance_model():
             market_shares_frac = dict()
             market_shares_frac['hauling'] = dict()
             market_shares_frac['non hauling'] = dict()
-            market_shares_frac['hauling']['BEV'] = np.linspace(0, 1, 5)  # np.unique(np.linspace(0, 1, 5))
-            market_shares_frac['hauling']['ICE'] = np.linspace(1, 0, 5)  # np.unique(np.linspace(1, 0, 5))
-            market_shares_frac['non hauling']['BEV'] = np.linspace(0, 1, 5)  # np.unique(np.linspace(0, 1, 5))
-            market_shares_frac['non hauling']['ICE'] = np.linspace(1, 0, 5)  # np.unique(np.linspace(1, 0, 5))
+            market_shares_frac['hauling']['BEV'] = unique(np.linspace(0, 1, 5))
+            market_shares_frac['hauling']['ICE'] = unique(np.linspace(1, 0, 5))
+            market_shares_frac['non hauling']['BEV'] = unique(np.linspace(0, 1, 5))
+            market_shares_frac['non hauling']['ICE'] = unique(np.linspace(1, 0, 5))
             market_share_groups = dict()
             market_share_groups['hauling'] = fueling_classes
             market_share_groups['non hauling'] = fueling_classes

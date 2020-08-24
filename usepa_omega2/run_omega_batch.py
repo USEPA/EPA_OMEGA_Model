@@ -538,7 +538,7 @@ class DispyCluster(object):
         self.master_ip = ''
         self.desired_node_list = []
         self.found_node_list = []
-        self.sleep_time_secs = 10
+        self.sleep_time_secs = 1
         if scheduler is not None:
             self.scheduler_node = scheduler
         else:
@@ -556,7 +556,7 @@ class DispyCluster(object):
 
         print("Finding dispynodes...")
         self.master_ip = socket.gethostbyname(socket.gethostname())
-        if options.dispy_ping or options.network:
+        if not options.local and (options.dispy_ping or options.network):
             self.desired_node_list = ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63',
                                       '204.47.184.59']
         elif options.local:
@@ -564,7 +564,7 @@ class DispyCluster(object):
         else:
             self.desired_node_list = []  # to auto-discover nodes, only seems to find the local node
 
-        if options.exclusive:
+        if options.dispy_exclusive:
             print('Starting JobCluster...')
             cluster = dispy.JobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip,
                                        pulse_interval=60, reentrant=True,
@@ -609,7 +609,7 @@ class DispyCluster(object):
     def submit_sessions(self, batch_name, batch_path, batch_file, session_list):
         import dispy, socket, time
 
-        if options.exclusive:
+        if options.dispy_exclusive:
             print('Starting JobCluster...')
             self.cluster = dispy.JobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip,
                                             pulse_interval=60, reentrant=True,
@@ -655,6 +655,10 @@ class DispyCluster(object):
 
 class runtime_options(object):
     def __init__(self):
+        import socket
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+
         self.validate_batch = True
         self.no_sim = False
         self.bundle_path_root = ''
@@ -668,7 +672,7 @@ class runtime_options(object):
         self.dispy_ping = False
         self.dispy_debug = False
         self.dispy_exclusive = False
-        self.dispy_scheduler = '204.47.182.182'
+        self.dispy_scheduler = ip_address  # local ip_address by default
         self.local = True
         self.network = False
 
@@ -710,7 +714,8 @@ if __name__ == '__main__':
     options.dispy_ping = args.dispy_ping
     options.dispy_debug = args.dispy_debug
     options.dispy_exclusive = args.dispy_exclusive
-    options.dispy_scheduler = args.dispy_scheduler
+    if args.dispy_scheduler:
+        options.dispy_scheduler = args.dispy_scheduler
     options.local = args.local
     options.network = args.network
 
@@ -721,7 +726,7 @@ if __name__ == '__main__':
     import numpy as np
 
     if options.dispy_ping:
-        dispycluster = DispyCluster(options.scheduler)
+        dispycluster = DispyCluster(options.dispy_scheduler)
         dispycluster.find_nodes()
         print("*** ping complete ***")
     else:
@@ -841,7 +846,7 @@ if __name__ == '__main__':
             if options.dispy:  # run remote job on cluster
                 retry_count = dict()  # track retry attempts for terminated or abandoned jobs
 
-                dispycluster = DispyCluster(options.scheduler)
+                dispycluster = DispyCluster(options.dispy_scheduler)
                 dispycluster.find_nodes()
                 dispycluster.submit_sessions(batch.name, options.bundle_path_root, options.batch_path + batch.name,
                                              session_list)
