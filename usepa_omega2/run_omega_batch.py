@@ -8,9 +8,6 @@ example usage:
 
 """
 
-from usepa_omega2 import *
-from usepa_omega2.file_eye_oh import gui_comm
-
 
 class OMEGABatchObject(object):
     def __init__(self, name='', **kwargs):
@@ -487,50 +484,45 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     import sys, subprocess
     # call shell command
     pythonpath = sys.exec_prefix
-    if pythonpath.__contains__('envs'):
+    if 'env' in pythonpath:
         pythonpath = pythonpath + "\\scripts"
-    cmd = '{}\\python "{}\\{}\\run_omega_batch.py" --bundle_path "{}"  \
-            --batch_file "{}.csv" --session_num {} --no_validate'.format(
+    cmd = '{}\\python "{}\\{}\\usepa_omega2\\run_omega_batch.py" --bundle_path "{}"  \
+            --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
         pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
     sysprint('.')
     sysprint(cmd)
     sysprint('.')
     subprocess.call(cmd)
-    # remove temporary dll folder for this session:
-    dllpath = "C:\\Users\\Public\\temp\\%s\\" % (batch_name + '_' + session_name)
-    sysprint('Removing ' + dllpath)
-    shutil.rmtree(dllpath, ignore_errors=False)
 
-    summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output\\logs\\Summary.txt')
-
-    time.sleep(5)  # wait for summary file to finish writing?
-
-    if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
-        f_read = open(summary_filename, "r")
-        last_line = f_read.readlines()[-1]
-        f_read.close()
-        batch_path = os.path.join(network_batch_path_root, batch_name)
-        if last_line.__contains__("Standard Compliance Model Completed"):
-            os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))
-            sysprint('^^^ dispy_run_session Standard Compliance Model Completed, Session %s ^^^' % session_name)
-            return True
-        elif last_line.__contains__("Standard Compliance Model Stopped"):
-            os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '#FAIL_' + session_name))
-            sysprint('???? Standard Compliance Model Stopped, Session %s ????' % session_name)
-            return False
-        else:
-            sysprint('???? Weird Summary File for Session %s : last_line = "%s" ????' % (session_name, last_line))
-            return False
-    else:
-        sysprint('???? No Summary File for Session %s, path_exists=%d, non_zero=%d ????' % (
-            session_name, os.path.exists(summary_filename), os.path.getsize(summary_filename) > 0))
-        if retry_count < 3:
-            sysprint('???? Trying Session %s again (attempt %d)... ????' % (session_name, retry_count + 1))
-            dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,
-                              retry_count=retry_count + 1)
-        else:
-            sysprint('???? Abandoning Session %s... ????' % session_name)
-        return False
+    # summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output\\logs\\Summary.txt')
+    # time.sleep(5)  # wait for summary file to finish writing?
+    #
+    # if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
+    #     f_read = open(summary_filename, "r")
+    #     last_line = f_read.readlines()[-1]
+    #     f_read.close()
+    #     batch_path = os.path.join(network_batch_path_root, batch_name)
+    #     if last_line.__contains__("Standard Compliance Model Completed"):
+    #         os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))
+    #         sysprint('^^^ dispy_run_session Standard Compliance Model Completed, Session %s ^^^' % session_name)
+    #         return True
+    #     elif last_line.__contains__("Standard Compliance Model Stopped"):
+    #         os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '#FAIL_' + session_name))
+    #         sysprint('???? Standard Compliance Model Stopped, Session %s ????' % session_name)
+    #         return False
+    #     else:
+    #         sysprint('???? Weird Summary File for Session %s : last_line = "%s" ????' % (session_name, last_line))
+    #         return False
+    # else:
+    #     sysprint('???? No Summary File for Session %s, path_exists=%d, non_zero=%d ????' % (
+    #         session_name, os.path.exists(summary_filename), os.path.getsize(summary_filename) > 0))
+    #     if retry_count < 3:
+    #         sysprint('???? Trying Session %s again (attempt %d)... ????' % (session_name, retry_count + 1))
+    #         dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,
+    #                           retry_count=retry_count + 1)
+    #     else:
+    #         sysprint('???? Abandoning Session %s... ????' % session_name)
+    #     return False
 
 
 class DispyCluster(object):
@@ -539,7 +531,7 @@ class DispyCluster(object):
         self.master_ip = ''
         self.desired_node_list = []
         self.found_node_list = []
-        self.sleep_time_secs = 1
+        self.sleep_time_secs = 3
         if scheduler is not None:
             self.scheduler_node = scheduler
         else:
@@ -608,13 +600,13 @@ class DispyCluster(object):
         cluster.close()
 
     def submit_sessions(self, batch_name, batch_path, batch_file, session_list):
-        import dispy, socket, time
+        import dispy, socket, time, usepa_omega2
 
         if options.dispy_exclusive:
             print('Starting JobCluster...')
             self.cluster = dispy.JobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip,
                                             pulse_interval=60, reentrant=True,
-                                            ping_interval=10, loglevel=self.loglevel, depends=[sysprint],
+                                            ping_interval=10, loglevel=self.loglevel, depends=[sysprint, usepa_omega2],
                                             cluster_status=status_cb, callback=job_cb)
         else:
             print('Starting SharedJobCluster...')
@@ -666,7 +658,7 @@ class runtime_options(object):
         self.batch_path = ''
         self.session_path = ''
         self.session_num = []
-        self.bundle = False
+        self.no_bundle = False
         self.verbose = False
         self.dispy = False
         self.dispy_ping = False
@@ -678,6 +670,7 @@ class runtime_options(object):
 
 
 if __name__ == '__main__':
+    import os, sys
     import argparse
 
     parser = argparse.ArgumentParser(
@@ -688,7 +681,7 @@ if __name__ == '__main__':
                         default=os.getcwd() + os.sep + 'bundle')
     parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
     parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
-# parser.add_argument('--bundle', action='store_true', help='True = gather and copy all source files to bundle_path')
+    parser.add_argument('--no_bundle', action='store_true', help='Do NOT gather and copy all source files to bundle_path')
     parser.add_argument('--verbose', action='store_true', help='True = enable verbose omega_batch messages)')
     parser.add_argument('--dispy', action='store_true', help='True = run sessions on dispynode(s)')
     parser.add_argument('--dispy_ping', action='store_true', help='True = ping dispynode(s)')
@@ -708,7 +701,7 @@ if __name__ == '__main__':
     options.bundle_path_root = args.bundle_path
     options.batch_file = args.batch_file
     options.session_num = args.session_num
-    options.bundle = True  # args.bundle or args.dispy # or (options.bundle_path_root is not None)
+    options.no_bundle = args.no_bundle # or args.dispy # or (options.bundle_path_root is not None)
     options.verbose = args.verbose
     options.dispy = args.dispy
     options.dispy_ping = args.dispy_ping
@@ -719,8 +712,18 @@ if __name__ == '__main__':
     options.local = args.local
     options.network = args.network
 
+    if options.no_bundle:
+        batchfile_path = os.path.split(args.batch_file)[0]
+        print('updating sys.path: %s' % [batchfile_path, batchfile_path + '\\usepa_omega2',
+                                         batchfile_path + '\\usepa_omega2\\consumer'])
+        sys.path.extend([batchfile_path, batchfile_path + '\\usepa_omega2',
+                         batchfile_path + '\\usepa_omega2\\consumer'])
+
+    from usepa_omega2 import *
+    from usepa_omega2.file_eye_oh import gui_comm
+
     # get batch info
-    import sys, os, socket, shutil
+    import socket, shutil
     import pandas as pd
     from datetime import datetime
     import numpy as np
@@ -749,7 +752,7 @@ if __name__ == '__main__':
         expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
             os.path.splitext(options.batch_file)[1]
 
-        if options.bundle:
+        if not options.no_bundle:
             batch.dataframe.loc['Batch Name'][0] = batch.name = datetime.now().strftime(
                 "%Y_%m_%d_%H_%M_%S_") + batch.name
 
@@ -782,10 +785,20 @@ if __name__ == '__main__':
         print("\n*** validation complete ***")
 
         # copy files to network_batch_path
-        if options.bundle:
+        if not options.no_bundle:
             print('Bundling Source File...')
             # copy this file to batch folder
-            relocate_file(options.batch_path, __file__)
+            # relocate_file(options.batch_path, __file__)
+
+            source_files = [fn for fn in os.listdir('usepa_omega2') if '.py' in fn]
+            validate_folder(options.batch_path + 'usepa_omega2/')
+            for f in source_files:
+                relocate_file(options.batch_path + 'usepa_omega2/', 'usepa_omega2/' + f)
+
+            source_files = [fn for fn in os.listdir('usepa_omega2/consumer') if '.py' in fn]
+            validate_folder(options.batch_path + 'usepa_omega2/consumer/')
+            for f in source_files:
+                relocate_file(options.batch_path + 'usepa_omega2/consumer/', 'usepa_omega2/consumer/' + f)
 
             # write a copy of the expanded, validated batch to the source batch_file directory:
             if options.batch_file.__contains__('.csv'):
