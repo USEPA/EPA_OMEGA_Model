@@ -194,6 +194,7 @@ def run_omega(o2_options):
     import consumer.sales as consumer
     import producer
     from consumer.sales_gcam import get_demanded_shares
+    from consumer.stock import prior_year_stock_registered_count, prior_year_stock_vmt, age0_stock_vmt
 
     fileio.validate_folder(o2.options.output_folder)
 
@@ -263,6 +264,9 @@ def run_omega(o2_options):
             session_summary_results = get_demanded_shares(session_summary_results)
             session_summary_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
             session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a') # ToDo: need to add check if file exists so that header is only written once
+            age0_stock_vmt(o2.options.analysis_final_year)
+            prior_year_stock_registered_count(o2.options.analysis_final_year)
+            prior_year_stock_vmt(o2.options.analysis_final_year)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             end = time.time()

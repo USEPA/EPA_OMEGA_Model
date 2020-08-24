@@ -5,8 +5,8 @@ stock.py
 """
 
 from usepa_omega2 import *
-from usepa_omega2.vehicles import Vehicle
-from usepa_omega2.vehicle_annual_data import VehicleAnnualData
+from vehicles import Vehicle
+from vehicle_annual_data import VehicleAnnualData
 
 
 def prior_year_stock_registered_count(calendar_year):
