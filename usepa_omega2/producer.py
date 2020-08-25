@@ -116,6 +116,7 @@ def run_compliance_model():
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from cost_curves import CostCurve
+    from consumer.stock import prior_year_stock_registered_count, prior_year_stock_vmt, age0_stock_vmt
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
@@ -444,6 +445,9 @@ def run_compliance_model():
 
             o2.session.add_all(manufacturer_new_vehicles)
             o2.session.flush()
+            age0_stock_vmt(calendar_year)
+            prior_year_stock_registered_count(calendar_year)
+            prior_year_stock_vmt(calendar_year)
 
 
 if __name__ == '__main__':
