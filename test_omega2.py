@@ -63,7 +63,6 @@ if __name__ == "__main__":
         for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer']:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
-                # cmd_str = 'venv\\Scripts\\python %s\\%s' % (source_folder, f)
                 console_file = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
 
                 if f == 'run_omega_batch.py':
