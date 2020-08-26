@@ -30,7 +30,8 @@ class GHGStandardFlat(SQABase):
     # noinspection PyMethodParameters
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        omega_log.logwrite('\nInitializing database from %s...' % filename)
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'ghg_standards-flat'
         input_template_version = 0.0002

@@ -127,3 +127,4 @@ composer.lock
 /dev/*
 /bundle/*
 *log*.txt
+/test_omega2_output/*

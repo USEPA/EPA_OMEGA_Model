@@ -102,6 +102,7 @@ def dump_omega_db_to_csv(output_folder, verbose=False):
 
     # dump tables to .csv files using pandas!
     for table in o2.engine.table_names():
-        omega_log.logwrite(table)
+        if verbose:
+            omega_log.logwrite(table)
         sql_df = pd.read_sql("SELECT * FROM %s" % table, con=o2.engine)
         sql_df.to_csv('%s/%s_table.csv' % (output_folder, table), index=False)

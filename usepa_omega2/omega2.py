@@ -166,7 +166,7 @@ def run_omega(o2_options):
     import traceback
     import time
 
-    start = time.time()
+    o2_options.start_time = time.time()
 
     print('OMEGA2 greets you, version %s' % code_version)
     if '__file__' in locals():
@@ -265,10 +265,7 @@ def run_omega(o2_options):
             session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a') # ToDo: need to add check if file exists so that header is only written once
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-            end = time.time()
-            print('\nElapsed Time %.2f Seconds' % (end - start))
-
-
+            omega_log.end_logfile("\nSession Complete")
 
             # o2.session.close()
             o2.engine.dispose()
@@ -277,12 +274,15 @@ def run_omega(o2_options):
             o2.options = None
         else:
             omega_log.logwrite("\n#INIT FAIL")
+            omega_log.end_logfile("\nSession Fail")
+
     except Exception as e:
         if init_fail:
             omega_log.logwrite("\n#INIT FAIL")
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
+        omega_log.end_logfile("\nSession Fail")
 
 
 if __name__ == "__main__":

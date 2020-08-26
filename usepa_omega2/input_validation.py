@@ -17,7 +17,8 @@ def validate_template_version_info(filename, input_template_name, input_template
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
 
-    omega_log.logwrite('Validating Template Version [%s]' % filename)
+    if verbose:
+        omega_log.logwrite('Validating Template Version [%s]' % filename)
 
     error_list = []
     # check template name
@@ -47,7 +48,7 @@ def validate_template_version_info(filename, input_template_name, input_template
     if error_list:
         error_list.insert(0, '\n*** Detected errors in %s ***' % filename)
         omega_log.logwrite(error_list)
-    else:
+    elif verbose:
         omega_log.logwrite('')
 
     return error_list
@@ -58,7 +59,9 @@ def validate_template_columns(filename, input_template_columns, columns, verbose
     error_list = []
     columns_set = set(columns)
 
-    omega_log.logwrite('Validating Columns [%s]' % filename)
+    if verbose:
+        omega_log.logwrite('Validating Columns [%s]' % filename)
+
     if input_template_columns.intersection(columns_set) == input_template_columns:
         if verbose:
             omega_log.logwrite('Input columns OK')
@@ -69,7 +72,7 @@ def validate_template_columns(filename, input_template_columns, columns, verbose
     if error_list:
         error_list.insert(0, '\n*** Detected errors in %s ***' % filename)
         omega_log.logwrite(error_list)
-    else:
+    elif verbose:
         omega_log.logwrite('')
 
     return error_list

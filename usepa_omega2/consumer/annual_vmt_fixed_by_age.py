@@ -23,7 +23,8 @@ class AnnualVMTFixedByAge(SQABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        omega_log.logwrite(f'\nInitializing database from {filename}...')
+        if verbose:
+            omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'annual_vmt_fixed_by_age'
         input_template_version = 0.0001

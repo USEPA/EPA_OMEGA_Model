@@ -24,7 +24,8 @@ class Fuel(SQABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        omega_log.logwrite('\nInitializing database from %s...' % filename)
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'fuels'
         input_template_version = 0.0002
@@ -55,17 +56,29 @@ class Fuel(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        import os
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    SQABase.metadata.create_all(o2.engine)
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
+        o2.engine.echo = o2.options.verbose
+        omega_log.init_logfile()
 
-    init_fail = []
-    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        SQABase.metadata.create_all(o2.engine)
 
-    if not init_fail:
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        init_fail = []
+        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+
+        if not init_fail:
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
+
+        print('#SUCCESS')
+        os._exit(0)
+
+    except:
+        print('#FAIL')
+        os._exit(-1)

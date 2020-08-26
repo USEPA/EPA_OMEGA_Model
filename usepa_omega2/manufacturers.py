@@ -28,7 +28,8 @@ class Manufacturer(SQABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        omega_log.logwrite('\nInitializing database from %s...' % filename)
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'manufacturers'
         input_template_version = 0.0003

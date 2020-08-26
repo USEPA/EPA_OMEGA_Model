@@ -30,7 +30,7 @@ def get_demanded_shares(df):
     for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
         tmp_sales_share_denominator_all_hauling = 0
         tmp_sales_share_denominator_all_nonhauling = 0
-        print(cy)
+        # print(cy)
         market_class_ids = o2.session.query(DemandedSharesGCAM.market_class_ID).filter(DemandedSharesGCAM.calendar_year == cy).distinct()
         for pass_num in range(1,3):
             for market_class_id in market_class_ids:

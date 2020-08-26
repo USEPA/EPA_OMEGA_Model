@@ -35,6 +35,8 @@ print('loading usepa_omega2 version %s' % code_version)
 
 class OMEGARuntimeOptions(object):
     def __init__(self):
+        import time
+
         self.session_name = 'OMEGA2 Demo'
         self.verbose = True
         self.output_folder = 'output' + os.sep
@@ -73,6 +75,9 @@ class OMEGARuntimeOptions(object):
         self.slice_tech_combo_cloud_tables = False
         self.allow_backsliding = False
         self.num_tech_options_per_vehicle = 5
+        self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
+        self.start_time = 0
+        self.end_time = 0
 
 
 from omega2 import run_omega

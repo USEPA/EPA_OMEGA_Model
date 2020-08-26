@@ -30,7 +30,8 @@ class CostCurve(SQABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        omega_log.logwrite('\nInitializing database from %s...' % filename)
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'cost_curves'
         input_template_version = 0.0002
@@ -61,8 +62,9 @@ class CostCurve(SQABase):
         return template_errors
 
     @staticmethod
-    def init_database_from_lists(cost_curve_class, model_year, frontier_co2_gpmi, frontier_cost):
-        omega_log.logwrite('\nInitializing database from %s frontier...' % cost_curve_class)
+    def init_database_from_lists(cost_curve_class, model_year, frontier_co2_gpmi, frontier_cost, verbose=False):
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s frontier...' % cost_curve_class)
 
         obj_list = []
         for cost, co2_gpmi in zip(frontier_cost, frontier_co2_gpmi):
