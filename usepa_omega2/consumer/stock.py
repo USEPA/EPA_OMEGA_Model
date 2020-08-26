@@ -5,76 +5,140 @@ stock.py
 """
 
 from usepa_omega2 import *
-from usepa_omega2.vehicles import Vehicle
-from usepa_omega2.vehicle_annual_data import VehicleAnnualData
+from vehicles import Vehicle
+from vehicle_annual_data import VehicleAnnualData
 
+
+# def prior_year_stock_registered_count(calendar_year):
+#
+#     for year in range(o2.options.analysis_initial_year, calendar_year + 1):
+#         # pull in last year's vehicles:
+#         calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
+#             filter(VehicleAnnualData.calendar_year == year - 1).all()
+#
+#         vehicle_IDs = []
+#         for idx in range(0, len(calendar_year_prior_vehicles)):
+#             vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
+#
+#         for idx, vehicle_ID in enumerate(vehicle_IDs):
+#             # work on new stock count
+#             vehicle_initial_sales = o2.session.query(VehicleAnnualData.registered_count).\
+#                 filter(VehicleAnnualData.age==0).\
+#                 filter(VehicleAnnualData.vehicle_ID==vehicle_ID).scalar()
+#             veh_age = calendar_year_prior_vehicles[idx].age + 1
+#             veh_market_class = o2.session.query(Vehicle.market_class_ID).filter(Vehicle.vehicle_ID == vehicle_ID)
+#             scrappage_factor = o2.session.query(o2.options.stock_scrappage.reregistered_proportion).\
+#                 filter(o2.options.stock_scrappage.market_class_ID == veh_market_class).\
+#                 filter(o2.options.stock_scrappage.age == veh_age).scalar()
+#             new_count = vehicle_initial_sales * scrappage_factor
+#             VehicleAnnualData.update_registered_count(vehicle_ID, year, new_count)
+#
+#
+# def prior_year_stock_vmt(calendar_year):
+#
+#     for year in range(o2.options.analysis_initial_year, calendar_year + 1):
+#         # pull in last year's vehicles:
+#         calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
+#             filter(VehicleAnnualData.calendar_year == year - 1).all()
+#
+#         vehicle_IDs = []
+#         for idx in range(0, len(calendar_year_prior_vehicles)):
+#             vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
+#
+#         for idx, vehicle_ID in enumerate(vehicle_IDs):
+#             veh_market_class = o2.session.query(Vehicle.market_class_ID).\
+#                 filter(Vehicle.vehicle_ID == vehicle_ID)
+#             veh_age = calendar_year_prior_vehicles[idx].age + 1
+#             annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
+#                 filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
+#                 filter(o2.options.stock_vmt.age == veh_age).scalar()
+#             VehicleAnnualData.insert_vmt(vehicle_ID, year, annual_vmt)
+#
+#
+# def age0_stock_vmt(calendar_year):
+#
+#     for year in range(o2.options.analysis_initial_year, calendar_year + 1):
+#         # pull in last year's vehicles:
+#         age0_vehicles = o2.session.query(VehicleAnnualData).\
+#             filter(VehicleAnnualData.calendar_year == year).\
+#             filter(VehicleAnnualData.age==0).all()
+#
+#         vehicle_IDs = []
+#         for idx in range(0, len(age0_vehicles)):
+#             vehicle_IDs.append(age0_vehicles[idx].vehicle_ID)
+#
+#         for idx, vehicle_ID in enumerate(vehicle_IDs):
+#             veh_market_class = o2.session.query(Vehicle.market_class_ID).\
+#                 filter(Vehicle.vehicle_ID == vehicle_ID)
+#             veh_age = 0
+#             annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
+#                 filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
+#                 filter(o2.options.stock_vmt.age == veh_age).scalar()
+#             VehicleAnnualData.insert_vmt(vehicle_ID, year, annual_vmt)
 
 def prior_year_stock_registered_count(calendar_year):
 
-    for year in range(o2.options.analysis_initial_year, calendar_year + 1):
-        # pull in last year's vehicles:
-        calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
-            filter(VehicleAnnualData.calendar_year == year - 1).all()
+    # pull in last year's vehicles:
+    calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
+        filter(VehicleAnnualData.calendar_year == calendar_year - 1).all()
 
-        vehicle_IDs = []
-        for idx in range(0, len(calendar_year_prior_vehicles)):
-            vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
+    vehicle_IDs = []
+    for idx in range(0, len(calendar_year_prior_vehicles)):
+        vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
 
-        for idx, vehicle_ID in enumerate(vehicle_IDs):
-            # work on new stock count
-            vehicle_initial_sales = o2.session.query(VehicleAnnualData.registered_count).\
-                filter(VehicleAnnualData.age==0).\
-                filter(VehicleAnnualData.vehicle_ID==vehicle_ID).scalar()
-            veh_age = calendar_year_prior_vehicles[idx].age + 1
-            veh_market_class = o2.session.query(Vehicle.market_class_ID).filter(Vehicle.vehicle_ID == vehicle_ID)
-            scrappage_factor = o2.session.query(o2.options.stock_scrappage.reregistered_proportion).\
-                filter(o2.options.stock_scrappage.market_class_ID == veh_market_class).\
-                filter(o2.options.stock_scrappage.age == veh_age).scalar()
-            new_count = vehicle_initial_sales * scrappage_factor
-            VehicleAnnualData.update_registered_count(vehicle_ID, year, new_count)
+    for idx, vehicle_ID in enumerate(vehicle_IDs):
+        # work on new stock count
+        vehicle_initial_sales = o2.session.query(VehicleAnnualData.registered_count).\
+            filter(VehicleAnnualData.age==0).\
+            filter(VehicleAnnualData.vehicle_ID==vehicle_ID).scalar()
+        veh_age = calendar_year_prior_vehicles[idx].age + 1
+        veh_market_class = o2.session.query(Vehicle.market_class_ID).filter(Vehicle.vehicle_ID == vehicle_ID)
+        scrappage_factor = o2.session.query(o2.options.stock_scrappage.reregistered_proportion).\
+            filter(o2.options.stock_scrappage.market_class_ID == veh_market_class).\
+            filter(o2.options.stock_scrappage.age == veh_age).scalar()
+        new_count = vehicle_initial_sales * scrappage_factor
+        VehicleAnnualData.update_registered_count(vehicle_ID, calendar_year, new_count)
 
 
 def prior_year_stock_vmt(calendar_year):
 
-    for year in range(o2.options.analysis_initial_year, calendar_year + 1):
-        # pull in last year's vehicles:
-        calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
-            filter(VehicleAnnualData.calendar_year == year - 1).all()
+    # pull in last year's vehicles:
+    calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
+        filter(VehicleAnnualData.calendar_year == calendar_year - 1).all()
 
-        vehicle_IDs = []
-        for idx in range(0, len(calendar_year_prior_vehicles)):
-            vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
+    vehicle_IDs = []
+    for idx in range(0, len(calendar_year_prior_vehicles)):
+        vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
 
-        for idx, vehicle_ID in enumerate(vehicle_IDs):
-            veh_market_class = o2.session.query(Vehicle.market_class_ID).\
-                filter(Vehicle.vehicle_ID == vehicle_ID)
-            veh_age = calendar_year_prior_vehicles[idx].age + 1
-            annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
-                filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
-                filter(o2.options.stock_vmt.age == veh_age).scalar()
-            VehicleAnnualData.insert_vmt(vehicle_ID, year, annual_vmt)
+    for idx, vehicle_ID in enumerate(vehicle_IDs):
+        veh_market_class = o2.session.query(Vehicle.market_class_ID).\
+            filter(Vehicle.vehicle_ID == vehicle_ID)
+        veh_age = calendar_year_prior_vehicles[idx].age + 1
+        annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
+            filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
+            filter(o2.options.stock_vmt.age == veh_age).scalar()
+        VehicleAnnualData.insert_vmt(vehicle_ID, calendar_year, annual_vmt)
 
 
 def age0_stock_vmt(calendar_year):
 
-    for year in range(o2.options.analysis_initial_year, calendar_year + 1):
-        # pull in last year's vehicles:
-        age0_vehicles = o2.session.query(VehicleAnnualData).\
-            filter(VehicleAnnualData.calendar_year == year).\
-            filter(VehicleAnnualData.age==0).all()
+    # pull in last year's vehicles:
+    age0_vehicles = o2.session.query(VehicleAnnualData).\
+        filter(VehicleAnnualData.calendar_year == calendar_year).\
+        filter(VehicleAnnualData.age==0).all()
 
-        vehicle_IDs = []
-        for idx in range(0, len(age0_vehicles)):
-            vehicle_IDs.append(age0_vehicles[idx].vehicle_ID)
+    vehicle_IDs = []
+    for idx in range(0, len(age0_vehicles)):
+        vehicle_IDs.append(age0_vehicles[idx].vehicle_ID)
 
-        for idx, vehicle_ID in enumerate(vehicle_IDs):
-            veh_market_class = o2.session.query(Vehicle.market_class_ID).\
-                filter(Vehicle.vehicle_ID == vehicle_ID)
-            veh_age = 0
-            annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
-                filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
-                filter(o2.options.stock_vmt.age == veh_age).scalar()
-            VehicleAnnualData.insert_vmt(vehicle_ID, year, annual_vmt)
+    for idx, vehicle_ID in enumerate(vehicle_IDs):
+        veh_market_class = o2.session.query(Vehicle.market_class_ID).\
+            filter(Vehicle.vehicle_ID == vehicle_ID)
+        veh_age = 0
+        annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
+            filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
+            filter(o2.options.stock_vmt.age == veh_age).scalar()
+        VehicleAnnualData.insert_vmt(vehicle_ID, calendar_year, annual_vmt)
 
 
 if __name__ == '__main__':
