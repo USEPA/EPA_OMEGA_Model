@@ -37,7 +37,6 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_1oM_YK8zEeqO0d-UmaSoow" name="name" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_yG9xcLGdEeqot_EVL7aS4w"/>
-    <packagedElement xmi:type="uml:Association" xmi:id="_6BmswLGdEeqot_EVL7aS4w" name="" memberEnd="_ab4EAKstEeq6oJG-GxIr5g"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="_2g05kLuhEeqijc4sJTwzXQ" name="fuel_scenario_id" client="_d13h4MTvEembs_lAYl7NMg" supplier="_kfn98LuhEeqijc4sJTwzXQ"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="__dNlwLuhEeqijc4sJTwzXQ" name="fuel_id" client="_ZWk1sKdEEeqRUoM6l8Mfgg" supplier="_ecoowJkbEeq1MNw_X5quEQ"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_GGcxsMqXEeqfDrL7faTSqQ" name="runtime_options">
@@ -57,21 +56,21 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="_P0qbgNZgEeqxT4IWw4575Q" name="age" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_TVvVkNZgEeqxT4IWw4575Q" name="market_class_id"/>
       </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_Q9NG8KspEeq6oJG-GxIr5g" name="demanded_sales_annual_data">
+      <packagedElement xmi:type="uml:Class" xmi:id="_Q9NG8KspEeq6oJG-GxIr5g" name="demanded_shares (gcam)">
         <ownedAttribute xmi:type="uml:Property" xmi:id="_kypDgKstEeq6oJG-GxIr5g" name="market_class_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_muJt8KstEeq6oJG-GxIr5g" name="annual_vmt"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_-ql48KstEeq6oJG-GxIr5g" name="payback_years"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_tNKWcK8XEeqO0d-UmaSoow" name="price_amortization_period" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_gKYnMK8YEeqO0d-UmaSoow" name="share_weight" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_zi9lcK8YEeqO0d-UmaSoow" name="discount_rate" visibility="public"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_EepNsLpBEeqITOQjKacqMg" name="demanded_sales_count" visibility="public"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_EepNsLpBEeqITOQjKacqMg" name="demanded_share" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_MKuIkLpBEeqITOQjKacqMg" name="calendar_year" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_8yZVoLruEeqR6PiF084V6A" name="index" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_nqmpINJ_Eeqj-tYEjwDNJQ" name="consumer_generalized_cost_dollars" visibility="public"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Class" xmi:id="_YXJMIKstEeq6oJG-GxIr5g" name="market_classes">
         <ownedAttribute xmi:type="uml:Property" xmi:id="__O2R4LGWEeqot_EVL7aS4w" name="index"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_ab4EAKstEeq6oJG-GxIr5g" name="market_class_id" visibility="public" association="_6BmswLGdEeqot_EVL7aS4w"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ab4EAKstEeq6oJG-GxIr5g" name="market_class_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_dL4GcKstEeq6oJG-GxIr5g" name="hauling_class"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_fhujgKstEeq6oJG-GxIr5g" name="fueling_class"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_hvA18K8IEeqO0d-UmaSoow" name="ownership_class"/>
@@ -100,6 +99,13 @@
         <ownedOperation xmi:type="uml:Operation" xmi:id="_jCcE8NDvEeqzVL8A1ZovNA" name="calculate_target_co2_gpmi">
           <ownedParameter xmi:type="uml:Parameter" xmi:id="_jCcE8dDvEeqzVL8A1ZovNA" name="vehicle"/>
         </ownedOperation>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_tZ2bUOcBEeq0FIty4TOAXA" name="demanded_sales">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_Hd7oQOcCEeq0FIty4TOAXA" name="index"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_YW37UOcCEeq0FIty4TOAXA" name="calendar_year"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_dTniIOcCEeq0FIty4TOAXA" name="annual_vmt"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_eI7mQOcSEeq0FIty4TOAXA" name="discount_rate"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_kV3CkOcSEeq0FIty4TOAXA" name="demanded_sales_count"/>
       </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_bRd7YNZzEeqxT4IWw4575Q" name="Consumer">
@@ -219,6 +225,11 @@
         </ownedOperation>
         <nestedClassifier xmi:type="uml:Class" xmi:id="_cJVkQNaDEeqxT4IWw4575Q" name="Class8"/>
       </packagedElement>
+      <packagedElement xmi:type="uml:Class" xmi:id="_NN460OepEeq0FIty4TOAXA" name="vehicles_nems">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_PX57UOepEeq0FIty4TOAXA" name="average_new_vehicle_price_dollars" visibility="public"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_Ud7Z8OepEeq0FIty4TOAXA" name="calendar_year" visibility="public"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_xMYtAOeqEeq0FIty4TOAXA" name="average_new_vehicle_fuel_cost_dollars_per_mile" visibility="public"/>
+      </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_ayCmcJUiEeq1MNw_X5quEQ" name="vehicle_annual_data">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_eG-sgJUjEeq1MNw_X5quEQ" name="vehicle_id" association="_p2KHsKhvEeqRUoM6l8Mfgg"/>
@@ -279,6 +290,28 @@
       <node xmi:type="uml:OpaqueAction" xmi:id="_G3LKwN5xEeqZEda3BAeEzA" name="Run Calendar Year Analysis" incoming="_mJWNMN5xEeqZEda3BAeEzA _t7OOEN5xEeqZEda3BAeEzA" outgoing="_uq6loN5xEeqZEda3BAeEzA"/>
       <node xmi:type="uml:OpaqueAction" xmi:id="_Kas74N5xEeqZEda3BAeEzA" name="Increment Calendar Year" incoming="_uq6loN5xEeqZEda3BAeEzA" outgoing="_gdqcwN5xEeqZEda3BAeEzA"/>
       <node xmi:type="uml:ActivityFinalNode" xmi:id="_rNomcN5xEeqZEda3BAeEzA" name="" incoming="_yyffAN5xEeqZEda3BAeEzA"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Activity" xmi:id="_VH4pEOb9Eeq0FIty4TOAXA" name="Activity29"/>
+    <packagedElement xmi:type="uml:Activity" xmi:id="_uz9TwOb_Eeq0FIty4TOAXA" name="Calculate Sales Volume" node="_-hN20Ob_Eeq0FIty4TOAXA _Mml2EOcAEeq0FIty4TOAXA _FajykOcTEeq0FIty4TOAXA _JzHHMOcTEeq0FIty4TOAXA _bKqo4OcTEeq0FIty4TOAXA _VtMBoOcVEeq0FIty4TOAXA">
+      <ownedComment xmi:type="uml:Comment" xmi:id="_QH_98OcZEeq0FIty4TOAXA">
+        <body>Y: action alternative&#xD;
+X: no action alternative&#xD;
+dP = (generalized costsY - generalized costsX ) /generalized costsX&#xD;
+salesY = salesX * (dP / elasticity * (salesY - salesX) + 1)</body>
+      </ownedComment>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_NNIXAOcTEeq0FIty4TOAXA" target="_FajykOcTEeq0FIty4TOAXA" source="_-hN20Ob_Eeq0FIty4TOAXA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_OBVbIOcTEeq0FIty4TOAXA" target="_JzHHMOcTEeq0FIty4TOAXA" source="_FajykOcTEeq0FIty4TOAXA"/>
+      <edge xmi:type="uml:ControlFlow" xmi:id="_qIDjUOcVEeq0FIty4TOAXA" target="_VtMBoOcVEeq0FIty4TOAXA" source="_JzHHMOcTEeq0FIty4TOAXA"/>
+      <node xmi:type="uml:InitialNode" xmi:id="_-hN20Ob_Eeq0FIty4TOAXA" name="" outgoing="_NNIXAOcTEeq0FIty4TOAXA"/>
+      <node xmi:type="uml:ActivityParameterNode" xmi:id="_Mml2EOcAEeq0FIty4TOAXA" name="vehicles table - action alternative">
+        <upperBound xmi:type="uml:LiteralInteger" xmi:id="_MmnrQOcAEeq0FIty4TOAXA" value="1"/>
+      </node>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_FajykOcTEeq0FIty4TOAXA" name="Calculate fuel costs valued in sales decision" incoming="_NNIXAOcTEeq0FIty4TOAXA" outgoing="_OBVbIOcTEeq0FIty4TOAXA"/>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_JzHHMOcTEeq0FIty4TOAXA" name="Calculate generalized costs" incoming="_OBVbIOcTEeq0FIty4TOAXA" outgoing="_qIDjUOcVEeq0FIty4TOAXA"/>
+      <node xmi:type="uml:ActivityParameterNode" xmi:id="_bKqo4OcTEeq0FIty4TOAXA" name="vehicles NEMS table - no action alternative">
+        <upperBound xmi:type="uml:LiteralInteger" xmi:id="_bKr3AOcTEeq0FIty4TOAXA" value="1"/>
+      </node>
+      <node xmi:type="uml:OpaqueAction" xmi:id="_VtMBoOcVEeq0FIty4TOAXA" name="Calculate action alternative sales volume" incoming="_qIDjUOcVEeq0FIty4TOAXA" language="" body=""/>
     </packagedElement>
   </packagedElement>
   <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_jYTvAK8IEeqO0d-UmaSoow">
