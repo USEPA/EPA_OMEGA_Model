@@ -11,9 +11,9 @@ import numpy as np
 
 def get_demanded_shares(df):
     """
-    :param session: database session
-    :param model_year: not used, for now
-    :return: dict of sales by consumer (market) categories
+
+    :param df:
+    :return:
     """
     from demanded_shares_gcam import DemandedSharesGCAM
 
@@ -98,39 +98,47 @@ def get_demanded_shares(df):
     return df
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
-    omega_log.init_logfile()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
+        omega_log.init_logfile()
 
-    from manufacturers import Manufacturer  # needed for manufacturers table
-    from market_classes import MarketClass  # needed for market class ID
-    from fuels import Fuel  # needed for showroom fuel ID
-    from demanded_shares_gcam import DemandedSharesGCAM
-    from cost_curves import CostCurve
-    from GHG_standards_footprint import GHGStandardFootprint
-    o2.options.GHG_standard = GHGStandardFootprint
-    o2.options.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
-    from vehicles import Vehicle
-    from vehicle_annual_data import VehicleAnnualData
+        from manufacturers import Manufacturer  # needed for manufacturers table
+        from market_classes import MarketClass  # needed for market class ID
+        from fuels import Fuel  # needed for showroom fuel ID
+        from demanded_shares_gcam import DemandedSharesGCAM
+        from cost_curves import CostCurve
+        from GHG_standards_footprint import GHGStandardFootprint
+        o2.options.GHG_standard = GHGStandardFootprint
+        o2.options.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
+        from vehicles import Vehicle
+        from vehicle_annual_data import VehicleAnnualData
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
 
-    init_fail = []
-    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
-    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
-    init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file, verbose=o2.options.verbose)
-    init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-    init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file, verbose=o2.options.verbose)
-    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-    init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = []
+        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
+        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file, verbose=o2.options.verbose)
+        init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file, verbose=o2.options.verbose)
+        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
-    if not init_fail:
-        o2.options.analysis_initial_year = 2021
-        o2.options.analysis_final_year = 2035
-        o2.options.database_dump_folder = '__dump'
-        share_demand = get_demanded_shares(o2.options.analysis_initial_year)
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        if not init_fail:
+            o2.options.analysis_initial_year = 2021
+            o2.options.analysis_final_year = 2035
+            o2.options.database_dump_folder = '__dump'
+            # share_demand = get_demanded_shares(o2.options.analysis_initial_year)
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
+        else:
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

@@ -8,6 +8,7 @@ vehicles.py
 import o2  # import global variables
 from usepa_omega2 import *
 
+print('importing vehicles.py')
 
 class Vehicle(SQABase):
     # --- database table properties ---
@@ -65,7 +66,7 @@ class Vehicle(SQABase):
         o2.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
         o2.session.flush()
 
-        VehicleAnnualData.update_registered_count(vehicle_ID=self.vehicle_ID,
+        VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=self.model_year,
                                                   registered_count=sales)
 
@@ -135,29 +136,61 @@ class Vehicle(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
+        o2.engine.echo = True
+        omega_log.init_logfile()
 
-    from manufacturers import Manufacturer  # needed for manufacturers table
-    from market_classes import MarketClass  # needed for market class ID
-    from fuels import Fuel  # needed for showroom fuel ID
-    from cost_curves import CostCurve  # needed for vehicle cost from CO2
-    from cost_clouds import CostCloud  # needed for vehicle cost from CO2
+        from manufacturers import Manufacturer  # needed for manufacturers table
+        from market_classes import MarketClass  # needed for market class ID
+        from fuels import Fuel  # needed for showroom fuel ID
+        # from vehicles import Vehicle
+        from vehicle_annual_data import VehicleAnnualData
 
-    SQABase.metadata.create_all(o2.engine)
+        if o2.options.GHG_standard == 'flat':
+            from GHG_standards_flat import GHGStandardFlat
+        else:
+            from GHG_standards_footprint import GHGStandardFootprint
 
-    init_fail = []
-    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
-    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
-    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-    # init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_clouds_file, verbose=o2.options.verbose)
-    init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_curves_file, verbose=o2.options.verbose)
+        if o2.options.cost_file_type == 'curves':
+            from cost_curves import CostCurve  # needed for vehicle cost from CO2
+        else:
+            from cost_clouds import CostCloud  # needed for vehicle cost from CO2
 
-    init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        SQABase.metadata.create_all(o2.engine)
 
-    if not init_fail:
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        init_fail = []
+        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
+        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+
+        if o2.options.cost_file_type == 'curves':
+            init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        else:
+            init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+
+        if o2.options.GHG_standard == 'flat':
+            init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
+                                                                            verbose=o2.options.verbose)
+            o2.options.GHG_standard = GHGStandardFlat
+        else:
+            init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
+                                                                                 verbose=o2.options.verbose)
+            o2.options.GHG_standard = GHGStandardFootprint
+
+        init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+
+        if not init_fail:
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
+        else:
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

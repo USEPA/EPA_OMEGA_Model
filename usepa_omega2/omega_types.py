@@ -42,19 +42,24 @@ class OMEGAEnum:
 
 
 if __name__ == "__main__":
+    import os, traceback
 
-    test_enum = OMEGAEnum(['foo', 'bar', 'space force!'])
+    try:
+        test_enum = OMEGAEnum(['foo', 'bar', 'space force!'])
 
-    for i in test_enum:
-        print(i)
+        for i in test_enum:
+            print(i)
 
-    print([i for i in test_enum])
+        print([i for i in test_enum])
 
-    print(test_enum.values())
-    print(test_enum.keys())
+        print(test_enum.values())
+        print(test_enum.keys())
 
-    for k,v in test_enum.items():
-        print(k, v)
+        for k,v in test_enum.items():
+            print(k, v)
 
-    print(test_enum['foo'])
-    print(test_enum['space_force'])
+        print(test_enum['foo'])
+        print(test_enum['space_force'])
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

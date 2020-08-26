@@ -270,6 +270,7 @@ class OMEGASessionObject(object):
 def validate_file(filename):
     if not os.access(filename, os.F_OK):
         print("\n*** Couldn't access {}, check path and filename ***".format(filename), file=sys.stderr)
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         sys.exit(-1)
 
 
@@ -285,6 +286,7 @@ def validate_folder(batch_root, batch_name='', session_name=''):
             os.makedirs(dstfolder, exist_ok=True)  # try create folder if necessary
         except:
             print("Couldn't access or create {}".format(dstfolder), file=sys.stderr)
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             sys.exit(-1)
     return dstfolder
 
@@ -644,223 +646,225 @@ class runtime_options(object):
 
 
 if __name__ == '__main__':
-    import os, sys
-    import argparse
+    try:
+        import os, sys
+        import argparse
 
-    parser = argparse.ArgumentParser(
-        description='Run an OMEGA compliance batch available on the network on one or more dispyNodes')
-    parser.add_argument('--no_validate', action='store_true', help='Skip validating batch file')
-    parser.add_argument('--no_sim', action='store_true', help='Skip running simulations')
-    parser.add_argument('--bundle_path', type=str, help='Path to folder visible to all nodes',
-                        default=os.getcwd() + os.sep + 'bundle')
-    parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
-    parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
-    parser.add_argument('--no_bundle', action='store_true',
-                        help='Do NOT gather and copy all source files to bundle_path')
-    parser.add_argument('--verbose', action='store_true', help='True = enable verbose omega_batch messages)')
-    parser.add_argument('--dispy', action='store_true', help='True = run sessions on dispynode(s)')
-    parser.add_argument('--dispy_ping', action='store_true', help='True = ping dispynode(s)')
-    parser.add_argument('--dispy_debug', action='store_true', help='True = enable verbose dispy debug messages)')
-    parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
-    parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address', default=None)
+        parser = argparse.ArgumentParser(
+            description='Run an OMEGA compliance batch available on the network on one or more dispyNodes')
+        parser.add_argument('--no_validate', action='store_true', help='Skip validating batch file')
+        parser.add_argument('--no_sim', action='store_true', help='Skip running simulations')
+        parser.add_argument('--bundle_path', type=str, help='Path to folder visible to all nodes',
+                            default=os.getcwd() + os.sep + 'bundle')
+        parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
+        parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
+        parser.add_argument('--no_bundle', action='store_true',
+                            help='Do NOT gather and copy all source files to bundle_path')
+        parser.add_argument('--verbose', action='store_true', help='True = enable verbose omega_batch messages)')
+        parser.add_argument('--dispy', action='store_true', help='True = run sessions on dispynode(s)')
+        parser.add_argument('--dispy_ping', action='store_true', help='True = ping dispynode(s)')
+        parser.add_argument('--dispy_debug', action='store_true', help='True = enable verbose dispy debug messages)')
+        parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
+        parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address', default=None)
 
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
-    group.add_argument('--network', action='store_true', help='Run on local machine and/or network nodes')
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
+        group.add_argument('--network', action='store_true', help='Run on local machine and/or network nodes')
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    options = runtime_options()
-    options.validate_batch = not args.no_validate
-    options.no_sim = args.no_sim
-    options.bundle_path_root = args.bundle_path
-    options.batch_file = args.batch_file
-    options.session_num = args.session_num
-    options.no_bundle = args.no_bundle # or args.dispy # or (options.bundle_path_root is not None)
-    options.verbose = args.verbose
-    options.dispy = args.dispy
-    options.dispy_ping = args.dispy_ping
-    options.dispy_debug = args.dispy_debug
-    options.dispy_exclusive = args.dispy_exclusive
-    if args.dispy_scheduler:
-        options.dispy_scheduler = args.dispy_scheduler
-    options.local = args.local
-    options.network = args.network
+        options = runtime_options()
+        options.validate_batch = not args.no_validate
+        options.no_sim = args.no_sim
+        options.bundle_path_root = args.bundle_path
+        options.batch_file = args.batch_file
+        options.session_num = args.session_num
+        options.no_bundle = args.no_bundle # or args.dispy # or (options.bundle_path_root is not None)
+        options.verbose = args.verbose
+        options.dispy = args.dispy
+        options.dispy_ping = args.dispy_ping
+        options.dispy_debug = args.dispy_debug
+        options.dispy_exclusive = args.dispy_exclusive
+        if args.dispy_scheduler:
+            options.dispy_scheduler = args.dispy_scheduler
+        options.local = args.local
+        options.network = args.network
 
-    if options.no_bundle:
-        batchfile_path = os.path.split(args.batch_file)[0]
-        print('updating sys.path: %s' % [batchfile_path, batchfile_path + '\\usepa_omega2',
-                                         batchfile_path + '\\usepa_omega2\\consumer'])
-        sys.path.extend([batchfile_path, batchfile_path + '\\usepa_omega2',
-                         batchfile_path + '\\usepa_omega2\\consumer'])
+        if options.no_bundle:
+            batchfile_path = os.path.split(args.batch_file)[0]
+            print('updating sys.path: %s' % [batchfile_path, batchfile_path + '\\usepa_omega2',
+                                             batchfile_path + '\\usepa_omega2\\consumer'])
+            sys.path.extend([batchfile_path, batchfile_path + '\\usepa_omega2',
+                             batchfile_path + '\\usepa_omega2\\consumer'])
 
-    from usepa_omega2 import *
-    from usepa_omega2.file_eye_oh import gui_comm
+        from usepa_omega2 import *
+        from usepa_omega2.file_eye_oh import gui_comm
 
-    # get batch info
-    import socket, shutil
-    import pandas as pd
-    from datetime import datetime
-    import numpy as np
+        # get batch info
+        import socket, shutil
+        import pandas as pd
+        from datetime import datetime
+        import numpy as np
 
-    if options.dispy_ping:
-        dispycluster = DispyCluster(options.dispy_scheduler)
-        dispycluster.find_nodes()
-        print("*** ping complete ***")
-    else:
-        batch = OMEGABatchObject()
-        if options.batch_file.__contains__('.csv'):
-            batch.dataframe = pd.read_csv(options.batch_file, index_col=0)
+        if options.dispy_ping:
+            dispycluster = DispyCluster(options.dispy_scheduler)
+            dispycluster.find_nodes()
+            print("*** ping complete ***")
         else:
-            batch.dataframe = pd.read_excel(options.batch_file, index_col=0, sheet_name="Sessions")
-        batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False}, inplace=True)
-        batch.dataframe.drop('Type', axis=1, inplace=True,
-                             errors='ignore')  # drop Type column, no error if it's not there
-        batch.expand_dataframe(verbose=options.verbose)
-        batch.force_numeric_params()
-        batch.get_batch_settings()
-        batch.add_sessions(verbose=options.verbose)
-
-        import copy
-
-        expanded_batch = copy.deepcopy(batch)
-        expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
-            os.path.splitext(options.batch_file)[1]
-
-        if not options.no_bundle:
-            batch.dataframe.loc['Batch Name'][0] = batch.name = datetime.now().strftime(
-                "%Y_%m_%d_%H_%M_%S_") + batch.name
-
-        # validate session files
-        validate_folder(options.bundle_path_root)
-        options.batch_path = validate_folder(options.bundle_path_root, batch_name=batch.name)
-
-        if options.validate_batch:
-            # validate shared (batch) files
-            validate_file(options.batch_file)
-
-            sys.path.insert(0, os.getcwd())
-
-            for s in range(0, batch.num_sessions()):
-                session = batch.sessions[s]
-                print("\nValidating Session %d ('%s') Files..." % (s, session.name))
-
-                # automatically validate files and folders based on parameter naming convention
-                for i in batch.dataframe.index:
-                    if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
-                        print('validating %s=%s' % (i, session.read_parameter(i)))
-                    if str(i).endswith(' Folder Name'):
-                        validate_folder(session.read_parameter(i))
-                    elif str(i).endswith(' File'):
-                        validate_file(session.read_parameter(i))
-
-                print('Validating Session %d Parameters...' % s)
-                session.init(validate_only=True)
-
-        print("\n*** validation complete ***")
-
-        # copy files to network_batch_path
-        if not options.no_bundle:
-            print('Bundling Source File...')
-            # copy this file to batch folder
-            # relocate_file(options.batch_path, __file__)
-
-            source_files = [fn for fn in os.listdir('usepa_omega2') if '.py' in fn]
-            validate_folder(options.batch_path + 'usepa_omega2/')
-            for f in source_files:
-                relocate_file(options.batch_path + 'usepa_omega2/', 'usepa_omega2/' + f)
-
-            source_files = [fn for fn in os.listdir('usepa_omega2/consumer') if '.py' in fn]
-            validate_folder(options.batch_path + 'usepa_omega2/consumer/')
-            for f in source_files:
-                relocate_file(options.batch_path + 'usepa_omega2/consumer/', 'usepa_omega2/consumer/' + f)
-
-            # write a copy of the expanded, validated batch to the source batch_file directory:
+            batch = OMEGABatchObject()
             if options.batch_file.__contains__('.csv'):
-                expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name)
+                batch.dataframe = pd.read_csv(options.batch_file, index_col=0)
             else:
-                expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name,
-                                                  "Sessions")
+                batch.dataframe = pd.read_excel(options.batch_file, index_col=0, sheet_name="Sessions")
+            batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False}, inplace=True)
+            batch.dataframe.drop('Type', axis=1, inplace=True,
+                                 errors='ignore')  # drop Type column, no error if it's not there
+            batch.expand_dataframe(verbose=options.verbose)
+            batch.force_numeric_params()
+            batch.get_batch_settings()
+            batch.add_sessions(verbose=options.verbose)
 
-            # copy session inputs to session folder(s) for active session(s)
-            for s in range(0, batch.num_sessions()):
-                if batch.sessions[s].enabled:
-                    print('Bundling Session %d Files...' % s)
+            import copy
+
+            expanded_batch = copy.deepcopy(batch)
+            expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
+                os.path.splitext(options.batch_file)[1]
+
+            if not options.no_bundle:
+                batch.dataframe.loc['Batch Name'][0] = batch.name = datetime.now().strftime(
+                    "%Y_%m_%d_%H_%M_%S_") + batch.name
+
+            # validate session files
+            validate_folder(options.bundle_path_root)
+            options.batch_path = validate_folder(options.bundle_path_root, batch_name=batch.name)
+
+            if options.validate_batch:
+                # validate shared (batch) files
+                validate_file(options.batch_file)
+
+                sys.path.insert(0, os.getcwd())
+
+                for s in range(0, batch.num_sessions()):
                     session = batch.sessions[s]
-                    options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
-                                                           session_name=session.name)
+                    print("\nValidating Session %d ('%s') Files..." % (s, session.name))
 
-                    # indicate source batch
-                    if ':' in args.batch_file:
-                        # batch file path is absolute
-                        batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % args.batch_file
-                    else:
-                        # batch file path is relative
-                        batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (os.getcwd() + os.sep + args.batch_file)
-
-                    # automatically rename and relocate source files
+                    # automatically validate files and folders based on parameter naming convention
                     for i in batch.dataframe.index:
+                        if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
+                            print('validating %s=%s' % (i, session.read_parameter(i)))
                         if str(i).endswith(' Folder Name'):
-                            if options.verbose:
-                                print('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
-                                                             session.name + os.sep + batch.dataframe.loc[i][
-                                                                 session.num]))
-                            batch.dataframe.loc[i][session.num] = \
-                                session.name + os.sep + batch.dataframe.loc[i][session.num]
+                            validate_folder(session.read_parameter(i))
                         elif str(i).endswith(' File'):
-                            if options.verbose:
-                                print('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
-                                                               options.session_path + session.read_parameter(i)))
-                            batch.dataframe.loc[i][session.num] = \
-                                session.name + os.sep + relocate_file(options.session_path, session.read_parameter(i))
+                            validate_file(session.read_parameter(i))
 
-        import time
+                    print('Validating Session %d Parameters...' % s)
+                    session.init(validate_only=True)
 
-        time.sleep(5)  # was 10, wait for files to fully transfer...
+            print("\n*** validation complete ***")
 
-        os.chdir(options.batch_path)
+            # copy files to network_batch_path
+            if not options.no_bundle:
+                print('Bundling Source File...')
+                # copy this file to batch folder
+                # relocate_file(options.batch_path, __file__)
 
-        remote_batchfile = batch.name + '.csv'
-        batch.dataframe.to_csv(remote_batchfile)
+                source_files = [fn for fn in os.listdir('usepa_omega2') if '.py' in fn]
+                validate_folder(options.batch_path + 'usepa_omega2/')
+                for f in source_files:
+                    relocate_file(options.batch_path + 'usepa_omega2/', 'usepa_omega2/' + f)
 
-        print("Batch name = " + batch.name)
+                source_files = [fn for fn in os.listdir('usepa_omega2/consumer') if '.py' in fn]
+                validate_folder(options.batch_path + 'usepa_omega2/consumer/')
+                for f in source_files:
+                    relocate_file(options.batch_path + 'usepa_omega2/consumer/', 'usepa_omega2/consumer/' + f)
 
-        if options.session_num is None:
-            session_list = range(0, batch.num_sessions())
-        else:
-            session_list = [options.session_num]
+                # write a copy of the expanded, validated batch to the source batch_file directory:
+                if options.batch_file.__contains__('.csv'):
+                    expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name)
+                else:
+                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name,
+                                                      "Sessions")
 
-        if not options.no_sim:
-            if options.dispy:  # run remote job on cluster
-                retry_count = dict()  # track retry attempts for terminated or abandoned jobs
+                # copy session inputs to session folder(s) for active session(s)
+                for s in range(0, batch.num_sessions()):
+                    if batch.sessions[s].enabled:
+                        print('Bundling Session %d Files...' % s)
+                        session = batch.sessions[s]
+                        options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
+                                                               session_name=session.name)
 
-                dispycluster = DispyCluster(options.dispy_scheduler)
-                dispycluster.find_nodes()
-                dispycluster.submit_sessions(batch.name, options.bundle_path_root, options.batch_path + batch.name,
-                                             session_list)
-                print("*** batch complete ***")
-            else:  # run from here
-                batch = OMEGABatchObject()
-                print('REMOTE BATCHFILE = %s' % remote_batchfile)
-                batch.dataframe = pd.read_csv(remote_batchfile, index_col=0)
-                batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False},
-                                        inplace=True)
-                batch.dataframe.drop('Type', axis=1, inplace=True,
-                                     errors='ignore')  # drop Type column, no error if it's not there
-                batch.force_numeric_params()
-                batch.get_batch_settings()
-                batch.add_sessions(verbose=False)
+                        # indicate source batch
+                        if ':' in args.batch_file:
+                            # batch file path is absolute
+                            batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % args.batch_file
+                        else:
+                            # batch file path is relative
+                            batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (os.getcwd() + os.sep + args.batch_file)
 
-                # process sessions:
-                for s_index in session_list:
-                    print("Processing Session %d:" % s_index, end='')
-                    gui_comm("Running Session " + str(s_index + 1) + ' of ' + str(batch.num_sessions()) + '...')
+                        # automatically rename and relocate source files
+                        for i in batch.dataframe.index:
+                            if str(i).endswith(' Folder Name'):
+                                if options.verbose:
+                                    print('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
+                                                                 session.name + os.sep + batch.dataframe.loc[i][
+                                                                     session.num]))
+                                batch.dataframe.loc[i][session.num] = \
+                                    session.name + os.sep + batch.dataframe.loc[i][session.num]
+                            elif str(i).endswith(' File'):
+                                if options.verbose:
+                                    print('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
+                                                                   options.session_path + session.read_parameter(i)))
+                                batch.dataframe.loc[i][session.num] = \
+                                    session.name + os.sep + relocate_file(options.session_path, session.read_parameter(i))
 
-                    if not batch.sessions[s_index].enabled:
-                        print("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
-                        print('')
-                    else:
-                        batch.sessions[s_index].run()
+            import time
 
-    # sys.exit(0)
+            time.sleep(5)  # was 10, wait for files to fully transfer...
 
+            os.chdir(options.batch_path)
+
+            remote_batchfile = batch.name + '.csv'
+            batch.dataframe.to_csv(remote_batchfile)
+
+            print("Batch name = " + batch.name)
+
+            if options.session_num is None:
+                session_list = range(0, batch.num_sessions())
+            else:
+                session_list = [options.session_num]
+
+            if not options.no_sim:
+                if options.dispy:  # run remote job on cluster
+                    retry_count = dict()  # track retry attempts for terminated or abandoned jobs
+
+                    dispycluster = DispyCluster(options.dispy_scheduler)
+                    dispycluster.find_nodes()
+                    dispycluster.submit_sessions(batch.name, options.bundle_path_root, options.batch_path + batch.name,
+                                                 session_list)
+                    print("*** batch complete ***")
+                else:  # run from here
+                    batch = OMEGABatchObject()
+                    print('REMOTE BATCHFILE = %s' % remote_batchfile)
+                    batch.dataframe = pd.read_csv(remote_batchfile, index_col=0)
+                    batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False},
+                                            inplace=True)
+                    batch.dataframe.drop('Type', axis=1, inplace=True,
+                                         errors='ignore')  # drop Type column, no error if it's not there
+                    batch.force_numeric_params()
+                    batch.get_batch_settings()
+                    batch.add_sessions(verbose=False)
+
+                    # process sessions:
+                    for s_index in session_list:
+                        print("Processing Session %d:" % s_index, end='')
+                        gui_comm("Running Session " + str(s_index + 1) + ' of ' + str(batch.num_sessions()) + '...')
+
+                        if not batch.sessions[s_index].enabled:
+                            print("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
+                            print('')
+                        else:
+                            batch.sessions[s_index].run()
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

@@ -42,13 +42,18 @@ class ManufacturerAnnualData(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
 
-    from manufacturers import Manufacturer  # required by vehicles
+        from manufacturers import Manufacturer  # required by vehicles
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

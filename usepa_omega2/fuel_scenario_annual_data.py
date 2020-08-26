@@ -67,18 +67,26 @@ class FuelScenarioAnnualData(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
+        omega_log.init_logfile()
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
 
-    init_fail = []
-    init_fail = init_fail + FuelScenarioAnnualData.init_database_from_file(o2.options.fuel_scenario_annual_data_file,
-                                                                           verbose=o2.options.verbose)
+        init_fail = []
+        init_fail = init_fail + FuelScenarioAnnualData.init_database_from_file(o2.options.fuel_scenario_annual_data_file,
+                                                                               verbose=o2.options.verbose)
 
-    if not init_fail:
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        if not init_fail:
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
+        else:
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

@@ -65,7 +65,13 @@ if __name__ == "__main__":
             for f in source_files:
                 # cmd_str = 'venv\\Scripts\\python %s\\%s' % (source_folder, f)
                 console_file = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
-                cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file)
+
+                if f == 'run_omega_batch.py':
+                    cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose > %s' % \
+                              (source_folder, f, console_file)
+                else:
+                    cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file)
+
                 logwrite('TRYING %s' % cmd_str)
                 r = os.system(cmd_str)
                 if r == 0:
@@ -89,14 +95,14 @@ if __name__ == "__main__":
 
     finally:
         logwrite('TEST SUMMARY')
-        logwrite('-'*20 + ' PASSED ' + '-'*21)
+        logwrite('-'*20 + '%d PASSED ' % len(passed) + '-'*21)
         for c in passed:
             logwrite('%s PASSED' % c)
 
-        logwrite('-'*20 + ' UNKNOWN ' + '-'*20)
+        logwrite('-'*20 + '%d UNKNOWN ' % len(unknown) + '-'*20)
         for c in unknown:
             logwrite('%s UNKNOWN' % c)
 
-        logwrite('-'*20 + ' FAILED ' + '-'*21)
+        logwrite('-'*20 + '%d FAILED ' % len(failed) + '-'*21)
         for c in failed:
             logwrite('%s FAILED' % c)

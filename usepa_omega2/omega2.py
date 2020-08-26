@@ -286,4 +286,8 @@ def run_omega(o2_options):
 
 
 if __name__ == "__main__":
-    run_omega(OMEGARuntimeOptions())
+    try:
+        run_omega(OMEGARuntimeOptions())
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

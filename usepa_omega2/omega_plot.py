@@ -56,4 +56,10 @@ def fplotyyhg(x, y, ylinespec, y2, y2linespec):
 
 
 if __name__ == '__main__':
-    fig, ax = fplothg([1, 2, 3], [4, 5, 6], 'r-')
+    import os, traceback
+
+    try:
+        fig, ax = fplothg([1, 2, 3], [4, 5, 6], 'r-')
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

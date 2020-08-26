@@ -76,9 +76,6 @@ if __name__ == '__main__':
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-        print('#SUCCESS')
-        os._exit(0)
-
     except:
-        print('#FAIL')
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -117,22 +117,29 @@ class CostCurve(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
-    omega_log.init_logfile()
-    o2.options.cost_file = 'inputs_templates/cost_curves.csv'
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
+        omega_log.init_logfile()
+        o2.options.cost_file = 'input_templates/cost_curves.csv'
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
 
-    init_fail = []
-    init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail = []
+        init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
-    if not init_fail:
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        if not init_fail:
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-        print(CostCurve.get_cost(o2.session, 'ice_MPW_LRL', 2020, 100))
-        print(CostCurve.get_cost(o2.session, 'ice_MPW_LRL', 2020, [0, 100, 200, 300, 400, 500, 1000]))
+            print(CostCurve.get_cost('ice_MPW_LRL', 2020, 100))
+            print(CostCurve.get_cost('ice_MPW_LRL', 2020, [0, 100, 200, 300, 400, 500, 1000]))
+        else:
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

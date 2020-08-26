@@ -105,55 +105,62 @@ class GHGStandardFlat(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    o2.options.ghg_standards_file = 'input_templates\\ghg_standards-flat.csv'
-    init_omega_db()
-    omega_log.init_logfile()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        o2.options.ghg_standards_file = 'input_templates\\ghg_standards-flat.csv'
+        init_omega_db()
+        omega_log.init_logfile()
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
 
-    init_fail = []
-    init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
-                                                                    verbose=o2.options.verbose)
+        init_fail = []
+        init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
+                                                                        verbose=o2.options.verbose)
 
-    if not init_fail:
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        if not init_fail:
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-        o2.options.GHG_standard = GHGStandardFlat
+            o2.options.GHG_standard = GHGStandardFlat
 
-        class dummyVehicle:
-            model_year = None
-            reg_class_ID = None
-            initial_registered_count = None
+            class dummyVehicle:
+                model_year = None
+                reg_class_ID = None
+                initial_registered_count = None
 
-            def get_initial_registered_count(self):
-                return self.initial_registered_count
+                def get_initial_registered_count(self):
+                    return self.initial_registered_count
 
 
-        car_vehicle = dummyVehicle()
-        car_vehicle.model_year = 2021
-        car_vehicle.reg_class_ID = reg_classes.car
-        car_vehicle.initial_registered_count = 1
+            car_vehicle = dummyVehicle()
+            car_vehicle.model_year = 2021
+            car_vehicle.reg_class_ID = reg_classes.car
+            car_vehicle.initial_registered_count = 1
 
-        truck_vehicle = dummyVehicle()
-        truck_vehicle.model_year = 2021
-        truck_vehicle.reg_class_ID = reg_classes.truck
-        truck_vehicle.initial_registered_count = 1
+            truck_vehicle = dummyVehicle()
+            truck_vehicle.model_year = 2021
+            truck_vehicle.reg_class_ID = reg_classes.truck
+            truck_vehicle.initial_registered_count = 1
 
-        car_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
-        car_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
-        car_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
-                                                                         co2_gpmi_variants=[0, 50, 100, 150])
-        car_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
-                                                                               co2_gpmi_variants=[0, 50, 100, 150],
-                                                                               sales_variants=[1, 2, 3, 4])
+            car_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
+            car_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
+            car_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
+                                                                             co2_gpmi_variants=[0, 50, 100, 150])
+            car_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
+                                                                                   co2_gpmi_variants=[0, 50, 100, 150],
+                                                                                   sales_variants=[1, 2, 3, 4])
 
-        truck_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
-        truck_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)
-        truck_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
-        truck_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
-                                                                                 sales_variants=[1, 2, 3, 4])
+            truck_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
+            truck_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)
+            truck_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
+            truck_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                                     sales_variants=[1, 2, 3, 4])
+        else:
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

@@ -20,22 +20,24 @@ class VehicleAnnualData(SQABase):
     vmt = Column(Numeric)
     age = Column(Numeric)
 
-    def update_registered_count(vehicle_ID, calendar_year, registered_count):
-        from vehicles import Vehicle
+    @staticmethod
+    def update_registered_count(vehicle, calendar_year, registered_count):
 
-        age = calendar_year - o2.session.query(Vehicle.model_year).filter(Vehicle.vehicle_ID == vehicle_ID).scalar()
+        age = calendar_year - vehicle.model_year
 
-        o2.session.add(VehicleAnnualData(vehicle_ID=vehicle_ID,
-                                      calendar_year=calendar_year,
-                                      registered_count=registered_count,
-                                      age=age))
+        o2.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
+                                         calendar_year=calendar_year,
+                                         registered_count=registered_count,
+                                         age=age))
         o2.session.flush()
 
+    @staticmethod
     def get_registered_count(vehicle_ID, age):
         return float(o2.session.query(VehicleAnnualData.registered_count). \
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID). \
             filter(VehicleAnnualData.age==age).scalar())
 
+    @staticmethod
     def insert_vmt(vehicle_ID, calendar_year, annual_vmt):
         vmt = o2.session.query(VehicleAnnualData.registered_count).\
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID).\
@@ -48,16 +50,21 @@ class VehicleAnnualData(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
 
-    from manufacturers import Manufacturer  # required by vehicles
-    from fuels import Fuel  # required by vehicles
-    from market_classes import MarketClass  # required by vehicles
-    from vehicles import Vehicle  # for foreign key vehicle_ID
+        from manufacturers import Manufacturer  # required by vehicles
+        from fuels import Fuel  # required by vehicles
+        from market_classes import MarketClass  # required by vehicles
+        from vehicles import Vehicle  # for foreign key vehicle_ID
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

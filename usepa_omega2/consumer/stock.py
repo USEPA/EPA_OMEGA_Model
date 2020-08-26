@@ -97,7 +97,8 @@ def prior_year_stock_registered_count(calendar_year):
             filter(o2.options.stock_scrappage.market_class_ID == veh_market_class).\
             filter(o2.options.stock_scrappage.age == veh_age).scalar()
         new_count = vehicle_initial_sales * scrappage_factor
-        VehicleAnnualData.update_registered_count(vehicle_ID, calendar_year, new_count)
+        vehicle = o2.session.query(Vehicle).filter(Vehicle.vehicle_ID == vehicle_ID)
+        VehicleAnnualData.update_registered_count(vehicle, calendar_year, new_count)
 
 
 def prior_year_stock_vmt(calendar_year):
@@ -142,29 +143,34 @@ def age0_stock_vmt(calendar_year):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # from usepa_omega2 import *
-    # from usepa_omega2.manufacturers import Manufacturer  # required by vehicles
-    # from usepa_omega2.fuels import Fuel  # required by vehicles
-    # from usepa_omega2.market_classes import MarketClass  # required by vehicles
-    # # from vehicles import Vehicle  # for foreign key vehicle_ID
-    #
-    # fuels_file = 'EPA_OMEGA_MODEL/input_templates/fuels.csv'
-    # self.manufacturers_file = 'input_templates/manufacturers.csv'
-    # self.market_classes_file = 'input_templates/market_classes.csv'
-    # self.vehicles_file = 'input_templates/vehicles.csv'
-    #
-    # # session = Session(bind=engine)
-    # SQABase.metadata.create_all(engine)
-    #
-    # init_fail = []
-    # init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
-    # init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
-    # init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
-    #
-    # if not init_fail:
-    #     for yr in (o2_options.analysis_initial_year, o2_options.analysis_final_year + 1):
-    #         calc_stock_registered_count(session, yr)
-    #     dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+        # from usepa_omega2 import *
+        # from usepa_omega2.manufacturers import Manufacturer  # required by vehicles
+        # from usepa_omega2.fuels import Fuel  # required by vehicles
+        # from usepa_omega2.market_classes import MarketClass  # required by vehicles
+        # # from vehicles import Vehicle  # for foreign key vehicle_ID
+        #
+        # fuels_file = 'EPA_OMEGA_MODEL/input_templates/fuels.csv'
+        # self.manufacturers_file = 'input_templates/manufacturers.csv'
+        # self.market_classes_file = 'input_templates/market_classes.csv'
+        # self.vehicles_file = 'input_templates/vehicles.csv'
+        #
+        # # session = Session(bind=engine)
+        # SQABase.metadata.create_all(engine)
+        #
+        # init_fail = []
+        # init_fail = init_fail + MarketClass.init_database_from_file(o2_options.market_classes_file, session, verbose=o2_options.verbose)
+        # init_fail = init_fail + Fuel.init_database_from_file(o2_options.fuels_file, session, verbose=o2_options.verbose)
+        # init_fail = init_fail + Manufacturer.init_database_from_file(o2_options.manufacturers_file, session, verbose=o2_options.verbose)
+        #
+        # if not init_fail:
+        #     for yr in (o2_options.analysis_initial_year, o2_options.analysis_final_year + 1):
+        #         calc_stock_registered_count(session, yr)
+        #     dump_database_to_csv(engine, o2_options.database_dump_folder, verbose=o2_options.verbose)
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

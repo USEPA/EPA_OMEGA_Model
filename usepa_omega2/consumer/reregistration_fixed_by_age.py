@@ -55,24 +55,32 @@ class ReregistrationFixedByAge(SQABase):
 
 
 if __name__ == '__main__':
-    if '__file__' in locals():
-        print(fileio.get_filenameext(__file__))
+    try:
+        if '__file__' in locals():
+            print(fileio.get_filenameext(__file__))
 
-    # set up global variables:
-    o2.options = OMEGARuntimeOptions()
-    init_omega_db()
-    omega_log.init_logfile()
+        # set up global variables:
+        o2.options = OMEGARuntimeOptions()
+        init_omega_db()
+        omega_log.init_logfile()
 
-    from usepa_omega2.market_classes import MarketClass  # needed for market class ID
+        from usepa_omega2.market_classes import MarketClass  # needed for market class ID
 
-    SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(o2.engine)
 
-    init_fail = []
-    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                verbose=o2.options.verbose)
+        init_fail = []
+        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+                                                                    verbose=o2.options.verbose)
 
-    init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
-        o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
+        init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
+            o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
 
-    if not init_fail:
-        dump_omega_db_to_csv(o2.options.database_dump_folder)
+        if not init_fail:
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
+        else:
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
+
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)
