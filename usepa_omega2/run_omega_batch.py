@@ -580,7 +580,7 @@ class DispyCluster(object):
             print('Starting JobCluster...')
             self.cluster = dispy.JobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip,
                                             pulse_interval=60, reentrant=True,
-                                            ping_interval=10, loglevel=self.loglevel, depends=[sysprint, usepa_omega2],
+                                            ping_interval=10, loglevel=self.loglevel, depends=[sysprint],
                                             cluster_status=status_cb, callback=job_cb)
         else:
             print('Starting SharedJobCluster...')

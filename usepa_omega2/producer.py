@@ -445,9 +445,9 @@ def run_compliance_model():
 
             o2.session.add_all(manufacturer_new_vehicles)
             o2.session.flush()
-            age0_stock_vmt(calendar_year)
-            prior_year_stock_registered_count(calendar_year)
-            prior_year_stock_vmt(calendar_year)
+            # age0_stock_vmt(calendar_year)
+            # prior_year_stock_registered_count(calendar_year)
+            # prior_year_stock_vmt(calendar_year)
 
 
 if __name__ == '__main__':
