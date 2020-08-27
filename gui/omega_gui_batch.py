@@ -606,22 +606,25 @@ class Form(QObject):
         # omega2.terminate()
 
         # Prepare command line options for OMEGA2 batch process
+        batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         a = '--batch_file ' + '"' + input_batch_file + '"'
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
-        c = a + b
 
         if multiprocessor_mode_selected:
-            d = ' --dispy --local --dispy_exclusive --dispy_debug'
+            c = ' --dispy --local --dispy_exclusive --dispy_debug'
         else:
-            d = ''
+            c = ''
+        d = ' --timestamp ' + batch_time_stamp
+        print('*****', d)
 
-        c = c + d
+        x = a + b + c + d
+        print('*****', x)
 
         # --batch_file        inputs\phase0_default_batch_file.xlsx - -dispy - -local - -dispy_exclusive - -dispy_debug
 
         # Call OMEGA2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
-                                        c], close_fds=True)
+                                        x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         line_counter = 0
