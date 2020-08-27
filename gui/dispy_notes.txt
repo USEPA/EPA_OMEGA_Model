@@ -1,0 +1,2 @@
+psutil==5.7.2
+netifaces==0.10.9
