@@ -468,7 +468,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     subprocess.call(cmd)
 
     summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output', 'o2log_%s_%s.txt' % (batch_name, session_name))
-    sysprint('SFN=%s' % summary_filename)
+    # sysprint('SFN=%s' % summary_filename)
 
     time.sleep(1)  # wait for summary file to finish writing?
 
@@ -636,6 +636,7 @@ class runtime_options(object):
         self.session_num = []
         self.no_bundle = False
         self.verbose = False
+        self.timestamp = None
         self.dispy = False
         self.dispy_ping = False
         self.dispy_debug = False
@@ -661,6 +662,7 @@ if __name__ == '__main__':
         parser.add_argument('--no_bundle', action='store_true',
                             help='Do NOT gather and copy all source files to bundle_path')
         parser.add_argument('--verbose', action='store_true', help='True = enable verbose omega_batch messages)')
+        parser.add_argument('--timestamp', type=str, help='Timestamp string, overrides creating timestamp from system clock', default=None)
         parser.add_argument('--dispy', action='store_true', help='True = run sessions on dispynode(s)')
         parser.add_argument('--dispy_ping', action='store_true', help='True = ping dispynode(s)')
         parser.add_argument('--dispy_debug', action='store_true', help='True = enable verbose dispy debug messages)')
@@ -681,6 +683,7 @@ if __name__ == '__main__':
         options.session_num = args.session_num
         options.no_bundle = args.no_bundle # or args.dispy # or (options.bundle_path_root is not None)
         options.verbose = args.verbose
+        options.timestamp = args.timestamp
         options.dispy = args.dispy
         options.dispy_ping = args.dispy_ping
         options.dispy_debug = args.dispy_debug
@@ -731,8 +734,9 @@ if __name__ == '__main__':
                 os.path.splitext(options.batch_file)[1]
 
             if not options.no_bundle:
-                batch.dataframe.loc['Batch Name'][0] = batch.name = datetime.now().strftime(
-                    "%Y_%m_%d_%H_%M_%S_") + batch.name
+                if not options.timestamp:
+                    options.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+                batch.dataframe.loc['Batch Name'][0] = batch.name = options.timestamp + '_' + batch.name
 
             # validate session files
             validate_folder(options.bundle_path_root)
