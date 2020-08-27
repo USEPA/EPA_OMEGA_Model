@@ -46,7 +46,7 @@ def logwrite(message):
 
 
 if __name__ == "__main__":
-    import os, sys
+    import os, sys, subprocess
     import traceback
 
     sys.path.extend(['\\usepa_omega2', '\\usepa_omega2\\consumer'])
@@ -63,28 +63,42 @@ if __name__ == "__main__":
         for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer']:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
-                console_file = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
+                console_file_pathname = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
+
+                # if f == 'run_omega_batch.py':
+                #     cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose > %s' % \
+                #               (source_folder, f, console_file_pathname)
+                # else:
+                #     cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file_pathname)
+                #
+                # logwrite('TRYING %s' % cmd_str)
+                # r = os.system(cmd_str)
 
                 if f == 'run_omega_batch.py':
-                    cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose > %s' % \
-                              (source_folder, f, console_file)
+                    cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose' % \
+                              (source_folder, f)
                 else:
-                    cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file)
+                    cmd_str = 'python %s\\%s' % (source_folder, f)
+                with open(console_file_pathname, 'w+') as io:
+                    r = subprocess.run(cmd_str, stdout=io, stderr=io)
 
-                logwrite('TRYING %s' % cmd_str)
-                r = os.system(cmd_str)
+                import time
+                time.sleep(1)   # wait for console file to close??
+
+                r = r.returncode
+
                 if r == 0:
                     passed.append(cmd_str)
                     logwrite('%s PASSED' % cmd_str)
-                    os.system('RENAME %s PASSED_%s' % (console_file, f.replace('.py', '') + '.txt'))
+                    os.system('RENAME %s PASSED_%s' % (console_file_pathname, f.replace('.py', '') + '.txt'))
                 elif r == -1:
                     failed.append(cmd_str)
                     logwrite('%s FAILED' % cmd_str)
-                    os.system('RENAME %s FAILED_%s' % (console_file, f.replace('.py', '') + '.txt'))
+                    os.system('RENAME %s FAILED_%s' % (console_file_pathname, f.replace('.py', '') + '.txt'))
                 else:
                     unknown.append(cmd_str)
                     logwrite('%s UNKNOWN' % cmd_str)
-                    os.system('RENAME %s UNKNOWN_%s' % (console_file, f.replace('.py', '') + '.txt'))
+                    os.system('RENAME %s UNKNOWN_%s' % (console_file_pathname, f.replace('.py', '') + '.txt'))
                 logwrite('')
 
     except Exception as e:

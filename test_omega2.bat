@@ -1,3 +1,5 @@
+REM THIS DOES NOT WORK, FOR SOME REASON, FAILED MODULES GENERATE NO OUTPUT WHEN RUN FROM BATCH FILE
+set PATH=.\venv;.\venv\Scripts;%PATH%
 set PYTHONPATH=.;.\usepa_omega2
 
 python test_omega2.py
