@@ -49,7 +49,6 @@ if __name__ == "__main__":
     import os, sys, subprocess
     import traceback
 
-    sys.path.extend(['\\usepa_omega2', '\\usepa_omega2\\consumer'])
     validate_folder(test_omega2_output_folder)
     os.system('del %s\\*.* /Q' % test_omega2_output_folder)
 
@@ -60,32 +59,24 @@ if __name__ == "__main__":
         failed = []
         unknown = []
 
+        pythonpathstr = 'set PYTHONPATH=.;.\\usepa_omega2'
+        pythoncommand = 'python -u'
+
         for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer']:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
+
                 console_file_pathname = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
+                cmd_str = '%s & %s %s' % (pythonpathstr, pythoncommand, os.path.join(source_folder, f))
+                cmd_opts = ''
 
                 if f == 'run_omega_batch.py':
-                    cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose > %s' % \
-                              (source_folder, f, console_file_pathname)
-                else:
-                    cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file_pathname)
+                    cmd_opts = '--batch_file inputs\\phase0_default_batch_file.xlsx --verbose'
+
+                cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 
                 logwrite('TRYING %s' % cmd_str)
                 r = os.system(cmd_str)
-
-                # if f == 'run_omega_batch.py':
-                #     cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose' % \
-                #               (source_folder, f)
-                # else:
-                #     cmd_str = 'python %s\\%s' % (source_folder, f)
-                # with open(console_file_pathname, 'w+') as io:
-                #     r = subprocess.run(cmd_str, stdout=io, stderr=io)
-                #
-                # import time
-                # time.sleep(1)   # wait for console file to close??
-                #
-                # r = r.returncode
 
                 if r == 0:
                     passed.append(cmd_str)
@@ -103,8 +94,6 @@ if __name__ == "__main__":
 
     except Exception as e:
         logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-
-        logwrite('### test_omega2.py runtime fail ###')
 
     finally:
         logwrite('TEST SUMMARY')
