@@ -16,7 +16,7 @@ def init_logfile():
 
     fileio.validate_folder(o2.options.output_folder)
     o2.options.logfilename = '%s%s.txt' % (
-        o2.options.output_folder + o2.options.logfile_prefix, o2.options.session_name)
+        o2.options.output_folder + o2.options.logfile_prefix, o2.options.session_unique_name)
     log = open(o2.options.logfilename, 'w')
     log.write('OMEGA2 %s session %s started at %s %s\n\n' % (
         code_version, o2.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))

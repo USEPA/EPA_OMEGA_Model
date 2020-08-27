@@ -212,7 +212,8 @@ class OMEGASessionObject(object):
         else:
             self.settings.output_folder = self.output_path + "\\" + self.name
 
-        self.settings.session_name = self.parent.name + '_' + self.name
+        self.settings.session_name = self.name
+        self.settings.session_unique_name = self.parent.name + '_' + self.name
         self.settings.database_dump_folder = self.read_parameter('Database Dump Folder Name',
                                                                  default_value=self.settings.database_dump_folder)
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
@@ -262,7 +263,7 @@ class OMEGASessionObject(object):
     def run(self):
         self.init()
 
-        print("Starting Compliance Run...")
+        print("Starting Compliance Run %s ..." % self.name)
         run_omega(self.settings)
         # self.monitor()
 
@@ -475,11 +476,11 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
         with open(summary_filename, "r") as f_read:
             last_line = f_read.readlines()[-1]
         batch_path = os.path.join(network_batch_path_root, batch_name)
-        if last_line.__contains__('Session Complete'):
+        if 'Session Complete' in last_line:
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))
             sysprint('$$$ dispy_run_session Completed, Session %s $$$' % session_name)
             return True
-        elif last_line.__contains__('Session Fail'):
+        elif 'Session Fail' in last_line:
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '#FAIL_' + session_name))
             sysprint('?!? dispy_run_session Failed, Session %s ?!?' % session_name)
             return False
@@ -858,8 +859,8 @@ if __name__ == '__main__':
 
                     # process sessions:
                     for s_index in session_list:
-                        print("Processing Session %d:" % s_index, end='')
-                        gui_comm("Running Session " + str(s_index + 1) + ' of ' + str(batch.num_sessions()) + '...')
+                        print("Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name), end='')
+                        gui_comm('%s: Running ...' % batch.sessions[s_index].name)
 
                         if not batch.sessions[s_index].enabled:
                             print("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)

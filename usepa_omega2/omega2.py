@@ -20,8 +20,6 @@ def run_postproc():
     from vehicle_annual_data import VehicleAnnualData
     import pandas as pd
 
-    gui_comm('Post Processing...')
-
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
     cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
     cert_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all())
@@ -32,8 +30,8 @@ def run_postproc():
     fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, '.-')
     ax1.plot(calendar_years, cert_co2_Mg, '.-')
     label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
-    o2.options.session_name, total_cost_billions))
-    fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_name)
+    o2.options.session_unique_name, total_cost_billions))
+    fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_unique_name)
 
     bev_non_hauling_share_frac = sql_unpack_result(
         o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all())
@@ -46,9 +44,9 @@ def run_postproc():
     ax1.plot(calendar_years, ice_non_hauling_share_frac, '.-')
     ax1.plot(calendar_years, bev_hauling_share_frac, '.-')
     ax1.plot(calendar_years, ice_hauling_share_frac, '.-')
-    label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_name)
+    label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_unique_name)
     ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling'])
-    fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_name)
+    fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_unique_name)
 
     # cost/vehicle chart
     fig, ax1 = figure()
@@ -88,10 +86,10 @@ def run_postproc():
                                           filter(VehicleAnnualData.age == 0).scalar())
     ax1.plot(calendar_years, average_cost_data['total'])
 
-    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]', '%s\nAverage Vehicle Cost v Year' % o2.options.session_name)
+    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]', '%s\nAverage Vehicle Cost v Year' % o2.options.session_unique_name)
     ax1.set_ylim(15e3, 50e3)
     ax1.legend(average_cost_data.keys())
-    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_name)
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_unique_name)
 
     # g/mi chart
     fig, ax1 = figure()
@@ -132,10 +130,10 @@ def run_postproc():
     ax1.plot(calendar_years, average_co2_gpmi_data['total'])
 
     label_xyt(ax1, 'Year', 'Average Vehicle Cert CO2 [g/mi]',
-              '%s\nAverage Vehicle Cert CO2 g/mi v Year' % o2.options.session_name)
+              '%s\nAverage Vehicle Cert CO2 g/mi v Year' % o2.options.session_unique_name)
     ax1.set_ylim(0, 500)
     ax1.legend(average_co2_gpmi_data.keys())
-    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi' % o2.options.session_name)
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi' % o2.options.session_unique_name)
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = calendar_years
@@ -162,6 +160,7 @@ def run_postproc():
 
     return session_results
 
+
 def run_omega(o2_options, single_shot=False):
     import traceback
     import time
@@ -171,6 +170,8 @@ def run_omega(o2_options, single_shot=False):
     print('OMEGA2 greets you, version %s' % code_version)
     if '__file__' in locals():
         print('from %s with love' % fileio.get_filenameext(__file__))
+
+    print('run_omega(%s)' % o2_options.session_name)
 
     # set up global variables:
     o2.options = o2_options
@@ -259,17 +260,22 @@ def run_omega(o2_options, single_shot=False):
         if not init_fail:
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
+
+            gui_comm('%s: Post Processing ...' % o2.options.session_name)
+
             session_summary_results = run_postproc()
             session_summary_results = get_demanded_shares(session_summary_results)
-            session_summary_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
             if single_shot:
                 session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
             else:
-                if not os.access('all_sessions_summary_results.csv', os.F_OK):
-                    session_summary_results.to_csv('all_sessions_summary_results.csv', mode='w')
+                if not os.access('%s_summary_results.csv' % fileio.get_filename(os.getcwd()), os.F_OK):
+                    session_summary_results.to_csv(
+                        '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
                 else:
-                    session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a', header=False)
+                    session_summary_results.to_csv(
+                        '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a',
+                        header=False)
 
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 

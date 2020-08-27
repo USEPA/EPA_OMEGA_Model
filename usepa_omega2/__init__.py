@@ -39,6 +39,7 @@ try:
             import time
 
             self.session_name = 'OMEGA2 Demo'
+            self.session_unique_name = 'OMEGA2 Demo'
             self.verbose = True
             self.output_folder = 'output' + os.sep
             self.database_dump_folder = '__dump' + os.sep
