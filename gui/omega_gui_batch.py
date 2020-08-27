@@ -43,6 +43,8 @@ output_batch_directory = ""
 status_bar_message = "Ready"
 # Python dictionary containing contents of the configuration file
 scenario = ""
+# Multiprocessor flag
+multiprocessor_mode_selected = False
 # Logic elements for program control
 configuration_file_valid = False
 input_batch_file_valid = False
@@ -92,6 +94,7 @@ class Form(QObject):
         self.window.action_run_model.triggered.connect(self.run_model)
         self.window.action_documentation.triggered.connect(self.launch_documentation)
         self.window.action_about_omega.triggered.connect(self.launch_about)
+        self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -563,6 +566,7 @@ class Form(QObject):
         model_sound_start = 'gui/elements/model_start.mp3'
         model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
+        global multiprocessor_mode_selected
         # self.event_monitor("Start Model Run ...", "black", 'dt')
         status_bar_message = "Model Running ..."
         status_bar()
@@ -605,6 +609,15 @@ class Form(QObject):
         a = '--batch_file ' + '"' + input_batch_file + '"'
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
         c = a + b
+
+        if multiprocessor_mode_selected:
+            d = ' --dispy --local --dispy_exclusive --dispy_debug'
+        else:
+            d = ''
+
+        c = c + d
+
+        # --batch_file        inputs\phase0_default_batch_file.xlsx - -dispy - -local - -dispy_exclusive - -dispy_debug
 
         # Call OMEGA2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
@@ -672,6 +685,18 @@ class Form(QObject):
         # Stop timer process
         timer.stop()
 
+    def multiprocessor_mode(self):
+        """
+        Checks the status of the Multiprocessor checkbox
+        """
+        global multiprocessor_mode_selected
+        if self.window.multiprocessor_checkbox.isChecked():
+            self.event_monitor("Multi Processor Mode Selected", "black", 'dt')
+            multiprocessor_mode_selected = True
+        else:
+            self.event_monitor("Single Processor Mode Selected", "black", 'dt')
+            multiprocessor_mode_selected = False
+
     def enable_run_button(self, enable):
         """
         Enables and disables the run model button.
@@ -710,5 +735,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('gui/elements/omega_gui_v15.ui')
+    form = Form('gui/elements/omega_gui_v16.ui')
     sys.exit(app.exec_())
