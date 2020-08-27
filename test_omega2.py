@@ -55,12 +55,10 @@ if __name__ == "__main__":
     try:
         init_logfile()
 
-        passed = []
-        failed = []
-        unknown = []
-
         pythonpathstr = 'set PYTHONPATH=.;.\\usepa_omega2'
         pythoncommand = 'python -u'
+
+        results = {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}
 
         for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer']:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
@@ -79,17 +77,16 @@ if __name__ == "__main__":
                 r = os.system(cmd_str)
 
                 if r == 0:
-                    passed.append(cmd_str)
-                    logwrite('%s PASSED' % cmd_str)
-                    os.system('RENAME %s PASSED_%s' % (console_file_pathname, f.replace('.py', '') + '.txt'))
+                    result_status = 'PASSED'
                 elif r == -1:
-                    failed.append(cmd_str)
-                    logwrite('%s FAILED' % cmd_str)
-                    os.system('RENAME %s FAILED_%s' % (console_file_pathname, f.replace('.py', '') + '.txt'))
+                    result_status = 'FAILED'
                 else:
-                    unknown.append(cmd_str)
-                    logwrite('%s UNKNOWN' % cmd_str)
-                    os.system('RENAME %s UNKNOWN_%s' % (console_file_pathname, f.replace('.py', '') + '.txt'))
+                    result_status = 'UNKNOWN'
+
+                results[result_status].append(cmd_str)
+                logwrite('%s %s' % (cmd_str, result_status))
+                os.system('RENAME %s %s_%s' % (console_file_pathname, result_status, f.replace('.py', '') + '.txt'))
+
                 logwrite('')
 
     except Exception as e:
@@ -97,14 +94,7 @@ if __name__ == "__main__":
 
     finally:
         logwrite('TEST SUMMARY')
-        logwrite('-'*20 + '%d PASSED ' % len(passed) + '-'*21)
-        for c in passed:
-            logwrite('%s PASSED' % c)
-
-        logwrite('-'*20 + '%d UNKNOWN ' % len(unknown) + '-'*20)
-        for c in unknown:
-            logwrite('%s UNKNOWN' % c)
-
-        logwrite('-'*20 + '%d FAILED ' % len(failed) + '-'*21)
-        for c in failed:
-            logwrite('%s FAILED' % c)
+        for k, v in results.items():
+            logwrite('-'*20 + ' %d %s ' % (len(v), k) + '-'*20)
+            for c in v:
+                logwrite('%s %s' % (c, k))
