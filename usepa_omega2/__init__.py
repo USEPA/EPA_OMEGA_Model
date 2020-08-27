@@ -41,7 +41,7 @@ try:
             self.session_name = 'OMEGA2 Demo'
             self.verbose = True
             self.output_folder = 'output' + os.sep
-            self.database_dump_folder = '__dump'  + os.sep
+            self.database_dump_folder = '__dump' + os.sep
             self.manufacturers_file = 'input_templates/manufacturers.csv'
             self.market_classes_file = 'input_templates/market_classes.csv'
             self.vehicles_file = 'input_templates/vehicles.csv'

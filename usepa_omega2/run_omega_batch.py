@@ -468,14 +468,12 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     subprocess.call(cmd)
 
     summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output', 'o2log_%s_%s.txt' % (batch_name, session_name))
-    # sysprint('SFN=%s' % summary_filename)
 
     time.sleep(1)  # wait for summary file to finish writing?
 
     if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
-        f_read = open(summary_filename, "r")
-        last_line = f_read.readlines()[-1]
-        f_read.close()
+        with open(summary_filename, "r") as f_read:
+            last_line = f_read.readlines()[-1]
         batch_path = os.path.join(network_batch_path_root, batch_name)
         if last_line.__contains__('Session Complete'):
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))

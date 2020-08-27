@@ -162,7 +162,7 @@ def run_postproc():
 
     return session_results
 
-def run_omega(o2_options):
+def run_omega(o2_options, single_shot=False):
     import traceback
     import time
 
@@ -262,7 +262,15 @@ def run_omega(o2_options):
             session_summary_results = run_postproc()
             session_summary_results = get_demanded_shares(session_summary_results)
             session_summary_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
-            session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a') # ToDo: need to add check if file exists so that header is only written once
+
+            if single_shot:
+                session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
+            else:
+                if not os.access('all_sessions_summary_results.csv', os.F_OK):
+                    session_summary_results.to_csv('all_sessions_summary_results.csv', mode='w')
+                else:
+                    session_summary_results.to_csv('all_sessions_summary_results.csv', mode='a', header=False)
+
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             omega_log.end_logfile("\nSession Complete")
@@ -287,7 +295,7 @@ def run_omega(o2_options):
 
 if __name__ == "__main__":
     try:
-        run_omega(OMEGARuntimeOptions())
+        run_omega(OMEGARuntimeOptions(), single_shot=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
