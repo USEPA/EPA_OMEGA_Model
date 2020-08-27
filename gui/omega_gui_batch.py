@@ -625,13 +625,10 @@ class Form(QObject):
             c = ' --dispy --local --dispy_exclusive --dispy_debug'
         else:
             c = ''
+
         d = ' --timestamp ' + batch_time_stamp
-        print('*****', d)
 
         x = a + b + c + d
-        print('*****', x)
-
-        # --batch_file        inputs\phase0_default_batch_file.xlsx - -dispy - -local - -dispy_exclusive - -dispy_debug
 
         # Call OMEGA2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
@@ -640,8 +637,8 @@ class Form(QObject):
         # While the subprocess is running, output communication from the batch process to the event monitor
         line_counter = 0
         status_file = output_batch_subdirectory + '/comm_file.txt'
-        poll = None
-        while poll is None:
+        # poll = None
+        while omega_batch.poll() is None:
             time.sleep(1)
             poll = omega_batch.poll()
             # This command allows the GUI to catch up and repaint itself
