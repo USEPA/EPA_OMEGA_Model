@@ -4,14 +4,14 @@ from pathlib import Path
 
 def PHEVT_Consumer():
     path_code = Path(__file__).parent
-    path_project = Path(path_code).parent
-    path_inputs = path_project / 'inputs' / 'ma3t'
-    path_outputs = path_project / 'outputs' / 'ma3t'
-    YearOnMarket = np.loadtxt(path_inputs / 'tech_yearonmarket_allowEV300_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,6))
-    dBeta = np.loadtxt(path_inputs / 'consumer_beta.csv', delimiter=',', skiprows=0, usecols=range(1,136))
-    bDummyFlag = np.transpose(np.loadtxt(path_inputs / 'tech_nestheterogeneity_zeroH2andCI_20200728.csv', delimiter=',', skiprows=1, usecols=range(5,10)))
-    choiceNames = np.loadtxt(path_inputs / 'tech_choicenames_orig20190404.csv', delimiter=',', skiprows=0, usecols=range(1, 406), dtype=str)
-    generalizedcost = np.loadtxt(path_inputs / 'generalizedcosts_wPEVlearning_Same2050GeneralizedCosts_20200728.csv', delimiter=',', skiprows=1, usecols=range(1,47))
+    path_project = Path(path_code).parent.parent
+    path_inputs = path_project / 'input_templates' / 'ma3t' # ToDo: Getting the inputs from the templates directory is temporary for testing
+    path_outputs = path_project / 'output'
+    YearOnMarket = np.loadtxt(path_inputs / 'tech_yearonmarket_templatev001.csv', delimiter=',', skiprows=1, usecols=range(5,6))
+    dBeta = np.loadtxt(path_inputs / 'consumer_beta_templatev001.csv', delimiter=',', skiprows=0, usecols=range(1,136))
+    bDummyFlag = np.transpose(np.loadtxt(path_inputs / 'tech_nestheterogeneity_templatev001.csv', delimiter=',', skiprows=1, usecols=range(5,10)))
+    choiceNames = np.loadtxt(path_inputs / 'tech_choicenames_templatev001.csv', delimiter=',', skiprows=0, usecols=range(1, 406), dtype=str)
+    generalizedcost = np.loadtxt(path_inputs / 'generalizedcosts_templatev001.csv', delimiter=',', skiprows=1, usecols=range(1,47))
     # generalizedcostchoicenames = np.loadtxt(path_inputs + 'generalizedcosts.csv', delimiter=',', skiprows=1, usecols=range(0, 1), dtype=str)
     iNestLayerNum = 5
     iLastNestLayerIdx = iNestLayerNum - 1

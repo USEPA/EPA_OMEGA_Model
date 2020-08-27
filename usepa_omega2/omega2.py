@@ -193,7 +193,7 @@ def run_omega(o2_options):
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
     import consumer.sales as consumer
     import producer
-    from consumer.sales_gcam import get_demanded_shares
+    from consumer.sales_share_gcam import get_demanded_shares
 
     fileio.validate_folder(o2.options.output_folder)
 
