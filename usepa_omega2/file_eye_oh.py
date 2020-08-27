@@ -128,7 +128,7 @@ def gui_comm(text):
     # file1 = open("../comm_file.txt", "a")  # append mode
     # file1.close()
     # num_lines = sum(1 for line in open('../comm_file.txt'))
-    file1 = open("../comm_file.txt", "a")  # append mode
+    file1 = open("comm_file.txt", "a")  # append mode
     file1.write(text + " \n")
     # file1.write('line' + str(num_lines + 1) + " " + text + " \n")
     file1.close()

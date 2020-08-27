@@ -11,6 +11,7 @@
 import os
 import sys
 import subprocess
+import pandas
 
 import multitimer
 import time
@@ -39,6 +40,8 @@ configuration_file = ""
 input_batch_file = ""
 # Contains the directory path to the project directory
 output_batch_directory = ""
+# Contains the directory path to the project subdirectory
+output_batch_subdirectory = ""
 # Output to the status bar every timer cycle
 status_bar_message = "Ready"
 # Python dictionary containing contents of the configuration file
@@ -567,6 +570,7 @@ class Form(QObject):
         model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         global multiprocessor_mode_selected
+        global output_batch_subdirectory
         # self.event_monitor("Start Model Run ...", "black", 'dt')
         status_bar_message = "Model Running ..."
         status_bar()
@@ -586,15 +590,22 @@ class Form(QObject):
         # This call works but gui freezes until new process ends
         # os.system("python usepa_omega2/__main__.py")
 
+        excel_data_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
+        batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + excel_data_df.loc['Batch Name', 'Value']
+        print('*****', output_batch_subdirectory)
+
         # Delete contents of comm_file.txt used to communicate with other processes
         # and place the first line 'Start Model Run'
-        file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
+        path = output_batch_subdirectory
+        os.mkdir(path)
+        file1 = open(output_batch_subdirectory + "/comm_file.txt", "a")  # append mode
         file1.write("Today \n")
         file1.close()
-        file = open(output_batch_directory + "/comm_file.txt", "r+")
+        file = open(output_batch_subdirectory + "/comm_file.txt", "r+")
         file.truncate(0)
         file.close()
-        file1 = open(output_batch_directory + "/comm_file.txt", "a")  # append mode
+        file1 = open(output_batch_subdirectory + "/comm_file.txt", "a")  # append mode
         file1.write("Start Model Run \n")
         file1.close()
 
@@ -606,7 +617,7 @@ class Form(QObject):
         # omega2.terminate()
 
         # Prepare command line options for OMEGA2 batch process
-        batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        # batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         a = '--batch_file ' + '"' + input_batch_file + '"'
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
 
@@ -628,7 +639,7 @@ class Form(QObject):
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         line_counter = 0
-        status_file = output_batch_directory + '/comm_file.txt'
+        status_file = output_batch_subdirectory + '/comm_file.txt'
         poll = None
         while poll is None:
             time.sleep(1)
@@ -657,6 +668,8 @@ class Form(QObject):
         status_bar_message = "Ready"
         status_bar()
         self.window.progress_bar.setValue(100)
+
+        os.remove(status_file)
 
     def showbox(self, message_title, message):
         """
