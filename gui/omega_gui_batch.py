@@ -618,6 +618,7 @@ class Form(QObject):
         print('*****', d)
 
         x = a + b + c + d
+        print('*****', x)
 
         # --batch_file        inputs\phase0_default_batch_file.xlsx - -dispy - -local - -dispy_exclusive - -dispy_debug
 
