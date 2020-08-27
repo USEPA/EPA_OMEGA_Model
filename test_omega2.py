@@ -65,27 +65,27 @@ if __name__ == "__main__":
             for f in source_files:
                 console_file_pathname = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
 
-                # if f == 'run_omega_batch.py':
-                #     cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose > %s' % \
-                #               (source_folder, f, console_file_pathname)
-                # else:
-                #     cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file_pathname)
-                #
-                # logwrite('TRYING %s' % cmd_str)
-                # r = os.system(cmd_str)
-
                 if f == 'run_omega_batch.py':
-                    cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose' % \
-                              (source_folder, f)
+                    cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose > %s' % \
+                              (source_folder, f, console_file_pathname)
                 else:
-                    cmd_str = 'python %s\\%s' % (source_folder, f)
-                with open(console_file_pathname, 'w+') as io:
-                    r = subprocess.run(cmd_str, stdout=io, stderr=io)
+                    cmd_str = 'python %s\\%s > %s' % (source_folder, f, console_file_pathname)
 
-                import time
-                time.sleep(1)   # wait for console file to close??
+                logwrite('TRYING %s' % cmd_str)
+                r = os.system(cmd_str)
 
-                r = r.returncode
+                # if f == 'run_omega_batch.py':
+                #     cmd_str = 'python %s\\%s --batch_file inputs\phase0_default_batch_file.xlsx --verbose' % \
+                #               (source_folder, f)
+                # else:
+                #     cmd_str = 'python %s\\%s' % (source_folder, f)
+                # with open(console_file_pathname, 'w+') as io:
+                #     r = subprocess.run(cmd_str, stdout=io, stderr=io)
+                #
+                # import time
+                # time.sleep(1)   # wait for console file to close??
+                #
+                # r = r.returncode
 
                 if r == 0:
                     passed.append(cmd_str)
