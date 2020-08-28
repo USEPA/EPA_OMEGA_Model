@@ -243,11 +243,11 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
 
 def main():
     path_cwd = Path.cwd()
-    path_project = path_cwd.parent
-    path_inputs = path_project.joinpath('inputs')
-    path_alpha_inputs = path_inputs.joinpath('ALPHA_ToyModel')
-    path_input_templates = path_project.joinpath('sample_inputs')
-    path_outputs = path_project.joinpath('outputs')
+    path_inputs = path_cwd / 'alpha_package_costs/alpha_package_costs_inputs'
+    path_alpha_inputs = Path('I:\Project\OMEGA2\O2_package_cost_test\ALPHA_ToyModel')
+    # path_alpha_inputs = path_cwd / 'inputs/ALPHA_ToyModel'
+    path_input_templates = path_cwd / 'sample_inputs'
+    path_outputs = path_cwd / 'alpha_package_costs/outputs'
     bev_wr_range = [x / 2 for x in range(0, 41, 1)]
 
     alpha_folders = [folder for folder in path_alpha_inputs.iterdir()]

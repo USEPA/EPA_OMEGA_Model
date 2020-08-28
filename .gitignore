@@ -8,6 +8,7 @@ outputs
 .pytest_cache
 .coverage
 input_templates/.*
+alpha_package_costs/outputs
 
 # Distribution / packaging
 .Python
