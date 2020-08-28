@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 cmd_opts = ''
 
                 if f == 'run_omega_batch.py':
-                    cmd_opts = '--batch_file inputs\\phase0_default_batch_file.xlsx --verbose'
+                    cmd_opts = '--batch_file sample_inputs\\single_session_batch.xlsx --verbose'
 
                 cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 

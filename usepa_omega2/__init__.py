@@ -43,15 +43,15 @@ try:
             self.verbose = True
             self.output_folder = 'output' + os.sep
             self.database_dump_folder = '__dump' + os.sep
-            self.manufacturers_file = 'input_templates/manufacturers.csv'
-            self.market_classes_file = 'input_templates/market_classes.csv'
-            self.vehicles_file = 'input_templates/vehicles.csv'
-            self.demanded_shares_file = 'input_templates/demanded_shares-gcam.csv'
-            self.fuels_file = 'input_templates/fuels.csv'
-            self.fuel_scenarios_file = 'input_templates/fuel_scenarios.csv'
-            self.fuel_scenario_annual_data_file = 'input_templates/fuel_scenario_annual_data.csv'
+            self.manufacturers_file = 'sample_inputs/manufacturers.csv'
+            self.market_classes_file = 'sample_inputs/market_classes.csv'
+            self.vehicles_file = 'sample_inputs/vehicles.csv'
+            self.demanded_shares_file = 'sample_inputs/demanded_shares-gcam.csv'
+            self.fuels_file = 'sample_inputs/fuels.csv'
+            self.fuel_scenarios_file = 'sample_inputs/fuel_scenarios.csv'
+            self.fuel_scenario_annual_data_file = 'sample_inputs/fuel_scenario_annual_data.csv'
             self.cost_file_type = 'curves'
-            self.cost_file = 'input_templates/cost_curves.csv'
+            self.cost_file = 'sample_inputs/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = None
@@ -61,17 +61,17 @@ try:
             self.consumer_calculate_generalized_cost = None
             self.GHG_standard = 'flat'
             if self.GHG_standard == 'flat':
-                self.ghg_standards_file = 'input_templates/ghg_standards-flat.csv'
+                self.ghg_standards_file = 'sample_inputs/ghg_standards-flat.csv'
             else:
-                self.ghg_standards_file = 'input_templates/ghg_standards-footprint.csv'
+                self.ghg_standards_file = 'sample_inputs/ghg_standards-footprint.csv'
             self.stock_scrappage = 'fixed'
             self.stock_vmt = 'fixed'
             if self.stock_scrappage == 'fixed':
-                self.reregistration_fixed_by_age_file = 'input_templates/reregistration_fixed_by_age.csv'
+                self.reregistration_fixed_by_age_file = 'sample_inputs/reregistration_fixed_by_age.csv'
             else:
                 pass
             if self.stock_vmt == 'fixed':
-                self.annual_vmt_fixed_by_age_file = 'input_templates/annual_vmt_fixed_by_age.csv'
+                self.annual_vmt_fixed_by_age_file = 'sample_inputs/annual_vmt_fixed_by_age.csv'
             else:
                 pass
             self.slice_tech_combo_cloud_tables = False

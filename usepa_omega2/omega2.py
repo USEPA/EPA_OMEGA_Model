@@ -261,7 +261,8 @@ def run_omega(o2_options, single_shot=False):
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
 
-            gui_comm('%s: Post Processing ...' % o2.options.session_name)
+            if not single_shot:
+                gui_comm('%s: Post Processing ...' % o2.options.session_name)
 
             session_summary_results = run_postproc()
             session_summary_results = get_demanded_shares(session_summary_results)

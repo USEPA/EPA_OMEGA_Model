@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         o2.options = OMEGARuntimeOptions()
-        o2.options.ghg_standards_file = 'input_templates\\ghg_standards-flat.csv'
+        o2.options.ghg_standards_file = 'sample_inputs\\ghg_standards-flat.csv'
         init_omega_db()
         omega_log.init_logfile()
 

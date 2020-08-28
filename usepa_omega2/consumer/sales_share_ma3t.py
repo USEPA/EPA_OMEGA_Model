@@ -5,7 +5,7 @@ from pathlib import Path
 def PHEVT_Consumer():
     path_code = Path(__file__).parent
     path_project = Path(path_code).parent.parent
-    path_inputs = path_project / 'input_templates' / 'ma3t' # ToDo: Getting the inputs from the templates directory is temporary for testing
+    path_inputs = path_project / 'sample_inputs' / 'ma3t' # ToDo: Getting the inputs from the templates directory is temporary for testing
     path_outputs = path_project / 'output'
     YearOnMarket = np.loadtxt(path_inputs / 'tech_yearonmarket_templatev001.csv', delimiter=',', skiprows=1, usecols=range(5,6))
     dBeta = np.loadtxt(path_inputs / 'consumer_beta_templatev001.csv', delimiter=',', skiprows=0, usecols=range(1,136))

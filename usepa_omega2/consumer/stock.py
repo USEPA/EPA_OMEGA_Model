@@ -153,10 +153,10 @@ if __name__ == '__main__':
         # from usepa_omega2.market_classes import MarketClass  # required by vehicles
         # # from vehicles import Vehicle  # for foreign key vehicle_ID
         #
-        # fuels_file = 'EPA_OMEGA_MODEL/input_templates/fuels.csv'
-        # self.manufacturers_file = 'input_templates/manufacturers.csv'
-        # self.market_classes_file = 'input_templates/market_classes.csv'
-        # self.vehicles_file = 'input_templates/vehicles.csv'
+        # fuels_file = 'EPA_OMEGA_MODEL/sample_inputs/fuels.csv'
+        # self.manufacturers_file = 'sample_inputs/manufacturers.csv'
+        # self.market_classes_file = 'sample_inputs/market_classes.csv'
+        # self.vehicles_file = 'sample_inputs/vehicles.csv'
         #
         # # session = Session(bind=engine)
         # SQABase.metadata.create_all(engine)

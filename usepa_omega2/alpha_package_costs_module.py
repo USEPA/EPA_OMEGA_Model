@@ -246,7 +246,7 @@ def main():
     path_project = path_cwd.parent
     path_inputs = path_project.joinpath('inputs')
     path_alpha_inputs = path_inputs.joinpath('ALPHA_ToyModel')
-    path_input_templates = path_project.joinpath('input_templates')
+    path_input_templates = path_project.joinpath('sample_inputs')
     path_outputs = path_project.joinpath('outputs')
     bev_wr_range = [x / 2 for x in range(0, 41, 1)]
 
