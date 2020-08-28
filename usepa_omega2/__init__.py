@@ -40,7 +40,7 @@ try:
 
             self.session_name = 'OMEGA2 Demo'
             self.session_unique_name = 'OMEGA2 Demo'
-            self.verbose = True
+            self.verbose = False
             self.output_folder = 'output' + os.sep
             self.database_dump_folder = '__dump' + os.sep
             self.manufacturers_file = 'sample_inputs/manufacturers.csv'
@@ -76,7 +76,7 @@ try:
                 pass
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
-            self.num_tech_options_per_vehicle = 5
+            self.num_tech_options_per_vehicle = 15
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0
             self.end_time = 0

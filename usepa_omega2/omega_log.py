@@ -30,6 +30,7 @@ def end_logfile(message):
     import datetime
     logwrite('Session ended at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
     logwrite('\nElapsed Time %.2f Seconds' % elapsed_time)
+    print('\nElapsed Time %.2f Seconds' % elapsed_time)
     logwrite(message, terminator='')
 
 

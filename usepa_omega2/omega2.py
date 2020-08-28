@@ -302,7 +302,22 @@ def run_omega(o2_options, single_shot=False):
 
 if __name__ == "__main__":
     try:
-        run_omega(OMEGARuntimeOptions(), single_shot=True)
+        import cProfile
+        import re
+
+        # pr = cProfile.run('run_omega(OMEGARuntimeOptions(), single_shot=True)')
+        # pr.dump_stats('stats.txt')
+
+        with cProfile.Profile() as pr:
+            run_omega(OMEGARuntimeOptions(), single_shot=True)
+
+        pr.print_stats()
+        pr.dump_stats('stats.txt')
+
+        # cProfile.run('run_omega(OMEGARuntimeOptions(), single_shot=True)', sort='cumulative')
+        # cProfile.run('run_omega(OMEGARuntimeOptions(), single_shot=True)', sort='time')
+
+        # run_omega(OMEGARuntimeOptions(), single_shot=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

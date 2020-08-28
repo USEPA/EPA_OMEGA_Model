@@ -115,7 +115,6 @@ def run_compliance_model():
     from manufacturers import Manufacturer
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
-    from cost_curves import CostCurve
     from consumer.stock import prior_year_stock_registered_count, prior_year_stock_vmt, age0_stock_vmt
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
@@ -189,199 +188,17 @@ def run_compliance_model():
                                     sql_format_value_list_str(zip(*ms_values))))
 
             # create tech package options, for each vehicle
-            new_vehicle_co2_dict = dict()
-            for new_veh in manufacturer_new_vehicles:
-                new_vehicles_by_hauling_class[new_veh.hauling_class][new_veh.fueling_class].append(new_veh)
-                tech_table_name = 'tech_options_veh_%d_%d' % (new_veh.vehicle_ID, new_veh.model_year)
-                vehicle_tables[new_veh.hauling_class].append(tech_table_name)
-                tech_table_co2_gpmi_col = 'veh_%d_co2_gpmi' % new_veh.vehicle_ID
-                tech_table_cost_dollars = 'veh_%d_cost_dollars' % new_veh.vehicle_ID
-                if o2.options.allow_backsliding:
-                    max_co2_gpmi = CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year)
-                else:
-                    max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
-                co2_gpmi_options = np.linspace(
-                    CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
-                    max_co2_gpmi,
-                    num=num_tech_options).tolist()
-                tech_cost_options = CostCurve.get_cost(cost_curve_class=new_veh.cost_curve_class,
-                                                       model_year=new_veh.model_year,
-                                                       target_co2_gpmi=co2_gpmi_options)
-                o2.session.execute('CREATE TABLE %s (%s FLOAT, %s FLOAT)' % (tech_table_name,
-                                                                             tech_table_co2_gpmi_col,
-                                                                             tech_table_cost_dollars))
-                o2.session.execute('INSERT INTO %s VALUES %s' %
-                                   (tech_table_name,
-                                    sql_format_value_list_str(zip(co2_gpmi_options, tech_cost_options))))
-
-                tech_table_columns[new_veh.hauling_class].add(tech_table_co2_gpmi_col)
-                tech_table_columns[new_veh.hauling_class].add(tech_table_cost_dollars)
-                new_vehicle_co2_dict[new_veh] = tech_table_co2_gpmi_col
+            new_vehicle_co2_dict = create_vehicle_tech_options(manufacturer_new_vehicles, new_vehicles_by_hauling_class,
+                                                               num_tech_options, tech_table_columns, vehicle_tables)
 
             # combine tech package options, by hauling class
-            for hc in hauling_classes:
-                tech_combo_table_name = 'tech_combos_%d_%s' % (calendar_year, sql_valid_name(hc))
-                vehicle_combo_tables[hc].append(tech_combo_table_name)
-                o2.session.execute(
-                    'CREATE TABLE %s AS SELECT %s FROM %s' % (tech_combo_table_name,
-                                                              sql_format_list_str(tech_table_columns[hc]),  # TODO: convert to sql_get_column_names()?
-                                                              sql_format_list_str(vehicle_tables[hc])  # TODO: convert to sql_get_column_names()?
-                                                              ))
-                # combine tech combos with bev shares
-                tech_share_combos_table_name = 'tech_share_combos_%d_%s' % (calendar_year, sql_valid_name(hc))
-                vehicle_combo_tables[hc].append(tech_share_combos_table_name)
-                o2.session.execute(
-                    'CREATE TABLE %s AS SELECT %s, %s FROM %s, %s_shares' %
-                    (tech_share_combos_table_name,
-                     sql_get_column_names(tech_combo_table_name),
-                     sql_get_column_names('%s_shares' % sql_valid_name(hc)),
-                     tech_combo_table_name, sql_valid_name(hc)
-                     ))
+            create_tech_combos_by_hauling_class(calendar_year, market_share_groups, market_shares_frac,
+                                                new_vehicles_by_hauling_class, tech_table_columns, vehicle_combo_tables,
+                                                vehicle_tables)
 
-                # set market share sales
-                for ms in market_shares_frac[hc]:
-                    o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_sales FLOAT' %
-                                       (tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
-                    o2.session.execute('UPDATE %s SET %s_%s_sales=%s_%s_share_frac*%f' % (
-                        tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc), sql_valid_name(ms), sql_valid_name(hc),
-                        consumer.sales.demand_sales(calendar_year)[hc]))
+            create_tech_share_combos_total(calendar_year)
 
-                    # tally up costs by market share
-                    veh_prefixes_by_ms = ['veh_' + str(v.vehicle_ID) for v in
-                                                new_vehicles_by_hauling_class[hc][ms]]
-                    # TODO: instead of (veh_6_cost_dollars*bev_sales) should be (veh_6_cost_dollars*veh_6_segment_share*bev_sales) or something, if there is more than one veh in the segment
-                    # TODO: then sum up vehicle costs into market share costs, instead of assuming one vehicle per segment (unless we always aggregate...)
-                    cost_str = '('
-                    for veh_prefix in veh_prefixes_by_ms:
-                        cost_str = cost_str + veh_prefix + '_cost_dollars*%s_%s_sales' % (sql_valid_name(ms), sql_valid_name(hc)) + '+'
-                    cost_str = cost_str[:-1]
-                    cost_str = cost_str + ')'
-                    for veh_prefix in veh_prefixes_by_ms:
-                        o2.session.execute('ALTER TABLE %s ADD COLUMN %s_total_cost_dollars' %
-                                           (tech_share_combos_table_name, veh_prefix))
-                        o2.session.execute('UPDATE %s SET %s_total_cost_dollars=%s' %
-                                           (tech_share_combos_table_name, veh_prefix, cost_str))
-                    # tally up vehicle costs by market segment
-                    cost_str = ''
-                    for veh_prefix in veh_prefixes_by_ms:
-                        cost_str = cost_str + '%s_total_cost_dollars+' % veh_prefix
-                    cost_str = cost_str[:-1]
-                    o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_cost_dollars' %
-                                       (tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
-                    o2.session.execute('UPDATE %s SET %s_%s_cost_dollars=%s' % (
-                        tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc), cost_str))
-
-                    # calc cert and target Mg for each vehicle CO2 g/mi
-                    for veh, veh_prefix in zip(new_vehicles_by_hauling_class[hc][ms], veh_prefixes_by_ms):
-                        sales = sql_unpack_result(o2.session.query('%s_%s_sales FROM %s' % (sql_valid_name(ms), sql_valid_name(hc), tech_share_combos_table_name)).all())
-                        co2_gpmi = sql_unpack_result(o2.session.query('%s_co2_gpmi FROM %s' % (veh_prefix, tech_share_combos_table_name)).all())
-                        cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(veh, co2_gpmi_variants=co2_gpmi, sales_variants=sales)
-                        target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(veh, sales_variants=sales)
-
-                        combo_data = o2.session.execute('SELECT * FROM %s' % tech_share_combos_table_name).fetchall()
-                        new_data = [(*c, cm, tm) for c, cm, tm in zip(combo_data, cert_co2_Mg, target_co2_Mg)]
-                        o2.session.execute('DELETE FROM %s' % tech_share_combos_table_name)
-
-                        o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_cert_co2_megagrams FLOAT' % (
-                            tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
-                        o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_target_co2_megagrams FLOAT' % (
-                            tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
-
-                        o2.session.execute('INSERT INTO %s VALUES %s' % (tech_share_combos_table_name, sql_format_value_list_str(new_data)))
-
-                combo_str = ''
-                for ms in market_share_groups[hc]:
-                    combo_str = combo_str + '%s_%s_cost_dollars+' % (sql_valid_name(ms), sql_valid_name(hc))
-                combo_str = combo_str[:-1]
-                # tally up total market segment combo cost
-                o2.session.execute('ALTER TABLE %s ADD COLUMN %s_combo_cost_dollars' %
-                                   (tech_share_combos_table_name, sql_valid_name(hc)))
-                o2.session.execute('UPDATE %s SET %s_combo_cost_dollars=%s' %
-                                   (tech_share_combos_table_name, sql_valid_name(hc), combo_str))
-
-                combo_str = ''
-                for ms in market_share_groups[hc]:
-                    combo_str = combo_str + '%s_%s_cert_co2_megagrams+' % (sql_valid_name(ms), sql_valid_name(hc))
-                combo_str = combo_str[:-1]
-                # tally up total market segment Mg
-                o2.session.execute('ALTER TABLE %s ADD COLUMN %s_combo_cert_co2_megagrams' %
-                                   (tech_share_combos_table_name, sql_valid_name(hc)))
-                o2.session.execute('UPDATE %s SET %s_combo_cert_co2_megagrams=%s' %
-                                   (tech_share_combos_table_name, sql_valid_name(hc), combo_str))
-
-                combo_str = ''
-                for ms in market_share_groups[hc]:
-                    combo_str = combo_str + '%s_%s_target_co2_megagrams+' % (sql_valid_name(ms), sql_valid_name(hc))
-                combo_str = combo_str[:-1]
-                # tally up total market segment Mg
-                o2.session.execute('ALTER TABLE %s ADD COLUMN %s_combo_target_co2_megagrams' %
-                                   (tech_share_combos_table_name, sql_valid_name(hc)))
-                o2.session.execute('UPDATE %s SET %s_combo_target_co2_megagrams=%s' %
-                                   (tech_share_combos_table_name, sql_valid_name(hc), combo_str))
-
-                # remove duplicate Mg outcomes and costs
-                # (this cuts down on the full factorial combinations by a significant amount)
-                # TODO: there's a SQL way to do this, involving partitioning data and assigning row numbers,
-                #  but I couldn't understand it
-                megagrams_set = set()
-                unique_data = []
-                res = o2.session.execute('SELECT %s_combo_cert_co2_megagrams, %s_combo_cost_dollars, * FROM %s' %
-                                         (sql_valid_name(hc), sql_valid_name(hc),
-                                          tech_share_combos_table_name)).fetchall()
-                for r in res:
-                    combo_cert_co2_megagrams = r['%s_combo_cert_co2_megagrams' % sql_valid_name(hc)]
-                    combo_cost_dollars = r['%s_combo_cost_dollars' % sql_valid_name(hc)]
-                    combo_data = r[2:]
-                    if (combo_cert_co2_megagrams, combo_cost_dollars) not in megagrams_set:
-                        megagrams_set.add((combo_cert_co2_megagrams, combo_cost_dollars))
-                        unique_data.append(combo_data)
-                # clear table
-                o2.session.execute('DELETE FROM %s' % tech_share_combos_table_name)
-                # toss unique data back in
-                for ud in unique_data:
-                    o2.session.execute('INSERT INTO %s (%s) VALUES %s' %
-                                       (tech_share_combos_table_name,
-                                        sql_get_column_names(tech_share_combos_table_name),
-                                        ud))
-
-            # if False:
-            o2.session.execute(
-                'CREATE TABLE tech_share_combos_total_%d AS SELECT %s, %s FROM tech_share_combos_%d_hauling, \
-                    tech_share_combos_%d_non_hauling' % (
-                    calendar_year,
-                    sql_get_column_names('tech_share_combos_%d_hauling' % calendar_year),
-                    sql_get_column_names('tech_share_combos_%d_non_hauling' % calendar_year),
-                    calendar_year, calendar_year))
-
-            # add up cert Mg
-            o2.session.execute(
-                'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_cert_co2_megagrams' % calendar_year)
-            o2.session.execute(
-                'UPDATE tech_share_combos_total_%d SET \
-                    total_combo_cert_co2_megagrams=non_hauling_combo_cert_co2_megagrams+hauling_combo_cert_co2_megagrams' %
-                calendar_year)
-
-            # add up target Mg
-            o2.session.execute(
-                'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_target_co2_megagrams' % calendar_year)
-            o2.session.execute(
-                'UPDATE tech_share_combos_total_%d SET \
-                    total_combo_target_co2_megagrams=non_hauling_combo_target_co2_megagrams+hauling_combo_target_co2_megagrams' %
-                calendar_year)
-
-            # calculate credits (positive = under target... for now anyway... not sure the convention)
-            o2.session.execute(
-                'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_credits_co2_megagrams' % calendar_year)
-            o2.session.execute(
-                'UPDATE tech_share_combos_total_%d SET \
-                    total_combo_credits_co2_megagrams=total_combo_target_co2_megagrams-total_combo_cert_co2_megagrams' %
-                calendar_year)
-
-            o2.session.execute(
-                'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_cost_dollars' % calendar_year)
-            o2.session.execute(
-                'UPDATE tech_share_combos_total_%d SET \
-                total_combo_cost_dollars=non_hauling_combo_cost_dollars+hauling_combo_cost_dollars' % calendar_year)
+            calculate_compliance_outcomes(calendar_year)
 
             # TODO: pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0... or minimum...??)
             sel = 'SELECT * FROM tech_share_combos_total_%d WHERE ' \
@@ -448,6 +265,222 @@ def run_compliance_model():
             # age0_stock_vmt(calendar_year)
             # prior_year_stock_registered_count(calendar_year)
             # prior_year_stock_vmt(calendar_year)
+
+
+def create_vehicle_tech_options(manufacturer_new_vehicles, new_vehicles_by_hauling_class, num_tech_options,
+                                tech_table_columns, vehicle_tables):
+    from cost_curves import CostCurve
+
+    new_vehicle_co2_dict = dict()
+    for new_veh in manufacturer_new_vehicles:
+        new_vehicles_by_hauling_class[new_veh.hauling_class][new_veh.fueling_class].append(new_veh)
+        tech_table_name = 'tech_options_veh_%d_%d' % (new_veh.vehicle_ID, new_veh.model_year)
+        vehicle_tables[new_veh.hauling_class].append(tech_table_name)
+        tech_table_co2_gpmi_col = 'veh_%d_co2_gpmi' % new_veh.vehicle_ID
+        tech_table_cost_dollars = 'veh_%d_cost_dollars' % new_veh.vehicle_ID
+        if o2.options.allow_backsliding:
+            max_co2_gpmi = CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year)
+        else:
+            max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
+        co2_gpmi_options = np.linspace(
+            CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+            max_co2_gpmi,
+            num=num_tech_options).tolist()
+        tech_cost_options = CostCurve.get_cost(cost_curve_class=new_veh.cost_curve_class,
+                                               model_year=new_veh.model_year,
+                                               target_co2_gpmi=co2_gpmi_options)
+        o2.session.execute('CREATE TABLE %s (%s FLOAT, %s FLOAT)' % (tech_table_name,
+                                                                     tech_table_co2_gpmi_col,
+                                                                     tech_table_cost_dollars))
+        o2.session.execute('INSERT INTO %s VALUES %s' %
+                           (tech_table_name,
+                            sql_format_value_list_str(zip(co2_gpmi_options, tech_cost_options))))
+
+        tech_table_columns[new_veh.hauling_class].add(tech_table_co2_gpmi_col)
+        tech_table_columns[new_veh.hauling_class].add(tech_table_cost_dollars)
+        new_vehicle_co2_dict[new_veh] = tech_table_co2_gpmi_col
+    return new_vehicle_co2_dict
+
+
+def create_tech_combos_by_hauling_class(calendar_year, market_share_groups, market_shares_frac,
+                                        new_vehicles_by_hauling_class, tech_table_columns, vehicle_combo_tables,
+                                        vehicle_tables):
+    for hc in hauling_classes:
+        tech_combo_table_name = 'tech_combos_%d_%s' % (calendar_year, sql_valid_name(hc))
+        vehicle_combo_tables[hc].append(tech_combo_table_name)
+        o2.session.execute(
+            'CREATE TABLE %s AS SELECT %s FROM %s' % (tech_combo_table_name,
+                                                      sql_format_list_str(tech_table_columns[hc]),
+                                                      # TODO: convert to sql_get_column_names()?
+                                                      sql_format_list_str(vehicle_tables[hc])
+                                                      # TODO: convert to sql_get_column_names()?
+                                                      ))
+        # combine tech combos with bev shares
+        tech_share_combos_table_name = 'tech_share_combos_%d_%s' % (calendar_year, sql_valid_name(hc))
+        vehicle_combo_tables[hc].append(tech_share_combos_table_name)
+        o2.session.execute(
+            'CREATE TABLE %s AS SELECT %s, %s FROM %s, %s_shares' %
+            (tech_share_combos_table_name,
+             sql_get_column_names(tech_combo_table_name),
+             sql_get_column_names('%s_shares' % sql_valid_name(hc)),
+             tech_combo_table_name, sql_valid_name(hc)
+             ))
+
+        # set market share sales
+        for ms in market_shares_frac[hc]:
+            o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_sales FLOAT' %
+                               (tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
+            o2.session.execute('UPDATE %s SET %s_%s_sales=%s_%s_share_frac*%f' % (
+                tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc), sql_valid_name(ms),
+                sql_valid_name(hc),
+                consumer.sales.demand_sales(calendar_year)[hc]))
+
+            # tally up costs by market share
+            veh_prefixes_by_ms = ['veh_' + str(v.vehicle_ID) for v in
+                                  new_vehicles_by_hauling_class[hc][ms]]
+            # TODO: instead of (veh_6_cost_dollars*bev_sales) should be (veh_6_cost_dollars*veh_6_segment_share*bev_sales) or something, if there is more than one veh in the segment
+            # TODO: then sum up vehicle costs into market share costs, instead of assuming one vehicle per segment (unless we always aggregate...)
+            cost_str = '('
+            for veh_prefix in veh_prefixes_by_ms:
+                cost_str = cost_str + veh_prefix + '_cost_dollars*%s_%s_sales' % (
+                sql_valid_name(ms), sql_valid_name(hc)) + '+'
+            cost_str = cost_str[:-1]
+            cost_str = cost_str + ')'
+            for veh_prefix in veh_prefixes_by_ms:
+                o2.session.execute('ALTER TABLE %s ADD COLUMN %s_total_cost_dollars' %
+                                   (tech_share_combos_table_name, veh_prefix))
+                o2.session.execute('UPDATE %s SET %s_total_cost_dollars=%s' %
+                                   (tech_share_combos_table_name, veh_prefix, cost_str))
+            # tally up vehicle costs by market segment
+            cost_str = ''
+            for veh_prefix in veh_prefixes_by_ms:
+                cost_str = cost_str + '%s_total_cost_dollars+' % veh_prefix
+            cost_str = cost_str[:-1]
+            o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_cost_dollars' %
+                               (tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
+            o2.session.execute('UPDATE %s SET %s_%s_cost_dollars=%s' % (
+                tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc), cost_str))
+
+            # calc cert and target Mg for each vehicle CO2 g/mi
+            for veh, veh_prefix in zip(new_vehicles_by_hauling_class[hc][ms], veh_prefixes_by_ms):
+                sales = sql_unpack_result(o2.session.query('%s_%s_sales FROM %s' % (
+                sql_valid_name(ms), sql_valid_name(hc), tech_share_combos_table_name)).all())
+                co2_gpmi = sql_unpack_result(
+                    o2.session.query('%s_co2_gpmi FROM %s' % (veh_prefix, tech_share_combos_table_name)).all())
+                cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(veh, co2_gpmi_variants=co2_gpmi,
+                                                                            sales_variants=sales)
+                target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(veh, sales_variants=sales)
+
+                combo_data = o2.session.execute('SELECT * FROM %s' % tech_share_combos_table_name).fetchall()
+                new_data = [(*c, cm, tm) for c, cm, tm in zip(combo_data, cert_co2_Mg, target_co2_Mg)]
+                o2.session.execute('DELETE FROM %s' % tech_share_combos_table_name)
+
+                o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_cert_co2_megagrams FLOAT' % (
+                    tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
+                o2.session.execute('ALTER TABLE %s ADD COLUMN %s_%s_target_co2_megagrams FLOAT' % (
+                    tech_share_combos_table_name, sql_valid_name(ms), sql_valid_name(hc)))
+
+                o2.session.execute(
+                    'INSERT INTO %s VALUES %s' % (tech_share_combos_table_name, sql_format_value_list_str(new_data)))
+
+        combo_str = ''
+        for ms in market_share_groups[hc]:
+            combo_str = combo_str + '%s_%s_cost_dollars+' % (sql_valid_name(ms), sql_valid_name(hc))
+        combo_str = combo_str[:-1]
+        # tally up total market segment combo cost
+        o2.session.execute('ALTER TABLE %s ADD COLUMN %s_combo_cost_dollars' %
+                           (tech_share_combos_table_name, sql_valid_name(hc)))
+        o2.session.execute('UPDATE %s SET %s_combo_cost_dollars=%s' %
+                           (tech_share_combos_table_name, sql_valid_name(hc), combo_str))
+
+        combo_str = ''
+        for ms in market_share_groups[hc]:
+            combo_str = combo_str + '%s_%s_cert_co2_megagrams+' % (sql_valid_name(ms), sql_valid_name(hc))
+        combo_str = combo_str[:-1]
+        # tally up total market segment Mg
+        o2.session.execute('ALTER TABLE %s ADD COLUMN %s_combo_cert_co2_megagrams' %
+                           (tech_share_combos_table_name, sql_valid_name(hc)))
+        o2.session.execute('UPDATE %s SET %s_combo_cert_co2_megagrams=%s' %
+                           (tech_share_combos_table_name, sql_valid_name(hc), combo_str))
+
+        combo_str = ''
+        for ms in market_share_groups[hc]:
+            combo_str = combo_str + '%s_%s_target_co2_megagrams+' % (sql_valid_name(ms), sql_valid_name(hc))
+        combo_str = combo_str[:-1]
+        # tally up total market segment Mg
+        o2.session.execute('ALTER TABLE %s ADD COLUMN %s_combo_target_co2_megagrams' %
+                           (tech_share_combos_table_name, sql_valid_name(hc)))
+        o2.session.execute('UPDATE %s SET %s_combo_target_co2_megagrams=%s' %
+                           (tech_share_combos_table_name, sql_valid_name(hc), combo_str))
+
+        remove_duplicate_combos(hc, tech_share_combos_table_name)
+
+
+def remove_duplicate_combos(hc, tech_share_combos_table_name):
+    # remove duplicate Mg outcomes and costs
+    # (this cuts down on the full factorial combinations by a significant amount)
+    # TODO: there's a SQL way to do this, involving partitioning data and assigning row numbers,
+    #  but I couldn't understand it
+    megagrams_set = set()
+    unique_data = []
+    res = o2.session.execute('SELECT %s_combo_cert_co2_megagrams, %s_combo_cost_dollars, * FROM %s' %
+                             (sql_valid_name(hc), sql_valid_name(hc),
+                              tech_share_combos_table_name)).fetchall()
+    for r in res:
+        combo_cert_co2_megagrams = r['%s_combo_cert_co2_megagrams' % sql_valid_name(hc)]
+        combo_cost_dollars = r['%s_combo_cost_dollars' % sql_valid_name(hc)]
+        combo_data = r[2:]
+        if (combo_cert_co2_megagrams, combo_cost_dollars) not in megagrams_set:
+            megagrams_set.add((combo_cert_co2_megagrams, combo_cost_dollars))
+            unique_data.append(combo_data)
+    # clear table
+    o2.session.execute('DELETE FROM %s' % tech_share_combos_table_name)
+    # toss unique data back in
+    for ud in unique_data:
+        o2.session.execute('INSERT INTO %s (%s) VALUES %s' %
+                           (tech_share_combos_table_name,
+                            sql_get_column_names(tech_share_combos_table_name),
+                            ud))
+
+
+def add_Mg_columns(calendar_year):
+    # add up cert Mg
+    o2.session.execute(
+        'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_cert_co2_megagrams' % calendar_year)
+    # add up target Mg
+    o2.session.execute(
+        'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_target_co2_megagrams' % calendar_year)
+    # calculate credits (positive = under target... for now anyway... not sure the convention)
+    o2.session.execute(
+        'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_credits_co2_megagrams' % calendar_year)
+    o2.session.execute(
+        'ALTER TABLE tech_share_combos_total_%d ADD COLUMN total_combo_cost_dollars' % calendar_year)
+
+
+def calculate_compliance_outcomes(calendar_year):
+    add_Mg_columns(calendar_year)
+
+    o2.session.execute(
+        'UPDATE tech_share_combos_total_%d SET \
+            total_combo_cert_co2_megagrams=non_hauling_combo_cert_co2_megagrams+hauling_combo_cert_co2_megagrams, \
+            total_combo_target_co2_megagrams=non_hauling_combo_target_co2_megagrams+hauling_combo_target_co2_megagrams, \
+            total_combo_cost_dollars=non_hauling_combo_cost_dollars+hauling_combo_cost_dollars' %
+        calendar_year)
+
+    o2.session.execute(
+        'UPDATE tech_share_combos_total_%d SET \
+            total_combo_credits_co2_megagrams=total_combo_target_co2_megagrams-total_combo_cert_co2_megagrams' %
+        calendar_year)
+
+
+def create_tech_share_combos_total(calendar_year):
+    o2.session.execute(
+        'CREATE TABLE tech_share_combos_total_%d AS SELECT %s, %s FROM tech_share_combos_%d_hauling, \
+            tech_share_combos_%d_non_hauling' % (
+            calendar_year,
+            sql_get_column_names('tech_share_combos_%d_hauling' % calendar_year),
+            sql_get_column_names('tech_share_combos_%d_non_hauling' % calendar_year),
+            calendar_year, calendar_year))
 
 
 if __name__ == '__main__':
