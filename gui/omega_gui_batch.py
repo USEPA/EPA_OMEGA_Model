@@ -593,7 +593,7 @@ class Form(QObject):
         excel_data_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
         batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + excel_data_df.loc['Batch Name', 'Value']
-        print('*****', output_batch_subdirectory)
+        # print('*****', output_batch_subdirectory)
 
         # Delete contents of comm_file.txt used to communicate with other processes
         # and place the first line 'Start Model Run'
@@ -622,12 +622,15 @@ class Form(QObject):
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
 
         if multiprocessor_mode_selected:
+            # Add command line options for multiprocessor mode
             c = ' --dispy --local --dispy_exclusive --dispy_debug'
         else:
+            # No multiprocessor
             c = ''
-
+        # Add timestamp option so program can track comm_file
         d = ' --timestamp ' + batch_time_stamp
 
+        # Combine command line options
         x = a + b + c + d
 
         # Call OMEGA2 batch as a subprocess with command line options from above
@@ -635,16 +638,20 @@ class Form(QObject):
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
+        # Keep track of lines read from comm_file
         line_counter = 0
+        # Pointer to comm_file
         status_file = output_batch_subdirectory + '/comm_file.txt'
         # poll = None
+        # Keep looking for comm_file entries as long as process is running
         while omega_batch.poll() is None:
             time.sleep(1)
             poll = omega_batch.poll()
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
+            # Get number of lines in comm_file
             num_lines = sum(1 for line in open(status_file))
-
+            # Read and output all new lines from comm_file
             while line_counter < num_lines:
                 f = open(status_file)
                 lines = f.readlines()
@@ -653,19 +660,18 @@ class Form(QObject):
                 g = g.rstrip("\n")
                 self.event_monitor(g, "black", 'dt')
                 line_counter = line_counter + 1
-                # This command allows the GUI to catch up and repaint itself
-                # app.processEvents()
 
         # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
         # sound1.terminate()
 
+        # process has ended - update items in GUI
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Ready"
         status_bar()
         self.window.progress_bar.setValue(100)
-
+        # Remove comm_file
         os.remove(status_file)
 
     def showbox(self, message_title, message):
