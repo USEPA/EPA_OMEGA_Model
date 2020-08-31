@@ -529,6 +529,25 @@
       <string>Multiprocessor</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="epa_button">
+     <property name="geometry">
+      <rect>
+       <x>810</x>
+       <y>0</y>
+       <width>80</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>80</width>
+       <height>80</height>
+      </size>
+     </property>
+    </widget>
    </widget>
    <zorder>background_widget</zorder>
    <zorder>label</zorder>
