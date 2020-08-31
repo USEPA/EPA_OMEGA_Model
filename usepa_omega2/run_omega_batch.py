@@ -12,6 +12,8 @@ example usage:
 class OMEGABatchObject(object):
     def __init__(self, name='', **kwargs):
         self.name = name
+        self.context_folder = ''
+        self.context_name = ''
         self.output_path = ".\\"
         self.sessions = []
         self.dataframe = pd.DataFrame()
@@ -146,6 +148,8 @@ class OMEGABatchObject(object):
 
     def get_batch_settings(self):
         self.name = self.read_parameter('Batch Name')
+        self.context_folder = self.read_parameter('Context Folder Name')
+        self.context_name = self.read_parameter('Context Name')
 
     def num_sessions(self):
         return len(self.dataframe.columns)
@@ -184,7 +188,7 @@ class OMEGASessionObject(object):
         self.num = 0
         self.output_path = ".\\"
         self.enabled = False
-        self.settings = []
+        self.settings = OMEGARuntimeOptions()
 
     def read_parameter(self, index_str, default_value=None):
         try:
@@ -199,23 +203,26 @@ class OMEGASessionObject(object):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
         self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
-        self.output_path = self.read_parameter('Session Output Folder Name')
+        self.output_path = OMEGARuntimeOptions().output_folder  # self.read_parameter('Session Output Folder Name')
 
     def get_io_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
         print('Getting I/O settings...')
-        self.settings = OMEGARuntimeOptions()
 
         # setup IOSettings
-        if not options.dispy:
-            self.settings.output_folder = self.output_path + "\\"
-        else:
-            self.settings.output_folder = self.output_path + "\\" + self.name
+        # if not options.dispy:
+        #     self.settings.output_folder = self.output_path + "\\"
+        # else:
+        #     self.settings.output_folder = self.output_path + "\\" + self.name
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.parent.name + '_' + self.name
-        self.settings.database_dump_folder = self.read_parameter('Database Dump Folder Name',
-                                                                 default_value=self.settings.database_dump_folder)
+
+        self.settings.output_folder = self.name + os.sep + self.settings.output_folder
+        self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
+        self.settings.context_folder = self.parent.context_folder
+        self.settings.context_name = self.parent.context_name
+
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
@@ -252,7 +259,6 @@ class OMEGASessionObject(object):
         if validate_predefined_input(self.read_parameter('Stock VMT'), {'Fixed', 'Dynamic'}):
             self.settings.stock_vmt = self.read_parameter('Stock VMT')
 
-
     def init(self, validate_only=False):
         if not validate_only:
             print("Starting Session '%s' -> %s" % (self.name, self.output_path))
@@ -265,7 +271,6 @@ class OMEGASessionObject(object):
 
         print("Starting Compliance Run %s ..." % self.name)
         run_omega(self.settings)
-        # self.monitor()
 
 
 def validate_file(filename):
@@ -468,7 +473,8 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
 
     subprocess.call(cmd)
 
-    summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output', 'o2log_%s_%s.txt' % (batch_name, session_name))
+    summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
+                                    'o2log_%s_%s.txt' % (batch_name, session_name))
 
     time.sleep(1)  # wait for summary file to finish writing?
 
@@ -661,12 +667,14 @@ if __name__ == '__main__':
         parser.add_argument('--no_bundle', action='store_true',
                             help='Do NOT gather and copy all source files to bundle_path')
         parser.add_argument('--verbose', action='store_true', help='True = enable verbose omega_batch messages)')
-        parser.add_argument('--timestamp', type=str, help='Timestamp string, overrides creating timestamp from system clock', default=None)
+        parser.add_argument('--timestamp', type=str,
+                            help='Timestamp string, overrides creating timestamp from system clock', default=None)
         parser.add_argument('--dispy', action='store_true', help='True = run sessions on dispynode(s)')
         parser.add_argument('--dispy_ping', action='store_true', help='True = ping dispynode(s)')
         parser.add_argument('--dispy_debug', action='store_true', help='True = enable verbose dispy debug messages)')
         parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
-        parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address', default=None)
+        parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
+                            default=None)
 
         group = parser.add_mutually_exclusive_group()
         group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
@@ -680,7 +688,7 @@ if __name__ == '__main__':
         options.bundle_path_root = args.bundle_path
         options.batch_file = args.batch_file
         options.session_num = args.session_num
-        options.no_bundle = args.no_bundle # or args.dispy # or (options.bundle_path_root is not None)
+        options.no_bundle = args.no_bundle  # or args.dispy # or (options.bundle_path_root is not None)
         options.verbose = args.verbose
         options.timestamp = args.timestamp
         options.dispy = args.dispy
@@ -718,7 +726,8 @@ if __name__ == '__main__':
                 batch.dataframe = pd.read_csv(options.batch_file, index_col=0)
             else:
                 batch.dataframe = pd.read_excel(options.batch_file, index_col=0, sheet_name="Sessions")
-            batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False}, inplace=True)
+            batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False},
+                                    inplace=True)
             batch.dataframe.drop('Type', axis=1, inplace=True,
                                  errors='ignore')  # drop Type column, no error if it's not there
             batch.expand_dataframe(verbose=options.verbose)
@@ -730,7 +739,7 @@ if __name__ == '__main__':
 
             expanded_batch = copy.deepcopy(batch)
             expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
-                os.path.splitext(options.batch_file)[1]
+                                  os.path.splitext(options.batch_file)[1]
 
             if not options.no_bundle:
                 if not options.timestamp:
@@ -753,10 +762,14 @@ if __name__ == '__main__':
 
                     # automatically validate files and folders based on parameter naming convention
                     for i in batch.dataframe.index:
-                        if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
+                        # if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
+                        #     print('validating %s=%s' % (i, session.read_parameter(i)))
+                        # elif str(i).endswith(' Folder Name'):
+                        #     validate_folder(session.read_parameter(i))
+                        # elif str(i).endswith(' File'):
+                        #     validate_file(session.read_parameter(i))
+                        if options.verbose and (str(i).endswith(' File')):
                             print('validating %s=%s' % (i, session.read_parameter(i)))
-                        if str(i).endswith(' Folder Name'):
-                            validate_folder(session.read_parameter(i))
                         elif str(i).endswith(' File'):
                             validate_file(session.read_parameter(i))
 
@@ -802,23 +815,25 @@ if __name__ == '__main__':
                             batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % args.batch_file
                         else:
                             # batch file path is relative
-                            batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (os.getcwd() + os.sep + args.batch_file)
+                            batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (
+                                        os.getcwd() + os.sep + args.batch_file)
 
                         # automatically rename and relocate source files
                         for i in batch.dataframe.index:
-                            if str(i).endswith(' Folder Name'):
-                                if options.verbose:
-                                    print('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
-                                                                 session.name + os.sep + batch.dataframe.loc[i][
-                                                                     session.num]))
-                                batch.dataframe.loc[i][session.num] = \
-                                    session.name + os.sep + batch.dataframe.loc[i][session.num]
-                            elif str(i).endswith(' File'):
+                            # if str(i).endswith(' Folder Name'):
+                            #     if options.verbose:
+                            #         print('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
+                            #                                      session.name + os.sep + batch.dataframe.loc[i][
+                            #                                          session.num]))
+                            #     batch.dataframe.loc[i][session.num] = \
+                            #         session.name + os.sep + batch.dataframe.loc[i][session.num]
+                            if str(i).endswith(' File'):
                                 if options.verbose:
                                     print('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
                                                                    options.session_path + session.read_parameter(i)))
                                 batch.dataframe.loc[i][session.num] = \
-                                    session.name + os.sep + relocate_file(options.session_path, session.read_parameter(i))
+                                    session.name + os.sep + relocate_file(options.session_path,
+                                                                          session.read_parameter(i))
 
             import time
 

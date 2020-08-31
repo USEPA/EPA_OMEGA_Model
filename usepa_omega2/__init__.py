@@ -74,6 +74,8 @@ try:
                 self.annual_vmt_fixed_by_age_file = 'sample_inputs/annual_vmt_fixed_by_age.csv'
             else:
                 pass
+            self.context_folder = ''
+            self.context_name = ''
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
             self.num_tech_options_per_vehicle = 15
