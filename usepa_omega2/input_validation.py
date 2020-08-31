@@ -12,19 +12,6 @@ from usepa_omega2 import *
 import pandas as pd
 
 
-def validate_predefined_input(input_str, valid_inputs):
-    if valid_inputs.__contains__(input_str):
-        if type(valid_inputs) is dict:
-            return valid_inputs[input_str]
-        elif type(valid_inputs) is set:
-            return True
-        else:
-            raise Exception(
-                'validate_predefined_input(...,valid_inputs) error: valid_inputs must be a set or dictionary')
-    else:
-        raise Exception('Invalid input "%s", expecting %s' % (input_str, str(valid_inputs)))
-
-
 def validate_template_version_info(filename, input_template_name, input_template_version, verbose=False):
 
     # read first row of input file as list of values
