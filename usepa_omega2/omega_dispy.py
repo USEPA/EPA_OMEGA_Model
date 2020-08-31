@@ -14,13 +14,12 @@ def dispy_node_setup():
     sysprint('.')
 
 
-retry_count = dict()    # track retry attempts for terminated or abandoned jobs
+retry_count = dict()  # track retry attempts for terminated or abandoned jobs
 
 
 def restart_job(job):
-    global options, dispycluster
-
-    dispy_debug = options.dispy_debug
+    global dispycluster
+    global dispy_debug
 
     job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id['session_name'] + ': #' + str(
         job.id['session_num'])
@@ -44,7 +43,7 @@ def restart_job(job):
 
 def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, DispyJob.Abandoned)
     import dispy
-    dispy_debug = options.dispy_debug
+    global dispy_debug
 
     if job is not None:
         job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id['session_name'] + ': #' + str(
@@ -76,22 +75,17 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
 # 'cluster_status' callback function. It is called by dispy (client)
 # to indicate node / job status changes.
 def status_cb(status, node, job):
-    # global sim_jobs, terminated_jobs, retry_count, config_case, minimum_batch_size, found_node_list, found_node_matlabs, dispy_debug
     import dispy
+    global dispy_debug
 
-    dispy_debug = options.dispy_debug
-
-    # SOMETIMES job comes in as an "int" instead of an object, then it throws an error here... not sure why!
-    # SEEMS to be associated with those jobs that run fine but don't finish by adding the "_"
-    # NOT all jobs have this problem... keep an eye on this and see if we have the same problem in the cluster...
+    # job comes in as an int before the job.id is initialized
     if job is not None:
         try:
-            job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id['session_name'] + ': #' + str(
+            job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id[
+                'session_name'] + ': #' + str(
                 job.id['session_num'])
         except:
-            sysprint('#### job_id object FAIL ### "%s"\n' % str(job))
-            job_id_str = str(job)
-            pass
+            job_id_str = str(job.id)
     else:
         job_id_str = 'NONE'
 
@@ -137,103 +131,109 @@ def status_cb(status, node, job):
 
 
 def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, retry_count=0):
-    import sys, subprocess
-    #call shell command
+    import sys, subprocess, os, time
+    # call shell command
     pythonpath = sys.exec_prefix
-    if pythonpath.__contains__('envs'):
-        pythonpath = pythonpath + "\\scripts"
-    cmd = '{}\\python "{}\\{}\\run_dse2_batch.py" --bundle_path "{}" --batch_file "{}.csv" --session_num {} --no_validate'.format(pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
+    if 'env' in pythonpath:
+        pythonpath = pythonpath + "\\Scripts"
+    cmd = '"{}\\python" "{}\\{}\\usepa_omega2\\run_omega_batch.py" --bundle_path "{}" \
+            --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
+        pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
     sysprint('.')
     sysprint(cmd)
     sysprint('.')
+
     subprocess.call(cmd)
-    # remove temporary dll folder for this session:
-    dllpath = "C:\\Users\\Public\\temp\\%s\\" % (batch_name + '_' + session_name)
-    sysprint('Removing ' + dllpath)
-    shutil.rmtree(dllpath, ignore_errors=False)
 
-    summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output\\logs\\Summary.txt')
+    summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
+                                    'o2log_%s_%s.txt' % (batch_name, session_name))
 
-    time.sleep(5) # wait for summary file to finish writing?
+    time.sleep(1)  # wait for summary file to finish writing?
 
     if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
-        f_read = open(summary_filename, "r")
-        last_line = f_read.readlines()[-1]
-        f_read.close()
+        with open(summary_filename, "r") as f_read:
+            last_line = f_read.readlines()[-1]
         batch_path = os.path.join(network_batch_path_root, batch_name)
-        if last_line.__contains__("Standard Compliance Model Completed"):
+        if 'Session Complete' in last_line:
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))
-            sysprint('^^^ dispy_run_session Standard Compliance Model Completed, Session %s ^^^' % session_name)
+            sysprint('$$$ dispy_run_session Completed, Session %s $$$' % session_name)
             return True
-        elif last_line.__contains__("Standard Compliance Model Stopped"):
+        elif 'Session Fail' in last_line:
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '#FAIL_' + session_name))
-            sysprint('???? Standard Compliance Model Stopped, Session %s ????' % session_name)
+            sysprint('?!? dispy_run_session Failed, Session %s ?!?' % session_name)
             return False
         else:
-            sysprint('???? Weird Summary File for Session %s : last_line = "%s" ????' % (session_name, last_line))
+            sysprint('??? Weird Summary File for Session %s : last_line = "%s" ???' % (session_name, last_line))
             return False
     else:
-        sysprint('???? No Summary File for Session %s, path_exists=%d, non_zero=%d ????' % (session_name, os.path.exists(summary_filename), os.path.getsize(summary_filename) > 0))
+        sysprint('??? No Summary File for Session %s, path_exists=%d, non_zero=%d ???' % (
+            session_name, os.path.exists(summary_filename), os.path.getsize(summary_filename) > 0))
         if retry_count < 3:
-            sysprint('???? Trying Session %s again (attempt %d)... ????' % (session_name, retry_count+1))
-            dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, retry_count=retry_count+1)
+            sysprint('@@@ Trying Session %s again (attempt %d)... @@@' % (session_name, retry_count + 1))
+            dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,
+                              retry_count=retry_count + 1)
         else:
-            sysprint('???? Abandoning Session %s... ????' % session_name)
+            sysprint('!!! Abandoning Session %s... !!!' % session_name)
         return False
 
 
+dispy_debug = None
+dispycluster = None
+
+
 class DispyCluster(object):
-    def __init__(self, scheduler):
+    def __init__(self, options):
         import dispy
         self.master_ip = ''
         self.desired_node_list = []
         self.found_node_list = []
-        self.sleep_time_secs = 10
-        if scheduler is not None:
-            self.scheduler_node = scheduler
+        self.sleep_time_secs = 3
+        self.options = options
+
+        if options.dispy_scheduler is not None:
+            self.scheduler_node = options.dispy_scheduler
         else:
             # self.scheduler_node = '204.47.182.182'
             self.scheduler_node = '204.47.184.69'
-        if options.dispy_debug:
+        if self.options.dispy_debug:
             self.loglevel = dispy.logger.DEBUG
         else:
             self.loglevel = dispy.logger.INFO
+
+        global dispy_debug
+        dispy_debug = self.loglevel
         self.total_cpus = 0
         self.cluster = None
 
+        global dispycluster
+        dispycluster = self
+
     def find_nodes(self):
-        import dispy, socket, time
+        import dispy, socket, time, sys
+        from usepa_omega2.file_eye_oh import gui_comm
 
         print("Finding dispynodes...")
         self.master_ip = socket.gethostbyname(socket.gethostname())
-        if options.one_ping_only or options.network:
-            # self.desired_node_list = ['204.47.182.182', '204.47.182.60', '204.47.185.53', '204.47.185.67',
-            #                           '204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63',
-            #                           '204.47.184.59']
-            # self.desired_node_list = ['204.47.182.182', '204.47.182.60', '204.47.185.53', '204.47.185.67']
+        if not self.options.local and (self.options.dispy_ping or self.options.network):
             self.desired_node_list = ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63',
                                       '204.47.184.59']
-        elif options.local:
+        elif self.options.local:
             self.desired_node_list = self.master_ip  # for local run
-        elif options.mazer:
-            self.desired_node_list = ['172.16.24.11']
-        elif options.doorlag:
-            self.desired_node_list = ['172.16.28.28']
-        elif options.newman40:
-            self.desired_node_list = ['172.16.24.12']
-        elif options.dekraker:
-            self.desired_node_list = ['172.16.24.10']
         else:
             self.desired_node_list = []  # to auto-discover nodes, only seems to find the local node
 
-        if options.exclusive:
+        if self.options.dispy_exclusive:
             print('Starting JobCluster...')
-            cluster = dispy.JobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip, pulse_interval=60, reentrant=True,
-                                   ping_interval=10, loglevel=self.loglevel, port=0, depends=[sysprint])
+            cluster = dispy.JobCluster(dispy_node_setup, nodes=self.desired_node_list,
+                                       pulse_interval=60, reentrant=True,
+                                       ping_interval=10, loglevel=self.loglevel, depends=[sysprint])
+
         else:
             print('Starting SharedJobCluster...')
-            cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip, reentrant=True,
-                                   loglevel=self.loglevel, depends=[sysprint], scheduler_node=self.scheduler_node, port=0)
+            cluster = dispy.SharedJobCluster(dispy_node_setup, nodes=self.desired_node_list, ip_addr=self.master_ip,
+                                             reentrant=True,
+                                             loglevel=self.loglevel, depends=[sysprint],
+                                             scheduler_node=self.scheduler_node)
 
         # need to wait for cluster to startup and transfer dependencies to nodes...
         t = 0
@@ -249,13 +249,14 @@ class DispyCluster(object):
             self.total_cpus = self.total_cpus + node.cpus
             print('Submitting %s' % node.ip_addr)
             job = cluster.submit_node(node)
-            if (job is not None):
+            if job is not None:
                 job.id = node.ip_addr
                 info_jobs.append(job)
                 self.found_node_list.append(node.ip_addr)
 
         if self.found_node_list == []:
             print('No dispy nodes found, exiting...', file=sys.stderr)
+            gui_comm('No Multiprocessor nodes found, exiting...')
             sys.exit(-1)  # exit, no nodes found
 
         print('Found Node List: %s' % self.found_node_list)
@@ -263,19 +264,24 @@ class DispyCluster(object):
 
         cluster.wait()
         cluster.print_status()
-        cluster.close()
+        cluster.shutdown()
 
-    def submit_sessions(self, batch_name, batch_path, batch_file, session_list):
-        import dispy, socket, time
+    def submit_sessions(self, batch, batch_name, batch_path, batch_file, session_list):
+        import dispy, socket, time, usepa_omega2, sys
 
-        if options.exclusive:
+        if self.options.dispy_exclusive:
             print('Starting JobCluster...')
-            self.cluster = dispy.JobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip, pulse_interval=60, reentrant=True,
-                                   ping_interval=10, loglevel=self.loglevel, port=0, depends=[sysprint], cluster_status=status_cb, callback=job_cb)
+            self.cluster = dispy.JobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip,
+                                            pulse_interval=60, reentrant=True,
+                                            ping_interval=10, loglevel=self.loglevel, depends=[sysprint],
+                                            cluster_status=status_cb, callback=job_cb)
         else:
             print('Starting SharedJobCluster...')
-            self.cluster = dispy.SharedJobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip, reentrant=True,
-                                   loglevel=self.loglevel, depends=[sysprint], scheduler_node=self.scheduler_node, port=0, cluster_status=status_cb, callback=job_cb)
+            self.cluster = dispy.SharedJobCluster(dispy_run_session, nodes=self.found_node_list, ip_addr=self.master_ip,
+                                                  reentrant=True,
+                                                  loglevel=self.loglevel, depends=[sysprint],
+                                                  scheduler_node=self.scheduler_node, cluster_status=status_cb,
+                                                  callback=job_cb)
 
         time.sleep(self.sleep_time_secs)  # need to wait for cluster to startup and transfer dependencies to nodes...
 
@@ -283,17 +289,18 @@ class DispyCluster(object):
         session_jobs = []
         for session_num in session_list:
             print("Processing Session %d: " % session_num, end='')
-
             if not batch.sessions[session_num].enabled:
                 print("Skipping Disabled Session '%s'" % batch.sessions[session_num].name)
-                #print('')
+                # print('')
             else:
                 print("Submitting Session '%s' to Cluster..." % batch.sessions[session_num].name)
-                #print('')
-                job = self.cluster.submit(batch_name, batch_path, batch_file, session_num, batch.sessions[session_num].name)
-                if (job != None):
+                # print('')
+                job = self.cluster.submit(batch_name, batch_path, batch_file, session_num,
+                                          batch.sessions[session_num].name)
+                if job is not None:
                     # job.id = (batch_name, batch_path, batch_file, session_num, batch.sessions[session_num].name)
-                    job.id = dict({'batch_name':batch_name, 'batch_path':batch_path, 'batch_file':batch_file, 'session_num':session_num, 'session_name':batch.sessions[session_num].name})
+                    job.id = dict({'batch_name': batch_name, 'batch_path': batch_path, 'batch_file': batch_file,
+                                   'session_num': session_num, 'session_name': batch.sessions[session_num].name})
                     session_jobs.append(job)
                 else:
                     print('*** Job Submit Failed %s ***' % str(job.id), file=sys.stderr)
@@ -302,4 +309,4 @@ class DispyCluster(object):
 
         self.cluster.wait()
         self.cluster.print_status()
-        self.cluster.close()
+        self.cluster.shutdown()

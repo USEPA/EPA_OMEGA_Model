@@ -63,6 +63,10 @@ def get_filepathname(filename):
     return os.path.splitext(filename)[0]
 
 
+def get_basename(filename):
+    return os.path.basename(filename)
+
+
 def get_filename(filename):
     """
     Returns file name without extension, e.g. /somepath/somefile.txt -> somefile
