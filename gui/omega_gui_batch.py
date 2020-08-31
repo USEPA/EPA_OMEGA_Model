@@ -55,6 +55,7 @@ output_batch_directory_valid = False
 # Images for model run button
 run_button_image_disabled = "gui/elements/green_car_1.jpg"
 run_button_image_enabled = "gui/elements/green_car_1.jpg"
+epa_button_image = "gui/elements/epa_logo.jpg"
 # Common spacer between events
 event_separator = "----------"
 
@@ -547,6 +548,7 @@ class Form(QObject):
         status_bar_message = "Ready"
         self.enable_run_button(False)
         self.window.save_configuration_file_button.setEnabled(0)
+        self.window.epa_button.setIcon(QIcon(epa_button_image))
 
     def clear_entries(self):
         """
@@ -658,7 +660,12 @@ class Form(QObject):
                 f.close()
                 g = lines[line_counter]
                 g = g.rstrip("\n")
-                self.event_monitor(g, "black", 'dt')
+                # Print in red if ERROR in line
+                if g.find("ERROR") == -1:
+                    self.event_monitor(g, "black", 'dt')
+                else:
+                    self.event_monitor(g, "red", 'dt')
+                # self.event_monitor(g, "black", 'dt')
                 line_counter = line_counter + 1
 
         # Play a model end sound
