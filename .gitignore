@@ -129,3 +129,4 @@ composer.lock
 /bundle/*
 *log*.txt
 /test_omega2_output/*
+*_expanded.xlsx
