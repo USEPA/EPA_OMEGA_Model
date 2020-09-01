@@ -256,7 +256,7 @@ class DispyCluster(object):
 
         if self.found_node_list == []:
             print('No dispy nodes found, exiting...', file=sys.stderr)
-            gui_comm('No Multiprocessor nodes found, exiting...')
+            gui_comm('Error - No Multiprocessor nodes found, exiting...')
             sys.exit(-1)  # exit, no nodes found
 
         print('Found Node List: %s' % self.found_node_list)
