@@ -28,13 +28,16 @@ from PySide2.QtCore import QFile, QObject
 from datetime import datetime
 
 # Import functions from other files
-from omega_gui_functions import *
-from omega_gui_stylesheets import *
+# from omega_gui_functions import *
+# from omega_gui_stylesheets import *
 
 # from external_functions import *
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
+from gui.omega_gui_functions import *
+from gui.omega_gui_stylesheets import *
+
 configuration_file = ""
 # Contains the directory path to the input file directory
 input_batch_file = ""
@@ -348,7 +351,7 @@ class Form(QObject):
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Batch Files (*.xlsx)"
         # Add file dialog title
-        file_dialog_title = "Select OMEGA2 Batch File"
+        file_dialog_title = "Select Input Batch File"
         # Call file dialog function
         file_name, file_type, file_dialog_title = file_dialog(file_name, file_type, file_dialog_title)
         # Return if no file selected or dialog cancelled
@@ -369,7 +372,7 @@ class Form(QObject):
         color = "green"
         self.window.input_batch_file_1_result.setTextColor(QColor(color))
         self.window.input_batch_file_1_result.setPlainText(str(directory))
-        temp2 = "Input File Directory Loaded:\n    [" + directory + "]"
+        temp2 = "Input Batch File Loaded:\n    [" + directory + "]"
         self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
         self.window.configuration_file_1_result.setPlainText("")
@@ -398,7 +401,7 @@ class Form(QObject):
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Configuration Files (*.om2)"
         # Add file dialog title
-        file_dialog_title = "Select Project Directory"
+        file_dialog_title = "Select Output Batch Directory"
         # Call file dialog function
         file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
         # Return if no file selected or dialog cancelled
@@ -492,6 +495,7 @@ class Form(QObject):
             self.event_monitor(temp2, 'green', 'dt')
 
             temp1 = "Configuration Loaded.\n"
+            temp1 = temp1 + "Model Run Enabled.\n"
             temp1 = temp1 + "Punch It Chewie!"
             self.event_monitor(temp1, 'black', '')
 
@@ -508,10 +512,10 @@ class Form(QObject):
             self.event_monitor(temp1, 'black', '')
             self.window.save_configuration_file_button.setEnabled(0)
             if not input_batch_file_valid:
-                temp2 = "Input Directory Invalid:\n    [" + input_batch_file + "]"
+                temp2 = "Input Batch File Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
             if not output_batch_directory_valid:
-                temp2 = "Project Directory Invalid:\n    [" + output_batch_directory + "]"
+                temp2 = "Output Batch Directory Invalid:\n    [" + output_batch_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             self.enable_run_button(True)
@@ -527,8 +531,8 @@ class Form(QObject):
         global scenario, status_bar_message
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
         wizard_init = "Open a valid Configuration File or:\n" \
-                      "    Select New Input Directory," \
-                      " Select New Project Directory," \
+                      "    Select New Input Batch File," \
+                      " Select New Output Batch Directory," \
                       " and Save Configuration File\n" \
                       "----------"
         # Prime the status monitor
@@ -665,7 +669,7 @@ class Form(QObject):
                     self.event_monitor(g, "black", 'dt')
                 else:
                     self.event_monitor(g, "red", 'dt')
-                # self.event_monitor(g, "black", 'dt')
+                # Increment number of read lines from file counter
                 line_counter = line_counter + 1
 
         # Play a model end sound
