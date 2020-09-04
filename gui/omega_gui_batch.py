@@ -12,6 +12,7 @@ import os
 import sys
 import subprocess
 import pandas
+import pathlib
 
 import multitimer
 import time
@@ -201,7 +202,7 @@ class Form(QObject):
         # Place path in gui
         color = "green"
         self.window.configuration_file_1_result.setTextColor(QColor(color))
-        self.window.configuration_file_1_result.setPlainText(configuration_file)
+        self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
         # Create python dictionary 'scenario' from YAML formatted configuration file
         filepath = configuration_file
         scenario = open_file_action(filepath)
@@ -233,14 +234,14 @@ class Form(QObject):
             input_batch_file = item_value
             color = "green"
             self.window.input_batch_file_1_result.setTextColor(QColor(color))
-            self.window.input_batch_file_1_result.setPlainText(str(input_batch_file))
+            self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
             input_batch_file_valid = True
         else:
             # Display error message if invalid
             input_batch_file = item_value
             color = "red"
             self.window.input_batch_file_1_result.setTextColor(QColor(color))
-            self.window.input_batch_file_1_result.setPlainText(str(input_batch_file))
+            self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
             input_batch_file_valid = False
             configuration_file_valid = False
 
@@ -258,14 +259,15 @@ class Form(QObject):
             output_batch_directory = item_value
             color = "green"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-            self.window.output_batch_directory_1_result.setPlainText(str(output_batch_directory))
+            path = pathlib.PurePath(output_batch_directory)
+            self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
             output_batch_directory_valid = True
         else:
             # Display error message if invalid
             output_batch_directory = item_value
             color = "red"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-            self.window.output_batch_directory_1_result.setPlainText(str(output_batch_directory))
+            self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
             output_batch_directory_valid = False
             configuration_file_valid = False
 
@@ -284,6 +286,9 @@ class Form(QObject):
         self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
         self.event_monitor(event_separator, "black", "")
+        self.window.configuration_file_1_result.setToolTip(configuration_file)
+        self.window.input_batch_file_1_result.setToolTip(input_batch_file)
+        self.window.output_batch_directory_1_result.setToolTip(output_batch_directory)
 
     def save_file(self):
         """
@@ -369,6 +374,7 @@ class Form(QObject):
         scenario['input_batch_file']['input_batch_file'] = input_batch_file
         # Place path in gui
         directory = input_batch_file
+        # temp3 = '...' + directory[-40:]
         color = "green"
         self.window.input_batch_file_1_result.setTextColor(QColor(color))
         self.window.input_batch_file_1_result.setPlainText(str(directory))
@@ -765,5 +771,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('gui/elements/omega_gui_v16.ui')
+    form = Form('gui/elements/omega_gui_v18.ui')
     sys.exit(app.exec_())
