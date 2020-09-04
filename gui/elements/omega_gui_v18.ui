@@ -25,7 +25,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>941</width>
+      <width>731</width>
       <height>411</height>
      </rect>
     </property>
@@ -359,6 +359,25 @@
        <string>Project Description</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="multiprocessor_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>40</y>
+        <width>151</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Multiprocessor</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="options_tab">
      <attribute name="title">
@@ -510,32 +529,13 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QCheckBox" name="multiprocessor_checkbox">
-     <property name="geometry">
-      <rect>
-       <x>960</x>
-       <y>160</y>
-       <width>151</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Multiprocessor</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
        <x>810</x>
        <y>0</y>
-       <width>80</width>
-       <height>80</height>
+       <width>110</width>
+       <height>110</height>
       </rect>
      </property>
      <property name="text">
@@ -543,8 +543,8 @@
      </property>
      <property name="iconSize">
       <size>
-       <width>80</width>
-       <height>80</height>
+       <width>110</width>
+       <height>110</height>
       </size>
      </property>
     </widget>

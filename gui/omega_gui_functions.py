@@ -134,3 +134,11 @@ def directory_dialog(file_name, file_type, file_dialog_title):
 
 def copy_files(source, destination):
     copy_tree(source, destination)
+
+
+def sec_to_hours(seconds):
+    a = str(seconds//3600)
+    b = str((seconds % 3600)//60)
+    c = str((seconds % 3600) % 60)
+    d = "{} hours {} mins {} seconds".format(a, b, c)
+    return d

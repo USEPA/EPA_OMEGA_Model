@@ -578,6 +578,7 @@ class Form(QObject):
 
         :return: N/A
         """
+        elapsed_start = datetime.now()
         model_sound_start = 'gui/elements/model_start.mp3'
         model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
@@ -683,11 +684,20 @@ class Form(QObject):
         # sound1.terminate()
 
         # process has ended - update items in GUI
+
+        # Send elapsed time to event monitor.
+        elapsed_end = datetime.now()
+        elapsed_time = elapsed_end - elapsed_start
+        elapsed_time = sec_to_hours(elapsed_time.seconds)
+        self.event_monitor("Model Run Time = " + str(elapsed_time), "black", "dt")
+
+        # Update event monitor and status bar for end of model run
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Ready"
         status_bar()
         self.window.progress_bar.setValue(100)
+
         # Remove comm_file
         os.remove(status_file)
 
