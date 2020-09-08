@@ -324,7 +324,7 @@ class Form(QObject):
         # Place path in gui
         color = "green"
         self.window.configuration_file_1_result.setTextColor(QColor(color))
-        self.window.configuration_file_1_result.setPlainText(configuration_file)
+        self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
         temp1 = "Configuration File Saved:\n    [" + configuration_file + "]"
         self.event_monitor(temp1, "green", 'dt')
         # Save text from Project Description window to dictionary
@@ -377,7 +377,7 @@ class Form(QObject):
         # temp3 = '...' + directory[-40:]
         color = "green"
         self.window.input_batch_file_1_result.setTextColor(QColor(color))
-        self.window.input_batch_file_1_result.setPlainText(str(directory))
+        self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
         temp2 = "Input Batch File Loaded:\n    [" + directory + "]"
         self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
@@ -427,7 +427,7 @@ class Form(QObject):
         directory = output_batch_directory
         color = "green"
         self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-        self.window.output_batch_directory_1_result.setPlainText(str(directory))
+        self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
         temp2 = "Project Directory Loaded:\n    [" + directory + "]"
         self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file

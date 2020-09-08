@@ -60,7 +60,7 @@ def background_stylesheet(stylesheet):
 
 def button_stylesheet(stylesheet):
     """
-        Loads the stylesheet for the main window of the gui.
+        Loads the stylesheet for buttons contained in the the gui.
 
         :param stylesheet: Not used.
 
