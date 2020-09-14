@@ -130,3 +130,5 @@ composer.lock
 *log*.txt
 /test_omega2_output/*
 *_expanded.xlsx
+*.dmp
+*_expanded*
