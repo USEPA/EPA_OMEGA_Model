@@ -19,6 +19,7 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_OB7xUKdHEeqRUoM6l8Mfgg" name="fuel_scenario_id" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_TimkkKdHEeqRUoM6l8Mfgg" name="cost_curve_input_ dollar_year" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_9Zo3cKdIEeqRUoM6l8Mfgg" name="analysis_dollar_year" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_DPwx0Oh6EeqYsILSWtj_vw" name="aeo_scenario_name" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_spB7YJkuEeq1MNw_X5quEQ" isAbstract="true" memberEnd="_zBkskJUiEeq1MNw_X5quEQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_spDwkJkuEeq1MNw_X5quEQ" source="org.eclipse.papyrus">
@@ -199,15 +200,15 @@
           <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_37H6srGYEeqot_EVL7aS4w" name="kwh"/>
         </nestedClassifier>
       </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_ZWk1sKdEEeqRUoM6l8Mfgg" name="fuel_scenario_annual_data">
+      <packagedElement xmi:type="uml:Class" xmi:id="_ZWk1sKdEEeqRUoM6l8Mfgg" name="fuel_context">
         <ownedAttribute xmi:type="uml:Property" xmi:id="_s_gkIKdEEeqRUoM6l8Mfgg" name="calendar_year"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_4FlgsKdEEeqRUoM6l8Mfgg" name="fuel_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_KSuxIKdGEeqRUoM6l8Mfgg" name="cost_dollars_per_unit"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_WXp7kKdGEeqRUoM6l8Mfgg" name="upstream_co2_per_unit"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="fuel_scenario_id" visibility="public"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="fuel_scenario_id (delete)" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_qxWYwLrzEeqR6PiF084V6A" name="index"/>
       </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_kfn98LuhEeqijc4sJTwzXQ" name="fuel_scenarios">
+      <packagedElement xmi:type="uml:Class" xmi:id="_kfn98LuhEeqijc4sJTwzXQ" name="fuel_scenarios (delete)">
         <ownedAttribute xmi:type="uml:Property" xmi:id="_qy_ZcLuhEeqijc4sJTwzXQ" name="fuel_scenario_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_tnSGALuhEeqijc4sJTwzXQ" name="dollar_year" visibility="public"/>
       </packagedElement>
