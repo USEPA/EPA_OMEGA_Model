@@ -9,6 +9,23 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
+def populate_market_classes(market_class_dict, market_class, obj):
+    substrs = market_class.split('.', maxsplit=1)
+    prefix = substrs[0]
+    suffix = substrs[1:]
+    if not suffix:
+        # end of the string
+        if market_class_dict:
+            # if dict not empty, add new entry
+            market_class_dict[prefix].append(obj)
+    else:
+        if prefix in market_class_dict:
+            # update existing dictionary
+            populate_market_classes(market_class_dict[prefix], *suffix, obj)
+        else:
+            Exception()
+
+
 def parse_market_classes(market_class_list, market_class_dict=None):
     """
     Returns a nested dictionary of market classes from a dot-formatted list of market class names
@@ -26,10 +43,10 @@ def parse_market_classes(market_class_list, market_class_dict=None):
             # end of the string
             if market_class_dict:
                 # if dict not empty, add new entry
-                market_class_dict[prefix] = ''
+                market_class_dict[prefix] = []
             else:
                 # create new dictionary
-                return {prefix: ''}
+                return {prefix: []}
         else:
             if prefix in market_class_dict:
                 # update existing dictionary
@@ -48,11 +65,21 @@ def print_market_class_dict(mc_dict, num_tabs=0):
     :param num_tabs:
     :return:
     """
+    if num_tabs == 0:
+        print()
+
     for k in mc_dict.keys():
-        print('\t' * num_tabs + k)
-        if mc_dict[k]:
+        if type(mc_dict[k]) == list:
+            if mc_dict[k]:
+                print('\t' * num_tabs + k + ':' + str(mc_dict[k]))
+            else:
+                print('\t' * num_tabs + k)
+        else:
+            print('\t' * num_tabs + k)
             print_market_class_dict(mc_dict[k], num_tabs+1)
 
+    if num_tabs == 0:
+        print()
 
 class MarketClass(SQABase):
     # --- database table properties ---
@@ -61,9 +88,15 @@ class MarketClass(SQABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))
+    _market_class_dict = dict()
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
+
+    @staticmethod
+    def get_market_class_tree():
+        import copy
+        return copy.deepcopy(MarketClass._market_class_dict)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -95,6 +128,8 @@ class MarketClass(SQABase):
                 o2.session.add_all(obj_list)
                 o2.session.flush()
 
+                MarketClass._market_class_dict = parse_market_classes(df['market_class_id'])
+
         return template_errors
 
 
@@ -125,9 +160,26 @@ if __name__ == '__main__':
                 'non_hauling.bev',
             ]
 
+            market_class_list = [
+                'hauling.ice',
+                'hauling.bev',
+                'non_hauling.ice',
+                'non_hauling.bev',
+            ]
+
             market_class_dict = parse_market_classes(market_class_list)
 
             print_market_class_dict(market_class_dict)
+
+            populate_market_classes(market_class_dict, 'hauling.ice', 'F150')
+            populate_market_classes(market_class_dict, 'hauling.ice', 'Silverado')
+            populate_market_classes(market_class_dict, 'hauling.bev', 'Cybertruck')
+            populate_market_classes(market_class_dict, 'non_hauling.ice', '240Z')
+            populate_market_classes(market_class_dict, 'non_hauling.bev', 'Tesla3')
+            populate_market_classes(market_class_dict, 'non_hauling.bev', 'TeslaS')
+
+            print_market_class_dict(market_class_dict)
+
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)

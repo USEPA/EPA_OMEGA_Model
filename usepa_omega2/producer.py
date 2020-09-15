@@ -220,11 +220,11 @@ def run_compliance_model():
                 new_veh.set_cert_co2_grams_per_mile(winning_combo[co2_gpmi_col])
 
                 # TODO: *** THIS IS NOT THE RIGHT WAY TO DO THIS ***
-                if new_veh.market_class_ID == 'BEV non hauling':
+                if new_veh.market_class_ID == 'BEV.non hauling':
                     new_veh.set_initial_registered_count(winning_combo['BEV_non hauling_sales'])
-                elif new_veh.market_class_ID == 'BEV hauling':
+                elif new_veh.market_class_ID == 'BEV.hauling':
                     new_veh.set_initial_registered_count(winning_combo['BEV_hauling_sales'])
-                elif new_veh.market_class_ID == 'ICE non hauling':
+                elif new_veh.market_class_ID == 'ICE.non hauling':
                     new_veh.set_initial_registered_count(winning_combo['ICE_non hauling_sales'])
                 else:
                     new_veh.set_initial_registered_count(winning_combo['ICE_hauling_sales'])

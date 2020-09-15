@@ -1,6 +1,6 @@
 input_template_name:,market_classes,input_template_version:,0.0002
 market_class_id,hauling_class,fueling_class,ownership_class
-BEV non hauling,non hauling,BEV,private
-BEV hauling,hauling,BEV,private
-ICE non hauling,non hauling,ICE,private
-ICE hauling,hauling,ICE,private
+BEV.non hauling,non hauling,BEV,private
+BEV.hauling,hauling,BEV,private
+ICE.non hauling,non hauling,ICE,private
+ICE.hauling,hauling,ICE,private
