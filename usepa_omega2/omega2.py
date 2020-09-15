@@ -63,7 +63,7 @@ def run_postproc():
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[hc])
 
-    for mc in o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct():
+    for mc in sql_unpack_result(o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct()):
         average_cost_data[mc] = []
         for cy in calendar_years:
             average_cost_data[mc].append(o2.session.query(
@@ -106,7 +106,7 @@ def run_postproc():
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[hc])
 
-    for mc in o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct():
+    for mc in sql_unpack_result(o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct()):
         average_co2_gpmi_data[mc] = []
         for cy in calendar_years:
             average_co2_gpmi_data[mc].append(o2.session.query(
@@ -152,7 +152,7 @@ def run_postproc():
     for hc in hauling_classes:
         session_results['average_%s_co2_gpmi' % sql_valid_name(hc)] = average_co2_gpmi_data[hc]
     session_results['average_vehicle_co2_gpmi'] = average_co2_gpmi_data['total']
-    for mc in o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct():
+    for mc in sql_unpack_result(o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct()):
         session_results['average_%s_co2_gpmi' % sql_valid_name(mc[0])] = average_co2_gpmi_data[mc]
         session_results['average_%s_cost' % sql_valid_name(mc[0])] = average_cost_data[mc]
 
