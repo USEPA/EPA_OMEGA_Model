@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.join(path, '..', '..', 'gui'))
 # -- Project information -----------------------------------------------------
 
 project = 'OMEGA2'
-copyright = '2019, US EPA'
+copyright = '2020, US EPA'
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
