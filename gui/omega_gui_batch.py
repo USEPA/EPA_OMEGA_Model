@@ -1,7 +1,6 @@
 """
 
-OMEGA GUI
----------
+**omega_gui_batch.py**
 
 This code controls the OMEGA2 GUI
 
