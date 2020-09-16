@@ -17,7 +17,7 @@ def populate_market_classes(market_class_dict, market_class, obj):
         # end of the string
         if market_class_dict:
             # if dict not empty, add new entry
-            market_class_dict[prefix].append(obj)
+            market_class_dict[prefix].add(obj)
     else:
         if prefix in market_class_dict:
             # update existing dictionary
@@ -43,10 +43,10 @@ def parse_market_classes(market_class_list, market_class_dict=None):
             # end of the string
             if market_class_dict:
                 # if dict not empty, add new entry
-                market_class_dict[prefix] = []
+                market_class_dict[prefix] = set()
             else:
                 # create new dictionary
-                return {prefix: []}
+                return {prefix: set()}
         else:
             if prefix in market_class_dict:
                 # update existing dictionary
@@ -69,7 +69,7 @@ def print_market_class_dict(mc_dict, num_tabs=0):
         print()
 
     for k in mc_dict.keys():
-        if type(mc_dict[k]) == list:
+        if type(mc_dict[k]) == set:
             if mc_dict[k]:
                 print('\t' * num_tabs + k + ':' + str(mc_dict[k]))
             else:
