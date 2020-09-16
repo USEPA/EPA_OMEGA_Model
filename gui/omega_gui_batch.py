@@ -170,10 +170,10 @@ class Form(QObject):
 
     def open_file(self):
         """
-            Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to select an OMEGA2 (.om2) configuration file.
 
             When complete:
-                Global variable "scenario_file" = user selected scenario file name.
+                Global variable "scenario_file" = user selected configuration file name.
 
             :return: N/A
         """
@@ -292,11 +292,11 @@ class Form(QObject):
 
     def save_file(self):
         """
-            Opens a Windows dialog to save an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to save an OMEGA2 (.om2) configuration file.
 
             When complete:
-                Global variable "scenario_file" = user selected scenario file name.
-                Global variable "working_directory" = User selected path to scenario file name.
+                Global variable "scenario_file" = user selected configuration file name.
+                Global variable "working_directory" = User selected path to configuration file.
 
             :return: N/A
         """
@@ -344,7 +344,7 @@ class Form(QObject):
             Opens a Windows dialog to select an OMEGA2 input directory.
 
             When complete:
-                Global variable "input_batch_file" = user selected input file directory.
+                Global variable "input_batch_file" = user selected input batch file.
 
             :return: N/A
         """
@@ -395,7 +395,7 @@ class Form(QObject):
             Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
 
             When complete:
-                Global variable "output_batch_directory" = user selected project directory.
+                Global variable "output_batch_directory" = user selected output batch directory.
 
             :return: N/A
         """
