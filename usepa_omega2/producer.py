@@ -144,8 +144,8 @@ def run_compliance_model():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
 
-        # for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
-        for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_initial_year + 2):
+        for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
+        # for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_initial_year + 2):
             print(calendar_year)
             # pull in last year's vehicles:
             manufacturer_prior_vehicles = o2.session.query(Vehicle). \
@@ -169,10 +169,10 @@ def run_compliance_model():
             market_shares_frac = dict()
             market_shares_frac['hauling'] = dict()
             market_shares_frac['non hauling'] = dict()
-            market_shares_frac['hauling']['BEV'] = unique(np.linspace(0.001, 0.999, 5))
-            market_shares_frac['hauling']['ICE'] = unique(np.linspace(0.999, 0.001, 5))
-            market_shares_frac['non hauling']['BEV'] = unique(np.linspace(0.001, 0.999, 5))
-            market_shares_frac['non hauling']['ICE'] = unique(np.linspace(0.999, 0.001, 5))
+            market_shares_frac['hauling']['BEV'] = unique(np.linspace(0.001, 0.999, 20))
+            market_shares_frac['hauling']['ICE'] = unique(np.linspace(0.999, 0.001, 20))
+            market_shares_frac['non hauling']['BEV'] = unique(np.linspace(0.001, 0.999, 20))
+            market_shares_frac['non hauling']['ICE'] = unique(np.linspace(0.999, 0.001, 20))
             market_share_groups = dict()
             market_share_groups['hauling'] = fueling_classes
             market_share_groups['non hauling'] = fueling_classes
