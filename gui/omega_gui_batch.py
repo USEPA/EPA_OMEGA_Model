@@ -1,14 +1,10 @@
 """
-
 **omega_gui_batch.py**
 
 This code controls the OMEGA2 GUI
 
-    ::
-
-    A highlighted literal section may also be added here if needed.
-
 """
+
 import os
 import sys
 import subprocess
