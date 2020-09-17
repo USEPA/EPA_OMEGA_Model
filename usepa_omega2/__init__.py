@@ -6,7 +6,7 @@ __init.py__
 """
 
 # OMEGA2 code version number
-code_version = "phase0.1"
+code_version = "0.1.14"
 print('loading usepa_omega2 version %s' % code_version)
 
 import os, traceback
