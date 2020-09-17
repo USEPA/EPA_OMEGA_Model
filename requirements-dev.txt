@@ -24,3 +24,5 @@ multitimer~=0.2
 playsound~=1.2.2
 PyYAML~=5.3.1
 setuptools~=49.4.0
+
+Sphinx==3.2.1

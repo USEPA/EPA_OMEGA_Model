@@ -1,8 +1,7 @@
-OMEGA2 Code
-===========
+omega2
+======
 
 .. toctree::
    :maxdepth: 4
 
-   file_eye_oh
-   omega_gui_batch
+   usepa_omega2
