@@ -4,4 +4,5 @@ OMEGA2 Code
 .. toctree::
    :maxdepth: 4
 
-   omega_gui_batch
+    file_eye_oh
+    omega_gui_batch
