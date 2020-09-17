@@ -8,7 +8,7 @@ This code controls the OMEGA2 GUI
 import os
 import sys
 import subprocess
-# import pandas
+import pandas
 import pathlib
 
 import multitimer

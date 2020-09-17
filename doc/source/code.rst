@@ -5,4 +5,4 @@ OMEGA2 Code
    :maxdepth: 4
 
     file_eye_oh
-    omega_gui_batch
+    omega_gui_functions

@@ -1,7 +1,7 @@
 omega\_gui\_batch module
 ========================
 
-.. automodule:: omega_gui_batch
+.. automodule:: omega_gui_functions
    :members:
    :undoc-members:
    :show-inheritance:
