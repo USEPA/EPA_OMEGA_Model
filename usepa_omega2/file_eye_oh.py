@@ -1,7 +1,7 @@
 """
 **file_eye_oh.py**
 
-Handy file system routines for general use
+Handy file system routines for general uses
 
 """
 
