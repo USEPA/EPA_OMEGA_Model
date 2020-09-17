@@ -246,10 +246,10 @@ def run_compliance_model():
                                                                    cert_target_co2_Mg=cert_target_co2_Mg,
                                                                    cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
                                                                    manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
-                                                                   bev_non_hauling_share_frac=winning_combo['BEV.non hauling share_frac'] * winning_combo['BEV share_frac'],
-                                                                   ice_non_hauling_share_frac=winning_combo['ICE.non hauling share_frac'] * winning_combo['ICE share_frac'],
-                                                                   bev_hauling_share_frac=winning_combo['BEV.hauling share_frac'] * winning_combo['BEV share_frac'],
-                                                                   ice_hauling_share_frac=winning_combo['ICE.hauling share_frac'] * winning_combo['ICE share_frac'],
+                                                                   bev_non_hauling_share_frac=winning_combo['non hauling.BEV share_frac'] * winning_combo['non hauling share_frac'],
+                                                                   ice_non_hauling_share_frac=winning_combo['non hauling.ICE share_frac'] * winning_combo['non hauling share_frac'],
+                                                                   bev_hauling_share_frac=winning_combo['hauling.BEV share_frac'] * winning_combo['hauling share_frac'],
+                                                                   ice_hauling_share_frac=winning_combo['hauling.ICE share_frac'] * winning_combo['hauling share_frac'],
                                                                    )
 
         # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
