@@ -13,7 +13,7 @@ Is **incomplete**
 	glossary
     	developer
 	code
-	misc
+	CBI
 	
 Indices and Tables
 ==================

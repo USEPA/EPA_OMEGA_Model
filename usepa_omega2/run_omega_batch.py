@@ -8,6 +8,8 @@ example usage:
 
 """
 
+print('importing %s' % __file__)
+
 from file_eye_oh import validate_file, relocate_file
 
 

@@ -1,4 +1,4 @@
-print('Loading %s...' % __name__)
+print('importing %s' % __file__)
 
 import numpy as np
 

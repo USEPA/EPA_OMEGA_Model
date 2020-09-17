@@ -1,6 +1,6 @@
 """
 run_omega_batch_gui.py
-===========
+======================
 
 Calls run_omega_batch.py
 

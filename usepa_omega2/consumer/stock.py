@@ -1,12 +1,10 @@
 """
 stock.py
-=============================
+========
 
 """
 
 from usepa_omega2 import *
-from vehicles import Vehicle
-from vehicle_annual_data import VehicleAnnualData
 
 
 # def prior_year_stock_registered_count(calendar_year):
@@ -77,6 +75,8 @@ from vehicle_annual_data import VehicleAnnualData
 #             VehicleAnnualData.insert_vmt(vehicle_ID, year, annual_vmt)
 
 def prior_year_stock_registered_count(calendar_year):
+    from vehicles import Vehicle
+    from vehicle_annual_data import VehicleAnnualData
 
     # pull in last year's vehicles:
     calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
@@ -102,6 +102,8 @@ def prior_year_stock_registered_count(calendar_year):
 
 
 def prior_year_stock_vmt(calendar_year):
+    from vehicles import Vehicle
+    from vehicle_annual_data import VehicleAnnualData
 
     # pull in last year's vehicles:
     calendar_year_prior_vehicles = o2.session.query(VehicleAnnualData).\
@@ -122,6 +124,8 @@ def prior_year_stock_vmt(calendar_year):
 
 
 def age0_stock_vmt(calendar_year):
+    from vehicles import Vehicle
+    from vehicle_annual_data import VehicleAnnualData
 
     # pull in last year's vehicles:
     age0_vehicles = o2.session.query(VehicleAnnualData).\

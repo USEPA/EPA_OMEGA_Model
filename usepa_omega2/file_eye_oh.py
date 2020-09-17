@@ -5,7 +5,7 @@ Handy file system routines for general uses
 
 """
 
-print('Loading %s...' % __name__)
+print('importing %s' % __file__)
 
 import sys, os, shutil
 

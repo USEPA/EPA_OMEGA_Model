@@ -6,6 +6,8 @@ Functions to log diagnostic data
 
 """
 
+print('importing %s' % __file__)
+
 import o2  # import global variables
 
 

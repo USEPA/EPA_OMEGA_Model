@@ -5,6 +5,7 @@ __main__.py
 OMEGA2 module-level run with default options
 
 """
+print('importing %s' % __file__)
 
 from usepa_omega2 import *
 

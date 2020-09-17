@@ -5,6 +5,10 @@ __init.py__
 
 """
 
+# OMEGA2 code version number
+code_version = "phase0.1"
+print('loading usepa_omega2 version %s' % code_version)
+
 import os, traceback
 
 try:
@@ -27,12 +31,6 @@ try:
     ownership_classes = OMEGAEnum(['shared', 'private'])
     reg_classes = OMEGAEnum(['car', 'truck'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
-
-    # OMEGA2 code version number
-    code_version = "phase0.1"
-
-    print('loading usepa_omega2 version %s' % code_version)
-
 
     class OMEGARuntimeOptions(object):
         def __init__(self):

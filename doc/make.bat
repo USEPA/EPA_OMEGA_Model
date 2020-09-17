@@ -2,17 +2,20 @@
 
 pushd %~dp0
 
-REM Command file for Sphinx documentation
+if "%1" == "" goto help
 
-sphinx-apidoc -o source "..\usepa_omega2" -f -a -H omega2 -V 0.0.1 --tocfile code
+REM Command file for Sphinx documentation
+REM Call from venv command-line, e.g. "make html"
+
+REM sphinx-apidoc -o source "..\usepa_omega2" -f -a -H omega2 -V 0.0.1 --tocfile code
+sphinx-apidoc -o source ".." -f -a -H omega2 -V 0.0.1 --tocfile code
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD="sphinx-build"
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-
-REM if "%1" == "" goto help
+set SPHINXOPTS=-v
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
@@ -27,7 +30,7 @@ if errorlevel 9009 (
 	exit /b 1
 )
 
-REM %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
 :help

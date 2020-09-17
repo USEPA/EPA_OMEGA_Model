@@ -7,6 +7,8 @@ Routines to validate input file formats and/or values
 
 """
 
+print('importing %s' % __file__)
+
 from usepa_omega2 import *
 
 import pandas as pd

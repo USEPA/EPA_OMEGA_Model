@@ -4,11 +4,10 @@ cost_clouds.py
 
 
 """
+print('importing %s' % __file__)
 
 import o2  # import global variables
 from usepa_omega2 import *
-
-import cost_curves
 
 
 class CostCloud(SQABase):
@@ -34,6 +33,7 @@ class CostCloud(SQABase):
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         import matplotlib.pyplot as plt
+        import cost_curves
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -146,6 +146,8 @@ if __name__ == '__main__':
         init_omega_db()
         omega_log.init_logfile()
         o2.options.cost_file = 'sample_inputs/cost_clouds.csv'
+
+        import cost_curves
 
         SQABase.metadata.create_all(o2.engine)
 

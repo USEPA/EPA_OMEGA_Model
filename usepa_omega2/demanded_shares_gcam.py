@@ -5,6 +5,8 @@ demanded_shares_gcam.py
 
 """
 
+print('importing %s' % __file__)
+
 import o2  # import global variables
 from usepa_omega2 import *
 

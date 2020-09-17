@@ -2,6 +2,7 @@
 placeholder, for now, but the dispy stuff should not really be in the run_omega_batch.py...
 """
 
+print('importing %s' % __file__)
 
 def sysprint(str):
     import os

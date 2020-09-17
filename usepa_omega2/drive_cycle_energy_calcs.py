@@ -1,3 +1,5 @@
+print('importing %s' % __file__)
+
 import numpy as np
 import usepa_omega2.unit_conversions as convert
 import matplotlib.pyplot as plt

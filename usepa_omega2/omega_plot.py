@@ -1,3 +1,4 @@
+print('importing %s' % __file__)
 
 import matplotlib.pyplot as plt
 

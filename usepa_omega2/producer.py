@@ -7,6 +7,8 @@ the manufacturers.py is primarily related to the schema and class methods...
 
 """
 
+print('importing %s' % __file__)
+
 import o2  # import global variables
 from usepa_omega2 import *
 
@@ -169,10 +171,10 @@ def run_compliance_model():
             market_shares_frac = dict()
             market_shares_frac['hauling'] = dict()
             market_shares_frac['non hauling'] = dict()
-            market_shares_frac['hauling']['BEV'] = unique(np.linspace(0.001, 0.999, 20))
-            market_shares_frac['hauling']['ICE'] = unique(np.linspace(0.999, 0.001, 20))
-            market_shares_frac['non hauling']['BEV'] = unique(np.linspace(0.001, 0.999, 20))
-            market_shares_frac['non hauling']['ICE'] = unique(np.linspace(0.999, 0.001, 20))
+            market_shares_frac['hauling']['BEV'] = unique(np.linspace(0, 1, 5))
+            market_shares_frac['hauling']['ICE'] = unique(np.linspace(1, 0, 5))
+            market_shares_frac['non hauling']['BEV'] = unique(np.linspace(0, 1, 5))
+            market_shares_frac['non hauling']['ICE'] = unique(np.linspace(1, 0, 5))
             market_share_groups = dict()
             market_share_groups['hauling'] = fueling_classes
             market_share_groups['non hauling'] = fueling_classes

@@ -1,3 +1,9 @@
+"""
+omega_gui_functions
+===================
+
+"""
+
 from distutils.dir_util import copy_tree
 
 from PySide2.QtWidgets import QFileDialog
