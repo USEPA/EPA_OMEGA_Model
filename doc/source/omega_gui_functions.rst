@@ -1,5 +1,5 @@
-omega\_gui\_batch module
-========================
+omega\_gui\functions module
+===========================
 
 .. automodule:: omega_gui_functions
    :members:
