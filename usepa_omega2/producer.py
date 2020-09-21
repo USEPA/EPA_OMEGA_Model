@@ -367,8 +367,8 @@ def create_tech_combos_by_hauling_class(calendar_year, market_share_groups, mark
                     hauling_class_tech_combos[hc][tech_share_combos_table_name]['%s_combo_%s' % (hc, suffix)] + \
                     hauling_class_tech_combos[hc][tech_share_combos_table_name]['%s_%s_%s' % (ms, hc, suffix)]
 
-        hauling_class_tech_combos[hc][tech_share_combos_table_name].drop_duplicates(
-            subset='%s_combo_cert_co2_megagrams' % hc, inplace=True, keep='first', ignore_index=False)
+        # hauling_class_tech_combos[hc][tech_share_combos_table_name].drop_duplicates(
+        #     subset='%s_combo_cert_co2_megagrams' % hc, inplace=True, keep='first', ignore_index=False)
 
 
 def calculate_compliance_outcomes(calendar_year, tech_share_combos_total):
