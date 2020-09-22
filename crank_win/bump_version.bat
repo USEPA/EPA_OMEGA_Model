@@ -1,6 +1,6 @@
-REM bumpversion [major|minor|patch]
+REM bump_version [major|minor|patch]
 REM or
-REM bumpversion --new-version x.y.z
+REM bump_version --new-version x.y.z
 REM or any other valid bumpversion argument
 
 cd ..
