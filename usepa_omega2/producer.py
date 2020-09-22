@@ -24,8 +24,8 @@ def unique(vector):
     indexes = np.unique(vector, return_index=True)[1]
     return [vector[index] for index in sorted(indexes)]
 
-
-def partition(num_columns, num_levels, verbose=False):
+partition_dict = dict()
+def partition(num_columns, num_levels, min_level=0.001, verbose=False):
     """
     Returns a set of columns, the rows of which add up to 1.0, with num_levels between 0-1
     ex: >>> partition(num_columns=2, num_levels=3, verbose=True)
@@ -38,22 +38,25 @@ def partition(num_columns, num_levels, verbose=False):
     :param verbose: if True then result is printed to the console
     :return: a set of columns, the rows of which add up to 1.0
     """
-    from pyDOE2 import fullfact
-    permutations = fullfact([num_levels]*num_columns) / (num_levels-1)
-    valid_combinations = [permutation for permutation in permutations if sum(permutation) == 1.0]
-    if verbose:
-        for i in valid_combinations:
-            s = ''
-            for e in i:
-                s = s + '\t%.2f' % e
-            print(s)
 
-    # convert rows to columns
-    ans = []
-    for i in range(num_columns):
-        ans.append([vc[i] for vc in valid_combinations])
+    partition_name = '%d_%d_%s' % (num_columns, num_levels, min_level)
 
-    return ans
+    if not partition_name in partition_dict:
+        from pyDOE2 import fullfact
+
+        permutations = np.minimum(1 - min_level, np.maximum(min_level, fullfact([num_levels] * num_columns) / (num_levels - 1)))
+        valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
+
+        if verbose:
+            for i in valid_combinations:
+                s = ''
+                for e in i:
+                    s = s + '\t%.3f' % e
+                print(s)
+
+        partition_dict[partition_name] = valid_combinations.transpose()
+
+    return partition_dict[partition_name]
 
 
 def cartesian_prod(left_df, right_df):
@@ -100,13 +103,6 @@ def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
     return o2.session.query(func.sum(Vehicle.cert_target_CO2_Mg)). \
         filter(Vehicle.manufacturer_ID == manufacturer_id). \
         filter(Vehicle.model_year == model_year).scalar()
-
-
-# def calculate_cert_co2_Mg(model_year, manufacturer_id):
-#     from vehicles import Vehicle
-#     return o2.session.query(func.sum(Vehicle.cert_CO2_Mg)). \
-#         filter(Vehicle.manufacturer_ID == manufacturer_id). \
-#         filter(Vehicle.model_year == model_year).scalar()
 
 
 # placeholder for producer deemed generalized vehicle cost:
@@ -302,8 +298,7 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
         tech_share_combos_total['veh_%d_sales' % new_veh.vehicle_ID] = vehicle_sales
 
         # calculate vehicle total cost
-        vehicle_total_cost_dollars = vehicle_sales * tech_share_combos_total[
-            'veh_%d_cost_dollars' % new_veh.vehicle_ID]
+        vehicle_total_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%d_cost_dollars' % new_veh.vehicle_ID]
         tech_share_combos_total['veh_%d_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_cost_dollars
 
         # calculate cert and target Mg for the vehicle
@@ -319,6 +314,7 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
         total_target_co2_Mg = total_target_co2_Mg + target_co2_Mg
         total_cert_co2_Mg = total_cert_co2_Mg + cert_co2_Mg
         total_cost_dollars = total_cost_dollars + vehicle_total_cost_dollars
+
     tech_share_combos_total['total_combo_target_co2_megagrams'] = total_target_co2_Mg
     tech_share_combos_total['total_combo_cert_co2_megagrams'] = total_cert_co2_Mg
     tech_share_combos_total['total_combo_cost_dollars'] = total_cost_dollars
@@ -326,9 +322,13 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
 
 
 def select_winning_combo(tech_share_combos_total):
-    tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_combo_credits_co2_megagrams')
-    potential_winners = tech_share_combos_total[tech_share_combos_total['total_combo_credits_co2_megagrams'] >= 0]
-    winning_combo = potential_winners.loc[potential_winners['total_combo_cost_dollars'].idxmin()]
+    # tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_combo_credits_co2_megagrams')
+    mini_df = pd.DataFrame()
+    mini_df['total_combo_credits_co2_megagrams'] = tech_share_combos_total['total_combo_credits_co2_megagrams']
+    mini_df['total_combo_cost_dollars'] = tech_share_combos_total['total_combo_cost_dollars']
+
+    potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
+    winning_combo = tech_share_combos_total.loc[potential_winners['total_combo_cost_dollars'].idxmin()]
 
     return winning_combo
 
