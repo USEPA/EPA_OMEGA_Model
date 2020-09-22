@@ -69,13 +69,16 @@ def cartesian_prod(left_df, right_df):
     if left_df.empty:
         return right_df
     else:
-        left_df['_'] = 1
-        right_df['_'] = 1
+        if not '_' in left_df:
+            left_df['_'] = 1
 
-        leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
+        if not '_' in right_df:
+            right_df['_'] = 1
 
-        left_df.drop('_', axis=1, inplace=True)
-        right_df.drop('_', axis=1, inplace=True, errors='ignore')
+        leftXright = pd.merge(left_df, right_df, on='_')  # .drop('_', axis=1)
+
+        # left_df.drop('_', axis=1, inplace=True)
+        # right_df.drop('_', axis=1, inplace=True, errors='ignore')
 
         return leftXright
 
@@ -99,11 +102,11 @@ def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
         filter(Vehicle.model_year == model_year).scalar()
 
 
-def calculate_cert_co2_Mg(model_year, manufacturer_id):
-    from vehicles import Vehicle
-    return o2.session.query(func.sum(Vehicle.cert_CO2_Mg)). \
-        filter(Vehicle.manufacturer_ID == manufacturer_id). \
-        filter(Vehicle.model_year == model_year).scalar()
+# def calculate_cert_co2_Mg(model_year, manufacturer_id):
+#     from vehicles import Vehicle
+#     return o2.session.query(func.sum(Vehicle.cert_CO2_Mg)). \
+#         filter(Vehicle.manufacturer_ID == manufacturer_id). \
+#         filter(Vehicle.model_year == model_year).scalar()
 
 
 # placeholder for producer deemed generalized vehicle cost:
@@ -174,7 +177,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     if verbose:
         print('combining ' + str(children))
     tech_combos_df = pd.DataFrame()
-    for df in child_df_list:
+    for index,df in enumerate(child_df_list):
         tech_combos_df = cartesian_prod(tech_combos_df, df)
 
     tech_share_combos_df = cartesian_prod(tech_combos_df, sales_share_df)
@@ -304,8 +307,8 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
         tech_share_combos_total['veh_%d_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_cost_dollars
 
         # calculate cert and target Mg for the vehicle
-        co2_gpmi = tech_share_combos_total['veh_%d_co2_gpmi' % new_veh.vehicle_ID].to_list()
-        vehicle_sales = vehicle_sales.to_list()
+        co2_gpmi = tech_share_combos_total['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
+
         cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(new_veh, co2_gpmi_variants=co2_gpmi,
                                                                     sales_variants=vehicle_sales)
         target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(new_veh,
@@ -323,8 +326,10 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
 
 
 def select_winning_combo(tech_share_combos_total):
-    potential_winners = tech_share_combos_total.loc[tech_share_combos_total['total_combo_credits_co2_megagrams'] >= 0]
+    tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_combo_credits_co2_megagrams')
+    potential_winners = tech_share_combos_total[tech_share_combos_total['total_combo_credits_co2_megagrams'] >= 0]
     winning_combo = potential_winners.loc[potential_winners['total_combo_cost_dollars'].idxmin()]
+
     return winning_combo
 
 

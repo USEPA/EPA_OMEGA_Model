@@ -261,6 +261,13 @@ def run_omega(o2_options, single_shot=False):
             # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
             producer.run_compliance_model()
 
+            # try:
+            #     import cProfile
+            #     import re
+            #     cProfile.run('producer.run_compliance_model()', filename='omega2_profile.dmp')
+            # except:
+            #     producer.run_compliance_model()
+
             if not single_shot:
                 gui_comm('%s: Post Processing ...' % o2.options.session_name)
 
@@ -302,6 +309,7 @@ def run_omega(o2_options, single_shot=False):
 
 if __name__ == "__main__":
     try:
+        import producer
         run_omega(OMEGARuntimeOptions(), single_shot=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
