@@ -1,6 +1,6 @@
 input_template_name:,vehicles,input_template_version:,0.0004,,,,,,,
 vehicle_id,manufacturer_id,model_year,reg_class_id,hauling_class,cost_curve_class,showroom_fuel_id,market_class_id,sales,cert_co2_grams_per_mile,footprint_ft2
-BEV non hauling,USA Motors,2020,car,non hauling,bev_300_MPW_LRL,US electricity,BEV non hauling,42,40,40
-ICE non hauling,USA Motors,2020,car,non hauling,ice_MPW_LRL,pump gasoline,ICE non hauling,1000000,250,48.5
-BEV hauling,USA Motors,2020,truck,hauling,bev_300_Truck,US electricity,BEV hauling,24,61,50
-ICE hauling,USA Motors,2020,truck,hauling,ice_Truck,pump gasoline,ICE hauling,750000,375,54.65
+BEV non hauling,USA Motors,2020,car,non hauling,bev_300_MPW_LRL,US electricity,non hauling.BEV,42,40,40
+ICE non hauling,USA Motors,2020,car,non hauling,ice_MPW_LRL,pump gasoline,non hauling.ICE,1000000,250,48.5
+BEV hauling,USA Motors,2020,truck,hauling,bev_300_Truck,US electricity,hauling.BEV,24,61,50
+ICE hauling,USA Motors,2020,truck,hauling,ice_Truck,pump gasoline,hauling.ICE,750000,375,54.65

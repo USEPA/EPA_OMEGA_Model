@@ -44,10 +44,14 @@ def demand_sales(model_year):
         Vehicle.hauling_class == 'non hauling').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
+    total_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
+
     sales_dict['hauling'] = float(initial_hauling_sales)
     sales_dict['non hauling'] = float(initial_non_hauling_sales)
     sales_dict['BEV'] = float(initial_BEV_sales)
     sales_dict['ICE'] = float(initial_ICE_sales)
+    sales_dict['total'] = float(total_sales)
 
     return sales_dict
 

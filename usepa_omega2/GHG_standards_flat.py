@@ -83,8 +83,11 @@ class GHGStandardFlat(SQABase):
 
         co2_gpmi = GHGStandardFlat.calculate_target_co2_gpmi(vehicle)
 
-        if sales_variants:
-            sales = np.array(sales_variants)
+        if sales_variants is not None:
+            if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                sales = np.array(sales_variants)
+            else:
+                sales = sales_variants
         else:
             sales = vehicle.get_initial_registered_count()
 
@@ -96,9 +99,16 @@ class GHGStandardFlat(SQABase):
 
         lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
-        if co2_gpmi_variants:
-            sales = np.array(sales_variants)
-            co2_gpmi = np.array(co2_gpmi_variants)
+        if co2_gpmi_variants is not None:
+            if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                sales = np.array(sales_variants)
+            else:
+                sales = sales_variants
+
+            if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
+                co2_gpmi = np.array(co2_gpmi_variants)
+            else:
+                co2_gpmi = co2_gpmi_variants
         else:
             sales = vehicle.get_initial_registered_count()
             co2_gpmi = vehicle.cert_CO2_grams_per_mile
