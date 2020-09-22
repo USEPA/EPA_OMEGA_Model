@@ -177,7 +177,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     if verbose:
         print('combining ' + str(children))
     tech_combos_df = pd.DataFrame()
-    for index,df in enumerate(child_df_list):
+    for df in child_df_list:
         tech_combos_df = cartesian_prod(tech_combos_df, df)
 
     tech_share_combos_df = cartesian_prod(tech_combos_df, sales_share_df)
