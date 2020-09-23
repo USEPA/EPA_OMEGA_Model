@@ -117,6 +117,12 @@ class CostCurve(SQABase):
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
+    @staticmethod
+    def get_co2_gpmi(cost_curve_class, model_year):
+        return sql_unpack_result(o2.session.query(CostCurve.cert_co2_grams_per_mile).
+                                 filter(CostCurve.cost_curve_class == cost_curve_class).
+                                 filter(CostCurve.model_year == model_year).all())
+
 
 if __name__ == '__main__':
     try:
@@ -135,10 +141,39 @@ if __name__ == '__main__':
         init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
         if not init_fail:
+            from omega_plot import *
+            import numpy as np
+
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             print(CostCurve.get_cost('ice_MPW_LRL', 2020, 100))
             print(CostCurve.get_cost('ice_MPW_LRL', 2020, [0, 100, 200, 300, 400, 500, 1000]))
+
+            # plot cost curves
+            ice_Truck_co2gpmi = CostCurve.get_co2_gpmi('ice_Truck', 2020)
+            ice_Truck_cost = CostCurve.get_cost('ice_Truck', 2020, ice_Truck_co2gpmi)
+
+            ice_MPW_LRL_co2gpmi = CostCurve.get_co2_gpmi('ice_MPW_LRL', 2020)
+            ice_MPW_LRL_cost = CostCurve.get_cost('ice_MPW_LRL', 2020, ice_MPW_LRL_co2gpmi)
+
+            fig, ax1 = fplothg(ice_Truck_co2gpmi, ice_Truck_cost,'o-')
+            ax1.plot(ice_MPW_LRL_co2gpmi, ice_MPW_LRL_cost, 'o-')
+
+            # create weighted cost curves and plot
+            co2gpmi = list(set([*ice_Truck_co2gpmi, *ice_MPW_LRL_co2gpmi]))
+            co2gpmi.sort()
+            c1 = CostCurve.get_cost('ice_Truck', 2020, co2gpmi)
+            c2 = CostCurve.get_cost('ice_MPW_LRL', 2020, co2gpmi)
+            ax1.plot(co2gpmi, c1, '.--')
+            ax1.plot(co2gpmi, c2, '.--')
+            r1 = 0.75
+            c3 = np.array(c1) * r1 + np.array(c2) * (1-r1)
+            ax1.plot(co2gpmi, c3, '*--')
+            r1 = 0.25
+            c3 = np.array(c1) * r1 + np.array(c2) * (1-r1)
+            ax1.plot(co2gpmi, c3, '*--')
+            label_xyt(ax1, 'co2 [g/mi]', 'cost [$]', 'Cost Curves and weighted Cost Curves')
+
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
