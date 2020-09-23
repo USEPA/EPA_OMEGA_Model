@@ -305,6 +305,8 @@ def run_omega(o2_options, single_shot=False, profile=False):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
+        gui_comm("### Check OMEGA log for error messages ###")
+        gui_comm("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
 
 

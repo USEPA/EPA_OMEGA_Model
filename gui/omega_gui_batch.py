@@ -669,7 +669,7 @@ class Form(QObject):
                 g = lines[line_counter]
                 g = g.rstrip("\n")
                 # Print in red if ERROR in line
-                if g.find("ERROR") == -1:
+                if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
                     self.event_monitor(g, "black", 'dt')
                 else:
                     self.event_monitor(g, "red", 'dt')
