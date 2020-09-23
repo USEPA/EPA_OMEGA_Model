@@ -11,6 +11,43 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
+def sales_weight(veh_list, attribute_name):
+    """
+
+    :param veh_list:
+    :param attribute_name:
+    :return:
+    """
+    weighted_sum = 0
+    total_sales = 0
+    for v in veh_list:
+        sales = v.get_initial_registered_count()
+        total_sales = total_sales + sales
+        weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
+
+    return weighted_sum / total_sales
+
+
+def sales_unweight(veh, veh_list, attribute_name, weighted_value):
+    """
+
+    :param veh:
+    :param veh_list:
+    :param attribute_name:
+    :param weighted_value:
+    :return:
+    """
+    total_sales = 0
+    weighted_sum = 0
+    for v in veh_list:
+        sales = v.get_initial_registered_count()
+        total_sales = total_sales + sales
+        if v is not veh:
+            weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
+
+    return (weighted_value * total_sales - weighted_sum) / veh.get_initial_registered_count()
+
+
 class Vehicle(SQABase):
     # --- database table properties ---
     __tablename__ = 'vehicles'
@@ -188,6 +225,34 @@ if __name__ == '__main__':
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
+
+            vehicles_list = o2.session.query(Vehicle). \
+                filter(Vehicle.manufacturer_ID == 'USA Motors'). \
+                filter(Vehicle.model_year == 2020). \
+                all()
+
+            weighted_mfr_cost_dollars = sales_weight(vehicles_list, 'new_vehicle_mfr_cost_dollars')
+            weighted_co2gpmi = sales_weight(vehicles_list, 'cert_CO2_grams_per_mile')
+            weighted_footprint = sales_weight(vehicles_list, 'footprint_ft2')
+
+            print(vehicles_list[0].new_vehicle_mfr_cost_dollars - sales_unweight(vehicles_list[0], vehicles_list,
+                                                                             'new_vehicle_mfr_cost_dollars',
+                                                                             weighted_mfr_cost_dollars))
+            print(vehicles_list[1].new_vehicle_mfr_cost_dollars - sales_unweight(vehicles_list[1], vehicles_list,
+                                                                             'new_vehicle_mfr_cost_dollars',
+                                                                             weighted_mfr_cost_dollars))
+
+            print(vehicles_list[0].cert_CO2_grams_per_mile == sales_unweight(vehicles_list[0], vehicles_list,
+                                                                             'cert_CO2_grams_per_mile',
+                                                                             weighted_co2gpmi))
+            print(vehicles_list[1].cert_CO2_grams_per_mile == sales_unweight(vehicles_list[1], vehicles_list,
+                                                                             'cert_CO2_grams_per_mile',
+                                                                             weighted_co2gpmi))
+
+            print(vehicles_list[2].footprint_ft2 == sales_unweight(vehicles_list[2], vehicles_list, 'footprint_ft2',
+                                                                   weighted_footprint))
+            print(vehicles_list[3].footprint_ft2 == sales_unweight(vehicles_list[3], vehicles_list, 'footprint_ft2',
+                                                                   weighted_footprint))
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
