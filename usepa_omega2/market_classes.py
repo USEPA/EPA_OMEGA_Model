@@ -11,6 +11,14 @@ from usepa_omega2 import *
 
 
 def populate_market_classes(market_class_dict, market_class, obj):
+    """
+
+    :param market_class_dict: dict of dicts of market classes
+    :param market_class: dot separated market class name e.g. 'hauling.BEV',
+        possibly with reg class suffix e.g. 'non hauling.ICE.car' depending on the market_class_dict
+    :param obj: object to place in a set in the appropriate leaf
+    :return: modifies market_class_dict
+    """
     substrs = market_class.split('.', maxsplit=1)
     prefix = substrs[0]
     suffix = substrs[1:]
@@ -46,13 +54,18 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
             if market_class_dict:
                 # if dict not empty, add new entry
                 if by_reg_class:
-                    market_class_dict[prefix] = {'car': set(), 'truck': set()}
+                    market_class_dict[prefix] = dict()
+                    for rc in reg_classes:
+                        market_class_dict[prefix][rc] = set()
                 else:
                     market_class_dict[prefix] = set()
             else:
                 # create new dictionary
                 if by_reg_class:
-                    return {prefix: {'car': set(), 'truck': set()}}
+                    rc_dict = {prefix: dict()}
+                    for rc in reg_classes:
+                        rc_dict[prefix][rc] = set()
+                    return rc_dict
                 else:
                     return {prefix: set()}
         else:
@@ -96,15 +109,19 @@ class MarketClass(SQABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))
-    _market_class_dict = dict()
+    _market_class_dict = dict() # empty set market class dict
+    _market_class_dict_rc = dict() # empty set market class dict with reg class leaves
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
     @staticmethod
-    def get_market_class_tree():
+    def get_market_class_tree(by_reg_class=False):
         import copy
-        return copy.deepcopy(MarketClass._market_class_dict)
+        if by_reg_class:
+            return copy.deepcopy(MarketClass._market_class_dict_rc)
+        else:
+            return copy.deepcopy(MarketClass._market_class_dict)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -137,6 +154,7 @@ class MarketClass(SQABase):
                 o2.session.flush()
 
                 MarketClass._market_class_dict = parse_market_classes(df['market_class_id'])
+                MarketClass._market_class_dict_rc = parse_market_classes(df['market_class_id'], by_reg_class=True)
 
         return template_errors
 
