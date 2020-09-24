@@ -1,4 +1,4 @@
-omega2
+OMEGA2
 ======
 
 .. toctree::

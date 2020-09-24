@@ -19,7 +19,7 @@ xlrd==1.2.0
 pyDOE2==1.3.0
 openpyxl==3.0.4
 
-PySide2~=5.15.0
+PySide2~=5.15.1
 multitimer~=0.2
 playsound~=1.2.2
 PyYAML~=5.3.1
