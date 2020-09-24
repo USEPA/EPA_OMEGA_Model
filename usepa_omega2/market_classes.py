@@ -27,12 +27,13 @@ def populate_market_classes(market_class_dict, market_class, obj):
             Exception()
 
 
-def parse_market_classes(market_class_list, market_class_dict=None):
+def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class=False):
     """
     Returns a nested dictionary of market classes from a dot-formatted list of market class names
-    :param market_class_list:
-    :param market_class_dict:
-    :return:
+    :param market_class_list: list of dot-separted market class names e.g. ['hauling.BEV', 'hauling.ICE'] etc
+    :param market_class_dict: recursive input and also the output data structure
+    :param by_reg_class: if true then leaves are sets in reg class dicts, otherwise leaves are sets by market segment
+    :return: market_class_dict of dicts
     """
     if market_class_dict is None:
         market_class_dict = dict()
@@ -44,19 +45,23 @@ def parse_market_classes(market_class_list, market_class_dict=None):
             # end of the string
             if market_class_dict:
                 # if dict not empty, add new entry
-                market_class_dict[prefix] = set()
-                # market_class_dict[prefix] = {'car': set(), 'truck': set()}
+                if by_reg_class:
+                    market_class_dict[prefix] = {'car': set(), 'truck': set()}
+                else:
+                    market_class_dict[prefix] = set()
             else:
                 # create new dictionary
-                return {prefix: set()}
-                # return {prefix: {'car': set(), 'truck': set()}}
+                if by_reg_class:
+                    return {prefix: {'car': set(), 'truck': set()}}
+                else:
+                    return {prefix: set()}
         else:
             if prefix in market_class_dict:
                 # update existing dictionary
-                parse_market_classes(suffix, market_class_dict=market_class_dict[prefix])
+                parse_market_classes(suffix, market_class_dict=market_class_dict[prefix], by_reg_class=by_reg_class)
             else:
                 # new entry, create dictionary
-                market_class_dict[prefix] = parse_market_classes(suffix)
+                market_class_dict[prefix] = parse_market_classes(suffix, by_reg_class=by_reg_class)
 
     return market_class_dict
 
@@ -171,8 +176,10 @@ if __name__ == '__main__':
             ]
 
             market_class_dict = parse_market_classes(market_class_list)
-
             print_market_class_dict(market_class_dict)
+
+            market_class_dict_rc = parse_market_classes(market_class_list, by_reg_class=True)
+            print_market_class_dict(market_class_dict_rc)
 
             populate_market_classes(market_class_dict, 'hauling.ice', 'F150')
             populate_market_classes(market_class_dict, 'hauling.ice', 'Silverado')
@@ -180,8 +187,15 @@ if __name__ == '__main__':
             populate_market_classes(market_class_dict, 'non_hauling.ice', '240Z')
             populate_market_classes(market_class_dict, 'non_hauling.bev', 'Tesla3')
             populate_market_classes(market_class_dict, 'non_hauling.bev', 'TeslaS')
-
             print_market_class_dict(market_class_dict)
+
+            populate_market_classes(market_class_dict_rc, 'hauling.ice.truck', 'F150')
+            populate_market_classes(market_class_dict_rc, 'hauling.ice.truck', 'Silverado')
+            populate_market_classes(market_class_dict_rc, 'hauling.bev.truck', 'Cybertruck')
+            populate_market_classes(market_class_dict_rc, 'non_hauling.ice.car', '240Z')
+            populate_market_classes(market_class_dict_rc, 'non_hauling.ice.car', 'Sentra')
+            populate_market_classes(market_class_dict_rc, 'non_hauling.bev.car', 'Tesla3')
+            print_market_class_dict(market_class_dict_rc)
 
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
