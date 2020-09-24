@@ -76,7 +76,9 @@ try:
             self.context_name = ''
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
-            self.num_tech_options_per_vehicle = 10
+            self.num_share_options = 15
+            self.num_tech_options_per_ice_vehicle = 10
+            self.num_tech_options_per_bev_vehicle = 3
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0
             self.end_time = 0

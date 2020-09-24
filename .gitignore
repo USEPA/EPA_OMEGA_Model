@@ -133,3 +133,4 @@ composer.lock
 *.dmp
 *_expanded*
 
+/comm_file.txt

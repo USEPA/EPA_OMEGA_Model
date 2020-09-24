@@ -39,7 +39,8 @@ class OMEGABatchObject(object):
 
         numeric_params = {
             'Cost Curve Frontier Affinity Factor',
-            'Num Tech Options per Vehicle',
+            'Num Tech Options per ICE Vehicle',
+            'Num Tech Options per BEV Vehicle',
         }
 
         for p in numeric_params:
@@ -248,8 +249,10 @@ class OMEGASessionObject(object):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
         print('Getting Runtime Settings...')
-        if not pd.isna(self.read_parameter('Num Tech Options per Vehicle')):
-            self.settings.num_tech_options_per_vehicle = int(self.read_parameter('Num Tech Options per Vehicle'))
+        if not pd.isna(self.read_parameter('Num Tech Options per ICE Vehicle')):
+            self.settings.num_tech_options_per_ice_vehicle = int(self.read_parameter('Num Tech Options per ICE Vehicle'))
+        if not pd.isna(self.read_parameter('Num Tech Options per BEV Vehicle')):
+            self.settings.num_tech_options_per_ice_vehicle = int(self.read_parameter('Num Tech Options per BEV Vehicle'))
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)
         self.settings.cost_curve_frontier_affinity_factor = self.read_parameter('Cost Curve Frontier Affinity Factor')

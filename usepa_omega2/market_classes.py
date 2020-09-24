@@ -45,9 +45,11 @@ def parse_market_classes(market_class_list, market_class_dict=None):
             if market_class_dict:
                 # if dict not empty, add new entry
                 market_class_dict[prefix] = set()
+                # market_class_dict[prefix] = {'car': set(), 'truck': set()}
             else:
                 # create new dictionary
                 return {prefix: set()}
+                # return {prefix: {'car': set(), 'truck': set()}}
         else:
             if prefix in market_class_dict:
                 # update existing dictionary

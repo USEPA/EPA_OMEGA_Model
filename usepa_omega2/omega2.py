@@ -163,6 +163,25 @@ def run_postproc():
     return session_results
 
 
+def run_producer_consumer():
+    from manufacturers import Manufacturer
+    import producer
+
+    for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
+        manufacturer_ID = manufacturer[0]
+        print(manufacturer_ID)
+
+        for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
+            print(calendar_year)
+            iterate = True
+            consumer_bev_share = None
+            while iterate:
+                producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
+                # run consumer module here, get consumer BEV share
+                # decide whether to iterate again or not
+                iterate = False
+
+
 def run_omega(o2_options, single_shot=False, profile=False):
     import traceback
     import time
@@ -267,7 +286,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
                 import re
                 cProfile.run('producer.run_compliance_model()', filename='omega2_profile.dmp')
             else:
-                producer.run_compliance_model()
+                run_producer_consumer()
 
             if not single_shot:
                 gui_comm('%s: Post Processing ...' % o2.options.session_name)
