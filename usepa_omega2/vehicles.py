@@ -11,16 +11,16 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-def sales_weight(veh_list, attribute_name):
+def sales_weight(vehicle_list, attribute_name):
     """
 
-    :param veh_list:
+    :param vehicle_list:
     :param attribute_name:
     :return:
     """
     weighted_sum = 0
     total_sales = 0
-    for v in veh_list:
+    for v in vehicle_list:
         sales = v.get_initial_registered_count()
         total_sales = total_sales + sales
         weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
@@ -28,24 +28,76 @@ def sales_weight(veh_list, attribute_name):
     return weighted_sum / total_sales
 
 
-def sales_unweight(veh, veh_list, attribute_name, weighted_value):
+def sales_unweight(veh, vehicle_list, attribute_name, weighted_value):
     """
 
     :param veh:
-    :param veh_list:
+    :param vehicle_list:
     :param attribute_name:
     :param weighted_value:
     :return:
     """
     total_sales = 0
     weighted_sum = 0
-    for v in veh_list:
+    for v in vehicle_list:
         sales = v.get_initial_registered_count()
         total_sales = total_sales + sales
         if v is not veh:
             weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
 
     return (weighted_value * total_sales - weighted_sum) / veh.get_initial_registered_count()
+
+
+class CompositeVehicle:
+    composite_vehicle_num = 0
+
+    def __init__(self, vehicle_list):
+        """
+        Build composite vehicle from list of vehicles
+        :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
+        """
+        self.vehicle_list = vehicle_list
+        self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
+
+        self.vehicle_ID = 'CV%d' % CompositeVehicle.composite_vehicle_num
+        CompositeVehicle.composite_vehicle_num = CompositeVehicle.composite_vehicle_num + 1
+
+        self.model_year = self.vehicle_list[0].model_year
+        self.reg_class_ID = self.vehicle_list[0].reg_class_ID
+        self.fueling_class = self.vehicle_list[0].fueling_class
+
+        # calc sales-weighted values
+        self.cert_CO2_grams_per_mile = sales_weight(self.vehicle_list, 'cert_CO2_grams_per_mile')
+        self.footprint_ft2 = sales_weight(self.vehicle_list, 'footprint_ft2')
+        self.cost_curve = None  # TODO: calc sales weighted cost curve here, based on cost_curve classes and model_year
+
+        total_sales = 0
+        for v in self.vehicle_list:
+            total_sales = total_sales = v.get_initial_registered_count()
+
+        for v in self.vehicle_list:
+            v.reg_class_market_share_frac = v.get_initial_registered_count() / total_sales
+
+    def __repr__(self):
+        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
+
+    def __str__(self):
+        s = ''
+        for k in self.__dict__:
+            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
+        return s
+
+    def get_cost(self, target_co2_gpmi):
+        # get cost from cost curve for target_co2_gpmi(s)
+        pass
+
+    def get_max_co2_gpmi(self):
+        # get max co2_gpmi from self.cost_curve
+        pass
+
+    def get_min_co2_gpmi(self):
+        # get min co2_gpmi from self.cost_curve
+        pass
 
 
 class Vehicle(SQABase):
@@ -72,12 +124,13 @@ class Vehicle(SQABase):
     showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
+    reg_class_market_share_frac = 1.0
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
     def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
+        s = ''
         for k in self.__dict__:
             s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
         return s

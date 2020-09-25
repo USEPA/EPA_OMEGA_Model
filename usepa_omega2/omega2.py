@@ -284,7 +284,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
             if profile:
                 import cProfile
                 import re
-                cProfile.run('producer.run_compliance_model()', filename='omega2_profile.dmp')
+                cProfile.run('run_producer_consumer()', filename='omega2_profile.dmp')
             else:
                 run_producer_consumer()
 

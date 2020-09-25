@@ -45,7 +45,8 @@ def partition(num_columns, num_levels, min_level=0.001, verbose=False):
         from pyDOE2 import fullfact
 
         permutations = np.minimum(1 - min_level, np.maximum(min_level, fullfact([num_levels] * num_columns) / (num_levels - 1)))
-        valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
+        valid_combinations = permutations
+        # valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
 
         if verbose:
             for i in valid_combinations:
@@ -59,12 +60,13 @@ def partition(num_columns, num_levels, min_level=0.001, verbose=False):
     return partition_dict[partition_name]
 
 
-def cartesian_prod(left_df, right_df):
+def cartesian_prod(left_df, right_df, drop=False):
     """
     Calculate cartesian product of the dataframe rows
 
     :param left_df: 'left' dataframe
     :param right_df: 'right' dataframe
+    :param drop: if True, drop join-column '_' from dataframes
     :return: cartesian product of the dataframe rows
     """
     import pandas as pd
@@ -73,17 +75,19 @@ def cartesian_prod(left_df, right_df):
         return right_df
     else:
         if not '_' in left_df:
-            left_df['_'] = 1
+            left_df['_'] = 0
 
         if not '_' in right_df:
-            right_df['_'] = 1
+            right_df['_'] = 0
 
-        leftXright = pd.merge(left_df, right_df, on='_')  # .drop('_', axis=1)
+        if drop:
+            leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
+            left_df.drop('_', axis=1, inplace=True)
+            right_df.drop('_', axis=1, inplace=True, errors='ignore')
+        else:
+            leftXright = pd.merge(left_df, right_df, on='_')
 
-        # left_df.drop('_', axis=1, inplace=True)
-        # right_df.drop('_', axis=1, inplace=True, errors='ignore')
-
-        return leftXright
+    return leftXright
 
 
 def inherit_vehicles(from_year, to_year, manufacturer_id):
