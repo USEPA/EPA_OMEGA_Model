@@ -200,7 +200,7 @@
           <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_37H6srGYEeqot_EVL7aS4w" name="kwh"/>
         </nestedClassifier>
       </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_ZWk1sKdEEeqRUoM6l8Mfgg" name="fuel_context">
+      <packagedElement xmi:type="uml:Class" xmi:id="_ZWk1sKdEEeqRUoM6l8Mfgg" name="fuels_context">
         <ownedAttribute xmi:type="uml:Property" xmi:id="_s_gkIKdEEeqRUoM6l8Mfgg" name="calendar_year"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_4FlgsKdEEeqRUoM6l8Mfgg" name="fuel_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_KSuxIKdGEeqRUoM6l8Mfgg" name="cost_dollars_per_unit"/>
