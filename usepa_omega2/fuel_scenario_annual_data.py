@@ -11,9 +11,9 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class FuelScenarioAnnualData(SQABase):
+class FuelsContext(SQABase):
     # --- database table properties ---
-    __tablename__ = 'fuel_scenario_annual_data'
+    __tablename__ = 'fuels_context'
     index = Column('index', Integer, primary_key=True)
     fuel_ID = Column('fuel_id', String)
     fuel_scenario_ID = Column('fuel_scenario_id', String)
@@ -55,7 +55,7 @@ class FuelScenarioAnnualData(SQABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(FuelScenarioAnnualData(
+                    obj_list.append(FuelsContext(
                         fuel_ID=df.loc[i, 'fuel_id'],
                         fuel_scenario_ID=df.loc[i, 'fuel_scenario_id'],
                         calendar_year=df.loc[i, 'calendar_year'],
@@ -81,8 +81,8 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + FuelScenarioAnnualData.init_database_from_file(o2.options.fuel_scenario_annual_data_file,
-                                                                               verbose=o2.options.verbose)
+        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.fuel_scenario_annual_data_file,
+                                                                     verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)

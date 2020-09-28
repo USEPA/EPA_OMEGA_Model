@@ -201,8 +201,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     omega_log.init_logfile()
 
     from fuels import Fuel
-    from fuel_scenarios import FuelScenario
-    from fuel_scenario_annual_data import FuelScenarioAnnualData
+    from fuel_scenario_annual_data import FuelsContext
     from market_classes import MarketClass
     from cost_curves import CostCurve
     from cost_clouds import CostCloud
@@ -232,9 +231,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     init_fail = []
     try:
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-        init_fail = init_fail + FuelScenario.init_database_from_file(o2.options.fuel_scenarios_file,
-                                                                     verbose=o2.options.verbose)
-        init_fail = init_fail + FuelScenarioAnnualData.init_database_from_file(
+        init_fail = init_fail + FuelsContext.init_database_from_file(
             o2.options.fuel_scenario_annual_data_file, verbose=o2.options.verbose)
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
