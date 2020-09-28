@@ -68,26 +68,18 @@ usepa\_omega2.file\_eye\_oh module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.fuel\_scenario\_annual\_data module
--------------------------------------------------
-
-.. automodule:: usepa_omega2.fuel_scenario_annual_data
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.fuel\_scenarios module
-------------------------------------
-
-.. automodule:: usepa_omega2.fuel_scenarios
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.fuels module
 --------------------------
 
 .. automodule:: usepa_omega2.fuels
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.fuels\_context module
+-----------------------------------
+
+.. automodule:: usepa_omega2.fuels_context
    :members:
    :undoc-members:
    :show-inheritance:
