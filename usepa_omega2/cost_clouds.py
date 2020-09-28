@@ -83,54 +83,65 @@ class CostCloud(SQABase):
                 for model_year in cloud_model_years:
                     if verbose:
                         print(model_year)
-                    cloud = class_cloud[class_cloud['model_year'] == model_year]
 
-                    # vars to hold column names
-                    combined_GHG_gpmi = 'cert_co2_grams_per_mile'
-                    combined_GHG_cost = 'new_vehicle_mfr_cost_dollars'
+                    min_co2_gpmi, min_co2_cost = CostCloud.calculate_frontier(
+                        class_cloud[class_cloud['model_year'] == model_year],
+                        cost_curve_class, model_year, verbose,
+                        plot=model_year == cloud_model_years.min(), savefig=model_year == cloud_model_years.min())
 
-                    if verbose and model_year == cloud_model_years.min():
-                        plt.figure()
-                        plt.plot(cloud[combined_GHG_gpmi], cloud[combined_GHG_cost], '.')
-                        plt.title('Cost versus CO2 %s' % cost_curve_class)
-                        plt.xlabel('Combined GHG CO2 [g/mi]')
-                        plt.ylabel('Combined GHG Cost [$]')
-                        plt.grid()
-
-                    # define frontier lists
-                    min_co2_gpmi = []
-                    min_co2_cost = []
-                    # find frontier starting point, lowest GHGs, and add to frontier lists
-                    min_co2_gpmi_index = cloud[combined_GHG_gpmi].idxmin()
-                    min_co2_gpmi.append(cloud[combined_GHG_gpmi].loc[min_co2_gpmi_index])
-                    min_co2_cost.append(cloud[combined_GHG_cost].loc[min_co2_gpmi_index])
-
-                    # keep lower cost points
-                    cloud = cloud[cloud[combined_GHG_cost] < min_co2_cost[-1]]
-                    while len(cloud):
-                        # calculate frontier factor (more negative is more better) = slope of each point relative
-                        # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                        cloud['frontier_factor'] = (cloud[combined_GHG_cost] - min_co2_cost[-1]) / (
-                                cloud[combined_GHG_gpmi] - min_co2_gpmi[
-                            -1]) ** o2.options.cost_curve_frontier_affinity_factor
-
-                        # find next frontier point, lowest slope, and add to frontier lists
-                        min_co2_gpmi_index = cloud['frontier_factor'].idxmin()
-                        min_co2_gpmi.append(cloud[combined_GHG_gpmi].loc[min_co2_gpmi_index])
-                        min_co2_cost.append(cloud[combined_GHG_cost].loc[min_co2_gpmi_index])
-
-                        # keep lower cost points
-                        cloud = cloud[cloud[combined_GHG_cost] < min_co2_cost[-1]]
-
-                    if verbose and model_year == cloud_model_years.min():
-                        plt.plot(min_co2_gpmi, min_co2_cost, 'r-')
-                        plt.savefig(o2.options.output_folder + 'Cost versus CO2 %s' % cost_curve_class)
                     cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year, min_co2_gpmi,
                                                                    min_co2_cost)
 
             plt.close()
 
         return template_errors
+
+    @staticmethod
+    def calculate_frontier(cloud, cost_curve_class, model_year, verbose=False, plot=False, savefig=False):
+        import matplotlib.pyplot as plt
+
+        # vars to hold column names
+        combined_GHG_gpmi = 'cert_co2_grams_per_mile'
+        combined_GHG_cost = 'new_vehicle_mfr_cost_dollars'
+        if plot:
+            plt.figure()
+            plt.plot(cloud[combined_GHG_gpmi], cloud[combined_GHG_cost], '.')
+            plt.title('Cost versus CO2 %s' % cost_curve_class)
+            plt.xlabel('Combined GHG CO2 [g/mi]')
+            plt.ylabel('Combined GHG Cost [$]')
+            plt.grid()
+        # define frontier lists
+        min_co2_gpmi = []
+        min_co2_cost = []
+        # find frontier starting point, lowest GHGs, and add to frontier lists
+        min_co2_gpmi_index = cloud[combined_GHG_gpmi].idxmin()
+        min_co2_gpmi.append(cloud[combined_GHG_gpmi].loc[min_co2_gpmi_index])
+        min_co2_cost.append(cloud[combined_GHG_cost].loc[min_co2_gpmi_index])
+        # keep lower cost points
+        cloud = cloud[cloud[combined_GHG_cost] < min_co2_cost[-1]]
+        while len(cloud):
+            # calculate frontier factor (more negative is more better) = slope of each point relative
+            # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
+            cloud['frontier_factor'] = (cloud[combined_GHG_cost] - min_co2_cost[-1]) / (
+                    cloud[combined_GHG_gpmi] - min_co2_gpmi[
+                -1]) ** o2.options.cost_curve_frontier_affinity_factor
+
+            # find next frontier point, lowest slope, and add to frontier lists
+            min_co2_gpmi_index = cloud['frontier_factor'].idxmin()
+            min_co2_gpmi.append(cloud[combined_GHG_gpmi].loc[min_co2_gpmi_index])
+            min_co2_cost.append(cloud[combined_GHG_cost].loc[min_co2_gpmi_index])
+
+            # keep lower cost points
+            cloud = cloud[cloud[combined_GHG_cost] < min_co2_cost[-1]]
+
+        if plot:
+            plt.plot(min_co2_gpmi, min_co2_cost, 'r-')
+
+        if savefig:
+            plt.savefig(o2.options.output_folder + 'Cost versus CO2 %s' % cost_curve_class)
+
+        return min_co2_gpmi, min_co2_cost
+
 
     def calculate_generalized_cost(self, cost_curve_class):
         print(cost_curve_class)
