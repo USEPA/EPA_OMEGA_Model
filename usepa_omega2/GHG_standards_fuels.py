@@ -1,6 +1,6 @@
 """
-fuels_context.py
-================
+GHG_standards_fuels.py
+======================
 
 
 """
@@ -11,14 +11,13 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class FuelsContext(SQABase):
+class GHGStandardFuels(SQABase):
     # --- database table properties ---
-    __tablename__ = 'fuels_context'
+    __tablename__ = 'ghg_standards_fuels'
     index = Column('index', Integer, primary_key=True)
     fuel_ID = Column('fuel_id', String)
     calendar_year = Column(Numeric)
-    cost_dollars_per_unit = Column(Float)
-    upstream_CO2_per_unit = Column('upstream_co2_per_unit', Float)
+    cert_CO2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
@@ -34,10 +33,9 @@ class FuelsContext(SQABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'fuels_context'
-        input_template_version = 0.0003
-        input_template_columns = {'fuel_id', 'calendar_year', 'cost_dollars_per_unit',
-                                  'upstream_co2_grams_per_unit'}
+        input_template_name = 'ghg_standards-fuels'
+        input_template_version = 0.0001
+        input_template_columns = {'fuel_id', 'calendar_year', 'cert_co2_grams_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -54,11 +52,10 @@ class FuelsContext(SQABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(FuelsContext(
+                    obj_list.append(GHGStandardFuels(
                         fuel_ID=df.loc[i, 'fuel_id'],
                         calendar_year=df.loc[i, 'calendar_year'],
-                        cost_dollars_per_unit=df.loc[i, 'cost_dollars_per_unit'],
-                        upstream_CO2_per_unit=df.loc[i, 'upstream_co2_grams_per_unit'],
+                        cert_CO2_grams_per_unit=df.loc[i, 'cert_co2_grams_per_unit'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -79,8 +76,8 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.fuels_context_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
+                                                                         verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)

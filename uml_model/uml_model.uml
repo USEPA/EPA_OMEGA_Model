@@ -161,7 +161,7 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="_Hvr8kJUyEeq1MNw_X5quEQ" name="hauling_class"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_j0kosJkZEeq1MNw_X5quEQ" name="footprint_sqft" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_FQe8EKdCEeqRUoM6l8Mfgg" name="cost_curve_class" visibility="public"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_sLey8KslEeq6oJG-GxIr5g" name="cert_fuel_ID"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_sLey8KslEeq6oJG-GxIr5g" name="cert_fuel_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_t-_X8KslEeq6oJG-GxIr5g" name="cert_test_cycle"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_U8qtgKsmEeq6oJG-GxIr5g" name="cert_co2_grams_per_mile"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_rJLL8KsmEeq6oJG-GxIr5g" name="new_vehicle_mfr_cost_dollars" visibility="public"/>

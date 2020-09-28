@@ -1391,7 +1391,7 @@
             <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8g4qOascEeq6oJG-GxIr5g"/>
           </children>
           <element xmi:type="uml:Class" href="uml_model.uml#_8geagKscEeq6oJG-GxIr5g"/>
-          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8gvgQascEeq6oJG-GxIr5g" x="974" y="112" width="321" height="181"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8gvgQascEeq6oJG-GxIr5g" x="914" y="112" width="321" height="181"/>
         </children>
         <children xmi:type="notation:Shape" xmi:id="_NOy5wOepEeq0FIty4TOAXA" type="Class_Shape_CN">
           <children xmi:type="notation:DecorationNode" xmi:id="_NOzg0OepEeq0FIty4TOAXA" type="Class_NameLabel_CN"/>

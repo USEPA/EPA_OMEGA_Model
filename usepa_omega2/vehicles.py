@@ -121,7 +121,8 @@ class Vehicle(SQABase):
     cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
     new_vehicle_mfr_cost_dollars = Column(Float)
     manufacturer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    showroom_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
+    in_use_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
+    # TODO: cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('ghg_standard_fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
     reg_class_market_share_frac = 1.0
@@ -168,7 +169,7 @@ class Vehicle(SQABase):
 
     def inherit_vehicle(self, vehicle):
         inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
-                              'cost_curve_class', 'reg_class_ID', 'showroom_fuel_ID', 'market_class_ID',
+                              'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
                               'cert_CO2_grams_per_mile', 'footprint_ft2'}
         for p in inherit_properties:
             self.__setattr__(p, vehicle.__getattribute__(p))
@@ -179,9 +180,9 @@ class Vehicle(SQABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.0004
+        input_template_version = 0.0005
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'hauling_class',
-                                  'cost_curve_class', 'showroom_fuel_id', 'market_class_id', 'sales',
+                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'market_class_id', 'sales',
                                   'cert_co2_grams_per_mile', 'footprint_ft2'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
@@ -203,7 +204,7 @@ class Vehicle(SQABase):
                         reg_class_ID=df.loc[i, 'reg_class_id'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
-                        showroom_fuel_ID=df.loc[i, 'showroom_fuel_id'],
+                        in_use_fuel_ID=df.loc[i, 'in_use_fuel_id'],
                         market_class_ID=df.loc[i, 'market_class_id'],
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )

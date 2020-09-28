@@ -223,6 +223,8 @@ def run_omega(o2_options, single_shot=False, profile=False):
     else:
         from GHG_standards_footprint import GHGStandardFootprint
 
+    from GHG_standards_fuels import GHGStandardFuels
+
     o2.options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
     o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
 
@@ -232,7 +234,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     try:
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
         init_fail = init_fail + FuelsContext.init_database_from_file(
-            o2.options.fuel_scenario_annual_data_file, verbose=o2.options.verbose)
+            o2.options.fuels_context_file, verbose=o2.options.verbose)
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
 
@@ -249,6 +251,9 @@ def run_omega(o2_options, single_shot=False, profile=False):
             init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
                                                                                  verbose=o2.options.verbose)
             o2.options.GHG_standard = GHGStandardFootprint
+
+        init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
+                                                                         verbose=o2.options.verbose)
 
         init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
             o2.options.demanded_shares_file, verbose=o2.options.verbose)

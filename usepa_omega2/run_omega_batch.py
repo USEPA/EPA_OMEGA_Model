@@ -234,13 +234,14 @@ class OMEGASessionObject(object):
         self.settings.demanded_shares_file = self.read_parameter('Demanded Shares File')
         self.settings.fuels_file = self.read_parameter('Fuels File')
         self.settings.fuel_scenarios_file = self.read_parameter('Fuel Scenarios File')
-        self.settings.fuel_scenario_annual_data_file = self.read_parameter('Fuel Scenario Annual Data File')
+        self.settings.fuels_context_file = self.read_parameter('Fuel Scenario Annual Data File')
         if validate_predefined_input(self.read_parameter('Cost File Type'), {'clouds', 'curves'}):
             self.settings.cost_file_type = self.read_parameter('Cost File Type')
         self.settings.cost_file = self.read_parameter('Cost File')
         self.settings.ghg_standards_file = self.read_parameter('GHG Standards File')
         if validate_predefined_input(self.read_parameter('GHG Standard Type'), {'flat', 'footprint'}):
             self.settings.GHG_standard = self.read_parameter('GHG Standard Type')
+        self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards FUels File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
             self.read_parameter('Slice Tech Combo Tables'), true_false_dict)

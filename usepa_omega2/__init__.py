@@ -46,8 +46,7 @@ try:
             self.vehicles_file = 'sample_inputs/vehicles.csv'
             self.demanded_shares_file = 'sample_inputs/demanded_shares-gcam.csv'
             self.fuels_file = 'sample_inputs/fuels.csv'
-            self.fuel_scenarios_file = 'sample_inputs/fuel_scenarios.csv'
-            self.fuel_scenario_annual_data_file = 'sample_inputs/fuel_scenario_annual_data.csv'
+            self.fuels_context_file = 'sample_inputs/fuels_context.csv'
             self.cost_file_type = 'curves'
             self.cost_file = 'sample_inputs/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
@@ -62,6 +61,7 @@ try:
                 self.ghg_standards_file = 'sample_inputs/ghg_standards-flat.csv'
             else:
                 self.ghg_standards_file = 'sample_inputs/ghg_standards-footprint.csv'
+            self.ghg_standards_fuels_file = 'sample_inputs/ghg_standards-fuels.csv'
             self.stock_scrappage = 'fixed'
             self.stock_vmt = 'fixed'
             if self.stock_scrappage == 'fixed':
