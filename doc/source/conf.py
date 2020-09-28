@@ -24,7 +24,7 @@ copyright = '2020, US EPA'
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.17'
+release = '0.1.18'
 
 
 # -- General configuration ---------------------------------------------------
