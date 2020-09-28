@@ -571,7 +571,12 @@ class Form(QObject):
 
     def run_model(self):
         """
-        Copies all files from the input directory to the project directory.
+        Calls the OMEGA2 main program with selected options.
+        Options for single processor mode:
+        --batch_file [user selected batch file] --bundle_path [user selected output directory]
+        --timestamp [current date and time]
+
+        Options for multiprocessor mode:
 
         :return: N/A
         """
@@ -642,6 +647,7 @@ class Form(QObject):
 
         # Combine command line options
         x = a + b + c + d
+        # print("***", x, "***")
 
         # Call OMEGA2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
