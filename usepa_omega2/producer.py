@@ -25,39 +25,91 @@ def unique(vector):
     return [vector[index] for index in sorted(indexes)]
 
 partition_dict = dict()
-def partition(num_columns, num_levels, min_level=0.001, verbose=False):
-    """
-    Returns a set of columns, the rows of which add up to 1.0, with num_levels between 0-1
-    ex: >>> partition(num_columns=2, num_levels=3, verbose=True)
-            1.00	0.00
-            0.50	0.50
-            0.00	1.00
-
-    :param num_columns: number of columns in the output
-    :param num_levels: number of values from 0-1
-    :param verbose: if True then result is printed to the console
-    :return: a set of columns, the rows of which add up to 1.0
+def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):
     """
 
-    partition_name = '%d_%d_%s' % (num_columns, num_levels, min_level)
+    :param columns: number of columns or list of column names
+    :param max_values: list of max values for groups of columns
+    :param increment: increment from 0 to max_values
+    :param min_level: minimum output value (max output value will be max_value - min_level)
+    :param verbose: if True then print result
+    :return: pandas Dataframe of result, rows of which add up to sum(max_values)
+    """
+    import sys
+
+    if type(columns) is list:
+        num_columns = len(columns)
+    else:
+        num_columns = columns
+        columns = [i for i in range(num_columns)]
+
+    partition_name = '%s_%s_%s_%s' % (columns, max_values, increment, min_level)
 
     if not partition_name in partition_dict:
-        from pyDOE2 import fullfact
+        dfs = []
+        for mv in max_values:
+            members = []
+            for i in range(num_columns):
+                members.append(pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]]))
 
-        permutations = np.minimum(1 - min_level, np.maximum(min_level, fullfact([num_levels] * num_columns) / (num_levels - 1)))
-        valid_combinations = permutations
-        # valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
+            x = pd.DataFrame()
+            for m in members:
+                x = cartesian_prod(x, m)
+                x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon]  # sum <= mv
+
+            x = x[abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon]
+            x[x == 0] = min_level
+            x[x == mv] = mv - min_level
+            dfs.append(x)
+
+        ans = pd.DataFrame()
+        for df in dfs:
+            ans = cartesian_prod(ans, df)
 
         if verbose:
-            for i in valid_combinations:
-                s = ''
-                for e in i:
-                    s = s + '\t%.3f' % e
-                print(s)
+            with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                print(ans)
 
-        partition_dict[partition_name] = valid_combinations.transpose()
+        ans = ans[abs(ans.sum(axis=1, numeric_only=True) - sum(max_values)) <= sys.float_info.epsilon]
+        ans = ans.drop('_', axis=1)
+
+        partition_dict[partition_name] = ans
 
     return partition_dict[partition_name]
+
+
+# def partition(num_columns, num_levels, min_level=0.001, verbose=False):
+#     """
+#     Returns a set of columns, the rows of which add up to 1.0, with num_levels between 0-1
+#     ex: >>> partition(num_columns=2, num_levels=3, verbose=True)
+#             1.00	0.00
+#             0.50	0.50
+#             0.00	1.00
+#
+#     :param num_columns: number of columns in the output
+#     :param num_levels: number of values from 0-1
+#     :param verbose: if True then result is printed to the console
+#     :return: a set of columns, the rows of which add up to 1.0
+#     """
+#
+#     partition_name = '%d_%d_%s' % (num_columns, num_levels, min_level)
+#
+#     if not partition_name in partition_dict:
+#         from pyDOE2 import fullfact
+#
+#         permutations = np.minimum(1 - min_level, np.maximum(min_level, fullfact([num_levels] * num_columns) / (num_levels - 1)))
+#         valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
+#
+#         if verbose:
+#             for i in valid_combinations:
+#                 s = ''
+#                 for e in i:
+#                     s = s + '\t%.3f' % e
+#                 print(s)
+#
+#         partition_dict[partition_name] = valid_combinations.transpose()
+#
+#     return partition_dict[partition_name]
 
 
 def cartesian_prod(left_df, right_df, drop=False):
@@ -74,11 +126,11 @@ def cartesian_prod(left_df, right_df, drop=False):
     if left_df.empty:
         return right_df
     else:
-        if not '_' in left_df:
-            left_df['_'] = 0
+        if '_' not in left_df:
+            left_df['_'] = np.nan
 
-        if not '_' in right_df:
-            right_df['_'] = 0
+        if '_' not in right_df:
+            right_df['_'] = np.nan
 
         if drop:
             leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
@@ -164,29 +216,26 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
                 child_df_list.append(df)
 
-    if all(s in sweep_list for s in children):
-        sales_share_frac = partition(num_children, o2.options.num_share_options)
+    if parent:
+        sales_share_column_names = [parent + '.' + c + ' share_frac' for c in children]
     else:
-        sales_share_frac = []  # [[i] for i in [1/num_children] * num_children] # assume equal shares between children (for now...)
-        for c in children:
-            # maintain initial fleet market share (for now...)
-            sales_share_frac.append([consumer.sales.demand_sales(calendar_year)[c] /
-                                     consumer.sales.demand_sales(calendar_year)['total']])
+        sales_share_column_names = [c + ' share_frac' for c in children]
 
-    sales_share_df = pd.DataFrame()
-    i = 0
-    for c in children:
-        if parent:
-            if consumer_bev_share:
-                if c == 'BEV':
-                    sales_share_df[parent + '.' + c + ' share_frac'] = [consumer_bev_share]
-                else:
-                    sales_share_df[parent + '.' + c + ' share_frac'] = [1-consumer_bev_share]
+    if all(s in sweep_list for s in children) and not consumer_bev_share:
+        sales_share_df = partition(sales_share_column_names, increment=1/(o2.options.num_share_options-1), min_level=0.001)
+    else:
+        sales_share_df = pd.DataFrame()
+        for c, cn in zip(children, sales_share_column_names):
+            if not consumer_bev_share:
+                # maintain initial fleet market share (for now...)
+                sales_share_df[cn] = [consumer.sales.demand_sales(calendar_year)[c] /
+                                      consumer.sales.demand_sales(calendar_year)['total']]
             else:
-                sales_share_df[parent + '.' + c + ' share_frac'] = sales_share_frac[i]
-        else:
-            sales_share_df[c + ' share_frac'] = sales_share_frac[i]
-        i = i + 1
+                # implement target bev share... (for now...)
+                if c == 'BEV':
+                    sales_share_df[cn] = [consumer_bev_share]
+                else:
+                    sales_share_df[cn] = [1 - consumer_bev_share]
 
     if verbose:
         print('combining ' + str(children))
@@ -353,6 +402,8 @@ if __name__ == '__main__':
     try:
         if '__file__' in locals():
             print(fileio.get_filenameext(__file__))
+
+        partition_x(['a', 'b'], max_values=[1.01], increment=0.1)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
