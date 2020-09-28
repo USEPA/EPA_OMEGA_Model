@@ -21,4 +21,4 @@ means any information which pertains
 to the interests of any business, which
 was developed or acquired by that business, and (except where the context
 otherwise requires) which is possessed
-by EPA in recorded form..
+by EPA in recorded form.
