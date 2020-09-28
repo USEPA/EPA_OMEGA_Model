@@ -201,7 +201,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     omega_log.init_logfile()
 
     from fuels import Fuel
-    from fuel_scenario_annual_data import FuelsContext
+    from fuels_context import FuelsContext
     from market_classes import MarketClass
     from cost_curves import CostCurve
     from cost_clouds import CostCloud
