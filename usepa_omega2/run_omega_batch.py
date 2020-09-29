@@ -241,7 +241,7 @@ class OMEGASessionObject(object):
         self.settings.ghg_standards_file = self.read_parameter('GHG Standards File')
         if validate_predefined_input(self.read_parameter('GHG Standard Type'), {'flat', 'footprint'}):
             self.settings.GHG_standard = self.read_parameter('GHG Standard Type')
-        self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards FUels File')
+        self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards Fuels File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
             self.read_parameter('Slice Tech Combo Tables'), true_false_dict)
@@ -400,10 +400,10 @@ if __name__ == '__main__':
                 batch.dataframe = pd.read_csv(options.batch_file, index_col=0)
             else:
                 batch.dataframe = pd.read_excel(options.batch_file, index_col=0, sheet_name="Sessions")
-            batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False},
-                                    inplace=True)
-            batch.dataframe.drop('Type', axis=1, inplace=True,
-                                 errors='ignore')  # drop Type column, no error if it's not there
+
+            batch.dataframe = batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
+            batch.dataframe = batch.dataframe.drop('Type', axis=1, errors='ignore')  # drop Type column, no error if it's not there
+
             batch.expand_dataframe(verbose=options.verbose)
             batch.force_numeric_params()
             batch.get_batch_settings()
