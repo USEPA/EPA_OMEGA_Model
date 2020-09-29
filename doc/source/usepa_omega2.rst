@@ -28,6 +28,14 @@ usepa\_omega2.GHG\_standards\_footprint module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.GHG\_standards\_fuels module
+------------------------------------------
+
+.. automodule:: usepa_omega2.GHG_standards_fuels
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.cost\_clouds module
 ---------------------------------
 
