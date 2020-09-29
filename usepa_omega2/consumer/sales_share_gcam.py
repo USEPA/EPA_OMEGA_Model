@@ -41,25 +41,25 @@ def get_demanded_shares(df):
                 tmp_dr = vehicle_demanded_share[0].discount_rate
                 tmp_annualization_factor = tmp_pap + tmp_pap/(((1 + tmp_pap)**tmp_dr) - 1)
                 # this cost assignment below is temporary -- will be replaced with vehicle costs from producer module
-                if (market_class_id[0]=='BEV non hauling'):
+                if (market_class_id[0]=='non hauling.BEV'):
                     tmp_total_capital_costs = df[df.calendar_year == cy].average_bev_non_hauling_cost
                     tmp_fuel_cost_per_VMT = fuel_cost_electricity * df[df.calendar_year == cy].average_bev_non_hauling_co2_gpmi / carbon_intensity_electricity
                     #tmp_total_capital_costs = 45000 + 500 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 1600
                     #tmp_fuel_cost_per_VMT = 0.03
-                elif (market_class_id[0] == 'BEV hauling'):
+                elif (market_class_id[0] == 'hauling.BEV'):
                     tmp_total_capital_costs = df[df.calendar_year == cy].average_bev_hauling_cost
                     tmp_fuel_cost_per_VMT = fuel_cost_electricity * df[df.calendar_year == cy].average_bev_hauling_co2_gpmi / carbon_intensity_electricity
                     #tmp_total_capital_costs = 65000 + 500 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 1600
                     #tmp_fuel_cost_per_VMT = 0.04
-                elif (market_class_id[0] == 'ICE non hauling'):
+                elif (market_class_id[0] == 'non hauling.ICE'):
                     tmp_total_capital_costs = df[df.calendar_year == cy].average_ice_non_hauling_cost
                     tmp_fuel_cost_per_VMT = fuel_cost_gasoline * df[df.calendar_year == cy].average_ice_non_hauling_co2_gpmi / carbon_intensity_gasoline
                     #tmp_total_capital_costs = 35000 + 1000 * (cy - o2.options.analysis_initial_year)
                     tmp_annual_o_m_costs = 2000
                     #tmp_fuel_cost_per_VMT = 0.10
-                elif (market_class_id[0] == 'ICE hauling'):
+                elif (market_class_id[0] == 'hauling.ICE'):
                     tmp_total_capital_costs = df[df.calendar_year == cy].average_ice_hauling_cost
                     tmp_fuel_cost_per_VMT = fuel_cost_gasoline * df[df.calendar_year == cy].average_ice_hauling_co2_gpmi / carbon_intensity_gasoline
                     #tmp_total_capital_costs = 50000 + 1000 * (cy - o2.options.analysis_initial_year)

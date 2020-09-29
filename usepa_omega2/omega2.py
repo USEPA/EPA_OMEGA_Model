@@ -294,7 +294,8 @@ def run_omega(o2_options, single_shot=False, profile=False):
                 gui_comm('%s: Post Processing ...' % o2.options.session_name)
 
             session_summary_results = run_postproc()
-            session_summary_results = get_demanded_shares(session_summary_results)
+            # todo: fix get_demanded_shares()
+            # session_summary_results = get_demanded_shares(session_summary_results)
 
             if single_shot:
                 session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
