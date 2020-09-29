@@ -38,7 +38,6 @@
       <ownedAttribute xmi:type="uml:Property" xmi:id="_1oM_YK8zEeqO0d-UmaSoow" name="name" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_yG9xcLGdEeqot_EVL7aS4w"/>
-    <packagedElement xmi:type="uml:Dependency" xmi:id="_2g05kLuhEeqijc4sJTwzXQ" name="fuel_scenario_id" client="_d13h4MTvEembs_lAYl7NMg" supplier="_kfn98LuhEeqijc4sJTwzXQ"/>
     <packagedElement xmi:type="uml:Dependency" xmi:id="__dNlwLuhEeqijc4sJTwzXQ" name="fuel_id" client="_ZWk1sKdEEeqRUoM6l8Mfgg" supplier="_ecoowJkbEeq1MNw_X5quEQ"/>
     <packagedElement xmi:type="uml:Class" xmi:id="_GGcxsMqXEeqfDrL7faTSqQ" name="runtime_options">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Lgh0wMqXEeqfDrL7faTSqQ" name="curve_frontier_affinity_factor"/>
@@ -205,12 +204,7 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="_4FlgsKdEEeqRUoM6l8Mfgg" name="fuel_id" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_KSuxIKdGEeqRUoM6l8Mfgg" name="cost_dollars_per_unit"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_WXp7kKdGEeqRUoM6l8Mfgg" name="upstream_co2_per_unit"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_9sRxgKdGEeqRUoM6l8Mfgg" name="fuel_scenario_id (delete)" visibility="public"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_qxWYwLrzEeqR6PiF084V6A" name="index"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Class" xmi:id="_kfn98LuhEeqijc4sJTwzXQ" name="fuel_scenarios (delete)">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_qy_ZcLuhEeqijc4sJTwzXQ" name="fuel_scenario_id" visibility="public"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_tnSGALuhEeqijc4sJTwzXQ" name="dollar_year" visibility="public"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Class" xmi:id="_8geagKscEeq6oJG-GxIr5g" name="ghg_standards (flat)">
         <ownedAttribute xmi:type="uml:Property" xmi:id="_AGRcgKsdEeq6oJG-GxIr5g" name="model_year"/>
