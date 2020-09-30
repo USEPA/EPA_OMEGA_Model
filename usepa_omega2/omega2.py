@@ -20,6 +20,7 @@ def run_postproc():
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData
+    from market_classes import MarketClass
     import pandas as pd
 
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
@@ -65,7 +66,7 @@ def run_postproc():
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[hc])
 
-    for mc in sql_unpack_result(o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct()):
+    for mc in MarketClass.market_classes:
         average_cost_data[mc] = []
         for cy in calendar_years:
             average_cost_data[mc].append(o2.session.query(
@@ -73,7 +74,7 @@ def run_postproc():
                 func.sum(VehicleAnnualData.registered_count)). \
                                          filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
                                          filter(Vehicle.model_year == cy). \
-                                         filter(Vehicle.market_class_ID == mc[0]). \
+                                         filter(Vehicle.market_class_ID == mc). \
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[mc])
 
@@ -89,7 +90,7 @@ def run_postproc():
     ax1.plot(calendar_years, average_cost_data['total'])
 
     label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]', '%s\nAverage Vehicle Cost v Year' % o2.options.session_unique_name)
-    ax1.set_ylim(15e3, 50e3)
+    ax1.set_ylim(15e3, 60e3)
     ax1.legend(average_cost_data.keys())
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_unique_name)
 
@@ -108,7 +109,7 @@ def run_postproc():
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[hc])
 
-    for mc in sql_unpack_result(o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct()):
+    for mc in MarketClass.market_classes:
         average_co2_gpmi_data[mc] = []
         for cy in calendar_years:
             average_co2_gpmi_data[mc].append(o2.session.query(
@@ -116,7 +117,7 @@ def run_postproc():
                 func.sum(VehicleAnnualData.registered_count)). \
                                              filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID). \
                                              filter(Vehicle.model_year == cy). \
-                                             filter(Vehicle.market_class_ID == mc[0]). \
+                                             filter(Vehicle.market_class_ID == mc). \
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[mc])
 
@@ -148,15 +149,16 @@ def run_postproc():
     session_results['ice_non_hauling_share_frac'] = ice_non_hauling_share_frac
     session_results['bev_hauling_share_frac'] = bev_hauling_share_frac
     session_results['ice_hauling_share_frac'] = ice_hauling_share_frac
+
     for hc in hauling_classes:
         session_results['average_%s_cost' % sql_valid_name(hc)] = average_cost_data[hc]
-    session_results['average_vehicle_cost'] = average_cost_data['total']
-    for hc in hauling_classes:
         session_results['average_%s_co2_gpmi' % sql_valid_name(hc)] = average_co2_gpmi_data[hc]
+    session_results['average_vehicle_cost'] = average_cost_data['total']
     session_results['average_vehicle_co2_gpmi'] = average_co2_gpmi_data['total']
-    for mc in sql_unpack_result(o2.session.query(Vehicle.market_class_ID).filter(Vehicle.model_year == cy).distinct()):
-        session_results['average_%s_co2_gpmi' % sql_valid_name(mc[0])] = average_co2_gpmi_data[mc]
-        session_results['average_%s_cost' % sql_valid_name(mc[0])] = average_cost_data[mc]
+
+    for mc in MarketClass.market_classes:
+        session_results['average_%s_co2_gpmi' % sql_valid_name(mc)] = average_co2_gpmi_data[mc]
+        session_results['average_%s_cost' % sql_valid_name(mc)] = average_cost_data[mc]
 
     # session_results.to_csv(o2.options.output_folder + o2.options.session_name + '_summary_results.csv')
 
@@ -166,17 +168,30 @@ def run_postproc():
 def run_producer_consumer():
     from manufacturers import Manufacturer
     import producer
+    from market_classes import MarketClass
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
 
+        iteration_log = pd.DataFrame()
         for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
             print(calendar_year)
             iterate = True
             consumer_bev_share = None
+            iteration_num = 0
             while iterate:
+                # candidate_vehicles_list, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
                 producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
+
+                # create what we need for consumer thing in the log... 999
+                # new_row_of_iterator_data = pd.Series()
+                # new_row_of_iterator_data['iteration'] = iteration_num
+                #
+                # iteration_log.append(new_row_of_iterator_data)
+
+                iteration_num = iteration_num + 1
+
                 # run consumer module here, get consumer BEV share
                 # decide whether to iterate again or not
                 iterate = False
@@ -295,7 +310,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
 
             session_summary_results = run_postproc()
             # todo: fix get_demanded_shares()
-            # session_summary_results = get_demanded_shares(session_summary_results)
+            session_summary_results = get_demanded_shares(session_summary_results)
 
             if single_shot:
                 session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')

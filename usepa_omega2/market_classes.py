@@ -109,19 +109,27 @@ class MarketClass(SQABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))
-    _market_class_dict = dict() # empty set market class dict
-    _market_class_dict_rc = dict() # empty set market class dict with reg class leaves
+
+    market_classes = ()  # tuple of market classes
+    _market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
+    _market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()
+    _market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
     @staticmethod
+    def get_market_class_dict():
+        import copy
+        return copy.deepcopy(MarketClass._market_class_dict)
+
+    @staticmethod
     def get_market_class_tree(by_reg_class=False):
         import copy
         if by_reg_class:
-            return copy.deepcopy(MarketClass._market_class_dict_rc)
+            return copy.deepcopy(MarketClass._market_class_tree_dict_rc)
         else:
-            return copy.deepcopy(MarketClass._market_class_dict)
+            return copy.deepcopy(MarketClass._market_class_tree_dict)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -153,8 +161,12 @@ class MarketClass(SQABase):
                 o2.session.add_all(obj_list)
                 o2.session.flush()
 
-                MarketClass._market_class_dict = parse_market_classes(df['market_class_id'])
-                MarketClass._market_class_dict_rc = parse_market_classes(df['market_class_id'], by_reg_class=True)
+                MarketClass.market_classes = tuple(df['market_class_id'].unique())
+                for mc in MarketClass.market_classes:
+                    MarketClass._market_class_dict[mc] = set()
+
+                MarketClass._market_class_tree_dict = parse_market_classes(df['market_class_id'])
+                MarketClass._market_class_tree_dict_rc = parse_market_classes(df['market_class_id'], by_reg_class=True)
 
         return template_errors
 
