@@ -37,14 +37,14 @@ def get_demanded_shares(market_class_data, calendar_year):
     for pass_num in [0, 1]:
         for market_class_id in MarketClass.market_classes:
             # for testing purposes, assign a dummy cost that increases over time. This will come from a generalized cost function
-            gcam_data_cy = o2.session.query(DemandedSharesGCAM).\
-                filter(DemandedSharesGCAM.calendar_year == calendar_year).\
+            gcam_data_cy = o2.session.query(DemandedSharesGCAM). \
+                filter(DemandedSharesGCAM.calendar_year == calendar_year). \
                 filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
-            
+
             price_amortization_period = gcam_data_cy.price_amortization_period
             discount_rate = gcam_data_cy.discount_rate
             annualization_factor = price_amortization_period + \
-                                       price_amortization_period/(((1 + price_amortization_period)**discount_rate) - 1)
+                                   price_amortization_period / (((1 + price_amortization_period) ** discount_rate) - 1)
 
             total_capital_costs = market_class_data['average_%s_cost' % market_class_id].iloc[0]
             average_co2_gpmi = market_class_data['average_%s_co2_gpmi' % market_class_id].iloc[0]
@@ -64,9 +64,9 @@ def get_demanded_shares(market_class_data, calendar_year):
 
             gcam_data_cy.consumer_generalized_cost_dollars = total_capital_costs
             annualized_capital_costs = annualization_factor * total_capital_costs
-            annual_VMT = 12000
+            annual_VMT = float(gcam_data_cy.annual_VMT)
 
-            total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / float(annual_VMT)
+            total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
             total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
             total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / 1.58
             sales_share_numerator = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
@@ -103,6 +103,7 @@ if __name__ == '__main__':
         from demanded_shares_gcam import DemandedSharesGCAM
         from cost_curves import CostCurve
         from GHG_standards_footprint import GHGStandardFootprint
+
         o2.options.GHG_standard = GHGStandardFootprint
         o2.options.ghg_standards_file = 'sample_inputs/ghg_standards-footprint.csv'
         from vehicles import Vehicle
@@ -111,11 +112,15 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
-        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
-        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file, verbose=o2.options.verbose)
+        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
+                                                                     verbose=o2.options.verbose)
+        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+                                                                    verbose=o2.options.verbose)
+        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file,
+                                                                           verbose=o2.options.verbose)
         init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file, verbose=o2.options.verbose)
+        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
+                                                                             verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
         init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
