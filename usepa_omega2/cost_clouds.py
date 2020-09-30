@@ -110,29 +110,29 @@ class CostCloud(SQABase):
         return template_errors
 
     @staticmethod
-    def calculate_frontier(cloud, combined_GHG_gpmi, combined_GHG_cost):
+    def calculate_frontier(cloud, GHG_gpmi, GHG_cost):
         cloud = cloud.copy()
 
         result_df = pd.DataFrame()
 
         # find frontier starting point, lowest GHGs, and add to frontier
-        result_df = result_df.append(cloud.loc[cloud[combined_GHG_gpmi].idxmin()])
+        result_df = result_df.append(cloud.loc[cloud[GHG_gpmi].idxmin()])
 
         # keep lower cost points
-        cloud = cloud[cloud[combined_GHG_cost] < result_df[combined_GHG_cost].iloc[-1]]
+        cloud = cloud[cloud[GHG_cost] < result_df[GHG_cost].iloc[-1]]
 
         while len(cloud):
             # calculate frontier factor (more negative is more better) = slope of each point relative
             # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-            cloud['frontier_factor'] = (cloud[combined_GHG_cost] - result_df[combined_GHG_cost].iloc[-1]) \
-                                       / (cloud[combined_GHG_gpmi] - result_df[combined_GHG_gpmi].iloc[-1]) \
+            cloud['frontier_factor'] = (cloud[GHG_cost] - result_df[GHG_cost].iloc[-1]) \
+                                       / (cloud[GHG_gpmi] - result_df[GHG_gpmi].iloc[-1]) \
                                        ** o2.options.cost_curve_frontier_affinity_factor
 
             # find next frontier point, lowest slope, and add to frontier lists
             result_df = result_df.append(cloud.loc[cloud['frontier_factor'].idxmin()])
 
             # keep lower cost points
-            cloud = cloud[cloud[combined_GHG_cost] < result_df[combined_GHG_cost].iloc[-1]]
+            cloud = cloud[cloud[GHG_cost] < result_df[GHG_cost].iloc[-1]]
 
         result_df = result_df.drop('frontier_factor', axis=1)
 
