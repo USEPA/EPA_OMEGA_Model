@@ -16,85 +16,84 @@ def get_demanded_shares(df):
     :return:
     """
     from demanded_shares_gcam import DemandedSharesGCAM
+    from market_classes import MarketClass
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
-    df = df.fillna(value=np.nan) # not sure why the df has 'None' values and nan values
+
     demanded_share_data = dict()
     # ToDo: These fuels items should be populated from the fuels class
-    fuel_cost_gasoline = 3.5 # dollars per gallon
-    fuel_cost_electricity = 0.12 # dollars per kWh
-    carbon_intensity_gasoline = 8887 # g per CO2 per gallon
-    carbon_intensity_electricity = 534 # g per kWh generated
+    fuel_cost_gasoline = 3.5  # dollars per gallon
+    fuel_cost_electricity = 0.12  # dollars per kWh
+    carbon_intensity_gasoline = 8887  # g per CO2 per gallon
+    carbon_intensity_electricity = 534  # g per kWh generated
 
     for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
         tmp_sales_share_denominator_all_hauling = 0
         tmp_sales_share_denominator_all_nonhauling = 0
-        # print(cy)
-        market_class_ids = o2.session.query(DemandedSharesGCAM.market_class_ID).filter(DemandedSharesGCAM.calendar_year == cy).distinct()
-        for pass_num in range(1,3):
-            for market_class_id in market_class_ids:
+
+        for pass_num in [0, 1]:
+            for market_class_id in MarketClass.market_classes:
+                print('%s %s' % (cy, market_class_id))
+
                 # for testing purposes, assign a dummy cost that increases over time. This will come from a generalized cost function
-                vehicle_demanded_share = []
-                vehicle_demanded_share = o2.session.query(DemandedSharesGCAM).filter(DemandedSharesGCAM.calendar_year == cy).filter(DemandedSharesGCAM.market_class_ID == market_class_id[0])
-                tmp_pap = vehicle_demanded_share[0].price_amortization_period
-                tmp_dr = vehicle_demanded_share[0].discount_rate
+                vehicle_demanded_share = o2.session.query(DemandedSharesGCAM).filter(DemandedSharesGCAM.calendar_year == cy).filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
+                tmp_pap = vehicle_demanded_share.price_amortization_period
+                tmp_dr = vehicle_demanded_share.discount_rate
                 tmp_annualization_factor = tmp_pap + tmp_pap/(((1 + tmp_pap)**tmp_dr) - 1)
-                # this cost assignment below is temporary -- will be replaced with vehicle costs from producer module
-                if (market_class_id[0]=='non hauling.BEV'):
-                    tmp_total_capital_costs = df[df.calendar_year == cy].average_bev_non_hauling_cost
-                    tmp_fuel_cost_per_VMT = fuel_cost_electricity * df[df.calendar_year == cy].average_bev_non_hauling_co2_gpmi / carbon_intensity_electricity
-                    #tmp_total_capital_costs = 45000 + 500 * (cy - o2.options.analysis_initial_year)
+
+                tmp_total_capital_costs = df[df.calendar_year == cy]['average_%s_cost' % sql_valid_name(market_class_id)].iloc[0]
+                average_co2_gpmi = df[df.calendar_year == cy]['average_%s_co2_gpmi' % sql_valid_name(market_class_id)].iloc[0]
+
+                if market_class_id == 'non hauling.BEV':
+                    tmp_fuel_cost_per_VMT = fuel_cost_electricity * average_co2_gpmi / carbon_intensity_electricity
                     tmp_annual_o_m_costs = 1600
-                    #tmp_fuel_cost_per_VMT = 0.03
-                elif (market_class_id[0] == 'hauling.BEV'):
-                    tmp_total_capital_costs = df[df.calendar_year == cy].average_bev_hauling_cost
-                    tmp_fuel_cost_per_VMT = fuel_cost_electricity * df[df.calendar_year == cy].average_bev_hauling_co2_gpmi / carbon_intensity_electricity
-                    #tmp_total_capital_costs = 65000 + 500 * (cy - o2.options.analysis_initial_year)
+                elif market_class_id == 'hauling.BEV':
+                    tmp_fuel_cost_per_VMT = fuel_cost_electricity * average_co2_gpmi / carbon_intensity_electricity
                     tmp_annual_o_m_costs = 1600
-                    #tmp_fuel_cost_per_VMT = 0.04
-                elif (market_class_id[0] == 'non hauling.ICE'):
-                    tmp_total_capital_costs = df[df.calendar_year == cy].average_ice_non_hauling_cost
-                    tmp_fuel_cost_per_VMT = fuel_cost_gasoline * df[df.calendar_year == cy].average_ice_non_hauling_co2_gpmi / carbon_intensity_gasoline
-                    #tmp_total_capital_costs = 35000 + 1000 * (cy - o2.options.analysis_initial_year)
+                elif market_class_id == 'non hauling.ICE':
+                    tmp_fuel_cost_per_VMT = fuel_cost_gasoline * average_co2_gpmi / carbon_intensity_gasoline
                     tmp_annual_o_m_costs = 2000
-                    #tmp_fuel_cost_per_VMT = 0.10
-                elif (market_class_id[0] == 'hauling.ICE'):
-                    tmp_total_capital_costs = df[df.calendar_year == cy].average_ice_hauling_cost
-                    tmp_fuel_cost_per_VMT = fuel_cost_gasoline * df[df.calendar_year == cy].average_ice_hauling_co2_gpmi / carbon_intensity_gasoline
-                    #tmp_total_capital_costs = 50000 + 1000 * (cy - o2.options.analysis_initial_year)
+                elif market_class_id == 'hauling.ICE':
+                    tmp_fuel_cost_per_VMT = fuel_cost_gasoline * average_co2_gpmi / carbon_intensity_gasoline
                     tmp_annual_o_m_costs = 2000
-                    #tmp_fuel_cost_per_VMT = 0.10
-                vehicle_demanded_share[0].consumer_generalized_cost_dollars = tmp_total_capital_costs
+
+                vehicle_demanded_share.consumer_generalized_cost_dollars = tmp_total_capital_costs
                 tmp_annualized_capital_costs = tmp_annualization_factor * tmp_total_capital_costs
                 tmp_annual_VMT = 12000
-                #tmp_annual_VMT = vehicle_demanded_share[0].annual_VMT
-                tmp_total_non_fuel_costs_per_VMT = (tmp_annualized_capital_costs + tmp_annual_o_m_costs)/1.383/float(tmp_annual_VMT)
+
+                tmp_total_non_fuel_costs_per_VMT = (tmp_annualized_capital_costs + tmp_annual_o_m_costs) / 1.383 / float(tmp_annual_VMT)
                 tmp_total_cost_w_fuel_per_VMT = tmp_total_non_fuel_costs_per_VMT + tmp_fuel_cost_per_VMT
                 tmp_total_cost_w_fuel_per_PMT = tmp_total_cost_w_fuel_per_VMT / 1.58
-                tmp_sales_share_numerator = vehicle_demanded_share[0].share_weight * (tmp_total_cost_w_fuel_per_PMT ** logit_exponent_mu)
-                if (pass_num == 1):
-                    if (market_class_id[0] == 'ICE hauling' or market_class_id[0] == 'BEV hauling'):
-                        tmp_sales_share_denominator_all_hauling = tmp_sales_share_numerator + tmp_sales_share_denominator_all_hauling
-                        vehicle_demanded_share[0].demanded_share = tmp_sales_share_denominator_all_hauling
-                    elif (market_class_id[0] == 'ICE non hauling' or market_class_id[0] == 'BEV non hauling'):
-                        tmp_sales_share_denominator_all_nonhauling = tmp_sales_share_numerator + tmp_sales_share_denominator_all_nonhauling
-                        vehicle_demanded_share[0].demanded_share = tmp_sales_share_denominator_all_nonhauling
-                    o2.session.commit()
+                tmp_sales_share_numerator = vehicle_demanded_share.share_weight * (tmp_total_cost_w_fuel_per_PMT ** logit_exponent_mu)
+
+                if pass_num == 0:
+                    if 'non hauling' in market_class_id:
+                        tmp_sales_share_denominator_all_nonhauling = tmp_sales_share_numerator + \
+                                                                     tmp_sales_share_denominator_all_nonhauling
+                        vehicle_demanded_share.demanded_share = tmp_sales_share_denominator_all_nonhauling
+                    else:
+                        tmp_sales_share_denominator_all_hauling = tmp_sales_share_numerator + \
+                                                                  tmp_sales_share_denominator_all_hauling
+                        vehicle_demanded_share.demanded_share = tmp_sales_share_denominator_all_hauling
                 else:
-                    if (market_class_id[0] == 'ICE hauling' or market_class_id[0] == 'BEV hauling'):
-                        vehicle_demanded_share[0].demanded_share = tmp_sales_share_numerator/tmp_sales_share_denominator_all_hauling
-                    elif (market_class_id[0] == 'ICE non hauling' or market_class_id[0] == 'BEV non hauling'):
-                        vehicle_demanded_share[0].demanded_share = tmp_sales_share_numerator / tmp_sales_share_denominator_all_nonhauling
-                    o2.session.commit()
-                    if market_class_id[0] not in demanded_share_data:
-                        demanded_share_data[market_class_id[0]] = []
-                    demanded_share_data[market_class_id[0]].append(o2.session.query(DemandedSharesGCAM.demanded_share).filter(DemandedSharesGCAM.calendar_year == cy).filter(DemandedSharesGCAM.market_class_ID == market_class_id[0]).scalar())
-                    o2.session.commit()
+                    if 'non hauling' in market_class_id:
+                        vehicle_demanded_share.demanded_share = tmp_sales_share_numerator / \
+                                                                tmp_sales_share_denominator_all_nonhauling
+                    else:
+                        vehicle_demanded_share.demanded_share = tmp_sales_share_numerator / \
+                                                                tmp_sales_share_denominator_all_hauling
+
+                    if market_class_id not in demanded_share_data:
+                        demanded_share_data[market_class_id] = []
+
+                    demanded_share_data[market_class_id].append(o2.session.query(DemandedSharesGCAM.demanded_share).filter(DemandedSharesGCAM.calendar_year == cy).filter(DemandedSharesGCAM.market_class_ID == market_class_id).scalar())
+
+    o2.session.commit()
     # write to summary file
-    for market_class_id in market_class_ids:
-        df['demanded_%s_share-gcam' % sql_valid_name(market_class_id[0])] = demanded_share_data[market_class_id[0]]
-        o2.session.commit()
+    for market_class_id in MarketClass.market_classes:
+        df['demanded_%s_share-gcam' % sql_valid_name(market_class_id)] = demanded_share_data[market_class_id]
+
     return df
 
 if __name__ == '__main__':
