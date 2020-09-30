@@ -9,11 +9,14 @@ sales_gcam.py
 from usepa_omega2 import *
 import numpy as np
 
-def get_demanded_shares(df, calendar_year):
+
+def get_demanded_shares(market_class_data, calendar_year):
     """
 
-    :param df:
-    :return:
+    :param market_class_data: dict-like data structure with 'average_MC_cost' and 'average_MC_co2_gpmi' keys
+                                where MC = market class ID
+    :param calendar_year: calendar year to calculate market shares in
+    :return: dict of demanded ICE/BEV share by hauling / non_hauling market segments
     """
     from demanded_shares_gcam import DemandedSharesGCAM
     from market_classes import MarketClass
@@ -43,8 +46,8 @@ def get_demanded_shares(df, calendar_year):
             annualization_factor = price_amortization_period + \
                                        price_amortization_period/(((1 + price_amortization_period)**discount_rate) - 1)
 
-            total_capital_costs = df['average_%s_cost' % sql_valid_name(market_class_id)].iloc[0]
-            average_co2_gpmi = df['average_%s_co2_gpmi' % sql_valid_name(market_class_id)].iloc[0]
+            total_capital_costs = market_class_data['average_%s_cost' % market_class_id].iloc[0]
+            average_co2_gpmi = market_class_data['average_%s_co2_gpmi' % market_class_id].iloc[0]
 
             if market_class_id == 'non hauling.BEV':
                 fuel_cost_per_VMT = fuel_cost_electricity * average_co2_gpmi / carbon_intensity_electricity
