@@ -249,7 +249,6 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
 
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
-    from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from market_classes import MarketClass, populate_market_classes, print_market_class_dict
 
@@ -287,8 +286,14 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
 
     # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
 
-    # TODO: pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0... or minimum...??)
+    # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
     winning_combo = select_winning_combo(tech_share_combos_total)
+
+    return manufacturer_new_vehicles, winning_combo
+
+
+def finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicles, winning_combo):
+    from manufacturer_annual_data import ManufacturerAnnualData
 
     # for k, v in zip(winning_combo.keys(), winning_combo):
     #     print('%s = %f' % (k, v))
@@ -302,19 +307,23 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
 
     cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
-    ManufacturerAnnualData.create_manufacturer_annual_data(calendar_year=calendar_year,
-                                                           manufacturer_ID=manufacturer_ID,
-                                                           cert_target_co2_Mg=cert_target_co2_Mg,
-                                                           cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
-                                                           manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
-                                                           bev_non_hauling_share_frac=winning_combo['non hauling.BEV share_frac'] * winning_combo['non hauling share_frac'],
-                                                           ice_non_hauling_share_frac=winning_combo['non hauling.ICE share_frac'] * winning_combo['non hauling share_frac'],
-                                                           bev_hauling_share_frac=winning_combo['hauling.BEV share_frac'] * winning_combo['hauling share_frac'],
-                                                           ice_hauling_share_frac=winning_combo['hauling.ICE share_frac'] * winning_combo['hauling share_frac'],
-                                                           )
-
-# tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
-# if not o2.options.verbose:
+    ManufacturerAnnualData. \
+        create_manufacturer_annual_data(calendar_year=calendar_year,
+                                        manufacturer_ID=manufacturer_ID,
+                                        cert_target_co2_Mg=cert_target_co2_Mg,
+                                        cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
+                                        manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
+                                        bev_non_hauling_share_frac=winning_combo['non hauling.BEV share_frac'] *
+                                                                   winning_combo['non hauling share_frac'],
+                                        ice_non_hauling_share_frac=winning_combo['non hauling.ICE share_frac'] *
+                                                                   winning_combo['non hauling share_frac'],
+                                        bev_hauling_share_frac=winning_combo['hauling.BEV share_frac'] *
+                                                               winning_combo['hauling share_frac'],
+                                        ice_hauling_share_frac=winning_combo['hauling.ICE share_frac'] *
+                                                               winning_combo['hauling share_frac'],
+                                        )
+    # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
+    # if not o2.options.verbose:
     #     # drop big ass table
     #     o2.session.execute('DROP TABLE tech_share_combos_total_%d' % calendar_year)
     #     # drop vehicle tech options tables
@@ -330,7 +339,6 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     #     o2.session.execute(
     #         'DELETE FROM tech_share_combos_total_%d WHERE total_combo_cert_co2_megagrams NOT BETWEEN %f AND %f' %
     #         (calendar_year, cert_co2_Mg - slice_width, cert_co2_Mg + slice_width))
-
     o2.session.add_all(manufacturer_new_vehicles)
     o2.session.flush()
     # age0_stock_vmt(calendar_year)

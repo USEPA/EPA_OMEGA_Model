@@ -178,7 +178,7 @@ def run_producer_consumer():
             iteration_num = 0
             while iterate:
                 # candidate_vehicles_list, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
-                producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
+                manufacturer_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
 
                 # create what we need for consumer thing in the log... 999
                 # new_row_of_iterator_data = pd.Series()
@@ -191,6 +191,8 @@ def run_producer_consumer():
                 # run consumer module here, get consumer BEV share
                 # decide whether to iterate again or not
                 iterate = False
+
+            producer.finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicles, winning_combo)
 
 
 def run_omega(o2_options, single_shot=False, profile=False):
