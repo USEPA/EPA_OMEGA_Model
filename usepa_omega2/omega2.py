@@ -309,8 +309,16 @@ def run_omega(o2_options, single_shot=False, profile=False):
                 gui_comm('%s: Post Processing ...' % o2.options.session_name)
 
             session_summary_results = run_postproc()
-            # todo: fix get_demanded_shares()
-            session_summary_results = get_demanded_shares(session_summary_results)
+            for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
+                 market_share_results_cy = get_demanded_shares(
+                     session_summary_results[session_summary_results.calendar_year==cy], cy)
+
+            # add market share results to session_summary
+            for mc in MarketClass.market_classes:
+                session_summary_results['demanded_%s_share-gcam' % sql_valid_name(mc)] = \
+                    sql_unpack_result(o2.session.query(DemandedSharesGCAM.demanded_share).
+                        filter(DemandedSharesGCAM.calendar_year <= o2.options.analysis_final_year).
+                        filter(DemandedSharesGCAM.market_class_ID == mc))
 
             if single_shot:
                 session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
