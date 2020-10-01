@@ -10,6 +10,6 @@ REM     outstanding commits
 git commit -m "commit before version bump" --all
 
 REM bump the version
-bumpversion %1 --verbose
+bumpversion %1 %2 --verbose --dry_run
 
 cd crank_win
