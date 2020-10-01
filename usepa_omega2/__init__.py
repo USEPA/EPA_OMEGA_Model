@@ -54,7 +54,6 @@ try:
             self.analysis_final_year = None
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
-            self.producer_consumer_max_iterations = 4
             self.producer_calculate_generalized_cost = None
             self.consumer_calculate_generalized_cost = None
             self.GHG_standard = 'flat'
@@ -77,6 +76,8 @@ try:
             self.context_name = ''
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
+            self.producer_consumer_max_iterations = 10
+            self.producer_consumer_iteration_tolerance = 0.01
             self.num_share_options = 15
             self.num_tech_options_per_ice_vehicle = 10
             self.num_tech_options_per_bev_vehicle = 2

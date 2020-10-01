@@ -206,30 +206,58 @@ def run_producer_consumer():
                                                             consumer_market_share_demand,
                                                             winning_combo))
 
+                converged = True
+                for mc in market_class_dict:
+                    # relative percentage convergence:
+                    converged = converged and abs(1 - \
+                                consumer_market_share_demand['desired_%s_share_frac' % mc] / \
+                                consumer_market_share_demand['demanded_%s_share_frac' % mc]) <= \
+                                o2.options.producer_consumer_iteration_tolerance
+                    # absolute percentage convergence:
+                    # converged = converged and abs(consumer_market_share_demand['desired_%s_share_frac' % mc] -
+                    #             consumer_market_share_demand['demanded_%s_share_frac' % mc]) <= \
+                    #             o2.options.producer_consumer_iteration_tolerance
+
                 # decide whether to iterate or not
-                iterate = iteration_num < o2.options.producer_consumer_max_iterations
+                iterate = iteration_num < o2.options.producer_consumer_max_iterations and not converged
 
                 if iterate:
                     # drop candidates from database, they are no longer needed or desired
                     for cv in candidate_mfr_new_vehicles:
                         o2.session.delete(cv)
 
-                iteration_num = iteration_num + 1
+                    if iteration_num == 0:
+                        for mc in market_class_dict:
+                            # try meeting partway (first pass)
+                            consumer_market_share_demand['demanded_%s_share_frac' % mc] = \
+                                (0.5 * consumer_market_share_demand['desired_%s_share_frac' % mc] +
+                                 0.5 * consumer_market_share_demand['demanded_%s_share_frac' % mc])
+                    else:
+                        for mc in market_class_dict:
+                            # try meeting partway
+                            consumer_market_share_demand['demanded_%s_share_frac' % mc] = \
+                                (0.33*consumer_market_share_demand['desired_%s_share_frac' % mc] +
+                                 0.67*consumer_market_share_demand['demanded_%s_share_frac' % mc])
+
+                    iteration_num = iteration_num + 1
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
 
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder)
 
         import matplotlib.pyplot as plt
+        year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in zip(iteration_log['calendar_year'], iteration_log['iteration'])]
         for mc in market_class_dict:
-            foo = ['%d_%d' % (cy-2000, it) for cy, it in zip(iteration_log['calendar_year'], iteration_log['iteration'])]
-            # foo = ['%d' % it for it in iteration_log['iteration']]
             plt.figure()
-            plt.plot(foo, iteration_log['desired_%s_share_frac' % mc])
-            plt.plot(foo, iteration_log['demanded_%s_share_frac' % mc])
+            plt.plot(year_iter_labels, iteration_log['desired_%s_share_frac' % mc])
+            plt.plot(year_iter_labels, iteration_log['demanded_%s_share_frac' % mc])
             plt.title('%s iteration' % mc)
             plt.grid()
-            plt.savefig('%s%s iteration.png' % (o2.options.output_folder, mc))
+            plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
+
+        fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'])
+        label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % iteration_log['iteration'].mean())
+        fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
 
 
 def cleanup_vehicle_ids(candidate_mfr_new_vehicles, iteration_log, winning_combo):
@@ -404,7 +432,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)
+        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
