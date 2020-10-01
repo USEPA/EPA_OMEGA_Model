@@ -46,8 +46,8 @@ def get_demanded_shares(market_class_data, calendar_year):
             annualization_factor = price_amortization_period + \
                                    price_amortization_period / (((1 + price_amortization_period) ** discount_rate) - 1)
 
-            total_capital_costs = market_class_data['average_%s_cost' % market_class_id].iloc[0]
-            average_co2_gpmi = market_class_data['average_%s_co2_gpmi' % market_class_id].iloc[0]
+            total_capital_costs = market_class_data['average_%s_cost' % market_class_id]
+            average_co2_gpmi = market_class_data['average_%s_co2_gpmi' % market_class_id]
 
             if market_class_id == 'non hauling.BEV':
                 fuel_cost_per_VMT = fuel_cost_electricity * average_co2_gpmi / carbon_intensity_electricity
@@ -78,13 +78,16 @@ def get_demanded_shares(market_class_data, calendar_year):
                     sales_share_denominator_all_hauling = sales_share_numerator + sales_share_denominator_all_hauling
             else:
                 if 'non hauling' in market_class_id:
+                    # gcam_data_cy.demanded_share = market_class_data[
+                    #                                   'desired_non hauling share_frac'] * sales_share_numerator / sales_share_denominator_all_nonhauling
                     gcam_data_cy.demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
                 else:
+                    # gcam_data_cy.demanded_share = market_class_data['desired_hauling share_frac'] * sales_share_numerator / sales_share_denominator_all_hauling
                     gcam_data_cy.demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
 
-                demanded_share_data[market_class_id] = gcam_data_cy.demanded_share
+                market_class_data['demanded_%s_share_frac' % market_class_id] = gcam_data_cy.demanded_share
 
-    return demanded_share_data
+    return market_class_data.copy()
 
 
 if __name__ == '__main__':

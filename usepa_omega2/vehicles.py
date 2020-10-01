@@ -69,6 +69,7 @@ class CompositeVehicle:
         # calc sales-weighted values
         self.cert_CO2_grams_per_mile = sales_weight(self.vehicle_list, 'cert_CO2_grams_per_mile')
         self.footprint_ft2 = sales_weight(self.vehicle_list, 'footprint_ft2')
+        self.new_vehicle_mfr_cost_dollars = sales_weight(self.vehicle_list, 'new_vehicle_mfr_cost_dollars')
         self.cost_curve = None  # TODO: calc sales weighted cost curve here, based on cost_curve classes and model_year
 
         total_sales = 0
@@ -107,6 +108,7 @@ class Vehicle(SQABase):
     name = Column('name', String)
     manufacturer_ID = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
     manufacturer = relationship('Manufacturer', back_populates='vehicles')
+    annual_data = relationship('VehicleAnnualData', cascade='delete-orphan')
 
     # --- static properties ---
     # vehicle_nameplate = Column(String, default='USALDV')

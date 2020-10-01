@@ -54,6 +54,7 @@ try:
             self.analysis_final_year = None
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
+            self.producer_consumer_max_iterations = 4
             self.producer_calculate_generalized_cost = None
             self.consumer_calculate_generalized_cost = None
             self.GHG_standard = 'flat'

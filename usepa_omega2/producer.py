@@ -217,25 +217,21 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                 child_df_list.append(df)
 
     if parent:
-        sales_share_column_names = [parent + '.' + c + ' share_frac' for c in children]
+        sales_share_column_names = ['desired_' + parent + '.' + c + '_share_frac' for c in children]
     else:
-        sales_share_column_names = [c + ' share_frac' for c in children]
+        sales_share_column_names = ['desired_' + c + '_share_frac' for c in children]
 
-    if all(s in sweep_list for s in children) and not consumer_bev_share:
+    if all(s in sweep_list for s in children) and consumer_bev_share is None:
         sales_share_df = partition(sales_share_column_names, increment=1/(o2.options.num_share_options-1), min_level=0.001)
     else:
         sales_share_df = pd.DataFrame()
         for c, cn in zip(children, sales_share_column_names):
-            if not consumer_bev_share:
+            if consumer_bev_share is None or cn.replace('desired', 'demanded') not in consumer_bev_share:
                 # maintain initial fleet market share (for now...)
                 sales_share_df[cn] = [consumer.sales.demand_sales(calendar_year)[c] /
                                       consumer.sales.demand_sales(calendar_year)['total']]
             else:
-                # implement target bev share... (for now...)
-                if c == 'BEV':
-                    sales_share_df[cn] = [consumer_bev_share]
-                else:
-                    sales_share_df[cn] = [1 - consumer_bev_share]
+                sales_share_df[cn] = [consumer_bev_share[cn.replace('desired', 'demanded')]]
 
     if verbose:
         print('combining ' + str(children))
@@ -289,6 +285,13 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
     winning_combo = select_winning_combo(tech_share_combos_total)
 
+    # assign co2 values and sales to vehicles...
+    for new_veh in manufacturer_new_vehicles:
+        new_veh.set_cert_co2_grams_per_mile(winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID])
+        new_veh.set_initial_registered_count(winning_combo['veh_%d_sales' % new_veh.vehicle_ID])
+        new_veh.set_cert_target_CO2_Mg()
+        new_veh.set_cert_CO2_Mg()
+
     return manufacturer_new_vehicles, winning_combo
 
 
@@ -298,13 +301,6 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicle
     # for k, v in zip(winning_combo.keys(), winning_combo):
     #     print('%s = %f' % (k, v))
 
-    # assign co2 values and sales to vehicles...
-    for new_veh in manufacturer_new_vehicles:
-        new_veh.set_cert_co2_grams_per_mile(winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID])
-        new_veh.set_initial_registered_count(winning_combo['veh_%d_sales' % new_veh.vehicle_ID])
-        new_veh.set_cert_target_CO2_Mg()
-        new_veh.set_cert_CO2_Mg()
-
     cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
     ManufacturerAnnualData. \
@@ -313,14 +309,14 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicle
                                         cert_target_co2_Mg=cert_target_co2_Mg,
                                         cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
-                                        bev_non_hauling_share_frac=winning_combo['non hauling.BEV share_frac'] *
-                                                                   winning_combo['non hauling share_frac'],
-                                        ice_non_hauling_share_frac=winning_combo['non hauling.ICE share_frac'] *
-                                                                   winning_combo['non hauling share_frac'],
-                                        bev_hauling_share_frac=winning_combo['hauling.BEV share_frac'] *
-                                                               winning_combo['hauling share_frac'],
-                                        ice_hauling_share_frac=winning_combo['hauling.ICE share_frac'] *
-                                                               winning_combo['hauling share_frac'],
+                                        bev_non_hauling_share_frac=winning_combo['desired_non hauling.BEV_share_frac'] *
+                                                                   winning_combo['desired_non hauling_share_frac'],
+                                        ice_non_hauling_share_frac=winning_combo['desired_non hauling.ICE_share_frac'] *
+                                                                   winning_combo['desired_non hauling_share_frac'],
+                                        bev_hauling_share_frac=winning_combo['desired_hauling.BEV_share_frac'] *
+                                                               winning_combo['desired_hauling_share_frac'],
+                                        ice_hauling_share_frac=winning_combo['desired_hauling.ICE_share_frac'] *
+                                                               winning_combo['desired_hauling_share_frac'],
                                         )
     # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
     # if not o2.options.verbose:
@@ -357,10 +353,10 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
         substrs = market_class.split('.')
         chain = []
         for i in range(len(substrs)):
-            str = ''
+            str = 'desired_'
             for j in range(i + 1):
                 str = str + substrs[j] + '.' * (j != i)
-            str = str + ' share_frac'
+            str = str + '_share_frac'
             chain.append(str)
         vehicle_sales = total_sales
         for c in chain:
@@ -403,7 +399,7 @@ def select_winning_combo(tech_share_combos_total):
     else:
         winning_combo = tech_share_combos_total.loc[mini_df['total_combo_credits_co2_megagrams'].idxmax()]
 
-    return winning_combo
+    return winning_combo.copy()
 
 
 if __name__ == '__main__':

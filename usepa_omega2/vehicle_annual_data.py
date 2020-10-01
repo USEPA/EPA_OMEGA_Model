@@ -22,6 +22,7 @@ class VehicleAnnualData(SQABase):
     vmt = Column(Numeric)
     age = Column(Numeric)
 
+
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
 

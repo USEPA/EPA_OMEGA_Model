@@ -165,6 +165,8 @@ def run_producer_consumer():
     from manufacturers import Manufacturer
     import producer
     from market_classes import MarketClass
+    import vehicles
+    from consumer.sales_share_gcam import get_demanded_shares
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
@@ -172,27 +174,72 @@ def run_producer_consumer():
 
         iteration_log = pd.DataFrame()
         for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
-            print(calendar_year)
             iterate = True
-            consumer_bev_share = None
+            consumer_market_share_demand = None
             iteration_num = 0
             while iterate:
-                # candidate_vehicles_list, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
-                manufacturer_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share)
+                print('%d_%d' % (calendar_year, iteration_num))
+                candidate_mfr_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
-                # create what we need for consumer thing in the log... 999
-                # new_row_of_iterator_data = pd.Series()
-                # new_row_of_iterator_data['iteration'] = iteration_num
-                #
-                # iteration_log.append(new_row_of_iterator_data)
+                # group vehicles by market class
+                market_class_dict = MarketClass.get_market_class_dict()
+                for new_veh in candidate_mfr_new_vehicles:
+                    market_class_dict[new_veh.market_class_ID].add(new_veh)
+
+                for mc in MarketClass.market_classes:
+                    market_class_vehicles = market_class_dict[mc]
+                    winning_combo['average_%s_co2_gpmi' % mc] = vehicles.sales_weight(market_class_vehicles,
+                                                                                          'cert_CO2_grams_per_mile')
+                    winning_combo['average_%s_cost' % mc] = vehicles.sales_weight(market_class_vehicles,
+                                                                                      'new_vehicle_mfr_cost_dollars')
+
+                consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
+
+                generic_winning_combo_with_market_share_demand = cleanup_vehicle_ids(candidate_mfr_new_vehicles,
+                                                            consumer_market_share_demand,
+                                                            winning_combo)
+
+                consumer_market_share_demand.loc['iteration'] = iteration_num
+                consumer_market_share_demand.loc['calendar_year'] = calendar_year
+
+                iteration_log = iteration_log.append(cleanup_vehicle_ids(candidate_mfr_new_vehicles,
+                                                            consumer_market_share_demand,
+                                                            winning_combo))
+
+                # decide whether to iterate or not
+                iterate = iteration_num < o2.options.producer_consumer_max_iterations
+
+                if iterate:
+                    # drop candidates from database, they are no longer needed or desired
+                    for cv in candidate_mfr_new_vehicles:
+                        o2.session.delete(cv)
 
                 iteration_num = iteration_num + 1
 
-                # run consumer module here, get consumer BEV share
-                # decide whether to iterate again or not
-                iterate = False
+            producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
 
-            producer.finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicles, winning_combo)
+        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder)
+
+        import matplotlib.pyplot as plt
+        for mc in market_class_dict:
+            foo = ['%d_%d' % (cy-2000, it) for cy, it in zip(iteration_log['calendar_year'], iteration_log['iteration'])]
+            # foo = ['%d' % it for it in iteration_log['iteration']]
+            plt.figure()
+            plt.plot(foo, iteration_log['desired_%s_share_frac' % mc])
+            plt.plot(foo, iteration_log['demanded_%s_share_frac' % mc])
+            plt.title('%s iteration' % mc)
+            plt.grid()
+            plt.savefig('%s%s iteration.png' % (o2.options.output_folder, mc))
+
+
+def cleanup_vehicle_ids(candidate_mfr_new_vehicles, iteration_log, winning_combo):
+    for i, id in enumerate([v.vehicle_ID for v in candidate_mfr_new_vehicles]):
+        rename_dict = dict()
+        veh_cols = [(c, c.replace(str(id), str(i))) for c in winning_combo.keys() if 'veh_%d' % id in c]
+        for vc in veh_cols:
+            rename_dict[vc[0]] = vc[1]
+        iteration_log = iteration_log.rename(rename_dict, axis='columns')
+    return iteration_log
 
 
 def run_omega(o2_options, single_shot=False, profile=False):
@@ -307,16 +354,17 @@ def run_omega(o2_options, single_shot=False, profile=False):
                 gui_comm('%s: Post Processing ...' % o2.options.session_name)
 
             session_summary_results = run_postproc()
-            for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
-                 market_share_results_cy = get_demanded_shares(
-                     session_summary_results[session_summary_results.calendar_year==cy], cy)
 
-            # add market share results to session_summary
-            for mc in MarketClass.market_classes:
-                session_summary_results['demanded_%s_share-gcam' % sql_valid_name(mc)] = \
-                    sql_unpack_result(o2.session.query(DemandedSharesGCAM.demanded_share).
-                        filter(DemandedSharesGCAM.calendar_year <= o2.options.analysis_final_year).
-                        filter(DemandedSharesGCAM.market_class_ID == mc))
+            # for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
+            #      market_share_results_cy = get_demanded_shares(
+            #          session_summary_results[session_summary_results.calendar_year==cy].iloc[0], cy)
+            #
+            # # add market share results to session_summary
+            # for mc in MarketClass.market_classes:
+            #     session_summary_results['demanded_%s_share' % mc] = \
+            #         sql_unpack_result(o2.session.query(DemandedSharesGCAM.demanded_share).
+            #             filter(DemandedSharesGCAM.calendar_year <= o2.options.analysis_final_year).
+            #             filter(DemandedSharesGCAM.market_class_ID == mc))
 
             if single_shot:
                 session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
