@@ -256,7 +256,7 @@ def run_producer_consumer():
             plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
 
         fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'])
-        label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % iteration_log['iteration'].mean())
+        label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (2.0*iteration_log['iteration'].mean()))
         fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
 
 
