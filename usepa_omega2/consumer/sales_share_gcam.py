@@ -85,7 +85,7 @@ def get_demanded_shares(market_class_data, calendar_year):
                     # gcam_data_cy.demanded_share = market_class_data['desired_hauling share_frac'] * sales_share_numerator / sales_share_denominator_all_hauling
                     gcam_data_cy.demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
 
-                market_class_data['demanded_%s_share_frac' % market_class_id] = gcam_data_cy.demanded_share
+                market_class_data['consumer_%s_share_frac' % market_class_id] = gcam_data_cy.demanded_share
 
     return market_class_data.copy()
 

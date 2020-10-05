@@ -79,7 +79,7 @@ try:
             self.producer_consumer_max_iterations = 10
             self.producer_consumer_iteration_tolerance = 0.01
             self.num_share_options = 15
-            self.num_tech_options_per_ice_vehicle = 10
+            self.num_tech_options_per_ice_vehicle = 15
             self.num_tech_options_per_bev_vehicle = 2
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0

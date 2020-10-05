@@ -16,12 +16,27 @@ import os
 from usepa_omega2.file_eye_oh import gui_comm
 
 
-def run_postproc():
+def run_postproc(iteration_log):
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData
     from market_classes import MarketClass
     import pandas as pd
+
+    import matplotlib.pyplot as plt
+    year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
+                        zip(iteration_log['calendar_year'], iteration_log['iteration'])]
+    for mc in MarketClass.get_market_class_dict():
+        plt.figure()
+        plt.plot(year_iter_labels, iteration_log['producer_%s_share_frac' % mc])
+        plt.plot(year_iter_labels, iteration_log['consumer_%s_share_frac' % mc])
+        plt.title('%s iteration' % mc)
+        plt.grid()
+        plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
+
+    fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'])
+    label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (2.0 * iteration_log['iteration'].mean()))
+    fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
 
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
     cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
@@ -210,12 +225,12 @@ def run_producer_consumer():
                 for mc in market_class_dict:
                     # relative percentage convergence:
                     converged = converged and abs(1 - \
-                                consumer_market_share_demand['desired_%s_share_frac' % mc] / \
-                                consumer_market_share_demand['demanded_%s_share_frac' % mc]) <= \
+                                consumer_market_share_demand['producer_%s_share_frac' % mc] / \
+                                consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
                                 o2.options.producer_consumer_iteration_tolerance
                     # absolute percentage convergence:
-                    # converged = converged and abs(consumer_market_share_demand['desired_%s_share_frac' % mc] -
-                    #             consumer_market_share_demand['demanded_%s_share_frac' % mc]) <= \
+                    # converged = converged and abs(consumer_market_share_demand['producer_%s_share_frac' % mc] -
+                    #             consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
                     #             o2.options.producer_consumer_iteration_tolerance
 
                 # decide whether to iterate or not
@@ -226,18 +241,18 @@ def run_producer_consumer():
                     for cv in candidate_mfr_new_vehicles:
                         o2.session.delete(cv)
 
-                    if iteration_num == 0:
+                    if iteration_num < 1:
                         for mc in market_class_dict:
                             # try meeting partway (first pass)
-                            consumer_market_share_demand['demanded_%s_share_frac' % mc] = \
-                                (0.5 * consumer_market_share_demand['desired_%s_share_frac' % mc] +
-                                 0.5 * consumer_market_share_demand['demanded_%s_share_frac' % mc])
+                            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
+                                (0.5 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
+                                 0.5 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
                     else:
                         for mc in market_class_dict:
                             # try meeting partway
-                            consumer_market_share_demand['demanded_%s_share_frac' % mc] = \
-                                (0.33*consumer_market_share_demand['desired_%s_share_frac' % mc] +
-                                 0.67*consumer_market_share_demand['demanded_%s_share_frac' % mc])
+                            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
+                                (0.33 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
+                                 0.67 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
 
                     iteration_num = iteration_num + 1
 
@@ -245,19 +260,7 @@ def run_producer_consumer():
 
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder)
 
-        import matplotlib.pyplot as plt
-        year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in zip(iteration_log['calendar_year'], iteration_log['iteration'])]
-        for mc in market_class_dict:
-            plt.figure()
-            plt.plot(year_iter_labels, iteration_log['desired_%s_share_frac' % mc])
-            plt.plot(year_iter_labels, iteration_log['demanded_%s_share_frac' % mc])
-            plt.title('%s iteration' % mc)
-            plt.grid()
-            plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
-
-        fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'])
-        label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (2.0*iteration_log['iteration'].mean()))
-        fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
+    return iteration_log
 
 
 def cleanup_vehicle_ids(candidate_mfr_new_vehicles, iteration_log, winning_combo):
@@ -374,25 +377,17 @@ def run_omega(o2_options, single_shot=False, profile=False):
             if profile:
                 import cProfile
                 import re
-                cProfile.run('run_producer_consumer()', filename='omega2_profile.dmp')
+                cProfile.run('iteration_log = run_producer_consumer()', filename='omega2_profile.dmp')
+
+                if not single_shot:
+                    gui_comm('%s: Post Processing ...' % o2.options.session_name)
+                session_summary_results = run_postproc(globals()['iteration_log'])  # return values of cProfile.run() show up in the globals namespace
             else:
-                run_producer_consumer()
+                iteration_log = run_producer_consumer()
 
-            if not single_shot:
-                gui_comm('%s: Post Processing ...' % o2.options.session_name)
-
-            session_summary_results = run_postproc()
-
-            # for cy in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
-            #      market_share_results_cy = get_demanded_shares(
-            #          session_summary_results[session_summary_results.calendar_year==cy].iloc[0], cy)
-            #
-            # # add market share results to session_summary
-            # for mc in MarketClass.market_classes:
-            #     session_summary_results['demanded_%s_share' % mc] = \
-            #         sql_unpack_result(o2.session.query(DemandedSharesGCAM.demanded_share).
-            #             filter(DemandedSharesGCAM.calendar_year <= o2.options.analysis_final_year).
-            #             filter(DemandedSharesGCAM.market_class_ID == mc))
+                if not single_shot:
+                    gui_comm('%s: Post Processing ...' % o2.options.session_name)
+                session_summary_results = run_postproc(iteration_log)
 
             if single_shot:
                 session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
@@ -432,7 +427,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=True)
+        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
