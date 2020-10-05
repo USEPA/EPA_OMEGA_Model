@@ -207,19 +207,17 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                         CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
                         max_co2_gpmi,
                         num=num_tech_options).tolist()
-                else:
-                    if new_veh.fueling_class == 'ICE':
-                        if o2.options.allow_backsliding:
-                            max_co2_gpmi = consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1
-                        else:
-                            max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile,
-                                               consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
+                else:  # ICE vehicle and consumer_bev_share available
+                    if o2.options.allow_backsliding:
+                        max_co2_gpmi = consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1
+                    else:
+                        max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile,
+                                           consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
 
-                        co2_gpmi_options = np.linspace(
-                            max(CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
-                            consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 0.9),
-                            max_co2_gpmi,
-                            num=num_tech_options).tolist()
+                    min_co2_gpmi = max(CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+                                       consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 0.9)
+
+                    co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
                 tech_cost_options = CostCurve.get_cost(cost_curve_class=new_veh.cost_curve_class,
                                                        model_year=new_veh.model_year,

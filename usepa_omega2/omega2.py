@@ -222,6 +222,7 @@ def run_producer_consumer():
                                                             winning_combo))
 
                 converged = True
+                thrashing = len(iteration_log) >= 5
                 for mc in market_class_dict:
                     # relative percentage convergence:
                     converged = converged and abs(1 - \
@@ -233,8 +234,44 @@ def run_producer_consumer():
                     #             consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
                     #             o2.options.producer_consumer_iteration_tolerance
 
+                    thrashing = thrashing and \
+                                ((
+                                        abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-3] /
+                                            iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                                            <= o2.options.producer_consumer_iteration_tolerance
+                                        and
+                                        abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-3] /
+                                            iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                                            <= o2.options.producer_consumer_iteration_tolerance
+                                ) \
+                                or (
+                                    (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-4] /
+                                         iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                                            <= o2.options.producer_consumer_iteration_tolerance
+                                     and
+                                     abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-4] /
+                                         iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                                            <= o2.options.producer_consumer_iteration_tolerance)
+                                    )
+                                 or (
+                                     (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-5] /
+                                          iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                                      <= o2.options.producer_consumer_iteration_tolerance
+                                      and
+                                      abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-5] /
+                                          iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                                      <= o2.options.producer_consumer_iteration_tolerance)
+                                 )
+                                 )
+
+                if thrashing:
+                    print('!!THRASHING!!')
+
+                iteration_log['thrashing'] = thrashing
+                iteration_log['converged'] = converged
+
                 # decide whether to iterate or not
-                iterate = iteration_num < o2.options.producer_consumer_max_iterations and not converged
+                iterate = iteration_num < o2.options.producer_consumer_max_iterations and not converged and not thrashing
 
                 if iterate:
                     # drop candidates from database, they are no longer needed or desired
