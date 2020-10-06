@@ -101,7 +101,73 @@ class CompositeVehicle:
         pass
 
 
-class Vehicle(SQABase):
+class VehicleBase():
+    next_vehicle_ID = 0
+
+    name = ''
+    manufacturer_ID = None
+
+    model_year = None
+    fueling_class = None
+    hauling_class = None
+    cost_curve_class = None
+    reg_class_ID = None
+    cert_CO2_grams_per_mile = None
+    cert_target_CO2_grams_per_mile = None
+    cert_CO2_Mg = None
+    cert_target_CO2_Mg = None
+    new_vehicle_mfr_cost_dollars = None
+    manufacturer_deemed_new_vehicle_generalized_cost_dollars = None
+    in_use_fuel_ID = None
+    # TODO: cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('ghg_standard_fuels.fuel_id'))
+    market_class_ID = None
+    footprint_ft2 = None
+    reg_class_market_share_frac = 1.0
+
+    def __init__(self):
+        self.vehicle_ID = VehicleBase.next_vehicle_ID
+        VehicleBase.next_vehicle_ID = VehicleBase.next_vehicle_ID + 1
+
+    def set_cert_target_CO2_grams_per_mile(self):
+        self.cert_target_CO2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
+
+    def set_cert_target_CO2_Mg(self):
+        self.cert_target_CO2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
+
+    def set_cert_co2_grams_per_mile(self, cert_co2_grams_per_mile):
+        from cost_curves import CostCurve
+        self.cert_CO2_grams_per_mile = cert_co2_grams_per_mile
+        self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
+                                                              model_year=self.model_year,
+                                                              target_co2_gpmi=self.cert_CO2_grams_per_mile)
+
+    def set_cert_CO2_Mg(self):
+        self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
+
+    def set_initial_registered_count(self, sales):
+        self.sales = sales
+
+    def get_initial_registered_count(self):
+        return self.sales
+
+    def inherit_vehicle(self, vehicle):
+        inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
+                              'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
+                              'cert_CO2_grams_per_mile', 'footprint_ft2'}
+        for p in inherit_properties:
+            self.__setattr__(p, vehicle.__getattribute__(p))
+
+    def __repr__(self):
+        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
+
+    def __str__(self):
+        s = ''
+        for k in self.__dict__:
+            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
+        return s
+
+
+class Vehicle(SQABase, VehicleBase):
     # --- database table properties ---
     __tablename__ = 'vehicles'
     vehicle_ID = Column('vehicle_id', Integer, primary_key=True)
@@ -127,32 +193,6 @@ class Vehicle(SQABase):
     # TODO: cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('ghg_standard_fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
-    reg_class_market_share_frac = 1.0
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-
-    def __str__(self):
-        s = ''
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
-
-    def set_cert_target_CO2_grams_per_mile(self):
-        self.cert_target_CO2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
-
-    def set_cert_target_CO2_Mg(self):
-        self.cert_target_CO2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
-
-    def set_cert_co2_grams_per_mile(self, cert_co2_grams_per_mile):
-        from cost_curves import CostCurve
-        self.cert_CO2_grams_per_mile = cert_co2_grams_per_mile
-        self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
-                                                              model_year=self.model_year,
-                                                              target_co2_gpmi=self.cert_CO2_grams_per_mile)
-
-    def set_cert_CO2_Mg(self):
-        self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
 
     def set_initial_registered_count(self, sales):
         from vehicle_annual_data import VehicleAnnualData
@@ -168,13 +208,6 @@ class Vehicle(SQABase):
         from vehicle_annual_data import VehicleAnnualData
 
         return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
-
-    def inherit_vehicle(self, vehicle):
-        inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
-                              'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
-                              'cert_CO2_grams_per_mile', 'footprint_ft2'}
-        for p in inherit_properties:
-            self.__setattr__(p, vehicle.__getattribute__(p))
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
