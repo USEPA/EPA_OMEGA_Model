@@ -14,7 +14,7 @@ from file_eye_oh import validate_file, relocate_file
 
 
 def validate_predefined_input(input_str, valid_inputs):
-    if valid_inputs.__contains__(input_str):
+    if input_str in valid_inputs:
         if type(valid_inputs) is dict:
             return valid_inputs[input_str]
         elif type(valid_inputs) is set:
@@ -71,7 +71,7 @@ class OMEGABatchObject(object):
             return param
         else:
             if verbose:
-                print('%s = %s' % (index_str, raw_param.__str__()))
+                print('%s = %s' % (index_str, str(raw_param)))
             return raw_param
 
     def set_parameter(self, index_str, column_index, value):
@@ -86,7 +86,7 @@ class OMEGABatchObject(object):
                 if type(param) is tuple:
                     if verbose:
                         print('found tuple')
-                    fullfact_dimensions.append(param.__len__())
+                    fullfact_dimensions.append(len(param))
                 else:
                     fullfact_dimensions.append(1)
             else:
@@ -97,7 +97,7 @@ class OMEGABatchObject(object):
 
     def parse_dataframe_params(self, verbose=False):
         fullfact_dimensions_vectors = []
-        for column_index in range(0, self.dataframe.columns.__len__()):
+        for column_index in range(0, len(self.dataframe.columns)):
             fullfact_dimensions_vectors.append(self.parse_column_params(column_index, verbose))
         return fullfact_dimensions_vectors
 
@@ -112,6 +112,7 @@ class OMEGABatchObject(object):
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
             'GHG Standard Type': 'GHG',
+            'Iterate Producer-Consumer':'IPC',
         }
 
         fullfact_dimensions_vectors = self.parse_dataframe_params(verbose=verbose)
@@ -123,7 +124,7 @@ class OMEGABatchObject(object):
 
         dfx_column_index = 0
         # for each column in dataframe, copy or expand into dfx
-        for df_column_index in range(0, self.dataframe.columns.__len__()):
+        for df_column_index in range(0, len(self.dataframe.columns)):
             df_ff_dimensions_vector = fullfact_dimensions_vectors[df_column_index]
             df_ff_matrix = np.int_(doe.fullfact(df_ff_dimensions_vector))
             num_expanded_columns = np.product(df_ff_dimensions_vector)
@@ -135,7 +136,7 @@ class OMEGABatchObject(object):
                     column_name = column_name + '_%d' % variation_index
                     dfx[column_name] = np.nan  # add empty column to dfx
                     ff_param_indices = df_ff_matrix[variation_index]
-                    num_params = dfx.index.__len__()
+                    num_params = len(dfx.index)
                     for param_index in range(0, num_params):
                         param_name = dfx.index[param_index]
                         if type(param_name) is str:  # if param_name is not blank (np.nan):
@@ -150,7 +151,7 @@ class OMEGABatchObject(object):
                                 dfx.loc[param_name, dfx.columns[dfx_column_index]] = value
                                 if df_ff_dimensions_vector[param_index] > 1:
                                     # print(param_name + ' has ' + str(df_ff_dimensions_vector[param_index]) + ' values ')
-                                    if acronyms_dict.__contains__(value):
+                                    if value in acronyms_dict:
                                         session_name = session_name + '-' + acronyms_dict[param_name] + '=' + \
                                                        acronyms_dict[value]
                                     else:
@@ -212,7 +213,7 @@ class OMEGASessionObject(object):
 
     def get_io_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
-        print('Getting I/O settings...')
+        print('Getting Session I/O settings...')
 
         # setup IOSettings
         # if not options.dispy:
@@ -242,6 +243,7 @@ class OMEGASessionObject(object):
         if validate_predefined_input(self.read_parameter('GHG Standard Type'), {'flat', 'footprint'}):
             self.settings.GHG_standard = self.read_parameter('GHG Standard Type')
         self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards Fuels File')
+        self.settings.required_zev_share_file = self.read_parameter('ZEV Requirement File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
             self.read_parameter('Slice Tech Combo Tables'), true_false_dict)
@@ -251,12 +253,17 @@ class OMEGASessionObject(object):
 
         print('Getting Runtime Settings...')
         if not pd.isna(self.read_parameter('Num Tech Options per ICE Vehicle')):
-            self.settings.num_tech_options_per_ice_vehicle = int(self.read_parameter('Num Tech Options per ICE Vehicle'))
+            self.settings.num_tech_options_per_ice_vehicle = int(
+                self.read_parameter('Num Tech Options per ICE Vehicle'))
         if not pd.isna(self.read_parameter('Num Tech Options per BEV Vehicle')):
-            self.settings.num_tech_options_per_ice_vehicle = int(self.read_parameter('Num Tech Options per BEV Vehicle'))
+            self.settings.num_tech_options_per_bev_vehicle = int(
+                self.read_parameter('Num Tech Options per BEV Vehicle'))
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)
         self.settings.cost_curve_frontier_affinity_factor = self.read_parameter('Cost Curve Frontier Affinity Factor')
+        self.settings.iterate_producer_consumer = validate_predefined_input(
+            self.read_parameter('Iterate Producer-Consumer'),
+            true_false_dict)
 
     def get_postproc_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
@@ -396,7 +403,7 @@ if __name__ == '__main__':
             print("*** ping complete ***")
         else:
             batch = OMEGABatchObject()
-            if options.batch_file.__contains__('.csv'):
+            if '.csv' in options.batch_file:
                 batch.dataframe = pd.read_csv(options.batch_file, index_col=0)
             else:
                 batch.dataframe = pd.read_excel(options.batch_file, index_col=0, sheet_name="Sessions")
@@ -462,7 +469,7 @@ if __name__ == '__main__':
                         relocate_file(options.batch_path + source_folder, source_folder + f)
 
                 # write a copy of the expanded, validated batch to the source batch_file directory:
-                if options.batch_file.__contains__('.csv'):
+                if '.csv' in options.batch_file:
                     expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name)
                 else:
                     expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name,

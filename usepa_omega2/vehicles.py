@@ -108,7 +108,7 @@ class Vehicle(SQABase):
     name = Column('name', String)
     manufacturer_ID = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
     manufacturer = relationship('Manufacturer', back_populates='vehicles')
-    annual_data = relationship('VehicleAnnualData', cascade='delete-orphan')
+    annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')
 
     # --- static properties ---
     # vehicle_nameplate = Column(String, default='USALDV')

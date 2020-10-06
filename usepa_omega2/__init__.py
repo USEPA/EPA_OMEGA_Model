@@ -62,6 +62,7 @@ try:
             else:
                 self.ghg_standards_file = 'sample_inputs/ghg_standards-footprint.csv'
             self.ghg_standards_fuels_file = 'sample_inputs/ghg_standards-fuels.csv'
+            self.required_zev_share_file = 'sample_inputs/required_zev_share.csv'
             self.stock_scrappage = 'fixed'
             self.stock_vmt = 'fixed'
             if self.stock_scrappage == 'fixed':
@@ -81,6 +82,7 @@ try:
             self.num_share_options = 15
             self.num_tech_options_per_ice_vehicle = 15
             self.num_tech_options_per_bev_vehicle = 2
+            self.iterate_producer_consumer = True
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0
             self.end_time = 0

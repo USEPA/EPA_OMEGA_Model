@@ -189,9 +189,9 @@ def run_producer_consumer():
 
         iteration_log = pd.DataFrame()
         for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
-            iterate = True
             consumer_market_share_demand = None
             iteration_num = 0
+            iterate = True
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
                 candidate_mfr_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
@@ -222,7 +222,7 @@ def run_producer_consumer():
                                                             winning_combo))
 
                 converged = True
-                thrashing = len(iteration_log) >= 5
+                thrashing = iteration_num >= 5
                 for mc in market_class_dict:
                     # relative percentage convergence:
                     converged = converged and abs(1 - \
@@ -271,7 +271,10 @@ def run_producer_consumer():
                 iteration_log['converged'] = converged
 
                 # decide whether to iterate or not
-                iterate = iteration_num < o2.options.producer_consumer_max_iterations and not converged and not thrashing
+                iterate = o2.options.iterate_producer_consumer \
+                          and iteration_num < o2.options.producer_consumer_max_iterations \
+                          and not converged \
+                          and not thrashing
 
                 if iterate:
                     # drop candidates from database, they are no longer needed or desired
