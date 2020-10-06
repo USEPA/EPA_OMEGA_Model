@@ -210,16 +210,18 @@ def run_producer_consumer():
 
                 consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
 
-                generic_winning_combo_with_market_share_demand = cleanup_vehicle_ids(candidate_mfr_new_vehicles,
-                                                            consumer_market_share_demand,
-                                                            winning_combo)
+                # generic_winning_combo_with_market_share_demand = cleanup_vehicle_ids(candidate_mfr_new_vehicles,
+                #                                             consumer_market_share_demand,
+                #                                             winning_combo)
 
                 consumer_market_share_demand.loc['iteration'] = iteration_num
                 consumer_market_share_demand.loc['calendar_year'] = calendar_year
+                consumer_market_share_demand.loc['thrashing'] = False
+                consumer_market_share_demand.loc['converged'] = False
 
                 iteration_log = iteration_log.append(cleanup_vehicle_ids(candidate_mfr_new_vehicles,
                                                             consumer_market_share_demand,
-                                                            winning_combo))
+                                                            winning_combo), ignore_index=True)
 
                 converged = True
                 thrashing = iteration_num >= 5
@@ -267,8 +269,8 @@ def run_producer_consumer():
                 if thrashing:
                     print('!!THRASHING!!')
 
-                iteration_log['thrashing'] = thrashing
-                iteration_log['converged'] = converged
+                iteration_log.loc[iteration_log.index[-1], 'thrashing'] = thrashing
+                iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
 
                 # decide whether to iterate or not
                 iterate = o2.options.iterate_producer_consumer \
@@ -303,14 +305,14 @@ def run_producer_consumer():
     return iteration_log
 
 
-def cleanup_vehicle_ids(candidate_mfr_new_vehicles, iteration_log, winning_combo):
+def cleanup_vehicle_ids(candidate_mfr_new_vehicles, consumer_market_share_demand, winning_combo):
     for i, id in enumerate([v.vehicle_ID for v in candidate_mfr_new_vehicles]):
         rename_dict = dict()
         veh_cols = [(c, c.replace(str(id), str(i))) for c in winning_combo.keys() if 'veh_%d' % id in c]
         for vc in veh_cols:
             rename_dict[vc[0]] = vc[1]
-        iteration_log = iteration_log.rename(rename_dict, axis='columns')
-    return iteration_log
+        consumer_market_share_demand = consumer_market_share_demand.rename(rename_dict, axis='columns')
+    return consumer_market_share_demand.copy()
 
 
 def run_omega(o2_options, single_shot=False, profile=False):
