@@ -257,7 +257,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
 
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
-    from vehicles import Vehicle
+    from vehicles import Vehicle, VehicleBase
     from market_classes import MarketClass, populate_market_classes, print_market_class_dict
 
     from consumer.stock import prior_year_stock_registered_count, prior_year_stock_vmt, age0_stock_vmt
@@ -272,10 +272,12 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     # TODO: aggregate by reg class within market class and create sales weighted cost curves and
     #  vehicle attributes
 
+    VehicleBase.next_vehicle_ID = 0  # reset vehicle ID
+
     manufacturer_new_vehicles = []
     # update each vehicle and calculate compliance target for each vehicle
     for prior_veh in manufacturer_prior_vehicles:
-        new_veh = Vehicle()
+        new_veh = VehicleBase()
         new_veh.inherit_vehicle(prior_veh)
         new_veh.model_year = calendar_year
         new_veh.set_cert_target_CO2_grams_per_mile()
@@ -307,11 +309,22 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     return manufacturer_new_vehicles, winning_combo
 
 
-def finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicles, winning_combo):
+def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_vehicles, winning_combo):
     from manufacturer_annual_data import ManufacturerAnnualData
+    from vehicles import Vehicle
 
-    # for k, v in zip(winning_combo.keys(), winning_combo):
-    #     print('%s = %f' % (k, v))
+    manufacturer_new_vehicles = []
+    for cv in manufacturer_candidate_vehicles:
+        new_veh = Vehicle()
+        new_veh.inherit_vehicle(cv)
+        new_veh.set_initial_registered_count(cv.get_initial_registered_count())
+        new_veh.set_cert_co2_grams_per_mile(cv.cert_CO2_grams_per_mile)
+        new_veh.set_cert_target_CO2_grams_per_mile()
+        new_veh.set_cert_target_CO2_Mg()
+        new_veh.set_cert_CO2_Mg()
+        manufacturer_new_vehicles.append(new_veh)
+
+    o2.session.add_all(manufacturer_new_vehicles)
 
     cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
@@ -347,7 +360,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_new_vehicle
     #     o2.session.execute(
     #         'DELETE FROM tech_share_combos_total_%d WHERE total_combo_cert_co2_megagrams NOT BETWEEN %f AND %f' %
     #         (calendar_year, cert_co2_Mg - slice_width, cert_co2_Mg + slice_width))
-    o2.session.add_all(manufacturer_new_vehicles)
+
     o2.session.flush()
     # age0_stock_vmt(calendar_year)
     # prior_year_stock_registered_count(calendar_year)

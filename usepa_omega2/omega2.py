@@ -280,8 +280,8 @@ def run_producer_consumer():
 
                 if iterate:
                     # drop candidates from database, they are no longer needed or desired
-                    for cv in candidate_mfr_new_vehicles:
-                        o2.session.delete(cv)
+                    # for cv in candidate_mfr_new_vehicles:
+                    #     o2.session.delete(cv)
 
                     if iteration_num < 1:
                         for mc in market_class_dict:
