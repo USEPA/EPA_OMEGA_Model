@@ -469,7 +469,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)
+        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -76,13 +76,13 @@ try:
             self.context_folder = ''
             self.context_name = ''
             self.slice_tech_combo_cloud_tables = False
-            self.allow_backsliding = True
+            self.allow_backsliding = False
             self.producer_consumer_max_iterations = 20
             self.producer_consumer_iteration_tolerance = 0.01
             self.num_share_options = 15
             self.num_tech_options_per_ice_vehicle = 15
             self.num_tech_options_per_bev_vehicle = 2
-            self.iterate_producer_consumer = False
+            self.iterate_producer_consumer = True
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0
             self.end_time = 0
