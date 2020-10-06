@@ -362,9 +362,6 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_v
     #         (calendar_year, cert_co2_Mg - slice_width, cert_co2_Mg + slice_width))
 
     o2.session.flush()
-    # age0_stock_vmt(calendar_year)
-    # prior_year_stock_registered_count(calendar_year)
-    # prior_year_stock_vmt(calendar_year)
 
 
 def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total):

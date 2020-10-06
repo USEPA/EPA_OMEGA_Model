@@ -179,8 +179,6 @@ def run_postproc(iteration_log):
 def run_producer_consumer():
     from manufacturers import Manufacturer
     import producer
-    from market_classes import MarketClass
-    import vehicles
     from consumer.sales_share_gcam import get_demanded_shares
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
@@ -196,81 +194,17 @@ def run_producer_consumer():
                 print('%d_%d' % (calendar_year, iteration_num))
                 candidate_mfr_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
-                # group vehicles by market class
-                market_class_dict = MarketClass.get_market_class_dict()
-                for new_veh in candidate_mfr_new_vehicles:
-                    market_class_dict[new_veh.market_class_ID].add(new_veh)
-
-                for mc in MarketClass.market_classes:
-                    market_class_vehicles = market_class_dict[mc]
-                    winning_combo['average_%s_co2_gpmi' % mc] = vehicles.sales_weight(market_class_vehicles,
-                                                                                          'cert_CO2_grams_per_mile')
-                    winning_combo['average_%s_cost' % mc] = vehicles.sales_weight(market_class_vehicles,
-                                                                                      'new_vehicle_mfr_cost_dollars')
+                market_class_vehicle_dict = calc_market_class_data(candidate_mfr_new_vehicles, winning_combo)
 
                 consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
 
-                # generic_winning_combo_with_market_share_demand = cleanup_vehicle_ids(candidate_mfr_new_vehicles,
-                #                                             consumer_market_share_demand,
-                #                                             winning_combo)
+                iteration_log = iteration_log.append(consumer_market_share_demand, ignore_index=True)
 
-                consumer_market_share_demand.loc['iteration'] = iteration_num
-                consumer_market_share_demand.loc['calendar_year'] = calendar_year
-                consumer_market_share_demand.loc['thrashing'] = False
-                consumer_market_share_demand.loc['converged'] = False
+                converged, thrashing = detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log,
+                                                                        iteration_num, market_class_vehicle_dict,
+                                                                        o2.options.verbose)
 
-                iteration_log = iteration_log.append(cleanup_vehicle_ids(candidate_mfr_new_vehicles,
-                                                            consumer_market_share_demand,
-                                                            winning_combo), ignore_index=True)
-
-                converged = True
-                thrashing = iteration_num >= 5
-                for mc in market_class_dict:
-                    # relative percentage convergence:
-                    converged = converged and abs(1 - \
-                                consumer_market_share_demand['producer_%s_share_frac' % mc] / \
-                                consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
-                                o2.options.producer_consumer_iteration_tolerance
-                    # absolute percentage convergence:
-                    # converged = converged and abs(consumer_market_share_demand['producer_%s_share_frac' % mc] -
-                    #             consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
-                    #             o2.options.producer_consumer_iteration_tolerance
-
-                    thrashing = thrashing and \
-                                ((
-                                        abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-3] /
-                                            iteration_log['producer_%s_share_frac' % mc].iloc[-1])
-                                            <= o2.options.producer_consumer_iteration_tolerance
-                                        and
-                                        abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-3] /
-                                            iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
-                                            <= o2.options.producer_consumer_iteration_tolerance
-                                ) \
-                                or (
-                                    (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-4] /
-                                         iteration_log['producer_%s_share_frac' % mc].iloc[-1])
-                                            <= o2.options.producer_consumer_iteration_tolerance
-                                     and
-                                     abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-4] /
-                                         iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
-                                            <= o2.options.producer_consumer_iteration_tolerance)
-                                    )
-                                 or (
-                                     (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-5] /
-                                          iteration_log['producer_%s_share_frac' % mc].iloc[-1])
-                                      <= o2.options.producer_consumer_iteration_tolerance
-                                      and
-                                      abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-5] /
-                                          iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
-                                      <= o2.options.producer_consumer_iteration_tolerance)
-                                 )
-                                 )
-
-                if thrashing:
-                    print('!!THRASHING!!')
-
-                iteration_log.loc[iteration_log.index[-1], 'thrashing'] = thrashing
-                iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
+                update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing)
 
                 # decide whether to iterate or not
                 iterate = o2.options.iterate_producer_consumer \
@@ -279,23 +213,7 @@ def run_producer_consumer():
                           and not thrashing
 
                 if iterate:
-                    # drop candidates from database, they are no longer needed or desired
-                    # for cv in candidate_mfr_new_vehicles:
-                    #     o2.session.delete(cv)
-
-                    if iteration_num < 1:
-                        for mc in market_class_dict:
-                            # try meeting partway (first pass)
-                            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
-                                (0.5 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
-                                 0.5 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
-                    else:
-                        for mc in market_class_dict:
-                            # try meeting partway
-                            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
-                                (0.33 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
-                                 0.67 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
-
+                    negotiate_market_shares(consumer_market_share_demand, iteration_num, market_class_vehicle_dict)
                     iteration_num = iteration_num + 1
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
@@ -303,6 +221,98 @@ def run_producer_consumer():
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder)
 
     return iteration_log
+
+
+def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing):
+    iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
+    iteration_log.loc[iteration_log.index[-1], 'calendar_year'] = calendar_year
+    iteration_log.loc[iteration_log.index[-1], 'thrashing'] = thrashing
+    iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
+
+
+def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
+    from market_classes import MarketClass
+    import vehicles
+
+    # group vehicles by market class
+    market_class_vehicle_dict = MarketClass.get_market_class_dict()
+    for new_veh in candidate_mfr_new_vehicles:
+        market_class_vehicle_dict[new_veh.market_class_ID].add(new_veh)
+
+    # calculate sales-weighted co2 g/mi and cost by market class
+    for mc in MarketClass.market_classes:
+        market_class_vehicles = market_class_vehicle_dict[mc]
+        winning_combo['average_%s_co2_gpmi' % mc] = vehicles.sales_weight(market_class_vehicles,
+                                                                          'cert_CO2_grams_per_mile')
+        winning_combo['average_%s_cost' % mc] = vehicles.sales_weight(market_class_vehicles,
+                                                                      'new_vehicle_mfr_cost_dollars')
+    return market_class_vehicle_dict
+
+
+def detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log, iteration_num, market_class_dict, verbose):
+    converged = True
+    thrashing = iteration_num >= 5
+    for mc in market_class_dict:
+        # relative percentage convergence:
+        converged = converged and abs(1 - \
+                                      consumer_market_share_demand['producer_%s_share_frac' % mc] / \
+                                      consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
+                    o2.options.producer_consumer_iteration_tolerance
+
+        thrashing = detect_thrashing(iteration_log, mc, thrashing)
+
+    if thrashing and verbose:
+        print('!!THRASHING!!')
+
+    return converged, thrashing
+
+
+def negotiate_market_shares(consumer_market_share_demand, iteration_num, market_class_dict):
+    if iteration_num < 1:
+        for mc in market_class_dict:
+            # try meeting partway (first pass)
+            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
+                (0.5 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
+                 0.5 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
+    else:
+        for mc in market_class_dict:
+            # try meeting partway
+            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
+                (0.33 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
+                 0.67 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
+
+
+def detect_thrashing(iteration_log, mc, thrashing):
+    thrashing = thrashing and \
+                ((
+                         abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-3] /
+                             iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                         <= o2.options.producer_consumer_iteration_tolerance
+                         and
+                         abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-3] /
+                             iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                         <= o2.options.producer_consumer_iteration_tolerance
+                 ) \
+                 or (
+                     (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-4] /
+                          iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                      <= o2.options.producer_consumer_iteration_tolerance
+                      and
+                      abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-4] /
+                          iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                      <= o2.options.producer_consumer_iteration_tolerance)
+                 )
+                 or (
+                     (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-5] /
+                          iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                      <= o2.options.producer_consumer_iteration_tolerance
+                      and
+                      abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-5] /
+                          iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                      <= o2.options.producer_consumer_iteration_tolerance)
+                 )
+                 )
+    return thrashing
 
 
 def cleanup_vehicle_ids(candidate_mfr_new_vehicles, consumer_market_share_demand, winning_combo):
@@ -469,7 +479,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=True)
+        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
