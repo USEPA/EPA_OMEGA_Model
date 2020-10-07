@@ -10,7 +10,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class CostCloud(SQABase):
+class CostCloud(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'cost_clouds'
     index = Column('index', Integer, primary_key=True)
@@ -20,15 +20,6 @@ class CostCloud(SQABase):
     new_vehicle_mfr_cost_dollars = Column(Float)
     cert_co2_grams_per_mile = Column(Float)
     mfr_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

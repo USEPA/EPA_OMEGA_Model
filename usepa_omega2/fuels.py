@@ -11,18 +11,12 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class Fuel(SQABase):
+class Fuel(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'fuels'
     fuel_ID = Column('fuel_id', String, primary_key=True)
     unit = Column(Enum(*fuel_units, validate_strings=True))
     energy_density_MJ_per_unit = Column('energy_density_megajoules_per_unit', Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        return "<Fuel('%s', %f MJ/%s)>" % (self.name, self.energy_density_MJ_per_unit, self.unit)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

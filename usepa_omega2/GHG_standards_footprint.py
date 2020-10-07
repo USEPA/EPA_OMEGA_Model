@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class GHGStandardFootprint(SQABase):
+class GHGStandardFootprint(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_footprint'
     index = Column(Integer, primary_key=True)
@@ -24,15 +24,6 @@ class GHGStandardFootprint(SQABase):
     coeff_c = Column('coeff_c', Float)
     coeff_d = Column('coeff_d', Float)
     lifetime_VMT = Column('lifetime_vmt', Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

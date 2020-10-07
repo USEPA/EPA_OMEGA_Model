@@ -278,9 +278,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     # update each vehicle and calculate compliance target for each vehicle
     for prior_veh in manufacturer_prior_vehicles:
         new_veh = VehicleBase()
-        new_veh.inherit_vehicle(prior_veh)
-        new_veh.model_year = calendar_year
-        new_veh.set_cert_target_CO2_grams_per_mile()
+        new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
         manufacturer_new_vehicles.append(new_veh)
 
     # get empty market class tree
@@ -317,11 +315,6 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_v
     for cv in manufacturer_candidate_vehicles:
         new_veh = Vehicle()
         new_veh.inherit_vehicle(cv)
-        new_veh.set_initial_registered_count(cv.get_initial_registered_count())
-        new_veh.set_cert_co2_grams_per_mile(cv.cert_CO2_grams_per_mile)
-        new_veh.set_cert_target_CO2_grams_per_mile()
-        new_veh.set_cert_target_CO2_Mg()
-        new_veh.set_cert_CO2_Mg()
         manufacturer_new_vehicles.append(new_veh)
 
     o2.session.add_all(manufacturer_new_vehicles)
