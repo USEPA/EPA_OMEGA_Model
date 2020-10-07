@@ -193,7 +193,6 @@ class Vehicle(SQABase, VehicleBase):
     @property
     def initial_registered_count(self):
         from vehicle_annual_data import VehicleAnnualData
-
         return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
 
     @initial_registered_count.setter

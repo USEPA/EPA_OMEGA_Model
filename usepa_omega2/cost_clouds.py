@@ -18,7 +18,7 @@ class CostCloud(SQABase, o2.OmegaBase):
     cost_curve_class = Column(String)
     model_year = Column(Numeric)
     new_vehicle_mfr_cost_dollars = Column(Float)
-    cert_co2_grams_per_mile = Column(Float)
+    cert_CO2_grams_per_mile = Column(Float)
     mfr_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
 
     @staticmethod

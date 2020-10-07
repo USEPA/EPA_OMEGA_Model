@@ -19,7 +19,7 @@ class CostCurve(SQABase, o2.OmegaBase):
     cost_curve_class = Column(String)
     model_year = Column(Numeric)
     cost_dollars = Column(Float)
-    cert_co2_grams_per_mile = Column(Float)
+    cert_CO2_grams_per_mile = Column(Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -87,7 +87,7 @@ class CostCurve(SQABase, o2.OmegaBase):
                     cost_curve_class, model_year, max_cost_curve_year))
             model_year = min_cost_curve_year
 
-        result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_co2_grams_per_mile).filter(
+        result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_CO2_grams_per_mile).filter(
             CostCurve.model_year == model_year).filter(CostCurve.cost_curve_class == cost_curve_class)
         curve_cost_dollars = [r[0] for r in result]
         curve_co2_gpmi = [r[1] for r in result]
@@ -98,19 +98,19 @@ class CostCurve(SQABase, o2.OmegaBase):
 
     @staticmethod
     def get_min_co2_gpmi(cost_curve_class, model_year):
-        return o2.session.query(func.min(CostCurve.cert_co2_grams_per_mile)). \
+        return o2.session.query(func.min(CostCurve.cert_CO2_grams_per_mile)). \
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
     @staticmethod
     def get_max_co2_gpmi(cost_curve_class, model_year):
-        return o2.session.query(func.max(CostCurve.cert_co2_grams_per_mile)). \
+        return o2.session.query(func.max(CostCurve.cert_CO2_grams_per_mile)). \
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
     @staticmethod
     def get_co2_gpmi(cost_curve_class, model_year):
-        return sql_unpack_result(o2.session.query(CostCurve.cert_co2_grams_per_mile).
+        return sql_unpack_result(o2.session.query(CostCurve.cert_CO2_grams_per_mile).
                                  filter(CostCurve.cost_curve_class == cost_curve_class).
                                  filter(CostCurve.model_year == model_year).all())
 
