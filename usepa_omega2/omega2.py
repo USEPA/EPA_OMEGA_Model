@@ -16,7 +16,7 @@ import os
 from usepa_omega2.file_eye_oh import gui_comm
 
 
-def run_postproc(iteration_log):
+def run_postproc(iteration_log, single_shot):
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import Vehicle
     from vehicle_annual_data import VehicleAnnualData
@@ -24,6 +24,10 @@ def run_postproc(iteration_log):
     import pandas as pd
 
     import matplotlib.pyplot as plt
+
+    if not single_shot:
+        gui_comm('%s: Post Processing ...' % o2.options.session_name)
+
     year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
                         zip(iteration_log['calendar_year'], iteration_log['iteration'])]
     for mc in MarketClass.get_market_class_dict():
@@ -315,7 +319,15 @@ def detect_thrashing(iteration_log, mc, thrashing):
     return thrashing
 
 
-def init_omega(init_fail):
+def init_omega(o2_options):
+
+    # set up global variables:
+    o2.options = o2_options
+    omega_log.init_logfile()
+
+    init_omega_db()
+    o2.engine.echo = o2.options.verbose
+
     # import database modules to populate ORM context
     from fuels import Fuel
     from fuels_context import FuelsContext
@@ -347,6 +359,8 @@ def init_omega(init_fail):
 
     o2.options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
     o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
+
+    init_fail = []
 
     init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
@@ -412,44 +426,22 @@ def run_omega(o2_options, single_shot=False, profile=False):
 
     print('run_omega(%s)' % o2_options.session_name)
 
-    # set up global variables:
-    o2.options = o2_options
-    init_omega_db()
-    o2.engine.echo = o2.options.verbose
-    omega_log.init_logfile()
-
-    init_fail = []
     try:
-        init_fail = init_omega(init_fail)
+        init_fail = init_omega(o2_options)
 
         if not init_fail:
-            # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
-
             if profile:
+                # run with profiler
                 import cProfile
                 import re
                 cProfile.run('iteration_log = run_producer_consumer()', filename='omega2_profile.dmp')
-
-                if not single_shot:
-                    gui_comm('%s: Post Processing ...' % o2.options.session_name)
-                session_summary_results = run_postproc(globals()['iteration_log'])  # return values of cProfile.run() show up in the globals namespace
+                session_summary_results = run_postproc(globals()['iteration_log'], single_shot)  # return values of cProfile.run() show up in the globals namespace
             else:
+                # run without profiler
                 iteration_log = run_producer_consumer()
+                session_summary_results = run_postproc(iteration_log, single_shot)
 
-                if not single_shot:
-                    gui_comm('%s: Post Processing ...' % o2.options.session_name)
-                session_summary_results = run_postproc(iteration_log)
-
-            if single_shot:
-                session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
-            else:
-                if not os.access('%s_summary_results.csv' % fileio.get_filename(os.getcwd()), os.F_OK):
-                    session_summary_results.to_csv(
-                        '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
-                else:
-                    session_summary_results.to_csv(
-                        '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a',
-                        header=False)
+            publish_summary_results(session_summary_results, single_shot)
 
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
@@ -473,6 +465,19 @@ def run_omega(o2_options, single_shot=False, profile=False):
         gui_comm("### Check OMEGA log for error messages ###")
         gui_comm("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
+
+
+def publish_summary_results(session_summary_results, single_shot):
+    if single_shot:
+        session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
+    else:
+        if not os.access('%s_summary_results.csv' % fileio.get_filename(os.getcwd()), os.F_OK):
+            session_summary_results.to_csv(
+                '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
+        else:
+            session_summary_results.to_csv(
+                '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a',
+                header=False)
 
 
 if __name__ == "__main__":
