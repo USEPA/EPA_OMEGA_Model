@@ -299,8 +299,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
 
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_new_vehicles:
-        new_veh.set_cert_co2_grams_per_mile(winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID])
+        new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%d_sales' % new_veh.vehicle_ID]
+        new_veh.set_new_vehicle_mfr_cost_dollars()
         new_veh.set_cert_target_CO2_Mg()
         new_veh.set_cert_CO2_Mg()
 

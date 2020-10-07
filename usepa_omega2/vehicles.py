@@ -134,17 +134,12 @@ class VehicleBase(o2.OmegaBase):
     def set_cert_target_CO2_Mg(self):
         self.cert_target_CO2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
 
-    def set_cert_co2_grams_per_mile(self, cert_co2_grams_per_mile):
-        """
-        Update cert_co2_grams_per_mile and new_vehicle_mfr_cost_dollars
-        :param cert_co2_grams_per_mile: certification test CO2 g/mi
-        :return: set self.cert_CO2_grams_per_mile and self.new_vehicle_mfr_cost_dollars
-        """
+    def set_new_vehicle_mfr_cost_dollars(self):
         from cost_curves import CostCurve
-        self.cert_CO2_grams_per_mile = cert_co2_grams_per_mile
         self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
                                                               model_year=self.model_year,
                                                               target_co2_gpmi=self.cert_CO2_grams_per_mile)
+
 
     def set_cert_CO2_Mg(self):
         self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
@@ -152,7 +147,8 @@ class VehicleBase(o2.OmegaBase):
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
-                              'cert_CO2_grams_per_mile', 'footprint_ft2'}
+                              'footprint_ft2'}
+
         for p in inherit_properties:
             self.__setattr__(p, vehicle.__getattribute__(p))
 
@@ -161,7 +157,8 @@ class VehicleBase(o2.OmegaBase):
 
         self.set_cert_target_CO2_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
-        self.set_cert_co2_grams_per_mile(vehicle.cert_CO2_grams_per_mile)
+        self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile
+        self.set_new_vehicle_mfr_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
         self.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
         self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
 
@@ -182,7 +179,6 @@ class Vehicle(SQABase, VehicleBase):
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
-    cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
     cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
@@ -192,6 +188,7 @@ class Vehicle(SQABase, VehicleBase):
     # TODO: cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('ghg_standard_fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
+    cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
 
     @property
     def initial_registered_count(self):
@@ -249,8 +246,9 @@ class Vehicle(SQABase, VehicleBase):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.set_cert_co2_grams_per_mile(df.loc[i, 'cert_co2_grams_per_mile'])
+                    veh.cert_CO2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
+                    veh.set_new_vehicle_mfr_cost_dollars()
                     veh.set_cert_target_CO2_grams_per_mile()
                     veh.set_cert_target_CO2_Mg()
                     veh.set_cert_CO2_Mg()
