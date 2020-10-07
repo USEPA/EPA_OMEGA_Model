@@ -52,7 +52,7 @@ class CostCloud(SQABase, o2.OmegaBase):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
                         new_vehicle_mfr_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
-                        cert_co2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
+                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 original_echo = o2.engine.echo

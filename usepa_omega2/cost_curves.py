@@ -47,7 +47,7 @@ class CostCurve(SQABase, o2.OmegaBase):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
                         cost_dollars=df.loc[i, 'cost_dollars'],
-                        cert_co2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
+                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -65,7 +65,7 @@ class CostCurve(SQABase, o2.OmegaBase):
                 cost_curve_class=cost_curve_class,
                 model_year=model_year,
                 cost_dollars=cost,
-                cert_co2_grams_per_mile=co2_gpmi,
+                cert_CO2_grams_per_mile=co2_gpmi,
             ))
         o2.session.add_all(obj_list)
         o2.session.flush()
