@@ -107,7 +107,7 @@ class Form(QObject):
 
         # Initialize items
         # Select file path tab
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         # Set status monitor window options
         self.window.event_monitor_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.event_monitor_result.setReadOnly(1)
@@ -162,7 +162,7 @@ class Form(QObject):
         self.window.output_batch_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
         self.initialize_gui()
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         self.enable_run_button(False)
 
     def open_file(self):
@@ -177,7 +177,7 @@ class Form(QObject):
         global configuration_file, scenario, configuration_file_valid, input_batch_file_valid
         global output_batch_directory_valid, input_batch_file, output_batch_directory
         # self.window.statusBar().showMessage("Open File")
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Configuration Files (*.om2)"
@@ -299,7 +299,7 @@ class Form(QObject):
         """
         global configuration_file, scenario, input_batch_file, output_batch_directory
         global configuration_file_valid
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Configuration Files (*.om2)"
@@ -348,7 +348,7 @@ class Form(QObject):
         global input_batch_file, scenario, configuration_file
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
         # self.window.statusBar().showMessage("Open File")
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Batch Files (*.xlsx)"
@@ -399,7 +399,7 @@ class Form(QObject):
         global output_batch_directory, scenario, configuration_file
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
         # self.window.statusBar().showMessage("Open File")
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "file_path_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
         file_type = "OMEGA2 Configuration Files (*.om2)"
@@ -784,5 +784,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('gui/elements/omega_gui_v18.ui')
+    form = Form('gui/elements/omega_gui_v20.ui')
     sys.exit(app.exec_())
