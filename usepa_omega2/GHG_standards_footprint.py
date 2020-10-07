@@ -99,7 +99,7 @@ class GHGStandardFootprint(SQABase, o2.OmegaBase):
             else:
                 sales = sales_variants
         else:
-            sales = vehicle.get_initial_registered_count()
+            sales = vehicle.initial_registered_count
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
 
@@ -120,7 +120,7 @@ class GHGStandardFootprint(SQABase, o2.OmegaBase):
             else:
                 co2_gpmi = co2_gpmi_variants
         else:
-            sales = vehicle.get_initial_registered_count()
+            sales = vehicle.initial_registered_count
             co2_gpmi = vehicle.cert_CO2_grams_per_mile
 
         return co2_gpmi * lifetime_VMT * sales / 1e6

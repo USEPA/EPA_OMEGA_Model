@@ -21,7 +21,7 @@ def sales_weight(vehicle_list, attribute_name):
     weighted_sum = 0
     total_sales = 0
     for v in vehicle_list:
-        sales = v.get_initial_registered_count()
+        sales = v.initial_registered_count
         total_sales = total_sales + sales
         weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
 
@@ -40,12 +40,12 @@ def sales_unweight(veh, vehicle_list, attribute_name, weighted_value):
     total_sales = 0
     weighted_sum = 0
     for v in vehicle_list:
-        sales = v.get_initial_registered_count()
+        sales = v.initial_registered_count
         total_sales = total_sales + sales
         if v is not veh:
             weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
 
-    return (weighted_value * total_sales - weighted_sum) / veh.get_initial_registered_count()
+    return (weighted_value * total_sales - weighted_sum) / veh.initial_registered_count
 
 
 class CompositeVehicle(o2.OmegaBase):
@@ -74,10 +74,10 @@ class CompositeVehicle(o2.OmegaBase):
 
         total_sales = 0
         for v in self.vehicle_list:
-            total_sales = total_sales = v.get_initial_registered_count()
+            total_sales = total_sales = v.initial_registered_count
 
         for v in self.vehicle_list:
-            v.reg_class_market_share_frac = v.get_initial_registered_count() / total_sales
+            v.reg_class_market_share_frac = v.initial_registered_count / total_sales
 
     def get_cost(self, target_co2_gpmi):
         # get cost from cost curve for target_co2_gpmi(s)
@@ -114,10 +114,19 @@ class VehicleBase(o2.OmegaBase):
     market_class_ID = None
     footprint_ft2 = None
     reg_class_market_share_frac = 1.0
+    _initial_registered_count = 0
 
     def __init__(self):
         self.vehicle_ID = VehicleBase.next_vehicle_ID
         VehicleBase.next_vehicle_ID = VehicleBase.next_vehicle_ID + 1
+
+    @property
+    def initial_registered_count(self):
+        return self._initial_registered_count
+
+    @initial_registered_count.setter
+    def initial_registered_count(self, initial_registered_count):
+        self._initial_registered_count = initial_registered_count
 
     def set_cert_target_CO2_grams_per_mile(self):
         self.cert_target_CO2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
@@ -140,12 +149,6 @@ class VehicleBase(o2.OmegaBase):
     def set_cert_CO2_Mg(self):
         self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
 
-    def set_initial_registered_count(self, sales):
-        self.sales = sales
-
-    def get_initial_registered_count(self):
-        return self.sales
-
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
@@ -157,7 +160,7 @@ class VehicleBase(o2.OmegaBase):
             self.model_year = model_year
 
         self.set_cert_target_CO2_grams_per_mile()  # varies by model year
-        self.set_initial_registered_count(vehicle.get_initial_registered_count())
+        self.initial_registered_count = vehicle.initial_registered_count
         self.set_cert_co2_grams_per_mile(vehicle.cert_CO2_grams_per_mile)
         self.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
         self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
@@ -190,7 +193,14 @@ class Vehicle(SQABase, VehicleBase):
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
 
-    def set_initial_registered_count(self, sales):
+    @property
+    def initial_registered_count(self):
+        from vehicle_annual_data import VehicleAnnualData
+
+        return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
+
+    @initial_registered_count.setter
+    def initial_registered_count(self, initial_registered_count):
         from vehicle_annual_data import VehicleAnnualData
 
         o2.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
@@ -198,12 +208,7 @@ class Vehicle(SQABase, VehicleBase):
 
         VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=self.model_year,
-                                                  registered_count=sales)
-
-    def get_initial_registered_count(self):
-        from vehicle_annual_data import VehicleAnnualData
-
-        return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
+                                                  registered_count=initial_registered_count)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -213,8 +218,8 @@ class Vehicle(SQABase, VehicleBase):
         input_template_name = 'vehicles'
         input_template_version = 0.0005
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'hauling_class',
-                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'market_class_id', 'sales',
-                                  'cert_co2_grams_per_mile', 'footprint_ft2'}
+                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'market_class_id',
+                                  'sales', 'cert_co2_grams_per_mile', 'footprint_ft2'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -225,7 +230,6 @@ class Vehicle(SQABase, VehicleBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                # obj_list = []
                 # load data into database
                 for i in df.index:
                     veh = Vehicle(
@@ -246,11 +250,7 @@ class Vehicle(SQABase, VehicleBase):
                         veh.fueling_class = 'ICE'
 
                     veh.set_cert_co2_grams_per_mile(df.loc[i, 'cert_co2_grams_per_mile'])
-                    # veh.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=veh.cost_curve_class,
-                    #                                                       model_year=veh.model_year,
-                    #                                                       target_co2_gpmi=veh.cert_CO2_grams_per_mile)
-
-                    veh.set_initial_registered_count(df.loc[i, 'sales'])
+                    veh.initial_registered_count = df.loc[i, 'sales']
                     veh.set_cert_target_CO2_grams_per_mile()
                     veh.set_cert_target_CO2_Mg()
                     veh.set_cert_CO2_Mg()
