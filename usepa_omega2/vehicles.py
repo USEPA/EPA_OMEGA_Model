@@ -56,7 +56,9 @@ class CompositeVehicle(o2.OmegaBase):
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
         """
-        self.vehicle_list = vehicle_list
+        import copy
+
+        self.vehicle_list = copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
 
         self.vehicle_ID = '%d' % CompositeVehicle.next_vehicle_ID
@@ -70,7 +72,6 @@ class CompositeVehicle(o2.OmegaBase):
         self.cert_CO2_grams_per_mile = sales_weight(self.vehicle_list, 'cert_CO2_grams_per_mile')
         self.footprint_ft2 = sales_weight(self.vehicle_list, 'footprint_ft2')
         self.new_vehicle_mfr_cost_dollars = sales_weight(self.vehicle_list, 'new_vehicle_mfr_cost_dollars')
-        self.cost_curve = None  # TODO: calc sales weighted cost curve here, based on cost_curve classes and model_year
 
         self.total_sales = 0
         for v in self.vehicle_list:
@@ -79,17 +80,61 @@ class CompositeVehicle(o2.OmegaBase):
         for v in self.vehicle_list:
             v.reg_class_market_share_frac = v.initial_registered_count / self.total_sales
 
+        self.cost_curve = self.calc_composite_cost_curve(plot=True)
+
+    def calc_composite_cost_curve(self, plot=False):
+        from cost_clouds import CostCloud
+        from omega_functions import cartesian_prod
+        from omega_plot import figure, label_xy
+
+        if plot:
+            fig, ax1 = figure()
+            label_xy(ax1, 'CO2 g/mi', '$')
+
+        composite_cloud_df = pd.DataFrame()
+        composite_cloud_df['cert_co2_grams_per_mile'] = [0]
+        composite_cloud_df['new_vehicle_mfr_cost_dollars'] = [0]
+        for v in self.vehicle_list:
+            vehicle_frontier = v.create_frontier_df()
+
+            if plot:
+                ax1.plot(vehicle_frontier.iloc[:, 0], vehicle_frontier.iloc[:, 1], '.-')
+
+            vehicle_frontier['veh_%d_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
+            composite_cloud_df = cartesian_prod(composite_cloud_df, vehicle_frontier, drop=True)
+
+            composite_cloud_df['cert_co2_grams_per_mile'] = composite_cloud_df['cert_co2_grams_per_mile'] + \
+                                                      composite_cloud_df['veh_%d_cert_co2_grams_per_mile' % v.vehicle_ID] * \
+                                                      composite_cloud_df['veh_%d_market_share' % v.vehicle_ID]
+
+            composite_cloud_df['new_vehicle_mfr_cost_dollars'] = composite_cloud_df['new_vehicle_mfr_cost_dollars'] + \
+                                                          composite_cloud_df[
+                                                              'veh_%s_mfr_cost_dollars' % v.vehicle_ID] * \
+                                                          composite_cloud_df['veh_%s_market_share' % v.vehicle_ID]
+
+        cost_curve = CostCloud.calculate_frontier(composite_cloud_df, 'cert_co2_grams_per_mile',
+                                            'new_vehicle_mfr_cost_dollars')
+
+        if plot:
+            ax1.plot(cost_curve['cert_co2_grams_per_mile'], cost_curve['new_vehicle_mfr_cost_dollars'], '.-')
+
+        return cost_curve
+
     def get_cost(self, target_co2_gpmi):
         # get cost from cost curve for target_co2_gpmi(s)
-        pass
+        cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
+                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'],
+                                                  fill_value='extrapolate')
+
+        return cost_dollars(target_co2_gpmi).tolist()
 
     def get_max_co2_gpmi(self):
         # get max co2_gpmi from self.cost_curve
-        pass
+        return self.cost_curve['cert_co2_grams_per_mile'].max()
 
     def get_min_co2_gpmi(self):
         # get min co2_gpmi from self.cost_curve
-        pass
+        return self.cost_curve['cert_co2_grams_per_mile'].min()
 
 
 class VehicleBase(o2.OmegaBase):
@@ -165,11 +210,11 @@ class VehicleBase(o2.OmegaBase):
     def create_frontier_df(self):
         df = pd.DataFrame()
 
-        df['veh_%d_frontier_co2_gpmi' % self.vehicle_ID] = \
+        df['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID] = \
             CostCurve.get_co2_gpmi(self.cost_curve_class, self.model_year)
 
-        df['veh_%d_frontier_cost_dollars' % self.vehicle_ID] = \
-            CostCurve.get_cost(self.cost_curve_class, self.model_year, df['veh_%d_frontier_co2_gpmi' % self.vehicle_ID])
+        df['veh_%s_mfr_cost_dollars' % self.vehicle_ID] = \
+            CostCurve.get_cost(self.cost_curve_class, self.model_year, df['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID])
 
         return df
 
@@ -348,37 +393,57 @@ if __name__ == '__main__':
                                                                    weighted_footprint))
 
             cv = CompositeVehicle(vehicles_list)
-            veh_0_frontier_df = vehicles_list[0].create_frontier_df()
-            veh_1_frontier_df = vehicles_list[1].create_frontier_df()
-            veh_2_frontier_df = vehicles_list[2].create_frontier_df()
-            veh_3_frontier_df = vehicles_list[3].create_frontier_df()
+
+            market_shares = [[1, 0, 0, 0],
+                             [0, 1, 0, 0],
+                             [0, 0, 1, 0],
+                             [0, 0, 0, 1],
+                             [0.25, 0.25, 0.25, 0.25],
+                             [0.5, 0.5, 0, 0],
+                             [0, 0.5, 0.5, 0],
+                             [0, 0, 0.5, 0.5],
+                             [0.5, 0, 0, 0.5],
+                             [0.1, 0.2, 0.3, 0.4],
+                             ]
 
             from omega_plot import *
             import matplotlib.pyplot as plt
-            fig, ax1 = figure()
-            for v in vehicles_list:
-                frontier_df = v.create_frontier_df()
-                ax1.plot(frontier_df.iloc[:, 0], frontier_df.iloc[:, 1], '.-')
-
             from omega_functions import cartesian_prod
-            combined_cloud_df = pd.DataFrame()
-            combined_cloud_df['frontier_co2_gpmi'] = [0]
-            combined_cloud_df['frontier_cost_dollars'] = [0]
-            for v in vehicles_list:
-                vehicle_frontier = v.create_frontier_df()
-                vehicle_frontier['veh_%d_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
-                combined_cloud_df = cartesian_prod(combined_cloud_df, vehicle_frontier)
-                combined_cloud_df['frontier_co2_gpmi'] = combined_cloud_df['frontier_co2_gpmi'] + \
-                                                         combined_cloud_df['veh_%d_frontier_co2_gpmi' % v.vehicle_ID] * \
-                                                         combined_cloud_df['veh_%d_market_share' % v.vehicle_ID]
-                combined_cloud_df['frontier_cost_dollars'] = combined_cloud_df['frontier_cost_dollars'] + \
-                                                             combined_cloud_df['veh_%d_frontier_cost_dollars' % v.vehicle_ID] * \
-                                                             combined_cloud_df['veh_%d_market_share' % v.vehicle_ID]
-            ax1.plot(combined_cloud_df['frontier_co2_gpmi'], combined_cloud_df['frontier_cost_dollars'], '.')
 
-            from cost_clouds import CostCloud
-            combined_frontier_df = CostCloud.calculate_frontier(combined_cloud_df, 'frontier_co2_gpmi', 'frontier_cost_dollars')
-            ax1.plot(combined_frontier_df['frontier_co2_gpmi'], combined_frontier_df['frontier_cost_dollars'], '.-')
+            for ms in market_shares:
+                fig, ax1 = figure()
+                label_xyt(ax1, 'CO2 g/mi', '$', 'Market Shares = %s' % ms)
+                for i, v in enumerate(vehicles_list):
+                    frontier_df = v.create_frontier_df()
+                    ax1.plot(frontier_df.iloc[:, 0], frontier_df.iloc[:, 1], '.-')
+                    v.reg_class_market_share_frac = ms[i]
+
+                combined_cloud_df = pd.DataFrame()
+                combined_cloud_df['frontier_co2_grams_per_mile'] = [0]
+                combined_cloud_df['frontier_cost_dollars'] = [0]
+                for v in vehicles_list:
+                    vehicle_frontier = v.create_frontier_df()
+                    vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
+                    combined_cloud_df = cartesian_prod(combined_cloud_df, vehicle_frontier, drop=True)
+
+                    combined_cloud_df['frontier_co2_grams_per_mile'] = \
+                        combined_cloud_df['frontier_co2_grams_per_mile'] + combined_cloud_df[
+                            'veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID] * combined_cloud_df[
+                            'veh_%s_market_share' % v.vehicle_ID]
+
+
+                    combined_cloud_df['frontier_cost_dollars'] = \
+                        combined_cloud_df['frontier_cost_dollars'] + \
+                        combined_cloud_df[
+                            'veh_%s_mfr_cost_dollars' % v.vehicle_ID] * \
+                        combined_cloud_df['veh_%s_market_share' % v.vehicle_ID]
+
+                ax1.plot(combined_cloud_df['frontier_co2_grams_per_mile'], combined_cloud_df['frontier_cost_dollars'], '.')
+
+                from cost_clouds import CostCloud
+                combined_frontier_df = CostCloud.calculate_frontier(combined_cloud_df, 'frontier_co2_grams_per_mile', 'frontier_cost_dollars')
+                ax1.plot(combined_frontier_df['frontier_co2_grams_per_mile'], combined_frontier_df['frontier_cost_dollars'], '.-')
+
             combined_frontier_df.to_csv('combined_frontier.csv', index=False)
 
         else:

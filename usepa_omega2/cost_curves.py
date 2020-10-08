@@ -92,9 +92,9 @@ class CostCurve(SQABase, o2.OmegaBase):
         curve_cost_dollars = [r[0] for r in result]
         curve_co2_gpmi = [r[1] for r in result]
 
-        cost_curve = scipy.interpolate.interp1d(curve_co2_gpmi, curve_cost_dollars, fill_value='extrapolate')
+        cost_dollars = scipy.interpolate.interp1d(curve_co2_gpmi, curve_cost_dollars, fill_value='extrapolate')
 
-        return cost_curve(target_co2_gpmi).tolist()
+        return cost_dollars(target_co2_gpmi)
 
     @staticmethod
     def get_min_co2_gpmi(cost_curve_class, model_year):
