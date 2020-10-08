@@ -58,7 +58,7 @@ class CompositeVehicle(o2.OmegaBase):
         """
         import copy
 
-        self.vehicle_list = copy.deepcopy(vehicle_list)
+        self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
 
         self.vehicle_ID = '%d' % CompositeVehicle.next_vehicle_ID
@@ -73,14 +73,32 @@ class CompositeVehicle(o2.OmegaBase):
         self.footprint_ft2 = sales_weight(self.vehicle_list, 'footprint_ft2')
         self.new_vehicle_mfr_cost_dollars = sales_weight(self.vehicle_list, 'new_vehicle_mfr_cost_dollars')
 
-        self.total_sales = 0
+        self.initial_registered_count = 0
         for v in self.vehicle_list:
-            self.total_sales = self.total_sales + v.initial_registered_count
+            self.initial_registered_count = self.initial_registered_count + v.initial_registered_count
 
         for v in self.vehicle_list:
-            v.reg_class_market_share_frac = v.initial_registered_count / self.total_sales
+            v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
 
         self.cost_curve = self.calc_composite_cost_curve(plot=True)
+
+    def decompose(self):
+        for v in self.vehicle_list:
+            print('%s= %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+
+        for v in self.vehicle_list:
+            vehicle_cost_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
+                                                            self.cost_curve[
+                                                                'veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID],
+                                                            fill_value='extrapolate')
+
+            v.cert_CO2_grams_per_mile = vehicle_cost_curve(self.cert_CO2_grams_per_mile)
+            v.initial_registered_count = self.initial_registered_count * v.reg_class_market_share_frac
+            v.set_new_vehicle_mfr_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
+            v.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
+            v.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
+
+            print('%s: %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
 
     def calc_composite_cost_curve(self, plot=False):
         from cost_clouds import CostCloud
@@ -392,7 +410,26 @@ if __name__ == '__main__':
             print(vehicles_list[3].footprint_ft2 == sales_unweight(vehicles_list[3], vehicles_list, 'footprint_ft2',
                                                                    weighted_footprint))
 
-            cv = CompositeVehicle(vehicles_list)
+            base_vehicles_list = []
+            for v in vehicles_list:
+                vb = VehicleBase()
+                vb.inherit_vehicle(v)
+                base_vehicles_list.append(vb)
+
+            cv = CompositeVehicle(base_vehicles_list)
+            print(cv)
+
+            cv.cost_curve.to_csv('combined_frontier.csv', index=False)
+
+            cv.decompose()  # update cv.vehicle_list vehicles
+
+            cv2 = CompositeVehicle(cv.vehicle_list)
+            cv2.decompose()
+            print(cv2)
+
+            cv3 = CompositeVehicle(cv2.vehicle_list)
+            cv3.decompose()
+            print(cv3)
 
             market_shares = [[1, 0, 0, 0],
                              [0, 1, 0, 0],
