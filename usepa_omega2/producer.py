@@ -8,21 +8,11 @@ the manufacturers.py is primarily related to the schema and class methods...
 """
 
 import o2  # import global variables
+from omega_functions import cartesian_prod
 from usepa_omega2 import *
-
 import numpy as np
-
 import consumer
 
-
-def unique(vector):
-    """
-
-    :param vector:
-    :return:
-    """
-    indexes = np.unique(vector, return_index=True)[1]
-    return [vector[index] for index in sorted(indexes)]
 
 partition_dict = dict()
 def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):
@@ -76,82 +66,6 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
         partition_dict[partition_name] = ans
 
     return partition_dict[partition_name]
-
-
-# def partition(num_columns, num_levels, min_level=0.001, verbose=False):
-#     """
-#     Returns a set of columns, the rows of which add up to 1.0, with num_levels between 0-1
-#     ex: >>> partition(num_columns=2, num_levels=3, verbose=True)
-#             1.00	0.00
-#             0.50	0.50
-#             0.00	1.00
-#
-#     :param num_columns: number of columns in the output
-#     :param num_levels: number of values from 0-1
-#     :param verbose: if True then result is printed to the console
-#     :return: a set of columns, the rows of which add up to 1.0
-#     """
-#
-#     partition_name = '%d_%d_%s' % (num_columns, num_levels, min_level)
-#
-#     if not partition_name in partition_dict:
-#         from pyDOE2 import fullfact
-#
-#         permutations = np.minimum(1 - min_level, np.maximum(min_level, fullfact([num_levels] * num_columns) / (num_levels - 1)))
-#         valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
-#
-#         if verbose:
-#             for i in valid_combinations:
-#                 s = ''
-#                 for e in i:
-#                     s = s + '\t%.3f' % e
-#                 print(s)
-#
-#         partition_dict[partition_name] = valid_combinations.transpose()
-#
-#     return partition_dict[partition_name]
-
-
-def cartesian_prod(left_df, right_df, drop=False):
-    """
-    Calculate cartesian product of the dataframe rows
-
-    :param left_df: 'left' dataframe
-    :param right_df: 'right' dataframe
-    :param drop: if True, drop join-column '_' from dataframes
-    :return: cartesian product of the dataframe rows
-    """
-    import pandas as pd
-
-    if left_df.empty:
-        return right_df
-    else:
-        if '_' not in left_df:
-            left_df['_'] = np.nan
-
-        if '_' not in right_df:
-            right_df['_'] = np.nan
-
-        if drop:
-            leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
-            left_df.drop('_', axis=1, inplace=True)
-            right_df.drop('_', axis=1, inplace=True, errors='ignore')
-        else:
-            leftXright = pd.merge(left_df, right_df, on='_')
-
-    return leftXright
-
-
-def inherit_vehicles(from_year, to_year, manufacturer_id):
-    # this works, but ignores annual data like initial registered count (needs to be joined from vehicle_annual_data)
-    # which will be fine when are getting sales from the consumer module or creating them as part of the unconstrained
-    # full factorial tech combos
-    cn = sql_get_column_names('vehicles', exclude='vehicle_id')
-    o2.session.execute('CREATE TABLE new_vehicles AS SELECT %s FROM vehicles \
-                     WHERE model_year==%d AND manufacturer_id=="%s"' % (cn, from_year, manufacturer_id))
-    o2.session.execute('UPDATE new_vehicles SET model_year=%d' % to_year)
-    o2.session.execute('INSERT INTO vehicles (%s) SELECT %s FROM new_vehicles' % (cn, cn))
-    o2.session.execute('DROP TABLE new_vehicles')
 
 
 def calculate_cert_target_co2_Mg(model_year, manufacturer_id):

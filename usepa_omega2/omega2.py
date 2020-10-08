@@ -222,7 +222,7 @@ def run_producer_consumer():
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
 
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder)
+        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
     return iteration_log
 
