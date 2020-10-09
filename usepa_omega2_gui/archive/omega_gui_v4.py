@@ -13,13 +13,14 @@ import sys
 import multitimer
 import time
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QWidget, QListWidget, QListWidgetItem, \
+    QTableWidgetItem
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
 # Import functions from other files
-from gui.omega_gui_setup3 import *
-from gui.omega_gui_functions import *
+from usepa_omega2_gui.omega_gui_setup3 import *
+from usepa_omega2_gui.omega_gui_functions import *
 
 atimer = 0
 scenario_file = ""
@@ -31,6 +32,16 @@ Ui_MainWindow, QtBaseClass = uic.loadUiType('omega_gui_v4.ui')
 def timer3():
     global atimer
     atimer = atimer + 1
+    atimer
+    if atimer == 5:
+        window.ui.statusbar.showMessage("rrr")
+
+
+    #else:
+    #    window.ui.statusbar.showMessage("Hello")
+    #    window.exit_gui()
+    #    temp = MyApp()
+    #    temp.exit_gui()
     print(atimer)
 
 
@@ -61,45 +72,14 @@ class MyApp(QMainWindow):
         # Set the window icon
         self.setWindowIcon(QIcon("images/omega2_icon.jpg"))
 
-        # Sets an icon and messages in the system tray
-        # icon = QIcon("images/alpha_logo.jpg")
-        # self.tray = QSystemTrayIcon()
-        # self.tray.setIcon(icon)
-        # self.tray.show()
-        # self.tray.setToolTip("ALPHA Command Generator")
-        # self.tray.showMessage("ALPHA Command Generator", "Ready")
-        # self.tray.showMessage("ALPHA Command Generator", "Idle")
-
-        # Connect routines to events and any other needed initialization
-        # self.ui.vehicle_type_select.currentIndexChanged.connect(self.displayvalue)
-        # self.ui.validate_mass_reduction_button.clicked.connect(self.validate_mass_reduction)
-        # self.ui.validate_rolling_reduction_button.clicked.connect(self.validate_rolling_reduction)
-        # self.ui.validate_aero_reduction_button.clicked.connect(self.validate_aero_reduction)
-        # self.ui.validate_engine_sizing_button.clicked.connect(self.validate_engine_sizing)
-        # self.ui.calculate_iterations_button.clicked.connect(self.calculate_iterations)
-
         self.ui.action_new_file.triggered.connect(self.new_file)
         self.ui.action_open_file.triggered.connect(self.open_file)
         self.ui.action_save_file.triggered.connect(self.save_file)
         self.ui.action_save_file_as.triggered.connect(self.save_file_as)
+        self.ui.action_exit.triggered.connect(self.exit_gui)
 
         # Initialize items
-        # Hide buttons not used for UI
-        # self.ui.validate_mass_reduction_button.setVisible(0)
-        # self.ui.validate_rolling_reduction_button.setVisible(0)
-        # self.ui.validate_aero_reduction_button.setVisible(0)
-        # self.ui.validate_engine_sizing_button.setVisible(0)
-        # self.ui.calculate_iterations_button.setVisible(0)
-
-        # self.ui.number_of_iterations.setText(str(1))
-
-        # Read input file labels
-        # self.ui.file_1_label.setText(input_file_1_label)
-        # self.ui.file_2_label.setText(input_file_2_label)
-        # self.ui.file_3_label.setText(input_file_3_label)
-        # self.ui.file_4_label.setText(input_file_4_label)
-        # self.ui.file_5_label.setText(input_file_5_label)
-        # self.ui.file_6_label.setText(input_file_6_label)
+        self.ui.tab_select.setCurrentWidget(self.ui.tab_select.findChild(QWidget, "intro_tab"))
 
     def new_file(self):
         self.statusBar().showMessage("New File")
@@ -154,24 +134,45 @@ class MyApp(QMainWindow):
         # Change status bar
         self.statusBar().showMessage("Ready")
 
+        # Create library 'data' from YAML formatted scenario file
         filepath = working_directory + scenario_file
-
-        # temp1 = self.ui.working_directory_1_result.toPlainText()
         data = open_file_action(filepath)
-        # print(data)
 
+        # Read dictionary 'data' into tables in gui
+        # Set row and column count
+        self.ui.input_file_table.setRowCount(15)
+        self.ui.input_file_table.setColumnCount(2)
+        # Set header names
+        self.ui.input_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
+        # Reset line counter
+        a = 0
+        # Read 'input_file' elements in dictionary 'data'
         parts = data.get('input_files')
+        # Load name and value for each element into input file table
         for item_name, item_value in parts.items():
-            print(item_name, item_value)
-        parts = data.get('output_files')
-        for item_name, item_value in parts.items():
-            print(item_name, item_value)
+            self.ui.input_file_table.setItem(a, 0, QTableWidgetItem(str(item_name)))
+            self.ui.input_file_table.setItem(a, 1, QTableWidgetItem(str(item_value)))
+            a = a + 1
+        # Autosize column widths
+        self.ui.input_file_table.resizeColumnsToContents()
 
-        # path = working_directory + scenario_file
-        # f = open(path, "r")
-        # if f.mode == 'r':
-        #    contents = f.read()
-        #    print(contents)
+        # Read dictionary 'data' into tables in gui
+        # Set row and column count
+        self.ui.output_file_table.setRowCount(15)
+        self.ui.output_file_table.setColumnCount(2)
+        # Set header names
+        self.ui.output_file_table.setHorizontalHeaderLabels(['File Type', 'File Name'])
+        # Reset line counter
+        a = 0
+        # Read 'output_file' elements in dictionary 'data'
+        parts = data.get('output_files')
+        # Load name and value for each element into output file table
+        for item_name, item_value in parts.items():
+            self.ui.output_file_table.setItem(a, 0, QTableWidgetItem(str(item_name)))
+            self.ui.output_file_table.setItem(a, 1, QTableWidgetItem(str(item_value)))
+            a = a + 1
+        # Autosize column widths
+        self.ui.output_file_table.resizeColumnsToContents()
 
     def save_file(self):
         self.statusBar().showMessage("Save File")
@@ -192,23 +193,16 @@ class MyApp(QMainWindow):
         print(file_type)
         print(file_dialog_title)
 
+    def exit_gui(self):
+        self.close()
+
     def closeEvent(self, event):
         print("End Program")
         # timer.stop()
-
-    # def displayvalue(self):
-    #    self.ui.textEdit.setText(self.ui.vehicle_type_select.currentText())
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MyApp()
     window.show()
-
-    # Initialize global variables
-    # mass_iterations = 1
-    # rolling_iterations = 1
-    # aero_iterations = 1
-    # engine_iterations = 1
-
     sys.exit(app.exec_())

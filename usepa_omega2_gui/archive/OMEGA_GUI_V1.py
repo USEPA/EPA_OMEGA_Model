@@ -15,7 +15,7 @@ from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 
 # Import functions from other files
-from gui.include1 import *
+from usepa_omega2_gui.include1 import *
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType('OMEGA_GUI_V2.ui')
 
