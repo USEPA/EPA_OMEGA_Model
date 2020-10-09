@@ -20,7 +20,7 @@ class CompositeVehicle(o2.OmegaBase):
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
         """
         import copy
-        from omega_functions import weighted_value, unweighted_value
+        from omega_functions import weighted_value
 
         self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
@@ -31,6 +31,9 @@ class CompositeVehicle(o2.OmegaBase):
         self.model_year = self.vehicle_list[0].model_year
         self.reg_class_ID = self.vehicle_list[0].reg_class_ID
         self.fueling_class = self.vehicle_list[0].fueling_class
+        self.market_class_ID = self.vehicle_list[0].market_class_ID
+        self.cert_target_CO2_Mg = self.set_cert_target_CO2_Mg()
+        self.cert_CO2_Mg = self.set_cert_CO2_Mg()
 
         # calc sales-weighted values
         self.cert_CO2_grams_per_mile = weighted_value(self.vehicle_list, 'initial_registered_count',
@@ -38,8 +41,7 @@ class CompositeVehicle(o2.OmegaBase):
 
         self.footprint_ft2 = weighted_value(self.vehicle_list, 'initial_registered_count', 'footprint_ft2')
 
-        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count',
-                                                           'new_vehicle_mfr_cost_dollars')
+        self.new_vehicle_mfr_cost_dollars = self.set_new_vehicle_mfr_cost_dollars()
 
         self.initial_registered_count = 0
         for v in self.vehicle_list:
@@ -48,7 +50,7 @@ class CompositeVehicle(o2.OmegaBase):
         for v in self.vehicle_list:
             v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
 
-        self.cost_curve = self.calc_composite_cost_curve(plot=True)
+        self.cost_curve = self.calc_composite_cost_curve(plot=False)
 
     def decompose(self):
         for v in self.vehicle_list:
@@ -121,6 +123,18 @@ class CompositeVehicle(o2.OmegaBase):
     def get_min_co2_gpmi(self):
         # get min co2_gpmi from self.cost_curve
         return self.cost_curve['cert_co2_grams_per_mile'].min()
+
+    def set_new_vehicle_mfr_cost_dollars(self):
+        from omega_functions import weighted_value
+        return weighted_value(self.vehicle_list, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
+
+    def set_cert_target_CO2_Mg(self):
+        from omega_functions import weighted_value
+        return weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_CO2_Mg')
+
+    def set_cert_CO2_Mg(self):
+        from omega_functions import weighted_value
+        return weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_CO2_Mg')
 
 
 class VehicleBase(o2.OmegaBase):
@@ -212,6 +226,7 @@ class VehicleBase(o2.OmegaBase):
         self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
 
     def create_frontier_df(self):
+        from cost_curves import CostCurve
         df = pd.DataFrame()
 
         df['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID] = \
