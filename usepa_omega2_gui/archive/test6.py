@@ -23,7 +23,7 @@ from PySide2.QtCore import QFile, QObject
 from datetime import datetime, date
 
 # Import functions from other files
-from gui.omega_gui_functions import *
+from usepa_omega2_gui.omega_gui_functions import *
 
 # Initialize global variables
 atimer = 0

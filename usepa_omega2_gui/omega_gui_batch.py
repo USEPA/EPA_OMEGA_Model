@@ -33,8 +33,8 @@ from datetime import datetime
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
-from gui.omega_gui_functions import *
-from gui.omega_gui_stylesheets import *
+from usepa_omega2_gui.omega_gui_functions import *
+from usepa_omega2_gui.omega_gui_stylesheets import *
 
 configuration_file = ""
 # Contains the directory path to the input file directory
