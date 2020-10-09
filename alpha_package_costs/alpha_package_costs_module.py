@@ -246,7 +246,7 @@ def main():
     path_inputs = path_cwd / 'alpha_package_costs/alpha_package_costs_inputs'
     path_alpha_inputs = Path('I:\Project\OMEGA2\O2_package_cost_test\ALPHA_ToyModel')
     # path_alpha_inputs = path_cwd / 'inputs/ALPHA_ToyModel'
-    path_input_templates = path_cwd / 'sample_inputs'
+    path_input_templates = path_cwd / 'input_samples'
     path_outputs = path_cwd / 'alpha_package_costs/outputs'
     bev_wr_range = [x / 2 for x in range(0, 41, 1)]
 

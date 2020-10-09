@@ -236,7 +236,7 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
 
 def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
     from market_classes import MarketClass
-    import vehicles
+    from omega_functions import weighted_value
 
     # group vehicles by market class
     market_class_vehicle_dict = MarketClass.get_market_class_dict()
@@ -246,10 +246,12 @@ def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
     # calculate sales-weighted co2 g/mi and cost by market class
     for mc in MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
-        winning_combo['average_%s_co2_gpmi' % mc] = vehicles.sales_weight(market_class_vehicles,
-                                                                          'cert_CO2_grams_per_mile')
-        winning_combo['average_%s_cost' % mc] = vehicles.sales_weight(market_class_vehicles,
-                                                                      'new_vehicle_mfr_cost_dollars')
+        winning_combo['average_%s_co2_gpmi' % mc] = weighted_value(market_class_vehicles,
+                                                                   'initial_registered_count',
+                                                                   'cert_CO2_grams_per_mile')
+        winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
+                                                               'initial_registered_count',
+                                                               'new_vehicle_mfr_cost_dollars')
     return market_class_vehicle_dict
 
 
