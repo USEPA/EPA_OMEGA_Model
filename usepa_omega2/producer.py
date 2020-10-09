@@ -91,8 +91,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     """
     child_df_list = []
 
-    children = [k for k in market_class_dict]
-    num_children = len(children)
+    children = list(market_class_dict)
 
     for k in market_class_dict:
         if verbose:
@@ -102,7 +101,6 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
             child_df_list.append(create_tech_options_from_market_class_tree(calendar_year, market_class_dict[k], consumer_bev_share, parent=k,))
         else:
             # process leaf
-            from cost_curves import CostCurve
             for new_veh in market_class_dict[k]:
                 df = pd.DataFrame()
 
@@ -113,12 +111,12 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
                 if consumer_bev_share is None or new_veh.fueling_class == 'BEV':
                     if o2.options.allow_backsliding:
-                        max_co2_gpmi = CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year)
+                        max_co2_gpmi = new_veh.get_max_co2_gpmi()
                     else:
                         max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
 
                     co2_gpmi_options = np.linspace(
-                        CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+                        new_veh.get_min_co2_gpmi(),
                         max_co2_gpmi,
                         num=num_tech_options).tolist()
                 else:  # ICE vehicle and consumer_bev_share available
@@ -128,14 +126,12 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                         max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile,
                                            consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
 
-                    min_co2_gpmi = max(CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+                    min_co2_gpmi = max(new_veh.get_min_co2_gpmi(),
                                        consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 0.9)
 
                     co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
-                tech_cost_options = CostCurve.get_cost(cost_curve_class=new_veh.cost_curve_class,
-                                                       model_year=new_veh.model_year,
-                                                       target_co2_gpmi=co2_gpmi_options)
+                tech_cost_options = new_veh.get_cost(co2_gpmi_options)
 
                 df['veh_%d_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
                 df['veh_%d_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
