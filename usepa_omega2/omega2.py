@@ -18,7 +18,7 @@ from usepa_omega2.file_eye_oh import gui_comm
 
 def run_postproc(iteration_log, single_shot):
     from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
     from market_classes import MarketClass
     import pandas as pd
@@ -77,11 +77,11 @@ def run_postproc(iteration_log, single_shot):
         average_cost_data[hc] = []
         for cy in calendar_years:
             average_cost_data[hc].append(o2.session.query(
-                func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                         filter(Vehicle.model_year == cy).
-                                         filter(Vehicle.hauling_class == hc).
+                                         filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                         filter(VehicleFinal.model_year == cy).
+                                         filter(VehicleFinal.hauling_class == hc).
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[hc])
 
@@ -89,21 +89,21 @@ def run_postproc(iteration_log, single_shot):
         average_cost_data[mc] = []
         for cy in calendar_years:
             average_cost_data[mc].append(o2.session.query(
-                func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                         filter(Vehicle.model_year == cy).
-                                         filter(Vehicle.market_class_ID == mc).
+                                         filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                         filter(VehicleFinal.model_year == cy).
+                                         filter(VehicleFinal.market_class_ID == mc).
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[mc])
 
     average_cost_data['total'] = []
     for cy in calendar_years:
         average_cost_data['total'].append(o2.session.query(
-            func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                          filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                          filter(Vehicle.model_year == cy).
+                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                          filter(VehicleFinal.model_year == cy).
                                           filter(VehicleAnnualData.age == 0).scalar())
     ax1.plot(calendar_years, average_cost_data['total'])
 
@@ -119,11 +119,11 @@ def run_postproc(iteration_log, single_shot):
         average_co2_gpmi_data[hc] = []
         for cy in calendar_years:
             average_co2_gpmi_data[hc].append(o2.session.query(
-                func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                             filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                             filter(Vehicle.model_year == cy).
-                                             filter(Vehicle.hauling_class == hc).
+                                             filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.hauling_class == hc).
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[hc])
 
@@ -131,21 +131,21 @@ def run_postproc(iteration_log, single_shot):
         average_co2_gpmi_data[mc] = []
         for cy in calendar_years:
             average_co2_gpmi_data[mc].append(o2.session.query(
-                func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                             filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                             filter(Vehicle.model_year == cy).
-                                             filter(Vehicle.market_class_ID == mc).
+                                             filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.market_class_ID == mc).
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[mc])
 
     average_co2_gpmi_data['total'] = []
     for cy in calendar_years:
         average_co2_gpmi_data['total'].append(o2.session.query(
-            func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                              filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                              filter(Vehicle.model_year == cy).
+                                              filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                              filter(VehicleFinal.model_year == cy).
                                               filter(VehicleAnnualData.age == 0).scalar())
     ax1.plot(calendar_years, average_co2_gpmi_data['total'])
 
@@ -339,7 +339,7 @@ def init_omega(o2_options):
     from demanded_shares_gcam import DemandedSharesGCAM
     from manufacturers import Manufacturer
     from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
     from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
@@ -392,7 +392,7 @@ def init_omega(o2_options):
 
     init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
                                                                  verbose=o2.options.verbose)
-    init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+    init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
     if o2.options.stock_scrappage == 'fixed':
         init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
@@ -409,7 +409,7 @@ def init_omega(o2_options):
         pass
 
     # initial year = initial fleet model year (latest year of data)
-    o2.options.analysis_initial_year = int(o2.session.query(func.max(Vehicle.model_year)).scalar()) + 1
+    o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
     # final year = last year of cost curve data
     o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
 

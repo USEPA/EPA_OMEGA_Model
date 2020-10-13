@@ -70,10 +70,10 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
 
 
 def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
-    from vehicles import Vehicle
-    return o2.session.query(func.sum(Vehicle.cert_target_CO2_Mg)). \
-        filter(Vehicle.manufacturer_ID == manufacturer_id). \
-        filter(Vehicle.model_year == model_year).scalar()
+    from vehicles import VehicleFinal
+    return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
+        filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+        filter(VehicleFinal.model_year == model_year).scalar()
 
 
 # placeholder for producer deemed generalized vehicle cost:
@@ -196,22 +196,22 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
 
 
 def get_initial_vehicle_data(calendar_year, manufacturer_ID):
-    from vehicles import Vehicle, VehicleBase
+    from vehicles import VehicleFinal, Vehicle
     from market_classes import MarketClass, populate_market_classes
 
     if calendar_year not in calendar_year_initial_vehicle_data:
         # pull in last year's vehicles:
-        manufacturer_prior_vehicles = o2.session.query(Vehicle). \
-            filter(Vehicle.manufacturer_ID == manufacturer_ID). \
-            filter(Vehicle.model_year == calendar_year - 1). \
+        manufacturer_prior_vehicles = o2.session.query(VehicleFinal). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_ID). \
+            filter(VehicleFinal.model_year == calendar_year - 1). \
             all()
 
-        VehicleBase.reset_vehicle_IDs()
+        Vehicle.reset_vehicle_IDs()
 
         manufacturer_new_vehicles = []
         # update each vehicle and calculate compliance target for each vehicle
         for prior_veh in manufacturer_prior_vehicles:
-            new_veh = VehicleBase()
+            new_veh = Vehicle()
             new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
             manufacturer_new_vehicles.append(new_veh)
 
@@ -250,19 +250,19 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
 
 def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_vehicles, winning_combo):
     from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
 
     manufacturer_new_vehicles = []
 
     if use_composite_vehicles:
         for cv in manufacturer_candidate_vehicles:
             for v in cv.vehicle_list:
-                new_veh = Vehicle()
+                new_veh = VehicleFinal()
                 new_veh.inherit_vehicle(v)
                 manufacturer_new_vehicles.append(new_veh)
     else:
         for cv in manufacturer_candidate_vehicles:
-            new_veh = Vehicle()
+            new_veh = VehicleFinal()
             new_veh.inherit_vehicle(cv)
             manufacturer_new_vehicles.append(new_veh)
 

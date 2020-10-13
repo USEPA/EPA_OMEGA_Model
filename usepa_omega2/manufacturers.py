@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
         from fuels import Fuel
         from market_classes import MarketClass
-        from vehicles import Vehicle
+        from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
 
         SQABase.metadata.create_all(o2.engine)

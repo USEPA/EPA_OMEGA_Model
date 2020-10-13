@@ -148,7 +148,7 @@ class CompositeVehicle(o2.OmegaBase):
         return self.cert_CO2_Mg
 
 
-class VehicleBase(o2.OmegaBase):
+class Vehicle(o2.OmegaBase):
     next_vehicle_ID = 0
 
     name = ''
@@ -173,16 +173,16 @@ class VehicleBase(o2.OmegaBase):
     _initial_registered_count = 0
 
     def __init__(self):
-        self.vehicle_ID = VehicleBase.next_vehicle_ID
-        VehicleBase.set_next_vehicle_ID()
+        self.vehicle_ID = Vehicle.next_vehicle_ID
+        Vehicle.set_next_vehicle_ID()
 
     @staticmethod
     def reset_vehicle_IDs():
-        VehicleBase.next_vehicle_ID = 0
+        Vehicle.next_vehicle_ID = 0
 
     @staticmethod
     def set_next_vehicle_ID():
-        VehicleBase.next_vehicle_ID = VehicleBase.next_vehicle_ID + 1
+        Vehicle.next_vehicle_ID = Vehicle.next_vehicle_ID + 1
 
     @property
     def initial_registered_count(self):
@@ -257,7 +257,7 @@ class VehicleBase(o2.OmegaBase):
         return df
 
 
-class Vehicle(SQABase, VehicleBase):
+class VehicleFinal(SQABase, Vehicle):
     # --- database table properties ---
     __tablename__ = 'vehicles'
     vehicle_ID = Column('vehicle_id', Integer, primary_key=True)
@@ -322,7 +322,7 @@ class Vehicle(SQABase, VehicleBase):
             if not template_errors:
                 # load data into database
                 for i in df.index:
-                    veh = Vehicle(
+                    veh = VehicleFinal(
                         name=df.loc[i, 'vehicle_id'],
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
@@ -401,14 +401,14 @@ if __name__ == '__main__':
                                                                                  verbose=o2.options.verbose)
             o2.options.GHG_standard = GHGStandardFootprint
 
-        init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-            vehicles_list = o2.session.query(Vehicle). \
-                filter(Vehicle.manufacturer_ID == 'USA Motors'). \
-                filter(Vehicle.model_year == 2020). \
+            vehicles_list = o2.session.query(VehicleFinal). \
+                filter(VehicleFinal.manufacturer_ID == 'USA Motors'). \
+                filter(VehicleFinal.model_year == 2020). \
                 all()
 
             weighted_mfr_cost_dollars = weighted_value(vehicles_list, 'initial_registered_count',
@@ -445,7 +445,7 @@ if __name__ == '__main__':
 
             base_vehicles_list = []
             for v in vehicles_list:
-                vb = VehicleBase()
+                vb = Vehicle()
                 vb.inherit_vehicle(v)
                 base_vehicles_list.append(vb)
 

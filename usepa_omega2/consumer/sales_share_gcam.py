@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
         o2.options.GHG_standard = GHGStandardFootprint
         o2.options.ghg_standards_file = 'input_samples/ghg_standards-footprint.csv'
-        from vehicles import Vehicle
+        from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
 
         SQABase.metadata.create_all(o2.engine)
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
                                                                              verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-        init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
         if not init_fail:
             o2.options.analysis_initial_year = 2021
