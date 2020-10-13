@@ -381,8 +381,10 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
-        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
+                                                                     verbose=o2.options.verbose)
+        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+                                                                    verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
         if o2.options.cost_file_type == 'curves':
@@ -461,58 +463,6 @@ if __name__ == '__main__':
             cv3 = CompositeVehicle(cv2.vehicle_list)
             cv3.decompose()
             print(cv3)
-
-            market_shares = [[1, 0, 0, 0],
-                             [0, 1, 0, 0],
-                             [0, 0, 1, 0],
-                             [0, 0, 0, 1],
-                             [0.25, 0.25, 0.25, 0.25],
-                             [0.5, 0.5, 0, 0],
-                             [0, 0.5, 0.5, 0],
-                             [0, 0, 0.5, 0.5],
-                             [0.5, 0, 0, 0.5],
-                             [0.1, 0.2, 0.3, 0.4],
-                             ]
-
-            from omega_plot import *
-            import matplotlib.pyplot as plt
-            from omega_functions import cartesian_prod
-
-            for ms in market_shares:
-                fig, ax1 = figure()
-                label_xyt(ax1, 'CO2 g/mi', '$', 'Market Shares = %s' % ms)
-                for i, v in enumerate(vehicles_list):
-                    frontier_df = v.create_frontier_df()
-                    ax1.plot(frontier_df.iloc[:, 0], frontier_df.iloc[:, 1], '.-')
-                    v.reg_class_market_share_frac = ms[i]
-
-                combined_cloud_df = pd.DataFrame()
-                combined_cloud_df['frontier_co2_grams_per_mile'] = [0]
-                combined_cloud_df['frontier_cost_dollars'] = [0]
-                for v in vehicles_list:
-                    vehicle_frontier = v.create_frontier_df()
-                    vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
-                    combined_cloud_df = cartesian_prod(combined_cloud_df, vehicle_frontier, drop=True)
-
-                    combined_cloud_df['frontier_co2_grams_per_mile'] = \
-                        combined_cloud_df['frontier_co2_grams_per_mile'] + combined_cloud_df[
-                            'veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID] * combined_cloud_df[
-                            'veh_%s_market_share' % v.vehicle_ID]
-
-
-                    combined_cloud_df['frontier_cost_dollars'] = \
-                        combined_cloud_df['frontier_cost_dollars'] + \
-                        combined_cloud_df[
-                            'veh_%s_mfr_cost_dollars' % v.vehicle_ID] * \
-                        combined_cloud_df['veh_%s_market_share' % v.vehicle_ID]
-
-                ax1.plot(combined_cloud_df['frontier_co2_grams_per_mile'], combined_cloud_df['frontier_cost_dollars'], '.')
-
-                from cost_clouds import CostCloud
-                combined_frontier_df = CostCloud.calculate_frontier(combined_cloud_df, 'frontier_co2_grams_per_mile', 'frontier_cost_dollars')
-                ax1.plot(combined_frontier_df['frontier_co2_grams_per_mile'], combined_frontier_df['frontier_cost_dollars'], '.-')
-
-            combined_frontier_df.to_csv('combined_frontier.csv', index=False)
 
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
