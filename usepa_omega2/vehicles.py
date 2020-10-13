@@ -127,14 +127,17 @@ class CompositeVehicle(o2.OmegaBase):
     def set_new_vehicle_mfr_cost_dollars(self):
         from omega_functions import weighted_value
         self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
+        return self.new_vehicle_mfr_cost_dollars
 
     def set_cert_target_CO2_Mg(self):
         from omega_functions import weighted_value
         self.cert_target_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_CO2_Mg')
+        return self.cert_target_CO2_Mg
 
     def set_cert_CO2_Mg(self):
         from omega_functions import weighted_value
         self.cert_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_CO2_Mg')
+        return self.cert_CO2_Mg
 
 
 class VehicleBase(o2.OmegaBase):
