@@ -379,9 +379,9 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="options_tab">
+    <widget class="QWidget" name="results_tab">
      <attribute name="title">
-      <string>Options</string>
+      <string>Results</string>
      </attribute>
     </widget>
    </widget>

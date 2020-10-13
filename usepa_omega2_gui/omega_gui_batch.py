@@ -54,9 +54,9 @@ configuration_file_valid = False
 input_batch_file_valid = False
 output_batch_directory_valid = False
 # Images for model run button
-run_button_image_disabled = "gui/elements/green_car_1.jpg"
-run_button_image_enabled = "gui/elements/green_car_1.jpg"
-epa_button_image = "gui/elements/epa_logo.jpg"
+run_button_image_disabled = "usepa_omega2_gui/elements/green_car_1.jpg"
+run_button_image_enabled = "usepa_omega2_gui/elements/green_car_1.jpg"
+epa_button_image = "usepa_omega2_gui/elements/epa_logo.jpg"
 # Common spacer between events
 event_separator = "----------"
 
@@ -81,7 +81,7 @@ class Form(QObject):
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
-        self.window.setWindowIcon(QIcon("gui/elements/omega2_icon.jpg"))
+        self.window.setWindowIcon(QIcon("usepa_omega2_gui/elements/omega2_icon.jpg"))
 
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
@@ -581,8 +581,8 @@ class Form(QObject):
         :return: N/A
         """
         elapsed_start = datetime.now()
-        model_sound_start = 'gui/elements/model_start.mp3'
-        model_sound_stop = 'gui/elements/model_stop.mp3'
+        # model_sound_start = 'gui/elements/model_start.mp3'
+        # model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         global multiprocessor_mode_selected
         global output_batch_subdirectory
@@ -650,7 +650,7 @@ class Form(QObject):
         # print("***", x, "***")
 
         # Call OMEGA2 batch as a subprocess with command line options from above
-        omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),
+        omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
@@ -784,5 +784,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    form = Form('gui/elements/omega_gui_v20.ui')
+    form = Form('usepa_omega2_gui/elements/omega_gui_v20.ui')
     sys.exit(app.exec_())
