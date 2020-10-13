@@ -11,43 +11,6 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-def sales_weight(vehicle_list, attribute_name):
-    """
-
-    :param vehicle_list:
-    :param attribute_name:
-    :return:
-    """
-    weighted_sum = 0
-    total_sales = 0
-    for v in vehicle_list:
-        sales = v.initial_registered_count
-        total_sales = total_sales + sales
-        weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
-
-    return weighted_sum / total_sales
-
-
-def sales_unweight(veh, vehicle_list, attribute_name, weighted_value):
-    """
-
-    :param veh:
-    :param vehicle_list:
-    :param attribute_name:
-    :param weighted_value:
-    :return:
-    """
-    total_sales = 0
-    weighted_sum = 0
-    for v in vehicle_list:
-        sales = v.initial_registered_count
-        total_sales = total_sales + sales
-        if v is not veh:
-            weighted_sum = weighted_sum + v.__getattribute__(attribute_name) * sales
-
-    return (weighted_value * total_sales - weighted_sum) / veh.initial_registered_count
-
-
 class CompositeVehicle(o2.OmegaBase):
     next_vehicle_ID = -1
 
@@ -57,21 +20,28 @@ class CompositeVehicle(o2.OmegaBase):
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
         """
         import copy
+        from omega_functions import weighted_value
 
         self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
 
-        self.vehicle_ID = '%d' % CompositeVehicle.next_vehicle_ID
-        CompositeVehicle.next_vehicle_ID = CompositeVehicle.next_vehicle_ID - 1
+        self.vehicle_ID = CompositeVehicle.next_vehicle_ID
+        CompositeVehicle.set_next_vehicle_ID()
 
         self.model_year = self.vehicle_list[0].model_year
         self.reg_class_ID = self.vehicle_list[0].reg_class_ID
         self.fueling_class = self.vehicle_list[0].fueling_class
+        self.market_class_ID = self.vehicle_list[0].market_class_ID
+        self.cert_target_CO2_Mg = self.set_cert_target_CO2_Mg()
+        self.cert_CO2_Mg = self.set_cert_CO2_Mg()
 
         # calc sales-weighted values
-        self.cert_CO2_grams_per_mile = sales_weight(self.vehicle_list, 'cert_CO2_grams_per_mile')
-        self.footprint_ft2 = sales_weight(self.vehicle_list, 'footprint_ft2')
-        self.new_vehicle_mfr_cost_dollars = sales_weight(self.vehicle_list, 'new_vehicle_mfr_cost_dollars')
+        self.cert_CO2_grams_per_mile = weighted_value(self.vehicle_list, 'initial_registered_count',
+                                                      'cert_CO2_grams_per_mile')
+
+        self.footprint_ft2 = weighted_value(self.vehicle_list, 'initial_registered_count', 'footprint_ft2')
+
+        self.new_vehicle_mfr_cost_dollars = self.set_new_vehicle_mfr_cost_dollars()
 
         self.initial_registered_count = 0
         for v in self.vehicle_list:
@@ -80,11 +50,19 @@ class CompositeVehicle(o2.OmegaBase):
         for v in self.vehicle_list:
             v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
 
-        self.cost_curve = self.calc_composite_cost_curve(plot=True)
+        self.cost_curve = self.calc_composite_cost_curve(plot=False)
+
+    @staticmethod
+    def reset_vehicle_IDs():
+        CompositeVehicle.next_vehicle_ID = -1
+
+    @staticmethod
+    def set_next_vehicle_ID():
+        CompositeVehicle.next_vehicle_ID = CompositeVehicle.next_vehicle_ID - 1
 
     def decompose(self):
-        for v in self.vehicle_list:
-            print('%s= %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+        # for v in self.vehicle_list:
+        #     print('%s= %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
 
         for v in self.vehicle_list:
             vehicle_cost_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
@@ -98,7 +76,7 @@ class CompositeVehicle(o2.OmegaBase):
             v.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
             v.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
 
-            print('%s: %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+            # print('%s: %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
 
     def calc_composite_cost_curve(self, plot=False):
         from cost_clouds import CostCloud
@@ -154,6 +132,21 @@ class CompositeVehicle(o2.OmegaBase):
         # get min co2_gpmi from self.cost_curve
         return self.cost_curve['cert_co2_grams_per_mile'].min()
 
+    def set_new_vehicle_mfr_cost_dollars(self):
+        from omega_functions import weighted_value
+        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
+        return self.new_vehicle_mfr_cost_dollars
+
+    def set_cert_target_CO2_Mg(self):
+        from omega_functions import weighted_value
+        self.cert_target_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_CO2_Mg')
+        return self.cert_target_CO2_Mg
+
+    def set_cert_CO2_Mg(self):
+        from omega_functions import weighted_value
+        self.cert_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_CO2_Mg')
+        return self.cert_CO2_Mg
+
 
 class VehicleBase(o2.OmegaBase):
     next_vehicle_ID = 0
@@ -181,6 +174,14 @@ class VehicleBase(o2.OmegaBase):
 
     def __init__(self):
         self.vehicle_ID = VehicleBase.next_vehicle_ID
+        VehicleBase.set_next_vehicle_ID()
+
+    @staticmethod
+    def reset_vehicle_IDs():
+        VehicleBase.next_vehicle_ID = 0
+
+    @staticmethod
+    def set_next_vehicle_ID():
         VehicleBase.next_vehicle_ID = VehicleBase.next_vehicle_ID + 1
 
     @property
@@ -200,9 +201,27 @@ class VehicleBase(o2.OmegaBase):
     def set_new_vehicle_mfr_cost_dollars(self):
         from cost_curves import CostCurve
         self.new_vehicle_mfr_cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
-                                                              model_year=self.model_year,
-                                                              target_co2_gpmi=self.cert_CO2_grams_per_mile)
+                                                               model_year=self.model_year,
+                                                               target_co2_gpmi=self.cert_CO2_grams_per_mile)
 
+    def get_cost(self, target_co2_gpmi):
+        from cost_curves import CostCurve
+        # get cost from cost curve for target_co2_gpmi(s)
+        cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
+                                          model_year=self.model_year,
+                                          target_co2_gpmi=target_co2_gpmi)
+
+        return cost_dollars
+
+    def get_max_co2_gpmi(self):
+        from cost_curves import CostCurve
+        # get max co2_gpmi from self.cost_curve
+        return CostCurve.get_max_co2_gpmi(self.cost_curve_class, self.model_year)
+
+    def get_min_co2_gpmi(self):
+        from cost_curves import CostCurve
+        # get min co2_gpmi from self.cost_curve
+        return CostCurve.get_min_co2_gpmi(self.cost_curve_class, self.model_year)
 
     def set_cert_CO2_Mg(self):
         self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
@@ -226,6 +245,7 @@ class VehicleBase(o2.OmegaBase):
         self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
 
     def create_frontier_df(self):
+        from cost_curves import CostCurve
         df = pd.DataFrame()
 
         df['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID] = \
@@ -340,6 +360,8 @@ if __name__ == '__main__':
         o2.engine.echo = True
         omega_log.init_logfile()
 
+        from omega_functions import weighted_value, unweighted_value
+
         from manufacturers import Manufacturer  # needed for manufacturers table
         from market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
@@ -387,28 +409,37 @@ if __name__ == '__main__':
                 filter(Vehicle.model_year == 2020). \
                 all()
 
-            weighted_mfr_cost_dollars = sales_weight(vehicles_list, 'new_vehicle_mfr_cost_dollars')
-            weighted_co2gpmi = sales_weight(vehicles_list, 'cert_CO2_grams_per_mile')
-            weighted_footprint = sales_weight(vehicles_list, 'footprint_ft2')
+            weighted_mfr_cost_dollars = weighted_value(vehicles_list, 'initial_registered_count',
+                                                       'new_vehicle_mfr_cost_dollars')
+            weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_CO2_grams_per_mile')
+            weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
 
-            print(vehicles_list[0].new_vehicle_mfr_cost_dollars - sales_unweight(vehicles_list[0], vehicles_list,
-                                                                             'new_vehicle_mfr_cost_dollars',
-                                                                             weighted_mfr_cost_dollars))
-            print(vehicles_list[1].new_vehicle_mfr_cost_dollars - sales_unweight(vehicles_list[1], vehicles_list,
-                                                                             'new_vehicle_mfr_cost_dollars',
-                                                                             weighted_mfr_cost_dollars))
+            print(vehicles_list[0].new_vehicle_mfr_cost_dollars - unweighted_value(vehicles_list[0],
+                                                                                   weighted_mfr_cost_dollars,
+                                                                                   vehicles_list,
+                                                                                   'initial_registered_count',
+                                                                                   'new_vehicle_mfr_cost_dollars'))
+            print(vehicles_list[1].new_vehicle_mfr_cost_dollars - unweighted_value(vehicles_list[1],
+                                                                                   weighted_mfr_cost_dollars,
+                                                                                   vehicles_list,
+                                                                                   'initial_registered_count',
+                                                                                   'new_vehicle_mfr_cost_dollars'))
 
-            print(vehicles_list[0].cert_CO2_grams_per_mile == sales_unweight(vehicles_list[0], vehicles_list,
-                                                                             'cert_CO2_grams_per_mile',
-                                                                             weighted_co2gpmi))
-            print(vehicles_list[1].cert_CO2_grams_per_mile == sales_unweight(vehicles_list[1], vehicles_list,
-                                                                             'cert_CO2_grams_per_mile',
-                                                                             weighted_co2gpmi))
+            print(vehicles_list[0].cert_CO2_grams_per_mile == unweighted_value(vehicles_list[0], weighted_co2gpmi,
+                                                                               vehicles_list,
+                                                                               'initial_registered_count',
+                                                                               'cert_CO2_grams_per_mile'))
+            print(vehicles_list[1].cert_CO2_grams_per_mile == unweighted_value(vehicles_list[1], weighted_co2gpmi,
+                                                                               vehicles_list,
+                                                                               'initial_registered_count',
+                                                                               'cert_CO2_grams_per_mile'))
 
-            print(vehicles_list[2].footprint_ft2 == sales_unweight(vehicles_list[2], vehicles_list, 'footprint_ft2',
-                                                                   weighted_footprint))
-            print(vehicles_list[3].footprint_ft2 == sales_unweight(vehicles_list[3], vehicles_list, 'footprint_ft2',
-                                                                   weighted_footprint))
+            print(
+                vehicles_list[2].footprint_ft2 == unweighted_value(vehicles_list[2], weighted_footprint, vehicles_list,
+                                                                   'initial_registered_count', 'footprint_ft2'))
+            print(
+                vehicles_list[3].footprint_ft2 == unweighted_value(vehicles_list[3], weighted_footprint, vehicles_list,
+                                                                   'initial_registered_count', 'footprint_ft2'))
 
             base_vehicles_list = []
             for v in vehicles_list:

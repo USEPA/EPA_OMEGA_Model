@@ -86,7 +86,7 @@ if __name__ == '__main__':
     new_veh_price = 32000
     context_mpg = 30
     new_mpg = 40
-    elasticity = -.01
+    elasticity = -1.0
 
     percent_change_obj = SalesEffect(wtp_factor, fuel_price, context_veh_price, new_veh_price, context_mpg, new_mpg, elasticity)
     print('\ncost per mile, context:  ', percent_change_obj.cost_per_mile(context_mpg))
