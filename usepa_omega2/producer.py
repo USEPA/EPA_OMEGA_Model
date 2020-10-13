@@ -179,7 +179,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
         filter(Vehicle.model_year == calendar_year - 1). \
         all()
 
-    VehicleBase.next_vehicle_ID = 0  # reset vehicle ID
+    VehicleBase.reset_vehicle_IDs()
 
     manufacturer_new_vehicles = []
     # update each vehicle and calculate compliance target for each vehicle
@@ -196,7 +196,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
         mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
 
     from vehicles import CompositeVehicle
-    CompositeVehicle.next_vehicle_ID = -1
+    CompositeVehicle.reset_vehicle_IDs()
     composite_vehicles = []
     for mc in mctrc:
         for rc in reg_classes:

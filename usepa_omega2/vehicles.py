@@ -26,7 +26,7 @@ class CompositeVehicle(o2.OmegaBase):
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
 
         self.vehicle_ID = CompositeVehicle.next_vehicle_ID
-        CompositeVehicle.next_vehicle_ID = CompositeVehicle.next_vehicle_ID - 1
+        CompositeVehicle.set_next_vehicle_ID()
 
         self.model_year = self.vehicle_list[0].model_year
         self.reg_class_ID = self.vehicle_list[0].reg_class_ID
@@ -51,6 +51,14 @@ class CompositeVehicle(o2.OmegaBase):
             v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
 
         self.cost_curve = self.calc_composite_cost_curve(plot=False)
+
+    @staticmethod
+    def reset_vehicle_IDs():
+        CompositeVehicle.next_vehicle_ID = -1
+
+    @staticmethod
+    def set_next_vehicle_ID():
+        CompositeVehicle.next_vehicle_ID = CompositeVehicle.next_vehicle_ID - 1
 
     def decompose(self):
         # for v in self.vehicle_list:
@@ -166,6 +174,14 @@ class VehicleBase(o2.OmegaBase):
 
     def __init__(self):
         self.vehicle_ID = VehicleBase.next_vehicle_ID
+        VehicleBase.set_next_vehicle_ID()
+
+    @staticmethod
+    def reset_vehicle_IDs():
+        VehicleBase.next_vehicle_ID = 0
+
+    @staticmethod
+    def set_next_vehicle_ID():
         VehicleBase.next_vehicle_ID = VehicleBase.next_vehicle_ID + 1
 
     @property
