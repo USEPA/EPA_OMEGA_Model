@@ -13,7 +13,7 @@ from usepa_omega2 import *
 import numpy as np
 import consumer
 
-use_composite_vehicles = False
+use_composite_vehicles = True
 
 partition_dict = dict()
 def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):

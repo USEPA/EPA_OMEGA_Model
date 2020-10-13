@@ -53,8 +53,8 @@ class CompositeVehicle(o2.OmegaBase):
         self.cost_curve = self.calc_composite_cost_curve(plot=False)
 
     def decompose(self):
-        for v in self.vehicle_list:
-            print('%s= %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+        # for v in self.vehicle_list:
+        #     print('%s= %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
 
         for v in self.vehicle_list:
             vehicle_cost_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
@@ -68,7 +68,7 @@ class CompositeVehicle(o2.OmegaBase):
             v.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
             v.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
 
-            print('%s: %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+            # print('%s: %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
 
     def calc_composite_cost_curve(self, plot=False):
         from cost_clouds import CostCloud
@@ -126,15 +126,15 @@ class CompositeVehicle(o2.OmegaBase):
 
     def set_new_vehicle_mfr_cost_dollars(self):
         from omega_functions import weighted_value
-        return weighted_value(self.vehicle_list, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
+        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
 
     def set_cert_target_CO2_Mg(self):
         from omega_functions import weighted_value
-        return weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_CO2_Mg')
+        self.cert_target_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_CO2_Mg')
 
     def set_cert_CO2_Mg(self):
         from omega_functions import weighted_value
-        return weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_CO2_Mg')
+        self.cert_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_CO2_Mg')
 
 
 class VehicleBase(o2.OmegaBase):
