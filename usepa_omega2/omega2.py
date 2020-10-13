@@ -485,7 +485,7 @@ def publish_summary_results(session_summary_results, single_shot):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)
+        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)  # to view in terminal: snakeviz omega2_profile.dmp
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

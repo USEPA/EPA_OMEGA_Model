@@ -167,60 +167,20 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     return tech_share_combos_df
 
 
+calendar_year_initial_vehicle_data = dict()
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
-    from vehicles import Vehicle, VehicleBase
-    from market_classes import MarketClass, populate_market_classes, print_market_class_dict
 
-    from consumer.stock import prior_year_stock_registered_count, prior_year_stock_vmt, age0_stock_vmt
+    manufacturer_new_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
-    # pull in last year's vehicles:
-    manufacturer_prior_vehicles = o2.session.query(Vehicle). \
-        filter(Vehicle.manufacturer_ID == manufacturer_ID). \
-        filter(Vehicle.model_year == calendar_year - 1). \
-        all()
-
-    VehicleBase.reset_vehicle_IDs()
-
-    manufacturer_new_vehicles = []
-    # update each vehicle and calculate compliance target for each vehicle
-    for prior_veh in manufacturer_prior_vehicles:
-        new_veh = VehicleBase()
-        new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
-        manufacturer_new_vehicles.append(new_veh)
-
-    # aggregate by market class / reg class
-    mctrc = dict()
-    for mc in MarketClass.market_classes:
-        mctrc[mc] = {'car': [], 'truck': []}
-    for new_veh in manufacturer_new_vehicles:
-        mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
-
-    from vehicles import CompositeVehicle
-    CompositeVehicle.reset_vehicle_IDs()
-    composite_vehicles = []
-    for mc in mctrc:
-        for rc in reg_classes:
-            if mctrc[mc][rc]:
-                cv = CompositeVehicle(mctrc[mc][rc])
-                composite_vehicles.append(cv)
-
-    if use_composite_vehicles:
-        manufacturer_new_vehicles = composite_vehicles
-
-    # get empty market class tree
-    mct = MarketClass.get_market_class_tree()
-    # populate tree with vehicle objects
-    for new_veh in manufacturer_new_vehicles:
-        populate_market_classes(mct, new_veh.market_class_ID, new_veh)
-
-    tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, mct, consumer_bev_share)
+    tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, market_class_tree, consumer_bev_share)
 
     calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total)
 
-    # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
-
     # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
     winning_combo = select_winning_combo(tech_share_combos_total)
+
+    import copy
+    manufacturer_new_vehicles = copy.deepcopy(manufacturer_new_vehicles)
 
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_new_vehicles:
@@ -233,6 +193,59 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
         new_veh.set_cert_CO2_Mg()
 
     return manufacturer_new_vehicles, winning_combo
+
+
+def get_initial_vehicle_data(calendar_year, manufacturer_ID):
+    from vehicles import Vehicle, VehicleBase
+    from market_classes import MarketClass, populate_market_classes
+
+    if calendar_year not in calendar_year_initial_vehicle_data:
+        # pull in last year's vehicles:
+        manufacturer_prior_vehicles = o2.session.query(Vehicle). \
+            filter(Vehicle.manufacturer_ID == manufacturer_ID). \
+            filter(Vehicle.model_year == calendar_year - 1). \
+            all()
+
+        VehicleBase.reset_vehicle_IDs()
+
+        manufacturer_new_vehicles = []
+        # update each vehicle and calculate compliance target for each vehicle
+        for prior_veh in manufacturer_prior_vehicles:
+            new_veh = VehicleBase()
+            new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
+            manufacturer_new_vehicles.append(new_veh)
+
+        # aggregate by market class / reg class
+        mctrc = dict()
+        for mc in MarketClass.market_classes:
+            mctrc[mc] = {'car': [], 'truck': []}
+        for new_veh in manufacturer_new_vehicles:
+            mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
+
+        from vehicles import CompositeVehicle
+        CompositeVehicle.reset_vehicle_IDs()
+        composite_vehicles = []
+        for mc in mctrc:
+            for rc in reg_classes:
+                if mctrc[mc][rc]:
+                    cv = CompositeVehicle(mctrc[mc][rc])
+                    composite_vehicles.append(cv)
+
+        if use_composite_vehicles:
+            manufacturer_new_vehicles = composite_vehicles
+
+        # get empty market class tree
+        market_class_tree = MarketClass.get_market_class_tree()
+        # populate tree with vehicle objects
+        for new_veh in manufacturer_new_vehicles:
+            populate_market_classes(market_class_tree, new_veh.market_class_ID, new_veh)
+
+        calendar_year_initial_vehicle_data[calendar_year] = {'manufacturer_new_vehicles': manufacturer_new_vehicles,
+                                                             'market_class_tree': market_class_tree}
+    else:
+        manufacturer_new_vehicles = calendar_year_initial_vehicle_data[calendar_year]['manufacturer_new_vehicles']
+        market_class_tree = calendar_year_initial_vehicle_data[calendar_year]['market_class_tree']
+    return manufacturer_new_vehicles, market_class_tree
 
 
 def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_vehicles, winning_combo):

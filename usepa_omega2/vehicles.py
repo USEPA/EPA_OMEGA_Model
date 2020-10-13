@@ -97,7 +97,7 @@ class CompositeVehicle(o2.OmegaBase):
                 ax1.plot(vehicle_frontier.iloc[:, 0], vehicle_frontier.iloc[:, 1], '.-')
 
             vehicle_frontier['veh_%d_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
-            composite_cloud_df = cartesian_prod(composite_cloud_df, vehicle_frontier, drop=True)
+            composite_cloud_df = cartesian_prod(composite_cloud_df, vehicle_frontier, drop=False)
 
             composite_cloud_df['cert_co2_grams_per_mile'] = composite_cloud_df['cert_co2_grams_per_mile'] + \
                                                       composite_cloud_df['veh_%d_cert_co2_grams_per_mile' % v.vehicle_ID] * \
@@ -227,7 +227,7 @@ class VehicleBase(o2.OmegaBase):
         self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
-        inherit_properties = {'name', 'manufacturer', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
+        inherit_properties = {'name', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
                               'footprint_ft2'}
 
