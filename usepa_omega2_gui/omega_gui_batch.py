@@ -484,12 +484,14 @@ class Form(QObject):
 
         :return: N/A
         """
-        message_title = "About OMEGA"
+        # Search file for OMEGA2 version #.
         searchfile = open("usepa_omega2/__init__.py", "r")
         for line in searchfile:
             if "code_version =" in line:
                 a = line
         searchfile.close()
+        # Display result.
+        message_title = "About OMEGA"
         message = a
         self.showbox(message_title, message)
 

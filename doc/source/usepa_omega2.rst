@@ -156,6 +156,14 @@ usepa\_omega2.omega\_dispy module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.omega\_functions module
+-------------------------------------
+
+.. automodule:: usepa_omega2.omega_functions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.omega\_log module
 -------------------------------
 
