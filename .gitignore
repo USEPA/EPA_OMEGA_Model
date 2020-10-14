@@ -4,6 +4,7 @@ env
 build
 dist
 /usepa_omega2/output/*
+/usepa_omega2_preproc/output_context_aeo
 outputs
 .pytest_cache
 .coverage
@@ -134,3 +135,4 @@ composer.lock
 *_expanded*
 
 /comm_file.txt
+/usepa_omega2_preproc/output_context_aeo/

@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class CostCurve(SQABase):
+class CostCurve(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'cost_curves'
     index = Column('index', Integer, primary_key=True)
@@ -19,16 +19,7 @@ class CostCurve(SQABase):
     cost_curve_class = Column(String)
     model_year = Column(Numeric)
     cost_dollars = Column(Float)
-    cert_co2_grams_per_mile = Column(Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
+    cert_CO2_grams_per_mile = Column(Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -56,7 +47,7 @@ class CostCurve(SQABase):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
                         cost_dollars=df.loc[i, 'cost_dollars'],
-                        cert_co2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
+                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -74,7 +65,7 @@ class CostCurve(SQABase):
                 cost_curve_class=cost_curve_class,
                 model_year=model_year,
                 cost_dollars=cost,
-                cert_co2_grams_per_mile=co2_gpmi,
+                cert_CO2_grams_per_mile=co2_gpmi,
             ))
         o2.session.add_all(obj_list)
         o2.session.flush()
@@ -96,30 +87,30 @@ class CostCurve(SQABase):
                     cost_curve_class, model_year, max_cost_curve_year))
             model_year = min_cost_curve_year
 
-        result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_co2_grams_per_mile).filter(
+        result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_CO2_grams_per_mile).filter(
             CostCurve.model_year == model_year).filter(CostCurve.cost_curve_class == cost_curve_class)
         curve_cost_dollars = [r[0] for r in result]
         curve_co2_gpmi = [r[1] for r in result]
 
-        cost_curve = scipy.interpolate.interp1d(curve_co2_gpmi, curve_cost_dollars, fill_value='extrapolate')
+        cost_dollars = scipy.interpolate.interp1d(curve_co2_gpmi, curve_cost_dollars, fill_value='extrapolate')
 
-        return cost_curve(target_co2_gpmi).tolist()
+        return cost_dollars(target_co2_gpmi)
 
     @staticmethod
     def get_min_co2_gpmi(cost_curve_class, model_year):
-        return o2.session.query(func.min(CostCurve.cert_co2_grams_per_mile)). \
+        return o2.session.query(func.min(CostCurve.cert_CO2_grams_per_mile)). \
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
     @staticmethod
     def get_max_co2_gpmi(cost_curve_class, model_year):
-        return o2.session.query(func.max(CostCurve.cert_co2_grams_per_mile)). \
+        return o2.session.query(func.max(CostCurve.cert_CO2_grams_per_mile)). \
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
     @staticmethod
     def get_co2_gpmi(cost_curve_class, model_year):
-        return sql_unpack_result(o2.session.query(CostCurve.cert_co2_grams_per_mile).
+        return sql_unpack_result(o2.session.query(CostCurve.cert_CO2_grams_per_mile).
                                  filter(CostCurve.cost_curve_class == cost_curve_class).
                                  filter(CostCurve.model_year == model_year).all())
 
@@ -133,7 +124,7 @@ if __name__ == '__main__':
         o2.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        o2.options.cost_file = 'sample_inputs/cost_curves.csv'
+        o2.options.cost_file = 'input_samples/cost_curves.csv'
 
         SQABase.metadata.create_all(o2.engine)
 

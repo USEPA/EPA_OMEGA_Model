@@ -10,7 +10,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class CostCloud(SQABase):
+class CostCloud(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'cost_clouds'
     index = Column('index', Integer, primary_key=True)
@@ -18,17 +18,8 @@ class CostCloud(SQABase):
     cost_curve_class = Column(String)
     model_year = Column(Numeric)
     new_vehicle_mfr_cost_dollars = Column(Float)
-    cert_co2_grams_per_mile = Column(Float)
+    cert_CO2_grams_per_mile = Column(Float)
     mfr_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -61,7 +52,7 @@ class CostCloud(SQABase):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         model_year=df.loc[i, 'model_year'],
                         new_vehicle_mfr_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
-                        cert_co2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
+                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 original_echo = o2.engine.echo
@@ -152,7 +143,7 @@ if __name__ == '__main__':
         o2.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        o2.options.cost_file = 'sample_inputs/cost_clouds.csv'
+        o2.options.cost_file = 'input_samples/cost_clouds.csv'
 
         import cost_curves
 

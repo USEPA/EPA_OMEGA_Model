@@ -16,14 +16,18 @@ import os
 from usepa_omega2.file_eye_oh import gui_comm
 
 
-def run_postproc(iteration_log):
+def run_postproc(iteration_log, single_shot):
     from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
     from market_classes import MarketClass
     import pandas as pd
 
     import matplotlib.pyplot as plt
+
+    if not single_shot:
+        gui_comm('%s: Post Processing ...' % o2.options.session_name)
+
     year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
                         zip(iteration_log['calendar_year'], iteration_log['iteration'])]
     for mc in MarketClass.get_market_class_dict():
@@ -73,11 +77,11 @@ def run_postproc(iteration_log):
         average_cost_data[hc] = []
         for cy in calendar_years:
             average_cost_data[hc].append(o2.session.query(
-                func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                         filter(Vehicle.model_year == cy).
-                                         filter(Vehicle.hauling_class == hc).
+                                         filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                         filter(VehicleFinal.model_year == cy).
+                                         filter(VehicleFinal.hauling_class == hc).
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[hc])
 
@@ -85,21 +89,21 @@ def run_postproc(iteration_log):
         average_cost_data[mc] = []
         for cy in calendar_years:
             average_cost_data[mc].append(o2.session.query(
-                func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                         filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                         filter(Vehicle.model_year == cy).
-                                         filter(Vehicle.market_class_ID == mc).
+                                         filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                         filter(VehicleFinal.model_year == cy).
+                                         filter(VehicleFinal.market_class_ID == mc).
                                          filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_cost_data[mc])
 
     average_cost_data['total'] = []
     for cy in calendar_years:
         average_cost_data['total'].append(o2.session.query(
-            func.sum(Vehicle.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                          filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                          filter(Vehicle.model_year == cy).
+                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                          filter(VehicleFinal.model_year == cy).
                                           filter(VehicleAnnualData.age == 0).scalar())
     ax1.plot(calendar_years, average_cost_data['total'])
 
@@ -115,11 +119,11 @@ def run_postproc(iteration_log):
         average_co2_gpmi_data[hc] = []
         for cy in calendar_years:
             average_co2_gpmi_data[hc].append(o2.session.query(
-                func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                             filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                             filter(Vehicle.model_year == cy).
-                                             filter(Vehicle.hauling_class == hc).
+                                             filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.hauling_class == hc).
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[hc])
 
@@ -127,21 +131,21 @@ def run_postproc(iteration_log):
         average_co2_gpmi_data[mc] = []
         for cy in calendar_years:
             average_co2_gpmi_data[mc].append(o2.session.query(
-                func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                             filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                             filter(Vehicle.model_year == cy).
-                                             filter(Vehicle.market_class_ID == mc).
+                                             filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.market_class_ID == mc).
                                              filter(VehicleAnnualData.age == 0).scalar())
         ax1.plot(calendar_years, average_co2_gpmi_data[mc])
 
     average_co2_gpmi_data['total'] = []
     for cy in calendar_years:
         average_co2_gpmi_data['total'].append(o2.session.query(
-            func.sum(Vehicle.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                              filter(Vehicle.vehicle_ID == VehicleAnnualData.vehicle_ID).
-                                              filter(Vehicle.model_year == cy).
+                                              filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                              filter(VehicleFinal.model_year == cy).
                                               filter(VehicleAnnualData.age == 0).scalar())
     ax1.plot(calendar_years, average_co2_gpmi_data['total'])
 
@@ -218,7 +222,7 @@ def run_producer_consumer():
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
 
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder)
+        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
     return iteration_log
 
@@ -232,7 +236,7 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
 
 def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
     from market_classes import MarketClass
-    import vehicles
+    from omega_functions import weighted_value
 
     # group vehicles by market class
     market_class_vehicle_dict = MarketClass.get_market_class_dict()
@@ -242,10 +246,12 @@ def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
     # calculate sales-weighted co2 g/mi and cost by market class
     for mc in MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
-        winning_combo['average_%s_co2_gpmi' % mc] = vehicles.sales_weight(market_class_vehicles,
-                                                                          'cert_CO2_grams_per_mile')
-        winning_combo['average_%s_cost' % mc] = vehicles.sales_weight(market_class_vehicles,
-                                                                      'new_vehicle_mfr_cost_dollars')
+        winning_combo['average_%s_co2_gpmi' % mc] = weighted_value(market_class_vehicles,
+                                                                   'initial_registered_count',
+                                                                   'cert_CO2_grams_per_mile')
+        winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
+                                                               'initial_registered_count',
+                                                               'new_vehicle_mfr_cost_dollars')
     return market_class_vehicle_dict
 
 
@@ -315,14 +321,99 @@ def detect_thrashing(iteration_log, mc, thrashing):
     return thrashing
 
 
-def cleanup_vehicle_ids(candidate_mfr_new_vehicles, consumer_market_share_demand, winning_combo):
-    for i, id in enumerate([v.vehicle_ID for v in candidate_mfr_new_vehicles]):
-        rename_dict = dict()
-        veh_cols = [(c, c.replace(str(id), str(i))) for c in winning_combo.keys() if 'veh_%d' % id in c]
-        for vc in veh_cols:
-            rename_dict[vc[0]] = vc[1]
-        consumer_market_share_demand = consumer_market_share_demand.rename(rename_dict, axis='columns')
-    return consumer_market_share_demand.copy()
+def init_omega(o2_options):
+
+    # set up global variables:
+    o2.options = o2_options
+    omega_log.init_logfile()
+
+    init_omega_db()
+    o2.engine.echo = o2.options.verbose
+
+    # import database modules to populate ORM context
+    from fuels import Fuel
+    from fuels_context import FuelsContext
+    from market_classes import MarketClass
+    from cost_curves import CostCurve
+    from cost_clouds import CostCloud
+    from demanded_shares_gcam import DemandedSharesGCAM
+    from manufacturers import Manufacturer
+    from manufacturer_annual_data import ManufacturerAnnualData
+    from vehicles import VehicleFinal
+    from vehicle_annual_data import VehicleAnnualData
+    from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
+    from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
+
+    if o2.options.GHG_standard == 'flat':
+        from GHG_standards_flat import GHGStandardFlat
+    else:
+        from GHG_standards_footprint import GHGStandardFootprint
+
+    from GHG_standards_fuels import GHGStandardFuels
+
+    # instantiate database tables
+    SQABase.metadata.create_all(o2.engine)
+
+    import consumer.sales as consumer
+    import producer
+
+    fileio.validate_folder(o2.options.output_folder)
+
+    o2.options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
+    o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
+
+    init_fail = []
+
+    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+
+    init_fail = init_fail + FuelsContext.init_database_from_file(
+        o2.options.fuels_context_file, verbose=o2.options.verbose)
+
+    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+                                                                verbose=o2.options.verbose)
+    if o2.options.cost_file_type == 'curves':
+        init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+    else:
+        init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+
+    if o2.options.GHG_standard == 'flat':
+        init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
+                                                                        verbose=o2.options.verbose)
+        o2.options.GHG_standard = GHGStandardFlat
+    else:
+        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
+                                                                             verbose=o2.options.verbose)
+        o2.options.GHG_standard = GHGStandardFootprint
+
+    init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
+                                                                     verbose=o2.options.verbose)
+    init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
+        o2.options.demanded_shares_file, verbose=o2.options.verbose)
+
+    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
+                                                                 verbose=o2.options.verbose)
+    init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+
+    if o2.options.stock_scrappage == 'fixed':
+        init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
+            o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
+        o2.options.stock_scrappage = ReregistrationFixedByAge
+    else:
+        pass
+
+    if o2.options.stock_vmt == 'fixed':
+        init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
+                                                                            verbose=o2.options.verbose)
+        o2.options.stock_vmt = AnnualVMTFixedByAge
+    else:
+        pass
+
+    # initial year = initial fleet model year (latest year of data)
+    o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+    # final year = last year of cost curve data
+    o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
+
+    return init_fail
 
 
 def run_omega(o2_options, single_shot=False, profile=False):
@@ -337,120 +428,22 @@ def run_omega(o2_options, single_shot=False, profile=False):
 
     print('run_omega(%s)' % o2_options.session_name)
 
-    # set up global variables:
-    o2.options = o2_options
-    init_omega_db()
-    o2.engine.echo = o2.options.verbose
-    omega_log.init_logfile()
-
-    from fuels import Fuel
-    from fuels_context import FuelsContext
-    from market_classes import MarketClass
-    from cost_curves import CostCurve
-    from cost_clouds import CostCloud
-    from demanded_shares_gcam import DemandedSharesGCAM
-    from manufacturers import Manufacturer
-    from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import Vehicle
-    from vehicle_annual_data import VehicleAnnualData
-    from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
-    from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
-    import consumer.sales as consumer
-    import producer
-    from consumer.sales_share_gcam import get_demanded_shares
-
-    fileio.validate_folder(o2.options.output_folder)
-
-    if o2.options.GHG_standard == 'flat':
-        from GHG_standards_flat import GHGStandardFlat
-    else:
-        from GHG_standards_footprint import GHGStandardFootprint
-
-    from GHG_standards_fuels import GHGStandardFuels
-
-    o2.options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
-    o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
-
-    SQABase.metadata.create_all(o2.engine)
-
-    init_fail = []
     try:
-        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-        init_fail = init_fail + FuelsContext.init_database_from_file(
-            o2.options.fuels_context_file, verbose=o2.options.verbose)
-        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                    verbose=o2.options.verbose)
-
-        if o2.options.cost_file_type == 'curves':
-            init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-        else:
-            init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-
-        if o2.options.GHG_standard == 'flat':
-            init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
-                                                                            verbose=o2.options.verbose)
-            o2.options.GHG_standard = GHGStandardFlat
-        else:
-            init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
-                                                                                 verbose=o2.options.verbose)
-            o2.options.GHG_standard = GHGStandardFootprint
-
-        init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
-                                                                         verbose=o2.options.verbose)
-
-        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
-            o2.options.demanded_shares_file, verbose=o2.options.verbose)
-        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
-                                                                     verbose=o2.options.verbose)
-        init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
-
-        if o2.options.stock_scrappage == 'fixed':
-            init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
-                o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
-            o2.options.stock_scrappage = ReregistrationFixedByAge
-        else:
-            pass
-
-        if o2.options.stock_vmt == 'fixed':
-            init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
-                                                                                verbose=o2.options.verbose)
-            o2.options.stock_vmt = AnnualVMTFixedByAge
-        else:
-            pass
-
-        # initial year = initial fleet model year (latest year of data)
-        o2.options.analysis_initial_year = int(o2.session.query(func.max(Vehicle.model_year)).scalar()) + 1
-        # final year = last year of cost curve data
-        o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
+        init_fail = init_omega(o2_options)
 
         if not init_fail:
-            # dump_database_to_csv(engine, o2.options.database_dump_folder, verbose=False)
-
             if profile:
+                # run with profiler
                 import cProfile
                 import re
                 cProfile.run('iteration_log = run_producer_consumer()', filename='omega2_profile.dmp')
-
-                if not single_shot:
-                    gui_comm('%s: Post Processing ...' % o2.options.session_name)
-                session_summary_results = run_postproc(globals()['iteration_log'])  # return values of cProfile.run() show up in the globals namespace
+                session_summary_results = run_postproc(globals()['iteration_log'], single_shot)  # return values of cProfile.run() show up in the globals namespace
             else:
+                # run without profiler
                 iteration_log = run_producer_consumer()
+                session_summary_results = run_postproc(iteration_log, single_shot)
 
-                if not single_shot:
-                    gui_comm('%s: Post Processing ...' % o2.options.session_name)
-                session_summary_results = run_postproc(iteration_log)
-
-            if single_shot:
-                session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
-            else:
-                if not os.access('%s_summary_results.csv' % fileio.get_filename(os.getcwd()), os.F_OK):
-                    session_summary_results.to_csv(
-                        '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
-                else:
-                    session_summary_results.to_csv(
-                        '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a',
-                        header=False)
+            publish_summary_results(session_summary_results, single_shot)
 
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
@@ -476,10 +469,23 @@ def run_omega(o2_options, single_shot=False, profile=False):
         omega_log.end_logfile("\nSession Fail")
 
 
+def publish_summary_results(session_summary_results, single_shot):
+    if single_shot:
+        session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
+    else:
+        if not os.access('%s_summary_results.csv' % fileio.get_filename(os.getcwd()), os.F_OK):
+            session_summary_results.to_csv(
+                '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
+        else:
+            session_summary_results.to_csv(
+                '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a',
+                header=False)
+
+
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)
+        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)  # to view in terminal: snakeviz omega2_profile.dmp
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

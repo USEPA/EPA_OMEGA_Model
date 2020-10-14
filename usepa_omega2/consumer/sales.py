@@ -23,25 +23,25 @@ def demand_sales(model_year):
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
 
     sales_dict = dict()
 
     # get sales numbers from initial fleet (for now)
-    initial_ICE_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.fueling_class == 'ICE').filter(
+    initial_ICE_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+        VehicleFinal.fueling_class == 'ICE').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
-    initial_BEV_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.fueling_class == 'BEV').filter(
+    initial_BEV_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+        VehicleFinal.fueling_class == 'BEV').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
-    initial_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.hauling_class == 'hauling').filter(
+    initial_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+        VehicleFinal.hauling_class == 'hauling').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
-    initial_non_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(Vehicle).filter(
-        Vehicle.hauling_class == 'non hauling').filter(
+    initial_non_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+        VehicleFinal.hauling_class == 'non hauling').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
     total_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         init_omega_db()
         omega_log.init_logfile()
 
-        from vehicles import Vehicle
+        from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
         from manufacturers import Manufacturer  # needed for manufacturers table
         from market_classes import MarketClass  # needed for market class ID
@@ -102,10 +102,10 @@ if __name__ == '__main__':
                                                                                  verbose=o2.options.verbose)
             o2.options.GHG_standard = GHGStandardFootprint
 
-        init_fail = init_fail + Vehicle.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
         if not init_fail:
-            o2.options.analysis_initial_year = o2.session.query(func.max(Vehicle.model_year)).scalar() + 1
+            o2.options.analysis_initial_year = o2.session.query(func.max(VehicleFinal.model_year)).scalar() + 1
 
             sales_demand = demand_sales(o2.options.analysis_initial_year)
         else:

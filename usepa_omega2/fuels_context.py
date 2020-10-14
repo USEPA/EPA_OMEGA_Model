@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class FuelsContext(SQABase):
+class FuelsContext(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'fuels_context'
     index = Column('index', Integer, primary_key=True)
@@ -19,15 +19,6 @@ class FuelsContext(SQABase):
     calendar_year = Column(Numeric)
     cost_dollars_per_unit = Column(Float)
     upstream_CO2_per_unit = Column('upstream_co2_per_unit', Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

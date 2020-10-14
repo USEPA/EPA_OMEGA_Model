@@ -64,7 +64,7 @@ if __name__ == '__main__':
         from manufacturers import Manufacturer  # required by vehicles
         from fuels import Fuel  # required by vehicles
         from market_classes import MarketClass  # required by vehicles
-        from vehicles import Vehicle  # for foreign key vehicle_ID
+        from vehicles import VehicleFinal  # for foreign key vehicle_ID
 
         SQABase.metadata.create_all(o2.engine)
 

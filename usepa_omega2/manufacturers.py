@@ -11,23 +11,13 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class Manufacturer(SQABase):
+class Manufacturer(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'manufacturers'
     manufacturer_ID = Column('manufacturer_id', String, primary_key=True)
-    vehicles = relationship('Vehicle', back_populates='manufacturer')
+    vehicles = relationship('VehicleFinal', back_populates='manufacturer')
 
     # --- static properties ---
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-
-    def __str__(self):
-        s = '\n<manufacturer.Manufacturer object at %#x>\n' % id(self)
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
-
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         if verbose:
@@ -70,7 +60,7 @@ if __name__ == '__main__':
 
         from fuels import Fuel
         from market_classes import MarketClass
-        from vehicles import Vehicle
+        from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
 
         SQABase.metadata.create_all(o2.engine)

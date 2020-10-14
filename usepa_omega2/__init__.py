@@ -41,14 +41,14 @@ try:
             self.verbose = False
             self.output_folder = 'output' + os.sep
             self.database_dump_folder = '__dump' + os.sep
-            self.manufacturers_file = 'sample_inputs/manufacturers.csv'
-            self.market_classes_file = 'sample_inputs/market_classes.csv'
-            self.vehicles_file = 'sample_inputs/vehicles.csv'
-            self.demanded_shares_file = 'sample_inputs/demanded_shares-gcam.csv'
-            self.fuels_file = 'sample_inputs/fuels.csv'
-            self.fuels_context_file = 'sample_inputs/fuels_context.csv'
+            self.manufacturers_file = 'input_samples/manufacturers.csv'
+            self.market_classes_file = 'input_samples/market_classes.csv'
+            self.vehicles_file = 'input_samples/vehicles.csv'
+            self.demanded_shares_file = 'input_samples/demanded_shares-gcam.csv'
+            self.fuels_file = 'input_samples/fuels.csv'
+            self.fuels_context_file = 'input_samples/fuels_context.csv'
             self.cost_file_type = 'curves'
-            self.cost_file = 'sample_inputs/cost_curves.csv'
+            self.cost_file = 'input_samples/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = None
@@ -58,19 +58,19 @@ try:
             self.consumer_calculate_generalized_cost = None
             self.GHG_standard = 'flat'
             if self.GHG_standard == 'flat':
-                self.ghg_standards_file = 'sample_inputs/ghg_standards-flat.csv'
+                self.ghg_standards_file = 'input_samples/ghg_standards-flat.csv'
             else:
-                self.ghg_standards_file = 'sample_inputs/ghg_standards-footprint.csv'
-            self.ghg_standards_fuels_file = 'sample_inputs/ghg_standards-fuels.csv'
-            self.required_zev_share_file = 'sample_inputs/required_zev_share.csv'
+                self.ghg_standards_file = 'input_samples/ghg_standards-footprint.csv'
+            self.ghg_standards_fuels_file = 'input_samples/ghg_standards-fuels.csv'
+            self.required_zev_share_file = 'input_samples/required_zev_share.csv'
             self.stock_scrappage = 'fixed'
             self.stock_vmt = 'fixed'
             if self.stock_scrappage == 'fixed':
-                self.reregistration_fixed_by_age_file = 'sample_inputs/reregistration_fixed_by_age.csv'
+                self.reregistration_fixed_by_age_file = 'input_samples/reregistration_fixed_by_age.csv'
             else:
                 pass
             if self.stock_vmt == 'fixed':
-                self.annual_vmt_fixed_by_age_file = 'sample_inputs/annual_vmt_fixed_by_age.csv'
+                self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
             else:
                 pass
             self.context_folder = ''

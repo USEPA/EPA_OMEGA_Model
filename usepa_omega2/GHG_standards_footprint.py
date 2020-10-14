@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class GHGStandardFootprint(SQABase):
+class GHGStandardFootprint(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_footprint'
     index = Column(Integer, primary_key=True)
@@ -24,15 +24,6 @@ class GHGStandardFootprint(SQABase):
     coeff_c = Column('coeff_c', Float)
     coeff_d = Column('coeff_d', Float)
     lifetime_VMT = Column('lifetime_vmt', Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
-
-    def __str__(self):
-        s = ''  # '"<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
-        for k in self.__dict__:
-            s = s + k + ' = ' + str(self.__dict__[k]) + '\n'
-        return s
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -108,7 +99,7 @@ class GHGStandardFootprint(SQABase):
             else:
                 sales = sales_variants
         else:
-            sales = vehicle.get_initial_registered_count()
+            sales = vehicle.initial_registered_count
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
 
@@ -129,7 +120,7 @@ class GHGStandardFootprint(SQABase):
             else:
                 co2_gpmi = co2_gpmi_variants
         else:
-            sales = vehicle.get_initial_registered_count()
+            sales = vehicle.initial_registered_count
             co2_gpmi = vehicle.cert_CO2_grams_per_mile
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
@@ -142,7 +133,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         o2.options = OMEGARuntimeOptions()
-        o2.options.ghg_standards_file = 'sample_inputs/ghg_standards-footprint.csv'
+        o2.options.ghg_standards_file = 'input_samples/ghg_standards-footprint.csv'
         init_omega_db()
         omega_log.init_logfile()
 

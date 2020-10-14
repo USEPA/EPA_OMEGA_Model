@@ -1,0 +1,6 @@
+input_template_name:,fuels,input_template_version:,0.0002
+fuel_id,unit,energy_density_megajoules_per_unit,
+MTE Gasoline,gallon,129.46,
+MTE US electricity,kWh,3.6,
+pump gasoline,gallon,129.46,
+US electricity,kWh,3.6,

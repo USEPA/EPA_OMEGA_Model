@@ -8,21 +8,12 @@ the manufacturers.py is primarily related to the schema and class methods...
 """
 
 import o2  # import global variables
+from omega_functions import cartesian_prod
 from usepa_omega2 import *
-
 import numpy as np
-
 import consumer
 
-
-def unique(vector):
-    """
-
-    :param vector:
-    :return:
-    """
-    indexes = np.unique(vector, return_index=True)[1]
-    return [vector[index] for index in sorted(indexes)]
+use_composite_vehicles = True
 
 partition_dict = dict()
 def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):
@@ -78,87 +69,11 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
     return partition_dict[partition_name]
 
 
-# def partition(num_columns, num_levels, min_level=0.001, verbose=False):
-#     """
-#     Returns a set of columns, the rows of which add up to 1.0, with num_levels between 0-1
-#     ex: >>> partition(num_columns=2, num_levels=3, verbose=True)
-#             1.00	0.00
-#             0.50	0.50
-#             0.00	1.00
-#
-#     :param num_columns: number of columns in the output
-#     :param num_levels: number of values from 0-1
-#     :param verbose: if True then result is printed to the console
-#     :return: a set of columns, the rows of which add up to 1.0
-#     """
-#
-#     partition_name = '%d_%d_%s' % (num_columns, num_levels, min_level)
-#
-#     if not partition_name in partition_dict:
-#         from pyDOE2 import fullfact
-#
-#         permutations = np.minimum(1 - min_level, np.maximum(min_level, fullfact([num_levels] * num_columns) / (num_levels - 1)))
-#         valid_combinations = np.array([permutation for permutation in permutations if sum(permutation) == 1.0])
-#
-#         if verbose:
-#             for i in valid_combinations:
-#                 s = ''
-#                 for e in i:
-#                     s = s + '\t%.3f' % e
-#                 print(s)
-#
-#         partition_dict[partition_name] = valid_combinations.transpose()
-#
-#     return partition_dict[partition_name]
-
-
-def cartesian_prod(left_df, right_df, drop=False):
-    """
-    Calculate cartesian product of the dataframe rows
-
-    :param left_df: 'left' dataframe
-    :param right_df: 'right' dataframe
-    :param drop: if True, drop join-column '_' from dataframes
-    :return: cartesian product of the dataframe rows
-    """
-    import pandas as pd
-
-    if left_df.empty:
-        return right_df
-    else:
-        if '_' not in left_df:
-            left_df['_'] = np.nan
-
-        if '_' not in right_df:
-            right_df['_'] = np.nan
-
-        if drop:
-            leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
-            left_df.drop('_', axis=1, inplace=True)
-            right_df.drop('_', axis=1, inplace=True, errors='ignore')
-        else:
-            leftXright = pd.merge(left_df, right_df, on='_')
-
-    return leftXright
-
-
-def inherit_vehicles(from_year, to_year, manufacturer_id):
-    # this works, but ignores annual data like initial registered count (needs to be joined from vehicle_annual_data)
-    # which will be fine when are getting sales from the consumer module or creating them as part of the unconstrained
-    # full factorial tech combos
-    cn = sql_get_column_names('vehicles', exclude='vehicle_id')
-    o2.session.execute('CREATE TABLE new_vehicles AS SELECT %s FROM vehicles \
-                     WHERE model_year==%d AND manufacturer_id=="%s"' % (cn, from_year, manufacturer_id))
-    o2.session.execute('UPDATE new_vehicles SET model_year=%d' % to_year)
-    o2.session.execute('INSERT INTO vehicles (%s) SELECT %s FROM new_vehicles' % (cn, cn))
-    o2.session.execute('DROP TABLE new_vehicles')
-
-
 def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
-    from vehicles import Vehicle
-    return o2.session.query(func.sum(Vehicle.cert_target_CO2_Mg)). \
-        filter(Vehicle.manufacturer_ID == manufacturer_id). \
-        filter(Vehicle.model_year == model_year).scalar()
+    from vehicles import VehicleFinal
+    return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
+        filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+        filter(VehicleFinal.model_year == model_year).scalar()
 
 
 # placeholder for producer deemed generalized vehicle cost:
@@ -177,8 +92,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     """
     child_df_list = []
 
-    children = [k for k in market_class_dict]
-    num_children = len(children)
+    children = list(market_class_dict)
 
     for k in market_class_dict:
         if verbose:
@@ -188,7 +102,6 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
             child_df_list.append(create_tech_options_from_market_class_tree(calendar_year, market_class_dict[k], consumer_bev_share, parent=k,))
         else:
             # process leaf
-            from cost_curves import CostCurve
             for new_veh in market_class_dict[k]:
                 df = pd.DataFrame()
 
@@ -199,12 +112,12 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
                 if consumer_bev_share is None or new_veh.fueling_class == 'BEV':
                     if o2.options.allow_backsliding:
-                        max_co2_gpmi = CostCurve.get_max_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year)
+                        max_co2_gpmi = new_veh.get_max_co2_gpmi()
                     else:
                         max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
 
                     co2_gpmi_options = np.linspace(
-                        CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+                        new_veh.get_min_co2_gpmi(),
                         max_co2_gpmi,
                         num=num_tech_options).tolist()
                 else:  # ICE vehicle and consumer_bev_share available
@@ -214,14 +127,12 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                         max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile,
                                            consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
 
-                    min_co2_gpmi = max(CostCurve.get_min_co2_gpmi(new_veh.cost_curve_class, new_veh.model_year),
+                    min_co2_gpmi = max(new_veh.get_min_co2_gpmi(),
                                        consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 0.9)
 
                     co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
-                tech_cost_options = CostCurve.get_cost(cost_curve_class=new_veh.cost_curve_class,
-                                                       model_year=new_veh.model_year,
-                                                       target_co2_gpmi=co2_gpmi_options)
+                tech_cost_options = new_veh.get_cost(co2_gpmi_options)
 
                 df['veh_%d_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
                 df['veh_%d_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
@@ -256,73 +167,104 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     return tech_share_combos_df
 
 
+calendar_year_initial_vehicle_data = dict()
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
-    from vehicles import Vehicle, VehicleBase
-    from market_classes import MarketClass, populate_market_classes, print_market_class_dict
 
-    from consumer.stock import prior_year_stock_registered_count, prior_year_stock_vmt, age0_stock_vmt
+    manufacturer_new_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
-    # pull in last year's vehicles:
-    manufacturer_prior_vehicles = o2.session.query(Vehicle). \
-        filter(Vehicle.manufacturer_ID == manufacturer_ID). \
-        filter(Vehicle.model_year == calendar_year - 1). \
-        all()
-
-    # TODO: aggregate...? By market class...? Or not....? Or only for USA Motors?
-    # TODO: aggregate by reg class within market class and create sales weighted cost curves and
-    #  vehicle attributes
-
-    VehicleBase.next_vehicle_ID = 0  # reset vehicle ID
-
-    manufacturer_new_vehicles = []
-    # update each vehicle and calculate compliance target for each vehicle
-    for prior_veh in manufacturer_prior_vehicles:
-        new_veh = VehicleBase()
-        new_veh.inherit_vehicle(prior_veh)
-        new_veh.model_year = calendar_year
-        new_veh.set_cert_target_CO2_grams_per_mile()
-        manufacturer_new_vehicles.append(new_veh)
-
-    # get empty market class tree
-    mct = MarketClass.get_market_class_tree()
-    # populate tree with vehicle objects
-    for new_veh in manufacturer_new_vehicles:
-        populate_market_classes(mct, new_veh.market_class_ID, new_veh)
-        # populate_market_classes(mct, new_veh.market_class_ID + '.' + new_veh.reg_class_ID, new_veh)
-
-    tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, mct, consumer_bev_share)
+    tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, market_class_tree, consumer_bev_share)
 
     calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total)
-
-    # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
 
     # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
     winning_combo = select_winning_combo(tech_share_combos_total)
 
+    import copy
+    manufacturer_new_vehicles = copy.deepcopy(manufacturer_new_vehicles)
+
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_new_vehicles:
-        new_veh.set_cert_co2_grams_per_mile(winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID])
-        new_veh.set_initial_registered_count(winning_combo['veh_%d_sales' % new_veh.vehicle_ID])
+        new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
+        new_veh.initial_registered_count = winning_combo['veh_%d_sales' % new_veh.vehicle_ID]
+        if use_composite_vehicles:
+            new_veh.decompose()
+        new_veh.set_new_vehicle_mfr_cost_dollars()
         new_veh.set_cert_target_CO2_Mg()
         new_veh.set_cert_CO2_Mg()
 
     return manufacturer_new_vehicles, winning_combo
 
 
+def get_initial_vehicle_data(calendar_year, manufacturer_ID):
+    from vehicles import VehicleFinal, Vehicle
+    from market_classes import MarketClass, populate_market_classes
+
+    if calendar_year not in calendar_year_initial_vehicle_data:
+        # pull in last year's vehicles:
+        manufacturer_prior_vehicles = o2.session.query(VehicleFinal). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_ID). \
+            filter(VehicleFinal.model_year == calendar_year - 1). \
+            all()
+
+        Vehicle.reset_vehicle_IDs()
+
+        manufacturer_new_vehicles = []
+        # update each vehicle and calculate compliance target for each vehicle
+        for prior_veh in manufacturer_prior_vehicles:
+            new_veh = Vehicle()
+            new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
+            manufacturer_new_vehicles.append(new_veh)
+
+        # aggregate by market class / reg class
+        mctrc = dict()
+        for mc in MarketClass.market_classes:
+            mctrc[mc] = {'car': [], 'truck': []}
+        for new_veh in manufacturer_new_vehicles:
+            mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
+
+        from vehicles import CompositeVehicle
+        CompositeVehicle.reset_vehicle_IDs()
+        composite_vehicles = []
+        for mc in mctrc:
+            for rc in reg_classes:
+                if mctrc[mc][rc]:
+                    cv = CompositeVehicle(mctrc[mc][rc])
+                    composite_vehicles.append(cv)
+
+        if use_composite_vehicles:
+            manufacturer_new_vehicles = composite_vehicles
+
+        # get empty market class tree
+        market_class_tree = MarketClass.get_market_class_tree()
+        # populate tree with vehicle objects
+        for new_veh in manufacturer_new_vehicles:
+            populate_market_classes(market_class_tree, new_veh.market_class_ID, new_veh)
+
+        calendar_year_initial_vehicle_data[calendar_year] = {'manufacturer_new_vehicles': manufacturer_new_vehicles,
+                                                             'market_class_tree': market_class_tree}
+    else:
+        manufacturer_new_vehicles = calendar_year_initial_vehicle_data[calendar_year]['manufacturer_new_vehicles']
+        market_class_tree = calendar_year_initial_vehicle_data[calendar_year]['market_class_tree']
+    return manufacturer_new_vehicles, market_class_tree
+
+
 def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_vehicles, winning_combo):
     from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
 
     manufacturer_new_vehicles = []
-    for cv in manufacturer_candidate_vehicles:
-        new_veh = Vehicle()
-        new_veh.inherit_vehicle(cv)
-        new_veh.set_initial_registered_count(cv.get_initial_registered_count())
-        new_veh.set_cert_co2_grams_per_mile(cv.cert_CO2_grams_per_mile)
-        new_veh.set_cert_target_CO2_grams_per_mile()
-        new_veh.set_cert_target_CO2_Mg()
-        new_veh.set_cert_CO2_Mg()
-        manufacturer_new_vehicles.append(new_veh)
+
+    if use_composite_vehicles:
+        for cv in manufacturer_candidate_vehicles:
+            for v in cv.vehicle_list:
+                new_veh = VehicleFinal()
+                new_veh.inherit_vehicle(v)
+                manufacturer_new_vehicles.append(new_veh)
+    else:
+        for cv in manufacturer_candidate_vehicles:
+            new_veh = VehicleFinal()
+            new_veh.inherit_vehicle(cv)
+            manufacturer_new_vehicles.append(new_veh)
 
     o2.session.add_all(manufacturer_new_vehicles)
 

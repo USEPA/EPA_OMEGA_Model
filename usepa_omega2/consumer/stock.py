@@ -75,7 +75,7 @@ from usepa_omega2 import *
 #             VehicleAnnualData.insert_vmt(vehicle_ID, year, annual_vmt)
 
 def prior_year_stock_registered_count(calendar_year):
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
 
     # pull in last year's vehicles:
@@ -92,17 +92,17 @@ def prior_year_stock_registered_count(calendar_year):
             filter(VehicleAnnualData.age==0).\
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID).scalar()
         veh_age = calendar_year_prior_vehicles[idx].age + 1
-        veh_market_class = o2.session.query(Vehicle.market_class_ID).filter(Vehicle.vehicle_ID == vehicle_ID)
+        veh_market_class = o2.session.query(VehicleFinal.market_class_ID).filter(VehicleFinal.vehicle_ID == vehicle_ID)
         scrappage_factor = o2.session.query(o2.options.stock_scrappage.reregistered_proportion).\
             filter(o2.options.stock_scrappage.market_class_ID == veh_market_class).\
             filter(o2.options.stock_scrappage.age == veh_age).scalar()
         new_count = vehicle_initial_sales * scrappage_factor
-        vehicle = o2.session.query(Vehicle).filter(Vehicle.vehicle_ID == vehicle_ID)
+        vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)
         VehicleAnnualData.update_registered_count(vehicle, calendar_year, new_count)
 
 
 def prior_year_stock_vmt(calendar_year):
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
 
     # pull in last year's vehicles:
@@ -114,8 +114,8 @@ def prior_year_stock_vmt(calendar_year):
         vehicle_IDs.append(calendar_year_prior_vehicles[idx].vehicle_ID)
 
     for idx, vehicle_ID in enumerate(vehicle_IDs):
-        veh_market_class = o2.session.query(Vehicle.market_class_ID).\
-            filter(Vehicle.vehicle_ID == vehicle_ID)
+        veh_market_class = o2.session.query(VehicleFinal.market_class_ID).\
+            filter(VehicleFinal.vehicle_ID == vehicle_ID)
         veh_age = calendar_year_prior_vehicles[idx].age + 1
         annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
             filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
@@ -124,7 +124,7 @@ def prior_year_stock_vmt(calendar_year):
 
 
 def age0_stock_vmt(calendar_year):
-    from vehicles import Vehicle
+    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
 
     # pull in last year's vehicles:
@@ -137,8 +137,8 @@ def age0_stock_vmt(calendar_year):
         vehicle_IDs.append(age0_vehicles[idx].vehicle_ID)
 
     for idx, vehicle_ID in enumerate(vehicle_IDs):
-        veh_market_class = o2.session.query(Vehicle.market_class_ID).\
-            filter(Vehicle.vehicle_ID == vehicle_ID)
+        veh_market_class = o2.session.query(VehicleFinal.market_class_ID).\
+            filter(VehicleFinal.vehicle_ID == vehicle_ID)
         veh_age = 0
         annual_vmt = o2.session.query(o2.options.stock_vmt.annual_vmt). \
             filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
@@ -157,10 +157,10 @@ if __name__ == '__main__':
         # from usepa_omega2.market_classes import MarketClass  # required by vehicles
         # # from vehicles import Vehicle  # for foreign key vehicle_ID
         #
-        # fuels_file = 'EPA_OMEGA_MODEL/sample_inputs/fuels.csv'
-        # self.manufacturers_file = 'sample_inputs/manufacturers.csv'
-        # self.market_classes_file = 'sample_inputs/market_classes.csv'
-        # self.vehicles_file = 'sample_inputs/vehicles.csv'
+        # fuels_file = 'EPA_OMEGA_MODEL/input_samples/fuels.csv'
+        # self.manufacturers_file = 'input_samples/manufacturers.csv'
+        # self.market_classes_file = 'input_samples/market_classes.csv'
+        # self.vehicles_file = 'input_samples/vehicles.csv'
         #
         # # session = Session(bind=engine)
         # SQABase.metadata.create_all(engine)
