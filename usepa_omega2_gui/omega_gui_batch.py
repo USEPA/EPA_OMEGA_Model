@@ -588,6 +588,9 @@ class Form(QObject):
         --timestamp [current date and time]
 
         Options for multiprocessor mode:
+        --batch_file [user selected batch file] --bundle_path [user selected output directory]
+        --dispy --local --dispy_exclusive --dispy_debug
+        --timestamp [current date and time]
 
         :return: N/A
         """
