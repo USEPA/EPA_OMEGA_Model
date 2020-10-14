@@ -15,7 +15,7 @@ class Manufacturer(SQABase, o2.OmegaBase):
     # --- database table properties ---
     __tablename__ = 'manufacturers'
     manufacturer_ID = Column('manufacturer_id', String, primary_key=True)
-    vehicles = relationship('Vehicle', back_populates='manufacturer')
+    vehicles = relationship('VehicleFinal', back_populates='manufacturer')
 
     # --- static properties ---
     @staticmethod
