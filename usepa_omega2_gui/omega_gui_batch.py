@@ -479,12 +479,21 @@ class Form(QObject):
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
+        The function searches the __init__.py file for the line containing the code version and then calls
+        the function "showbox" to display the result.
 
         :return: N/A
         """
         message_title = "About OMEGA"
-        message = "OMEGA Version 10.1.2"
+        searchfile = open("usepa_omega2/__init__.py", "r")
+        for line in searchfile:
+            if "code_version =" in line:
+                a = line
+        searchfile.close()
+        message = a
         self.showbox(message_title, message)
+
+
 
     def wizard_logic(self):
         """
