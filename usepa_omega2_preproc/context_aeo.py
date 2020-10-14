@@ -5,15 +5,17 @@ context_aeo.py
 
 import pandas as pd
 from pathlib import Path
+from datetime import datetime
+import shutil
 
 path_cwd = Path.cwd()
 path_inputs = path_cwd / 'usepa_omega2_preproc/aeo_tables'
 path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
 path_outputs.mkdir(exist_ok=True)
-path_input_templates = path_cwd / 'input_templates'
+path_input_templates = path_cwd / 'input_samples'
 
-vehicles_context_filename = 'new_vehicle_sales_context-aeo.csv'
-fuels_context_filename = 'fuels_context-aeo.csv'
+vehicles_context_template = 'new_vehicle_sales_context-aeo.csv'
+fuels_context_template = 'fuels_context-aeo.csv'
 
 # from somewhere, e.g., the top/general section of the batch file, the aeo_case has to be set; this is a placeholder
 aeo_case = 'Reference case'
@@ -55,6 +57,28 @@ def new_metric(df, id_column, new_metric, new_metric_entry, *id_words):
             else:
                 pass
     return df
+
+
+def save_template(df, path_to_template, path_to_save, template_name):
+    """
+
+    :param path_to_template: Path to the input template.
+    :param path_to_save: Path to the save folder.
+    :param template_name: Name of template.
+    :return: Confirmation message that the template has been saved and to where.
+    """
+    shutil.copy2(path_to_template / f'{template_name}', path_to_save / f'{template_name}')
+
+    # open the input template into which results will be placed.
+    template_info = pd.read_csv(path_to_save / f'{template_name}', 'b', nrows=0)
+    temp = ' '.join((item for item in template_info))
+    temp2 = temp.split(',')
+    template_info_df = pd.DataFrame(columns=temp2)
+    template_info_df.to_csv(path_to_save / f'{template_name}', index=False)
+
+    with open(path_to_save / f'{template_name}', 'a', newline='') as template_file:
+        df.to_csv(template_file, index=False)
+    return print(f'\n{template_name} saved to {path_to_save}')
 
 
 class GetAEO:
@@ -109,6 +133,8 @@ class GetAEO:
 
 
 def main():
+    start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
+
     # name the aeo tables being used
     aeo_class_attributes_table = 'Table_42._Summary_of_New_Light-Duty_Vehicle_Size_Class_Attributes.csv'
     aeo_sales_table = 'Table_38._Light-Duty_Vehicle_Sales_by_Technology_Type.csv'
@@ -229,7 +255,6 @@ def main():
     fleet_context_df = fleet_context_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class'], how='left')
     fleet_context_df.rename(columns={'full name': 'aeo_size_class'}, inplace=True)
 
-
     # work on fuel prices
     aeo_table_obj = GetAEO(aeo_petroleum_fuel_prices_table, aeo_case)
     print(aeo_table_obj)
@@ -282,8 +307,11 @@ def main():
 
     # print to output files
     print(f'Saving output files to {path_outputs}')
-    fleet_context_df.to_csv(path_outputs / vehicles_context_filename, index=False)
-    aeo_fuel_context.to_csv(path_outputs / fuels_context_filename, index=False)
+    path_of_run_folder = path_outputs / f'{start_time_readable}_run'
+    path_of_run_folder.mkdir(exist_ok=False)
+
+    save_template(fleet_context_df, path_input_templates, path_of_run_folder, vehicles_context_template)
+    save_template(aeo_fuel_context, path_input_templates, path_of_run_folder, fuels_context_template)
 
 
 if __name__ == '__main__':

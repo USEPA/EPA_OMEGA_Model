@@ -1,0 +1,130 @@
+input_template_name:,fuels_context-aeo,input_template_version:,0.0001,
+aeo_context_id,aeo_case_id,fuel_id,calendar_year,cost_dollars_per_unit
+AEO2020,Reference case,pump gasoline retail,2019,2.665601
+AEO2020,Reference case,pump gasoline retail,2020,2.639979
+AEO2020,Reference case,pump gasoline retail,2021,2.64319
+AEO2020,Reference case,pump gasoline retail,2022,2.64413
+AEO2020,Reference case,pump gasoline retail,2023,2.633867
+AEO2020,Reference case,pump gasoline retail,2024,2.599251
+AEO2020,Reference case,pump gasoline retail,2025,2.628672
+AEO2020,Reference case,pump gasoline retail,2026,2.650331
+AEO2020,Reference case,pump gasoline retail,2027,2.682016
+AEO2020,Reference case,pump gasoline retail,2028,2.694953
+AEO2020,Reference case,pump gasoline retail,2029,2.729894
+AEO2020,Reference case,pump gasoline retail,2030,2.813741
+AEO2020,Reference case,pump gasoline retail,2031,2.832745
+AEO2020,Reference case,pump gasoline retail,2032,2.85718
+AEO2020,Reference case,pump gasoline retail,2033,2.907378
+AEO2020,Reference case,pump gasoline retail,2034,2.953295
+AEO2020,Reference case,pump gasoline retail,2035,2.983456
+AEO2020,Reference case,pump gasoline retail,2036,3.018609
+AEO2020,Reference case,pump gasoline retail,2037,3.027417
+AEO2020,Reference case,pump gasoline retail,2038,3.060073
+AEO2020,Reference case,pump gasoline retail,2039,3.100547
+AEO2020,Reference case,pump gasoline retail,2040,3.11111
+AEO2020,Reference case,pump gasoline retail,2041,3.132885
+AEO2020,Reference case,pump gasoline retail,2042,3.180762
+AEO2020,Reference case,pump gasoline retail,2043,3.206139
+AEO2020,Reference case,pump gasoline retail,2044,3.230979
+AEO2020,Reference case,pump gasoline retail,2045,3.272165
+AEO2020,Reference case,pump gasoline retail,2046,3.281969
+AEO2020,Reference case,pump gasoline retail,2047,3.338524
+AEO2020,Reference case,pump gasoline retail,2048,3.376594
+AEO2020,Reference case,pump gasoline retail,2049,3.405497
+AEO2020,Reference case,pump gasoline retail,2050,3.430088
+AEO2020,Reference case,pump gasoline pretax,2019,2.10838
+AEO2020,Reference case,pump gasoline pretax,2020,2.086804
+AEO2020,Reference case,pump gasoline pretax,2021,2.094743
+AEO2020,Reference case,pump gasoline pretax,2022,2.100513
+AEO2020,Reference case,pump gasoline pretax,2023,2.09524
+AEO2020,Reference case,pump gasoline pretax,2024,2.065917
+AEO2020,Reference case,pump gasoline pretax,2025,2.100097
+AEO2020,Reference case,pump gasoline pretax,2026,2.126037
+AEO2020,Reference case,pump gasoline pretax,2027,2.161779
+AEO2020,Reference case,pump gasoline pretax,2028,2.178818
+AEO2020,Reference case,pump gasoline pretax,2029,2.217607
+AEO2020,Reference case,pump gasoline pretax,2030,2.264958
+AEO2020,Reference case,pump gasoline pretax,2031,2.288131
+AEO2020,Reference case,pump gasoline pretax,2032,2.316642
+AEO2020,Reference case,pump gasoline pretax,2033,2.365156
+AEO2020,Reference case,pump gasoline pretax,2034,2.414751
+AEO2020,Reference case,pump gasoline pretax,2035,2.448793
+AEO2020,Reference case,pump gasoline pretax,2036,2.486603
+AEO2020,Reference case,pump gasoline pretax,2037,2.49834
+AEO2020,Reference case,pump gasoline pretax,2038,2.533639
+AEO2020,Reference case,pump gasoline pretax,2039,2.576556
+AEO2020,Reference case,pump gasoline pretax,2040,2.589809
+AEO2020,Reference case,pump gasoline pretax,2041,2.614152
+AEO2020,Reference case,pump gasoline pretax,2042,2.664272
+AEO2020,Reference case,pump gasoline pretax,2043,2.692087
+AEO2020,Reference case,pump gasoline pretax,2044,2.71927
+AEO2020,Reference case,pump gasoline pretax,2045,2.762639
+AEO2020,Reference case,pump gasoline pretax,2046,2.774897
+AEO2020,Reference case,pump gasoline pretax,2047,2.83338
+AEO2020,Reference case,pump gasoline pretax,2048,2.873584
+AEO2020,Reference case,pump gasoline pretax,2049,2.90462
+AEO2020,Reference case,pump gasoline pretax,2050,2.931466
+AEO2020,Reference case,US electricity residential,2019,0.12559407
+AEO2020,Reference case,US electricity residential,2020,0.1239522
+AEO2020,Reference case,US electricity residential,2021,0.12462153
+AEO2020,Reference case,US electricity residential,2022,0.1247601
+AEO2020,Reference case,US electricity residential,2023,0.12547039
+AEO2020,Reference case,US electricity residential,2024,0.12677696
+AEO2020,Reference case,US electricity residential,2025,0.12859044
+AEO2020,Reference case,US electricity residential,2026,0.13024888
+AEO2020,Reference case,US electricity residential,2027,0.1311085
+AEO2020,Reference case,US electricity residential,2028,0.13094872
+AEO2020,Reference case,US electricity residential,2029,0.1304935
+AEO2020,Reference case,US electricity residential,2030,0.1305922
+AEO2020,Reference case,US electricity residential,2031,0.13030392
+AEO2020,Reference case,US electricity residential,2032,0.12999648
+AEO2020,Reference case,US electricity residential,2033,0.13043603
+AEO2020,Reference case,US electricity residential,2034,0.13062144
+AEO2020,Reference case,US electricity residential,2035,0.12998402
+AEO2020,Reference case,US electricity residential,2036,0.12962379
+AEO2020,Reference case,US electricity residential,2037,0.12922574
+AEO2020,Reference case,US electricity residential,2038,0.12934729
+AEO2020,Reference case,US electricity residential,2039,0.12897934
+AEO2020,Reference case,US electricity residential,2040,0.12841133
+AEO2020,Reference case,US electricity residential,2041,0.12819372
+AEO2020,Reference case,US electricity residential,2042,0.12780978
+AEO2020,Reference case,US electricity residential,2043,0.12748143
+AEO2020,Reference case,US electricity residential,2044,0.12743569
+AEO2020,Reference case,US electricity residential,2045,0.12719047
+AEO2020,Reference case,US electricity residential,2046,0.12680022
+AEO2020,Reference case,US electricity residential,2047,0.1267236
+AEO2020,Reference case,US electricity residential,2048,0.12634107
+AEO2020,Reference case,US electricity residential,2049,0.12567993
+AEO2020,Reference case,US electricity residential,2050,0.12516408
+AEO2020,Reference case,US electricity all sectors average,2019,0.10391058
+AEO2020,Reference case,US electricity all sectors average,2020,0.10212733
+AEO2020,Reference case,US electricity all sectors average,2021,0.10144772
+AEO2020,Reference case,US electricity all sectors average,2022,0.10119162
+AEO2020,Reference case,US electricity all sectors average,2023,0.10121079
+AEO2020,Reference case,US electricity all sectors average,2024,0.10184604
+AEO2020,Reference case,US electricity all sectors average,2025,0.10321589
+AEO2020,Reference case,US electricity all sectors average,2026,0.10438571
+AEO2020,Reference case,US electricity all sectors average,2027,0.10493044
+AEO2020,Reference case,US electricity all sectors average,2028,0.10451485
+AEO2020,Reference case,US electricity all sectors average,2029,0.10390381
+AEO2020,Reference case,US electricity all sectors average,2030,0.10370628
+AEO2020,Reference case,US electricity all sectors average,2031,0.10328291
+AEO2020,Reference case,US electricity all sectors average,2032,0.10280963
+AEO2020,Reference case,US electricity all sectors average,2033,0.10315948
+AEO2020,Reference case,US electricity all sectors average,2034,0.1032381
+AEO2020,Reference case,US electricity all sectors average,2035,0.1026488
+AEO2020,Reference case,US electricity all sectors average,2036,0.10233636
+AEO2020,Reference case,US electricity all sectors average,2037,0.10199707
+AEO2020,Reference case,US electricity all sectors average,2038,0.1021621
+AEO2020,Reference case,US electricity all sectors average,2039,0.10185767
+AEO2020,Reference case,US electricity all sectors average,2040,0.10131741
+AEO2020,Reference case,US electricity all sectors average,2041,0.10114
+AEO2020,Reference case,US electricity all sectors average,2042,0.10088268
+AEO2020,Reference case,US electricity all sectors average,2043,0.10056148
+AEO2020,Reference case,US electricity all sectors average,2044,0.10052033
+AEO2020,Reference case,US electricity all sectors average,2045,0.10030838
+AEO2020,Reference case,US electricity all sectors average,2046,0.10001727
+AEO2020,Reference case,US electricity all sectors average,2047,0.10003813
+AEO2020,Reference case,US electricity all sectors average,2048,0.0997754
+AEO2020,Reference case,US electricity all sectors average,2049,0.09932341
+AEO2020,Reference case,US electricity all sectors average,2050,0.09903041
