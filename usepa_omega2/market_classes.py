@@ -89,15 +89,18 @@ def print_market_class_dict(mc_dict, num_tabs=0):
     if num_tabs == 0:
         print()
 
-    for k in mc_dict.keys():
-        if type(mc_dict[k]) == set:
-            if mc_dict[k]:
-                print('\t' * num_tabs + k + ':' + str(mc_dict[k]))
+    if type(mc_dict) is list:
+        print('\t' * num_tabs + str(mc_dict))
+    else:
+        for k in mc_dict.keys():
+            if type(mc_dict[k]) == set:
+                if mc_dict[k]:
+                    print('\t' * num_tabs + k + ':' + str(mc_dict[k]))
+                else:
+                    print('\t' * num_tabs + k)
             else:
                 print('\t' * num_tabs + k)
-        else:
-            print('\t' * num_tabs + k)
-            print_market_class_dict(mc_dict[k], num_tabs+1)
+                print_market_class_dict(mc_dict[k], num_tabs+1)
 
     if num_tabs == 0:
         print()

@@ -246,12 +246,17 @@ def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
     # calculate sales-weighted co2 g/mi and cost by market class
     for mc in MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
-        winning_combo['average_%s_co2_gpmi' % mc] = weighted_value(market_class_vehicles,
+        if market_class_vehicles:
+            winning_combo['average_%s_co2_gpmi' % mc] = weighted_value(market_class_vehicles,
+                                                                       'initial_registered_count',
+                                                                       'cert_CO2_grams_per_mile')
+            winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
-                                                                   'cert_CO2_grams_per_mile')
-        winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
-                                                               'initial_registered_count',
-                                                               'new_vehicle_mfr_cost_dollars')
+                                                                   'new_vehicle_mfr_cost_dollars')
+        else:
+            winning_combo['average_%s_co2_gpmi' % mc] = 0
+            winning_combo['average_%s_cost' % mc] = 0
+
     return market_class_vehicle_dict
 
 

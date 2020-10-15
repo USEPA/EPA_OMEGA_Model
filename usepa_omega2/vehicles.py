@@ -14,7 +14,7 @@ from usepa_omega2 import *
 class CompositeVehicle(o2.OmegaBase):
     next_vehicle_ID = -1
 
-    def __init__(self, vehicle_list):
+    def __init__(self, vehicle_list, verbose=False):
         """
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
@@ -50,7 +50,7 @@ class CompositeVehicle(o2.OmegaBase):
         for v in self.vehicle_list:
             v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
 
-        self.cost_curve = self.calc_composite_cost_curve(plot=False)
+        self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -87,34 +87,52 @@ class CompositeVehicle(o2.OmegaBase):
             fig, ax1 = figure()
             label_xy(ax1, 'CO2 g/mi', '$')
 
-        composite_cloud_df = pd.DataFrame()
-        composite_cloud_df['cert_co2_grams_per_mile'] = [0]
-        composite_cloud_df['new_vehicle_mfr_cost_dollars'] = [0]
+        composite_frontier_df = pd.DataFrame()
+        composite_frontier_df['cert_co2_grams_per_mile'] = [0]
+        composite_frontier_df['new_vehicle_mfr_cost_dollars'] = [0]
+        composite_frontier_df['market_share_frac'] = [0]
+
         for v in self.vehicle_list:
             vehicle_frontier = v.create_frontier_df()
+            vehicle_frontier['veh_%d_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
+
+            composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier, drop=False)
+
+            prior_market_share_frac = composite_frontier_df['market_share_frac']
+            veh_market_share_frac = composite_frontier_df['veh_%d_market_share' % v.vehicle_ID]
+
+            # calculate weighted co2 g/mi
+            composite_frontier_df['cert_co2_grams_per_mile'] = \
+                (composite_frontier_df['cert_co2_grams_per_mile'] * prior_market_share_frac +
+                 composite_frontier_df['veh_%d_cert_co2_grams_per_mile' % v.vehicle_ID] * veh_market_share_frac) / \
+                (prior_market_share_frac + veh_market_share_frac)
+
+            # calculate weighted cost
+            composite_frontier_df['new_vehicle_mfr_cost_dollars'] = \
+                (composite_frontier_df['new_vehicle_mfr_cost_dollars'] * prior_market_share_frac +
+                 composite_frontier_df['veh_%s_mfr_cost_dollars' % v.vehicle_ID] * veh_market_share_frac) / \
+                (prior_market_share_frac + veh_market_share_frac)
+
+            # update running total market share
+            composite_frontier_df['market_share_frac'] = prior_market_share_frac + veh_market_share_frac
 
             if plot:
-                ax1.plot(vehicle_frontier.iloc[:, 0], vehicle_frontier.iloc[:, 1], '.-')
+                ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
+                         composite_frontier_df['new_vehicle_mfr_cost_dollars'], '.')
 
-            vehicle_frontier['veh_%d_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
-            composite_cloud_df = cartesian_prod(composite_cloud_df, vehicle_frontier, drop=False)
+            # calculate new sales-weighted frontier
+            composite_frontier_df = CostCloud.calculate_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
+                                                                 'new_vehicle_mfr_cost_dollars')
 
-            composite_cloud_df['cert_co2_grams_per_mile'] = composite_cloud_df['cert_co2_grams_per_mile'] + \
-                                                      composite_cloud_df['veh_%d_cert_co2_grams_per_mile' % v.vehicle_ID] * \
-                                                      composite_cloud_df['veh_%d_market_share' % v.vehicle_ID]
-
-            composite_cloud_df['new_vehicle_mfr_cost_dollars'] = composite_cloud_df['new_vehicle_mfr_cost_dollars'] + \
-                                                          composite_cloud_df[
-                                                              'veh_%s_mfr_cost_dollars' % v.vehicle_ID] * \
-                                                          composite_cloud_df['veh_%s_market_share' % v.vehicle_ID]
-
-        cost_curve = CostCloud.calculate_frontier(composite_cloud_df, 'cert_co2_grams_per_mile',
-                                            'new_vehicle_mfr_cost_dollars')
+            if plot:
+                ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
+                         composite_frontier_df['new_vehicle_mfr_cost_dollars'], '.-')
 
         if plot:
-            ax1.plot(cost_curve['cert_co2_grams_per_mile'], cost_curve['new_vehicle_mfr_cost_dollars'], '.-')
+            ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
+                     composite_frontier_df['new_vehicle_mfr_cost_dollars'], 'x-')
 
-        return cost_curve
+        return composite_frontier_df
 
     def get_cost(self, target_co2_gpmi):
         # get cost from cost curve for target_co2_gpmi(s)
@@ -343,12 +361,11 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.initial_registered_count = df.loc[i, 'sales']
                     veh.set_new_vehicle_mfr_cost_dollars()
                     veh.set_cert_target_CO2_grams_per_mile()
+                    veh.set_cert_target_CO2_Mg()
+                    veh.set_cert_CO2_Mg()
 
                     if verbose:
                         print(veh)
-
-                    veh.set_cert_target_CO2_Mg()
-                    veh.set_cert_CO2_Mg()
 
         return template_errors
 
@@ -405,8 +422,7 @@ if __name__ == '__main__':
                                                                                  verbose=o2.options.verbose)
             o2.options.GHG_standard = GHGStandardFootprint
 
-        # init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
-        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=True)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
@@ -420,6 +436,9 @@ if __name__ == '__main__':
                                                        'new_vehicle_mfr_cost_dollars')
             weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_CO2_grams_per_mile')
             weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
+
+            cv = CompositeVehicle(vehicles_list[0:4], verbose=True)
+            cv.cost_curve.to_csv('composite_cost_curve.csv')
 
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
