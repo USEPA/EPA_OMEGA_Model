@@ -5,3 +5,9 @@ Overview
 ========
 
 This is an introduction to OMEGA2
+
+History of OMEGA 2
+^^^^^^^^^^^^^^^^^^
+The OMEGA model started a long time ago, in a galaxy far, far away.
+
+It used to be called "EPA VGHGECACM"

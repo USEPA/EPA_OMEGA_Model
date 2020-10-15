@@ -11,9 +11,7 @@ Is **incomplete**
     overview
     components
     iteration
-    data_elements
-    introduction
-    history
+    data_element
     glossary
     developer
     code
