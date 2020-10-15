@@ -20,3 +20,14 @@ OMEGA2 should be:
 * User-friendly
 * Robust
 * Modular
+
+Goals1
+------
+
+OMEGA2 should be:
+
+* Transparent
+* Open Source
+* User-friendly
+* Robust
+* Modular
