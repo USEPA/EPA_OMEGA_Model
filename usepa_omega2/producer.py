@@ -186,8 +186,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     for new_veh in manufacturer_new_vehicles:
         new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%d_sales' % new_veh.vehicle_ID]
-        if use_composite_vehicles:
-            new_veh.decompose()
+        new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
         new_veh.set_cert_target_CO2_Mg()
         new_veh.set_cert_CO2_Mg()
@@ -231,8 +230,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
                     cv = CompositeVehicle(mctrc[mc][rc])
                     composite_vehicles.append(cv)
 
-        if use_composite_vehicles:
-            manufacturer_new_vehicles = composite_vehicles
+        manufacturer_new_vehicles = composite_vehicles
 
         # get empty market class tree
         market_class_tree = MarketClass.get_market_class_tree()

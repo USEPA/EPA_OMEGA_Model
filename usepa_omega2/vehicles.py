@@ -334,9 +334,6 @@ class VehicleFinal(SQABase, Vehicle):
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
-                    if verbose:
-                        print(veh)
-
                     if 'BEV' in veh.market_class_ID:
                         veh.fueling_class = 'BEV'
                     else:
@@ -346,6 +343,10 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.initial_registered_count = df.loc[i, 'sales']
                     veh.set_new_vehicle_mfr_cost_dollars()
                     veh.set_cert_target_CO2_grams_per_mile()
+
+                    if verbose:
+                        print(veh)
+
                     veh.set_cert_target_CO2_Mg()
                     veh.set_cert_CO2_Mg()
 
@@ -419,54 +420,6 @@ if __name__ == '__main__':
                                                        'new_vehicle_mfr_cost_dollars')
             weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_CO2_grams_per_mile')
             weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
-
-            print(vehicles_list[0].new_vehicle_mfr_cost_dollars - unweighted_value(vehicles_list[0],
-                                                                                   weighted_mfr_cost_dollars,
-                                                                                   vehicles_list,
-                                                                                   'initial_registered_count',
-                                                                                   'new_vehicle_mfr_cost_dollars'))
-            print(vehicles_list[1].new_vehicle_mfr_cost_dollars - unweighted_value(vehicles_list[1],
-                                                                                   weighted_mfr_cost_dollars,
-                                                                                   vehicles_list,
-                                                                                   'initial_registered_count',
-                                                                                   'new_vehicle_mfr_cost_dollars'))
-
-            print(vehicles_list[0].cert_CO2_grams_per_mile == unweighted_value(vehicles_list[0], weighted_co2gpmi,
-                                                                               vehicles_list,
-                                                                               'initial_registered_count',
-                                                                               'cert_CO2_grams_per_mile'))
-            print(vehicles_list[1].cert_CO2_grams_per_mile == unweighted_value(vehicles_list[1], weighted_co2gpmi,
-                                                                               vehicles_list,
-                                                                               'initial_registered_count',
-                                                                               'cert_CO2_grams_per_mile'))
-
-            print(
-                vehicles_list[2].footprint_ft2 == unweighted_value(vehicles_list[2], weighted_footprint, vehicles_list,
-                                                                   'initial_registered_count', 'footprint_ft2'))
-            print(
-                vehicles_list[3].footprint_ft2 == unweighted_value(vehicles_list[3], weighted_footprint, vehicles_list,
-                                                                   'initial_registered_count', 'footprint_ft2'))
-
-            base_vehicles_list = []
-            for v in vehicles_list:
-                vb = Vehicle()
-                vb.inherit_vehicle(v)
-                base_vehicles_list.append(vb)
-
-            cv = CompositeVehicle(base_vehicles_list)
-            print(cv)
-
-            cv.cost_curve.to_csv('combined_frontier.csv', index=False)
-
-            cv.decompose()  # update cv.vehicle_list vehicles
-
-            cv2 = CompositeVehicle(cv.vehicle_list)
-            cv2.decompose()
-            print(cv2)
-
-            cv3 = CompositeVehicle(cv2.vehicle_list)
-            cv3.decompose()
-            print(cv3)
 
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
