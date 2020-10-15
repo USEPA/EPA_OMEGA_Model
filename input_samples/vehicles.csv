@@ -1,10 +1,55 @@
 input_template_name:,vehicles,input_template_version:,0.0005,,,,,,,,
 vehicle_id,manufacturer_id,model_year,reg_class_id,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,market_class_id,sales,cert_co2_grams_per_mile,footprint_ft2
-BEV non hauling A,USA Motors,2020,car,non hauling,bev_300_MPW_LRL,US electricity,MTE US electricity,non hauling.BEV,21,40,40
-BEV non hauling B,USA Motors,2020,car,non hauling,bev_300_MPW_LRL,US electricity,MTE US electricity,non hauling.BEV,21,40,40
-ICE non hauling A,USA Motors,2020,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,750000,225,48.5
-ICE non hauling B,USA Motors,2020,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,250000,325,48.5
-BEV hauling A,USA Motors,2020,truck,hauling,bev_300_Truck,US electricity,MTE US electricity,hauling.BEV,12,61,50
-BEV hauling B,USA Motors,2020,truck,hauling,bev_300_Truck,US electricity,MTE US electricity,hauling.BEV,12,61,50
-ICE hauling A,USA Motors,2020,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,375000,375,54.65
-ICE hauling B,USA Motors,2020,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,375000,375,54.65
+BEV non hauling Compact car,USA Motors,2019,car,non hauling,bev_300_LPW_LRL,US electricity,MTE US electricity,non hauling.BEV,5552,,43.2
+ICE non hauling Compact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,17828,201.3181288,46.72694077
+ICE non hauling Compact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,758547,219.7848799,44.41370937
+ICE-PHEV non hauling Compact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,14029,91.03664552,48.97793143
+ICE non hauling Large car,USA Motors,2019,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,26580,160.0013205,49.80954031
+ICE non hauling Large car,USA Motors,2019,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,527613,262.5549528,49.93200474
+ICE-PHEV non hauling Large car,USA Motors,2019,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,181,138.8303867,56.14475138
+BEV non hauling Midsize car,USA Motors,2019,car,non hauling,bev_300_MPW_LRL,US electricity,MTE US electricity,non hauling.BEV,16557,,44.85234644
+ICE non hauling Midsize car,USA Motors,2019,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,221115,149.459114,47.64624019
+ICE non hauling Midsize car,USA Motors,2019,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,1917102,225.2576048,47.07810664
+ICE-PHEV non hauling Midsize car,USA Motors,2019,car,non hauling,ice_MPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,29689,61.62847519,46.5459901
+ICE non hauling Small Crossover truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,550,273.54,52.1
+ICE non hauling Small Crossover car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,58810,294.2256487,49.92312872
+BEV non hauling Minicompact car,USA Motors,2019,car,non hauling,bev_300_LPW_LRL,US electricity,MTE US electricity,non hauling.BEV,434,,34.8
+ICE non hauling Minicompact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,16630,262.8456765,41.52058328
+ICE hauling Small Pickup truck,USA Motors,2019,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,219742,337.5430323,55.64807775
+ICE hauling Small Pickup truck,USA Motors,2019,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,317083,358.1681878,56.17542252
+ICE non hauling Small Crossover truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,498867,297.9910126,50.19645637
+ICE non hauling Small Crossover car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,565,187,46.4
+ICE non hauling Small Crossover car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,1407364,246.0105893,46.09300266
+ICE non hauling Small Utility truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,141135,210.9836164,48.22605898
+ICE non hauling Small Utility truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,3103827,268.0786594,47.00492517
+ICE-PHEV non hauling Small Utility truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,8207,142.3344828,48.19934203
+ICE non hauling Small Utility car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,44943,260.195185,49.12520971
+ICE-PHEV non hauling Small Utility car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,2185,138.7,44.2
+ICE non hauling Small Crossover truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,15,264,50.4
+BEV non hauling Small Crossover car,USA Motors,2019,car,non hauling,bev_300_MPW_HRL,US electricity,MTE US electricity,non hauling.BEV,21361,,42.3
+ICE non hauling Small Crossover car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,334994,220.6435891,43.46368651
+ICE non hauling Small Van truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,74886,260.4093382,50.69562669
+ICE non hauling Small Van car,USA Motors,2019,car,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,3885,355.2114801,49.16882883
+ICE non hauling Small Van truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,1071,389.5469655,53.56526611
+ICE non hauling Small Van truck,USA Motors,2019,truck,non hauling,ice_LPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,1,400.6,66.5
+ICE non hauling Large Van truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,3484,83.8,58
+ICE non hauling Large Van truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,453956,322.3734512,55.68217074
+ICE non hauling Large Van truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,13795,338.2,56
+ICE hauling Large Pickup truck,USA Motors,2019,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,12601,341.90569,68.23594247
+ICE hauling Large Pickup truck,USA Motors,2019,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,457853,360.2746746,66.728669
+ICE hauling Large Pickup truck,USA Motors,2019,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,78297,349.3694522,68.54975283
+ICE hauling Large Pickup truck,USA Motors,2019,truck,hauling,ice_Truck,pump gasoline,MTE Gasoline,hauling.ICE,1434762,385.5336256,67.80602909
+ICE non hauling Large Crossover truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,447631,347.0483765,54.66451251
+BEV non hauling Large Utility truck,USA Motors,2019,truck,non hauling,bev_300_MPW_HRL,US electricity,MTE US electricity,non hauling.BEV,10416,,51.8
+ICE non hauling Large Utility truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,56030,264.2380582,50.7994152
+ICE non hauling Large Utility truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,1416209,353.2084851,53.09250694
+ICE non hauling Large Utility car,USA Motors,2019,car,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,2583,216.3,49.3
+BEV non hauling Subcompact car,USA Motors,2019,car,non hauling,bev_300_LPW_LRL,US electricity,MTE US electricity,non hauling.BEV,1557,,43.48657675
+ICE non hauling Subcompact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,1630,292.1971166,49.8107362
+ICE non hauling Subcompact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,338707,273.9371634,44.53765496
+ICE-PHEV non hauling Subcompact car,USA Motors,2019,car,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,3632,25.35457048,44.24881608
+BEV non hauling Two Seater car,USA Motors,2019,car,non hauling,bev_300_HPW,US electricity,MTE US electricity,non hauling.BEV,394,,29.18274112
+ICE non hauling Two Seater car,USA Motors,2019,car,non hauling,ice_HPW,pump gasoline,MTE Gasoline,non hauling.ICE,234,300.2,46.3
+ICE non hauling Two Seater car,USA Motors,2019,car,non hauling,ice_HPW,pump gasoline,MTE Gasoline,non hauling.ICE,46466,362.6335794,45.54409461
+ICE-PHEV non hauling Two Seater car,USA Motors,2019,car,non hauling,ice_HPW,pump gasoline,MTE Gasoline,non hauling.ICE,1303,126.7,50.3
+ICE non hauling Large Van truck,USA Motors,2019,truck,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,8320,447.6217067,61.6
