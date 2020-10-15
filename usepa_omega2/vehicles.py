@@ -334,6 +334,9 @@ class VehicleFinal(SQABase, Vehicle):
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
+                    if verbose:
+                        print(veh)
+
                     if 'BEV' in veh.market_class_ID:
                         veh.fueling_class = 'BEV'
                     else:
@@ -401,7 +404,8 @@ if __name__ == '__main__':
                                                                                  verbose=o2.options.verbose)
             o2.options.GHG_standard = GHGStandardFootprint
 
-        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        # init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=True)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
