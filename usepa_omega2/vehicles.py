@@ -324,7 +324,7 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.0005
+        input_template_version = 0.0006
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'hauling_class',
                                   'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'market_class_id',
                                   'sales', 'cert_co2_grams_per_mile', 'footprint_ft2'}
