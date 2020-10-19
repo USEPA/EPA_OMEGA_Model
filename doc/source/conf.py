@@ -51,8 +51,17 @@ exclude_patterns = []
 #
 # html_theme = 'default'
 # html_theme = 'alabaster'
-html_theme = 'bizstyle'
+# html_theme = 'bizstyle'
 
+html_theme = 'classic'
+html_theme_options = {
+    "stickysidebar": "true",
+    "sidebarwidth": "30em"
+}
+html_sidebars = {
+   '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'],
+   'using/windows': ['windowssidebar.html', 'searchbox.html'],
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
