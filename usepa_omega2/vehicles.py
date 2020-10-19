@@ -425,7 +425,6 @@ if __name__ == '__main__':
         init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             vehicles_list = o2.session.query(VehicleFinal). \
                 filter(VehicleFinal.manufacturer_ID == 'USA Motors'). \
@@ -436,6 +435,9 @@ if __name__ == '__main__':
             VehicleAnnualData.update_registered_count(vehicles_list[0], 2021, 54321)
             VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2021, 'vmt', 12345)
             VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2021, 'annual_vmt', 15000)
+
+            # dump database with updated vehicle annual data
+            dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             weighted_mfr_cost_dollars = weighted_value(vehicles_list, 'initial_registered_count',
                                                        'new_vehicle_mfr_cost_dollars')
