@@ -2,11 +2,12 @@
 OMEGA2 Documentation
 ====================
 
-Is **incomplete**
+Is in process...
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 4
     :caption: Contents:
+    :numbered:
 
     overview
     components
