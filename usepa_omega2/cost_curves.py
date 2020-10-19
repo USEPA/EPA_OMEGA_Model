@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class CostCurve(SQABase, o2.OmegaBase):
+class CostCurve(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_curves'
     index = Column('index', Integer, primary_key=True)

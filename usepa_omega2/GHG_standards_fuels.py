@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class GHGStandardFuels(SQABase, o2.OmegaBase):
+class GHGStandardFuels(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_fuels'
     index = Column('index', Integer, primary_key=True)

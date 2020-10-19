@@ -10,7 +10,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class CostCloud(SQABase, o2.OmegaBase):
+class CostCloud(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_clouds'
     index = Column('index', Integer, primary_key=True)

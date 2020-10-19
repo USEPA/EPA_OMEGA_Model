@@ -7,7 +7,7 @@ o2.py
 print('importing %s' % __file__)
 
 
-class OmegaBase:
+class OMEGABase:
     # define common behaviors for all OMEGA objects
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))

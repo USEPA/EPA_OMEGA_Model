@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class GHGStandardFootprint(SQABase, o2.OmegaBase):
+class GHGStandardFootprint(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_footprint'
     index = Column(Integer, primary_key=True)

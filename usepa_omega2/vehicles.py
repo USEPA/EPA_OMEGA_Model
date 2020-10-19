@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class CompositeVehicle(o2.OmegaBase):
+class CompositeVehicle(OMEGABase):
     next_vehicle_ID = -1
 
     def __init__(self, vehicle_list, verbose=False):
@@ -166,7 +166,7 @@ class CompositeVehicle(o2.OmegaBase):
         return self.cert_CO2_Mg
 
 
-class Vehicle(o2.OmegaBase):
+class Vehicle(OMEGABase):
     next_vehicle_ID = 0
 
     name = ''

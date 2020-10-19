@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class VehicleAnnualData(SQABase, OmegaBase):
+class VehicleAnnualData(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'vehicle_annual_data'
     index = Column('index', Integer, primary_key=True)

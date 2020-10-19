@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class GHGStandardFlat(SQABase, o2.OmegaBase):
+class GHGStandardFlat(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_flat'
     index = Column(Integer, primary_key=True)

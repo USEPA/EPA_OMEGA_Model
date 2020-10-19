@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class FuelsContext(SQABase, o2.OmegaBase):
+class FuelsContext(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'fuels_context'
     index = Column('index', Integer, primary_key=True)

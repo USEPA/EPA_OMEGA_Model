@@ -15,7 +15,7 @@ try:
     import pandas as pd
     pd.set_option('chained_assignment', 'raise')
 
-    from o2 import OmegaBase
+    from o2 import OMEGABase
     from omega_db import *
     from omega_types import *
     import omega_log
@@ -33,7 +33,7 @@ try:
     reg_classes = OMEGAEnum(['car', 'truck'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
-    class OMEGARuntimeOptions(OmegaBase):
+    class OMEGARuntimeOptions(OMEGABase):
         def __init__(self):
             import time
 

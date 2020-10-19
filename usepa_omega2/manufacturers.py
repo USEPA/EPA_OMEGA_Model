@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class Manufacturer(SQABase, o2.OmegaBase):
+class Manufacturer(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'manufacturers'
     manufacturer_ID = Column('manufacturer_id', String, primary_key=True)

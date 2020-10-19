@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class Fuel(SQABase, o2.OmegaBase):
+class Fuel(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'fuels'
     fuel_ID = Column('fuel_id', String, primary_key=True)
