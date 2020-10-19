@@ -39,8 +39,11 @@ class OMEGABatchObject(object):
 
         numeric_params = {
             'Cost Curve Frontier Affinity Factor',
-            'Num Tech Options per ICE Vehicle',
-            'Num Tech Options per BEV Vehicle',
+            'First Pass Num Market Share Options',
+            'First Pass Num Tech Options per ICE Vehicle',
+            'First Pass Num Tech Options per BEV Vehicle',
+            'Iteration Num Tech Options per ICE Vehicle',
+            'Iteration Num Tech Options per BEV Vehicle',
         }
 
         for p in numeric_params:
@@ -107,7 +110,11 @@ class OMEGABatchObject(object):
         acronyms_dict = {
             False: '0',
             True: '1',
-            'Num Tech Options per Vehicle': 'NTO',
+            'First Pass Num Market Share Options': 'FPNMSO',
+            'First Pass Num Tech Options per ICE Vehicle': 'FPNITO',
+            'First Pass Num Tech Options per BEV Vehicle': 'FPNBTO',
+            'Iteration Num Tech Options per ICE Vehicle': 'INITO',
+            'Iteration Num Tech Options per BEV Vehicle': 'INBTO',
             'Allow Backsliding': 'ABS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
@@ -252,12 +259,27 @@ class OMEGASessionObject(object):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
         print('Getting Runtime Settings...')
-        if not pd.isna(self.read_parameter('Num Tech Options per ICE Vehicle')):
-            self.settings.num_tech_options_per_ice_vehicle = int(
-                self.read_parameter('Num Tech Options per ICE Vehicle'))
-        if not pd.isna(self.read_parameter('Num Tech Options per BEV Vehicle')):
-            self.settings.num_tech_options_per_bev_vehicle = int(
-                self.read_parameter('Num Tech Options per BEV Vehicle'))
+
+        if not pd.isna(self.read_parameter('First Pass Num Market Share Options')):
+            self.settings.first_pass_num_market_share_options = int(
+                self.read_parameter('First Pass Num Market Share Options'))
+
+        if not pd.isna(self.read_parameter('First Pass Num Tech Options per ICE Vehicle')):
+            self.settings.first_pass_num_tech_options_per_ice_vehicle = int(
+                self.read_parameter('First Pass Num Tech Options per ICE Vehicle'))
+
+        if not pd.isna(self.read_parameter('First Pass Num Tech Options per BEV Vehicle')):
+            self.settings.first_pass_num_tech_options_per_bev_vehicle = int(
+                self.read_parameter('First Pass Num Tech Options per BEV Vehicle'))
+
+        if not pd.isna(self.read_parameter('Iteration Num Tech Options per ICE Vehicle')):
+            self.settings.iteration_num_tech_options_per_ice_vehicle = int(
+                self.read_parameter('Iteration Num Tech Options per ICE Vehicle'))
+
+        if not pd.isna(self.read_parameter('Iteration Num Tech Options per BEV Vehicle')):
+            self.settings.iteration_num_tech_options_per_bev_vehicle = int(
+                self.read_parameter('Iteration Num Tech Options per BEV Vehicle'))
+
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)
         self.settings.cost_curve_frontier_affinity_factor = self.read_parameter('Cost Curve Frontier Affinity Factor')

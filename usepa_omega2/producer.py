@@ -46,7 +46,7 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
             x = pd.DataFrame()
             for m in members:
                 x = cartesian_prod(x, m)
-                x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon]  # sum <= mv
+                x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon].copy()  # sum <= mv
 
             x = x[abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon]
             x[x == 0] = min_level
@@ -61,7 +61,7 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
             with pd.option_context('display.max_rows', None, 'display.max_columns', None):
                 print(ans)
 
-        ans = ans[abs(ans.sum(axis=1, numeric_only=True) - sum(max_values)) <= sys.float_info.epsilon]
+        ans = ans.loc[abs(ans.sum(axis=1, numeric_only=True) - sum(max_values)) <= sys.float_info.epsilon]
         ans = ans.drop('_', axis=1)
 
         partition_dict[partition_name] = ans
@@ -106,9 +106,15 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                 df = pd.DataFrame()
 
                 if new_veh.fueling_class == 'ICE':
-                    num_tech_options = o2.options.num_tech_options_per_ice_vehicle
+                    if consumer_bev_share is None:
+                        num_tech_options = o2.options.first_pass_num_tech_options_per_ice_vehicle
+                    else:
+                        num_tech_options = o2.options.iteration_num_tech_options_per_ice_vehicle
                 else:
-                    num_tech_options = o2.options.num_tech_options_per_bev_vehicle
+                    if consumer_bev_share is None:
+                        num_tech_options = o2.options.first_pass_num_tech_options_per_bev_vehicle
+                    else:
+                        num_tech_options = o2.options.iteration_num_tech_options_per_bev_vehicle
 
                 if consumer_bev_share is None or new_veh.fueling_class == 'BEV':
                     if o2.options.allow_backsliding:
@@ -145,7 +151,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
         sales_share_column_names = ['producer_' + c + '_share_frac' for c in children]
 
     if all(s in sweep_list for s in children) and consumer_bev_share is None:
-        sales_share_df = partition(sales_share_column_names, increment=1/(o2.options.num_share_options-1), min_level=0.001)
+        sales_share_df = partition(sales_share_column_names, increment=1/(o2.options.first_pass_num_market_share_options - 1), min_level=0.001)
     else:
         sales_share_df = pd.DataFrame()
         for c, cn in zip(children, sales_share_column_names):

@@ -83,8 +83,8 @@ def cartesian_prod(left_df, right_df, drop=False):
 
         if drop:
             leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
-            left_df.drop('_', axis=1, inplace=True)
-            right_df.drop('_', axis=1, inplace=True, errors='ignore')
+            left_df = left_df.drop('_', axis=1)
+            right_df = right_df.drop('_', axis=1, errors='ignore')
         else:
             leftXright = pd.merge(left_df, right_df, on='_')
 
