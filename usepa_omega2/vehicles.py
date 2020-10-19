@@ -432,6 +432,11 @@ if __name__ == '__main__':
                 filter(VehicleFinal.model_year == 2020). \
                 all()
 
+            # update vehicle annual data, registered count must be update first:
+            VehicleAnnualData.update_registered_count(vehicles_list[0], 2021, 54321)
+            VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2021, 'vmt', 12345)
+            VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2021, 'annual_vmt', 15000)
+
             weighted_mfr_cost_dollars = weighted_value(vehicles_list, 'initial_registered_count',
                                                        'new_vehicle_mfr_cost_dollars')
             weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_CO2_grams_per_mile')

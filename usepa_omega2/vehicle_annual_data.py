@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class VehicleAnnualData(SQABase):
+class VehicleAnnualData(SQABase, OmegaBase):
     # --- database table properties ---
     __tablename__ = 'vehicle_annual_data'
     index = Column('index', Integer, primary_key=True)
@@ -25,13 +25,42 @@ class VehicleAnnualData(SQABase):
 
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
-
+        """
+        Update vehicle registered count and / or create initial vehicle annual data table entry
+        :param vehicle:  VehicleFinal object
+        :param calendar_year: calendar year
+        :param registered_count: number of vehicle that are still in service (registered)
+        :return: updates vehicle annual data table
+        """
         age = calendar_year - vehicle.model_year
 
-        o2.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
+        vad = o2.session.query(VehicleAnnualData). \
+            filter(VehicleAnnualData.vehicle_ID == vehicle.vehicle_ID). \
+            filter(VehicleAnnualData.calendar_year == calendar_year). \
+            filter(VehicleAnnualData.age == age).one_or_none()
+
+        if vad:
+            vad.registered_count=registered_count
+        else:
+            o2.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
                                          calendar_year=calendar_year,
                                          registered_count=registered_count,
                                          age=age))
+
+        o2.session.flush()
+
+    @staticmethod
+    def update_vehicle_annual_data(vehicle, calendar_year, attribute, attribute_value):
+
+        age = calendar_year - vehicle.model_year
+
+        vad = o2.session.query(VehicleAnnualData). \
+            filter(VehicleAnnualData.vehicle_ID == vehicle.vehicle_ID). \
+            filter(VehicleAnnualData.calendar_year == calendar_year). \
+            filter(VehicleAnnualData.age == age).one()
+
+        vad.__setattr__(attribute, attribute_value)
+
         o2.session.flush()
 
     @staticmethod
