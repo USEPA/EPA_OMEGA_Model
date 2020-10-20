@@ -164,38 +164,69 @@ class CalcCosts:
 
 
 class Targets:
-    def __init__(self, reg_class, fp, coefficients, upstream):
+    def __init__(self, reg_class, fp, coefficients, upstream, standards):
+        """
+
+        :param reg_class: Regulatory class (e.g., car/truck)
+        :param fp: Footprint (in square feet)
+        :param coefficients: A dictionary of targets.
+        :param upstream: CO2/gallon at the refinery and for test fuel.
+        """
         self.reg_class = reg_class
         self.fp = fp
         self.coefficients = coefficients
         self.upstream = upstream
+        self.standards = standards
+
+    def get_targets_dict(self):
+        """
+
+        :return: A dictionary of targets or target coefficients for the given reg_class.
+        """
+        regclass_targets_df = self.coefficients.loc[self.coefficients['reg_class_id'] == self.reg_class, :]
+        regclass_targets_dict = regclass_targets_df.to_dict('index')
+        return regclass_targets_dict
 
     def calc_targets(self, years):
-        return_dict = dict()
-        a = f'{self.reg_class}_a'
-        b = f'{self.reg_class}_b'
-        c = f'{self.reg_class}_c'
-        d = f'{self.reg_class}_d'
-        fp_min = f'{self.reg_class}_fp_min'
-        fp_max = f'{self.reg_class}_fp_max'
-        for year in years:
-            if self.fp <= self.coefficients[year][fp_min]:
-                return_dict[year] = {'CO2_target': self.coefficients[year][a]}
-            elif self.fp > self.coefficients[year][fp_max]:
-                return_dict[year] = {'CO2_target': self.coefficients[year][b]}
-            else:
-                return_dict[year] = {'CO2_target': self.coefficients[year][c] * self.fp + self.coefficients[year][d]}
-            return_dict[year].update({'CO2_refinery': return_dict[year]['CO2_target']
-                                                      * self.upstream[year]['CO2pGal_Refinery'] / self.upstream[year]['CO2pGal_TestFuel']})
+        """
+
+        :param years: Model/Calendar years (these are interchangeable for new vehicle sales).
+        :return: A dictionary of targets and upstream emissions for the given regclass/footprint/upstream for all years.
+        """
+        if self.standards != 'flat':
+            return_dict = dict()
+            for year in years:
+                if self.fp <= self.get_targets_dict()[year]['fp_min']:
+                    return_dict[year] = {'CO2_target': self.get_targets_dict()[year]['a_coeff']}
+                elif self.fp > self.get_targets_dict()[year]['fp_max']:
+                    return_dict[year] = {'CO2_target': self.get_targets_dict()[year]['b_coeff']}
+                else:
+                    return_dict[year] = {'CO2_target': self.get_targets_dict()[year]['c_coeff'] * self.fp + self.get_targets_dict()[year]['d_coeff']}
+                return_dict[year].update({'CO2_refinery': return_dict[year]['CO2_target']
+                                                          * self.upstream[year]['CO2pGal_Refinery'] / self.upstream[year]['CO2pGal_TestFuel']})
+        else:
+            return_dict = dict()
+            for year in years:
+                return_dict[year] = {'CO2_target': self.get_targets_dict()[year]['ghg_target_co2_grams_per_mile']}
+                return_dict[year].update({'CO2_refinery': return_dict[year]['CO2_target']
+                                                          * self.upstream[year]['CO2pGal_Refinery'] / self.upstream[year]['CO2pGal_TestFuel']})
         return return_dict
 
 
 def calc_bev_co2(df, years, targets_dict, upstream):
+    """
+
+    :param df: The passed DataFrame for a given BEV.
+    :param years: Model/Calendar years (these are interchangeable for new vehicle sales).
+    :param targets_dict: A dictionary of targets and upstream emissions to be attributed to the given BEV at each target level.
+    :param upstream: The grid loss factor and upstream emissions per unit of electricity.
+    :return:
+    """
     for year in years:
         df.insert(len(df.columns), f'cert_co2_grams_per_mile_{year}', 0)
         df[f'cert_co2_grams_per_mile_{year}'] = df['kWhpMi_cycle'] \
-                                  * upstream[year]['GHGpkWh'] / (1 - upstream[year]['grid_loss']) \
-                                  - targets_dict[year]['CO2_refinery']
+                                                * upstream[year]['GHGpkWh'] / (1 - upstream[year]['grid_loss']) \
+                                                - targets_dict[year]['CO2_refinery']
     return df
 
 
@@ -244,8 +275,8 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
 def main():
     path_cwd = Path.cwd()
     path_inputs = path_cwd / 'alpha_package_costs/alpha_package_costs_inputs'
-    path_alpha_inputs = Path('I:\Project\OMEGA2\O2_package_cost_test\ALPHA_ToyModel')
-    # path_alpha_inputs = path_cwd / 'inputs/ALPHA_ToyModel'
+    # path_alpha_inputs = Path('I:\Project\OMEGA2\O2_package_cost_test\ALPHA_ToyModel')
+    path_alpha_inputs = path_cwd / 'inputs/ALPHA'
     path_input_templates = path_cwd / 'input_samples'
     path_outputs = path_cwd / 'alpha_package_costs/outputs'
     bev_wr_range = [x / 2 for x in range(0, 41, 1)]
@@ -306,8 +337,6 @@ def main():
     techcosts_bev = pd.read_excel(techcosts_file, 'bev', index_col=0)
     upstream = pd.read_excel(techcosts_file, 'upstream', index_col=0)
     upstream = upstream.to_dict('index')
-    coefficients = pd.read_excel(techcosts_file, 'coefficients', index_col=0)
-    coefficients = coefficients.to_dict('index')
     gdp_deflators = pd.read_excel(techcosts_file, 'gdp_deflators', index_col=0)
     gdp_deflators.insert(len(gdp_deflators.columns), 'adjustment', 0) # adjustment values are filled below
     gdp_deflators = gdp_deflators.to_dict('index')
@@ -323,6 +352,10 @@ def main():
     learning_rate_roadload = inputs['learning_rate_roadload']['value']
     learning_rate_bev = inputs['learning_rate_bev']['value']
     dollar_basis = int(inputs['analysis_year_dollars']['value'])
+    ghg_standards = inputs['ghg_standards']['value']
+
+    coefficients = pd.read_csv(path_input_templates / f'ghg_standards-{ghg_standards}.csv', skiprows=1, index_col='model_year')
+    # coefficients = coefficients.to_dict('index')
 
     # update gdp_deflators dict with adjustment values
     for key in gdp_deflators:
@@ -491,8 +524,9 @@ def main():
                                           'Reg_Class': reg_class, 'Hauling_Class': work_class, 'bev_tech': f'bev_{bev_range}'})
 
         # calc the pack size and energy consumption
-        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'kWh_pack',
-                                      kWh_pack_slope * bev_cost_co2[key]['weight_reduction'] / 100 + kWh_pack_intercept)
+        bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
+                                 'kWh_pack',
+                                 kWh_pack_slope * bev_cost_co2[key]['weight_reduction'] / 100 + kWh_pack_intercept)
         bev_cost_co2[key].insert(len(bev_cost_co2[key].columns), 'kWhpMi_cycle', 0)
         bev_cost_co2[key]['kWhpMi_cycle'] = bev_cost_co2[key]['kWh_pack'] * usuable_SOC * (1 - gap) * utility_factor / (bev_range * (1 - loss_charging))
 
@@ -512,7 +546,7 @@ def main():
                                      bev_cost_co2[key][[f'weight_cost_{year}', f'bev_cost_{year}']].sum(axis=1))
 
         # calc targets and upstream petroleum CO2 (CO2_refinery)
-        targets = Targets(reg_class, fp, coefficients, upstream)
+        targets = Targets(reg_class, fp, coefficients, upstream, ghg_standards)
         targets_dict = targets.calc_targets(years)
 
         calc_bev_co2(bev_cost_co2[key], years, targets_dict, upstream)
