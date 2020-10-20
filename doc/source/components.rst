@@ -17,6 +17,7 @@ Algorithm descriptions, code snippets, equations, etc
 Policy Decision Module
 ----------------------
 Algorithm descriptions, code snippets, equations, etc
+
 Effects Module
 --------------
 Algorithm descriptions, code snippets, equations, etc
