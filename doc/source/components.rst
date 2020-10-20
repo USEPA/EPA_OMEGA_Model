@@ -9,9 +9,11 @@ Modules
 Consumer Decision Module
 ------------------------
 Algorithm descriptions, code snippets, equations, etc
+
 Producer Decision Module
 ------------------------
 Algorithm descriptions, code snippets, equations, etc
+
 Policy Decision Module
 ----------------------
 Algorithm descriptions, code snippets, equations, etc
@@ -21,4 +23,5 @@ Algorithm descriptions, code snippets, equations, etc
 
 Module Integration and Iteration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Algorithm descriptions, code snippets, equations, etc
 
