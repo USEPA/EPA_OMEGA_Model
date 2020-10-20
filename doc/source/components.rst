@@ -1,25 +1,24 @@
 .. image:: https://www.epa.gov/sites/production/files/styles/medium/public/2013-06/epa_logo_horiz_verysmall.gif
 
-Primary OMEGA2 Components
-=========================
+Model Architecture and Algorithms
+=================================
 
-Producer Module
-^^^^^^^^^^^^^^^
-Producer module body text
+Modules
+^^^^^^^
 
-Producer Module Basics
+Consumer Decision Module
+------------------------
+Algorithm descriptions, code snippets, equations, etc
+Producer Decision Module
+------------------------
+Algorithm descriptions, code snippets, equations, etc
+Policy Decision Module
 ----------------------
-Producer module basics body text
-
-Consumer Module
-^^^^^^^^^^^^^^^
-Consumer module body text
-
+Algorithm descriptions, code snippets, equations, etc
 Effects Module
-^^^^^^^^^^^^^^
-Effects module body text
+--------------
+Algorithm descriptions, code snippets, equations, etc
 
-Policy Module
-^^^^^^^^^^^^^
-Policy module body text
+Module Integration and Iteration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
