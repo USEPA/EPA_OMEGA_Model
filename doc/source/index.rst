@@ -10,9 +10,10 @@ Is in process...
     :numbered:
 
     overview
-    components
-    iteration
-    data_elements
+    getstart
+    archalgo
+    inputs
+    code_description
     glossary
     developer
     code
