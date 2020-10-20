@@ -36,6 +36,8 @@ def run_postproc(iteration_log, single_shot):
         plt.plot(year_iter_labels, iteration_log['consumer_%s_share_frac' % mc])
         plt.title('%s iteration' % mc)
         plt.grid()
+        plt.legend(['producer_%s_share_frac' % mc, 'consumer_%s_share_frac' % mc])
+        plt.ylim([0,1])
         plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
 
     fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'])
@@ -51,6 +53,7 @@ def run_postproc(iteration_log, single_shot):
     # compliance chart
     fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, '.-')
     ax1.plot(calendar_years, cert_co2_Mg, '.-')
+    ax1.legend(['cert_target_co2_Mg', 'cert_co2_Mg'])
     label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
         o2.options.session_unique_name, total_cost_billions))
     fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_unique_name)
@@ -194,27 +197,40 @@ def run_producer_consumer():
             consumer_market_share_demand = None
             iteration_num = 0
             iterate = True
+            prev_winning_combo = None
+            prev_candidate_mfr_new_vehicles = None
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
                 candidate_mfr_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
-                market_class_vehicle_dict = calc_market_class_data(candidate_mfr_new_vehicles, winning_combo)
+                compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
 
-                consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
+                if compliant:
+                    market_class_vehicle_dict = calc_market_class_data(candidate_mfr_new_vehicles, winning_combo)
 
-                iteration_log = iteration_log.append(consumer_market_share_demand, ignore_index=True)
+                    consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
 
-                converged, thrashing = detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log,
-                                                                        iteration_num, market_class_vehicle_dict,
-                                                                        o2.options.verbose)
+                    iteration_log = iteration_log.append(consumer_market_share_demand, ignore_index=True)
 
-                update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing)
+                    converged, thrashing = detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log,
+                                                                            iteration_num, market_class_vehicle_dict,
+                                                                            o2.options.verbose)
+
+                    update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing, compliant)
+
+                    prev_winning_combo = winning_combo
+                    prev_candidate_mfr_new_vehicles = candidate_mfr_new_vehicles
+                else:
+                    # roll back to prior iteration result, can't comply based on consumer response
+                    winning_combo = prev_winning_combo
+                    candidate_mfr_new_vehicles = prev_candidate_mfr_new_vehicles
 
                 # decide whether to iterate or not
                 iterate = o2.options.iterate_producer_consumer \
                           and iteration_num < o2.options.producer_consumer_max_iterations \
                           and not converged \
-                          and not thrashing
+                          and not thrashing \
+                          and compliant
 
                 if iterate:
                     negotiate_market_shares(consumer_market_share_demand, iteration_num, market_class_vehicle_dict)
@@ -227,11 +243,12 @@ def run_producer_consumer():
     return iteration_log
 
 
-def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing):
+def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing, compliant):
     iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
     iteration_log.loc[iteration_log.index[-1], 'calendar_year'] = calendar_year
     iteration_log.loc[iteration_log.index[-1], 'thrashing'] = thrashing
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
+    iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
 
 
 def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
