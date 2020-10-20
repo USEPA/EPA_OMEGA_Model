@@ -266,6 +266,9 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
         temp.drop(columns='variable', inplace=True)
         temp = temp.join(pd.melt(df_source[[f'new_vehicle_mfr_cost_dollars_{year}']], value_vars=f'new_vehicle_mfr_cost_dollars_{year}', value_name='new_vehicle_mfr_cost_dollars'))
         temp.drop(columns='variable', inplace=True)
+        # melt in the kWhpMi data, which doesn't change by year but melting here for ease
+        temp = temp.join(pd.melt(df_source[['kWhpMi_cycle']], value_vars='kWhpMi_cycle', value_name='kWh_per_mile_cycle'))
+        temp.drop(columns='variable', inplace=True)
         temp.insert(0, 'model_year', year)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
     df_return.insert(0, 'cost_curve_class', f'{bev_key}')
@@ -554,8 +557,14 @@ def main():
         bev_cost_co2[key].to_csv(path_of_run_folder.joinpath(f'{key}.csv'), index=False)
         print(f'Adding bev_{eff_class} results to cost_clouds DataFrame for inclusion in the input template.')
         reshaped_df = reshape_bev_df_for_cloud_file(bev_cost_co2[key], key, years)
+        # reshaped_df has an extra column - kWhpMi_cycle data - so insert that column into the cost_clouds_df if not there already
+        try:
+            cost_clouds_df.insert(len(cost_clouds_df.columns), 'kWh_per_mile_cycle', np.nan)
+        except:
+            pass
         cost_clouds_df = pd.concat([cost_clouds_df, reshaped_df], ignore_index=True, axis=0)
 
+    # save outputs
     modified_costs = pd.ExcelWriter(path_of_run_folder.joinpath(f'techcosts_in_{dollar_basis}_dollars.xlsx'))
     techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='engine', index=False)
     techcosts_deac[['Tech', 'deac_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='deac', index=False)
@@ -571,6 +580,7 @@ def main():
     gdp_deflators.to_excel(modified_costs, sheet_name='gdp_deflators', index=True)
     modified_costs.save()
 
+    # copy input files into the output folder
     input_files_list = [techcosts_file]
     filename_list = [PurePath(path).name for path in input_files_list]
     for file in filename_list:
