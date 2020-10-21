@@ -5,6 +5,7 @@ from datetime import datetime
 from itertools import product
 import shutil
 from usepa_omega2.drive_cycle_energy_calcs import SAEJ2951_target_inertia_and_roadload_weight_combined_calcs
+from usepa_omega2 import *
 
 
 class CreatePackageDictTuple:
@@ -158,7 +159,7 @@ class CalcCosts:
         dollar_years = pd.Series(self.df['dollar_basis']).unique()
         for year in dollar_years:
             for arg in args:
-                self.df.loc[self.df['dollar_basis'] == year, arg] = self.df[arg] * deflators[year]['adjustment']
+                self.df.loc[self.df['dollar_basis'] == year, arg] = self.df[arg] * deflators[year]['adjustment_factor']
         self.df['dollar_basis'] = dollar_basis
         return self.df
 
@@ -275,6 +276,13 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
     return df_return
 
 
+def dollar_basis_year(df):
+    for i in range(len(df)):
+        if df.iloc[i]['adjustment_factor'] == 1:
+            dollar_year = df.index[i]
+    return dollar_year
+
+
 def main():
     path_cwd = Path.cwd()
     path_inputs = path_cwd / 'alpha_package_costs/alpha_package_costs_inputs'
@@ -340,8 +348,11 @@ def main():
     techcosts_bev = pd.read_excel(techcosts_file, 'bev', index_col=0)
     upstream = pd.read_excel(techcosts_file, 'upstream', index_col=0)
     upstream = upstream.to_dict('index')
-    gdp_deflators = pd.read_excel(techcosts_file, 'gdp_deflators', index_col=0)
-    gdp_deflators.insert(len(gdp_deflators.columns), 'adjustment', 0) # adjustment values are filled below
+
+    # get the price deflators
+    gdp_deflators = pd.read_csv(path_input_templates / 'price_deflators-aeo.csv', skiprows=1, index_col=0)
+    gdp_deflators = gdp_deflators.iloc[:, :-1]
+    dollar_basis = dollar_basis_year(gdp_deflators)
     gdp_deflators = gdp_deflators.to_dict('index')
 
     # set inputs
@@ -354,15 +365,10 @@ def main():
     learning_rate_powertrain = inputs['learning_rate_powertrain']['value']
     learning_rate_roadload = inputs['learning_rate_roadload']['value']
     learning_rate_bev = inputs['learning_rate_bev']['value']
-    dollar_basis = int(inputs['analysis_year_dollars']['value'])
+
     ghg_standards = inputs['ghg_standards']['value']
 
     coefficients = pd.read_csv(path_input_templates / f'ghg_standards-{ghg_standards}.csv', skiprows=1, index_col='model_year')
-    # coefficients = coefficients.to_dict('index')
-
-    # update gdp_deflators dict with adjustment values
-    for key in gdp_deflators:
-        gdp_deflators[key]['adjustment'] = gdp_deflators[dollar_basis]['factor'] / gdp_deflators[key]['factor']
 
     techcosts_engine.insert(0, 'ALPHA_engine, Cylinders', list(zip(techcosts_engine['ALPHA_engine'], techcosts_engine['actual_cylinders'])))
 
