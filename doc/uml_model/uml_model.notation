@@ -1913,20 +1913,6 @@
           <element xmi:type="uml:Property" href="uml_model.uml#_zi9lcK8YEeqO0d-UmaSoow"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_uLlttgowEeuVv_4T_-DFlw"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_uLlttwowEeuVv_4T_-DFlw" type="Property_ClassAttributeLabel" bold="true">
-          <element xmi:type="uml:Property" href="uml_model.uml#_EepNsLpBEeqITOQjKacqMg"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_uLltuAowEeuVv_4T_-DFlw"/>
-        </children>
-        <children xmi:type="notation:Shape" xmi:id="_uLltuQowEeuVv_4T_-DFlw" type="Property_ClassAttributeLabel" fontName="Segoe UI" bold="true">
-          <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uLltugowEeuVv_4T_-DFlw" source="PapyrusCSSForceValue">
-            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uLltuwowEeuVv_4T_-DFlw" key="fontHeight" value="true"/>
-            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uLltvAowEeuVv_4T_-DFlw" key="bold" value="true"/>
-            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uLltvQowEeuVv_4T_-DFlw" key="italic" value="true"/>
-            <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uLltvgowEeuVv_4T_-DFlw" key="fontColor" value="true"/>
-          </eAnnotations>
-          <element xmi:type="uml:Property" href="uml_model.uml#_nqmpINJ_Eeqj-tYEjwDNJQ"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_uLltvwowEeuVv_4T_-DFlw"/>
-        </children>
         <styles xmi:type="notation:TitleStyle" xmi:id="_uLltwAowEeuVv_4T_-DFlw"/>
         <styles xmi:type="notation:SortingStyle" xmi:id="_uLltwQowEeuVv_4T_-DFlw"/>
         <styles xmi:type="notation:FilteringStyle" xmi:id="_uLltwgowEeuVv_4T_-DFlw"/>

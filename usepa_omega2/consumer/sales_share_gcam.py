@@ -36,7 +36,6 @@ def get_demanded_shares(market_class_data, calendar_year):
 
     for pass_num in [0, 1]:
         for market_class_id in MarketClass.market_classes:
-            # for testing purposes, assign a dummy cost that increases over time. This will come from a generalized cost function
             gcam_data_cy = o2.session.query(DemandedSharesGCAM). \
                 filter(DemandedSharesGCAM.calendar_year == calendar_year). \
                 filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
@@ -62,7 +61,7 @@ def get_demanded_shares(market_class_data, calendar_year):
                 fuel_cost_per_VMT = fuel_cost_gasoline * average_co2_gpmi / carbon_intensity_gasoline
                 annual_o_m_costs = 2000
 
-            gcam_data_cy.consumer_generalized_cost_dollars = total_capital_costs
+            consumer_generalized_cost_dollars = total_capital_costs
             annualized_capital_costs = annualization_factor * total_capital_costs
             annual_VMT = float(gcam_data_cy.annual_VMT)
 
@@ -78,14 +77,11 @@ def get_demanded_shares(market_class_data, calendar_year):
                     sales_share_denominator_all_hauling = sales_share_numerator + sales_share_denominator_all_hauling
             else:
                 if 'non hauling' in market_class_id:
-                    # gcam_data_cy.demanded_share = market_class_data[
-                    #                                   'desired_non hauling share_frac'] * sales_share_numerator / sales_share_denominator_all_nonhauling
-                    gcam_data_cy.demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
+                    demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
                 else:
-                    # gcam_data_cy.demanded_share = market_class_data['desired_hauling share_frac'] * sales_share_numerator / sales_share_denominator_all_hauling
-                    gcam_data_cy.demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
+                    demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
 
-                market_class_data['consumer_%s_share_frac' % market_class_id] = gcam_data_cy.demanded_share
+                market_class_data['consumer_%s_share_frac' % market_class_id] = demanded_share
 
     return market_class_data.copy()
 
@@ -131,8 +127,17 @@ if __name__ == '__main__':
             o2.options.analysis_initial_year = 2021
             o2.options.analysis_final_year = 2035
             o2.options.database_dump_folder = '__dump'
-            # share_demand = get_demanded_shares(o2.options.analysis_initial_year)
+
             dump_omega_db_to_csv(o2.options.database_dump_folder)
+
+            # test market shares at different CO2 and price levels
+            mcd = pd.DataFrame()
+            for mc in MarketClass.market_classes:
+                mcd['average_%s_cost' % mc] = [35000, 25000]
+                mcd['average_%s_co2_gpmi' % mc] = [125, 150]
+
+            share_demand = get_demanded_shares(mcd, o2.options.analysis_initial_year)
+
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)

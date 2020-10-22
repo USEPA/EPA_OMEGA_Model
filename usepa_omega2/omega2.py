@@ -489,6 +489,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
         gui_comm("### Check OMEGA log for error messages ###")
         gui_comm("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
+        dump_omega_db_to_csv(o2.options.database_dump_folder)
 
 
 def publish_summary_results(session_summary_results, single_shot):
