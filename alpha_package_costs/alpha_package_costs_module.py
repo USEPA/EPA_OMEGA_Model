@@ -5,6 +5,7 @@ from datetime import datetime
 from itertools import product
 import shutil
 from usepa_omega2.drive_cycle_energy_calcs import SAEJ2951_target_inertia_and_roadload_weight_combined_calcs
+from usepa_omega2 import *
 
 
 class CreatePackageDictTuple:
@@ -158,7 +159,7 @@ class CalcCosts:
         dollar_years = pd.Series(self.df['dollar_basis']).unique()
         for year in dollar_years:
             for arg in args:
-                self.df.loc[self.df['dollar_basis'] == year, arg] = self.df[arg] * deflators[year]['adjustment']
+                self.df.loc[self.df['dollar_basis'] == year, arg] = self.df[arg] * deflators[year]['adjustment_factor']
         self.df['dollar_basis'] = dollar_basis
         return self.df
 
@@ -266,10 +267,20 @@ def reshape_bev_df_for_cloud_file(df_source, bev_key, years):
         temp.drop(columns='variable', inplace=True)
         temp = temp.join(pd.melt(df_source[[f'new_vehicle_mfr_cost_dollars_{year}']], value_vars=f'new_vehicle_mfr_cost_dollars_{year}', value_name='new_vehicle_mfr_cost_dollars'))
         temp.drop(columns='variable', inplace=True)
+        # melt in the kWhpMi data, which doesn't change by year but melting here for ease
+        temp = temp.join(pd.melt(df_source[['kWhpMi_cycle']], value_vars='kWhpMi_cycle', value_name='kWh_per_mile_cycle'))
+        temp.drop(columns='variable', inplace=True)
         temp.insert(0, 'model_year', year)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
     df_return.insert(0, 'cost_curve_class', f'{bev_key}')
     return df_return
+
+
+def dollar_basis_year(df):
+    for i in range(len(df)):
+        if df.iloc[i]['adjustment_factor'] == 1:
+            dollar_year = df.index[i]
+    return dollar_year
 
 
 def main():
@@ -337,8 +348,11 @@ def main():
     techcosts_bev = pd.read_excel(techcosts_file, 'bev', index_col=0)
     upstream = pd.read_excel(techcosts_file, 'upstream', index_col=0)
     upstream = upstream.to_dict('index')
-    gdp_deflators = pd.read_excel(techcosts_file, 'gdp_deflators', index_col=0)
-    gdp_deflators.insert(len(gdp_deflators.columns), 'adjustment', 0) # adjustment values are filled below
+
+    # get the price deflators
+    gdp_deflators = pd.read_csv(path_input_templates / 'price_deflators-aeo.csv', skiprows=1, index_col=0)
+    gdp_deflators = gdp_deflators.iloc[:, :-1]
+    dollar_basis = dollar_basis_year(gdp_deflators)
     gdp_deflators = gdp_deflators.to_dict('index')
 
     # set inputs
@@ -351,15 +365,10 @@ def main():
     learning_rate_powertrain = inputs['learning_rate_powertrain']['value']
     learning_rate_roadload = inputs['learning_rate_roadload']['value']
     learning_rate_bev = inputs['learning_rate_bev']['value']
-    dollar_basis = int(inputs['analysis_year_dollars']['value'])
+
     ghg_standards = inputs['ghg_standards']['value']
 
     coefficients = pd.read_csv(path_input_templates / f'ghg_standards-{ghg_standards}.csv', skiprows=1, index_col='model_year')
-    # coefficients = coefficients.to_dict('index')
-
-    # update gdp_deflators dict with adjustment values
-    for key in gdp_deflators:
-        gdp_deflators[key]['adjustment'] = gdp_deflators[dollar_basis]['factor'] / gdp_deflators[key]['factor']
 
     techcosts_engine.insert(0, 'ALPHA_engine, Cylinders', list(zip(techcosts_engine['ALPHA_engine'], techcosts_engine['actual_cylinders'])))
 
@@ -554,8 +563,14 @@ def main():
         bev_cost_co2[key].to_csv(path_of_run_folder.joinpath(f'{key}.csv'), index=False)
         print(f'Adding bev_{eff_class} results to cost_clouds DataFrame for inclusion in the input template.')
         reshaped_df = reshape_bev_df_for_cloud_file(bev_cost_co2[key], key, years)
+        # reshaped_df has an extra column - kWhpMi_cycle data - so insert that column into the cost_clouds_df if not there already
+        try:
+            cost_clouds_df.insert(len(cost_clouds_df.columns), 'kWh_per_mile_cycle', np.nan)
+        except:
+            pass
         cost_clouds_df = pd.concat([cost_clouds_df, reshaped_df], ignore_index=True, axis=0)
 
+    # save outputs
     modified_costs = pd.ExcelWriter(path_of_run_folder.joinpath(f'techcosts_in_{dollar_basis}_dollars.xlsx'))
     techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='engine', index=False)
     techcosts_deac[['Tech', 'deac_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='deac', index=False)
@@ -571,6 +586,7 @@ def main():
     gdp_deflators.to_excel(modified_costs, sheet_name='gdp_deflators', index=True)
     modified_costs.save()
 
+    # copy input files into the output folder
     input_files_list = [techcosts_file]
     filename_list = [PurePath(path).name for path in input_files_list]
     for file in filename_list:
