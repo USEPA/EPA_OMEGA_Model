@@ -26,16 +26,11 @@ from PySide2.QtCore import QFile, QObject
 from datetime import datetime
 
 # Import functions from other files
-# from omega_gui_functions import *
-# from omega_gui_stylesheets import *
-
-# from external_functions import *
-
-# Initialize global variables
-# Contains the complete path (including filename) to the configuration file
 from usepa_omega2_gui.omega_gui_functions import *
 from usepa_omega2_gui.omega_gui_stylesheets import *
 
+# Initialize global variables
+# Contains the complete path (including filename) to the configuration file
 configuration_file = ""
 # Contains the directory path to the input file directory
 input_batch_file = ""
@@ -44,7 +39,7 @@ output_batch_directory = ""
 # Contains the directory path to the project subdirectory
 output_batch_subdirectory = ""
 # Output to the status bar every timer cycle
-status_bar_message = "Ready"
+status_bar_message = "Status = Ready"
 # Python dictionary containing contents of the configuration file
 scenario = ""
 # Multiprocessor flag
@@ -59,6 +54,8 @@ run_button_image_enabled = "usepa_omega2_gui/elements/green_car_1.jpg"
 epa_button_image = "usepa_omega2_gui/elements/epa_logo.jpg"
 # Common spacer between events
 event_separator = "----------"
+# OMEGA2 version
+omega2_version = ""
 
 
 class Form(QObject):
@@ -484,18 +481,10 @@ class Form(QObject):
 
         :return: N/A
         """
-        # Search file for OMEGA2 version #.
-        searchfile = open("usepa_omega2/__init__.py", "r")
-        for line in searchfile:
-            if "code_version =" in line:
-                a = line
-        searchfile.close()
-        # Display result.
-        message_title = "About OMEGA"
-        message = a
+        global omega2_version
+        message_title = "About OMEGA2"
+        message = "OMEGA 2 Code Version = " + omega2_version
         self.showbox(message_title, message)
-
-
 
     def wizard_logic(self):
         """
@@ -542,16 +531,29 @@ class Form(QObject):
 
         :return: N/A
         """
-        global scenario, status_bar_message
+        global scenario, status_bar_message, omega2_version
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
         wizard_init = "Open a valid Configuration File or:\n" \
                       "    Select New Input Batch File," \
                       " Select New Output Batch Directory," \
                       " and Save Configuration File\n" \
                       "----------"
+        # Search file for OMEGA2 version #.
+        searchfile = open("usepa_omega2/__init__.py", "r")
+        version_line = "Not Found"
+        for line in searchfile:
+            if "code_version =" in line:
+                version_line = line
+        searchfile.close()
+        # Strip version number from text
+        start_pt = version_line.find("\"")
+        end_pt = version_line.find("\"", start_pt + 1)
+        omega2_version = version_line[start_pt + 1: end_pt]
+
         # Prime the status monitor
         color = "black"
-        self.event_monitor("Ready", color, 'dt')
+        message = "OMEGA2 Version " + omega2_version + " Ready"
+        self.event_monitor(message, color, 'dt')
         self.event_monitor(event_separator, color, '')
         # Prime the wizard
         # self.clear_wizard()
@@ -563,7 +565,7 @@ class Form(QObject):
         configuration_file_valid = False
         input_batch_file_valid = False
         output_batch_directory_valid = False
-        status_bar_message = "Ready"
+        status_bar_message = "Status = Ready"
         self.enable_run_button(False)
         self.window.save_configuration_file_button.setEnabled(0)
         self.window.epa_button.setIcon(QIcon(epa_button_image))
@@ -601,7 +603,7 @@ class Form(QObject):
         global multiprocessor_mode_selected
         global output_batch_subdirectory
         # self.event_monitor("Start Model Run ...", "black", 'dt')
-        status_bar_message = "Model Running ..."
+        status_bar_message = "Status = Model Running ..."
         status_bar()
         self.window.progress_bar.setValue(0)
         self.window.progress_bar.setValue(50)
@@ -711,7 +713,7 @@ class Form(QObject):
         # Update event monitor and status bar for end of model run
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
-        status_bar_message = "Ready"
+        status_bar_message = "Status = Ready"
         status_bar()
         self.window.progress_bar.setValue(100)
 
