@@ -203,10 +203,8 @@ salesY = salesX * (dP / elasticity * (salesY - salesX) + 1)</body>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_tNKWcK8XEeqO0d-UmaSoow" name="price_amortization_period" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_gKYnMK8YEeqO0d-UmaSoow" name="share_weight" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_zi9lcK8YEeqO0d-UmaSoow" name="discount_rate" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_EepNsLpBEeqITOQjKacqMg" name="demanded_share" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_MKuIkLpBEeqITOQjKacqMg" name="calendar_year" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_8yZVoLruEeqR6PiF084V6A" name="index" visibility="public"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_nqmpINJ_Eeqj-tYEjwDNJQ" name="consumer_generalized_cost_dollars" visibility="public"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Class" xmi:id="_tZ2bUOcBEeq0FIty4TOAXA" name="demanded_sales">
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Hd7oQOcCEeq0FIty4TOAXA" name="index"/>

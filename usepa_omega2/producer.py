@@ -8,65 +8,12 @@ the manufacturers.py is primarily related to the schema and class methods...
 """
 
 import o2  # import global variables
-from omega_functions import cartesian_prod
+from omega_functions import cartesian_prod, partition
 from usepa_omega2 import *
 import numpy as np
 import consumer
 
 use_composite_vehicles = True
-
-partition_dict = dict()
-def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):
-    """
-
-    :param columns: number of columns or list of column names
-    :param max_values: list of max values for groups of columns
-    :param increment: increment from 0 to max_values
-    :param min_level: minimum output value (max output value will be max_value - min_level)
-    :param verbose: if True then print result
-    :return: pandas Dataframe of result, rows of which add up to sum(max_values)
-    """
-    import sys
-
-    if type(columns) is list:
-        num_columns = len(columns)
-    else:
-        num_columns = columns
-        columns = [i for i in range(num_columns)]
-
-    partition_name = '%s_%s_%s_%s' % (columns, max_values, increment, min_level)
-
-    if not partition_name in partition_dict:
-        dfs = []
-        for mv in max_values:
-            members = []
-            for i in range(num_columns):
-                members.append(pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]]))
-
-            x = pd.DataFrame()
-            for m in members:
-                x = cartesian_prod(x, m)
-                x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon].copy()  # sum <= mv
-
-            x = x[abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon]
-            x[x == 0] = min_level
-            x[x == mv] = mv - min_level
-            dfs.append(x)
-
-        ans = pd.DataFrame()
-        for df in dfs:
-            ans = cartesian_prod(ans, df)
-
-        if verbose:
-            with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-                print(ans)
-
-        ans = ans.loc[abs(ans.sum(axis=1, numeric_only=True) - sum(max_values)) <= sys.float_info.epsilon]
-        ans = ans.drop('_', axis=1)
-
-        partition_dict[partition_name] = ans
-
-    return partition_dict[partition_name]
 
 
 def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
