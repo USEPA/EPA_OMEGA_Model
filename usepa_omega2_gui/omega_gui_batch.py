@@ -1,7 +1,7 @@
 """
 **omega_gui_batch.py**
 
-This code launches and controls the OMEGA2 GUI
+This code launches and controls the OMEGA 2 GUI
 
 """
 
@@ -52,9 +52,11 @@ output_batch_directory_valid = False
 run_button_image_disabled = "usepa_omega2_gui/elements/green_car_1.jpg"
 run_button_image_enabled = "usepa_omega2_gui/elements/green_car_1.jpg"
 epa_button_image = "usepa_omega2_gui/elements/epa_logo.jpg"
+green_check_image = "usepa_omega2_gui/elements/green_check.png"
+red_x_image = "usepa_omega2_gui/elements/red_x.png"
 # Common spacer between events
 event_separator = "----------"
-# OMEGA2 version
+# OMEGA 2 version
 omega2_version = ""
 
 
@@ -503,25 +505,39 @@ class Form(QObject):
             self.event_monitor(temp1, 'black', '')
 
             self.window.save_configuration_file_button.setEnabled(1)
+            self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
 
         elif not configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             # self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
             self.event_monitor(temp1, 'black', '')
             self.window.save_configuration_file_button.setEnabled(1)
+            self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         elif not configuration_file_valid and (not input_batch_file_valid or not output_batch_directory_valid):
             # self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid:"
             self.event_monitor(temp1, 'black', '')
             self.window.save_configuration_file_button.setEnabled(0)
+            self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
             if not input_batch_file_valid:
                 temp2 = "Input Batch File Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
+                self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
             if not output_batch_directory_valid:
                 temp2 = "Output Batch Directory Invalid:\n    [" + output_batch_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
+                self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             self.enable_run_button(True)
+            self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         else:
             self.enable_run_button(False)
 
@@ -569,6 +585,9 @@ class Form(QObject):
         self.enable_run_button(False)
         self.window.save_configuration_file_button.setEnabled(0)
         self.window.epa_button.setIcon(QIcon(epa_button_image))
+        self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+        self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
+        self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         self.window.setWindowTitle("EPA OMEGA 2 Model     Version: " + omega2_version)
 
     def clear_entries(self):
