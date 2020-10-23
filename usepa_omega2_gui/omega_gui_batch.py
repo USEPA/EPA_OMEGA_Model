@@ -74,7 +74,7 @@ class Form(QObject):
         ui_file.close()
 
         # Set the window title
-        self.window.setWindowTitle("EPA OMEGA Model")
+        self.window.setWindowTitle("EPA OMEGA 2 Model")
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
@@ -164,7 +164,7 @@ class Form(QObject):
 
     def open_file(self):
         """
-            Opens a Windows dialog to select an OMEGA2 (.om2) configuration file.
+            Opens a Windows dialog to select an OMEGA 2 (.om2) configuration file.
 
             When complete:
                 Global variable "scenario_file" = user selected configuration file name.
@@ -177,7 +177,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Open Configuration File"
         # Call file dialog function
@@ -286,7 +286,7 @@ class Form(QObject):
 
     def save_file(self):
         """
-            Opens a Windows dialog to save an OMEGA2 (.om2) configuration file.
+            Opens a Windows dialog to save an OMEGA 2 (.om2) configuration file.
 
             When complete:
                 Global variable "scenario_file" = user selected configuration file name.
@@ -299,7 +299,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Save Configuration File"
         # Call file dialog function
@@ -335,7 +335,7 @@ class Form(QObject):
 
     def open_input_batch_file(self):
         """
-            Opens a Windows dialog to select an OMEGA2 input directory.
+            Opens a Windows dialog to select an OMEGA 2 input directory.
 
             When complete:
                 Global variable "input_batch_file" = user selected input batch file.
@@ -348,7 +348,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Batch Files (*.xlsx)"
+        file_type = "OMEGA 2 Batch Files (*.xlsx)"
         # Add file dialog title
         file_dialog_title = "Select Input Batch File"
         # Call file dialog function
@@ -386,7 +386,7 @@ class Form(QObject):
 
     def open_output_batch_directory(self):
         """
-            Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to select an OMEGA 2 (.om2) Scenario file.
 
             When complete:
                 Global variable "output_batch_directory" = user selected output batch directory.
@@ -399,7 +399,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Select Output Batch Directory"
         # Call file dialog function
@@ -482,7 +482,7 @@ class Form(QObject):
         :return: N/A
         """
         global omega2_version
-        message_title = "About OMEGA2"
+        message_title = "About OMEGA 2"
         message = "OMEGA 2 Code Version = " + omega2_version
         self.showbox(message_title, message)
 
@@ -538,7 +538,7 @@ class Form(QObject):
                       " Select New Output Batch Directory," \
                       " and Save Configuration File\n" \
                       "----------"
-        # Search file for OMEGA2 version #.
+        # Search file for OMEGA 2 version #.
         searchfile = open("usepa_omega2/__init__.py", "r")
         version_line = "Not Found"
         for line in searchfile:
@@ -552,7 +552,7 @@ class Form(QObject):
 
         # Prime the status monitor
         color = "black"
-        message = "OMEGA2 Version " + omega2_version + " Ready"
+        message = "OMEGA 2 Version " + omega2_version + " Ready"
         self.event_monitor(message, color, 'dt')
         self.event_monitor(event_separator, color, '')
         # Prime the wizard
@@ -569,6 +569,7 @@ class Form(QObject):
         self.enable_run_button(False)
         self.window.save_configuration_file_button.setEnabled(0)
         self.window.epa_button.setIcon(QIcon(epa_button_image))
+        self.window.setWindowTitle("EPA OMEGA 2 Model     Version: " + omega2_version)
 
     def clear_entries(self):
         """
@@ -584,7 +585,7 @@ class Form(QObject):
 
     def run_model(self):
         """
-        Calls the OMEGA2 main program with selected options.
+        Calls the OMEGA 2 main program with selected options.
         Options for single processor mode:
         --batch_file [user selected batch file] --bundle_path [user selected output directory]
         --timestamp [current date and time]
@@ -647,7 +648,7 @@ class Form(QObject):
         # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
 
-        # Prepare command line options for OMEGA2 batch process
+        # Prepare command line options for OMEGA 2 batch process
         # batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         a = '--batch_file ' + '"' + input_batch_file + '"'
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
@@ -665,7 +666,7 @@ class Form(QObject):
         x = a + b + c + d
         # print("***", x, "***")
 
-        # Call OMEGA2 batch as a subprocess with command line options from above
+        # Call OMEGA 2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
