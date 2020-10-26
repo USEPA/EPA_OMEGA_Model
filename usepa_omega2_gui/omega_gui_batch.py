@@ -548,7 +548,12 @@ class Form(QObject):
         :return: N/A
         """
         global scenario, status_bar_message, omega2_version
+        global configuration_file, input_batch_file, output_batch_directory, output_batch_subdirectory
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
+        configuration_file = ""
+        input_batch_file = ""
+        output_batch_directory = ""
+        output_batch_subdirectory = ""
         wizard_init = "Open a valid Configuration File or:\n" \
                       "    Select New Input Batch File," \
                       " Select New Output Batch Directory," \
