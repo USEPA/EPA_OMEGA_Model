@@ -5,7 +5,7 @@ Model Overview
 
 Brief intro: Diagram + high level summary
 
-Inputs and outputs
+Summarize inputs and outputs
 
 Text1
 ^^^^^
