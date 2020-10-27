@@ -10,6 +10,7 @@ import sys
 import subprocess
 import pandas
 import pathlib
+import psutil
 
 import multitimer
 import time
@@ -475,6 +476,7 @@ class Form(QObject):
         """
         os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
 
+
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
@@ -703,6 +705,11 @@ class Form(QObject):
         # Keep looking for comm_file entries as long as process is running
         while omega_batch.poll() is None:
             time.sleep(1)
+            # Get CPU usage
+            # cpu = psutil.cpu_percent()
+            # Get memory used
+            # mem = psutil.virtual_memory().percent
+            # self.window.progress_bar.setValue(cpu)
             poll = omega_batch.poll()
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
@@ -814,8 +821,18 @@ def status_bar():
     # Put date, time, and message on status bar
     now = datetime.now()
     date_time = now.strftime("%B %d, %Y  %H:%M:%S")
+    # Get CPU usage
+    # psutil.cpu_percent()
+    # Get memory used
+    mem = psutil.virtual_memory().percent
+    # cpu = int(cpu/10)
+    # cpu = "[" + ">" * cpu + "             "
+    # cpu = "CPU Load=" + cpu[0:11] + "]"
+    mem = int(mem/10)
+    mem = "[" + ">" * mem + "             "
+    mem = "Memory Load=" + mem[0:11] + "]"
     try:
-        form.window.statusBar().showMessage(date_time + "  " + status_bar_message)
+        form.window.statusBar().showMessage(date_time + "  " + status_bar_message + "     " + mem)
     except NameError:
         return
 
