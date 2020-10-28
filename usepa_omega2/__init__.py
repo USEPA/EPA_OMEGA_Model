@@ -47,7 +47,7 @@ try:
             self.vehicles_file = 'input_samples/vehicles.csv'
             self.demanded_shares_file = 'input_samples/demanded_shares-gcam.csv'
             self.fuels_file = 'input_samples/fuels.csv'
-            self.fuels_context_file = 'input_samples/fuels_context.csv'
+            self.fuels_context_file = 'input_samples/context_fuel_prices.csv'
             self.cost_file_type = 'curves'
             self.cost_file = 'input_samples/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75

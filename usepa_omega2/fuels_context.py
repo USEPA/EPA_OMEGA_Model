@@ -15,20 +15,40 @@ class FuelsContext(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'fuels_context'
     index = Column('index', Integer, primary_key=True)
+    context_ID = Column('context_id', String)
+    case_ID = Column('case_id', String)
     fuel_ID = Column('fuel_id', String)
     calendar_year = Column(Numeric)
-    cost_dollars_per_unit = Column(Float)
-    upstream_CO2_per_unit = Column('upstream_co2_per_unit', Float)
+    retail_dollars_per_unit = Column(Float)
+    pretax_dollars_per_unit = Column(Float)
+    fuels_context_ID = 'AEO2020'  # TODO: should come from batch definition context specification
+    fuels_case_ID = 'Reference case'  # TODO: should come from batch definition context specification
+
+    @staticmethod
+    def get_retail_fuel_cost(calendar_year, fuel_ID):
+        return o2.session.query(FuelsContext.retail_dollars_per_unit).\
+            filter(FuelsContext.context_ID == FuelsContext.fuels_context_ID).\
+            filter(FuelsContext.case_ID == FuelsContext.fuels_case_ID).\
+            filter(FuelsContext.calendar_year == calendar_year).\
+            filter(FuelsContext.fuel_ID == fuel_ID).one()[0]
+
+    @staticmethod
+    def get_pretax_fuel_cost(calendar_year, fuel_ID):
+        return o2.session.query(FuelsContext.pretax_dollars_per_unit).\
+            filter(FuelsContext.context_ID == FuelsContext.fuels_context_ID).\
+            filter(FuelsContext.case_ID == FuelsContext.fuels_case_ID).\
+            filter(FuelsContext.calendar_year == calendar_year).\
+            filter(FuelsContext.fuel_ID == fuel_ID).one()[0]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'fuels_context'
-        input_template_version = 0.0003
-        input_template_columns = {'fuel_id', 'calendar_year', 'cost_dollars_per_unit',
-                                  'upstream_co2_grams_per_unit'}
+        input_template_name = 'context_fuel_prices'
+        input_template_version = 0.1
+        input_template_columns = {'context_id', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
+                                  'pretax_dollars_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -46,10 +66,12 @@ class FuelsContext(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(FuelsContext(
+                        context_ID=df.loc[i, 'context_id'],
+                        case_ID=df.loc[i, 'case_id'],
                         fuel_ID=df.loc[i, 'fuel_id'],
                         calendar_year=df.loc[i, 'calendar_year'],
-                        cost_dollars_per_unit=df.loc[i, 'cost_dollars_per_unit'],
-                        upstream_CO2_per_unit=df.loc[i, 'upstream_co2_grams_per_unit'],
+                        retail_dollars_per_unit=df.loc[i, 'retail_dollars_per_unit'],
+                        pretax_dollars_per_unit=df.loc[i, 'pretax_dollars_per_unit'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -75,6 +97,9 @@ if __name__ == '__main__':
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
+
+            print(FuelsContext.get_retail_fuel_cost(2020, 'pump gasoline'))
+            print(FuelsContext.get_pretax_fuel_cost(2020, 'pump gasoline'))
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
