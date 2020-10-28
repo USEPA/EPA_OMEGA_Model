@@ -1,5 +1,5 @@
-Distribution and Support Policy for EPA Models
-==============================================
+Distribution and Support Policy for EPA Software
+================================================
 
 Copyright Status
 ----------------
