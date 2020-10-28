@@ -71,6 +71,7 @@ def get_demanded_shares(market_class_data, calendar_year):
             sales_share_numerator = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
 
             if pass_num == 0:
+                ## ToDo: These market class conditions should be made more general, instead of using string searches.
                 if 'non hauling' in market_class_id:
                     sales_share_denominator_all_nonhauling = sales_share_numerator + sales_share_denominator_all_nonhauling
                 else:

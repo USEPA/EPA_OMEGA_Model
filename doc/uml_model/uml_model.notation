@@ -2322,6 +2322,10 @@
           <element xmi:type="uml:Property" href="uml_model.uml#_KSuxIKdGEeqRUoM6l8Mfgg"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_XqFPiwowEeuVv_4T_-DFlw"/>
         </children>
+        <children xmi:type="notation:Shape" xmi:id="__88_QBk3Eeupmfp2NgPq3A" type="Property_ClassAttributeLabel">
+          <element xmi:type="uml:Property" href="uml_model.uml#__8V7QBk3Eeupmfp2NgPq3A"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="__88_QRk3Eeupmfp2NgPq3A"/>
+        </children>
         <styles xmi:type="notation:TitleStyle" xmi:id="_XqFPkwowEeuVv_4T_-DFlw"/>
         <styles xmi:type="notation:SortingStyle" xmi:id="_XqFPlAowEeuVv_4T_-DFlw"/>
         <styles xmi:type="notation:FilteringStyle" xmi:id="_XqFPlQowEeuVv_4T_-DFlw"/>
