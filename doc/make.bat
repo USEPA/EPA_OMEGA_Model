@@ -8,7 +8,7 @@ REM Command file for Sphinx documentation
 REM Call from venv command-line, e.g. "make html"
 
 REM sphinx-apidoc -o source "..\usepa_omega2" -f -a -H omega2 -V 0.0.1 --tocfile code
-sphinx-apidoc -o source ".." -f -a -H "OMEGA 2 Code Details" -V 0.0.1 --tocfile code
+sphinx-apidoc -o source ".." -f -a -H "OMEGA 2 Code Details" -V 0.0.1 --tocfile code_details
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD="sphinx-build"
