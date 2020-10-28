@@ -185,6 +185,7 @@ if __name__ == '__main__':
             truck_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
                                                                                      sales_variants=[1, 2, 3, 4])
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:

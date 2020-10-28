@@ -215,7 +215,8 @@ def run_producer_consumer():
 
                 if compliant:
 
-                    market_class_vehicle_dict = calc_market_class_data(candidate_mfr_new_vehicles, winning_combo)
+                    market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_new_vehicles,
+                                                                       winning_combo)
 
                     # experiment ----------------------- #
                     if True:
@@ -291,7 +292,7 @@ def run_producer_consumer():
                         # ax1.plot(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['initial_revenue'], 'r.')
                         # label_xy(ax1, 'total_combo_credits_co2_megagrams', 'revenue [$]')
 
-                        sales_demand.to_csv('sales_demand_%s_%s.csv' % (calendar_year, iteration_num))
+                        # sales_demand.to_csv('sales_demand_%s_%s.csv' % (calendar_year, iteration_num))
 
                         # experiment ----------------------- #
 
@@ -338,7 +339,7 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
 
 
-def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
+def calc_market_class_data(calendar_year, candidate_mfr_new_vehicles, winning_combo):
     """
 
     :param candidate_mfr_new_vehicles: list of candidate composite vehicles that minimize producer compliance cost
@@ -367,6 +368,11 @@ def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
             winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
+
+            winning_combo['average_%s_fuel_price' % mc] = weighted_value(market_class_vehicles,
+                                                                   'initial_registered_count',
+                                                                   'retail_fuel_price')
+
             winning_combo['%s_sales' % mc] = 0
             for v in market_class_vehicles:
                 winning_combo['%s_sales' % mc] = winning_combo['%s_sales' % mc] + v.initial_registered_count
@@ -580,6 +586,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
             # o2.session = None
             o2.options = None
         else:
+            print(init_fail)
             omega_log.logwrite("\n#INIT FAIL")
             omega_log.end_logfile("\nSession Fail")
 

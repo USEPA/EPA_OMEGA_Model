@@ -14,7 +14,7 @@ from usepa_omega2 import *
 class CompositeVehicle(OMEGABase):
     next_vehicle_ID = -1
 
-    def __init__(self, vehicle_list, verbose=False):
+    def __init__(self, vehicle_list, calendar_year, verbose=False):
         """
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
@@ -59,6 +59,14 @@ class CompositeVehicle(OMEGABase):
     @staticmethod
     def set_next_vehicle_ID():
         CompositeVehicle.next_vehicle_ID = CompositeVehicle.next_vehicle_ID - 1
+
+    def retail_fuel_price(self, calendar_year=None):
+        from omega_functions import weighted_value
+
+        if calendar_year is None:
+            calendar_year = self.model_year
+
+        return weighted_value(self.vehicle_list, 'initial_registered_count', 'retail_fuel_price', calendar_year)
 
     def decompose(self):
         # for v in self.vehicle_list:
@@ -205,6 +213,18 @@ class Vehicle(OMEGABase):
     @property
     def initial_registered_count(self):
         return self._initial_registered_count
+
+    def retail_fuel_price(self, calendar_year=None):
+        from fuels_context import FuelsContext
+        if calendar_year is None:
+            calendar_year = self.model_year
+        return FuelsContext.get_retail_fuel_price(calendar_year, self.in_use_fuel_ID)
+
+    def pretax_fuel_price(self, calendar_year=None):
+        from fuels_context import FuelsContext
+        if calendar_year is None:
+            calendar_year = self.model_year
+        return FuelsContext.get_pretax_fuel_price(calendar_year, self.in_use_fuel_ID)
 
     @initial_registered_count.setter
     def initial_registered_count(self, initial_registered_count):
@@ -386,6 +406,7 @@ if __name__ == '__main__':
         from manufacturers import Manufacturer  # needed for manufacturers table
         from market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
+        from fuels_context import FuelsContext # needed for retail fuel price
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 
@@ -407,6 +428,9 @@ if __name__ == '__main__':
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+
+        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.fuels_context_file,
+                                                                     verbose=o2.options.verbose)
 
         if o2.options.cost_file_type == 'curves':
             init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
@@ -444,10 +468,17 @@ if __name__ == '__main__':
             weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_CO2_grams_per_mile')
             weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
 
-            cv = CompositeVehicle(vehicles_list[0:4], verbose=True)
+            print(vehicles_list[0].retail_fuel_price())
+            print(vehicles_list[1].retail_fuel_price())
+            print(vehicles_list[0].retail_fuel_price(2030))
+            print(vehicles_list[1].retail_fuel_price(2030))
+
+            cv = CompositeVehicle(vehicles_list[0:4], calendar_year=2021, verbose=True)
             cv.cost_curve.to_csv('composite_cost_curve.csv')
 
+            print(cv.retail_fuel_price(2021))
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
 

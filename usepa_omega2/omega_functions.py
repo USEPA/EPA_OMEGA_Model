@@ -77,12 +77,13 @@ def unique(vector):
     return [vector[index] for index in sorted(indexes)]
 
 
-def weighted_value(objects, weight_attribute, attribute):
+def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     """
 
     :param objects: list-like of objects
     :param weight_attribute: name of object attribute to weight by (e.g. 'sales')
     :param attribute: name of attribute to calculate weighted value from (e.g. 'footprint_ft2')
+    :param attribute_args: arguments to attribute if it's a method (e.g. calendar year)
     :return: weighted value
     """
     weighted_sum = 0
@@ -90,7 +91,10 @@ def weighted_value(objects, weight_attribute, attribute):
     for o in objects:
         weight = o.__getattribute__(weight_attribute)
         total = total + weight
-        weighted_sum = weighted_sum + o.__getattribute__(attribute) * weight
+        if callable(o.__getattribute__(attribute)):
+            weighted_sum = weighted_sum + o.__getattribute__(attribute)(attribute_args) * weight
+        else:
+            weighted_sum = weighted_sum + o.__getattribute__(attribute) * weight
 
     return weighted_sum / total
 

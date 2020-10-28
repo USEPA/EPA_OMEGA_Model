@@ -24,10 +24,6 @@ def get_demanded_shares(market_class_data, calendar_year):
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
 
-    demanded_share_data = dict()
-    # ToDo: These fuels items should be populated from the fuels class
-    fuel_cost_gasoline = 3.5  # dollars per gallon
-    fuel_cost_electricity = 0.12  # dollars per kWh
     carbon_intensity_gasoline = 8887  # g per CO2 per gallon
     carbon_intensity_electricity = 534  # g per kWh generated
 
@@ -36,6 +32,9 @@ def get_demanded_shares(market_class_data, calendar_year):
 
     for pass_num in [0, 1]:
         for market_class_id in MarketClass.market_classes:
+            # ToDo: These fuels items should be populated from the fuels class
+            fuel_cost = market_class_data['average_%s_fuel_price' % market_class_id]
+
             gcam_data_cy = o2.session.query(DemandedSharesGCAM). \
                 filter(DemandedSharesGCAM.calendar_year == calendar_year). \
                 filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
@@ -49,16 +48,16 @@ def get_demanded_shares(market_class_data, calendar_year):
             average_co2_gpmi = market_class_data['average_%s_co2_gpmi' % market_class_id]
 
             if market_class_id == 'non hauling.BEV':
-                fuel_cost_per_VMT = fuel_cost_electricity * average_co2_gpmi / carbon_intensity_electricity
+                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
                 annual_o_m_costs = 1600
             elif market_class_id == 'hauling.BEV':
-                fuel_cost_per_VMT = fuel_cost_electricity * average_co2_gpmi / carbon_intensity_electricity
+                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
                 annual_o_m_costs = 1600
             elif market_class_id == 'non hauling.ICE':
-                fuel_cost_per_VMT = fuel_cost_gasoline * average_co2_gpmi / carbon_intensity_gasoline
+                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
                 annual_o_m_costs = 2000
             elif market_class_id == 'hauling.ICE':
-                fuel_cost_per_VMT = fuel_cost_gasoline * average_co2_gpmi / carbon_intensity_gasoline
+                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
                 annual_o_m_costs = 2000
 
             consumer_generalized_cost_dollars = total_capital_costs
@@ -138,10 +137,14 @@ if __name__ == '__main__':
             for mc in MarketClass.market_classes:
                 mcd['average_%s_cost' % mc] = [35000, 25000]
                 mcd['average_%s_co2_gpmi' % mc] = [125, 150]
+                mcd['average_%s_fuel_price' % mc] = [2.75, 3.25]
+                mcd['producer_non hauling_share_frac'] = [0.8, 0.85]
+                mcd['producer_hauling_share_frac'] = [0.2, 0.15]
 
             share_demand = get_demanded_shares(mcd, o2.options.analysis_initial_year)
 
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
 

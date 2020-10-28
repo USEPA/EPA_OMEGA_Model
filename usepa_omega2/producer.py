@@ -181,7 +181,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for mc in mctrc:
             for rc in reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc])
+                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
                     cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     composite_vehicles.append(cv)
 

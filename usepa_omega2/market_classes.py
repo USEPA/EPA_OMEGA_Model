@@ -231,6 +231,7 @@ if __name__ == '__main__':
             print_market_class_dict(market_class_dict_rc)
 
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
 

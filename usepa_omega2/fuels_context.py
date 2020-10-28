@@ -25,7 +25,7 @@ class FuelsContext(SQABase, OMEGABase):
     fuels_case_ID = 'Reference case'  # TODO: should come from batch definition context specification
 
     @staticmethod
-    def get_retail_fuel_cost(calendar_year, fuel_ID):
+    def get_retail_fuel_price(calendar_year, fuel_ID):
         return o2.session.query(FuelsContext.retail_dollars_per_unit).\
             filter(FuelsContext.context_ID == FuelsContext.fuels_context_ID).\
             filter(FuelsContext.case_ID == FuelsContext.fuels_case_ID).\
@@ -33,7 +33,7 @@ class FuelsContext(SQABase, OMEGABase):
             filter(FuelsContext.fuel_ID == fuel_ID).one()[0]
 
     @staticmethod
-    def get_pretax_fuel_cost(calendar_year, fuel_ID):
+    def get_pretax_fuel_price(calendar_year, fuel_ID):
         return o2.session.query(FuelsContext.pretax_dollars_per_unit).\
             filter(FuelsContext.context_ID == FuelsContext.fuels_context_ID).\
             filter(FuelsContext.case_ID == FuelsContext.fuels_case_ID).\
@@ -98,9 +98,10 @@ if __name__ == '__main__':
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-            print(FuelsContext.get_retail_fuel_cost(2020, 'pump gasoline'))
-            print(FuelsContext.get_pretax_fuel_cost(2020, 'pump gasoline'))
+            print(FuelsContext.get_retail_fuel_price(2020, 'pump gasoline'))
+            print(FuelsContext.get_pretax_fuel_price(2020, 'pump gasoline'))
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:

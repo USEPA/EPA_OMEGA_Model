@@ -166,6 +166,7 @@ if __name__ == '__main__':
             label_xyt(ax1, 'co2 [g/mi]', 'cost [$]', 'Cost Curves and weighted Cost Curves')
 
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:

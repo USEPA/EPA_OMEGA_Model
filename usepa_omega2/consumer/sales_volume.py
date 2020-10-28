@@ -137,6 +137,7 @@ if __name__ == '__main__':
 
             sales_demand = context_new_vehicle_sales(o2.options.analysis_initial_year)
         else:
+            print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
 
