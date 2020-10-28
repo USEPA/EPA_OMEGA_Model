@@ -104,8 +104,8 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
         for c, cn in zip(children, sales_share_column_names):
             if consumer_bev_share is None or cn.replace('producer', 'consumer') not in consumer_bev_share:
                 # maintain initial fleet market share (for now...)
-                sales_share_df[cn] = [consumer.sales.demand_sales(calendar_year)[c] /
-                                      consumer.sales.demand_sales(calendar_year)['total']]
+                sales_share_df[cn] = [consumer.sales_volume.context_new_vehicle_sales(calendar_year)[c] /
+                                      consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']]
             else:
                 sales_share_df[cn] = [consumer_bev_share[cn.replace('producer', 'consumer')]]
 
@@ -144,7 +144,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
         new_veh.set_cert_target_CO2_Mg()
         new_veh.set_cert_CO2_Mg()
 
-    return manufacturer_new_vehicles, winning_combo
+    return manufacturer_new_vehicles, winning_combo, market_class_tree
 
 
 def get_initial_vehicle_data(calendar_year, manufacturer_ID):
@@ -170,9 +170,10 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         # aggregate by market class / reg class
         mctrc = dict()
         for mc in MarketClass.market_classes:
-            mctrc[mc] = {'car': [], 'truck': []}
+            mctrc[mc] = {'car': [], 'truck': [], 'sales': 0}
         for new_veh in manufacturer_new_vehicles:
             mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
+            mctrc[new_veh.market_class_ID]['sales'] = mctrc[new_veh.market_class_ID]['sales'] + new_veh.initial_registered_count
 
         from vehicles import CompositeVehicle
         CompositeVehicle.reset_vehicle_IDs()
@@ -181,6 +182,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
             for rc in reg_classes:
                 if mctrc[mc][rc]:
                     cv = CompositeVehicle(mctrc[mc][rc])
+                    cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     composite_vehicles.append(cv)
 
         manufacturer_new_vehicles = composite_vehicles
@@ -257,25 +259,39 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_v
     o2.session.flush()
 
 
-def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total):
-    total_sales = consumer.sales.demand_sales(calendar_year)['total']
+def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total, total_sales=None):
+    # on the first time through, from the producer module, total_sales = None => use context sales, market shares
+    # come from the producer desired market shares
+    # on the second time through, from the omega2 module, total_sales is determined by sales response, market shares
+    # come from the consumer demanded market shares...
+
+    if total_sales is None:
+        prefix = 'producer_'
+        total_sales = consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']
+    else:
+        prefix = 'consumer_'
+
     total_target_co2_Mg = 0
     total_cert_co2_Mg = 0
     total_cost_dollars = 0
     for new_veh in manufacturer_new_vehicles:
-        # assign sales to vehicle based on market share fractions
+        # assign sales to vehicle based on market share fractions and reg class share fractions
         market_class = new_veh.market_class_ID
-        substrs = market_class.split('.')
-        chain = []
-        for i in range(len(substrs)):
-            str = 'producer_'
-            for j in range(i + 1):
-                str = str + substrs[j] + '.' * (j != i)
-            str = str + '_share_frac'
-            chain.append(str)
-        vehicle_sales = total_sales
-        for c in chain:
-            vehicle_sales = vehicle_sales * tech_share_combos_total[c]
+        if prefix == 'producer_':
+            substrs = market_class.split('.')
+            chain = []
+            for i in range(len(substrs)):
+                str = prefix
+                for j in range(i + 1):
+                    str = str + substrs[j] + '.' * (j != i)
+                str = str + '_share_frac'
+                chain.append(str)
+            vehicle_sales = total_sales
+            for c in chain:
+                vehicle_sales = vehicle_sales * tech_share_combos_total[c]
+        else:
+            vehicle_sales = total_sales * tech_share_combos_total['consumer_%s_abs_share_frac' % market_class]
+        vehicle_sales = vehicle_sales * new_veh.reg_class_market_share_frac
         tech_share_combos_total['veh_%d_sales' % new_veh.vehicle_ID] = vehicle_sales
 
         # calculate vehicle total cost
@@ -300,6 +316,7 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, 
     tech_share_combos_total['total_combo_cert_co2_megagrams'] = total_cert_co2_Mg
     tech_share_combos_total['total_combo_cost_dollars'] = total_cost_dollars
     tech_share_combos_total['total_combo_credits_co2_megagrams'] = total_target_co2_Mg - total_cert_co2_Mg
+    tech_share_combos_total['total_sales'] = total_sales
 
 
 def select_winning_combo(tech_share_combos_total):

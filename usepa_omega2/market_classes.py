@@ -89,7 +89,7 @@ def print_market_class_dict(mc_dict, num_tabs=0):
     if num_tabs == 0:
         print()
 
-    if type(mc_dict) is list:
+    if type(mc_dict) is list or type(mc_dict) is not dict:
         print('\t' * num_tabs + str(mc_dict))
     else:
         for k in mc_dict.keys():

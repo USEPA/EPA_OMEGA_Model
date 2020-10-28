@@ -1,5 +1,5 @@
 """
-sales.py
+sales_volume.py
 ========
 
 Consumer module stub (for now)
@@ -15,11 +15,13 @@ def calculate_generalized_cost(cost_factors):
     pass
 
 
-def demand_sales(model_year):
+def context_new_vehicle_sales(model_year):
     """
     :param model_year: not used, for now
     :return: dict of sales by consumer (market) categories
     """
+
+    # TODO: needs to get context new vehicle sales from projections (AEO, etc)
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
@@ -54,6 +56,32 @@ def demand_sales(model_year):
     sales_dict['total'] = float(total_sales)
 
     return sales_dict
+
+
+def new_vehicle_sales(P):
+    """
+    Calculate new vehicle sales, relative to a reference sales volume and average new vehicle price
+    :param P: a single price or a list-like of prices
+    :return: total new vehicle sales volume at each price
+    """
+
+    if type(P) is list:
+        import numpy as np
+        P = np.array(P)
+
+    # Q0 = o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
+    #     VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).filter(VehicleAnnualData.age == 0).one()
+
+    # TODO: un-hardcode these values
+    Q0 = 14581209  # from vehicles.csv
+    P0 = 30937  # sales-weighted, from vehicles.csv
+    E = -0.5  # new vehicle sales elasticity, eventually to come from batch file input
+
+    M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
+
+    Q = Q0 + M * (P-P0)  # point-slope equation of a line
+
+    return Q
 
 
 if __name__ == '__main__':
@@ -107,7 +135,7 @@ if __name__ == '__main__':
         if not init_fail:
             o2.options.analysis_initial_year = o2.session.query(func.max(VehicleFinal.model_year)).scalar() + 1
 
-            sales_demand = demand_sales(o2.options.analysis_initial_year)
+            sales_demand = context_new_vehicle_sales(o2.options.analysis_initial_year)
         else:
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)

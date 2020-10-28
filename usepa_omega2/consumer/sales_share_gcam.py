@@ -72,16 +72,19 @@ def get_demanded_shares(market_class_data, calendar_year):
 
             if pass_num == 0:
                 if 'non hauling' in market_class_id:
-                    sales_share_denominator_all_nonhauling = sales_share_numerator + sales_share_denominator_all_nonhauling
+                    sales_share_denominator_all_nonhauling = sales_share_denominator_all_nonhauling + sales_share_numerator
                 else:
-                    sales_share_denominator_all_hauling = sales_share_numerator + sales_share_denominator_all_hauling
+                    sales_share_denominator_all_hauling = sales_share_denominator_all_hauling + sales_share_numerator
             else:
                 if 'non hauling' in market_class_id:
                     demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
+                    demanded_absolute_share = demanded_share * market_class_data['producer_non hauling_share_frac']
                 else:
                     demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
+                    demanded_absolute_share = demanded_share * market_class_data['producer_hauling_share_frac']
 
                 market_class_data['consumer_%s_share_frac' % market_class_id] = demanded_share
+                market_class_data['consumer_%s_abs_share_frac' % market_class_id] = demanded_absolute_share
 
     return market_class_data.copy()
 

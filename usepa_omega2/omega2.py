@@ -184,8 +184,16 @@ def run_postproc(iteration_log, single_shot):
 
 
 def run_producer_consumer():
+    """
+    Create producer cost-minimizing technology and market share options, in consideration of market response from
+    the consumer module, possibly with iteration between the two
+
+    :return: iteration log dataframe, updated omega database with final vehicle technology and market share data
+    """
+
     from manufacturers import Manufacturer
     import producer
+    import consumer
     from consumer.sales_share_gcam import get_demanded_shares
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
@@ -201,12 +209,91 @@ def run_producer_consumer():
             prev_candidate_mfr_new_vehicles = None
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
-                candidate_mfr_new_vehicles, winning_combo = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
+                candidate_mfr_new_vehicles, winning_combo, market_class_tree = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
                 compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
 
                 if compliant:
+
                     market_class_vehicle_dict = calc_market_class_data(candidate_mfr_new_vehicles, winning_combo)
+
+                    # experiment ----------------------- #
+                    if True:
+                        import numpy as np
+                        from market_classes import MarketClass
+                        from omega_functions import cartesian_prod
+
+                        initial_total_sales = winning_combo['total_sales']
+
+                        multiplier_columns = ['%s_cost_multiplier' % mc for mc in MarketClass.market_classes]
+
+                        multiplier_df = winning_combo.to_frame().transpose()
+                        for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
+                            multiplier_df = cartesian_prod(multiplier_df,
+                                                           pd.DataFrame(np.arange(0.1, 2.0 + 0.1, 0.1), columns=[mcc]))
+                            multiplier_df['initial_average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc]
+                            multiplier_df['average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc] * \
+                                                                    multiplier_df[mcc]
+
+                        multiplier_df['initial_revenue'] = 0
+                        for mc in market_class_vehicle_dict:
+                            multiplier_df['initial_revenue'] = multiplier_df['initial_revenue'] + multiplier_df['%s_sales' % mc] * multiplier_df['initial_average_%s_cost' % mc]
+
+                        sales_demand = get_demanded_shares(multiplier_df, calendar_year)
+
+                        sales_demand['share_weighted_share_delta'] = 0
+                        sales_demand['share_weighted_price'] = 0
+                        sales_demand['revenue'] = 0
+                        for mc in market_class_vehicle_dict:
+                            sales_demand['share_weighted_share_delta'] = sales_demand['share_weighted_share_delta'] + \
+                                                                         abs(sales_demand['producer_%s_share_frac' % mc] - sales_demand['consumer_%s_share_frac' % mc]) \
+                                                                         * sales_demand['consumer_%s_abs_share_frac' % mc]
+
+                            sales_demand['share_weighted_price'] = sales_demand['share_weighted_price'] + \
+                                                                   sales_demand['average_%s_cost' % mc] * \
+                                                                   sales_demand['consumer_%s_abs_share_frac' % mc]
+
+                        # calculate new total sales demand based on total share weighted price
+                        sales_demand['new_vehicle_sales'] = consumer.sales_volume.new_vehicle_sales(sales_demand['share_weighted_price'])
+
+                        # propagate total sales down to composite vehicles by market class share and reg class share,
+                        # calculate new compliance status for each producer-technology / consumer response combination
+                        producer.calculate_tech_share_combos_total(calendar_year, candidate_mfr_new_vehicles, sales_demand, total_sales=sales_demand['new_vehicle_sales'])
+
+                        sales_demand['revenue'] = sales_demand['share_weighted_price'] * \
+                                                  sales_demand['new_vehicle_sales']
+
+                        sales_demand['delta_revenue'] = sales_demand['revenue'] - sales_demand['initial_revenue']
+                        sales_demand['profit'] = sales_demand['revenue'] - sales_demand['total_combo_cost_dollars']
+                        sales_demand['sales_ratio'] = sales_demand['new_vehicle_sales'] / initial_total_sales
+                        sales_demand['revenue_ratio'] = sales_demand['revenue'] / sales_demand['initial_revenue']
+
+                        sales_demand['compliance_ratio'] = sales_demand['total_combo_cert_co2_megagrams'] / \
+                                                           sales_demand['total_combo_target_co2_megagrams']
+
+                        sales_demand['price_modification_score'] = \
+                            (abs(1 - sales_demand['non hauling.BEV_cost_multiplier']) *
+                             sales_demand['consumer_non hauling.BEV_abs_share_frac'] +
+                             abs(1 - sales_demand['non hauling.ICE_cost_multiplier']) *
+                             sales_demand['consumer_non hauling.ICE_abs_share_frac'] +
+                             abs(1 - sales_demand['hauling.BEV_cost_multiplier']) *
+                             sales_demand['consumer_hauling.BEV_abs_share_frac'] +
+                             abs(1 - sales_demand['hauling.ICE_cost_multiplier']) *
+                             sales_demand['consumer_hauling.ICE_abs_share_frac'])
+
+                            # sales_demand = sales_demand[sales_demand['sales_weighted_share_delta'] <= 0.01]
+
+                        # fig, ax1 = fplothg(sales_demand['share_weighted_share_delta'], sales_demand['revenue'], '.')
+                        # ax1.plot(sales_demand['share_weighted_share_delta'], sales_demand['initial_revenue'], 'r.')
+                        # label_xy(ax1, 'share weighted share delta [frac]', 'revenue [$]')
+
+                        # fig, ax1 = fplothg(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['revenue'], '.')
+                        # ax1.plot(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['initial_revenue'], 'r.')
+                        # label_xy(ax1, 'total_combo_credits_co2_megagrams', 'revenue [$]')
+
+                        sales_demand.to_csv('sales_demand_%s_%s.csv' % (calendar_year, iteration_num))
+
+                        # experiment ----------------------- #
 
                     consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
 
@@ -252,6 +339,15 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
 
 
 def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
+    """
+
+    :param candidate_mfr_new_vehicles: list of candidate composite vehicles that minimize producer compliance cost
+    :param winning_combo: pandas Series that corresponds with candidate_mfr_new_vehicles, has market shares, costs,
+            compliance data (Mg CO2)
+    :return: dictionary of candidate vehicles binned by market class and reg class, updates winning_combo with
+            sales-weighted average cost and CO2 g/mi by market class
+    """
+
     from market_classes import MarketClass
     from omega_functions import weighted_value
 
@@ -267,12 +363,19 @@ def calc_market_class_data(candidate_mfr_new_vehicles, winning_combo):
             winning_combo['average_%s_co2_gpmi' % mc] = weighted_value(market_class_vehicles,
                                                                        'initial_registered_count',
                                                                        'cert_CO2_grams_per_mile')
+
             winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
+            winning_combo['%s_sales' % mc] = 0
+            for v in market_class_vehicles:
+                winning_combo['%s_sales' % mc] = winning_combo['%s_sales' % mc] + v.initial_registered_count
         else:
             winning_combo['average_%s_co2_gpmi' % mc] = 0
             winning_combo['average_%s_cost' % mc] = 0
+            winning_combo['%s_sales' % mc] = 0
+
+        winning_combo['%s_abs_market_share_frac' % mc] = winning_combo['%s_sales' % mc] / winning_combo['total_sales']
 
     return market_class_vehicle_dict
 
@@ -376,7 +479,7 @@ def init_omega(o2_options):
     # instantiate database tables
     SQABase.metadata.create_all(o2.engine)
 
-    import consumer.sales as consumer
+    import consumer.sales_volume as consumer
     import producer
 
     fileio.validate_folder(o2.options.output_folder)
