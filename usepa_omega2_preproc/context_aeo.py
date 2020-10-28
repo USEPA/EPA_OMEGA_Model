@@ -2,7 +2,8 @@
 context_aeo.py
 
 """
-
+# TODO aeo_context_id > context_id; aeo_case_id > case_id; fuel_id values should be pump gasoline and US Electricity with separate columns
+# for retail and pre-tax; template name is context_fuel_prices and vehicles file should be context_new_vehicle_sales
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
@@ -15,9 +16,9 @@ path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
 path_outputs.mkdir(exist_ok=True)
 path_input_templates = path_cwd / 'input_samples'
 
-vehicles_context_template = 'new_vehicle_sales_context-aeo.csv'
-fuels_context_template = 'fuels_context-aeo.csv'
-price_deflators_template = 'price_deflators-aeo.csv'
+vehicles_context_template = 'context_new_vehicle_sales.csv'
+fuels_context_template = 'context_fuel_prices.csv'
+price_deflators_template = 'price_deflators.csv'
 
 # from somewhere, e.g., the top/general section of the batch file, the aeo_case has to be set; this is a placeholder
 aeo_case = 'Reference case'
@@ -198,8 +199,8 @@ def main():
     aeo_veh_context.insert(aeo_veh_context.columns.get_loc('mpg_alternative') + 1,
                            'mpg_alternative_onroad',
                            aeo_veh_context[['mpg_alternative', 'onroad_to_cycle_mpg_ratio']].product(axis=1))
-    aeo_veh_context.insert(0, 'aeo_case_id', f'{aeo_case}')
-    aeo_veh_context.insert(0, 'aeo_context_id', aeo_table_obj.aeo_year())
+    aeo_veh_context.insert(0, 'case_id', f'{aeo_case}')
+    aeo_veh_context.insert(0, 'context_id', aeo_table_obj.aeo_year())
 
     # work on sales
     aeo_table_obj = GetContext(path_aeo_inputs, aeo_sales_table, aeo_case, 'full name')
@@ -271,7 +272,7 @@ def main():
     fleet_context_df.replace({'full name': r'Light Trucks: '}, {'full name': ''}, regex=True, inplace=True)
 
     fleet_context_df = fleet_context_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class'], how='left')
-    fleet_context_df.rename(columns={'full name': 'aeo_size_class'}, inplace=True)
+    fleet_context_df.rename(columns={'full name': 'context_size_class'}, inplace=True)
 
     # work on fuel prices
     aeo_table_obj = GetContext(path_aeo_inputs, aeo_petroleum_fuel_prices_table, aeo_case, 'full name')
@@ -284,18 +285,20 @@ def main():
 
     gasoline_wholesale = aeo_table_obj.select_table_rows('Price Components: Motor Gasoline: End-User Price: Wholesale Price')
 
-    gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'cost_dollars_per_unit', 'full name')
-    gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline retail')
-    gasoline_retail_prices.insert(0, 'aeo_case_id', f'{aeo_case}')
-    gasoline_retail_prices.insert(0, 'aeo_context_id', aeo_table_obj.aeo_year())
+    gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
+    gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline')
+    gasoline_retail_prices.insert(0, 'case_id', f'{aeo_case}')
+    gasoline_retail_prices.insert(0, 'context_id', aeo_table_obj.aeo_year())
 
     gasoline_distribution = melt_df(gasoline_distribution, 'full name', 'gasoline_distribution', 'full name')
     gasoline_wholesale = melt_df(gasoline_wholesale, 'full name', 'gasoline_wholesale', 'full name')
 
-    gasoline_prices_pretax = gasoline_retail_prices.copy()
-    gasoline_prices_pretax['cost_dollars_per_unit'] = gasoline_distribution['gasoline_distribution'] \
+    gasoline_pretax_prices = gasoline_retail_prices.copy()
+    gasoline_pretax_prices['pretax_dollars_per_unit'] = gasoline_distribution['gasoline_distribution'] \
                                                       + gasoline_wholesale['gasoline_wholesale']
-    gasoline_prices_pretax['fuel_id'] = 'pump gasoline pretax'
+    gasoline_pretax_prices['fuel_id'] = 'pump gasoline'
+
+    gasoline_prices = gasoline_retail_prices.join(gasoline_pretax_prices[['pretax_dollars_per_unit']])
 
     usd_basis = aeo_table_obj.aeo_dollars()
 
@@ -308,22 +311,23 @@ def main():
     electricity_prices_residential = electricity_prices_residential.loc[~electricity_prices_residential['units'].str.contains('nom'), :]
     electricity_prices_allsecavg = electricity_prices_allsecavg.loc[~electricity_prices_allsecavg['units'].str.contains('nom'), :]
 
-    electricity_prices_residential = melt_df(electricity_prices_residential, 'full name', 'cost_dollars_per_unit', 'full name')
-    electricity_prices_allsecavg = melt_df(electricity_prices_allsecavg, 'full name', 'cost_dollars_per_unit', 'full name')
+    electricity_prices_residential = melt_df(electricity_prices_residential, 'full name', 'retail_dollars_per_unit', 'full name')
+    electricity_prices_allsecavg = melt_df(electricity_prices_allsecavg, 'full name', 'pretax_dollars_per_unit', 'full name')
 
-    electricity_prices_residential['cost_dollars_per_unit'] = electricity_prices_residential['cost_dollars_per_unit'] / 100
-    electricity_prices_allsecavg['cost_dollars_per_unit'] = electricity_prices_allsecavg['cost_dollars_per_unit'] / 100
+    electricity_prices_residential['retail_dollars_per_unit'] = electricity_prices_residential['retail_dollars_per_unit'] / 100
+    electricity_prices_allsecavg['pretax_dollars_per_unit'] = electricity_prices_allsecavg['pretax_dollars_per_unit'] / 100
 
-    electricity_prices_residential.insert(0, 'fuel_id', 'US electricity residential')
-    electricity_prices_allsecavg.insert(0, 'fuel_id', 'US electricity all sectors average')
+    electricity_prices_residential.insert(0, 'fuel_id', 'US electricity')
+    electricity_prices_allsecavg.insert(0, 'fuel_id', 'US electricity')
 
     for df in [electricity_prices_residential, electricity_prices_allsecavg]:
-        df.insert(0, 'aeo_case_id', f'{aeo_case}')
-        df.insert(0, 'aeo_context_id', aeo_table_obj.aeo_year())
+        df.insert(0, 'case_id', f'{aeo_case}')
+        df.insert(0, 'context_id', aeo_table_obj.aeo_year())
+
+    electricity_prices = electricity_prices_residential.join(electricity_prices_allsecavg[['pretax_dollars_per_unit']])
 
     # concatenate the fuel prices into one DF
-    aeo_fuel_context = pd.concat([gasoline_retail_prices, gasoline_prices_pretax,
-                                  electricity_prices_residential, electricity_prices_allsecavg], ignore_index=True, axis=0)
+    aeo_fuel_context = pd.concat([gasoline_prices, electricity_prices], ignore_index=True, axis=0)
 
     # work on deflators
     bea_table_obj = GetContext(path_bea_inputs, deflators_table, 'Gross domestic product', 'Unnamed: 1')

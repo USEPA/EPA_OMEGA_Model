@@ -2,15 +2,7 @@
 
 Getting Started
 ===================
-Getting Started body text.
-
-Developer Path
-^^^^^^^^^^^^^^
-Developer Path body text
-
-General User Path
-^^^^^^^^^^^^^^^^^
-User Path body text
+Including downloading PyCharm, sample inputs
 
 Text1
 ^^^^^

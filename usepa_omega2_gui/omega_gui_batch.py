@@ -1,7 +1,7 @@
 """
 **omega_gui_batch.py**
 
-This code launches and controls the OMEGA2 GUI
+This code launches and controls the OMEGA 2 GUI
 
 """
 
@@ -10,6 +10,7 @@ import sys
 import subprocess
 import pandas
 import pathlib
+import psutil
 
 import multitimer
 import time
@@ -26,16 +27,11 @@ from PySide2.QtCore import QFile, QObject
 from datetime import datetime
 
 # Import functions from other files
-# from omega_gui_functions import *
-# from omega_gui_stylesheets import *
-
-# from external_functions import *
-
-# Initialize global variables
-# Contains the complete path (including filename) to the configuration file
 from usepa_omega2_gui.omega_gui_functions import *
 from usepa_omega2_gui.omega_gui_stylesheets import *
 
+# Initialize global variables
+# Contains the complete path (including filename) to the configuration file
 configuration_file = ""
 # Contains the directory path to the input file directory
 input_batch_file = ""
@@ -44,7 +40,7 @@ output_batch_directory = ""
 # Contains the directory path to the project subdirectory
 output_batch_subdirectory = ""
 # Output to the status bar every timer cycle
-status_bar_message = "Ready"
+status_bar_message = "Status = Ready"
 # Python dictionary containing contents of the configuration file
 scenario = ""
 # Multiprocessor flag
@@ -57,8 +53,12 @@ output_batch_directory_valid = False
 run_button_image_disabled = "usepa_omega2_gui/elements/green_car_1.jpg"
 run_button_image_enabled = "usepa_omega2_gui/elements/green_car_1.jpg"
 epa_button_image = "usepa_omega2_gui/elements/epa_logo.jpg"
+green_check_image = "usepa_omega2_gui/elements/green_check.png"
+red_x_image = "usepa_omega2_gui/elements/red_x.png"
 # Common spacer between events
 event_separator = "----------"
+# OMEGA 2 version
+omega2_version = ""
 
 
 class Form(QObject):
@@ -77,7 +77,7 @@ class Form(QObject):
         ui_file.close()
 
         # Set the window title
-        self.window.setWindowTitle("EPA OMEGA Model")
+        self.window.setWindowTitle("EPA OMEGA 2 Model")
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
@@ -167,7 +167,7 @@ class Form(QObject):
 
     def open_file(self):
         """
-            Opens a Windows dialog to select an OMEGA2 (.om2) configuration file.
+            Opens a Windows dialog to select an OMEGA 2 (.om2) configuration file.
 
             When complete:
                 Global variable "scenario_file" = user selected configuration file name.
@@ -180,7 +180,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Open Configuration File"
         # Call file dialog function
@@ -289,7 +289,7 @@ class Form(QObject):
 
     def save_file(self):
         """
-            Opens a Windows dialog to save an OMEGA2 (.om2) configuration file.
+            Opens a Windows dialog to save an OMEGA 2 (.om2) configuration file.
 
             When complete:
                 Global variable "scenario_file" = user selected configuration file name.
@@ -302,7 +302,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Save Configuration File"
         # Call file dialog function
@@ -338,7 +338,7 @@ class Form(QObject):
 
     def open_input_batch_file(self):
         """
-            Opens a Windows dialog to select an OMEGA2 input directory.
+            Opens a Windows dialog to select an OMEGA 2 input directory.
 
             When complete:
                 Global variable "input_batch_file" = user selected input batch file.
@@ -351,7 +351,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Batch Files (*.xlsx)"
+        file_type = "OMEGA 2 Batch Files (*.xlsx)"
         # Add file dialog title
         file_dialog_title = "Select Input Batch File"
         # Call file dialog function
@@ -389,7 +389,7 @@ class Form(QObject):
 
     def open_output_batch_directory(self):
         """
-            Opens a Windows dialog to select an OMEGA2 (.om2) Scenario file.
+            Opens a Windows dialog to select an OMEGA 2 (.om2) Scenario file.
 
             When complete:
                 Global variable "output_batch_directory" = user selected output batch directory.
@@ -402,7 +402,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA2 Configuration Files (*.om2)"
+        file_type = "OMEGA 2 Configuration Files (*.om2)"
         # Add file dialog title
         file_dialog_title = "Select Output Batch Directory"
         # Call file dialog function
@@ -476,6 +476,7 @@ class Form(QObject):
         """
         os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
 
+
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
@@ -484,18 +485,10 @@ class Form(QObject):
 
         :return: N/A
         """
-        # Search file for OMEGA2 version #.
-        searchfile = open("usepa_omega2/__init__.py", "r")
-        for line in searchfile:
-            if "code_version =" in line:
-                a = line
-        searchfile.close()
-        # Display result.
-        message_title = "About OMEGA"
-        message = a
+        global omega2_version
+        message_title = "About OMEGA 2"
+        message = "OMEGA 2 Code Version = " + omega2_version
         self.showbox(message_title, message)
-
-
 
     def wizard_logic(self):
         """
@@ -514,25 +507,39 @@ class Form(QObject):
             self.event_monitor(temp1, 'black', '')
 
             self.window.save_configuration_file_button.setEnabled(1)
+            self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
 
         elif not configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             # self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File to continue."
             self.event_monitor(temp1, 'black', '')
             self.window.save_configuration_file_button.setEnabled(1)
+            self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         elif not configuration_file_valid and (not input_batch_file_valid or not output_batch_directory_valid):
             # self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid:"
             self.event_monitor(temp1, 'black', '')
             self.window.save_configuration_file_button.setEnabled(0)
+            self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
             if not input_batch_file_valid:
                 temp2 = "Input Batch File Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
+                self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
             if not output_batch_directory_valid:
                 temp2 = "Output Batch Directory Invalid:\n    [" + output_batch_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
+                self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             self.enable_run_button(True)
+            self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         else:
             self.enable_run_button(False)
 
@@ -542,16 +549,34 @@ class Form(QObject):
 
         :return: N/A
         """
-        global scenario, status_bar_message
+        global scenario, status_bar_message, omega2_version
+        global configuration_file, input_batch_file, output_batch_directory, output_batch_subdirectory
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
+        configuration_file = ""
+        input_batch_file = ""
+        output_batch_directory = ""
+        output_batch_subdirectory = ""
         wizard_init = "Open a valid Configuration File or:\n" \
                       "    Select New Input Batch File," \
                       " Select New Output Batch Directory," \
                       " and Save Configuration File\n" \
                       "----------"
+        # Search file for OMEGA 2 version #.
+        searchfile = open("usepa_omega2/__init__.py", "r")
+        version_line = "Not Found"
+        for line in searchfile:
+            if "code_version =" in line:
+                version_line = line
+        searchfile.close()
+        # Strip version number from text
+        start_pt = version_line.find("\"")
+        end_pt = version_line.find("\"", start_pt + 1)
+        omega2_version = version_line[start_pt + 1: end_pt]
+
         # Prime the status monitor
         color = "black"
-        self.event_monitor("Ready", color, 'dt')
+        message = "OMEGA 2 Version " + omega2_version + " Ready"
+        self.event_monitor(message, color, 'dt')
         self.event_monitor(event_separator, color, '')
         # Prime the wizard
         # self.clear_wizard()
@@ -563,10 +588,14 @@ class Form(QObject):
         configuration_file_valid = False
         input_batch_file_valid = False
         output_batch_directory_valid = False
-        status_bar_message = "Ready"
+        status_bar_message = "Status = Ready"
         self.enable_run_button(False)
         self.window.save_configuration_file_button.setEnabled(0)
         self.window.epa_button.setIcon(QIcon(epa_button_image))
+        self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+        self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
+        self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
+        self.window.setWindowTitle("EPA OMEGA 2 Model     Version: " + omega2_version)
 
     def clear_entries(self):
         """
@@ -582,7 +611,7 @@ class Form(QObject):
 
     def run_model(self):
         """
-        Calls the OMEGA2 main program with selected options.
+        Calls the OMEGA 2 main program with selected options.
         Options for single processor mode:
         --batch_file [user selected batch file] --bundle_path [user selected output directory]
         --timestamp [current date and time]
@@ -601,7 +630,7 @@ class Form(QObject):
         global multiprocessor_mode_selected
         global output_batch_subdirectory
         # self.event_monitor("Start Model Run ...", "black", 'dt')
-        status_bar_message = "Model Running ..."
+        status_bar_message = "Status = Model Running ..."
         status_bar()
         self.window.progress_bar.setValue(0)
         self.window.progress_bar.setValue(50)
@@ -645,7 +674,7 @@ class Form(QObject):
         # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
 
-        # Prepare command line options for OMEGA2 batch process
+        # Prepare command line options for OMEGA 2 batch process
         # batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         a = '--batch_file ' + '"' + input_batch_file + '"'
         b = ' --bundle_path ' + '"' + output_batch_directory + '"'
@@ -663,7 +692,7 @@ class Form(QObject):
         x = a + b + c + d
         # print("***", x, "***")
 
-        # Call OMEGA2 batch as a subprocess with command line options from above
+        # Call OMEGA 2 batch as a subprocess with command line options from above
         omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
@@ -676,6 +705,11 @@ class Form(QObject):
         # Keep looking for comm_file entries as long as process is running
         while omega_batch.poll() is None:
             time.sleep(1)
+            # Get CPU usage
+            # cpu = psutil.cpu_percent()
+            # Get memory used
+            # mem = psutil.virtual_memory().percent
+            # self.window.progress_bar.setValue(cpu)
             poll = omega_batch.poll()
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
@@ -711,7 +745,7 @@ class Form(QObject):
         # Update event monitor and status bar for end of model run
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
-        status_bar_message = "Ready"
+        status_bar_message = "Status = Ready"
         status_bar()
         self.window.progress_bar.setValue(100)
 
@@ -787,8 +821,18 @@ def status_bar():
     # Put date, time, and message on status bar
     now = datetime.now()
     date_time = now.strftime("%B %d, %Y  %H:%M:%S")
+    # Get CPU usage
+    # psutil.cpu_percent()
+    # Get memory used
+    mem = psutil.virtual_memory().percent
+    # cpu = int(cpu/10)
+    # cpu = "[" + ">" * cpu + "             "
+    # cpu = "CPU Load=" + cpu[0:11] + "]"
+    mem = int(mem/10)
+    mem = "[" + ">" * mem + "             "
+    mem = "Memory Load=" + mem[0:11] + "]"
     try:
-        form.window.statusBar().showMessage(date_time + "  " + status_bar_message)
+        form.window.statusBar().showMessage(date_time + "  " + status_bar_message + "     " + mem)
     except NameError:
         return
 

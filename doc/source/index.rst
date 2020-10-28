@@ -16,8 +16,8 @@ Is in process...
     code_description
     glossary
     developer
-    code
-    CBI
+    code_details
+    software_policy
 
 Indices and Tables
 ==================
