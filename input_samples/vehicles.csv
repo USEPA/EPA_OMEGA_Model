@@ -1,5 +1,5 @@
-input_template_name:,vehicles,input_template_version:,0.0006,,,,,,,,,,,,,,
-vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,aeo_size_class,electrification_class,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,market_class_id,sales,cert_co2_grams_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs
+input_template_name:,vehicles,input_template_version:,0.1,,,,,,,,,,,,,,
+vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,market_class_id,sales,cert_co2_grams_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs
 BEV Compact car,USA Motors,2020,car,Compact Cars,Compact,EV,non hauling,bev_300_LPW_LRL,US electricity,MTE US electricity,non hauling.BEV,5552,0,43.2,,12.1,3750
 ICE-HEV Compact car,USA Motors,2020,car,Compact Cars,Compact,HEV,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,17828,201.3181288,46.72694077,230.9710007,13.13122616,4134.353265
 ICE Compact car,USA Motors,2020,car,Compact Cars,Compact,N,non hauling,ice_LPW_LRL,pump gasoline,MTE Gasoline,non hauling.ICE,758547,219.7848799,44.41370937,178.7876717,10.84411579,3436.687674

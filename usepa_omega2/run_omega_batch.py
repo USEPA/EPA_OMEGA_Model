@@ -30,7 +30,8 @@ class OMEGABatchObject(object):
     def __init__(self, name='', **kwargs):
         self.name = name
         self.context_folder = ''
-        self.context_name = ''
+        self.context_id = ''
+        self.context_case_id = ''
         self.output_path = ".\\"
         self.sessions = []
         self.dataframe = pd.DataFrame()
@@ -44,6 +45,7 @@ class OMEGABatchObject(object):
             'First Pass Num Tech Options per BEV Vehicle',
             'Iteration Num Tech Options per ICE Vehicle',
             'Iteration Num Tech Options per BEV Vehicle',
+            'New Vehicle Price Sales Response Elasticity',
         }
 
         for p in numeric_params:
@@ -115,6 +117,7 @@ class OMEGABatchObject(object):
             'First Pass Num Tech Options per BEV Vehicle': 'FPNBTO',
             'Iteration Num Tech Options per ICE Vehicle': 'INITO',
             'Iteration Num Tech Options per BEV Vehicle': 'INBTO',
+            'New Vehicle Price Sales Response Elasticity': 'NVPSRE',
             'Allow Backsliding': 'ABS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
@@ -175,7 +178,8 @@ class OMEGABatchObject(object):
     def get_batch_settings(self):
         self.name = self.read_parameter('Batch Name')
         self.context_folder = self.read_parameter('Context Folder Name')
-        self.context_name = self.read_parameter('Context Name')
+        self.context_id = self.read_parameter('Context Name')
+        self.context_case_id = self.read_parameter('Context Case')
 
     def num_sessions(self):
         return len(self.dataframe.columns)
@@ -234,7 +238,8 @@ class OMEGASessionObject(object):
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
         self.settings.context_folder = self.parent.context_folder
-        self.settings.context_name = self.parent.context_name
+        self.settings.context_id = self.parent.context_id
+        self.settings.context_case_id = self.parent.context_case_id
 
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
@@ -244,12 +249,8 @@ class OMEGASessionObject(object):
         self.settings.fuel_scenarios_file = self.read_parameter('Fuel Scenarios File')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
-        if validate_predefined_input(self.read_parameter('Cost File Type'), {'clouds', 'curves'}):
-            self.settings.cost_file_type = self.read_parameter('Cost File Type')
         self.settings.cost_file = self.read_parameter('Cost File')
         self.settings.ghg_standards_file = self.read_parameter('GHG Standards File')
-        if validate_predefined_input(self.read_parameter('GHG Standard Type'), {'flat', 'footprint'}):
-            self.settings.GHG_standard = self.read_parameter('GHG Standard Type')
         self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards Fuels File')
         self.settings.required_zev_share_file = self.read_parameter('ZEV Requirement File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
@@ -280,6 +281,10 @@ class OMEGASessionObject(object):
         if not pd.isna(self.read_parameter('Iteration Num Tech Options per BEV Vehicle')):
             self.settings.iteration_num_tech_options_per_bev_vehicle = int(
                 self.read_parameter('Iteration Num Tech Options per BEV Vehicle'))
+
+        if not pd.isna(self.read_parameter('New Vehicle Price Sales Response Elasticity')):
+            self.settings.new_vehicle_sales_response_elasticity = \
+                self.read_parameter('New Vehicle Price Sales Response Elasticity')
 
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)

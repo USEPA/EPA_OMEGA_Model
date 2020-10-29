@@ -21,22 +21,20 @@ class ContextFuelPrices(SQABase, OMEGABase):
     calendar_year = Column(Numeric)
     retail_dollars_per_unit = Column(Float)
     pretax_dollars_per_unit = Column(Float)
-    fuels_context_ID = 'AEO2020'  # TODO: should come from batch definition context specification
-    fuels_case_ID = 'Reference case'  # TODO: should come from batch definition context specification
 
     @staticmethod
     def get_retail_fuel_price(calendar_year, fuel_ID):
         return o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
-            filter(ContextFuelPrices.context_ID == ContextFuelPrices.fuels_context_ID).\
-            filter(ContextFuelPrices.case_ID == ContextFuelPrices.fuels_case_ID).\
+            filter(ContextFuelPrices.context_ID == o2.options.context_id).\
+            filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
             filter(ContextFuelPrices.calendar_year == calendar_year).\
             filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
 
     @staticmethod
     def get_pretax_fuel_price(calendar_year, fuel_ID):
         return o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
-            filter(ContextFuelPrices.context_ID == ContextFuelPrices.fuels_context_ID).\
-            filter(ContextFuelPrices.case_ID == ContextFuelPrices.fuels_case_ID).\
+            filter(ContextFuelPrices.context_ID == o2.options.context_id).\
+            filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
             filter(ContextFuelPrices.calendar_year == calendar_year).\
             filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
 

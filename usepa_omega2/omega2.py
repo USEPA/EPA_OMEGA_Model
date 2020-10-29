@@ -70,19 +70,23 @@ def run_postproc(iteration_log, single_shot):
         o2.options.session_unique_name, total_sales.sum() / 1e6))
     fig.savefig(o2.options.output_folder + '%s Total Sales v Year' % o2.options.session_unique_name)
 
-    bev_non_hauling_share_frac = sql_unpack_result(
-        o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all())
-    ice_non_hauling_share_frac = sql_unpack_result(
-        o2.session.query(ManufacturerAnnualData.ice_non_hauling_share_frac).all())
-    bev_hauling_share_frac = sql_unpack_result(o2.session.query(ManufacturerAnnualData.bev_hauling_share_frac).all())
-    ice_hauling_share_frac = sql_unpack_result(o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all())
+    bev_non_hauling_share_frac = np.array(sql_unpack_result(
+        o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all()))
+    ice_non_hauling_share_frac = np.array(sql_unpack_result(
+        o2.session.query(ManufacturerAnnualData.ice_non_hauling_share_frac).all()))
+    bev_hauling_share_frac = np.array(sql_unpack_result(o2.session.query(ManufacturerAnnualData.bev_hauling_share_frac).all()))
+    ice_hauling_share_frac = np.array(sql_unpack_result(o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all()))
+    hauling_share_frac = bev_hauling_share_frac + ice_hauling_share_frac
+    non_hauling_share_frac = bev_non_hauling_share_frac + ice_non_hauling_share_frac
 
     fig, ax1 = fplothg(calendar_years, bev_non_hauling_share_frac, '.-')
     ax1.plot(calendar_years, ice_non_hauling_share_frac, '.-')
     ax1.plot(calendar_years, bev_hauling_share_frac, '.-')
     ax1.plot(calendar_years, ice_hauling_share_frac, '.-')
+    ax1.plot(calendar_years, hauling_share_frac, '.-')
+    ax1.plot(calendar_years, non_hauling_share_frac, '.-')
     label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_unique_name)
-    ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling'])
+    ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling', 'hauling', 'non_hauling'])
     fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_unique_name)
 
     # cost/vehicle chart
@@ -267,7 +271,8 @@ def run_producer_consumer():
                                                                    sales_demand['consumer_%s_abs_share_frac' % mc]
 
                         # calculate new total sales demand based on total share weighted price
-                        sales_demand['new_vehicle_sales'] = consumer.sales_volume.new_vehicle_sales(sales_demand['share_weighted_price'])
+                        sales_demand['new_vehicle_sales'] = \
+                            consumer.sales_volume.new_vehicle_sales_response(calendar_year, sales_demand['share_weighted_price'])
 
                         # propagate total sales down to composite vehicles by market class share and reg class share,
                         # calculate new compliance status for each producer-technology / consumer response combination
@@ -473,12 +478,14 @@ def init_omega(o2_options):
     init_omega_db()
     o2.engine.echo = o2.options.verbose
 
+    init_fail = []
+
     # import database modules to populate ORM context
     from fuels import Fuel
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
     from market_classes import MarketClass
-    from cost_curves import CostCurve
+    from cost_curves import CostCurve, input_template_name as cost_curve_template_name
     from cost_clouds import CostCloud
     from demanded_shares_gcam import DemandedSharesGCAM
     from manufacturers import Manufacturer
@@ -488,10 +495,18 @@ def init_omega(o2_options):
     from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
 
-    if o2.options.GHG_standard == 'flat':
+    from GHG_standards_flat import input_template_name as flat_template_name
+    from GHG_standards_footprint import input_template_name as footprint_template_name
+    ghg_template_name = get_template_name(o2.options.ghg_standards_file)
+
+    if ghg_template_name == flat_template_name:
         from GHG_standards_flat import GHGStandardFlat
-    else:
+        o2.options.GHG_standard = GHGStandardFlat
+    elif ghg_template_name == footprint_template_name:
         from GHG_standards_footprint import GHGStandardFootprint
+        o2.options.GHG_standard = GHGStandardFootprint
+    else:
+        init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
     from GHG_standards_fuels import GHGStandardFuels
 
@@ -506,8 +521,6 @@ def init_omega(o2_options):
     o2.options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
     o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
 
-    init_fail = []
-
     try:
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
@@ -519,19 +532,14 @@ def init_omega(o2_options):
 
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
-        if o2.options.cost_file_type == 'curves':
+
+        if get_template_name(o2.options.cost_file) == cost_curve_template_name:
             init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
         else:
             init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
-        if o2.options.GHG_standard == 'flat':
-            init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
-                                                                            verbose=o2.options.verbose)
-            o2.options.GHG_standard = GHGStandardFlat
-        else:
-            init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
-                                                                                 verbose=o2.options.verbose)
-            o2.options.GHG_standard = GHGStandardFootprint
+        init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
+                                                                             verbose=o2.options.verbose)
 
         init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
                                                                          verbose=o2.options.verbose)

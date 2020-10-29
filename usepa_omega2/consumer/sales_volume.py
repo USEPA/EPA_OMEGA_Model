@@ -21,9 +21,7 @@ def context_new_vehicle_sales(model_year):
     :return: dict of sales by consumer (market) categories
     """
 
-    # TODO: needs to get context new vehicle sales from projections (AEO, etc)
-
-    #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
+    #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
     from vehicles import VehicleFinal
     from context_new_vehicle_market import ContextNewVehicleMarket
@@ -33,41 +31,36 @@ def context_new_vehicle_sales(model_year):
     # get total sales from context
     total_sales = ContextNewVehicleMarket.get_new_vehicle_sales(model_year)
 
-    # TODO: get market class sales from context, for now scale initial fleet
-
     total_sales_initial = float(o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
 
-    # for now, to scale everything up appropriately...
-    sales_ratio = total_sales / total_sales_initial
-
-    # get sales numbers from initial fleet (for now)
-    initial_ICE_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+    # get ICE share from initial fleet (for now)
+    ICE_share = float(o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
         VehicleFinal.fueling_class == 'ICE').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()) / total_sales_initial
 
-    initial_BEV_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
-        VehicleFinal.fueling_class == 'BEV').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
+    # TODO: this may break if some size classes are both hauling and non-hauling... would need to calculate shares then or something
+    # pulling in hauling sales, non hauling = total minus hauling
+    hauling_size_classes = set(sql_unpack_result(
+        o2.session.query(VehicleFinal.context_size_class).
+            filter(VehicleFinal.hauling_class == 'hauling').
+            filter(VehicleFinal.model_year == o2.options.analysis_initial_year - 1)))
 
-    initial_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
-        VehicleFinal.hauling_class == 'hauling').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
+    hauling_sales = 0
+    for csc in hauling_size_classes:
+        hauling_sales = hauling_sales + ContextNewVehicleMarket.get_new_vehicle_sales(model_year,
+                                                                                      context_size_class=csc)
 
-    initial_non_hauling_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
-        VehicleFinal.hauling_class == 'non hauling').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
-
-    sales_dict['hauling'] = sales_ratio * float(initial_hauling_sales)
-    sales_dict['non hauling'] = sales_ratio * float(initial_non_hauling_sales)
-    sales_dict['BEV'] = sales_ratio * float(initial_BEV_sales)
-    sales_dict['ICE'] = sales_ratio * float(initial_ICE_sales)
+    sales_dict['hauling'] = hauling_sales
+    sales_dict['non hauling'] = total_sales - hauling_sales
+    sales_dict['ICE'] = total_sales * ICE_share
+    sales_dict['BEV'] = total_sales * (1 - ICE_share)
     sales_dict['total'] = total_sales
 
     return sales_dict
 
 
-def new_vehicle_sales(P):
+def new_vehicle_sales_response(calendar_year, P):
     """
     Calculate new vehicle sales, relative to a reference sales volume and average new vehicle price
     :param P: a single price or a list-like of prices
@@ -78,13 +71,13 @@ def new_vehicle_sales(P):
         import numpy as np
         P = np.array(P)
 
-    # Q0 = o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
-    #     VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).filter(VehicleAnnualData.age == 0).one()
+    from context_new_vehicle_market import ContextNewVehicleMarket
 
     # TODO: un-hardcode these values
-    Q0 = 14581209  # from vehicles.csv
+    Q0 = ContextNewVehicleMarket.get_new_vehicle_sales(calendar_year)
     P0 = 30937  # sales-weighted, from vehicles.csv
-    E = -0.5  # new vehicle sales elasticity, eventually to come from batch file input
+
+    E = o2.options.new_vehicle_sales_response_elasticity
 
     M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
 

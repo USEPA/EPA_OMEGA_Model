@@ -9,6 +9,7 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
+input_template_name = 'cost_clouds'
 
 class CostCloud(SQABase, OMEGABase):
     # --- database table properties ---
@@ -30,7 +31,6 @@ class CostCloud(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'cost_clouds'
         input_template_version = 0.0004
         input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
                                   'new_vehicle_mfr_cost_dollars', 'kWh_per_mile_cycle'}

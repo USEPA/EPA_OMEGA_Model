@@ -14,6 +14,18 @@ from usepa_omega2 import *
 import pandas as pd
 
 
+def get_template_name(filename):
+    # read first row of input file as list of values
+    version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
+    if 'input_template_name:' not in version_data:
+        template_name = None
+    else:
+        name_index = version_data.index('input_template_name:')
+        template_name = version_data[name_index + 1]
+
+    return template_name
+
+
 def validate_template_version_info(filename, input_template_name, input_template_version, verbose=False):
 
     # read first row of input file as list of values
@@ -27,8 +39,8 @@ def validate_template_version_info(filename, input_template_name, input_template
     if 'input_template_name:' not in version_data:
         error_list.append("*** Can't find input template name in %s ***" % filename)
 
-    name_index = version_data.index('input_template_name:')
-    template_name = version_data[name_index + 1]
+    template_name = get_template_name(filename)
+
     if not template_name == input_template_name:
         error_list.append(
             '*** Wrong input template name, got "%s", was expecting "%s" ***' % (template_name, input_template_name))

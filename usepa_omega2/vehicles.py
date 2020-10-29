@@ -185,6 +185,9 @@ class Vehicle(OMEGABase):
     hauling_class = None
     cost_curve_class = None
     reg_class_ID = None
+    epa_size_class = None
+    context_size_class = None
+    electrification_class = None
     cert_CO2_grams_per_mile = None
     cert_target_CO2_grams_per_mile = None
     cert_CO2_Mg = None
@@ -192,7 +195,7 @@ class Vehicle(OMEGABase):
     new_vehicle_mfr_cost_dollars = None
     manufacturer_deemed_new_vehicle_generalized_cost_dollars = None
     in_use_fuel_ID = None
-    # TODO: cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('ghg_standard_fuels.fuel_id'))
+    cert_fuel_ID = None
     market_class_ID = None
     footprint_ft2 = None
     reg_class_market_share_frac = 1.0
@@ -266,7 +269,7 @@ class Vehicle(OMEGABase):
 
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
-                              'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'market_class_ID',
+                              'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'cert_fuel_ID', 'market_class_ID',
                               'footprint_ft2'}
 
         for p in inherit_properties:
@@ -311,13 +314,16 @@ class VehicleFinal(SQABase, Vehicle):
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    epa_size_class = Column(String)  # TODO: validate with enum?
+    context_size_class = Column(String)  # TODO: validate with enum?
+    electrification_class = Column(String)  # TODO: validate with enum?
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
     cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
     new_vehicle_mfr_cost_dollars = Column(Float)
     manufacturer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
     in_use_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
-    # TODO: cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('ghg_standard_fuels.fuel_id'))
+    cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
@@ -344,8 +350,9 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.0006
-        input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'hauling_class',
+        input_template_version = 0.1
+        input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
+                                  'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
                                   'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'market_class_id',
                                   'sales', 'cert_co2_grams_per_mile', 'footprint_ft2'}
 
@@ -365,14 +372,18 @@ class VehicleFinal(SQABase, Vehicle):
                         manufacturer_ID=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
+                        epa_size_class=df.loc[i, 'epa_size_class'],
+                        context_size_class=df.loc[i, 'context_size_class'],
+                        electrification_class=df.loc[i, 'electrification_class'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         in_use_fuel_ID=df.loc[i, 'in_use_fuel_id'],
+                        cert_fuel_ID=df.loc[i, 'cert_fuel_id'],
                         market_class_ID=df.loc[i, 'market_class_id'],
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
-                    if 'BEV' in veh.market_class_ID:
+                    if veh.electrification_class == 'EV':
                         veh.fueling_class = 'BEV'
                     else:
                         veh.fueling_class = 'ICE'
@@ -401,6 +412,8 @@ if __name__ == '__main__':
         o2.engine.echo = True
         omega_log.init_logfile()
 
+        init_fail = []
+
         from omega_functions import weighted_value, unweighted_value
 
         from manufacturers import Manufacturer  # needed for manufacturers table
@@ -410,19 +423,28 @@ if __name__ == '__main__':
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 
-        if o2.options.GHG_standard == 'flat':
+        from GHG_standards_flat import input_template_name as flat_template_name
+        from GHG_standards_footprint import input_template_name as footprint_template_name
+        ghg_template_name = get_template_name(o2.options.ghg_standards_file)
+
+        if ghg_template_name == flat_template_name:
             from GHG_standards_flat import GHGStandardFlat
-        else:
+
+            o2.options.GHG_standard = GHGStandardFlat
+        elif ghg_template_name == footprint_template_name:
             from GHG_standards_footprint import GHGStandardFootprint
 
-        if o2.options.cost_file_type == 'curves':
-            from cost_curves import CostCurve  # needed for vehicle cost from CO2
+            o2.options.GHG_standard = GHGStandardFootprint
         else:
-            from cost_clouds import CostCloud  # needed for vehicle cost from CO2
+            init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
+
+        from GHG_standards_fuels import GHGStandardFuels
+
+        from cost_curves import CostCurve, input_template_name as cost_curve_template_name
+        from cost_clouds import CostCloud
 
         SQABase.metadata.create_all(o2.engine)
 
-        init_fail = []
         init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
                                                                      verbose=o2.options.verbose)
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
@@ -432,19 +454,16 @@ if __name__ == '__main__':
         init_fail = init_fail + ContextFuelPrices.init_database_from_file(o2.options.context_fuel_prices_file,
                                                                           verbose=o2.options.verbose)
 
-        if o2.options.cost_file_type == 'curves':
+        if get_template_name(o2.options.cost_file) == cost_curve_template_name:
             init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
         else:
             init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
-        if o2.options.GHG_standard == 'flat':
-            init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
-                                                                            verbose=o2.options.verbose)
-            o2.options.GHG_standard = GHGStandardFlat
-        else:
-            init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
-                                                                                 verbose=o2.options.verbose)
-            o2.options.GHG_standard = GHGStandardFootprint
+        init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
+                                                                             verbose=o2.options.verbose)
+
+        init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
+                                                                         verbose=o2.options.verbose)
 
         init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
@@ -483,5 +502,6 @@ if __name__ == '__main__':
             os._exit(-1)
 
     except:
+        dump_omega_db_to_csv(o2.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -35,9 +35,35 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     bev_price_dollars = Column(Numeric)
 
     @staticmethod
-    def get_new_vehicle_sales(calendar_year):
-        return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).\
-            filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+    def get_new_vehicle_sales(calendar_year, context_size_class=None):
+        if context_size_class:
+            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)). \
+                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
+                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
+                         filter(ContextNewVehicleMarket.context_size_class == context_size_class). \
+                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+        else:
+            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)). \
+                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
+                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
+                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+
+    # TODO: was going to use this to calculate P0 for the consumer sales response, but there's no ice/bev split and some of the bevs have a zero price, which is bogus, even in 2050...
+    # @staticmethod
+    # def get_new_vehicle_sales_weighted_price(calendar_year):
+    #     ice_price = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales * ContextNewVehicleMarket.ice_price_dollars)). \
+    #                       filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
+    #                       filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
+    #                       filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar()) / \
+    #                 ContextNewVehicleMarket.get_new_vehicle_sales(calendar_year)
+    #
+    #     bev_price = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales * ContextNewVehicleMarket.bev_price_dollars)).
+    #                       filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
+    #                       filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
+    #                       filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar()) / \
+    #                 ContextNewVehicleMarket.get_new_vehicle_sales(calendar_year)
+    #
+    #     return ice_price
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -110,6 +136,8 @@ if __name__ == '__main__':
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
+            print(ContextNewVehicleMarket.get_new_vehicle_sales(2021))
+            print(ContextNewVehicleMarket.get_new_vehicle_sales_weighted_price(2021))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

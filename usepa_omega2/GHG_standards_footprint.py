@@ -10,6 +10,7 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
+input_template_name = 'ghg_standards-footprint'
 
 class GHGStandardFootprint(SQABase, OMEGABase):
     # --- database table properties ---
@@ -30,7 +31,6 @@ class GHGStandardFootprint(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'ghg_standards-footprint'
         input_template_version = 0.0003
         input_template_columns = {'model_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
                                   'd_coeff', 'lifetime_vmt'}

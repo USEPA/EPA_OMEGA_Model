@@ -47,9 +47,11 @@ try:
             self.vehicles_file = 'input_samples/vehicles.csv'
             self.demanded_shares_file = 'input_samples/demanded_shares-gcam.csv'
             self.fuels_file = 'input_samples/fuels.csv'
+            self.context_folder = ''
+            self.context_id = 'AEO2020'
+            self.context_case_id = 'Reference case'
             self.context_fuel_prices_file = 'input_samples/context_fuel_prices.csv'
             self.context_new_vehicle_market_file = 'input_samples/context_new_vehicle_market.csv'
-            self.cost_file_type = 'curves'
             self.cost_file = 'input_samples/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
@@ -58,11 +60,7 @@ try:
             self.logfilename = ''
             self.producer_calculate_generalized_cost = None
             self.consumer_calculate_generalized_cost = None
-            self.GHG_standard = 'flat'
-            if self.GHG_standard == 'flat':
-                self.ghg_standards_file = 'input_samples/ghg_standards-flat.csv'
-            else:
-                self.ghg_standards_file = 'input_samples/ghg_standards-footprint.csv'
+            self.ghg_standards_file = 'input_samples/ghg_standards-flat.csv'
             self.ghg_standards_fuels_file = 'input_samples/ghg_standards-fuels.csv'
             self.required_zev_share_file = 'input_samples/required_zev_share.csv'
             self.stock_scrappage = 'fixed'
@@ -75,8 +73,6 @@ try:
                 self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
             else:
                 pass
-            self.context_folder = ''
-            self.context_name = ''
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
             self.producer_consumer_max_iterations = 20
@@ -89,7 +85,8 @@ try:
             self.iteration_num_tech_options_per_ice_vehicle = 20
             self.iteration_num_tech_options_per_bev_vehicle = 2
 
-            self.iterate_producer_consumer = True
+            self.iterate_producer_consumer = False
+            self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0
             self.end_time = 0
