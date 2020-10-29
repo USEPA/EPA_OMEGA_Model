@@ -60,10 +60,6 @@ class OMEGABatchObject(object):
                        'N': 'N',
                        'TRUE': True,
                        'FALSE': False,
-                       'CostClouds': 'clouds',
-                       'CostCurves': 'curves',
-                       'Flat': 'flat',
-                       'Footprint': 'footprint',
                        }
 
         if type(raw_param) is str:
