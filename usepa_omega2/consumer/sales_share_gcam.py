@@ -24,6 +24,7 @@ def get_demanded_shares(market_class_data, calendar_year):
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
 
+    # TODO: these need to come from the policy
     carbon_intensity_gasoline = 8887  # g per CO2 per gallon
     carbon_intensity_electricity = 534  # g per kWh generated
 
@@ -32,7 +33,6 @@ def get_demanded_shares(market_class_data, calendar_year):
 
     for pass_num in [0, 1]:
         for market_class_id in MarketClass.market_classes:
-            # ToDo: These fuels items should be populated from the fuels class
             fuel_cost = market_class_data['average_%s_fuel_price' % market_class_id]
 
             gcam_data_cy = o2.session.query(DemandedSharesGCAM). \

@@ -29,7 +29,7 @@ def context_new_vehicle_sales(model_year):
     sales_dict = dict()
 
     # get total sales from context
-    total_sales = ContextNewVehicleMarket.get_new_vehicle_sales(model_year)
+    total_sales = ContextNewVehicleMarket.new_vehicle_sales(model_year)
 
     total_sales_initial = float(o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
@@ -48,8 +48,8 @@ def context_new_vehicle_sales(model_year):
 
     hauling_sales = 0
     for csc in hauling_size_classes:
-        hauling_sales = hauling_sales + ContextNewVehicleMarket.get_new_vehicle_sales(model_year,
-                                                                                      context_size_class=csc)
+        hauling_sales = hauling_sales + ContextNewVehicleMarket.new_vehicle_sales(model_year,
+                                                                                  context_size_class=csc)
 
     sales_dict['hauling'] = hauling_sales
     sales_dict['non hauling'] = total_sales - hauling_sales
@@ -74,7 +74,7 @@ def new_vehicle_sales_response(calendar_year, P):
     from context_new_vehicle_market import ContextNewVehicleMarket
 
     # TODO: un-hardcode these values
-    Q0 = ContextNewVehicleMarket.get_new_vehicle_sales(calendar_year)
+    Q0 = ContextNewVehicleMarket.new_vehicle_sales(calendar_year)
     P0 = 30937  # sales-weighted, from vehicles.csv
 
     E = o2.options.new_vehicle_sales_response_elasticity

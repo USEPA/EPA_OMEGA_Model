@@ -35,7 +35,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     bev_price_dollars = Column(Numeric)
 
     @staticmethod
-    def get_new_vehicle_sales(calendar_year, context_size_class=None):
+    def new_vehicle_sales(calendar_year, context_size_class=None):
         if context_size_class:
             return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)). \
                          filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
@@ -136,8 +136,8 @@ if __name__ == '__main__':
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
-            print(ContextNewVehicleMarket.get_new_vehicle_sales(2021))
-            print(ContextNewVehicleMarket.get_new_vehicle_sales_weighted_price(2021))
+            print(ContextNewVehicleMarket.new_vehicle_sales(2021))
+            # print(ContextNewVehicleMarket.get_new_vehicle_sales_weighted_price(2021))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
