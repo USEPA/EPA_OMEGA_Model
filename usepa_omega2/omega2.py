@@ -586,13 +586,14 @@ def run_omega(o2_options, single_shot=False, profile=False):
             # o2.session = None
             o2.options = None
         else:
-            print(init_fail)
             omega_log.logwrite("\n#INIT FAIL")
+            omega_log.logwrite(init_fail)
             omega_log.end_logfile("\nSession Fail")
 
     except Exception as e:
         if init_fail:
             omega_log.logwrite("\n#INIT FAIL")
+            omega_log.logwrite(init_fail)
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
