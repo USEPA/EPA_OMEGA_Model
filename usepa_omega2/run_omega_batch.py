@@ -242,7 +242,8 @@ class OMEGASessionObject(object):
         self.settings.demanded_shares_file = self.read_parameter('Demanded Shares File')
         self.settings.fuels_file = self.read_parameter('Fuels File')
         self.settings.fuel_scenarios_file = self.read_parameter('Fuel Scenarios File')
-        self.settings.fuels_context_file = self.read_parameter('Fuel Scenario Annual Data File')
+        self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
+        self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         if validate_predefined_input(self.read_parameter('Cost File Type'), {'clouds', 'curves'}):
             self.settings.cost_file_type = self.read_parameter('Cost File Type')
         self.settings.cost_file = self.read_parameter('Cost File')

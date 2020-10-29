@@ -508,60 +508,61 @@ def init_omega(o2_options):
 
     init_fail = []
 
-    init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+    try:
+        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-    init_fail = init_fail + FuelsContext.init_database_from_file(
-        o2.options.fuels_context_file, verbose=o2.options.verbose)
+        init_fail = init_fail + FuelsContext.init_database_from_file(
+            o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
 
-    init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
-        o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
+        init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
+            o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
 
-    init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                verbose=o2.options.verbose)
-    if o2.options.cost_file_type == 'curves':
-        init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-    else:
-        init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+                                                                    verbose=o2.options.verbose)
+        if o2.options.cost_file_type == 'curves':
+            init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        else:
+            init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
-    if o2.options.GHG_standard == 'flat':
-        init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
-                                                                        verbose=o2.options.verbose)
-        o2.options.GHG_standard = GHGStandardFlat
-    else:
-        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
-                                                                             verbose=o2.options.verbose)
-        o2.options.GHG_standard = GHGStandardFootprint
-
-    init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
-                                                                     verbose=o2.options.verbose)
-    init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
-        o2.options.demanded_shares_file, verbose=o2.options.verbose)
-
-    init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
-                                                                 verbose=o2.options.verbose)
-    init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
-
-    if o2.options.stock_scrappage == 'fixed':
-        init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
-            o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
-        o2.options.stock_scrappage = ReregistrationFixedByAge
-    else:
-        pass
-
-    if o2.options.stock_vmt == 'fixed':
-        init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
+        if o2.options.GHG_standard == 'flat':
+            init_fail = init_fail + GHGStandardFlat.init_database_from_file(o2.options.ghg_standards_file,
                                                                             verbose=o2.options.verbose)
-        o2.options.stock_vmt = AnnualVMTFixedByAge
-    else:
-        pass
+            o2.options.GHG_standard = GHGStandardFlat
+        else:
+            init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
+                                                                                 verbose=o2.options.verbose)
+            o2.options.GHG_standard = GHGStandardFootprint
 
-    # initial year = initial fleet model year (latest year of data)
-    o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
-    # final year = last year of cost curve data
-    o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
-    # o2.options.analysis_final_year = o2.options.analysis_initial_year
+        init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
+                                                                         verbose=o2.options.verbose)
+        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
+            o2.options.demanded_shares_file, verbose=o2.options.verbose)
 
-    return init_fail
+        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
+                                                                     verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+
+        if o2.options.stock_scrappage == 'fixed':
+            init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
+                o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
+            o2.options.stock_scrappage = ReregistrationFixedByAge
+        else:
+            pass
+
+        if o2.options.stock_vmt == 'fixed':
+            init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
+                                                                                verbose=o2.options.verbose)
+            o2.options.stock_vmt = AnnualVMTFixedByAge
+        else:
+            pass
+
+        # initial year = initial fleet model year (latest year of data)
+        o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+        # final year = last year of cost curve data
+        o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
+        # o2.options.analysis_final_year = o2.options.analysis_initial_year
+    finally:
+        return init_fail
 
 
 def run_omega(o2_options, single_shot=False, profile=False):

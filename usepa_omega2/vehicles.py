@@ -429,7 +429,7 @@ if __name__ == '__main__':
                                                                     verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.fuels_context_file,
+        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.context_fuel_prices_file,
                                                                      verbose=o2.options.verbose)
 
         if o2.options.cost_file_type == 'curves':

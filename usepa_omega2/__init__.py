@@ -47,7 +47,7 @@ try:
             self.vehicles_file = 'input_samples/vehicles.csv'
             self.demanded_shares_file = 'input_samples/demanded_shares-gcam.csv'
             self.fuels_file = 'input_samples/fuels.csv'
-            self.fuels_context_file = 'input_samples/context_fuel_prices.csv'
+            self.context_fuel_prices_file = 'input_samples/context_fuel_prices.csv'
             self.context_new_vehicle_market_file = 'input_samples/context_new_vehicle_market.csv'
             self.cost_file_type = 'curves'
             self.cost_file = 'input_samples/cost_curves.csv'
