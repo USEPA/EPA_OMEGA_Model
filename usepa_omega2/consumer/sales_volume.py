@@ -26,8 +26,20 @@ def context_new_vehicle_sales(model_year):
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
     from vehicles import VehicleFinal
+    from context_new_vehicle_market import ContextNewVehicleMarket
 
     sales_dict = dict()
+
+    # get total sales from context
+    total_sales = ContextNewVehicleMarket.get_new_vehicle_sales(model_year)
+
+    # TODO: get market class sales from context, for now scale initial fleet
+
+    total_sales_initial = float(o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
+        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
+
+    # for now, to scale everything up appropriately...
+    sales_ratio = total_sales / total_sales_initial
 
     # get sales numbers from initial fleet (for now)
     initial_ICE_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
@@ -46,14 +58,11 @@ def context_new_vehicle_sales(model_year):
         VehicleFinal.hauling_class == 'non hauling').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
 
-    total_sales = o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()
-
-    sales_dict['hauling'] = float(initial_hauling_sales)
-    sales_dict['non hauling'] = float(initial_non_hauling_sales)
-    sales_dict['BEV'] = float(initial_BEV_sales)
-    sales_dict['ICE'] = float(initial_ICE_sales)
-    sales_dict['total'] = float(total_sales)
+    sales_dict['hauling'] = sales_ratio * float(initial_hauling_sales)
+    sales_dict['non hauling'] = sales_ratio * float(initial_non_hauling_sales)
+    sales_dict['BEV'] = sales_ratio * float(initial_BEV_sales)
+    sales_dict['ICE'] = sales_ratio * float(initial_ICE_sales)
+    sales_dict['total'] = total_sales
 
     return sales_dict
 

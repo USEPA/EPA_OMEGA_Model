@@ -58,6 +58,18 @@ def run_postproc(iteration_log, single_shot):
         o2.options.session_unique_name, total_cost_billions))
     fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_unique_name)
 
+    import numpy as np
+    total_sales = []
+    for cy in calendar_years:
+        total_sales.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                           .filter(VehicleAnnualData.calendar_year == cy)
+                           .filter(VehicleAnnualData.age == 0).scalar()))
+    total_sales = np.array(total_sales)
+    fig, ax1 = fplothg(calendar_years, total_sales / 1e6, '.-')
+    label_xyt(ax1, 'Year', 'Sales [millions]', '%s\nTotal Sales Versus Calendar Year\n Total Sales %.2f Million' % (
+        o2.options.session_unique_name, total_sales.sum() / 1e6))
+    fig.savefig(o2.options.output_folder + '%s Total Sales v Year' % o2.options.session_unique_name)
+
     bev_non_hauling_share_frac = sql_unpack_result(
         o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all())
     ice_non_hauling_share_frac = sql_unpack_result(
@@ -464,6 +476,7 @@ def init_omega(o2_options):
     # import database modules to populate ORM context
     from fuels import Fuel
     from fuels_context import FuelsContext
+    from context_new_vehicle_market import ContextNewVehicleMarket
     from market_classes import MarketClass
     from cost_curves import CostCurve
     from cost_clouds import CostCloud
@@ -499,6 +512,9 @@ def init_omega(o2_options):
 
     init_fail = init_fail + FuelsContext.init_database_from_file(
         o2.options.fuels_context_file, verbose=o2.options.verbose)
+
+    init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
+        o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
 
     init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                 verbose=o2.options.verbose)
@@ -543,6 +559,7 @@ def init_omega(o2_options):
     o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
     # final year = last year of cost curve data
     o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
+    # o2.options.analysis_final_year = o2.options.analysis_initial_year
 
     return init_fail
 
