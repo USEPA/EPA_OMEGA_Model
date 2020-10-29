@@ -1,6 +1,6 @@
 """
-fuels_context.py
-================
+context_fuel_prices.py
+======================
 
 
 """
@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class FuelsContext(SQABase, OMEGABase):
+class ContextFuelPrices(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'fuels_context'
     index = Column('index', Integer, primary_key=True)
@@ -26,19 +26,19 @@ class FuelsContext(SQABase, OMEGABase):
 
     @staticmethod
     def get_retail_fuel_price(calendar_year, fuel_ID):
-        return o2.session.query(FuelsContext.retail_dollars_per_unit).\
-            filter(FuelsContext.context_ID == FuelsContext.fuels_context_ID).\
-            filter(FuelsContext.case_ID == FuelsContext.fuels_case_ID).\
-            filter(FuelsContext.calendar_year == calendar_year).\
-            filter(FuelsContext.fuel_ID == fuel_ID).one()[0]
+        return o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
+            filter(ContextFuelPrices.context_ID == ContextFuelPrices.fuels_context_ID).\
+            filter(ContextFuelPrices.case_ID == ContextFuelPrices.fuels_case_ID).\
+            filter(ContextFuelPrices.calendar_year == calendar_year).\
+            filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
 
     @staticmethod
     def get_pretax_fuel_price(calendar_year, fuel_ID):
-        return o2.session.query(FuelsContext.pretax_dollars_per_unit).\
-            filter(FuelsContext.context_ID == FuelsContext.fuels_context_ID).\
-            filter(FuelsContext.case_ID == FuelsContext.fuels_case_ID).\
-            filter(FuelsContext.calendar_year == calendar_year).\
-            filter(FuelsContext.fuel_ID == fuel_ID).one()[0]
+        return o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
+            filter(ContextFuelPrices.context_ID == ContextFuelPrices.fuels_context_ID).\
+            filter(ContextFuelPrices.case_ID == ContextFuelPrices.fuels_case_ID).\
+            filter(ContextFuelPrices.calendar_year == calendar_year).\
+            filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -65,7 +65,7 @@ class FuelsContext(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(FuelsContext(
+                    obj_list.append(ContextFuelPrices(
                         context_ID=df.loc[i, 'context_id'],
                         case_ID=df.loc[i, 'case_id'],
                         fuel_ID=df.loc[i, 'fuel_id'],
@@ -92,14 +92,14 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.context_fuel_prices_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail = init_fail + ContextFuelPrices.init_database_from_file(o2.options.context_fuel_prices_file,
+                                                                          verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-            print(FuelsContext.get_retail_fuel_price(2020, 'pump gasoline'))
-            print(FuelsContext.get_pretax_fuel_price(2020, 'pump gasoline'))
+            print(ContextFuelPrices.get_retail_fuel_price(2020, 'pump gasoline'))
+            print(ContextFuelPrices.get_pretax_fuel_price(2020, 'pump gasoline'))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

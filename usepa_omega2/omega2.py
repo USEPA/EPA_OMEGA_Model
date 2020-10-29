@@ -304,7 +304,7 @@ def run_producer_consumer():
                         # ax1.plot(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['initial_revenue'], 'r.')
                         # label_xy(ax1, 'total_combo_credits_co2_megagrams', 'revenue [$]')
 
-                        # sales_demand.to_csv('sales_demand_%s_%s.csv' % (calendar_year, iteration_num))
+                        # sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
 
                         # experiment ----------------------- #
 
@@ -475,7 +475,7 @@ def init_omega(o2_options):
 
     # import database modules to populate ORM context
     from fuels import Fuel
-    from fuels_context import FuelsContext
+    from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
     from market_classes import MarketClass
     from cost_curves import CostCurve
@@ -511,7 +511,7 @@ def init_omega(o2_options):
     try:
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + FuelsContext.init_database_from_file(
+        init_fail = init_fail + ContextFuelPrices.init_database_from_file(
             o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
 
         init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(

@@ -215,16 +215,16 @@ class Vehicle(OMEGABase):
         return self._initial_registered_count
 
     def retail_fuel_price(self, calendar_year=None):
-        from fuels_context import FuelsContext
+        from context_fuel_prices import ContextFuelPrices
         if calendar_year is None:
             calendar_year = self.model_year
-        return FuelsContext.get_retail_fuel_price(calendar_year, self.in_use_fuel_ID)
+        return ContextFuelPrices.get_retail_fuel_price(calendar_year, self.in_use_fuel_ID)
 
     def pretax_fuel_price(self, calendar_year=None):
-        from fuels_context import FuelsContext
+        from context_fuel_prices import ContextFuelPrices
         if calendar_year is None:
             calendar_year = self.model_year
-        return FuelsContext.get_pretax_fuel_price(calendar_year, self.in_use_fuel_ID)
+        return ContextFuelPrices.get_pretax_fuel_price(calendar_year, self.in_use_fuel_ID)
 
     @initial_registered_count.setter
     def initial_registered_count(self, initial_registered_count):
@@ -406,7 +406,7 @@ if __name__ == '__main__':
         from manufacturers import Manufacturer  # needed for manufacturers table
         from market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
-        from fuels_context import FuelsContext # needed for retail fuel price
+        from context_fuel_prices import ContextFuelPrices # needed for retail fuel price
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 
@@ -429,8 +429,8 @@ if __name__ == '__main__':
                                                                     verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + FuelsContext.init_database_from_file(o2.options.context_fuel_prices_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail = init_fail + ContextFuelPrices.init_database_from_file(o2.options.context_fuel_prices_file,
+                                                                          verbose=o2.options.verbose)
 
         if o2.options.cost_file_type == 'curves':
             init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
