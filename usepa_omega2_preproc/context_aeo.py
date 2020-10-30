@@ -2,9 +2,8 @@
 context_aeo.py
 
 """
-# TODO aeo_context_id > context_id; aeo_case_id > case_id; fuel_id values should be pump gasoline and US Electricity with separate columns
-# for retail and pre-tax; template name is context_fuel_prices and vehicles file should be context_new_vehicle_sales
 import pandas as pd
+import numpy as np
 from pathlib import Path
 from datetime import datetime
 import shutil
@@ -16,7 +15,7 @@ path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
 path_outputs.mkdir(exist_ok=True)
 path_input_templates = path_cwd / 'input_samples'
 
-vehicles_context_template = 'context_new_vehicle_sales.csv'
+vehicles_context_template = 'context_new_vehicle_market.csv'
 fuels_context_template = 'context_fuel_prices.csv'
 price_deflators_template = 'price_deflators.csv'
 
@@ -148,6 +147,51 @@ class GetContext:
         return df_rows
 
 
+def error_gen(actual, rounded):
+    divisor = np.sqrt(1.0 if actual < 1.0 else actual)
+    return abs(rounded - actual) ** 2 / divisor
+
+
+def round_to_100(percents):
+    """
+
+    :param percents: A list of percentages to be rounded.
+    :return: A list of percents rounded to integers and summing to 100.
+    """
+    if not np.isclose(sum(percents), 100):
+        raise ValueError
+    n = len(percents)
+    rounded = [int(x) for x in percents]
+    up_count = 100 - sum(rounded)
+    errors = [(error_gen(percents[i], rounded[i] + 1) - error_gen(percents[i], rounded[i]), i) for i in range(n)]
+    rank = sorted(errors)
+    for i in range(up_count):
+        rounded[rank[i][1]] += 1
+    return rounded
+
+
+def round_floats_to_100(percents, decimals):
+    """
+
+    :param percents: A list of percentages to be rounded.
+    :param decimals: The number of decimal places in rounded values.
+    :return: A list of percents rounded to 'decimals' number of decimal places and summing to 100.
+    """
+    if not np.isclose(sum(percents), 100):
+        raise ValueError
+    n = len(percents)
+    scaler = 10 ** decimals
+    rounded = [int(x * scaler) for x in percents]
+    up_count = int(100 * scaler - sum(rounded)) if int(100 * scaler - sum(rounded)) != 0 else 1
+    add = round((100 * scaler - sum(rounded)) / up_count, decimals)
+    errors = [(error_gen(percents[i] * scaler, rounded[i] + 1 * scaler) - error_gen(percents[i] * scaler, rounded[i]), i) for i in range(n)]
+    rank = sorted(errors)
+    for i in range(up_count):
+        rounded[rank[i][1]] += add
+    rounded = [rounded[x] / scaler for x in range(len(rounded))]
+    return rounded
+
+
 def main():
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -176,23 +220,23 @@ def main():
     aeo_veh_context = pd.DataFrame()
     aeo_veh_context = melt_df(attribute['percent'], 'full name', 'sales_share_of_regclass')
     aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['lb'], 'full name', 'weight_lbs'), on=['full name', 'calendar_year'])
-    aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['HP'], 'full name', 'hp'), on=['full name', 'calendar_year'])
+    aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['HP'], 'full name', 'horsepower'), on=['full name', 'calendar_year'])
     aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['mpg_conventional'], 'full name', 'mpg_conventional'), on=['full name', 'calendar_year'])
     aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['mpg_alternative'], 'full name', 'mpg_alternative'), on=['full name', 'calendar_year'])
 
     # define reg_class in aeo_veh_context and ratio DFs and then merge ratio in
     ratio_df = melt_df(attribute['ratio'], 'full name', 'onroad_to_cycle_mpg_ratio')
     for df in [aeo_veh_context, ratio_df]:
-        df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class', '')
-        df = new_metric(df, 'full name', 'reg_class', 'car', 'Car')
-        df = new_metric(df, 'full name', 'reg_class', 'truck', 'Truck')
+        df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class_id', '')
+        df = new_metric(df, 'full name', 'reg_class_id', 'car', 'Car')
+        df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Truck')
     ratio_df.drop(columns='full name', inplace=True)
-    aeo_veh_context = aeo_veh_context.merge(ratio_df, on=['reg_class', 'calendar_year'])
+    aeo_veh_context = aeo_veh_context.merge(ratio_df, on=['reg_class_id', 'calendar_year'])
 
     # calculate some new metrics
-    aeo_veh_context.insert(aeo_veh_context.columns.get_loc('hp') + 1,
-                           'hp_to_weight',
-                           aeo_veh_context['hp'] / aeo_veh_context['weight_lbs'])
+    aeo_veh_context.insert(aeo_veh_context.columns.get_loc('horsepower') + 1,
+                           'horsepower_to_weight_ratio',
+                           aeo_veh_context['horsepower'] / aeo_veh_context['weight_lbs'])
     aeo_veh_context.insert(aeo_veh_context.columns.get_loc('mpg_conventional') + 1,
                            'mpg_conventional_onroad',
                            aeo_veh_context[['mpg_conventional', 'onroad_to_cycle_mpg_ratio']].product(axis=1))
@@ -233,11 +277,11 @@ def main():
         truck_sales = sales_df.at[0, 'sales_truck']
         fleet_sales = sales_df.at[0, 'sales_fleet']
 
-        fleet_dict[year, 'car'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class'] == 'car'), :])
+        fleet_dict[year, 'car'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class_id'] == 'car'), :])
         fleet_dict[year, 'car']['sales'] = (fleet_dict[year, 'car']['sales_share_of_regclass'] / 100) * car_sales
         fleet_dict[year, 'car']['sales_share_of_total'] = (fleet_dict[year, 'car']['sales'] / fleet_sales) * 100
 
-        fleet_dict[year, 'truck'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class'] == 'truck'), :])
+        fleet_dict[year, 'truck'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class_id'] == 'truck'), :])
         fleet_dict[year, 'truck']['sales'] = (fleet_dict[year, 'truck']['sales_share_of_regclass'] / 100) * truck_sales
         fleet_dict[year, 'truck']['sales_share_of_total'] = (fleet_dict[year, 'truck']['sales'] / fleet_sales) * 100
         fleet_context_df = pd.concat([fleet_context_df, fleet_dict[year, 'car'], fleet_dict[year, 'truck']], axis=0, ignore_index=True)
@@ -256,23 +300,33 @@ def main():
 
     # clean up vehicle_prices for merging
     for df in [vehicle_prices['gasoline'], vehicle_prices['electric']]:
-        df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class', '')
-        df = new_metric(df, 'full name', 'reg_class', 'car', 'full name', 'Car')
-        df = new_metric(df, 'full name', 'reg_class', 'truck', 'Truck')
-        df = new_metric(df, 'full name', 'reg_class', 'truck', 'Pickup')
-        df = new_metric(df, 'full name', 'reg_class', 'truck', 'Van')
-        df = new_metric(df, 'full name', 'reg_class', 'truck', 'Utility')
+        df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class_id', '')
+        df = new_metric(df, 'full name', 'reg_class_id', 'car', 'full name', 'Car')
+        df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Truck')
+        df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Pickup')
+        df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Van')
+        df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Utility')
         df.replace({'full name': r' Car'}, {'full name': ''}, regex=True, inplace=True)
         df.replace({'full name': r'Mini-compact'}, {'full name': 'Minicompact'}, regex=True, inplace=True)
         df.replace({'full name': r' Light Truck'}, {'full name': ''}, regex=True, inplace=True)
-    vehicle_prices_df = vehicle_prices['gasoline'].merge(vehicle_prices['electric'], on=['full name', 'calendar_year', 'reg_class'])
+    vehicle_prices_df = vehicle_prices['gasoline'].merge(vehicle_prices['electric'], on=['full name', 'calendar_year', 'reg_class_id'])
 
     # merge prices into larger context DF, but first make the "full name" columns consistent
     fleet_context_df.replace({'full name': r'Cars: '}, {'full name': ''}, regex=True, inplace=True)
     fleet_context_df.replace({'full name': r'Light Trucks: '}, {'full name': ''}, regex=True, inplace=True)
 
-    fleet_context_df = fleet_context_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class'], how='left')
+    fleet_context_df = fleet_context_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class_id'], how='left')
     fleet_context_df.rename(columns={'full name': 'context_size_class'}, inplace=True)
+
+    # lastly, round all the sales shares and force sum to 100
+    for yr in range(fleet_context_df['calendar_year'].min(), fleet_context_df['calendar_year'].max() + 1):
+        shares = pd.Series(fleet_context_df.loc[fleet_context_df['calendar_year'] == yr, 'sales_share_of_total']).tolist()
+        new_shares = round_floats_to_100(shares, 2)
+        fleet_context_df.loc[fleet_context_df['calendar_year'] == yr, 'sales_share_of_total'] = new_shares
+        for reg_class in ['car', 'truck']:
+            shares = pd.Series(fleet_context_df.loc[(fleet_context_df['calendar_year'] == yr) & (fleet_context_df['reg_class_id'] == reg_class), 'sales_share_of_regclass']).tolist()
+            new_shares = round_floats_to_100(shares, 2)
+            fleet_context_df.loc[(fleet_context_df['calendar_year'] == yr) & (fleet_context_df['reg_class_id'] == reg_class), 'sales_share_of_regclass'] = new_shares
 
     # work on fuel prices
     aeo_table_obj = GetContext(path_aeo_inputs, aeo_petroleum_fuel_prices_table, aeo_case, 'full name')
