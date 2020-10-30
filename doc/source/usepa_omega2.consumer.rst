@@ -20,14 +20,6 @@ usepa\_omega2.consumer.reregistration\_fixed\_by\_age module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.consumer.sales module
------------------------------------
-
-.. automodule:: usepa_omega2.consumer.sales
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.consumer.sales\_effect module
 -------------------------------------------
 
@@ -48,6 +40,14 @@ usepa\_omega2.consumer.sales\_share\_ma3t module
 ------------------------------------------------
 
 .. automodule:: usepa_omega2.consumer.sales_share_ma3t
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.consumer.sales\_volume module
+-------------------------------------------
+
+.. automodule:: usepa_omega2.consumer.sales_volume
    :members:
    :undoc-members:
    :show-inheritance:

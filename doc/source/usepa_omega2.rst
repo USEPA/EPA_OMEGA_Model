@@ -36,6 +36,22 @@ usepa\_omega2.GHG\_standards\_fuels module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.context\_fuel\_prices module
+------------------------------------------
+
+.. automodule:: usepa_omega2.context_fuel_prices
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.context\_new\_vehicle\_market module
+--------------------------------------------------
+
+.. automodule:: usepa_omega2.context_new_vehicle_market
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.cost\_clouds module
 ---------------------------------
 
@@ -80,14 +96,6 @@ usepa\_omega2.fuels module
 --------------------------
 
 .. automodule:: usepa_omega2.fuels
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.fuels\_context module
------------------------------------
-
-.. automodule:: usepa_omega2.fuels_context
    :members:
    :undoc-members:
    :show-inheritance:

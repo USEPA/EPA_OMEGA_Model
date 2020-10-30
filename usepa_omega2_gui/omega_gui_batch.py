@@ -822,25 +822,26 @@ def status_bar():
     now = datetime.now()
     date_time = now.strftime("%B %d, %Y  %H:%M:%S")
     # Get CPU usage
-    # psutil.cpu_percent()
+    cpu = psutil.cpu_percent()
+    cpu = int(cpu / 5)
+    cpu = "{" + "|" * cpu + "                      "
+    cpu = "CPU Load=" + cpu[0:21] + "}"
     # Get memory used
     mem = psutil.virtual_memory().percent
-    # cpu = int(cpu/10)
-    # cpu = "[" + ">" * cpu + "             "
-    # cpu = "CPU Load=" + cpu[0:11] + "]"
-    mem = int(mem/10)
-    mem = "[" + ">" * mem + "             "
-    mem = "Memory Load=" + mem[0:11] + "]"
+    mem = int(mem/5)
+    mem = "{" + "|" * mem + "                      "
+    mem = "Memory Load=" + mem[0:21] + "}"
     try:
-        form.window.statusBar().showMessage(date_time + "  " + status_bar_message + "     " + mem)
+        form.window.statusBar().showMessage(date_time + "  " + status_bar_message + "     " + cpu + "   " + mem)
     except NameError:
         return
 
 
-# Run the function 'timer3' in 1 second intervals
+# Run the function 'status_bar' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    # Load the gui
     form = Form('usepa_omega2_gui/elements/omega_gui_v20.ui')
     sys.exit(app.exec_())
