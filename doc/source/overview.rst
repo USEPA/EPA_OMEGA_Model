@@ -1,4 +1,4 @@
-.. image:: epa_logo_1.jpg
+.. image:: _static/epa_logo_1.jpg
 
 Model Overview
 ==============
