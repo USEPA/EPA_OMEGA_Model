@@ -1,3 +1,5 @@
+.. image:: epa_logo_1.jpg
+
 Glossary
 --------
 
