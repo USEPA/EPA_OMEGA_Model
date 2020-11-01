@@ -256,7 +256,7 @@ class Form(QObject):
             output_batch_directory = item_value
             color = "green"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-            path = pathlib.PurePath(output_batch_directory)
+            # path = pathlib.PurePath(output_batch_directory)
             self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
             output_batch_directory_valid = True
         else:
@@ -476,7 +476,6 @@ class Form(QObject):
         """
         os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
 
-
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
@@ -650,7 +649,8 @@ class Form(QObject):
 
         excel_data_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
         batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + excel_data_df.loc['Batch Name', 'Value']
+        output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + \
+            excel_data_df.loc['Batch Name', 'Value']
         # print('*****', output_batch_subdirectory)
 
         # Delete contents of comm_file.txt used to communicate with other processes
@@ -710,7 +710,7 @@ class Form(QObject):
             # Get memory used
             # mem = psutil.virtual_memory().percent
             # self.window.progress_bar.setValue(cpu)
-            poll = omega_batch.poll()
+            # poll = omega_batch.poll()
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
             # Get number of lines in comm_file
