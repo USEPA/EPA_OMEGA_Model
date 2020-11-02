@@ -5,7 +5,7 @@ Default Inputs and Assumptions
 Inputs/Assumptions body text
 
 Tips for preparing inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=========================
 Tips body text
 
 Text1
