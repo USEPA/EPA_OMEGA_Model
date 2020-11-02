@@ -1,5 +1,6 @@
 """
-**omega_gui_batch.py**
+omega_gui_batch.py
+==================
 
 This code launches and controls the OMEGA 2 GUI
 
