@@ -185,8 +185,10 @@ class Vehicle(OMEGABase):
     hauling_class = None
     cost_curve_class = None
     reg_class_ID = None
+    reg_class_market_share_frac = 1.0
     epa_size_class = None
     context_size_class = None
+    context_size_class_share_frac = None
     electrification_class = None
     cert_CO2_grams_per_mile = None
     cert_target_CO2_grams_per_mile = None
@@ -198,7 +200,6 @@ class Vehicle(OMEGABase):
     cert_fuel_ID = None
     market_class_ID = None
     footprint_ft2 = None
-    reg_class_market_share_frac = 1.0
     _initial_registered_count = 0
 
     def __init__(self):
@@ -316,6 +317,7 @@ class VehicleFinal(SQABase, Vehicle):
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
+    context_size_class_share_frac = Column(Float)
     electrification_class = Column(String)  # TODO: validate with enum?
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
@@ -346,6 +348,9 @@ class VehicleFinal(SQABase, Vehicle):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        context_size_class_dict = dict()
+        vehicles_list = []
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -395,8 +400,22 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.set_cert_target_CO2_Mg()
                     veh.set_cert_CO2_Mg()
 
+                    if veh.context_size_class not in context_size_class_dict:
+                        context_size_class_dict[veh.context_size_class] = veh.initial_registered_count
+                    else:
+                        context_size_class_dict[veh.context_size_class] = \
+                            context_size_class_dict[veh.context_size_class] + veh.initial_registered_count
+
+                    vehicles_list.append(veh)
+
                     if verbose:
                         print(veh)
+
+                # update context size class share
+                for v in vehicles_list:
+                    v.context_size_class_share_frac = v.initial_registered_count / context_size_class_dict[
+                        v.context_size_class]
+
 
         return template_errors
 
