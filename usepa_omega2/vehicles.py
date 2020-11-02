@@ -271,7 +271,8 @@ class Vehicle(OMEGABase):
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'cert_fuel_ID', 'market_class_ID',
-                              'footprint_ft2'}
+                              'footprint_ft2', 'epa_size_class', 'context_size_class', 'context_size_class_share_frac',
+                              'electrification_class'}
 
         for p in inherit_properties:
             self.__setattr__(p, vehicle.__getattribute__(p))

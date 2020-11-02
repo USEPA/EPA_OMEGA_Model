@@ -51,6 +51,7 @@ try:
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
             self.context_fuel_prices_file = 'input_samples/context_fuel_prices.csv'
+            self.context_fuel_upstream_file = 'input_samples/context_fuel_upstream.csv'
             self.context_new_vehicle_market_file = 'input_samples/context_new_vehicle_market.csv'
             self.cost_file = 'input_samples/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75

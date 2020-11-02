@@ -1,25 +1,26 @@
-fuel_id,unit,calendar_year,upstream_co2E_grams_per_unit
+input_template_name:,context_fuel_upstream,input_template_version:,0.1
+fuel_id,unit,calendar_year,upstream_co2e_grams_per_unit
 US electricity,kWh,2020,479.8
 US electricity,kWh,2021,460.5
 US electricity,kWh,2022,439.1
 US electricity,kWh,2023,415.3
 US electricity,kWh,2024,405.9
 US electricity,kWh,2025,388.8
-US electricity,kWh,2026,398.0
+US electricity,kWh,2026,398
 US electricity,kWh,2027,393.7
-US electricity,kWh,2028,390.0
+US electricity,kWh,2028,390
 US electricity,kWh,2029,385.2
 US electricity,kWh,2030,379.2
 US electricity,kWh,2031,376.8
 US electricity,kWh,2032,376.2
 US electricity,kWh,2033,378.6
-US electricity,kWh,2034,379.0
-US electricity,kWh,2035,374.0
+US electricity,kWh,2034,379
+US electricity,kWh,2035,374
 US electricity,kWh,2036,370.4
-US electricity,kWh,2037,368.0
+US electricity,kWh,2037,368
 US electricity,kWh,2038,364.1
 US electricity,kWh,2039,360.8
-US electricity,kWh,2040,359.0
+US electricity,kWh,2040,359
 US electricity,kWh,2041,355.7
 US electricity,kWh,2042,352.2
 US electricity,kWh,2043,348.9
