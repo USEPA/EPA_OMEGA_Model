@@ -8,6 +8,7 @@ OMEGA2 top level code
 
 print('importing %s' % __file__)
 
+
 import o2  # import global variables
 from usepa_omega2 import *
 from omega_plot import *
@@ -215,6 +216,7 @@ def run_producer_consumer():
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
+        gui_comm("Running: Manufacturer=" + str(manufacturer_ID))
 
         iteration_log = pd.DataFrame()
         for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
@@ -225,6 +227,7 @@ def run_producer_consumer():
             prev_candidate_mfr_new_vehicles = None
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
+                gui_comm("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
                 candidate_mfr_new_vehicles, winning_combo, market_class_tree = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
                 compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
@@ -580,6 +583,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     o2_options.start_time = time.time()
 
     print('OMEGA2 greets you, version %s' % code_version)
+    gui_comm("Running: OMEGA 2 Version " + str(code_version))
     if '__file__' in locals():
         print('from %s with love' % fileio.get_filenameext(__file__))
 
