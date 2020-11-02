@@ -543,6 +543,7 @@ if __name__ == '__main__':
             batch.dataframe.to_csv(remote_batchfile)
 
             print("Batch name = " + batch.name)
+            gui_comm("Batch Name=" + str(batch.name))
 
             if options.session_num is None:
                 session_list = range(0, batch.num_sessions())
