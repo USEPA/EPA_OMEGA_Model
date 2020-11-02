@@ -7,6 +7,33 @@ Functions that may be used throughout OMEGA
 """
 
 
+def print_dict(dict_in, num_tabs=0):
+    """
+    pretty-print a dict...
+    :param dict_in:
+    :param num_tabs:
+    :return:
+    """
+    if num_tabs == 0:
+        print()
+
+    if type(dict_in) is list or type(dict_in) is not dict:
+        print('\t' * num_tabs + str(dict_in))
+    else:
+        for k in dict_in.keys():
+            if type(dict_in[k]) == set:
+                if dict_in[k]:
+                    print('\t' * num_tabs + k + ':' + str(dict_in[k]))
+                else:
+                    print('\t' * num_tabs + k)
+            else:
+                print('\t' * num_tabs + k)
+                print_dict(dict_in[k], num_tabs + 1)
+
+    if num_tabs == 0:
+        print()
+
+
 partition_dict = dict()
 def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):
     """
