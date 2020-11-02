@@ -348,6 +348,7 @@ class VehicleFinal(SQABase, Vehicle):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        from context_new_vehicle_market import ContextNewVehicleMarket
         context_size_class_dict = dict()
         vehicles_list = []
 
@@ -408,6 +409,15 @@ class VehicleFinal(SQABase, Vehicle):
 
                     vehicles_list.append(veh)
 
+                    if veh.hauling_class == 'hauling':
+                        if veh.context_size_class not in ContextNewVehicleMarket.hauling_context_size_class_info:
+                            ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class] = \
+                                {'total': veh.initial_registered_count, 'hauling_share': 0}
+                        else:
+                            ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class]['total'] = \
+                                ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
+                                    'total'] + veh.initial_registered_count
+
                     if verbose:
                         print(veh)
 
@@ -416,6 +426,10 @@ class VehicleFinal(SQABase, Vehicle):
                     v.context_size_class_share_frac = v.initial_registered_count / context_size_class_dict[
                         v.context_size_class]
 
+                for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
+                    ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
+                        ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
+                        context_size_class_dict[hsc]
 
         return template_errors
 
@@ -439,6 +453,7 @@ if __name__ == '__main__':
         from market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
         from context_fuel_prices import ContextFuelPrices # needed for retail fuel price
+        from context_new_vehicle_market import ContextNewVehicleMarket # needed for context size class hauling info
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 

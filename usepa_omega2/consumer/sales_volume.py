@@ -39,17 +39,12 @@ def context_new_vehicle_sales(model_year):
         VehicleFinal.fueling_class == 'ICE').filter(
         VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()) / total_sales_initial
 
-    # TODO: this may break if some size classes are both hauling and non-hauling... would need to calculate shares then or something
     # pulling in hauling sales, non hauling = total minus hauling
-    hauling_size_classes = set(sql_unpack_result(
-        o2.session.query(VehicleFinal.context_size_class).
-            filter(VehicleFinal.hauling_class == 'hauling').
-            filter(VehicleFinal.model_year == o2.options.analysis_initial_year - 1)))
-
     hauling_sales = 0
-    for csc in hauling_size_classes:
-        hauling_sales = hauling_sales + ContextNewVehicleMarket.new_vehicle_sales(model_year,
-                                                                                  context_size_class=csc)
+    for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
+        hauling_sales = hauling_sales + \
+                        ContextNewVehicleMarket.new_vehicle_sales(model_year, context_size_class=hsc) * \
+                        ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
 
     sales_dict['hauling'] = hauling_sales
     sales_dict['non hauling'] = total_sales - hauling_sales

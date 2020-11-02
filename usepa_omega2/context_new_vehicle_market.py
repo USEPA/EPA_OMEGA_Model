@@ -34,6 +34,8 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     ice_price_dollars = Column(Numeric)
     bev_price_dollars = Column(Numeric)
 
+    hauling_context_size_class_info = dict()
+
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None):
         if context_size_class:
