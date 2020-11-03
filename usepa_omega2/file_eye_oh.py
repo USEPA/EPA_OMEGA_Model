@@ -8,6 +8,7 @@ Handy file system routines for general uses
 print('importing %s' % __file__)
 
 import sys, os, shutil
+import omega_log
 
 
 def validate_folder(dstfolder):
@@ -27,6 +28,7 @@ def validate_folder(dstfolder):
             os.makedirs(dstfolder, exist_ok=True) # try create folder if necessary
         except:
             print("Couldn't access or create {}".format(dstfolder),file=sys.stderr)
+            omega_log.logwrite("Couldn't access or create {}".format(dstfolder))
             exit(-1)
 
 
@@ -40,6 +42,7 @@ def validate_file(filename):
     """
     if not os.access(filename, os.F_OK):
         print("\n*** Couldn't access {}, check path and filename ***".format(filename), file=sys.stderr)
+        omega_log.logwrite("\n*** Couldn't access {}, check path and filename ***".format(filename))
         exit(-1)
 
 

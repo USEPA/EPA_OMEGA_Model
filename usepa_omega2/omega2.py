@@ -235,19 +235,22 @@ def run_producer_consumer():
                                                                        winning_combo)
 
                     # experiment ----------------------- #
-                    if True:
+                    if calendar_year == 2037:
                         import numpy as np
                         from market_classes import MarketClass
                         from omega_functions import cartesian_prod
 
                         initial_total_sales = winning_combo['total_sales']
+                        winning_combo['winning_combo_share_weighted_price'] = \
+                            winning_combo['total_combo_cost_dollars'] / winning_combo['total_sales']
 
                         multiplier_columns = ['%s_cost_multiplier' % mc for mc in MarketClass.market_classes]
 
                         multiplier_df = winning_combo.to_frame().transpose()
                         for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
+                            inc = 0.05
                             multiplier_df = cartesian_prod(multiplier_df,
-                                                           pd.DataFrame(np.arange(0.1, 2.0 + 0.1, 0.1), columns=[mcc]))
+                                                           pd.DataFrame(np.arange(inc, 2.0 + inc, inc), columns=[mcc]))
                             multiplier_df['initial_average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc]
                             multiplier_df['average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc] * \
                                                                     multiplier_df[mcc]
@@ -299,17 +302,15 @@ def run_producer_consumer():
                              abs(1 - sales_demand['hauling.ICE_cost_multiplier']) *
                              sales_demand['consumer_hauling.ICE_abs_share_frac'])
 
-                            # sales_demand = sales_demand[sales_demand['sales_weighted_share_delta'] <= 0.01]
+                        non_modified_price = float(sales_demand[
+                            (sales_demand['non hauling.BEV_cost_multiplier'] == 1) &
+                            (sales_demand['hauling.BEV_cost_multiplier'] == 1) &
+                            (sales_demand['non hauling.ICE_cost_multiplier'] == 1) &
+                            (sales_demand['hauling.ICE_cost_multiplier'] == 1)]['share_weighted_price'])
 
-                        # fig, ax1 = fplothg(sales_demand['share_weighted_share_delta'], sales_demand['revenue'], '.')
-                        # ax1.plot(sales_demand['share_weighted_share_delta'], sales_demand['initial_revenue'], 'r.')
-                        # label_xy(ax1, 'share weighted share delta [frac]', 'revenue [$]')
+                        sales_demand = sales_demand[abs(sales_demand['share_weighted_price'] - non_modified_price) <= 10]
 
-                        # fig, ax1 = fplothg(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['revenue'], '.')
-                        # ax1.plot(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['initial_revenue'], 'r.')
-                        # label_xy(ax1, 'total_combo_credits_co2_megagrams', 'revenue [$]')
-
-                        # sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
+                        sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
 
                         # experiment ----------------------- #
 

@@ -86,7 +86,7 @@ try:
             self.iteration_num_tech_options_per_ice_vehicle = 20
             self.iteration_num_tech_options_per_bev_vehicle = 2
 
-            self.iterate_producer_consumer = False
+            self.iterate_producer_consumer = True
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0
