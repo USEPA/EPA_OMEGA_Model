@@ -10,12 +10,12 @@ import os
 import sys
 import subprocess
 import pandas
-import pathlib
+# import pathlib
 import psutil
 
 import multitimer
 import time
-import signal
+# import signal
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
