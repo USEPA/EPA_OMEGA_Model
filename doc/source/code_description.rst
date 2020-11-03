@@ -6,24 +6,14 @@ Developer Guide
 Description of Code
 ^^^^^^^^^^^^^^^^^^^
 
+Text 1
+------
+
 Make your own modules
 ^^^^^^^^^^^^^^^^^^^^^
 
 Text1
-^^^^^
+-----
 
-Text2
-^^^^^
 
-Text3
-^^^^^
-
-Text4
-^^^^^
-
-Text5
-^^^^^
-
-Text8
-^^^^^
 
