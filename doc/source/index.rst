@@ -17,7 +17,6 @@ Is in process...
     inputs
     code_description
     glossary
-    developer
     code_details
     software_policy
 

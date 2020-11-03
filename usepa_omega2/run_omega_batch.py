@@ -549,6 +549,8 @@ if __name__ == '__main__':
             remote_batchfile = batch.name + '.csv'
             batch.dataframe.to_csv(remote_batchfile)
 
+            print("Batch name = " + batch.name)
+            gui_comm("Batch Name=" + str(batch.name))
             omega_log.logwrite("Batch name = " + batch.name)
 
             if options.session_num is None:

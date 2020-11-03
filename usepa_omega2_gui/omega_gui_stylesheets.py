@@ -1,8 +1,5 @@
 def tab_stylesheet(stylesheet):
     """
-    omega_gui_stylesheets
-    =====================
-
         Loads the stylesheet for the tab area of the gui.
 
         :param stylesheet: Not used.

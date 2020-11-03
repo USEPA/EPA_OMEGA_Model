@@ -1,7 +1,10 @@
 .. image:: _static/epa_logo_1.jpg
 
+User Guide
+==========
+
 Default Inputs and Assumptions
-==============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Inputs/Assumptions body text
 
 Tips for preparing inputs
