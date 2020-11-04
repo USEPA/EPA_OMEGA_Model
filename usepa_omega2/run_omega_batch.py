@@ -7,6 +7,7 @@ example usage:
     python run_omega_batch.py --batch_file inputs\phase0_default_batch_file.xlsx
 
 """
+from usepa_omega2 import omega_log
 
 print('importing %s' % __file__)
 

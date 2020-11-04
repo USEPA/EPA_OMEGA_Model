@@ -44,6 +44,14 @@ usepa\_omega2.context\_fuel\_prices module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.context\_fuel\_upstream module
+--------------------------------------------
+
+.. automodule:: usepa_omega2.context_fuel_upstream
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.context\_new\_vehicle\_market module
 --------------------------------------------------
 
