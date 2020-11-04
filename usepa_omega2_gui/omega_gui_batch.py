@@ -61,6 +61,9 @@ red_x_image = "usepa_omega2_gui/elements/red_x.png"
 event_separator = "----------"
 # OMEGA 2 version
 omega2_version = ""
+# Log file for communication from other processes
+# log_file = "comm_file.txt"
+log_file = "batch_logfile.txt"
 
 
 class Form(QObject):
@@ -659,13 +662,13 @@ class Form(QObject):
         # and place the first line 'Start Model Run'
         path = output_batch_subdirectory
         os.mkdir(path)
-        file1 = open(output_batch_subdirectory + "/comm_file.txt", "a")  # append mode
+        file1 = open(output_batch_subdirectory + "/" + log_file, "a")  # append mode
         file1.write("Today \n")
         file1.close()
-        file = open(output_batch_subdirectory + "/comm_file.txt", "r+")
+        file = open(output_batch_subdirectory + "/" + log_file, "r+")
         file.truncate(0)
         file.close()
-        file1 = open(output_batch_subdirectory + "/comm_file.txt", "a")  # append mode
+        file1 = open(output_batch_subdirectory + "/" + log_file, "a")  # append mode
         file1.write("Start Model Run \n")
         file1.close()
 
@@ -702,7 +705,7 @@ class Form(QObject):
         # Keep track of lines read from comm_file
         line_counter = 0
         # Pointer to comm_file
-        status_file = output_batch_subdirectory + '/comm_file.txt'
+        status_file = output_batch_subdirectory + "/" + log_file
         # poll = None
         # Keep looking for comm_file entries as long as process is running
         while omega_batch.poll() is None:
