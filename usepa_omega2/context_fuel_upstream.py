@@ -15,8 +15,7 @@ class ContextFuelUpstream(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'context_fuels_upstream'
     index = Column('index', Integer, primary_key=True)
-    fuel_ID = Column('fuel_id', String)
-    unit = Column(String)
+    fuel_ID = Column('fuel_id', String)    
     calendar_year = Column(Numeric)
     upstream_co2e_grams_per_unit = Column(Float)
 
@@ -32,8 +31,8 @@ class ContextFuelUpstream(SQABase, OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'context_fuel_upstream'
-        input_template_version = 0.1
-        input_template_columns = {'fuel_id', 'unit', 'calendar_year', 'upstream_co2e_grams_per_unit'}
+        input_template_version = 0.2
+        input_template_columns = {'fuel_id', 'calendar_year', 'upstream_co2e_grams_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -52,7 +51,6 @@ class ContextFuelUpstream(SQABase, OMEGABase):
                 for i in df.index:
                     obj_list.append(ContextFuelUpstream(
                         fuel_ID=df.loc[i, 'fuel_id'],
-                        unit=df.loc[i, 'unit'],
                         calendar_year=df.loc[i, 'calendar_year'],
                         upstream_co2e_grams_per_unit=df.loc[i, 'upstream_co2e_grams_per_unit'],
                     ))
