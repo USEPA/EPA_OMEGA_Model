@@ -7,6 +7,7 @@ This code launches and controls the OMEGA 2 GUI
 """
 
 import os
+import pathlib
 import sys
 import subprocess
 import pandas
@@ -63,7 +64,9 @@ event_separator = "----------"
 omega2_version = ""
 # Log file for communication from other processes
 # log_file = "comm_file.txt"
-log_file = "batch_logfile.txt"
+log_file_batch = "batch_logfile.txt"
+log_file_session_prefix = "o2log_"
+log_file_session_suffix = "_ReferencePolicy.txt"
 
 
 class Form(QObject):
@@ -656,21 +659,22 @@ class Form(QObject):
         batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + \
             excel_data_df.loc['Batch Name', 'Value']
-        # print('*****', output_batch_subdirectory)
+        output_session_subdirectory = output_batch_subdirectory + "/ReferencePolicy/output"
+        print('*****', output_session_subdirectory)
 
         # Delete contents of comm_file.txt used to communicate with other processes
         # and place the first line 'Start Model Run'
-        path = output_batch_subdirectory
-        os.mkdir(path)
-        file1 = open(output_batch_subdirectory + "/" + log_file, "a")  # append mode
-        file1.write("Today \n")
-        file1.close()
-        file = open(output_batch_subdirectory + "/" + log_file, "r+")
-        file.truncate(0)
-        file.close()
-        file1 = open(output_batch_subdirectory + "/" + log_file, "a")  # append mode
-        file1.write("Start Model Run \n")
-        file1.close()
+        # path = output_batch_subdirectory
+        # os.mkdir(path)
+        # file1 = open(output_batch_subdirectory + "/" + log_file_batch, "a")  # append mode
+        # file1.write("Today \n")
+        # file1.close()
+        # file = open(output_batch_subdirectory + "/" + log_file_batch, "r+")
+        # file.truncate(0)
+        # file.close()
+        # file1 = open(output_batch_subdirectory + "/" + log_file_batch, "a")  # append mode
+        # file1.write("Start Model Run \n")
+        # file1.close()
 
         # Play a model start sound
         # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
@@ -703,9 +707,14 @@ class Form(QObject):
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # Keep track of lines read from comm_file
-        line_counter = 0
+        line_counter_batch = 0
+        line_counter_session = 0
         # Pointer to comm_file
-        status_file = output_batch_subdirectory + "/" + log_file
+        status_file_batch = output_batch_subdirectory + "/" + log_file_batch
+        status_file_session = output_session_subdirectory + "/" + log_file_session_prefix
+        status_file_session = status_file_session + batch_time_stamp
+        status_file_session = status_file_session + '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
+        print('*****', status_file_session)
         # poll = None
         # Keep looking for comm_file entries as long as process is running
         while omega_batch.poll() is None:
@@ -719,13 +728,24 @@ class Form(QObject):
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
             # Get number of lines in comm_file
-            num_lines = sum(1 for line in open(status_file))
+            if os.path.isfile(status_file_batch):
+                num_lines_batch = sum(1 for line in open(status_file_batch))
+                status_file_batch_exists = 1
+            else:
+                num_lines_batch = 0
+                status_file_batch_exists = 0
+            if os.path.isfile(status_file_session):
+                num_lines_session = sum(1 for line in open(status_file_session))
+                status_file_session_exists = 1
+            else:
+                num_lines_session = 0
+                status_file_session_exists = 0
             # Read and output all new lines from comm_file
-            while line_counter < num_lines:
-                f = open(status_file)
+            while line_counter_batch < num_lines_batch and status_file_batch_exists == 1:
+                f = open(status_file_batch)
                 lines = f.readlines()
                 f.close()
-                g = lines[line_counter]
+                g = lines[line_counter_batch]
                 g = g.rstrip("\n")
                 # Print in red if ERROR in line
                 if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
@@ -733,7 +753,22 @@ class Form(QObject):
                 else:
                     self.event_monitor(g, "red", 'dt')
                 # Increment number of read lines from file counter
-                line_counter = line_counter + 1
+                line_counter_batch = line_counter_batch + 1
+
+            while line_counter_session < num_lines_session and status_file_session_exists == 1:
+                f = open(status_file_session)
+                lines = f.readlines()
+                f.close()
+                g = lines[line_counter_session]
+                g = g.rstrip("\n")
+                # Print in red if ERROR in line
+                if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
+                    self.event_monitor(g, "black", 'dt')
+                else:
+                    self.event_monitor(g, "red", 'dt')
+                # Increment number of read lines from file counter
+                line_counter_session = line_counter_session + 1
+
 
         # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
@@ -755,7 +790,7 @@ class Form(QObject):
         self.window.progress_bar.setValue(100)
 
         # Remove comm_file
-        os.remove(status_file)
+        # os.remove(status_file)
 
     def showbox(self, message_title, message):
         """

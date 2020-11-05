@@ -5,6 +5,7 @@ omega2.py
 OMEGA2 top level code
 
 """
+from usepa_omega2 import omega_log
 
 print('importing %s' % __file__)
 
@@ -228,6 +229,7 @@ def run_producer_consumer():
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
                 gui_comm("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
+                omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
                 candidate_mfr_new_vehicles, winning_combo, market_class_tree = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
                 compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
