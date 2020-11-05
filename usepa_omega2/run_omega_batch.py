@@ -414,7 +414,6 @@ if __name__ == '__main__':
                              batchfile_path + '\\usepa_omega2\\consumer'])
 
         from usepa_omega2 import *
-        from usepa_omega2.file_eye_oh import gui_comm
 
         o2.options = options
 
@@ -551,7 +550,6 @@ if __name__ == '__main__':
             batch.dataframe.to_csv(remote_batchfile)
 
             # print("Batch name = " + batch.name)
-            gui_comm("Batch Name=" + str(batch.name))
             omega_log.logwrite("Batch name = " + batch.name)
 
             if options.session_num is None:
@@ -583,7 +581,6 @@ if __name__ == '__main__':
                     # process sessions:
                     for s_index in session_list:
                         omega_log.logwrite("Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
-                        gui_comm('%s: Running ...' % batch.sessions[s_index].name)
 
                         if not batch.sessions[s_index].enabled:
                             omega_log.logwrite("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
@@ -591,7 +588,6 @@ if __name__ == '__main__':
                         else:
                             batch.sessions[s_index].run()
                         omega_log.logwrite("*** batch complete ***")
-
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

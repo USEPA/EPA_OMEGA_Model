@@ -1,6 +1,7 @@
 """
 placeholder, for now, but the dispy stuff should not really be in the run_omega_batch.py...
 """
+from usepa_omega2 import omega_log
 
 print('importing %s' % __file__)
 
@@ -211,7 +212,6 @@ class DispyCluster(object):
 
     def find_nodes(self):
         import dispy, socket, time, sys
-        from usepa_omega2.file_eye_oh import gui_comm
 
         print("Finding dispynodes...")
         self.master_ip = socket.gethostbyname(socket.gethostname())
@@ -257,7 +257,7 @@ class DispyCluster(object):
 
         if self.found_node_list == []:
             print('No dispy nodes found, exiting...', file=sys.stderr)
-            gui_comm('ERROR - No Multiprocessor nodes found, exiting...')
+            omega_log.logwrite('ERROR - No Multiprocessor nodes found, exiting...')
             sys.exit(-1)  # exit, no nodes found
 
         print('Found Node List: %s' % self.found_node_list)

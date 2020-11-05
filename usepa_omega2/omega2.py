@@ -15,8 +15,6 @@ from usepa_omega2 import *
 from omega_plot import *
 import os
 
-from usepa_omega2.file_eye_oh import gui_comm
-
 
 def run_postproc(iteration_log, single_shot):
     from manufacturer_annual_data import ManufacturerAnnualData
@@ -28,7 +26,7 @@ def run_postproc(iteration_log, single_shot):
     import matplotlib.pyplot as plt
 
     if not single_shot:
-        gui_comm('%s: Post Processing ...' % o2.options.session_name)
+        omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
     year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
                         zip(iteration_log['calendar_year'], iteration_log['iteration'])]
@@ -217,7 +215,7 @@ def run_producer_consumer():
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
-        gui_comm("Running: Manufacturer=" + str(manufacturer_ID))
+        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID))
 
         iteration_log = pd.DataFrame()
         for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
@@ -228,7 +226,6 @@ def run_producer_consumer():
             prev_candidate_mfr_new_vehicles = None
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
-                gui_comm("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
                 omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
                 candidate_mfr_new_vehicles, winning_combo, market_class_tree = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
@@ -590,7 +587,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     o2_options.start_time = time.time()
 
     print('OMEGA2 greets you, version %s' % code_version)
-    gui_comm("Running: OMEGA 2 Version " + str(code_version))
+    omega_log.logwrite("Running: OMEGA 2 Version " + str(code_version))
     if '__file__' in locals():
         print('from %s with love' % fileio.get_filenameext(__file__))
 
@@ -634,8 +631,8 @@ def run_omega(o2_options, single_shot=False, profile=False):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
-        gui_comm("### Check OMEGA log for error messages ###")
-        gui_comm("### RUNTIME FAIL ###")
+        omega_log.logwrite("### Check OMEGA log for error messages ###")
+        omega_log.logwrite("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
         dump_omega_db_to_csv(o2.options.database_dump_folder)
 
