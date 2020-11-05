@@ -587,7 +587,7 @@ if __name__ == '__main__':
                             omega_log.logwrite('')
                         else:
                             batch.sessions[s_index].run()
-                        omega_log.logwrite("*** batch complete ***")
+                        # omega_log.logwrite("*** batch complete ***")
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
