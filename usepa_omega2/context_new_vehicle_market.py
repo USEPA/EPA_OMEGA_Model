@@ -34,6 +34,8 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     ice_price_dollars = Column(Numeric)
     bev_price_dollars = Column(Numeric)
 
+    hauling_context_size_class_info = dict()
+
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None):
         if context_size_class:
@@ -50,7 +52,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
     # TODO: was going to use this to calculate P0 for the consumer sales response, but there's no ice/bev split and some of the bevs have a zero price, which is bogus, even in 2050...
     # @staticmethod
-    # def get_new_vehicle_sales_weighted_price(calendar_year):
+    # def new_vehicle_sales_weighted_price(calendar_year):
     #     ice_price = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales * ContextNewVehicleMarket.ice_price_dollars)). \
     #                       filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
     #                       filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \

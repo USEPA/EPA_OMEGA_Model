@@ -11,42 +11,29 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class ContextFuelPrices(SQABase, OMEGABase):
+class ContextFuelUpstream(SQABase, OMEGABase):
     # --- database table properties ---
-    __tablename__ = 'context_fuels'
+    __tablename__ = 'context_fuels_upstream'
     index = Column('index', Integer, primary_key=True)
-    context_ID = Column('context_id', String)
-    case_ID = Column('case_id', String)
     fuel_ID = Column('fuel_id', String)
+    unit = Column(String)
     calendar_year = Column(Numeric)
-    retail_dollars_per_unit = Column(Float)
-    pretax_dollars_per_unit = Column(Float)
+    upstream_co2e_grams_per_unit = Column(Float)
 
     @staticmethod
-    def get_retail_fuel_price(calendar_year, fuel_ID):
-        return o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
-            filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-            filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
-            filter(ContextFuelPrices.calendar_year == calendar_year).\
-            filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
-
-    @staticmethod
-    def get_pretax_fuel_price(calendar_year, fuel_ID):
-        return o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
-            filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-            filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
-            filter(ContextFuelPrices.calendar_year == calendar_year).\
-            filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+    def get_upstream_co2e_grams_per_unit(calendar_year, fuel_ID):
+        return o2.session.query(ContextFuelUpstream.upstream_co2e_grams_per_unit).\
+            filter(ContextFuelUpstream.calendar_year == calendar_year).\
+            filter(ContextFuelUpstream.fuel_ID == fuel_ID).one()[0]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'context_fuel_prices'
+        input_template_name = 'context_fuel_upstream'
         input_template_version = 0.1
-        input_template_columns = {'context_id', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
-                                  'pretax_dollars_per_unit'}
+        input_template_columns = {'fuel_id', 'unit', 'calendar_year', 'upstream_co2e_grams_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -63,13 +50,11 @@ class ContextFuelPrices(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(ContextFuelPrices(
-                        context_ID=df.loc[i, 'context_id'],
-                        case_ID=df.loc[i, 'case_id'],
+                    obj_list.append(ContextFuelUpstream(
                         fuel_ID=df.loc[i, 'fuel_id'],
+                        unit=df.loc[i, 'unit'],
                         calendar_year=df.loc[i, 'calendar_year'],
-                        retail_dollars_per_unit=df.loc[i, 'retail_dollars_per_unit'],
-                        pretax_dollars_per_unit=df.loc[i, 'pretax_dollars_per_unit'],
+                        upstream_co2e_grams_per_unit=df.loc[i, 'upstream_co2e_grams_per_unit'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -90,14 +75,14 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + ContextFuelPrices.init_database_from_file(o2.options.context_fuel_prices_file,
+        init_fail = init_fail + ContextFuelUpstream.init_database_from_file(o2.options.context_fuel_upstream_file,
                                                                           verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-            print(ContextFuelPrices.get_retail_fuel_price(2020, 'pump gasoline'))
-            print(ContextFuelPrices.get_pretax_fuel_price(2020, 'pump gasoline'))
+            print(ContextFuelUpstream.get_upstream_co2e_grams_per_unit(2020, 'pump gasoline'))
+            print(ContextFuelUpstream.get_upstream_co2e_grams_per_unit(2021, 'US electricity'))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

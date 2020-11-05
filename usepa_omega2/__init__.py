@@ -51,6 +51,7 @@ try:
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
             self.context_fuel_prices_file = 'input_samples/context_fuel_prices.csv'
+            self.context_fuel_upstream_file = 'input_samples/context_fuel_upstream.csv'
             self.context_new_vehicle_market_file = 'input_samples/context_new_vehicle_market.csv'
             self.cost_file = 'input_samples/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
@@ -78,14 +79,14 @@ try:
             self.producer_consumer_max_iterations = 20
             self.producer_consumer_iteration_tolerance = 0.01
 
-            self.first_pass_num_market_share_options = 7
-            self.first_pass_num_tech_options_per_ice_vehicle = 15
+            self.first_pass_num_market_share_options = 10
+            self.first_pass_num_tech_options_per_ice_vehicle = 10
             self.first_pass_num_tech_options_per_bev_vehicle = 2
 
             self.iteration_num_tech_options_per_ice_vehicle = 20
             self.iteration_num_tech_options_per_bev_vehicle = 2
 
-            self.iterate_producer_consumer = False
+            self.iterate_producer_consumer = True
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
             self.start_time = 0

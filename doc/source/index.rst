@@ -1,3 +1,5 @@
+.. image:: _static/epa_logo_1.jpg
+
 ====================
 OMEGA2 Documentation
 ====================
@@ -15,7 +17,6 @@ Is in process...
     inputs
     code_description
     glossary
-    developer
     code_details
     software_policy
 

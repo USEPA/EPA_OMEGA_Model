@@ -185,8 +185,10 @@ class Vehicle(OMEGABase):
     hauling_class = None
     cost_curve_class = None
     reg_class_ID = None
+    reg_class_market_share_frac = 1.0
     epa_size_class = None
     context_size_class = None
+    context_size_class_share_frac = None
     electrification_class = None
     cert_CO2_grams_per_mile = None
     cert_target_CO2_grams_per_mile = None
@@ -198,7 +200,6 @@ class Vehicle(OMEGABase):
     cert_fuel_ID = None
     market_class_ID = None
     footprint_ft2 = None
-    reg_class_market_share_frac = 1.0
     _initial_registered_count = 0
 
     def __init__(self):
@@ -270,7 +271,8 @@ class Vehicle(OMEGABase):
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'cert_fuel_ID', 'market_class_ID',
-                              'footprint_ft2'}
+                              'footprint_ft2', 'epa_size_class', 'context_size_class', 'context_size_class_share_frac',
+                              'electrification_class'}
 
         for p in inherit_properties:
             self.__setattr__(p, vehicle.__getattribute__(p))
@@ -316,6 +318,7 @@ class VehicleFinal(SQABase, Vehicle):
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
+    context_size_class_share_frac = Column(Float)
     electrification_class = Column(String)  # TODO: validate with enum?
     cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_CO2_Mg = Column('cert_co2_megagrams', Float)
@@ -346,6 +349,10 @@ class VehicleFinal(SQABase, Vehicle):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        from context_new_vehicle_market import ContextNewVehicleMarket
+        context_size_class_dict = dict()
+        vehicles_list = []
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -395,8 +402,35 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.set_cert_target_CO2_Mg()
                     veh.set_cert_CO2_Mg()
 
+                    if veh.context_size_class not in context_size_class_dict:
+                        context_size_class_dict[veh.context_size_class] = veh.initial_registered_count
+                    else:
+                        context_size_class_dict[veh.context_size_class] = \
+                            context_size_class_dict[veh.context_size_class] + veh.initial_registered_count
+
+                    vehicles_list.append(veh)
+
+                    if veh.hauling_class == 'hauling':
+                        if veh.context_size_class not in ContextNewVehicleMarket.hauling_context_size_class_info:
+                            ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class] = \
+                                {'total': veh.initial_registered_count, 'hauling_share': 0}
+                        else:
+                            ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class]['total'] = \
+                                ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
+                                    'total'] + veh.initial_registered_count
+
                     if verbose:
                         print(veh)
+
+                # update context size class share
+                for v in vehicles_list:
+                    v.context_size_class_share_frac = v.initial_registered_count / context_size_class_dict[
+                        v.context_size_class]
+
+                for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
+                    ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
+                        ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
+                        context_size_class_dict[hsc]
 
         return template_errors
 
@@ -420,6 +454,7 @@ if __name__ == '__main__':
         from market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
         from context_fuel_prices import ContextFuelPrices # needed for retail fuel price
+        from context_new_vehicle_market import ContextNewVehicleMarket # needed for context size class hauling info
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 

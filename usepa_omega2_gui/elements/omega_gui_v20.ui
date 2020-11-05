@@ -595,6 +595,9 @@
        <height>110</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>EPA Logo</string>
+     </property>
      <property name="text">
       <string/>
      </property>

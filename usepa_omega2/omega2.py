@@ -5,15 +5,15 @@ omega2.py
 OMEGA2 top level code
 
 """
+from usepa_omega2 import omega_log
 
 print('importing %s' % __file__)
+
 
 import o2  # import global variables
 from usepa_omega2 import *
 from omega_plot import *
 import os
-
-from usepa_omega2.file_eye_oh import gui_comm
 
 
 def run_postproc(iteration_log, single_shot):
@@ -26,7 +26,7 @@ def run_postproc(iteration_log, single_shot):
     import matplotlib.pyplot as plt
 
     if not single_shot:
-        gui_comm('%s: Post Processing ...' % o2.options.session_name)
+        omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
     year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
                         zip(iteration_log['calendar_year'], iteration_log['iteration'])]
@@ -215,6 +215,7 @@ def run_producer_consumer():
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
         print(manufacturer_ID)
+        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID))
 
         iteration_log = pd.DataFrame()
         for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
@@ -225,6 +226,7 @@ def run_producer_consumer():
             prev_candidate_mfr_new_vehicles = None
             while iterate:
                 print('%d_%d' % (calendar_year, iteration_num))
+                omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
                 candidate_mfr_new_vehicles, winning_combo, market_class_tree = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
                 compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
@@ -235,19 +237,22 @@ def run_producer_consumer():
                                                                        winning_combo)
 
                     # experiment ----------------------- #
-                    if True:
+                    if calendar_year == 2037:
                         import numpy as np
                         from market_classes import MarketClass
                         from omega_functions import cartesian_prod
 
                         initial_total_sales = winning_combo['total_sales']
+                        winning_combo['winning_combo_share_weighted_price'] = \
+                            winning_combo['total_combo_cost_dollars'] / winning_combo['total_sales']
 
                         multiplier_columns = ['%s_cost_multiplier' % mc for mc in MarketClass.market_classes]
 
                         multiplier_df = winning_combo.to_frame().transpose()
                         for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
+                            inc = 0.05
                             multiplier_df = cartesian_prod(multiplier_df,
-                                                           pd.DataFrame(np.arange(0.1, 2.0 + 0.1, 0.1), columns=[mcc]))
+                                                           pd.DataFrame(np.arange(inc, 2.0 + inc, inc), columns=[mcc]))
                             multiplier_df['initial_average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc]
                             multiplier_df['average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc] * \
                                                                     multiplier_df[mcc]
@@ -299,17 +304,15 @@ def run_producer_consumer():
                              abs(1 - sales_demand['hauling.ICE_cost_multiplier']) *
                              sales_demand['consumer_hauling.ICE_abs_share_frac'])
 
-                            # sales_demand = sales_demand[sales_demand['sales_weighted_share_delta'] <= 0.01]
+                        non_modified_price = float(sales_demand[
+                            (sales_demand['non hauling.BEV_cost_multiplier'] == 1) &
+                            (sales_demand['hauling.BEV_cost_multiplier'] == 1) &
+                            (sales_demand['non hauling.ICE_cost_multiplier'] == 1) &
+                            (sales_demand['hauling.ICE_cost_multiplier'] == 1)]['share_weighted_price'])
 
-                        # fig, ax1 = fplothg(sales_demand['share_weighted_share_delta'], sales_demand['revenue'], '.')
-                        # ax1.plot(sales_demand['share_weighted_share_delta'], sales_demand['initial_revenue'], 'r.')
-                        # label_xy(ax1, 'share weighted share delta [frac]', 'revenue [$]')
+                        sales_demand = sales_demand[abs(sales_demand['share_weighted_price'] - non_modified_price) <= 10]
 
-                        # fig, ax1 = fplothg(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['revenue'], '.')
-                        # ax1.plot(sales_demand['total_combo_credits_co2_megagrams'], sales_demand['initial_revenue'], 'r.')
-                        # label_xy(ax1, 'total_combo_credits_co2_megagrams', 'revenue [$]')
-
-                        # sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
+                        sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
 
                         # experiment ----------------------- #
 
@@ -484,6 +487,7 @@ def init_omega(o2_options):
     from fuels import Fuel
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
+    from context_fuel_upstream import ContextFuelUpstream
     from market_classes import MarketClass
     from cost_curves import CostCurve, input_template_name as cost_curve_template_name
     from cost_clouds import CostCloud
@@ -526,6 +530,9 @@ def init_omega(o2_options):
 
         init_fail = init_fail + ContextFuelPrices.init_database_from_file(
             o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
+
+        init_fail = init_fail + ContextFuelUpstream.init_database_from_file(o2.options.context_fuel_upstream_file,
+                                                                          verbose=o2.options.verbose)
 
         init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
@@ -580,6 +587,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
     o2_options.start_time = time.time()
 
     print('OMEGA2 greets you, version %s' % code_version)
+    omega_log.logwrite("Running: OMEGA 2 Version " + str(code_version))
     if '__file__' in locals():
         print('from %s with love' % fileio.get_filenameext(__file__))
 
@@ -623,8 +631,8 @@ def run_omega(o2_options, single_shot=False, profile=False):
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
-        gui_comm("### Check OMEGA log for error messages ###")
-        gui_comm("### RUNTIME FAIL ###")
+        omega_log.logwrite("### Check OMEGA log for error messages ###")
+        omega_log.logwrite("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
         dump_omega_db_to_csv(o2.options.database_dump_folder)
 

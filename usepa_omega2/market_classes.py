@@ -79,32 +79,6 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
     return market_class_dict
 
 
-def print_market_class_dict(mc_dict, num_tabs=0):
-    """
-    pretty-print a market class dict...
-    :param mc_dict:
-    :param num_tabs:
-    :return:
-    """
-    if num_tabs == 0:
-        print()
-
-    if type(mc_dict) is list or type(mc_dict) is not dict:
-        print('\t' * num_tabs + str(mc_dict))
-    else:
-        for k in mc_dict.keys():
-            if type(mc_dict[k]) == set:
-                if mc_dict[k]:
-                    print('\t' * num_tabs + k + ':' + str(mc_dict[k]))
-                else:
-                    print('\t' * num_tabs + k)
-            else:
-                print('\t' * num_tabs + k)
-                print_market_class_dict(mc_dict[k], num_tabs+1)
-
-    if num_tabs == 0:
-        print()
-
 class MarketClass(SQABase):
     # --- database table properties ---
     __tablename__ = 'market_classes'
@@ -190,6 +164,8 @@ if __name__ == '__main__':
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
 
         if not init_fail:
+            from omega_functions import print_dict
+
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             market_class_list = [
@@ -209,10 +185,10 @@ if __name__ == '__main__':
             ]
 
             market_class_dict = parse_market_classes(market_class_list)
-            print_market_class_dict(market_class_dict)
+            print_dict(market_class_dict)
 
             market_class_dict_rc = parse_market_classes(market_class_list, by_reg_class=True)
-            print_market_class_dict(market_class_dict_rc)
+            print_dict(market_class_dict_rc)
 
             populate_market_classes(market_class_dict, 'hauling.ice', 'F150')
             populate_market_classes(market_class_dict, 'hauling.ice', 'Silverado')
@@ -220,7 +196,7 @@ if __name__ == '__main__':
             populate_market_classes(market_class_dict, 'non_hauling.ice', '240Z')
             populate_market_classes(market_class_dict, 'non_hauling.bev', 'Tesla3')
             populate_market_classes(market_class_dict, 'non_hauling.bev', 'TeslaS')
-            print_market_class_dict(market_class_dict)
+            print_dict(market_class_dict)
 
             populate_market_classes(market_class_dict_rc, 'hauling.ice.truck', 'F150')
             populate_market_classes(market_class_dict_rc, 'hauling.ice.truck', 'Silverado')
@@ -228,7 +204,7 @@ if __name__ == '__main__':
             populate_market_classes(market_class_dict_rc, 'non_hauling.ice.car', '240Z')
             populate_market_classes(market_class_dict_rc, 'non_hauling.ice.car', 'Sentra')
             populate_market_classes(market_class_dict_rc, 'non_hauling.bev.car', 'Tesla3')
-            print_market_class_dict(market_class_dict_rc)
+            print_dict(market_class_dict_rc)
 
         else:
             print(init_fail)

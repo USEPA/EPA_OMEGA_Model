@@ -1,9 +1,7 @@
 """
 vehicle_annual_data.py
 ======================
-
 Functions to log diagnostic data
-
 """
 
 print('importing %s' % __file__)
