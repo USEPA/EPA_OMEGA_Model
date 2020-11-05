@@ -636,29 +636,21 @@ class Form(QObject):
         global status_bar_message
         global multiprocessor_mode_selected
         global output_batch_subdirectory
-        # self.event_monitor("Start Model Run ...", "black", 'dt')
-        status_bar_message = "Status = Model Running ..."
-        status_bar()
+        # status_bar()
         self.window.progress_bar.setValue(0)
         self.window.progress_bar.setValue(50)
         self.window.repaint()
-        # Copy all files from the input directory to the project directory.
-        # color = "green"
-        # temp = "[" + input_batch_file + "]" + " to [" + output_batch_directory + "]"
-        # self.event_monitor("Copying Files ...\n    " + temp, color, 'dt')
-        # self.window.repaint()
-        # copy_files(input_batch_file, output_batch_directory)
-        # self.window.progress_bar.setValue(50)
-        # copy_files(input_batch_file, output_batch_directory)
-        # self.event_monitor("Copying Files Complete\n    " + temp, color, 'dt')
 
         # This call works but gui freezes until new process ends
         # os.system("python usepa_omega2/__main__.py")
-
+        # Open batch excel spreadsheet
         excel_data_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
+        # Create timestamp for batch filename
         batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        # Create path to batch log file
         output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + \
             excel_data_df.loc['Batch Name', 'Value']
+        # Create path to session log file
         output_session_subdirectory = output_batch_subdirectory + "/ReferencePolicy/output"
         # print('*****', output_session_subdirectory)
 
@@ -701,27 +693,28 @@ class Form(QObject):
         x = a + b + c + d
         # print("***", x, "***")
 
-        # Call OMEGA 2 batch as a subprocess with command line options from above
+        # Indicate model start to status bar
         self.event_monitor("Start Model Run", "black", 'dt')
+        # Call OMEGA 2 batch as a subprocess with command line options from above
+        status_bar_message = "Status = Model Running ..."
         omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
-        # Keep track of lines read from comm_file
+        # Keep track of lines read from the log files
         line_counter_batch = 0
         line_counter_session = 0
-        # Pointer to comm_file
+        # Complete paths to log files
         status_file_batch = output_batch_subdirectory + "/" + log_file_batch
         status_file_session = output_session_subdirectory + "/" + log_file_session_prefix + batch_time_stamp +\
                               '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
-        # print('*****', status_file_session)
-        # poll = None
-        # Keep looking for communication from other processes
+
+        # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
             time.sleep(1)
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
-            # Get number of lines in comm_file
+            # Get number of lines in the log files if they exist
             if os.path.isfile(status_file_batch):
                 num_lines_batch = sum(1 for line in open(status_file_batch))
                 status_file_batch_exists = 1
@@ -734,7 +727,7 @@ class Form(QObject):
             else:
                 num_lines_session = 0
                 status_file_session_exists = 0
-            # Read and output all new lines from comm_file
+            # Read and output all new lines from log files
             while line_counter_batch < num_lines_batch and status_file_batch_exists == 1:
                 f = open(status_file_batch)
                 lines = f.readlines()
@@ -763,13 +756,11 @@ class Form(QObject):
                 # Increment number of read lines from file counter
                 line_counter_session = line_counter_session + 1
 
-
         # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
         # sound1.terminate()
 
         # process has ended - update items in GUI
-
         # Send elapsed time to event monitor.
         elapsed_end = datetime.now()
         elapsed_time = elapsed_end - elapsed_start
@@ -780,7 +771,6 @@ class Form(QObject):
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Status = Ready"
-        status_bar()
         self.window.progress_bar.setValue(100)
 
         # Remove comm_file
