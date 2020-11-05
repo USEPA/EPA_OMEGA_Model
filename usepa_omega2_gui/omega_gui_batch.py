@@ -660,7 +660,7 @@ class Form(QObject):
         output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + \
             excel_data_df.loc['Batch Name', 'Value']
         output_session_subdirectory = output_batch_subdirectory + "/ReferencePolicy/output"
-        print('*****', output_session_subdirectory)
+        # print('*****', output_session_subdirectory)
 
         # Delete contents of comm_file.txt used to communicate with other processes
         # and place the first line 'Start Model Run'
@@ -702,6 +702,7 @@ class Form(QObject):
         # print("***", x, "***")
 
         # Call OMEGA 2 batch as a subprocess with command line options from above
+        self.event_monitor("Start Model Run", "black", 'dt')
         omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
@@ -711,20 +712,13 @@ class Form(QObject):
         line_counter_session = 0
         # Pointer to comm_file
         status_file_batch = output_batch_subdirectory + "/" + log_file_batch
-        status_file_session = output_session_subdirectory + "/" + log_file_session_prefix
-        status_file_session = status_file_session + batch_time_stamp
-        status_file_session = status_file_session + '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
-        print('*****', status_file_session)
+        status_file_session = output_session_subdirectory + "/" + log_file_session_prefix + batch_time_stamp +\
+                              '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
+        # print('*****', status_file_session)
         # poll = None
-        # Keep looking for comm_file entries as long as process is running
+        # Keep looking for communication from other processes
         while omega_batch.poll() is None:
             time.sleep(1)
-            # Get CPU usage
-            # cpu = psutil.cpu_percent()
-            # Get memory used
-            # mem = psutil.virtual_memory().percent
-            # self.window.progress_bar.setValue(cpu)
-            # poll = omega_batch.poll()
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
             # Get number of lines in comm_file
