@@ -552,7 +552,7 @@ class Form(QObject):
 
     def initialize_gui(self):
         """
-        Initialize various program functions.
+        Initialize various gui program functions.
 
         :return: N/A
         """
