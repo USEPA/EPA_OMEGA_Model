@@ -587,7 +587,6 @@ def run_omega(o2_options, single_shot=False, profile=False):
     o2_options.start_time = time.time()
 
     print('OMEGA2 greets you, version %s' % code_version)
-    omega_log.logwrite("Running: OMEGA 2 Version " + str(code_version))
     if '__file__' in locals():
         print('from %s with love' % fileio.get_filenameext(__file__))
 
@@ -595,6 +594,8 @@ def run_omega(o2_options, single_shot=False, profile=False):
 
     try:
         init_fail = init_omega(o2_options)
+
+        omega_log.logwrite("Running: OMEGA 2 Version " + str(code_version))
 
         if not init_fail:
             if profile:
