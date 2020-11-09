@@ -734,7 +734,7 @@ class Form(QObject):
                 f.close()
                 g = lines[line_counter_batch]
                 g = g.rstrip("\n")
-                g = '[B] ' + g
+                g = '[B log] ' + g
                 # Print in red if ERROR in line
                 if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
                     self.event_monitor(g, "black", 'dt')
@@ -749,7 +749,7 @@ class Form(QObject):
                 f.close()
                 g = lines[line_counter_session]
                 g = g.rstrip("\n")
-                g = '[S] ' + g
+                g = '[S log] ' + g
                 # Print in red if ERROR in line
                 if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
                     self.event_monitor(g, "black", 'dt')
