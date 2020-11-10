@@ -5,5 +5,5 @@ Glossary
 
 .. csv-table::
    :file: glossary.csv
-   :widths: 10 10 10 10 70
+   :widths: 10 10 10 10 100
    :header-rows: 1
