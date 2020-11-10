@@ -54,25 +54,28 @@ exclude_patterns = []
 # html_theme = 'bizstyle'
 html_theme = 'classic'
 
-html_theme_options = {
-    "stickysidebar": "true",
-    "sidebarwidth": "30em"
-}
-
+# Default Palette
 # html_theme_options = {
 #     "stickysidebar": "true",
-#     "sidebarwidth": "30em",
-#     "sidebarbgcolor": "#556B2F",
-#     "sidebartextcolor": "#98FB98",
-#     "sidebarlinkcolor": "#98FB98",
-#     "relbarbgcolor": "#228B22",
-#     "textcolor": "#228B22",
-#     "linkcolor": "#228B22",
-#     "visitedlinkcolor": "#228B22",
-#     "headtextcolor": "#228B22",
-#     "headlinkcolor": "#228B22",
-#     "footerbgcolor": "#228B22"
+#     "sidebarwidth": "30em"
 # }
+
+# EPA Palette
+html_theme_options = {
+    "stickysidebar": "true",
+    "sidebarwidth": "30em",
+    "sidebarbgcolor": "#0071BC",
+    "sidebartextcolor": "#FFFFFF",
+    "sidebarlinkcolor": "#FFFFFF",
+    "relbarbgcolor": "#205493",
+    "textcolor": "#205493",
+    "linkcolor": "#205493",
+    "visitedlinkcolor": "#205493",
+    "headtextcolor": "#205493",
+    "headlinkcolor": "#205493",
+    "footerbgcolor": "#112E51"
+}
+
 html_sidebars = {
    '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'],
    'using/windows': ['windowssidebar.html', 'searchbox.html'],
