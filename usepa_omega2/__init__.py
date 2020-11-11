@@ -74,6 +74,9 @@ try:
                 self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
             else:
                 pass
+            self.scc_costs_file = 'input_samples/emission_costs-scc.csv'
+            self.criteria_costs_file = 'input_samples/emission_costs-criteria.csv'
+            self.emission_factors_vehicles_file = 'input_samples/emission_factors-vehicles.csv'
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
             self.producer_consumer_max_iterations = 20
