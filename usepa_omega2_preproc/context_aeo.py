@@ -18,7 +18,7 @@ path_input_templates = path_cwd / 'input_samples'
 
 vehicles_context_template = 'context_new_vehicle_market.csv'
 fuels_context_template = 'context_fuel_prices.csv'
-price_deflators_template = 'price_deflators.csv'
+price_deflators_template = 'context_implicit_price_deflators.csv'
 
 # from somewhere, e.g., the top/general section of the batch file, the aeo_case has to be set; this is a placeholder
 aeo_case = 'Reference case'

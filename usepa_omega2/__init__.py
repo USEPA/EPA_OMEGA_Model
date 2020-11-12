@@ -74,9 +74,6 @@ try:
                 self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
             else:
                 pass
-            self.scc_costs_file = 'input_samples/emission_costs-scc.csv'
-            self.criteria_costs_file = 'input_samples/emission_costs-criteria.csv'
-            self.emission_factors_vehicles_file = 'input_samples/emission_factors-vehicles.csv'
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = False
             self.producer_consumer_max_iterations = 20
@@ -92,6 +89,15 @@ try:
             self.iterate_producer_consumer = True
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
+
+            # effects modeling files
+            self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
+            self.scc_costs_file = 'input_samples/emission_costs-scc.csv'
+            self.criteria_costs_file = 'input_samples/emission_costs-criteria.csv'
+            self.emission_factors_vehicles_file = 'input_samples/emission_factors-vehicles.csv'
+            self.emission_factors_powersector_file = 'input_samples/emission_factors-powersector.csv'
+            self.emission_factors_refinery_file = 'input_samples/emission_factors-refinery.csv'
+
             self.start_time = 0
             self.end_time = 0
 

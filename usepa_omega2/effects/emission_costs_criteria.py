@@ -1,31 +1,18 @@
 """
 emission_costs_criteria.py
-=============================
+==========================
 
 
 """
 
-import o2  # import global variables
-from usepa_omega2 import *
 import pandas as pd
 import numpy as np
 from pathlib import Path
 
-# path_code = Path(__file__).parent
-path_project = Path.cwd()
-path_input_samples = path_project / 'input_samples'
-deflators = pd.read_csv(path_input_samples / 'price_deflators.csv', skiprows=1, index_col=0) # for now, but CPU deflators should be used for these
-
-
-def adjust_dollars(df, deflators, *args):
-    basis_years = df['dollar_basis'].unique()
-    df_return = df.copy()
-    for basis_year in basis_years:
-        for arg in args:
-            adj_factor = deflators.at[basis_year, 'adjustment_factor']
-            df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
-    df_return['dollar_basis'] = deflators.index[deflators['adjustment_factor'] == 1][0]
-    return df_return
+import o2  # import global variables
+from usepa_omega2 import *
+import usepa_omega2.effects.general_functions as gen_fxns
+from usepa_omega2.effects.ip_deflators import ImplicitPriceDeflators
 
 
 class EmissionCostsCriteria(SQABase):
@@ -64,9 +51,11 @@ class EmissionCostsCriteria(SQABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
+
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            df = adjust_dollars(df, deflators, 'low-mortality_onroad', 'high-mortality_onroad', 'low-mortality_upstream', 'high-mortality_upstream')
+            deflators = ImplicitPriceDeflators().df_from_table('calendar_year')
+            df = gen_fxns.adjust_dollars(df, deflators, 'low-mortality_onroad', 'high-mortality_onroad', 'low-mortality_upstream', 'high-mortality_upstream')
 
             if not template_errors:
                 obj_list = []
@@ -99,13 +88,14 @@ if __name__ == '__main__':
         init_omega_db()
         omega_log.init_logfile()
 
-        from usepa_omega2.market_classes import MarketClass  # needed for market class ID
+        from usepa_omega2.effects.ip_deflators import ImplicitPriceDeflators
 
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        # init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
-        #                                                             verbose=o2.options.verbose)
+
+        init_fail = init_fail + ImplicitPriceDeflators.init_database_from_file(o2.options.ip_deflators_file,
+                                                                               verbose=o2.options.verbose)
 
         init_fail = init_fail + EmissionCostsCriteria.init_database_from_file(o2.options.criteria_costs_file,
                                                                               verbose=o2.options.verbose)

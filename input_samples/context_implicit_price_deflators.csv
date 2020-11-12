@@ -1,4 +1,4 @@
-input_template_name:,deflators_context-aeo,input_template_version:,0.0001
+input_template_name:,context_implicit_price_deflators,input_template_version:,0.1
 calendar_year,price_deflator,adjustment_factor
 2000,78.078,1.4378570147800918
 2001,79.79,1.4070058904624638
