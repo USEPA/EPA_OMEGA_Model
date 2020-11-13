@@ -458,7 +458,7 @@
      </font>
     </property>
     <property name="text">
-     <string>EPA OMEGA 2 GHG Model</string>
+     <string>EPA OMEGA GHG Model</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
