@@ -7,22 +7,19 @@ This code launches and controls the OMEGA 2 GUI
 """
 
 import os
-import pathlib
 import sys
 import subprocess
 import pandas
-# import pathlib
 import psutil
 
 import multitimer
 import time
-# import signal
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
-import PySide2.QtXml
+# import PySide2.QtXml
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
@@ -152,6 +149,22 @@ class Form(QObject):
         self.window.save_configuration_file_button.setStyleSheet(stylesheet)
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
+
+        # Load stylesheet for labels
+        stylesheet = ""
+        stylesheet = label_stylesheet(stylesheet)
+        self.window.configuration_file_1_label.setStyleSheet(stylesheet)
+        self.window.input_batch_file_1_label.setStyleSheet(stylesheet)
+        self.window.output_batch_directory_1_label.setStyleSheet(stylesheet)
+        self.window.project_description_1_label.setStyleSheet(stylesheet)
+        self.window.main_title_1_label.setStyleSheet(stylesheet)
+        self.window.event_monitor_label.setStyleSheet(stylesheet)
+
+        # Load stylesheet for checkboxes
+        stylesheet = ""
+        stylesheet = checkbox_stylesheet(stylesheet)
+        self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
+
 
         # Timer start
         timer.start()
@@ -582,7 +595,7 @@ class Form(QObject):
 
         # Prime the status monitor
         color = "black"
-        message = "OMEGA 2 Version " + omega2_version + " Ready"
+        message = "OMEGA Version " + omega2_version + " Ready"
         self.event_monitor(message, color, 'dt')
         self.event_monitor(event_separator, color, '')
         # Prime the wizard
@@ -602,7 +615,7 @@ class Form(QObject):
         self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
         self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
         self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
-        self.window.setWindowTitle("EPA OMEGA 2 Model     Version: " + omega2_version)
+        self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
     def clear_entries(self):
         """

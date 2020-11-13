@@ -9,7 +9,7 @@ def tab_stylesheet(stylesheet):
     stylesheet = """
             QTabBar::tab { 
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                            stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
+                            stop: 0 rgb(181, 232, 181), stop: 1.0 rgb(147, 188, 147));
                 min-width: 150px;       /* Sets the width of the tabs */
                 height: 30px;           /* Sets the height of the tabs */
                 padding-top : 0px;      /* Sets extra space at the top of the tabs */
@@ -29,7 +29,7 @@ def tab_stylesheet(stylesheet):
                 border-right: 4px solid gray;
                 border-bottom: 4px solid gray;
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
+                        stop: 0 rgb(181, 232, 181), stop: 1.0 rgb(147, 188, 147));
                 }  
             QTabBar::tab:!selected {
                 margin-top: 2px; /* Shrinks non-selected tabs */
@@ -52,7 +52,7 @@ def background_stylesheet(stylesheet):
     stylesheet = """
         QWidget {
             background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                        stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
+                        stop: 0 rgb(181, 232, 181), stop: 1.0 rgb(147, 188, 147));
             }
      """
     return stylesheet
@@ -82,34 +82,6 @@ def button_stylesheet(stylesheet):
         border-radius: 6px;
         font: bold;
         }
-     """
-    return stylesheet
-
-
-def label_stylesheet(stylesheet):
-    """
-        Loads the stylesheet for labels contained in the the gui.
-
-        :param stylesheet: Not used.
-
-        :return: String containing stylesheet.
-        """
-    stylesheet = """
-        QLabel { color : white; }
-     """
-    return stylesheet
-
-
-def checkbox_stylesheet(stylesheet):
-    """
-        Loads the stylesheet for labels contained in the the gui.
-
-        :param stylesheet: Not used.
-
-        :return: String containing stylesheet.
-        """
-    stylesheet = """
-        QCheckBox { color : white; }
      """
     return stylesheet
 
