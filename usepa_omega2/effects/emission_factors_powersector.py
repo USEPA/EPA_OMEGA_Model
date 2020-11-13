@@ -36,7 +36,7 @@ class EmissionFactorsPowersector(SQABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'emission_factors-powersector'
+        input_template_name = 'context_emission_factors-powersector'
         input_template_version = 0.1
         input_template_columns = {'calendar_year',
                                   'voc_grams_per_kWh', 'co_grams_per_kWh', 'nox_grams_per_kWh', 'pm25_grams_per_kWh', 'sox_grams_per_kWh',

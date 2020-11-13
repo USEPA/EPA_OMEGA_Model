@@ -1,29 +1,34 @@
 """
-emission_costs_scc.py
-=====================
+cost_factors_criteria.py
+========================
 
 
 """
 
 import pandas as pd
+import numpy as np
+from pathlib import Path
+
 import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 from usepa_omega2.effects.ip_deflators import ImplicitPriceDeflators
-from pathlib import Path
 
 
-class EmissionCostsSCC(SQABase):
+class CostFactorsCriteria(SQABase):
     # --- database table properties ---
-    __tablename__ = 'emission_costs_scc'
+    __tablename__ = 'cost_factors_criteria'
     index = Column('index', Integer, primary_key=True)
 
     calendar_year = Column('calendar_year', Numeric)
     discount_rate = Column('discount_rate', Numeric)
+    fuel_id = Column('fuel_id', String)
     pollutant = Column('pollutant', String)
     dollar_basis = Column('dollar_basis', Numeric)
-    scc_interim_domestic = Column('scc_interim_domestic', Numeric)
-    scc_global = Column('scc_global', Numeric)
+    low_mortality_onroad = Column('low-mortality_onroad', Numeric)
+    high_mortality_onroad = Column('high-mortality_onroad', Numeric)
+    low_mortality_upstream = Column('low-mortality_upstream', Numeric)
+    high_mortality_upstream = Column('high-mortality_upstream', Numeric)
 
     def __repr__(self):
         return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
@@ -33,9 +38,11 @@ class EmissionCostsSCC(SQABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'emission_costs-scc'
+        input_template_name = 'context_cost_factors-criteria'
         input_template_version = 0.1
-        input_template_columns = {'calendar_year', 'discount_rate', 'pollutant', 'dollar_basis', 'scc_interim_domestic', 'scc_global'}
+        input_template_columns = {'calendar_year', 'discount_rate', 'fuel_id', 'pollutant', 'dollar_basis',
+                                  'low-mortality_onroad', 'high-mortality_onroad',
+                                  'low-mortality_upstream', 'high-mortality_upstream'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -48,19 +55,22 @@ class EmissionCostsSCC(SQABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             deflators = ImplicitPriceDeflators().df_from_table('calendar_year')
-            df = gen_fxns.adjust_dollars(df, deflators, 'scc_interim_domestic', 'scc_global')
+            df = gen_fxns.adjust_dollars(df, deflators, 'low-mortality_onroad', 'high-mortality_onroad', 'low-mortality_upstream', 'high-mortality_upstream')
 
             if not template_errors:
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(EmissionCostsSCC(
+                    obj_list.append(CostFactorsCriteria(
                         calendar_year=df.loc[i, 'calendar_year'],
                         discount_rate=df.loc[i, 'discount_rate'],
+                        fuel_id=df.loc[i, 'fuel_id'],
                         pollutant=df.loc[i, 'pollutant'],
                         dollar_basis=df.loc[i, 'dollar_basis'],
-                        scc_interim_domestic=df.loc[i, 'scc_interim_domestic'],
-                        scc_global=df.loc[i, 'scc_global'],
+                        low_mortality_onroad=df.loc[i, 'low-mortality_onroad'],
+                        high_mortality_onroad=df.loc[i, 'high-mortality_onroad'],
+                        low_mortality_upstream=df.loc[i, 'low-mortality_upstream'],
+                        high_mortality_upstream=df.loc[i, 'high-mortality_upstream'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -87,9 +97,8 @@ if __name__ == '__main__':
         init_fail = init_fail + ImplicitPriceDeflators.init_database_from_file(o2.options.ip_deflators_file,
                                                                                verbose=o2.options.verbose)
 
-        init_fail = init_fail + EmissionCostsSCC.init_database_from_file(o2.options.scc_costs_file,
-                                                                         verbose=o2.options.verbose)
-
+        init_fail = init_fail + CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
+                                                                            verbose=o2.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)

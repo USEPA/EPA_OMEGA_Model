@@ -1,4 +1,4 @@
-input_template_name:,emission_costs-criteria,input_template_version:,0.1,,,,,
+input_template_name:,context_cost_factors-criteria,input_template_version:,0.1,,,,,
 calendar_year,discount_rate,fuel_id,pollutant,dollar_basis,low-mortality_onroad,high-mortality_onroad,low-mortality_upstream,high-mortality_upstream
 2020,0.03,pump gasoline,PM25,2017,511599,1154713,511599,1154713
 2021,0.03,pump gasoline,PM25,2017,511599,1154713,511599,1154713

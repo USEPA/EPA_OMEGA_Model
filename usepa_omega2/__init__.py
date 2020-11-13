@@ -92,11 +92,11 @@ try:
 
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
-            self.scc_costs_file = 'input_samples/emission_costs-scc.csv'
-            self.criteria_costs_file = 'input_samples/emission_costs-criteria.csv'
-            self.emission_factors_vehicles_file = 'input_samples/emission_factors-vehicles.csv'
-            self.emission_factors_powersector_file = 'input_samples/emission_factors-powersector.csv'
-            self.emission_factors_refinery_file = 'input_samples/emission_factors-refinery.csv'
+            self.scc_cost_factors_file = 'input_samples/context_cost_factors-scc.csv'
+            self.criteria_cost_factors_file = 'input_samples/context_cost_factors-criteria.csv'
+            self.emission_factors_vehicles_file = 'input_samples/context_emission_factors-vehicles.csv'
+            self.emission_factors_powersector_file = 'input_samples/context_emission_factors-powersector.csv'
+            self.emission_factors_refinery_file = 'input_samples/context_emission_factors-refinery.csv'
 
             self.start_time = 0
             self.end_time = 0

@@ -1,4 +1,4 @@
-input_template_name:,emission_factors-refinery,input_template_version:,0.1,,,,,,,,,,,
+input_template_name:,context_emission_factors-refinery,input_template_version:,0.1,,,,,,,,,,,
 calendar_year,voc_grams_per_gallon,co_grams_per_gallon,nox_grams_per_gallon,pm25_grams_per_gallon,sox_grams_per_gallon,benzene_grams_per_gallon,13butadiene_grams_per_gallon,formaldehyde_grams_per_gallon,acetaldehyde_grams_per_gallon,acrolein_grams_per_gallon,naphthalene_grams_per_gallon,co2_grams_per_unit,n2o_grams_per_gallon,ch4_grams_per_gallon
 2020,47.4966,5.472144859,13.87268554,2.072919596,8.089375947,0.322958152,0.001442425,0.081646724,0.009797607,0.000816467,0.015177219,19145.2,0.369224,95.454
 2021,47.4966,5.472144859,13.87268554,2.072919596,8.089375947,0.322958152,0.001442425,0.081646724,0.009797607,0.000816467,0.015177219,19145.2,0.369224,95.454
