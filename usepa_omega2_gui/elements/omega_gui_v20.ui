@@ -442,7 +442,7 @@
      </attribute>
     </widget>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="main_title_1_label">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -610,7 +610,7 @@
     </widget>
    </widget>
    <zorder>background_widget</zorder>
-   <zorder>label</zorder>
+   <zorder>main_title_1_label</zorder>
    <zorder>event_monitor_result</zorder>
    <zorder>event_monitor_label</zorder>
    <zorder>clear_event_monitor_button</zorder>
