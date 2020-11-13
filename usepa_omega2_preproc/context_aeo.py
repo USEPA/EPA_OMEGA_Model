@@ -19,10 +19,11 @@ path_input_templates = path_cwd / 'input_samples'
 vehicles_context_template = 'context_new_vehicle_market.csv'
 fuels_context_template = 'context_fuel_prices.csv'
 price_deflators_template = 'context_implicit_price_deflators.csv'
+cpiu_deflators_template = 'context_cpiu_price_deflators.csv'
 
-# from somewhere, e.g., the top/general section of the batch file, the aeo_case has to be set; this is a placeholder
+# from somewhere, e.g., the top/general section of the batch file, the string_id has to be set; this is a placeholder
 aeo_case = 'Reference case'
-# aeo = aeo_case.replace(' ', '')
+# aeo = string_id.replace(' ', '')
 gasoline_upstream = 2478 # 77 FR 63181
 electricity_upstream = 534 # 77 FR 63182
 
@@ -86,23 +87,23 @@ def save_template(df, path_to_template, path_to_save, template_name):
 
 
 class GetContext:
-    def __init__(self, path, table_name, aeo_case, id_col, skiprows=4):
+    def __init__(self, path, table_name, string_id, col_id, skiprows=4):
         """
 
         :param path: The path to input files.
         :param table_name: The AEO table to read.
-        :param aeo_case: The aeo case (e.g., Reference case, High Oil Price, etc.).
-        :param id_col: The column name where id data can be found.
+        :param string_id: The string identifier (e.g., the string_id such as Reference case, High Oil Price, etc.).
+        :param col_id: The column identifier where string_id data can be found.
         :param skiprows: The number of rows to be skipped when reading the AEO table.
         """
         self.path = path
         self.table_name = table_name
-        self.aeo_case = aeo_case
-        self.id_col = id_col
+        self.string_id = string_id
+        self.col_id = col_id
         self.skiprows = skiprows
 
     def __repr__(self):
-        return f'Reading {self.table_name} for AEO {self.aeo_case}'
+        return f'Reading {self.table_name}'
 
     def read_table(self):
         return pd.read_csv(self.path / self.table_name, skiprows=self.skiprows, error_bad_lines=False).dropna()
@@ -112,8 +113,8 @@ class GetContext:
 
         :return: A DataFrame consisting of only the data for the given AEO case; the name of the AEO case is also removed from the 'full name' column entries.
         """
-        df_return = pd.DataFrame(self.read_table().loc[self.read_table()[self.id_col].str.endswith(f'{self.aeo_case}'), :]).reset_index(drop=True)
-        df_return.replace({self.id_col: f': {self.aeo_case}'}, {self.id_col: ''}, regex=True, inplace=True)
+        df_return = pd.DataFrame(self.read_table().loc[self.read_table()[self.col_id].str.endswith(f'{self.string_id}'), :]).reset_index(drop=True)
+        df_return.replace({self.col_id: f': {self.string_id}'}, {self.col_id: ''}, regex=True, inplace=True)
         return df_return
 
     def aeo_year(self):
@@ -140,10 +141,10 @@ class GetContext:
         :return: A DataFrame of those AEO table rows containing 'metric' within the 'full name' column.
         """
         df_rows = pd.DataFrame()
-        df_rows = pd.concat([df_rows, self.return_case_df().loc[self.return_case_df()[self.id_col].str.contains(metric), :]],
+        df_rows = pd.concat([df_rows, self.return_case_df().loc[self.return_case_df()[self.col_id].str.contains(metric), :]],
                             ignore_index=True)
         if replace:
-            df_rows.replace({self.id_col: replace}, {self.id_col: ''}, regex=True, inplace=True)
+            df_rows.replace({self.col_id: replace}, {self.col_id: ''}, regex=True, inplace=True)
         df_rows = df_rows.iloc[:, :-1]
         return df_rows
 
@@ -205,6 +206,7 @@ def main():
 
     # and the bea table(s) being used
     deflators_table = 'Table_1.1.9_ImplicitPriceDeflators.csv'
+    cpiu_table = 'SeriesReport.csv'
 
     # first work on class attributes
     attribute = dict()
@@ -396,6 +398,14 @@ def main():
                      'adjustment_factor',
                      basis_factor / deflators['price_deflator'])
 
+    cpi = pd.read_csv(path_bea_inputs / cpiu_table, skiprows=11, usecols=[0, 1])
+    cpi.rename(columns={'Year': 'calendar_year', 'Annual': 'price_deflator'}, inplace=True)
+    basis_factor_df = pd.DataFrame(cpi.loc[cpi['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)
+    basis_factor = basis_factor_df.at[0, 'price_deflator']
+    cpi.insert(len(cpi.columns),
+               'adjustment_factor',
+               basis_factor / cpi['price_deflator'])
+
     # print to output files
     print(f'Saving output files to {path_outputs}')
     path_of_run_folder = path_outputs / f'{start_time_readable}_run'
@@ -404,6 +414,7 @@ def main():
     save_template(fleet_context_df, path_input_templates, path_of_run_folder, vehicles_context_template)
     save_template(aeo_fuel_context, path_input_templates, path_of_run_folder, fuels_context_template)
     save_template(deflators, path_input_templates, path_of_run_folder, price_deflators_template)
+    save_template(cpi, path_input_templates, path_of_run_folder, cpiu_deflators_template)
 
 
 if __name__ == '__main__':

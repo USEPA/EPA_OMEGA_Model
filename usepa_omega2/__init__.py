@@ -92,6 +92,7 @@ try:
 
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
+            self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
             self.scc_cost_factors_file = 'input_samples/context_cost_factors-scc.csv'
             self.criteria_cost_factors_file = 'input_samples/context_cost_factors-criteria.csv'
             self.emission_factors_vehicles_file = 'input_samples/context_emission_factors-vehicles.csv'

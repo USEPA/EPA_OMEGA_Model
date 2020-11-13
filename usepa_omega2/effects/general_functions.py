@@ -7,7 +7,6 @@ general_functions.py
 import pandas as pd
 from math import log10, floor
 from usepa_omega2 import *
-from usepa_omega2.effects.ip_deflators import ImplicitPriceDeflators
 
 
 def adjust_dollars(df, deflators, *args):
