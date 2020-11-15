@@ -14,6 +14,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 from omega_plot import *
 import os
+from usepa_omega2.consumer import stock
 
 
 def run_postproc(iteration_log, single_shot):
@@ -345,7 +346,9 @@ def run_producer_consumer():
                     iteration_num = iteration_num + 1
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
-
+            stock.prior_year_stock_registered_count(calendar_year)
+            stock.prior_year_stock_vmt(calendar_year)
+            stock.age0_stock_vmt(calendar_year)
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
     return iteration_log

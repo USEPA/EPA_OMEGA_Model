@@ -92,12 +92,12 @@ def prior_year_stock_registered_count(calendar_year):
             filter(VehicleAnnualData.age==0).\
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID).scalar()
         veh_age = calendar_year_prior_vehicles[idx].age + 1
-        veh_market_class = o2.session.query(VehicleFinal.market_class_ID).filter(VehicleFinal.vehicle_ID == vehicle_ID)
+        veh_market_class = o2.session.query(VehicleFinal.market_class_ID).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
         scrappage_factor = o2.session.query(o2.options.stock_scrappage.reregistered_proportion).\
             filter(o2.options.stock_scrappage.market_class_ID == veh_market_class).\
             filter(o2.options.stock_scrappage.age == veh_age).scalar()
         new_count = vehicle_initial_sales * scrappage_factor
-        vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)
+        vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)[0]
         VehicleAnnualData.update_registered_count(vehicle, calendar_year, new_count)
 
 
