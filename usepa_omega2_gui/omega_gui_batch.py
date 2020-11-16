@@ -748,11 +748,9 @@ class Form(QObject):
                 g = lines[line_counter_batch]
                 g = g.rstrip("\n")
                 g = '[B log] ' + g
-                # Print in red if ERROR in line
-                if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
-                    self.event_monitor(g, "black", 'dt')
-                else:
-                    self.event_monitor(g, "red", 'dt')
+                # Select output color
+                color = status_output_color(g)
+                self.event_monitor(g, color, 'dt')
                 # Increment number of read lines from file counter
                 line_counter_batch = line_counter_batch + 1
 
@@ -763,11 +761,9 @@ class Form(QObject):
                 g = lines[line_counter_session]
                 g = g.rstrip("\n")
                 g = '[S log] ' + g
-                # Print in red if ERROR in line
-                if g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1:
-                    self.event_monitor(g, "black", 'dt')
-                else:
-                    self.event_monitor(g, "red", 'dt')
+                # Select output color
+                color = status_output_color(g)
+                self.event_monitor(g, color, 'dt')
                 # Increment number of read lines from file counter
                 line_counter_session = line_counter_session + 1
 

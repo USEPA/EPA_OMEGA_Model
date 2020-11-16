@@ -148,3 +148,14 @@ def sec_to_hours(seconds):
     c = str((seconds % 3600) % 60)
     d = "{} hours {} mins {} seconds".format(a, b, c)
     return d
+
+
+def status_output_color(g):
+    if g.find("Manufacturer=") != -1:
+        g = "green"
+    elif g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1 and g.find("FAIL") == -1\
+            and g.find("Fail") == -1:
+        g = "black"
+    else:
+        g = "red"
+    return g
