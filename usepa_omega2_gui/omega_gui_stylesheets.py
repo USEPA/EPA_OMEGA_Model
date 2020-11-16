@@ -14,7 +14,7 @@ def tab_stylesheet(stylesheet):
                 height: 30px;           /* Sets the height of the tabs */
                 padding-top : 0px;      /* Sets extra space at the top of the tabs */
                 padding-bottom : 0px;   /* Sets extra space at the bottom of the tabs */
-                color: rgb(0,0,0);            /* Sets the text color and frame color of the tabs */
+                color: white;            /* Sets the text color and frame color of the tabs */
                 font: 12pt "Arial";     /* Sets the font for the tabs */
                 }
             QTabBar::tab:hover { 
@@ -35,7 +35,7 @@ def tab_stylesheet(stylesheet):
                 margin-top: 2px; /* Shrinks non-selected tabs */
                 }
             QTabWidget {
-                background: rgb(170,170,170);  /* Sets the color of the unselected tabs */
+                background: rgb(32,84,147);  /* Sets the color of the unselected tabs */
                 }
             """
     return stylesheet
@@ -60,7 +60,7 @@ def background_stylesheet(stylesheet):
 
 def button_stylesheet(stylesheet):
     """
-        Loads the stylesheet for buttons contained in the the gui.
+        Loads the stylesheet for buttons contained in the gui.
 
         :param stylesheet: Not used.
 
@@ -68,19 +68,26 @@ def button_stylesheet(stylesheet):
         """
     stylesheet = """
         QPushButton {
-        background-color: rgb(170,170,170);
-        border: 1px solid rgb(100,100,100);
+        background-color: rgb(32,84,147);
+        border: 1px solid white;
         border-radius: 6px;
         }
+        QPushButton:enabled {
+        background-color: rgb(32,84,147); 
+        border: 1px solid white;
+        color: white;
+        }
         QPushButton:hover {
-        border: 2px solid rgb(60,60,60);
+        border: 2px solid white;
         border-radius: 6px;
         font: bold;
+        color: white;
         }
         QPushButton:pressed {
         border: 4px solid rgb(60,60,60);
         border-radius: 6px;
         font: bold;
+        color: white;
         }
      """
     return stylesheet
@@ -88,7 +95,7 @@ def button_stylesheet(stylesheet):
 
 def label_stylesheet(stylesheet):
     """
-        Loads the stylesheet for labels contained in the the gui.
+        Loads the stylesheet for labels contained in the gui.
 
         :param stylesheet: Not used.
 
@@ -102,7 +109,7 @@ def label_stylesheet(stylesheet):
 
 def checkbox_stylesheet(stylesheet):
     """
-        Loads the stylesheet for labels contained in the the gui.
+        Loads the stylesheet for checkboxes contained in the gui.
 
         :param stylesheet: Not used.
 
