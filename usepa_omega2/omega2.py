@@ -313,7 +313,7 @@ def run_producer_consumer():
 
                         sales_demand = sales_demand[abs(sales_demand['share_weighted_price'] - non_modified_price) <= 10]
 
-                        sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
+                        # sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
 
                         # experiment ----------------------- #
 
