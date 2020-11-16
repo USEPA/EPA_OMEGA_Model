@@ -295,9 +295,9 @@ class OMEGASessionObject(object):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
         omega_log.logwrite('Getting Postproc Settings...')
-        if validate_predefined_input(self.read_parameter('Stock Deregistration'), {'Fixed', 'Dynamic'}):
+        if validate_predefined_input(self.read_parameter('Stock Deregistration'), {'fixed', 'dynamic'}):
             self.settings.stock_scrappage = self.read_parameter('Stock Deregistration')
-        if validate_predefined_input(self.read_parameter('Stock VMT'), {'Fixed', 'Dynamic'}):
+        if validate_predefined_input(self.read_parameter('Stock VMT'), {'fixed', 'dynamic'}):
             self.settings.stock_vmt = self.read_parameter('Stock VMT')
 
     def init(self, validate_only=False):
