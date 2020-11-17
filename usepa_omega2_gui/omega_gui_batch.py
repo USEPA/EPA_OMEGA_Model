@@ -17,6 +17,7 @@ import time
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
+from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 # import PySide2.QtXml
@@ -64,6 +65,7 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
+button_click_sound = 'usepa_omega2_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -201,6 +203,7 @@ class Form(QObject):
 
             :return: N/A
         """
+        # playsound(button_click_sound)
         global configuration_file, scenario, configuration_file_valid, input_batch_file_valid
         global output_batch_directory_valid, input_batch_file, output_batch_directory
         # self.window.statusBar().showMessage("Open File")
@@ -497,7 +500,7 @@ class Form(QObject):
 
     def launch_documentation(self):
         """
-        Opens the OMEGA documentation website in browser window.
+        Opens the OMEGA documentation website in browser.
 
         :return: N/A
         """
@@ -505,7 +508,7 @@ class Form(QObject):
 
     def launch_epa_website(self):
         """
-        Opens the OMEGA documentation website in browser window.
+        Opens the EPA website in browser.
 
         :return: N/A
         """
@@ -514,12 +517,10 @@ class Form(QObject):
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
-        The function searches the __init__.py file for the line containing the code version and then calls
-        the function "showbox" to display the result.
 
         :return: N/A
         """
-        global omega2_version
+        global omega2_version, button_click_sound
         message_title = "About OMEGA"
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
@@ -658,7 +659,7 @@ class Form(QObject):
         :return: N/A
         """
         elapsed_start = datetime.now()
-        # model_sound_start = 'gui/elements/model_start.mp3'
+        # model_sound_start = 'gui/elements/click.mp3'
         # model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         global multiprocessor_mode_selected
@@ -728,60 +729,49 @@ class Form(QObject):
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
-        # Keep track of lines read from the log files
-        line_counter_batch = 0
-        line_counter_session = 0
         # Complete paths to log files
         status_file_batch = output_batch_subdirectory + "/" + log_file_batch
         status_file_session = output_session_subdirectory + "/" + log_file_session_prefix + batch_time_stamp +\
                               '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
+        # If more log files are monitored (currently 2) just add another element to the 5 arrays below
+        # Enter log file names into array
+        log_file_array = [status_file_batch, status_file_session]
+        # Give the log files a name
+        log_label_array = ['B log', 'S log']
+        # Temporary counter arrays
+        log_counter_array = [0, 0]
+        log_status_array = [0, 0]
+        log_lines_array = [0, 0]
 
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
-            time.sleep(1)
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
+            # Keep the overhead low and only update the event file at 1 hz
+            time.sleep(1)
             # Get number of lines in the log files if they exist
-            if os.path.isfile(status_file_batch):
-                num_lines_batch = sum(1 for line in open(status_file_batch))
-                status_file_batch_exists = 1
-            else:
-                num_lines_batch = 0
-                status_file_batch_exists = 0
-            if os.path.isfile(status_file_session):
-                num_lines_session = sum(1 for line in open(status_file_session))
-                status_file_session_exists = 1
-            else:
-                num_lines_session = 0
-                status_file_session_exists = 0
-            # Read and output all new lines from log files
-            while line_counter_batch < num_lines_batch and status_file_batch_exists == 1:
-                f = open(status_file_batch)
-                lines = f.readlines()
-                f.close()
-                g = lines[line_counter_batch]
-                g = g.rstrip("\n")
-                g = '[B log] ' + g
-                # Select output color
-                color = status_output_color(g)
-                # Output to event monitor
-                self.event_monitor(g, color, 'dt')
-                # Increment number of read lines from file counter
-                line_counter_batch = line_counter_batch + 1
+            for log_loop in range(0, len(log_file_array)):
+                if os.path.isfile(log_file_array[log_loop]):
+                    log_lines_array[log_loop] = sum(1 for line in open(log_file_array[log_loop]))
+                    log_status_array[log_loop] = 1
+                else:
+                    log_lines_array[log_loop] = 0
+                    log_status_array[log_loop] = 0
 
-            while line_counter_session < num_lines_session and status_file_session_exists == 1:
-                f = open(status_file_session)
-                lines = f.readlines()
-                f.close()
-                g = lines[line_counter_session]
-                g = g.rstrip("\n")
-                g = '[S log] ' + g
-                # Select output color
-                color = status_output_color(g)
-                # Output to event monitor
-                self.event_monitor(g, color, 'dt')
-                # Increment number of read lines from file counter
-                line_counter_session = line_counter_session + 1
+                # Read and output all new lines from log files
+                while log_counter_array[log_loop] < log_lines_array[log_loop] and log_status_array[log_loop] == 1:
+                    f = open(log_file_array[log_loop])
+                    lines = f.readlines()
+                    f.close()
+                    g = lines[log_counter_array[log_loop]]
+                    g = g.rstrip("\n")
+                    g = '[' + log_label_array[log_loop] + '] ' + g
+                    # Select output color
+                    color = status_output_color(g)
+                    # Output to event monitor
+                    self.event_monitor(g, color, 'dt')
+                    # Increment number of read lines from file counter
+                    log_counter_array[log_loop] = log_counter_array[log_loop] + 1
 
         # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
