@@ -52,7 +52,7 @@ output_batch_directory_valid = False
 # Images for model run button
 run_button_image_disabled = "usepa_omega2_gui/elements/green_car_1.jpg"
 run_button_image_enabled = "usepa_omega2_gui/elements/green_car_1.jpg"
-epa_button_image = "usepa_omega2_gui/elements/epa_logo.jpg"
+epa_button_image = "usepa_omega2_gui/elements/epa_seal_large_trim.gif"
 green_check_image = "usepa_omega2_gui/elements/green_check.png"
 red_x_image = "usepa_omega2_gui/elements/red_x.png"
 # Common spacer between events
@@ -103,6 +103,7 @@ class Form(QObject):
         self.window.run_model_button.clicked.connect(self.run_model)
         self.window.action_run_model.triggered.connect(self.run_model)
         self.window.action_documentation.triggered.connect(self.launch_documentation)
+        self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
         # Catch close event for clean exit
@@ -149,6 +150,11 @@ class Form(QObject):
         self.window.save_configuration_file_button.setStyleSheet(stylesheet)
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
+
+        # Load stylesheet for logo buttons
+        stylesheet = ""
+        stylesheet = logo_button_stylesheet(stylesheet)
+        self.window.epa_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for labels
         stylesheet = ""
@@ -497,6 +503,14 @@ class Form(QObject):
         """
         os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
 
+    def launch_epa_website(self):
+        """
+        Opens the OMEGA documentation website in browser window.
+
+        :return: N/A
+        """
+        os.system("start \"\" https://epa.gov")
+
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
@@ -506,8 +520,8 @@ class Form(QObject):
         :return: N/A
         """
         global omega2_version
-        message_title = "About OMEGA 2"
-        message = "OMEGA 2 Code Version = " + omega2_version
+        message_title = "About OMEGA"
+        message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
     def wizard_logic(self):
@@ -750,6 +764,7 @@ class Form(QObject):
                 g = '[B log] ' + g
                 # Select output color
                 color = status_output_color(g)
+                # Output to event monitor
                 self.event_monitor(g, color, 'dt')
                 # Increment number of read lines from file counter
                 line_counter_batch = line_counter_batch + 1
@@ -763,6 +778,7 @@ class Form(QObject):
                 g = '[S log] ' + g
                 # Select output color
                 color = status_output_color(g)
+                # Output to event monitor
                 self.event_monitor(g, color, 'dt')
                 # Increment number of read lines from file counter
                 line_counter_session = line_counter_session + 1

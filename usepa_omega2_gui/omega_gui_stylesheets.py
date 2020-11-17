@@ -24,10 +24,10 @@ def tab_stylesheet(stylesheet):
                 left: 15px;             /* Moves the tabs to the right */
                 }    
             QTabWidget::pane {
-                border-top: 4px solid gray;     /* Sets the border color and thickness of the tab area */
-                border-left: 4px solid gray;
-                border-right: 4px solid gray;
-                border-bottom: 4px solid gray;
+                border-top: 1px solid white;     /* Sets the border color and thickness of the tab area */
+                border-left: 1px solid white;
+                border-right: 1px solid white;
+                border-bottom: 1px solid white;
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                         stop: 0 rgb(00, 113, 188), stop: 1.0 rgb(00, 113, 188));
                 }  
@@ -35,7 +35,7 @@ def tab_stylesheet(stylesheet):
                 margin-top: 2px; /* Shrinks non-selected tabs */
                 }
             QTabWidget {
-                background: rgb(32,84,147);  /* Sets the color of the unselected tabs */
+                background: rgb(32, 84, 147);  /* Sets the color of the unselected tabs */
                 }
             """
     return stylesheet
@@ -68,12 +68,12 @@ def button_stylesheet(stylesheet):
         """
     stylesheet = """
         QPushButton {
-        background-color: rgb(32,84,147);
+        background-color: rgb(32, 84, 147);
         border: 1px solid white;
         border-radius: 6px;
         }
         QPushButton:enabled {
-        background-color: rgb(32,84,147); 
+        background-color: rgb(32, 84, 147); 
         border: 1px solid white;
         color: white;
         }
@@ -84,7 +84,41 @@ def button_stylesheet(stylesheet):
         color: white;
         }
         QPushButton:pressed {
-        border: 4px solid rgb(60,60,60);
+        border: 4px solid white;
+        border-radius: 6px;
+        font: bold;
+        color: white;
+        }
+     """
+    return stylesheet
+
+def logo_button_stylesheet(stylesheet):
+    """
+        Loads the stylesheet for logo buttons contained in the gui.
+
+        :param stylesheet: Not used.
+
+        :return: String containing stylesheet.
+        """
+    stylesheet = """
+        QPushButton {
+        background-color: rgb(00, 113, 188);
+        border: 0px solid white;
+        border-radius: 6px;
+        }
+        QPushButton:enabled {
+        background-color: rgb(00, 113, 188); 
+        border: 0px solid white;
+        color: white;
+        }
+        QPushButton:hover {
+        border: 2px solid white;
+        border-radius: 6px;
+        font: bold;
+        color: white;
+        }
+        QPushButton:pressed {
+        border: 4px solid white;
         border-radius: 6px;
         font: bold;
         color: white;
