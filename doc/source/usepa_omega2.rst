@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    usepa_omega2.consumer
+   usepa_omega2.effects
 
 Submodules
 ----------
