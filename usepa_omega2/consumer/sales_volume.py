@@ -28,6 +28,8 @@ def context_new_vehicle_sales(model_year):
 
     sales_dict = dict()
 
+    # model_year = 2021
+
     # get total sales from context
     total_sales = ContextNewVehicleMarket.new_vehicle_sales(model_year)
 

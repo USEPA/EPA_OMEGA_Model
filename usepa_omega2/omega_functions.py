@@ -61,17 +61,20 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
         dfs = []
         for mv in max_values:
             members = []
+            # foo['c'] = 1 - foo.sum(axis=1)
             for i in range(num_columns):
-                members.append(pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]]))
+                df = pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]])
+                df[df == 0] = min_level
+                df[df == mv] = mv-min_level
+                df = df[(df.min(axis=1) >= min_level) & (df.max(axis=1) <= (mv-min_level))]
+                members.append(df)
 
             x = pd.DataFrame()
             for m in members:
                 x = cartesian_prod(x, m)
                 x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon].copy()  # sum <= mv
 
-            x = x[abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon]
-            x[x == 0] = min_level
-            x[x == mv] = mv - min_level
+            x = x[(abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon)]
             dfs.append(x)
 
         ans = pd.DataFrame()
@@ -179,4 +182,6 @@ def cartesian_prod(left_df, right_df, drop=False):
 
 
 if __name__ == '__main__':
-    pass  # for now
+    import pandas as pd
+    import numpy as np
+    foo = partition(['a', 'b'], increment=0.1, min_level=0.01)

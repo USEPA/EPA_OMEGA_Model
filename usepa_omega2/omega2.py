@@ -33,11 +33,11 @@ def run_postproc(iteration_log, single_shot):
                         zip(iteration_log['calendar_year'], iteration_log['iteration'])]
     for mc in MarketClass.get_market_class_dict():
         plt.figure()
-        plt.plot(year_iter_labels, iteration_log['producer_%s_share_frac' % mc])
-        plt.plot(year_iter_labels, iteration_log['consumer_%s_share_frac' % mc])
+        plt.plot(year_iter_labels, iteration_log['producer_share_frac_%s' % mc])
+        plt.plot(year_iter_labels, iteration_log['consumer_share_frac_%s' % mc])
         plt.title('%s iteration' % mc)
         plt.grid()
-        plt.legend(['producer_%s_share_frac' % mc, 'consumer_%s_share_frac' % mc])
+        plt.legend(['producer_share_frac_%s' % mc, 'consumer_share_frac_%s' % mc])
         plt.ylim([0,1])
         plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
 
@@ -194,8 +194,8 @@ def run_postproc(iteration_log, single_shot):
     session_results['average_vehicle_co2_gpmi'] = average_co2_gpmi_data['total']
 
     for mc in MarketClass.market_classes:
-        session_results['average_%s_co2_gpmi' % mc] = average_co2_gpmi_data[mc]
-        session_results['average_%s_cost' % mc] = average_cost_data[mc]
+        session_results['average_co2_gpmi_%s' % mc] = average_co2_gpmi_data[mc]
+        session_results['average_cost_%s' % mc] = average_cost_data[mc]
 
     return session_results
 
@@ -225,42 +225,71 @@ def run_producer_consumer():
             iterate = True
             prev_winning_combo = None
             prev_candidate_mfr_new_vehicles = None
+            best_sales_demand = None
             while iterate:
-                print('%d_%d' % (calendar_year, iteration_num))
+                # print('%d_%d' % (calendar_year, iteration_num))
                 gui_comm("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
                 candidate_mfr_new_vehicles, winning_combo, market_class_tree = producer.run_compliance_model(manufacturer_ID, calendar_year, consumer_market_share_demand)
 
-                compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
+                producer_compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
 
-                if compliant:
+                if producer_compliant:
 
                     market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_new_vehicles,
                                                                        winning_combo)
 
-                    # experiment ----------------------- #
-                    if calendar_year == 2037:
-                        import numpy as np
-                        from market_classes import MarketClass
-                        from omega_functions import cartesian_prod
+                    # # experiment ----------------------- #
+                    # if calendar_year == 2037:
+                    import numpy as np
+                    from market_classes import MarketClass
+                    from omega_functions import cartesian_prod
 
-                        initial_total_sales = winning_combo['total_sales']
-                        winning_combo['winning_combo_share_weighted_price'] = \
-                            winning_combo['total_combo_cost_dollars'] / winning_combo['total_sales']
+                    winning_combo['winning_combo_share_weighted_price'] = 0
+                    for mc in market_class_vehicle_dict:
+                        winning_combo['winning_combo_share_weighted_price'] = winning_combo['winning_combo_share_weighted_price'] + \
+                                                               winning_combo['average_cost_%s' % mc] * \
+                                                               winning_combo['producer_abs_market_share_frac_%s' % mc]
 
-                        multiplier_columns = ['%s_cost_multiplier' % mc for mc in MarketClass.market_classes]
+                    winning_combo['total_sales'] = consumer.sales_volume.new_vehicle_sales_response(calendar_year,
+                                                                     winning_combo['winning_combo_share_weighted_price'])
 
+                    initial_total_sales = winning_combo['total_sales']
+                    # winning_combo['winning_combo_share_weighted_price'] = \
+                    #     winning_combo['total_combo_cost_dollars'] / winning_combo['total_sales']
+
+                    winning_combo['initial_compliance_ratio'] = winning_combo['total_combo_cert_co2_megagrams'] / \
+                                                       winning_combo['total_combo_target_co2_megagrams']
+
+                    multiplier_columns = ['cost_multiplier_%s' % mc for mc in MarketClass.market_classes]
+
+                    producer_consumer_compliant = False
+                    producer_consumer_iteration = 0
+
+                    while not producer_consumer_compliant:
                         multiplier_df = winning_combo.to_frame().transpose()
                         for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
-                            inc = 0.05
-                            multiplier_df = cartesian_prod(multiplier_df,
-                                                           pd.DataFrame(np.arange(inc, 2.0 + inc, inc), columns=[mcc]))
-                            multiplier_df['initial_average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc]
-                            multiplier_df['average_%s_cost' % mc] = multiplier_df['average_%s_cost' % mc] * \
+                            inc = 0.01
+                            # multiplier_df = cartesian_prod(multiplier_df, pd.DataFrame(np.arange(inc, 2.0 + inc, inc), columns=[mcc]))
+                            half_range = 0.05*producer_consumer_iteration
+                            range_size = min(40, int(10 * (1+((producer_consumer_iteration+1)-1)/2)))
+                            # multiplier_range = np.unique(
+                            #     np.append(np.linspace(max(0.05, 1 - half_range), min(2.0, 1 + half_range), range_size),
+                            #               1))
+
+                            multiplier_range = np.unique(
+                                np.append(np.linspace(max(0.01, 1 - half_range), 1 + half_range, range_size),
+                                          1))
+
+                            # multiplier_range = np.unique(np.append(np.arange(1-half_range, 1+half_range, inc), 1))
+
+                            multiplier_df = cartesian_prod(multiplier_df, pd.DataFrame(multiplier_range, columns=[mcc]))
+                            multiplier_df['initial_average_cost_%s' % mc] = multiplier_df['average_cost_%s' % mc]
+                            multiplier_df['average_cost_%s' % mc] = multiplier_df['average_cost_%s' % mc] * \
                                                                     multiplier_df[mcc]
 
                         multiplier_df['initial_revenue'] = 0
                         for mc in market_class_vehicle_dict:
-                            multiplier_df['initial_revenue'] = multiplier_df['initial_revenue'] + multiplier_df['%s_sales' % mc] * multiplier_df['initial_average_%s_cost' % mc]
+                            multiplier_df['initial_revenue'] = multiplier_df['initial_revenue'] + multiplier_df['sales_%s' % mc] * multiplier_df['initial_average_cost_%s' % mc]
 
                         sales_demand = get_demanded_shares(multiplier_df, calendar_year)
 
@@ -269,12 +298,15 @@ def run_producer_consumer():
                         sales_demand['revenue'] = 0
                         for mc in market_class_vehicle_dict:
                             sales_demand['share_weighted_share_delta'] = sales_demand['share_weighted_share_delta'] + \
-                                                                         abs(sales_demand['producer_%s_share_frac' % mc] - sales_demand['consumer_%s_share_frac' % mc]) \
-                                                                         * sales_demand['consumer_%s_abs_share_frac' % mc]
-
+                                                                         abs(sales_demand[
+                                                                                 'producer_share_frac_%s' % mc] -
+                                                                             sales_demand[
+                                                                                 'consumer_share_frac_%s' % mc]) \
+                                                                         * sales_demand[
+                                                                             'consumer_abs_share_frac_%s' % mc]
                             sales_demand['share_weighted_price'] = sales_demand['share_weighted_price'] + \
-                                                                   sales_demand['average_%s_cost' % mc] * \
-                                                                   sales_demand['consumer_%s_abs_share_frac' % mc]
+                                                                   sales_demand['average_cost_%s' % mc] * \
+                                                                   sales_demand['consumer_abs_share_frac_%s' % mc]
 
                         # calculate new total sales demand based on total share weighted price
                         sales_demand['new_vehicle_sales'] = \
@@ -287,45 +319,125 @@ def run_producer_consumer():
                         sales_demand['revenue'] = sales_demand['share_weighted_price'] * \
                                                   sales_demand['new_vehicle_sales']
 
-                        sales_demand['delta_revenue'] = sales_demand['revenue'] - sales_demand['initial_revenue']
+                        # sales_demand['delta_revenue'] = sales_demand['revenue'] - sales_demand['initial_revenue']
+                        # sales_demand['profit'] = np.maximum(1, sales_demand['revenue'] - sales_demand['total_combo_cost_dollars'])
                         sales_demand['profit'] = sales_demand['revenue'] - sales_demand['total_combo_cost_dollars']
+
                         sales_demand['sales_ratio'] = sales_demand['new_vehicle_sales'] / initial_total_sales
-                        sales_demand['revenue_ratio'] = sales_demand['revenue'] / sales_demand['initial_revenue']
+                        # sales_demand['revenue_ratio'] = sales_demand['revenue'] / sales_demand['initial_revenue']
 
                         sales_demand['compliance_ratio'] = sales_demand['total_combo_cert_co2_megagrams'] / \
                                                            sales_demand['total_combo_target_co2_megagrams']
 
-                        sales_demand['price_modification_score'] = \
-                            (abs(1 - sales_demand['non hauling.BEV_cost_multiplier']) *
-                             sales_demand['consumer_non hauling.BEV_abs_share_frac'] +
-                             abs(1 - sales_demand['non hauling.ICE_cost_multiplier']) *
-                             sales_demand['consumer_non hauling.ICE_abs_share_frac'] +
-                             abs(1 - sales_demand['hauling.BEV_cost_multiplier']) *
-                             sales_demand['consumer_hauling.BEV_abs_share_frac'] +
-                             abs(1 - sales_demand['hauling.ICE_cost_multiplier']) *
-                             sales_demand['consumer_hauling.ICE_abs_share_frac'])
+                        # sales_demand['price_modification_score'] = \
+                        #     (abs(1 - sales_demand['non hauling.BEV_cost_multiplier']) *
+                        #      sales_demand['consumer_non hauling.BEV_abs_share_frac'] +
+                        #      abs(1 - sales_demand['non hauling.ICE_cost_multiplier']) *
+                        #      sales_demand['consumer_non hauling.ICE_abs_share_frac'] +
+                        #      abs(1 - sales_demand['hauling.BEV_cost_multiplier']) *
+                        #      sales_demand['consumer_hauling.BEV_abs_share_frac'] +
+                        #      abs(1 - sales_demand['hauling.ICE_cost_multiplier']) *
+                        #      sales_demand['consumer_hauling.ICE_abs_share_frac'])
+                        #
 
-                        non_modified_price = float(sales_demand[
-                            (sales_demand['non hauling.BEV_cost_multiplier'] == 1) &
-                            (sales_demand['hauling.BEV_cost_multiplier'] == 1) &
-                            (sales_demand['non hauling.ICE_cost_multiplier'] == 1) &
-                            (sales_demand['hauling.ICE_cost_multiplier'] == 1)]['share_weighted_price'])
+                        sales_demand['price_modification_score'] = 0
+                        for mcc in multiplier_columns:
+                            sales_demand['price_modification_score'] = sales_demand['price_modification_score'] + \
+                                                                   abs(1 - sales_demand[mcc])
 
-                        sales_demand = sales_demand[abs(sales_demand['share_weighted_price'] - non_modified_price) <= 10]
+                        sales_demand['price_modification_score'] = sales_demand['price_modification_score'] / len(multiplier_columns)
 
-                        sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
+                        sales_demand['price_modification_score'] = np.maximum(0.001,
+                                                                              sales_demand['price_modification_score'])
+
+                        # non_modified_price = float(sales_demand[
+                        #     (sales_demand['non hauling.BEV_cost_multiplier'] == 1) &
+                        #     (sales_demand['hauling.BEV_cost_multiplier'] == 1) &
+                        #     (sales_demand['non hauling.ICE_cost_multiplier'] == 1) &
+                        #     (sales_demand['hauling.ICE_cost_multiplier'] == 1)]['share_weighted_price'])
+
+                        # sales_demand = sales_demand[abs(sales_demand['share_weighted_price'] -
+                        #                                 sales_demand['winning_combo_share_weighted_price']) <= 10]
+
+                        # if calendar_year == 2032:
+                        #     sales_demand.to_csv('%ssales_demand_%s_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num, producer_consumer_iteration))
+
+                        # log sub-iteration zero:
+                        if producer_consumer_iteration == 0:
+                            iteration_log = iteration_log.append(sales_demand, ignore_index=True)
+                            converged, thrashing = (False, False)
+                            update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+                                                 producer_consumer_iteration, thrashing, producer_consumer_compliant)
+
+                        sales_demand = sales_demand[abs(1-sales_demand['sales_ratio']) <= 0.001]
+                        sales_demand = sales_demand[sales_demand['profit'] >= 0]
+                        sales_demand = sales_demand[sales_demand['total_combo_credits_co2_megagrams'] >= 0]
+
+                        if not sales_demand.empty:
+                            # sales_demand['score'] = sales_demand['profit'] / (sales_demand['price_modification_score']**1.0) * \
+                            #                         (sales_demand['total_combo_credits_co2_megagrams'] >= 0)
+
+                            # sales_demand['score'] = (sales_demand['profit'] >= 0) / (1*sales_demand['price_modification_score']**1.0 +
+                            #                              0*sales_demand['share_weighted_share_delta']**1.0
+                            #                              ) * \
+                            #                         (sales_demand['total_combo_credits_co2_megagrams'] >= 0)
+
+                            # sales_demand['score'] = np.maximum(1, sales_demand['profit']) / (1*sales_demand['price_modification_score']**1.0 +
+                            #                              0*sales_demand['share_weighted_share_delta']**1.0)
+
+                            sales_demand['score'] = 1 / (sales_demand['share_weighted_share_delta']**1.0)
+                            # sales_demand['score'] = 1 / (sales_demand['price_modification_score']**1.0)
+
+                            sales_demand = sales_demand.loc[sales_demand['score'].idxmax()]
+
+                            print('%d_%d_%d_%.2f_%f' % (calendar_year, iteration_num, producer_consumer_iteration,
+                                                      sales_demand['score'], sales_demand['profit']))
+
+                            if (sales_demand['score'] > 0) and ((best_sales_demand is None) or (sales_demand['score'] >= best_sales_demand['score'])):
+                                best_sales_demand = sales_demand.copy()
+
+                            # log sub-iteration:
+                            iteration_log = iteration_log.append(sales_demand, ignore_index=True)
+                            converged, thrashing = detect_convergence_and_thrashing(sales_demand, iteration_log,
+                                                                                    iteration_num,
+                                                                                    market_class_vehicle_dict,
+                                                                                    o2.options.verbose)
+                            update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+                                                 producer_consumer_iteration, thrashing, producer_consumer_compliant)
+
+                            producer_consumer_compliant = (sales_demand['score'] > 0) and (converged or thrashing)
+
+                        else:
+                            print('%d_%d_%d' % (calendar_year, iteration_num, producer_consumer_iteration))
+                            producer_consumer_compliant = False
+
+                        producer_consumer_iteration = producer_consumer_iteration + 1
 
                         # experiment ----------------------- #
 
-                    consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
+                    producer_consumer_iteration = 999  # flag end of subiteration
+
+                    # if sales_demand['score'] < best_sales_demand['score']:
+                    if sales_demand['total_combo_cost_dollars'] > best_sales_demand['total_combo_cost_dollars']:
+                        consumer_market_share_demand = best_sales_demand
+                        converged = True
+                        trashing = False
+                        print('!!best price make a friend!!')
+                    else:
+                        consumer_market_share_demand = sales_demand
+                        converged, thrashing = detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log,
+                                                                                iteration_num, market_class_vehicle_dict,
+                                                                                o2.options.verbose)
+
+                    # converged, thrashing = detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log,
+                    #                                                         iteration_num, market_class_vehicle_dict,
+                    #                                                         o2.options.verbose)
+                    # for non-experiment (old school):
+                    # consumer_market_share_demand = get_demanded_shares(winning_combo, calendar_year)
 
                     iteration_log = iteration_log.append(consumer_market_share_demand, ignore_index=True)
-
-                    converged, thrashing = detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log,
-                                                                            iteration_num, market_class_vehicle_dict,
-                                                                            o2.options.verbose)
-
-                    update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing, compliant)
+                    update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+                                         producer_consumer_iteration, thrashing, producer_compliant)
 
                     prev_winning_combo = winning_combo
                     prev_candidate_mfr_new_vehicles = candidate_mfr_new_vehicles
@@ -339,10 +451,10 @@ def run_producer_consumer():
                           and iteration_num < o2.options.producer_consumer_max_iterations \
                           and not converged \
                           and not thrashing \
-                          and compliant
+                          and producer_compliant
 
                 if iterate:
-                    negotiate_market_shares(consumer_market_share_demand, iteration_num, market_class_vehicle_dict)
+                    # negotiate_market_shares(consumer_market_share_demand, iteration_num, market_class_vehicle_dict)
                     iteration_num = iteration_num + 1
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_new_vehicles, winning_combo)
@@ -352,12 +464,14 @@ def run_producer_consumer():
     return iteration_log
 
 
-def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, thrashing, compliant):
+def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, producer_consumer_iteration_num, thrashing, compliant):
     iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
+    iteration_log.loc[iteration_log.index[-1], 'iteration_sub'] = producer_consumer_iteration_num
     iteration_log.loc[iteration_log.index[-1], 'calendar_year'] = calendar_year
     iteration_log.loc[iteration_log.index[-1], 'thrashing'] = thrashing
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
+    iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
 
 def calc_market_class_data(calendar_year, candidate_mfr_new_vehicles, winning_combo):
@@ -382,27 +496,27 @@ def calc_market_class_data(calendar_year, candidate_mfr_new_vehicles, winning_co
     for mc in MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
-            winning_combo['average_%s_co2_gpmi' % mc] = weighted_value(market_class_vehicles,
+            winning_combo['average_co2_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
                                                                        'initial_registered_count',
                                                                        'cert_CO2_grams_per_mile')
 
-            winning_combo['average_%s_cost' % mc] = weighted_value(market_class_vehicles,
+            winning_combo['average_cost_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
 
-            winning_combo['average_%s_fuel_price' % mc] = weighted_value(market_class_vehicles,
+            winning_combo['average_fuel_price_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'retail_fuel_price')
 
-            winning_combo['%s_sales' % mc] = 0
+            winning_combo['sales_%s' % mc] = 0
             for v in market_class_vehicles:
-                winning_combo['%s_sales' % mc] = winning_combo['%s_sales' % mc] + v.initial_registered_count
+                winning_combo['sales_%s' % mc] = winning_combo['sales_%s' % mc] + v.initial_registered_count
         else:
-            winning_combo['average_%s_co2_gpmi' % mc] = 0
-            winning_combo['average_%s_cost' % mc] = 0
-            winning_combo['%s_sales' % mc] = 0
+            winning_combo['average_co2_gpmi_%s' % mc] = 0
+            winning_combo['average_cost_%s' % mc] = 0
+            winning_combo['sales_%s' % mc] = 0
 
-        winning_combo['%s_abs_market_share_frac' % mc] = winning_combo['%s_sales' % mc] / winning_combo['total_sales']
+        winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
 
     return market_class_vehicle_dict
 
@@ -411,11 +525,12 @@ def detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log
     converged = True
     thrashing = iteration_num >= 5
     for mc in market_class_dict:
-        # relative percentage convergence:
-        converged = converged and abs(1 - \
-                                      consumer_market_share_demand['producer_%s_share_frac' % mc] / \
-                                      consumer_market_share_demand['consumer_%s_share_frac' % mc]) <= \
-                    o2.options.producer_consumer_iteration_tolerance
+        # relative percentage convergence on largest market shares:
+        if consumer_market_share_demand['producer_share_frac_%s' % mc] >= 0.5:
+            converged = converged and abs(1 - \
+                                          consumer_market_share_demand['producer_share_frac_%s' % mc] / \
+                                          consumer_market_share_demand['consumer_share_frac_%s' % mc]) <= \
+                        o2.options.producer_consumer_iteration_tolerance
 
         thrashing = detect_thrashing(iteration_log, mc, thrashing)
 
@@ -429,44 +544,44 @@ def negotiate_market_shares(consumer_market_share_demand, iteration_num, market_
     if iteration_num < 1:
         for mc in market_class_dict:
             # try meeting partway (first pass)
-            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
-                (0.5 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
-                 0.5 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
+            consumer_market_share_demand['consumer_share_frac_%s' % mc] = \
+                (0.5 * consumer_market_share_demand['producer_share_frac_%s' % mc] +
+                 0.5 * consumer_market_share_demand['consumer_share_frac_%s' % mc])
     else:
         for mc in market_class_dict:
             # try meeting partway
-            consumer_market_share_demand['consumer_%s_share_frac' % mc] = \
-                (0.33 * consumer_market_share_demand['producer_%s_share_frac' % mc] +
-                 0.67 * consumer_market_share_demand['consumer_%s_share_frac' % mc])
+            consumer_market_share_demand['consumer_share_frac_%s' % mc] = \
+                (0.33 * consumer_market_share_demand['producer_share_frac_%s' % mc] +
+                 0.67 * consumer_market_share_demand['consumer_share_frac_%s' % mc])
 
 
 def detect_thrashing(iteration_log, mc, thrashing):
     thrashing = thrashing and \
                 ((
-                         abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-3] /
-                             iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                         abs(1 - iteration_log['producer_share_frac_%s' % mc].iloc[-3] /
+                             iteration_log['producer_share_frac_%s' % mc].iloc[-1])
                          <= o2.options.producer_consumer_iteration_tolerance
                          and
-                         abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-3] /
-                             iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                         abs(1 - iteration_log['consumer_share_frac_%s' % mc].iloc[-3] /
+                             iteration_log['consumer_share_frac_%s' % mc].iloc[-1])
                          <= o2.options.producer_consumer_iteration_tolerance
                  ) \
                  or (
-                     (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-4] /
-                          iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                     (abs(1 - iteration_log['producer_share_frac_%s' % mc].iloc[-4] /
+                          iteration_log['producer_share_frac_%s' % mc].iloc[-1])
                       <= o2.options.producer_consumer_iteration_tolerance
                       and
-                      abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-4] /
-                          iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                      abs(1 - iteration_log['consumer_share_frac_%s' % mc].iloc[-4] /
+                          iteration_log['consumer_share_frac_%s' % mc].iloc[-1])
                       <= o2.options.producer_consumer_iteration_tolerance)
                  )
                  or (
-                     (abs(1 - iteration_log['producer_%s_share_frac' % mc].iloc[-5] /
-                          iteration_log['producer_%s_share_frac' % mc].iloc[-1])
+                     (abs(1 - iteration_log['producer_share_frac_%s' % mc].iloc[-5] /
+                          iteration_log['producer_share_frac_%s' % mc].iloc[-1])
                       <= o2.options.producer_consumer_iteration_tolerance
                       and
-                      abs(1 - iteration_log['consumer_%s_share_frac' % mc].iloc[-5] /
-                          iteration_log['consumer_%s_share_frac' % mc].iloc[-1])
+                      abs(1 - iteration_log['consumer_share_frac_%s' % mc].iloc[-5] /
+                          iteration_log['consumer_share_frac_%s' % mc].iloc[-1])
                       <= o2.options.producer_consumer_iteration_tolerance)
                  )
                  )
