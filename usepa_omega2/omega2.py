@@ -501,13 +501,11 @@ def init_omega(o2_options):
     from vehicle_annual_data import VehicleAnnualData
     from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
-    # from effects.cost_factors_criteria import CostFactorsCriteria
-    # from effects.cost_factors_scc import CostFactorsSCC
-    # from effects.emission_factors_powersector import EmissionFactorsPowersector
-    # from effects.emission_factors_refinery import EmissionFactorsRefinery
-    # from effects.emission_factors_vehicles import EmissionFactorsVehicles
-    # from effects.ip_deflators import ImplicitPriceDeflators
-    # from effects.cpi_deflators import CPIPriceDeflators
+    from effects.cost_factors_criteria import CostFactorsCriteria
+    from effects.cost_factors_scc import CostFactorsSCC
+    from effects.emission_factors_powersector import EmissionFactorsPowersector
+    from effects.emission_factors_refinery import EmissionFactorsRefinery
+    from effects.emission_factors_vehicles import EmissionFactorsVehicles
 
     from GHG_standards_flat import input_template_name as flat_template_name
     from GHG_standards_footprint import input_template_name as footprint_template_name
@@ -575,20 +573,16 @@ def init_omega(o2_options):
                                                                             verbose=o2.options.verbose)
         o2.options.stock_vmt = AnnualVMTFixedByAge
 
-        # init_fail = init_fail + CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
-        #                                                                     verbose=o2.options.verbose)
-        # init_fail = init_fail + CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
-        #                                                                verbose=o2.options.verbose)
-        # init_fail = init_fail + EmissionFactorsPowersector.init_database_from_file(o2.options.emission_factors_powersector_file,
-        #                                                                            verbose=o2.options.verbose)
-        # init_fail = init_fail + EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,
-        #                                                                         verbose=o2.options.verbose)
-        # init_fail = init_fail + EmissionFactorsVehicles.init_database_from_file(o2.options.emission_factors_vehicles_file,
-        #                                                                         verbose=o2.options.verbose)
-        # init_fail = init_fail + ImplicitPriceDeflators.init_database_from_file(o2.options.ip_deflators_file,
-        #                                                                        verbose=o2.options.verbose)
-        # init_fail = init_fail + CPIPriceDeflators.init_database_from_file(o2.options.cpi_deflators_file,
-        #                                                                   verbose=o2.options.verbose)
+        init_fail = init_fail + CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
+                                                                            verbose=o2.options.verbose)
+        init_fail = init_fail + CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
+                                                                       verbose=o2.options.verbose)
+        init_fail = init_fail + EmissionFactorsPowersector.init_database_from_file(o2.options.emission_factors_powersector_file,
+                                                                                   verbose=o2.options.verbose)
+        init_fail = init_fail + EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,
+                                                                                verbose=o2.options.verbose)
+        init_fail = init_fail + EmissionFactorsVehicles.init_database_from_file(o2.options.emission_factors_vehicles_file,
+                                                                                verbose=o2.options.verbose)
 
         # initial year = initial fleet model year (latest year of data)
         o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
