@@ -445,9 +445,9 @@
    <widget class="QLabel" name="main_title_1_label">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>100</x>
       <y>10</y>
-      <width>791</width>
+      <width>541</width>
       <height>41</height>
      </rect>
     </property>
@@ -509,7 +509,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>480</y>
+      <y>479</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -558,6 +558,9 @@
       <height>741</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Goto EPA Website</string>
+    </property>
     <property name="styleSheet">
      <string notr="true"/>
     </property>
@@ -589,22 +592,22 @@
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
-       <x>810</x>
-       <y>0</y>
-       <width>110</width>
-       <height>110</height>
+       <x>657</x>
+       <y>5</y>
+       <width>80</width>
+       <height>80</height>
       </rect>
      </property>
      <property name="toolTip">
-      <string>EPA Logo</string>
+      <string>Opens EPA Website</string>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="iconSize">
       <size>
-       <width>110</width>
-       <height>110</height>
+       <width>80</width>
+       <height>80</height>
       </size>
      </property>
     </widget>

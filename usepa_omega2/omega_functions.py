@@ -178,5 +178,33 @@ def cartesian_prod(left_df, right_df, drop=False):
     return leftXright
 
 
+def generate_nearby_shares(columns, combo, half_range, num_steps, min_value=0.001, verbose=False):
+    dfs = []
+    for i in range(0, len(columns) - 1):
+        k = columns[i]
+        print(k)
+        val = combo[k]
+        dfs.append(pd.DataFrame({k: unique(
+            np.linspace(np.maximum(min_value, val - half_range),
+                        np.minimum(1.0 - min_value, val + half_range),
+                        num_steps))}
+        ))
+    dfx = pd.DataFrame()
+    for df in dfs:
+        dfx = cartesian_prod(dfx, df)
+    dfx = dfx[dfx.sum(axis=1) <= 1]
+    dfx[columns[-1]] = 1 - dfx.sum(axis=1)
+    if verbose:
+        print(dfx)
+    return dfx
+
+
 if __name__ == '__main__':
-    pass  # for now
+    import sys
+    import numpy as np
+    import pandas as pd
+
+    share_combo = pd.Series({'a': 0.5, 'b': 0.2, 'c': 0.3})
+    column_names = ['a', 'b', 'c']
+
+    dfx = generate_nearby_shares(column_names, share_combo, half_range=0.25, num_steps=5, min_value=0.001, verbose=True)
