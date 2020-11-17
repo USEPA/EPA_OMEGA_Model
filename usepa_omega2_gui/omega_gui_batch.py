@@ -17,6 +17,7 @@ import time
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
+from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 # import PySide2.QtXml
@@ -64,6 +65,7 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
+button_click_sound = 'usepa_omega2_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -201,6 +203,7 @@ class Form(QObject):
 
             :return: N/A
         """
+        # playsound(button_click_sound)
         global configuration_file, scenario, configuration_file_valid, input_batch_file_valid
         global output_batch_directory_valid, input_batch_file, output_batch_directory
         # self.window.statusBar().showMessage("Open File")
@@ -497,7 +500,7 @@ class Form(QObject):
 
     def launch_documentation(self):
         """
-        Opens the OMEGA documentation website in browser window.
+        Opens the OMEGA documentation website in browser.
 
         :return: N/A
         """
@@ -505,7 +508,7 @@ class Form(QObject):
 
     def launch_epa_website(self):
         """
-        Opens the OMEGA documentation website in browser window.
+        Opens the EPA website in browser.
 
         :return: N/A
         """
@@ -514,12 +517,10 @@ class Form(QObject):
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
-        The function searches the __init__.py file for the line containing the code version and then calls
-        the function "showbox" to display the result.
 
         :return: N/A
         """
-        global omega2_version
+        global omega2_version, button_click_sound
         message_title = "About OMEGA"
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
@@ -658,7 +659,7 @@ class Form(QObject):
         :return: N/A
         """
         elapsed_start = datetime.now()
-        # model_sound_start = 'gui/elements/model_start.mp3'
+        # model_sound_start = 'gui/elements/click.mp3'
         # model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         global multiprocessor_mode_selected

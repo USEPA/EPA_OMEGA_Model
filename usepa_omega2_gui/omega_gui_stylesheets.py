@@ -92,6 +92,7 @@ def button_stylesheet(stylesheet):
      """
     return stylesheet
 
+
 def logo_button_stylesheet(stylesheet):
     """
         Loads the stylesheet for logo buttons contained in the gui.
