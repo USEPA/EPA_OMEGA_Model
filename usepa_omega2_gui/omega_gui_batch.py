@@ -152,6 +152,7 @@ class Form(QObject):
         self.window.save_configuration_file_button.setStyleSheet(stylesheet)
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
+        self.window.run_model_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -167,12 +168,12 @@ class Form(QObject):
         self.window.project_description_1_label.setStyleSheet(stylesheet)
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
+        self.window.model_status_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
         stylesheet = ""
         stylesheet = checkbox_stylesheet(stylesheet)
         self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
-
 
         # Timer start
         timer.start()
@@ -632,6 +633,8 @@ class Form(QObject):
         self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
+        self.window.model_status_label.setText("Model Idle")
+
     def clear_entries(self):
         """
         Clears all fields in the gui.
@@ -665,8 +668,6 @@ class Form(QObject):
         global multiprocessor_mode_selected
         global output_batch_subdirectory
         # status_bar()
-        self.window.progress_bar.setValue(0)
-        self.window.progress_bar.setValue(50)
         self.window.repaint()
 
         # This call works but gui freezes until new process ends
@@ -721,6 +722,8 @@ class Form(QObject):
         x = a + b + c + d
         # print("***", x, "***")
 
+        # Disable selected gui functions during model run
+        self.enable_gui_run_functions(0)
         # Indicate model start to status bar
         self.event_monitor("Start Model Run", "black", 'dt')
         # Call OMEGA 2 batch as a subprocess with command line options from above
@@ -747,8 +750,14 @@ class Form(QObject):
         while omega_batch.poll() is None:
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
-            # Keep the overhead low and only update the event file at 1 hz
-            time.sleep(1)
+            # Keep the overhead low and only update the event file at 10 hz
+            time.sleep(0.1)
+            # Update model run time
+            elapsed_end = datetime.now()
+            elapsed_time = elapsed_end - elapsed_start
+            elapsed_time = str(elapsed_time)
+            elapsed_time = "Model Running\n" + elapsed_time[:-7]
+            self.window.model_status_label.setText(elapsed_time)
             # Get number of lines in the log files if they exist
             for log_loop in range(0, len(log_file_array)):
                 if os.path.isfile(log_file_array[log_loop]):
@@ -770,7 +779,7 @@ class Form(QObject):
                     color = status_output_color(g)
                     # Output to event monitor
                     self.event_monitor(g, color, 'dt')
-                    # Increment number of read lines from file counter
+                    # Increment total number of read lines in log file counter
                     log_counter_array[log_loop] = log_counter_array[log_loop] + 1
 
         # Play a model end sound
@@ -788,10 +797,10 @@ class Form(QObject):
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Status = Ready"
-        self.window.progress_bar.setValue(100)
 
-        # Remove comm_file
-        # os.remove(status_file)
+        # Enable selected gui functions disabled during model run
+        self.enable_gui_run_functions(1)
+        self.window.model_status_label.setText("Model Loaded")
 
     def showbox(self, message_title, message):
         """
@@ -846,10 +855,31 @@ class Form(QObject):
             self.window.run_model_button.setIcon(QIcon(run_button_image_enabled))
             self.window.run_model_button.setEnabled(1)
             self.window.action_run_model.setEnabled(1)
+            self.window.model_status_label.setText("Model Ready")
         else:
             self.window.run_model_button.setIcon(QIcon(run_button_image_disabled))
             self.window.run_model_button.setEnabled(0)
             self.window.action_run_model.setEnabled(0)
+            self.window.model_status_label.setText("Model Idle")
+
+    def enable_gui_run_functions(self, enable):
+        """
+        Enables and disables various gui functions during model run.
+
+        :param enable: Boolean to enable or disable selected gui functions during model run
+        :return: N/A
+        """
+        self.window.open_configuration_file_button.setEnabled(enable)
+        self.window.save_configuration_file_button.setEnabled(enable)
+        self.window.select_input_batch_file_button.setEnabled(enable)
+        self.window.select_output_batch_directory_button.setEnabled(enable)
+        self.window.action_new_file.setEnabled(enable)
+        self.window.action_open_configuration_file.setEnabled(enable)
+        self.window.action_save_configuration_file.setEnabled(enable)
+        self.window.action_select_input_batch_file.setEnabled(enable)
+        self.window.action_select_output_batch_directory.setEnabled(enable)
+        self.window.action_run_model.setEnabled(enable)
+        self.window.run_model_button.setEnabled(enable)
 
 
 def status_bar():

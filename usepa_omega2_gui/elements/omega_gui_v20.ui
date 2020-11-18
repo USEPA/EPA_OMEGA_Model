@@ -435,6 +435,47 @@
        </size>
       </property>
      </widget>
+     <widget class="QPushButton" name="run_model_button">
+      <property name="geometry">
+       <rect>
+        <x>509</x>
+        <y>80</y>
+        <width>111</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run Model</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>100</width>
+        <height>100</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="model_status_label">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>200</y>
+        <width>111</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="results_tab">
      <attribute name="title">
@@ -530,25 +571,6 @@
      <string>Clear</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="run_model_button">
-    <property name="geometry">
-     <rect>
-      <x>1000</x>
-      <y>0</y>
-      <width>110</width>
-      <height>110</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Run Model</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>100</width>
-      <height>100</height>
-     </size>
-    </property>
-   </widget>
    <widget class="QWidget" name="background_widget" native="true">
     <property name="geometry">
      <rect>
@@ -564,31 +586,6 @@
     <property name="styleSheet">
      <string notr="true"/>
     </property>
-    <widget class="QProgressBar" name="progress_bar">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>1007</x>
-       <y>120</y>
-       <width>101</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Run Progress</string>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="textVisible">
-      <bool>true</bool>
-     </property>
-     <property name="invertedAppearance">
-      <bool>false</bool>
-     </property>
-    </widget>
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
@@ -618,7 +615,6 @@
    <zorder>event_monitor_label</zorder>
    <zorder>clear_event_monitor_button</zorder>
    <zorder>tab_select</zorder>
-   <zorder>run_model_button</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
