@@ -9,6 +9,9 @@ from distutils.dir_util import copy_tree
 from PySide2.QtWidgets import QFileDialog
 import yaml
 
+import pandas
+import matplotlib.pyplot as plt
+
 
 def open_file_action(filepath):
     data = yaml_loader(filepath)
@@ -159,3 +162,20 @@ def status_output_color(g):
     else:
         g = "red"
     return g
+
+
+def test_plot_1():
+    df = pandas.read_csv('usepa_omega2_gui/elements/uk-election-results.csv')
+    print(df)
+    from matplotlib.colors import ListedColormap
+    # from ('usepa_omega2_gui/elements/uk-election-results.csv') import wide as df
+
+    cmap = ListedColormap(['#0343df', '#e50000', '#ffff14', '#929591'])
+
+    ax = df.plot.bar(x='year', colormap=cmap)
+
+    ax.set_xlabel(None)
+    ax.set_ylabel('Seats')
+    ax.set_title('UK election results')
+
+    plt.show()
