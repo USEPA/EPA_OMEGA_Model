@@ -736,15 +736,15 @@ class Form(QObject):
         status_file_batch = output_batch_subdirectory + "/" + log_file_batch
         status_file_session = output_session_subdirectory + "/" + log_file_session_prefix + batch_time_stamp +\
                               '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
-        # If more log files are monitored (currently 2) just add another element to the 5 arrays below
+        # If more log files are monitored (currently 2) just add another element to the 3 arrays below
         # Enter log file names into array
         log_file_array = [status_file_batch, status_file_session]
         # Give the log files a name
         log_label_array = ['B log', 'S log']
         # Temporary counter arrays
         log_counter_array = [0, 0]
-        log_status_array = [0, 0]
-        log_lines_array = [0, 0]
+        # log_status_array = [0, 0]
+        # log_lines_array = [0, 0]
 
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
@@ -761,14 +761,14 @@ class Form(QObject):
             # Get number of lines in the log files if they exist
             for log_loop in range(0, len(log_file_array)):
                 if os.path.isfile(log_file_array[log_loop]):
-                    log_lines_array[log_loop] = sum(1 for line in open(log_file_array[log_loop]))
-                    log_status_array[log_loop] = 1
+                    log_lines = sum(1 for line in open(log_file_array[log_loop]))
+                    log_status = 1
                 else:
-                    log_lines_array[log_loop] = 0
-                    log_status_array[log_loop] = 0
+                    log_lines = 0
+                    log_status = 0
 
                 # Read and output all new lines from log files
-                while log_counter_array[log_loop] < log_lines_array[log_loop] and log_status_array[log_loop] == 1:
+                while log_counter_array[log_loop] < log_lines and log_status == 1:
                     f = open(log_file_array[log_loop])
                     lines = f.readlines()
                     f.close()
