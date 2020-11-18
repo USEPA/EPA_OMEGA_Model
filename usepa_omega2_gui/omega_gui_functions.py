@@ -164,18 +164,23 @@ def status_output_color(g):
     return g
 
 
-def test_plot_1():
-    df = pandas.read_csv('usepa_omega2_gui/elements/uk-election-results.csv')
-    print(df)
-    from matplotlib.colors import ListedColormap
-    # from ('usepa_omega2_gui/elements/uk-election-results.csv') import wide as df
+def test_plot_1(y_axis):
+    df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
 
-    cmap = ListedColormap(['#0343df', '#e50000', '#ffff14', '#929591'])
+    if len(y_axis) > 0:
+        # print(y_axis)
+        ax = df.plot.scatter(x='calendar_year', y=y_axis)
+        ax.set_xlabel('Calendar Year')
+        ax.set_ylabel(y_axis)
+        ax.set_title('OMEGA Results')
 
-    ax = df.plot.bar(x='year', colormap=cmap)
-
-    ax.set_xlabel(None)
-    ax.set_ylabel('Seats')
-    ax.set_title('UK election results')
-
-    plt.show()
+    # ax = df.plot.scatter(x='calendar_year', y='cert_co2_Mg')
+    # ax.set_xlabel('Calendar Year')
+    # ax.set_ylabel('cert_co2_Mg')
+    # ax.set_title('OMEGA Results')
+    #
+    # bx = df.plot.scatter(x='calendar_year', y='bev_non_hauling_share_frac')
+    # bx.set_xlabel('Calendar Year')
+    # bx.set_ylabel('bev_non_hauling_share_frac')
+    # bx.set_title('OMEGA Results')
+        plt.show()

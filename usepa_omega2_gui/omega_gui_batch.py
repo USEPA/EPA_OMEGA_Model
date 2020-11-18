@@ -108,6 +108,7 @@ class Form(QObject):
         self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
+        self.window.open_plot_1.clicked.connect(self.open_plot_1)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -880,6 +881,20 @@ class Form(QObject):
         self.window.action_select_output_batch_directory.setEnabled(enable)
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
+
+    def open_plot_1(self):
+        df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
+
+        for col in df.columns:
+            # print(col)
+            self.window.list_graphs.addItem(col)
+        a = self.window.list_graphs.selectedIndexes()[0]
+        # print(a)
+        # print(a.data())
+        # print(a.row())
+        # print(a.column())
+        # QString & s = ui->listWidget->currentItem()->text();
+        test_plot_1(a.data())
 
 
 def status_bar():
