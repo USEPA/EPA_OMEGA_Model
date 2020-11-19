@@ -154,6 +154,7 @@ class Form(QObject):
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
         self.window.run_model_button.setStyleSheet(stylesheet)
+        self.window.open_plot_1.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -170,6 +171,7 @@ class Form(QObject):
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
+        self.window.available_plots_1_label_1.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
         stylesheet = ""
@@ -746,7 +748,7 @@ class Form(QObject):
         log_counter_array = [0, 0]
         # log_status_array = [0, 0]
         # log_lines_array = [0, 0]
-
+        self.load_plots()
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
             # This command allows the GUI to catch up and repaint itself
@@ -802,6 +804,8 @@ class Form(QObject):
         # Enable selected gui functions disabled during model run
         self.enable_gui_run_functions(1)
         self.window.model_status_label.setText("Model Loaded")
+
+        self.load_plots()
 
     def showbox(self, message_title, message):
         """
@@ -882,19 +886,17 @@ class Form(QObject):
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
 
-    def open_plot_1(self):
+    def load_plots(self):
+        self.window.list_graphs.clear()
         df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
-
         for col in df.columns:
             # print(col)
             self.window.list_graphs.addItem(col)
-        a = self.window.list_graphs.selectedIndexes()[0]
-        # print(a)
-        # print(a.data())
-        # print(a.row())
-        # print(a.column())
-        # QString & s = ui->listWidget->currentItem()->text();
-        test_plot_1(a.data())
+
+    def open_plot_1(self):
+        if self.window.list_graphs.currentItem() is not None:
+            a = self.window.list_graphs.selectedIndexes()[0]
+            test_plot_1(a.data())
 
 
 def status_bar():

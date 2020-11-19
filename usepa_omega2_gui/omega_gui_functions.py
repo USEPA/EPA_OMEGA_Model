@@ -141,11 +141,18 @@ def directory_dialog(file_name, file_type, file_dialog_title):
         return file_name, file_type, file_dialog_title
 
 
-def copy_files(source, destination):
-    copy_tree(source, destination)
+# def copy_files(source, destination):
+#     copy_tree(source, destination)
 
 
 def sec_to_hours(seconds):
+    """
+    Converts seconds to hours, minutes, and seconds.
+
+    :param seconds: seconds
+
+    :return: formatted xx hours  xx mins  xx seconds
+    """
     a = str(seconds//3600)
     b = str((seconds % 3600)//60)
     c = str((seconds % 3600) % 60)
@@ -154,9 +161,16 @@ def sec_to_hours(seconds):
 
 
 def status_output_color(g):
+    """
+    Examines strings for specific cases to change the color for display.
+
+    :param g: input string
+
+    :return: color for display
+    """
     if g.find("Manufacturer=") != -1:
         g = "green"
-    elif g.find("ERROR") == -1 and g.find("error") == -1 and g.find("###") == -1 and g.find("FAIL") == -1\
+    elif g.find("RROR") == -1 and g.find("rror") == -1 and g.find("###") == -1 and g.find("FAIL") == -1\
             and g.find("Fail") == -1:
         g = "black"
     else:
@@ -165,6 +179,13 @@ def status_output_color(g):
 
 
 def test_plot_1(y_axis):
+    """
+    Reads a csv file plots selected graph.
+
+    :param y-axis: column to plot
+
+    :return: N/A
+    """
     df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
 
     if len(y_axis) > 0:
@@ -172,15 +193,7 @@ def test_plot_1(y_axis):
         ax = df.plot.scatter(x='calendar_year', y=y_axis)
         ax.set_xlabel('Calendar Year')
         ax.set_ylabel(y_axis)
-        ax.set_title('OMEGA Results')
-
-    # ax = df.plot.scatter(x='calendar_year', y='cert_co2_Mg')
-    # ax.set_xlabel('Calendar Year')
-    # ax.set_ylabel('cert_co2_Mg')
-    # ax.set_title('OMEGA Results')
-    #
-    # bx = df.plot.scatter(x='calendar_year', y='bev_non_hauling_share_frac')
-    # bx.set_xlabel('Calendar Year')
-    # bx.set_ylabel('bev_non_hauling_share_frac')
-    # bx.set_title('OMEGA Results')
+        ax.set_title('OMEGA Results - ' + y_axis)
         plt.show()
+
+
