@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -82,6 +82,32 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="intro_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>681</width>
+        <height>351</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>16</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&quot;Evaluating a fuel efficiency or greenhouse gas emissions standard is a complex mix of scientific, engineering, and economic analysis. It requires the agency to: anticipate how the regulation will cause manufacturers to change the characteristics of individual vehicles and the mix of vehicles they offer; determine how sales of new vehicles will respond to that change; determine the impact on the evolution and utilization of the broader vehicle fleet; determine how those changes will affect aggregate fuel consumption, emissions of criteria pollutants and greenhouse gases, fatality rates, congestion, and other outcomes; and, finally, to assess the overall benefits and costs of the proposed rule.&quot;
+
+EPA Science Advisory Board - 2020</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>

@@ -172,6 +172,7 @@ class Form(QObject):
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
         self.window.available_plots_1_label_1.setStyleSheet(stylesheet)
+        self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
         stylesheet = ""
