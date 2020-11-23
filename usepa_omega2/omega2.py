@@ -22,9 +22,14 @@ def run_postproc(iteration_log, single_shot):
     from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
     from market_classes import MarketClass
+    from effects.o2_effects import run_effects_calcs
     import pandas as pd
 
     import matplotlib.pyplot as plt
+
+    calc_effects = True
+    if calc_effects:
+        run_effects_calcs()
 
     if not single_shot:
         omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
@@ -588,7 +593,7 @@ def init_omega(o2_options):
         o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
         # final year = last year of cost curve data
         o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
-        # o2.options.analysis_final_year = o2.options.analysis_initial_year
+        # o2.options.analysis_final_year = 2022
     finally:
         return init_fail
 
