@@ -15,19 +15,20 @@ class EmissionFactorsRefinery(SQABase):
     index = Column('index', Integer, primary_key=True)
 
     calendar_year = Column('calendar_year', Numeric)
-    voc_grams_per_gallon = Column('voc_grams_per_gallon', Numeric)
-    co_grams_per_gallon = Column('co_grams_per_gallon', Numeric)
-    nox_grams_per_gallon = Column('nox_grams_per_gallon', Numeric)
-    pm25_grams_per_gallon = Column('pm25_grams_per_gallon', Numeric)
-    sox_grams_per_gallon = Column('sox_grams_per_gallon', Numeric)
-    benzene_grams_per_gallon = Column('benzene_grams_per_gallon', Numeric)
-    butadiene_grams_per_gallon = Column('13butadiene_grams_per_gallon', Numeric)
-    formaldehyde_grams_per_gallon = Column('formaldehyde_grams_per_gallon', Numeric)
-    acetaldehyde_grams_per_gallon = Column('acetaldehyde_grams_per_gallon', Numeric)
-    acrolein_grams_per_gallon = Column('acrolein_grams_per_gallon', Numeric)
-    naphthalene_grams_per_gallon = Column('naphthalene_grams_per_gallon', Numeric)
-    ch4_grams_per_gallon = Column('ch4_grams_per_gallon', Numeric)
-    n2o_grams_per_gallon = Column('n2o_grams_per_gallon', Numeric)
+    voc_grams_per_gallon = Column('voc_grams_per_gallon', Float)
+    co_grams_per_gallon = Column('co_grams_per_gallon', Float)
+    nox_grams_per_gallon = Column('nox_grams_per_gallon', Float)
+    pm25_grams_per_gallon = Column('pm25_grams_per_gallon', Float)
+    sox_grams_per_gallon = Column('sox_grams_per_gallon', Float)
+    benzene_grams_per_gallon = Column('benzene_grams_per_gallon', Float)
+    butadiene_grams_per_gallon = Column('13butadiene_grams_per_gallon', Float)
+    formaldehyde_grams_per_gallon = Column('formaldehyde_grams_per_gallon', Float)
+    acetaldehyde_grams_per_gallon = Column('acetaldehyde_grams_per_gallon', Float)
+    acrolein_grams_per_gallon = Column('acrolein_grams_per_gallon', Float)
+    naphthalene_grams_per_gallon = Column('naphthalene_grams_per_gallon', Float)
+    ch4_grams_per_gallon = Column('ch4_grams_per_gallon', Float)
+    n2o_grams_per_gallon = Column('n2o_grams_per_gallon', Float)
+    co2_grams_per_gallon = Column('co2_grams_per_gallon', Float)
 
     def __repr__(self):
         return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
@@ -43,7 +44,7 @@ class EmissionFactorsRefinery(SQABase):
                                   'voc_grams_per_gallon', 'co_grams_per_gallon', 'nox_grams_per_gallon', 'pm25_grams_per_gallon', 'sox_grams_per_gallon',
                                   'benzene_grams_per_gallon', '13butadiene_grams_per_gallon', 'formaldehyde_grams_per_gallon',
                                   'acetaldehyde_grams_per_gallon', 'acrolein_grams_per_gallon', 'naphthalene_grams_per_gallon',
-                                  'ch4_grams_per_gallon', 'n2o_grams_per_gallon'}
+                                  'ch4_grams_per_gallon', 'n2o_grams_per_gallon', 'co2_grams_per_gallon'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -73,6 +74,7 @@ class EmissionFactorsRefinery(SQABase):
                         naphthalene_grams_per_gallon=df.loc[i, 'naphthalene_grams_per_gallon'],
                         ch4_grams_per_gallon=df.loc[i, 'ch4_grams_per_gallon'],
                         n2o_grams_per_gallon=df.loc[i, 'n2o_grams_per_gallon'],
+                        co2_grams_per_gallon=df.loc[i, 'co2_grams_per_gallon'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()

@@ -37,6 +37,20 @@ class VehicleAnnualData(SQABase, OMEGABase):
     ch4_vehicle_metrictons = Column(Float)
     n2o_vehicle_metrictons = Column(Float)
     co2_vehicle_metrictons = Column(Float)
+    voc_refinery_ustons = Column(Float)
+    co_refinery_ustons = Column(Float)
+    nox_refinery_ustons = Column(Float)
+    pm25_refinery_ustons = Column(Float)
+    sox_refinery_ustons = Column(Float)
+    benzene_refinery_ustons = Column(Float)
+    butadiene_refinery_ustons = Column(Float)
+    formaldehyde_refinery_ustons = Column(Float)
+    acetaldehyde_refinery_ustons = Column(Float)
+    acrolein_refinery_ustons = Column(Float)
+    naphthalene_refinery_ustons = Column(Float)
+    ch4_refinery_metrictons = Column(Float)
+    n2o_refinery_metrictons = Column(Float)
+    co2_refinery_metrictons = Column(Float)
 
 
     @staticmethod
