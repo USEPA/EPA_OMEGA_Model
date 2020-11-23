@@ -14,7 +14,7 @@ transloss = 0.07
 gap_ice = 0.8
 gap_bev = 0.7
 co2_indolene = 8887
-kwh_cycle = 0.3
+kwh_per_mile_cycle = 0.2 # TODO Placeholder - what are we doing about calculating energy consumption on vehicles?
 
 
 def calc_vehicle_co2_gallons():
@@ -45,7 +45,7 @@ def calc_vehicle_co2_gallons():
                 valu_co2 = veh_vmt * onroad_co2 / grams_per_metric_ton
                 valu_gal = veh_vmt / mpg
                 co2_attr = 'co2_vehicle_metrictons' # TODO metrictons and gallons probably belong in calc_vehicle_inventory, not here
-                gal_attr = 'vehicle_gallons'
+                gal_attr = 'fuel_consumption'
                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'onroad_co2_grams_per_mile', onroad_co2)
                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'onroad_fuel_consumption_rate', mpg)
                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, co2_attr, valu_co2)
@@ -84,7 +84,7 @@ def calc_vehicle_inventory(*args):
                 veh_vmt = o2.session.query(VehicleAnnualData.vmt).\
                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
                     filter(VehicleAnnualData.age == veh_age[0]).scalar()
-                veh_gallons = o2.session.query(VehicleAnnualData.vehicle_gallons).\
+                veh_gallons = o2.session.query(VehicleAnnualData.fuel_consumption).\
                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
                     filter(VehicleAnnualData.age == veh_age[0]).scalar()
 
@@ -133,7 +133,7 @@ def calc_refinery_inventory(*args):
                     filter(EmissionFactorsRefinery.calendar_year == veh_cyear[0]).all()
 
                 factor = factor_object[0].__getattribute__(factor_attr)
-                veh_gallons = o2.session.query(VehicleAnnualData.vehicle_gallons).\
+                veh_gallons = o2.session.query(VehicleAnnualData.fuel_consumption).\
                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
                     filter(VehicleAnnualData.calendar_year == veh_cyear[0]).scalar()
 
@@ -142,14 +142,70 @@ def calc_refinery_inventory(*args):
                 if arg == 'ch4' or arg == 'n2o' or arg == 'co2':
                     try:
                         valu = veh_gallons * factor / grams_per_metric_ton
-                        inv_attr = f'{arg}_refinery_metrictons'
+                        inv_attr = f'{arg}_upstream_metrictons'
                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
                     except:
                         pass
                 else:
                     try:
                         valu = veh_gallons * factor / grams_per_uston
-                        inv_attr = f'{arg}_refinery_ustons'
+                        inv_attr = f'{arg}_upstream_ustons'
                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
                     except:
                         pass
+
+
+def calc_powersector_inventory(*args):
+    from vehicles import VehicleFinal
+    from vehicle_annual_data import VehicleAnnualData
+    from effects.emission_factors_powersector import EmissionFactorsPowersector
+
+    vehicles = o2.session.query(VehicleFinal).filter(VehicleFinal.in_use_fuel_ID == 'US electricity').all()
+    vehicle_IDs = []
+    for idx, value in enumerate(vehicles):
+        vehicle_IDs.append(vehicles[idx].vehicle_ID)
+
+    for idx, vehicle_ID in enumerate(vehicle_IDs):
+        veh_cyears = o2.session.query(VehicleAnnualData.calendar_year).filter(VehicleAnnualData.vehicle_ID == vehicle_ID).all()
+
+        # cert_kwh_per_mile = o2.session.query(VehicleFinal.cert_kWh_per_mile).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
+        cert_kwh_per_mile = kwh_per_mile_cycle
+        onroad_kwh_per_mile = cert_kwh_per_mile / gap_bev / (1 - transloss)  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
+
+        for arg in args:
+            factor_attr = f'{arg}_grams_per_kWh'
+            for idx, veh_cyear in enumerate(veh_cyears):
+                factor_object = o2.session.query(EmissionFactorsPowersector).\
+                    filter(EmissionFactorsPowersector.calendar_year == veh_cyear[0]).all()
+
+                factor = factor_object[0].__getattribute__(factor_attr)
+                veh_vmt = o2.session.query(VehicleAnnualData.vmt).\
+                    filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
+                    filter(VehicleAnnualData.calendar_year == veh_cyear[0]).scalar()
+                try:
+                    veh_kWh = veh_vmt * onroad_kwh_per_mile
+                except:
+                    pass
+
+                vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)[0]
+                cy = veh_cyear[0]
+                if arg == 'ch4' or arg == 'n2o' or arg == 'co2':
+                    try:
+                        valu = veh_kWh * factor / grams_per_metric_ton
+                        inv_attr = f'{arg}_upstream_metrictons'
+                        VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
+                    except:
+                        pass
+                else:
+                    try:
+                        valu = veh_kWh * factor / grams_per_uston
+                        inv_attr = f'{arg}_upstream_ustons'
+                        VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
+                    except:
+                        pass
+                try:
+                    veh_kWh = veh_vmt * onroad_kwh_per_mile
+                    VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'onroad_fuel_consumption_rate', onroad_kwh_per_mile)
+                    VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'fuel_consumption', veh_kWh)
+                except:
+                    pass
