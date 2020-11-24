@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -82,6 +82,32 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="intro_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>681</width>
+        <height>351</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>16</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>&quot;Evaluating a fuel efficiency or greenhouse gas emissions standard is a complex mix of scientific, engineering, and economic analysis. It requires the agency to: anticipate how the regulation will cause manufacturers to change the characteristics of individual vehicles and the mix of vehicles they offer; determine how sales of new vehicles will respond to that change; determine the impact on the evolution and utilization of the broader vehicle fleet; determine how those changes will affect aggregate fuel consumption, emissions of criteria pollutants and greenhouse gases, fatality rates, congestion, and other outcomes; and, finally, to assess the overall benefits and costs of the proposed rule.&quot;
+
+EPA Science Advisory Board - 2020</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -435,11 +461,107 @@
        </size>
       </property>
      </widget>
+     <widget class="QPushButton" name="run_model_button">
+      <property name="geometry">
+       <rect>
+        <x>509</x>
+        <y>80</y>
+        <width>111</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run Model</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>100</width>
+        <height>100</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QLabel" name="model_status_label">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>200</y>
+        <width>111</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="results_tab">
      <attribute name="title">
       <string>Results</string>
      </attribute>
+     <widget class="QPushButton" name="open_plot_1">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>40</y>
+        <width>71</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Opens an existing OMEGA 2 Configuration File</string>
+      </property>
+      <property name="text">
+       <string>Plot</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="list_graphs">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>41</y>
+        <width>481</width>
+        <height>211</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="available_plots_1_label_1">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>10</y>
+        <width>461</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Available Plots</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QLabel" name="main_title_1_label">
@@ -530,25 +652,6 @@
      <string>Clear</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="run_model_button">
-    <property name="geometry">
-     <rect>
-      <x>1000</x>
-      <y>0</y>
-      <width>110</width>
-      <height>110</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Run Model</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>100</width>
-      <height>100</height>
-     </size>
-    </property>
-   </widget>
    <widget class="QWidget" name="background_widget" native="true">
     <property name="geometry">
      <rect>
@@ -564,31 +667,6 @@
     <property name="styleSheet">
      <string notr="true"/>
     </property>
-    <widget class="QProgressBar" name="progress_bar">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>1007</x>
-       <y>120</y>
-       <width>101</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Run Progress</string>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="textVisible">
-      <bool>true</bool>
-     </property>
-     <property name="invertedAppearance">
-      <bool>false</bool>
-     </property>
-    </widget>
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
@@ -618,7 +696,6 @@
    <zorder>event_monitor_label</zorder>
    <zorder>clear_event_monitor_button</zorder>
    <zorder>tab_select</zorder>
-   <zorder>run_model_button</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

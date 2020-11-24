@@ -251,6 +251,8 @@ class OMEGASessionObject(object):
         self.settings.ghg_standards_file = self.read_parameter('GHG Standards File')
         self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards Fuels File')
         self.settings.required_zev_share_file = self.read_parameter('ZEV Requirement File')
+        self.settings.reregistration_fixed_by_age_file = self.read_parameter('Stock Deregistration File')
+        self.settings.annual_vmt_fixed_by_age_file = self.read_parameter('Stock VMT File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
             self.read_parameter('Slice Tech Combo Tables'), true_false_dict)
@@ -295,10 +297,13 @@ class OMEGASessionObject(object):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
         omega_log.logwrite('Getting Postproc Settings...')
-        if validate_predefined_input(self.read_parameter('Stock Deregistration'), {'fixed', 'dynamic'}):
-            self.settings.stock_scrappage = self.read_parameter('Stock Deregistration')
-        if validate_predefined_input(self.read_parameter('Stock VMT'), {'fixed', 'dynamic'}):
-            self.settings.stock_vmt = self.read_parameter('Stock VMT')
+        self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
+        self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
+        self.settings.emission_factors_powersector_file = self.read_parameter('Context Powersector Emission Factors File')
+        self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
+        self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
+        self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
+        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
     def init(self, validate_only=False):
         if not validate_only:

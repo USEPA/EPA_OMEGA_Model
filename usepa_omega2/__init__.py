@@ -65,16 +65,8 @@ try:
             self.ghg_standards_file = 'input_samples/ghg_standards-flat.csv'
             self.ghg_standards_fuels_file = 'input_samples/ghg_standards-fuels.csv'
             self.required_zev_share_file = 'input_samples/required_zev_share.csv'
-            self.stock_scrappage = 'fixed'
-            self.stock_vmt = 'fixed'
-            if self.stock_scrappage == 'fixed':
-                self.reregistration_fixed_by_age_file = 'input_samples/reregistration_fixed_by_age.csv'
-            else:
-                pass
-            if self.stock_vmt == 'fixed':
-                self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
-            else:
-                pass
+            self.reregistration_fixed_by_age_file = 'input_samples/reregistration_fixed_by_age.csv'
+            self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
             self.slice_tech_combo_cloud_tables = False
             self.allow_backsliding = True
             self.producer_consumer_max_iterations = 20

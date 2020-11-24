@@ -28,6 +28,14 @@ usepa\_omega2\_gui.omega\_gui\_stylesheets module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2\_gui.omega\_gui\_stylesheets\_green module
+--------------------------------------------------------
+
+.. automodule:: usepa_omega2_gui.omega_gui_stylesheets_green
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2\_gui.run\_omega\_batch\_gui module
 ------------------------------------------------
 

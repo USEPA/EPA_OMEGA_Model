@@ -15,18 +15,19 @@ class EmissionFactorsPowersector(SQABase):
     index = Column('index', Integer, primary_key=True)
 
     calendar_year = Column('calendar_year', Numeric)
-    voc_grams_per_kWh = Column('voc_grams_per_kWh', Numeric)
-    co_grams_per_kWh = Column('co_grams_per_kWh', Numeric)
-    nox_grams_per_kWh = Column('nox_grams_per_kWh', Numeric)
-    pm25_grams_per_kWh = Column('pm25_grams_per_kWh', Numeric)
-    sox_grams_per_kWh = Column('sox_grams_per_kWh', Numeric)
-    benzene_grams_per_kWh = Column('benzene_grams_per_kWh', Numeric)
-    butadiene_grams_per_kWh = Column('13butadiene_grams_per_kWh', Numeric)
-    formaldehyde_grams_per_kWh = Column('formaldehyde_grams_per_kWh', Numeric)
-    acetaldehyde_grams_per_kWh = Column('acetaldehyde_grams_per_kWh', Numeric)
-    acrolein_grams_per_kWh = Column('acrolein_grams_per_kWh', Numeric)
-    ch4_grams_per_kWh = Column('ch4_grams_per_kWh', Numeric)
-    n2o_grams_per_kWh = Column('n2o_grams_per_kWh', Numeric)
+    voc_grams_per_kWh = Column('voc_grams_per_kWh', Float)
+    co_grams_per_kWh = Column('co_grams_per_kWh', Float)
+    nox_grams_per_kWh = Column('nox_grams_per_kWh', Float)
+    pm25_grams_per_kWh = Column('pm25_grams_per_kWh', Float)
+    sox_grams_per_kWh = Column('sox_grams_per_kWh', Float)
+    benzene_grams_per_kWh = Column('benzene_grams_per_kWh', Float)
+    butadiene_grams_per_kWh = Column('13butadiene_grams_per_kWh', Float)
+    formaldehyde_grams_per_kWh = Column('formaldehyde_grams_per_kWh', Float)
+    acetaldehyde_grams_per_kWh = Column('acetaldehyde_grams_per_kWh', Float)
+    acrolein_grams_per_kWh = Column('acrolein_grams_per_kWh', Float)
+    ch4_grams_per_kWh = Column('ch4_grams_per_kWh', Float)
+    n2o_grams_per_kWh = Column('n2o_grams_per_kWh', Float)
+    co2_grams_per_kWh = Column('co2_grams_per_kWh', Float)
 
     def __repr__(self):
         return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
@@ -42,7 +43,7 @@ class EmissionFactorsPowersector(SQABase):
                                   'voc_grams_per_kWh', 'co_grams_per_kWh', 'nox_grams_per_kWh', 'pm25_grams_per_kWh', 'sox_grams_per_kWh',
                                   'benzene_grams_per_kWh', '13butadiene_grams_per_kWh', 'formaldehyde_grams_per_kWh',
                                   'acetaldehyde_grams_per_kWh', 'acrolein_grams_per_kWh',
-                                  'ch4_grams_per_kWh', 'n2o_grams_per_kWh'}
+                                  'ch4_grams_per_kWh', 'n2o_grams_per_kWh', 'co2_grams_per_kWh'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -71,6 +72,7 @@ class EmissionFactorsPowersector(SQABase):
                         acrolein_grams_per_kWh=df.loc[i, 'acrolein_grams_per_kWh'],
                         ch4_grams_per_kWh=df.loc[i, 'ch4_grams_per_kWh'],
                         n2o_grams_per_kWh=df.loc[i, 'n2o_grams_per_kWh'],
+                        co2_grams_per_kWh=df.loc[i, 'co2_grams_per_kWh'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()

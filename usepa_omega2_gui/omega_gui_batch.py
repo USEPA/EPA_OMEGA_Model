@@ -17,6 +17,7 @@ import time
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
+from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 # import PySide2.QtXml
@@ -64,6 +65,7 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
+button_click_sound = 'usepa_omega2_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -106,6 +108,7 @@ class Form(QObject):
         self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
+        self.window.open_plot_1.clicked.connect(self.open_plot_1)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -150,6 +153,8 @@ class Form(QObject):
         self.window.save_configuration_file_button.setStyleSheet(stylesheet)
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
+        self.window.run_model_button.setStyleSheet(stylesheet)
+        self.window.open_plot_1.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -165,12 +170,14 @@ class Form(QObject):
         self.window.project_description_1_label.setStyleSheet(stylesheet)
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
+        self.window.model_status_label.setStyleSheet(stylesheet)
+        self.window.available_plots_1_label_1.setStyleSheet(stylesheet)
+        self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
         stylesheet = ""
         stylesheet = checkbox_stylesheet(stylesheet)
         self.window.multiprocessor_checkbox.setStyleSheet(stylesheet)
-
 
         # Timer start
         timer.start()
@@ -201,6 +208,7 @@ class Form(QObject):
 
             :return: N/A
         """
+        # playsound(button_click_sound)
         global configuration_file, scenario, configuration_file_valid, input_batch_file_valid
         global output_batch_directory_valid, input_batch_file, output_batch_directory
         # self.window.statusBar().showMessage("Open File")
@@ -497,7 +505,7 @@ class Form(QObject):
 
     def launch_documentation(self):
         """
-        Opens the OMEGA documentation website in browser window.
+        Opens the OMEGA documentation website in browser.
 
         :return: N/A
         """
@@ -505,7 +513,7 @@ class Form(QObject):
 
     def launch_epa_website(self):
         """
-        Opens the OMEGA documentation website in browser window.
+        Opens the EPA website in browser.
 
         :return: N/A
         """
@@ -514,12 +522,10 @@ class Form(QObject):
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
-        The function searches the __init__.py file for the line containing the code version and then calls
-        the function "showbox" to display the result.
 
         :return: N/A
         """
-        global omega2_version
+        global omega2_version, button_click_sound
         message_title = "About OMEGA"
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
@@ -631,6 +637,8 @@ class Form(QObject):
         self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
+        self.window.model_status_label.setText("Model Idle")
+
     def clear_entries(self):
         """
         Clears all fields in the gui.
@@ -658,14 +666,12 @@ class Form(QObject):
         :return: N/A
         """
         elapsed_start = datetime.now()
-        # model_sound_start = 'gui/elements/model_start.mp3'
+        # model_sound_start = 'gui/elements/click.mp3'
         # model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         global multiprocessor_mode_selected
         global output_batch_subdirectory
         # status_bar()
-        self.window.progress_bar.setValue(0)
-        self.window.progress_bar.setValue(50)
         self.window.repaint()
 
         # This call works but gui freezes until new process ends
@@ -720,6 +726,8 @@ class Form(QObject):
         x = a + b + c + d
         # print("***", x, "***")
 
+        # Disable selected gui functions during model run
+        self.enable_gui_run_functions(0)
         # Indicate model start to status bar
         self.event_monitor("Start Model Run", "black", 'dt')
         # Call OMEGA 2 batch as a subprocess with command line options from above
@@ -728,60 +736,55 @@ class Form(QObject):
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
-        # Keep track of lines read from the log files
-        line_counter_batch = 0
-        line_counter_session = 0
         # Complete paths to log files
         status_file_batch = output_batch_subdirectory + "/" + log_file_batch
         status_file_session = output_session_subdirectory + "/" + log_file_session_prefix + batch_time_stamp +\
                               '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
-
+        # If more log files are monitored (currently 2) just add another element to the 3 arrays below
+        # Enter log file names into array
+        log_file_array = [status_file_batch, status_file_session]
+        # Give the log files a name
+        log_label_array = ['B log', 'S log']
+        # Temporary counter arrays
+        log_counter_array = [0, 0]
+        # log_status_array = [0, 0]
+        # log_lines_array = [0, 0]
+        self.load_plots()
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
-            time.sleep(1)
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
+            # Keep the overhead low and only update the event file at 10 hz
+            time.sleep(0.1)
+            # Update model run time
+            elapsed_end = datetime.now()
+            elapsed_time = elapsed_end - elapsed_start
+            elapsed_time = str(elapsed_time)
+            elapsed_time = "Model Running\n" + elapsed_time[:-7]
+            self.window.model_status_label.setText(elapsed_time)
             # Get number of lines in the log files if they exist
-            if os.path.isfile(status_file_batch):
-                num_lines_batch = sum(1 for line in open(status_file_batch))
-                status_file_batch_exists = 1
-            else:
-                num_lines_batch = 0
-                status_file_batch_exists = 0
-            if os.path.isfile(status_file_session):
-                num_lines_session = sum(1 for line in open(status_file_session))
-                status_file_session_exists = 1
-            else:
-                num_lines_session = 0
-                status_file_session_exists = 0
-            # Read and output all new lines from log files
-            while line_counter_batch < num_lines_batch and status_file_batch_exists == 1:
-                f = open(status_file_batch)
-                lines = f.readlines()
-                f.close()
-                g = lines[line_counter_batch]
-                g = g.rstrip("\n")
-                g = '[B log] ' + g
-                # Select output color
-                color = status_output_color(g)
-                # Output to event monitor
-                self.event_monitor(g, color, 'dt')
-                # Increment number of read lines from file counter
-                line_counter_batch = line_counter_batch + 1
+            for log_loop in range(0, len(log_file_array)):
+                if os.path.isfile(log_file_array[log_loop]):
+                    log_lines = sum(1 for line in open(log_file_array[log_loop]))
+                    log_status = 1
+                else:
+                    log_lines = 0
+                    log_status = 0
 
-            while line_counter_session < num_lines_session and status_file_session_exists == 1:
-                f = open(status_file_session)
-                lines = f.readlines()
-                f.close()
-                g = lines[line_counter_session]
-                g = g.rstrip("\n")
-                g = '[S log] ' + g
-                # Select output color
-                color = status_output_color(g)
-                # Output to event monitor
-                self.event_monitor(g, color, 'dt')
-                # Increment number of read lines from file counter
-                line_counter_session = line_counter_session + 1
+                # Read and output all new lines from log files
+                while log_counter_array[log_loop] < log_lines and log_status == 1:
+                    f = open(log_file_array[log_loop])
+                    lines = f.readlines()
+                    f.close()
+                    g = lines[log_counter_array[log_loop]]
+                    g = g.rstrip("\n")
+                    g = '[' + log_label_array[log_loop] + '] ' + g
+                    # Select output color
+                    color = status_output_color(g)
+                    # Output to event monitor
+                    self.event_monitor(g, color, 'dt')
+                    # Increment total number of read lines in log file counter
+                    log_counter_array[log_loop] = log_counter_array[log_loop] + 1
 
         # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
@@ -798,10 +801,12 @@ class Form(QObject):
         self.event_monitor("End Model Run", "black", 'dt')
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Status = Ready"
-        self.window.progress_bar.setValue(100)
 
-        # Remove comm_file
-        # os.remove(status_file)
+        # Enable selected gui functions disabled during model run
+        self.enable_gui_run_functions(1)
+        self.window.model_status_label.setText("Model Loaded")
+
+        self.load_plots()
 
     def showbox(self, message_title, message):
         """
@@ -856,10 +861,43 @@ class Form(QObject):
             self.window.run_model_button.setIcon(QIcon(run_button_image_enabled))
             self.window.run_model_button.setEnabled(1)
             self.window.action_run_model.setEnabled(1)
+            self.window.model_status_label.setText("Model Ready")
         else:
             self.window.run_model_button.setIcon(QIcon(run_button_image_disabled))
             self.window.run_model_button.setEnabled(0)
             self.window.action_run_model.setEnabled(0)
+            self.window.model_status_label.setText("Model Idle")
+
+    def enable_gui_run_functions(self, enable):
+        """
+        Enables and disables various gui functions during model run.
+
+        :param enable: Boolean to enable or disable selected gui functions during model run
+        :return: N/A
+        """
+        self.window.open_configuration_file_button.setEnabled(enable)
+        self.window.save_configuration_file_button.setEnabled(enable)
+        self.window.select_input_batch_file_button.setEnabled(enable)
+        self.window.select_output_batch_directory_button.setEnabled(enable)
+        self.window.action_new_file.setEnabled(enable)
+        self.window.action_open_configuration_file.setEnabled(enable)
+        self.window.action_save_configuration_file.setEnabled(enable)
+        self.window.action_select_input_batch_file.setEnabled(enable)
+        self.window.action_select_output_batch_directory.setEnabled(enable)
+        self.window.action_run_model.setEnabled(enable)
+        self.window.run_model_button.setEnabled(enable)
+
+    def load_plots(self):
+        self.window.list_graphs.clear()
+        df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
+        for col in df.columns:
+            # print(col)
+            self.window.list_graphs.addItem(col)
+
+    def open_plot_1(self):
+        if self.window.list_graphs.currentItem() is not None:
+            a = self.window.list_graphs.selectedIndexes()[0]
+            test_plot_1(a.data())
 
 
 def status_bar():

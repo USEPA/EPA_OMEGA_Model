@@ -9,8 +9,6 @@ import pandas as pd
 import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
-from usepa_omega2.effects.ip_deflators import ImplicitPriceDeflators
-from pathlib import Path
 
 
 class CostFactorsSCC(SQABase):
@@ -47,7 +45,7 @@ class CostFactorsSCC(SQABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = ImplicitPriceDeflators().df_from_table('calendar_year')
+            deflators = pd.read_csv(o2.options.ip_deflators_file, skiprows=1, index_col=0)
             df = gen_fxns.adjust_dollars(df, deflators, 'scc_interim_domestic', 'scc_global')
 
             if not template_errors:
@@ -78,14 +76,9 @@ if __name__ == '__main__':
         init_omega_db()
         omega_log.init_logfile()
 
-        from usepa_omega2.effects.ip_deflators import ImplicitPriceDeflators
-
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-
-        init_fail = init_fail + ImplicitPriceDeflators.init_database_from_file(o2.options.ip_deflators_file,
-                                                                               verbose=o2.options.verbose)
 
         init_fail = init_fail + CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
                                                                        verbose=o2.options.verbose)

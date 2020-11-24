@@ -6,13 +6,10 @@ cost_factors_criteria.py
 """
 
 import pandas as pd
-import numpy as np
-from pathlib import Path
 
 import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
-from usepa_omega2.effects.cpi_deflators import CPIPriceDeflators
 
 
 class CostFactorsCriteria(SQABase):
@@ -54,7 +51,7 @@ class CostFactorsCriteria(SQABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = CPIPriceDeflators().df_from_table('calendar_year')
+            deflators = pd.read_csv(o2.options.cpi_deflators_file, skiprows=1, index_col=0)
             df = gen_fxns.adjust_dollars(df, deflators, 'low-mortality_onroad', 'high-mortality_onroad', 'low-mortality_upstream', 'high-mortality_upstream')
 
             if not template_errors:
@@ -84,18 +81,15 @@ if __name__ == '__main__':
             print(fileio.get_filenameext(__file__))
 
         # set up global variables:
+        from usepa_omega2 import *
+        import o2
         o2.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        from usepa_omega2.effects.cpi_deflators import CPIPriceDeflators
-
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-
-        init_fail = init_fail + CPIPriceDeflators.init_database_from_file(o2.options.cpi_deflators_file,
-                                                                          verbose=o2.options.verbose)
 
         init_fail = init_fail + CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
                                                                             verbose=o2.options.verbose)
