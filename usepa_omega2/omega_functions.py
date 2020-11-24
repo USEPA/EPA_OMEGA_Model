@@ -61,20 +61,17 @@ def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose
         dfs = []
         for mv in max_values:
             members = []
-            # foo['c'] = 1 - foo.sum(axis=1)
             for i in range(num_columns):
-                df = pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]])
-                df[df == 0] = min_level
-                df[df == mv] = mv-min_level
-                df = df[(df.min(axis=1) >= min_level) & (df.max(axis=1) <= (mv-min_level))]
-                members.append(df)
+                members.append(pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]]))
 
             x = pd.DataFrame()
             for m in members:
                 x = cartesian_prod(x, m)
                 x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon].copy()  # sum <= mv
 
-            x = x[(abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon)]
+            x = x[abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon]
+            x[x == 0] = min_level
+            x[x == mv] = mv - min_level
             dfs.append(x)
 
         ans = pd.DataFrame()
@@ -181,7 +178,53 @@ def cartesian_prod(left_df, right_df, drop=False):
     return leftXright
 
 
+def generate_nearby_shares(columns, combo, half_range_frac, num_steps, min_level=0.001, verbose=False):
+    """
+    Generate a partition of share values in the neighborhood of an initial set of share values
+    :param columns: list-like, list of values that represent shares in combo
+    :param combo: dict-like, typically a Series or Dataframe that contains the initial set of share values
+    :param half_range_frac: search "radius" [0..1], half the search range
+    :param num_steps: number of values to divide the search range into
+    :param min_level: specifies minimum share value (max will be 1-min_value), e.g. 0.001
+    :param verbose: if True then partition dataframe is printed to the console
+    :return: partition dataframe, with columns as specified, values near the initial values from combo
+    """
+    import numpy as np
+    import pandas as pd
+
+    dfs = []
+    for i in range(0, len(columns) - 1):
+        k = columns[i]
+        val = combo[k]
+        dfs.append(pd.DataFrame({k: unique(
+            # np.linspace(np.maximum(min_level, val - half_range_frac),
+            #             np.minimum(1.0 - min_level, val + half_range_frac),
+            #             num_steps))}
+            np.minimum(1-min_level, np.maximum(min_level, np.linspace(np.maximum(0, val - half_range_frac),
+                        np.minimum(1.0, val + half_range_frac),
+                        num_steps))))}
+        ))
+
+    dfx = pd.DataFrame()
+    for df in dfs:
+        dfx = cartesian_prod(dfx, df)
+
+    dfx = dfx[dfx.sum(axis=1) <= 1]
+    dfx[columns[-1]] = 1 - dfx.sum(axis=1)
+
+    if verbose:
+        print(dfx)
+
+    return dfx
+
+
 if __name__ == '__main__':
     import pandas as pd
-    import numpy as np
-    foo = partition(['a', 'b'], increment=0.1, min_level=0.01)
+
+    # partition test
+    part = partition(['a', 'b'], increment=0.1, min_level=0.01)
+
+    # nearby shares test
+    share_combo = pd.Series({'a': 0.5, 'b': 0.2, 'c': 0.3})
+    column_names = ['a', 'b', 'c']
+    dfx = generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)

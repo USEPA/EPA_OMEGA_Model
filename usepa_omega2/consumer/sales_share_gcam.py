@@ -21,6 +21,9 @@ def get_demanded_shares(market_class_data, calendar_year):
     from demanded_shares_gcam import DemandedSharesGCAM
     from market_classes import MarketClass
 
+    if o2.options.flat_context:
+        calendar_year = o2.options.flat_context_year
+
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
 

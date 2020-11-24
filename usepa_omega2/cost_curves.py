@@ -72,7 +72,9 @@ class CostCurve(SQABase, OMEGABase):
 
     @staticmethod
     def get_cost(cost_curve_class, model_year, target_co2_gpmi):
-        # model_year = 2021
+        if o2.options.flat_context:
+            model_year = o2.options.flat_context_year
+
         min_cost_curve_year = o2.session.query(func.min(CostCurve.model_year)).scalar()
         max_cost_curve_year = o2.session.query(func.max(CostCurve.model_year)).scalar()
 
@@ -99,21 +101,27 @@ class CostCurve(SQABase, OMEGABase):
 
     @staticmethod
     def get_min_co2_gpmi(cost_curve_class, model_year):
-        # model_year = 2021
+        if o2.options.flat_context:
+            model_year = o2.options.flat_context_year
+
         return o2.session.query(func.min(CostCurve.cert_CO2_grams_per_mile)). \
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
     @staticmethod
     def get_max_co2_gpmi(cost_curve_class, model_year):
-        # model_year = 2021
+        if o2.options.flat_context:
+            model_year = o2.options.flat_context_year
+
         return o2.session.query(func.max(CostCurve.cert_CO2_grams_per_mile)). \
             filter(CostCurve.cost_curve_class == cost_curve_class). \
             filter(CostCurve.model_year == model_year).scalar()
 
     @staticmethod
     def get_co2_gpmi(cost_curve_class, model_year):
-        # model_year = 2021
+        if o2.options.flat_context:
+            model_year = o2.options.flat_context_year
+
         return sql_unpack_result(o2.session.query(CostCurve.cert_CO2_grams_per_mile).
                                  filter(CostCurve.cost_curve_class == cost_curve_class).
                                  filter(CostCurve.model_year == model_year).all())

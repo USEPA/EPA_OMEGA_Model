@@ -103,11 +103,16 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
         sales_share_column_names = ['producer_share_frac_' + c for c in children]
 
     if all(s in sweep_list for s in children) and consumer_bev_share is None:
-        if share_range is None:
-            sales_share_df = partition(sales_share_column_names, increment=1/(o2.options.first_pass_num_market_share_options - 1), min_level=0.001)
+        if share_range == 1.0:
+            sales_share_df = partition(sales_share_column_names,
+                                       increment=1 / (o2.options.first_pass_num_market_share_options - 1),
+                                       min_level=0.001)
         else:
-            sales_share_df = partition(sales_share_column_names, increment=(1-2*share_range)/(o2.options.first_pass_num_market_share_options - 1),
-                                       min_level=max(producer_bev_share[sales_share_column_names]) - share_range)
+            # print('share = %f' % share_range)
+            # print(producer_bev_share[sales_share_column_names])
+            from omega_functions import generate_nearby_shares
+            sales_share_df = generate_nearby_shares(sales_share_column_names, producer_bev_share, share_range,
+                                                    o2.options.first_pass_num_market_share_options, min_level=0.001)
     else:
         sales_share_df = pd.DataFrame()
         for c, cn in zip(children, sales_share_column_names):
@@ -131,9 +136,26 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
 calendar_year_initial_vehicle_data = dict()
 
-compliance_iteration_share_ranges = [None, 0.25, 0.125, 0.0625, 0.03125]
+
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
     winning_combo = None
+
+    final_share_accuracy = 0.01
+    num_compliance_iterations = 7
+
+    # linear share range:
+    compliance_iteration_share_ranges = \
+        np.linspace(1.0,
+                    (final_share_accuracy * (o2.options.first_pass_num_market_share_options-1) / 2),
+                    num_compliance_iterations)  # [1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
+
+    # logarithmic share range:
+    compliance_iteration_share_ranges = \
+        np.e**np.linspace(0,
+                          np.log((final_share_accuracy * (o2.options.first_pass_num_market_share_options-1) / 2)),
+                          num_compliance_iterations)
+
+    print(compliance_iteration_share_ranges)
 
     for share_range in compliance_iteration_share_ranges:
         manufacturer_new_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
@@ -144,14 +166,30 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
 
         calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total)
 
+        tech_share_combos_total['share_range'] = share_range
+        tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
+                                           tech_share_combos_total['total_combo_target_co2_megagrams']
+
+        tech_share_combos_total = tech_share_combos_total[(1-abs(tech_share_combos_total['compliance_ratio'])) <= 0.001]
+
         # if (consumer_bev_share is None) and (calendar_year == 2037):
-        #     tech_share_combos_total.to_csv('%s_%s_combos.csv' % (manufacturer_ID, calendar_year))
+        # if share_range == 1.0:
+        #     tech_share_combos_total.to_csv(
+        #         '%s%s_%s_combos.csv' % (o2.options.output_folder, manufacturer_ID, calendar_year), mode='w')
+        # else:
+        #     tech_share_combos_total.to_csv(
+        #         '%s%s_%s_combos.csv' % (o2.options.output_folder, manufacturer_ID, calendar_year), mode='a',
+        #         header=False)
 
         # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
         winning_combo = select_winning_combo(tech_share_combos_total)
 
-        import copy
-        manufacturer_new_vehicles = copy.deepcopy(manufacturer_new_vehicles)
+    from market_classes import MarketClass
+    for mc in MarketClass.market_classes:
+        print('%d producer_share_frac_%s=%s' % (calendar_year, mc, winning_combo['producer_share_frac_%s' % mc]))
+
+    import copy
+    manufacturer_new_vehicles = copy.deepcopy(manufacturer_new_vehicles)
 
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_new_vehicles:
@@ -174,7 +212,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         manufacturer_prior_vehicles = o2.session.query(VehicleFinal). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_ID). \
             filter(VehicleFinal.model_year == calendar_year - 1). \
-            all()
+                all()
 
         Vehicle.reset_vehicle_IDs()
 
@@ -207,6 +245,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
 
         # get empty market class tree
         market_class_tree = MarketClass.get_market_class_tree()
+
         # populate tree with vehicle objects
         for new_veh in manufacturer_new_vehicles:
             populate_market_classes(market_class_tree, new_veh.market_class_ID, new_veh)
