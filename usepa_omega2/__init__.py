@@ -21,6 +21,7 @@ try:
     import omega_log
     import file_eye_oh as fileio
     from input_validation import *
+    from omega_functions import *
 
     import scipy.interpolate
 
@@ -75,7 +76,7 @@ try:
             else:
                 pass
             self.slice_tech_combo_cloud_tables = False
-            self.allow_backsliding = False
+            self.allow_backsliding = True
             self.producer_consumer_max_iterations = 20
             self.producer_consumer_iteration_tolerance = 0.005
 

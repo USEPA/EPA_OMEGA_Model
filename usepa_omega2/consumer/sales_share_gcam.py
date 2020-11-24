@@ -47,7 +47,7 @@ def get_demanded_shares(market_class_data, calendar_year):
             annualization_factor = price_amortization_period + \
                                    price_amortization_period / (((1 + price_amortization_period) ** discount_rate) - 1)
 
-            total_capital_costs = market_class_data['average_cost_%s' % market_class_id]
+            total_capital_costs = market_class_data['average_price_%s' % market_class_id]
             average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
 
             if market_class_id == 'non hauling.BEV':
