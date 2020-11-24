@@ -28,6 +28,9 @@ def context_new_vehicle_sales(model_year):
 
     sales_dict = dict()
 
+    if o2.options.flat_context:
+        model_year = o2.options.flat_context_year
+
     # get total sales from context
     total_sales = ContextNewVehicleMarket.new_vehicle_sales(model_year)
 

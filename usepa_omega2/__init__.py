@@ -21,6 +21,7 @@ try:
     import omega_log
     import file_eye_oh as fileio
     from input_validation import *
+    from omega_functions import *
 
     import scipy.interpolate
 
@@ -75,18 +76,18 @@ try:
             else:
                 pass
             self.slice_tech_combo_cloud_tables = False
-            self.allow_backsliding = False
+            self.allow_backsliding = True
             self.producer_consumer_max_iterations = 20
             self.producer_consumer_iteration_tolerance = 0.01
 
-            self.first_pass_num_market_share_options = 10
-            self.first_pass_num_tech_options_per_ice_vehicle = 10
+            self.first_pass_num_market_share_options = 5
+            self.first_pass_num_tech_options_per_ice_vehicle = 5
             self.first_pass_num_tech_options_per_bev_vehicle = 2
 
-            self.iteration_num_tech_options_per_ice_vehicle = 20
+            self.iteration_num_tech_options_per_ice_vehicle = 10
             self.iteration_num_tech_options_per_bev_vehicle = 2
 
-            self.iterate_producer_consumer = True
+            self.iterate_producer_consumer = False
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
@@ -101,6 +102,9 @@ try:
 
             self.start_time = 0
             self.end_time = 0
+
+            self.flat_context = False
+            self.flat_context_year = 2021
 
 
     from omega2 import run_omega

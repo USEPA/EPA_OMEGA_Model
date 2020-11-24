@@ -13,8 +13,6 @@ from usepa_omega2 import *
 import numpy as np
 import consumer
 
-use_composite_vehicles = True
-
 
 def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
     from vehicles import VehicleFinal
@@ -31,7 +29,8 @@ def calculate_generalized_cost(cost_factors):
 sweep_list = ['ICE', 'BEV']
 # sweep_list = ['hauling', 'non hauling']
 # sweep_list = ['ICE', 'BEV', 'hauling', 'non hauling']
-def create_tech_options_from_market_class_tree(calendar_year, market_class_dict, consumer_bev_share, parent='', verbose=False):
+def create_tech_options_from_market_class_tree(calendar_year, market_class_dict, producer_bev_share, share_range,
+                                               consumer_bev_share, parent='', verbose=False):
     """
 
     :param market_class_dict:
@@ -46,7 +45,11 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
             print('processing ' + k)
         if type(market_class_dict[k]) is dict:
             # process subtree
-            child_df_list.append(create_tech_options_from_market_class_tree(calendar_year, market_class_dict[k], consumer_bev_share, parent=k,))
+            child_df_list.append(
+                create_tech_options_from_market_class_tree(calendar_year, market_class_dict[k],
+                                                           producer_bev_share, share_range,
+                                                           consumer_bev_share,
+                                                           parent=k))
         else:
             # process leaf
             for new_veh in market_class_dict[k]:
@@ -93,12 +96,21 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                 child_df_list.append(df)
 
     if parent:
-        sales_share_column_names = ['producer_' + parent + '.' + c + '_share_frac' for c in children]
+        sales_share_column_names = ['producer_share_frac_' + parent + '.' + c for c in children]
     else:
-        sales_share_column_names = ['producer_' + c + '_share_frac' for c in children]
+        sales_share_column_names = ['producer_share_frac_' + c for c in children]
 
     if all(s in sweep_list for s in children) and consumer_bev_share is None:
-        sales_share_df = partition(sales_share_column_names, increment=1/(o2.options.first_pass_num_market_share_options - 1), min_level=0.001)
+        if share_range == 1.0:
+            sales_share_df = partition(sales_share_column_names,
+                                       increment=1 / (o2.options.first_pass_num_market_share_options - 1),
+                                       min_level=0.001)
+        else:
+            # print('share = %f' % share_range)
+            # print(producer_bev_share[sales_share_column_names])
+            from omega_functions import generate_nearby_shares
+            sales_share_df = generate_nearby_shares(sales_share_column_names, producer_bev_share, share_range,
+                                                    o2.options.first_pass_num_market_share_options, min_level=0.001)
     else:
         sales_share_df = pd.DataFrame()
         for c, cn in zip(children, sales_share_column_names):
@@ -121,22 +133,64 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
 
 calendar_year_initial_vehicle_data = dict()
+
+
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
+    winning_combo = None
 
-    manufacturer_new_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
+    final_share_accuracy = 0.01
+    num_compliance_iterations = 7
 
-    tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, market_class_tree, consumer_bev_share)
+    # linear share range:
+    compliance_iteration_share_ranges = \
+        np.linspace(1.0,
+                    (final_share_accuracy * (o2.options.first_pass_num_market_share_options-1) / 2),
+                    num_compliance_iterations)  # [1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
 
-    calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total)
+    # logarithmic share range:
+    compliance_iteration_share_ranges = \
+        np.e**np.linspace(0,
+                          np.log((final_share_accuracy * (o2.options.first_pass_num_market_share_options-1) / 2)),
+                          num_compliance_iterations)
 
-    # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
-    winning_combo = select_winning_combo(tech_share_combos_total)
+    print(compliance_iteration_share_ranges)
+
+    for share_range in compliance_iteration_share_ranges:
+        manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
+
+        tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, market_class_tree,
+                                                                             winning_combo, share_range,
+                                                                             consumer_bev_share)
+
+        calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total)
+
+        tech_share_combos_total['share_range'] = share_range
+        tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
+                                           tech_share_combos_total['total_combo_target_co2_megagrams']
+
+        tech_share_combos_total = tech_share_combos_total[(1-abs(tech_share_combos_total['compliance_ratio'])) <= 0.001]
+
+        # if (consumer_bev_share is None) and (calendar_year == 2037):
+        # if share_range == 1.0:
+        #     tech_share_combos_total.to_csv(
+        #         '%s%s_%s_combos.csv' % (o2.options.output_folder, manufacturer_ID, calendar_year), mode='w')
+        # else:
+        #     tech_share_combos_total.to_csv(
+        #         '%s%s_%s_combos.csv' % (o2.options.output_folder, manufacturer_ID, calendar_year), mode='a',
+        #         header=False)
+
+        # pick a winner!! (cheapest one where total_combo_credits_co2_megagrams >= 0 or least bad compliance option)
+        winning_combo = select_winning_combo(tech_share_combos_total)
+
+    from market_classes import MarketClass
+    for mc in MarketClass.market_classes:
+        print('%d producer_share_frac_%s=%s' % (calendar_year, mc, winning_combo['producer_share_frac_%s' % mc]))
 
     import copy
-    manufacturer_new_vehicles = copy.deepcopy(manufacturer_new_vehicles)
+    manufacturer_composite_vehicles = copy.deepcopy(manufacturer_composite_vehicles)
 
     # assign co2 values and sales to vehicles...
-    for new_veh in manufacturer_new_vehicles:
+    for new_veh in manufacturer_composite_vehicles:
         new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%d_sales' % new_veh.vehicle_ID]
         new_veh.decompose()
@@ -144,7 +198,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share):
         new_veh.set_cert_target_CO2_Mg()
         new_veh.set_cert_CO2_Mg()
 
-    return manufacturer_new_vehicles, winning_combo, market_class_tree
+    return manufacturer_composite_vehicles, winning_combo, market_class_tree
 
 
 def get_initial_vehicle_data(calendar_year, manufacturer_ID):
@@ -152,71 +206,70 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     from market_classes import MarketClass, populate_market_classes
 
     if calendar_year not in calendar_year_initial_vehicle_data:
-        # pull in last year's vehicles:
+        # pull in last year's vehicles from database:
         manufacturer_prior_vehicles = o2.session.query(VehicleFinal). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_ID). \
             filter(VehicleFinal.model_year == calendar_year - 1). \
-            all()
+                all()
 
         Vehicle.reset_vehicle_IDs()
 
-        manufacturer_new_vehicles = []
+        manufacturer_composite_vehicles = []
         # update each vehicle and calculate compliance target for each vehicle
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
             new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
-            manufacturer_new_vehicles.append(new_veh)
+            manufacturer_composite_vehicles.append(new_veh)
 
         # aggregate by market class / reg class
         mctrc = dict()
         for mc in MarketClass.market_classes:
             mctrc[mc] = {'car': [], 'truck': [], 'sales': 0}
-        for new_veh in manufacturer_new_vehicles:
+        for new_veh in manufacturer_composite_vehicles:
             mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
             mctrc[new_veh.market_class_ID]['sales'] = mctrc[new_veh.market_class_ID]['sales'] + new_veh.initial_registered_count
 
         from vehicles import CompositeVehicle
         CompositeVehicle.reset_vehicle_IDs()
-        composite_vehicles = []
+        manufacturer_composite_vehicles = []
         for mc in mctrc:
             for rc in reg_classes:
                 if mctrc[mc][rc]:
                     cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
                     cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
-                    composite_vehicles.append(cv)
-
-        manufacturer_new_vehicles = composite_vehicles
+                    manufacturer_composite_vehicles.append(cv)
 
         # get empty market class tree
         market_class_tree = MarketClass.get_market_class_tree()
+
         # populate tree with vehicle objects
-        for new_veh in manufacturer_new_vehicles:
+        for new_veh in manufacturer_composite_vehicles:
             populate_market_classes(market_class_tree, new_veh.market_class_ID, new_veh)
 
-        calendar_year_initial_vehicle_data[calendar_year] = {'manufacturer_new_vehicles': manufacturer_new_vehicles,
+        calendar_year_initial_vehicle_data[calendar_year] = {'manufacturer_composite_vehicles': manufacturer_composite_vehicles,
                                                              'market_class_tree': market_class_tree}
     else:
-        manufacturer_new_vehicles = calendar_year_initial_vehicle_data[calendar_year]['manufacturer_new_vehicles']
+        # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
+        manufacturer_composite_vehicles = calendar_year_initial_vehicle_data[calendar_year]['manufacturer_composite_vehicles']
         market_class_tree = calendar_year_initial_vehicle_data[calendar_year]['market_class_tree']
-    return manufacturer_new_vehicles, market_class_tree
+
+    return manufacturer_composite_vehicles, market_class_tree
 
 
-def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_vehicles, winning_combo):
+def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_vehicles, winning_combo):
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import VehicleFinal
 
     manufacturer_new_vehicles = []
 
-    if use_composite_vehicles:
-        for cv in manufacturer_candidate_vehicles:
-            for v in cv.vehicle_list:
-                new_veh = VehicleFinal()
-                new_veh.inherit_vehicle(v)
-                manufacturer_new_vehicles.append(new_veh)
-    else:
-        for cv in manufacturer_candidate_vehicles:
+    # pull final vehicles from composite vehicles
+    for cv in manufacturer_composite_vehicles:
+        # update sales, which may have changed due to consumer response and iteration
+        cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_ID]
+        cv.decompose()  # propagate sales to source vehicles
+        for v in cv.vehicle_list:
             new_veh = VehicleFinal()
-            new_veh.inherit_vehicle(cv)
+            new_veh.inherit_vehicle(v)
             manufacturer_new_vehicles.append(new_veh)
 
     o2.session.add_all(manufacturer_new_vehicles)
@@ -229,14 +282,14 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_v
                                         cert_target_co2_Mg=cert_target_co2_Mg,
                                         cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
-                                        bev_non_hauling_share_frac=winning_combo['producer_non hauling.BEV_share_frac'] *
-                                                                   winning_combo['producer_non hauling_share_frac'],
-                                        ice_non_hauling_share_frac=winning_combo['producer_non hauling.ICE_share_frac'] *
-                                                                   winning_combo['producer_non hauling_share_frac'],
-                                        bev_hauling_share_frac=winning_combo['producer_hauling.BEV_share_frac'] *
-                                                               winning_combo['producer_hauling_share_frac'],
-                                        ice_hauling_share_frac=winning_combo['producer_hauling.ICE_share_frac'] *
-                                                               winning_combo['producer_hauling_share_frac'],
+                                        bev_non_hauling_share_frac=winning_combo['producer_share_frac_non hauling.BEV'] *
+                                                                   winning_combo['producer_share_frac_non hauling'],
+                                        ice_non_hauling_share_frac=winning_combo['producer_share_frac_non hauling.ICE'] *
+                                                                   winning_combo['producer_share_frac_non hauling'],
+                                        bev_hauling_share_frac=winning_combo['producer_share_frac_hauling.BEV'] *
+                                                               winning_combo['producer_share_frac_hauling'],
+                                        ice_hauling_share_frac=winning_combo['producer_share_frac_hauling.ICE'] *
+                                                               winning_combo['producer_share_frac_hauling'],
                                         )
     # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
     # if not o2.options.verbose:
@@ -259,38 +312,39 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_candidate_v
     o2.session.flush()
 
 
-def calculate_tech_share_combos_total(calendar_year, manufacturer_new_vehicles, tech_share_combos_total, total_sales=None):
+def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total, total_sales=None):
     # on the first time through, from the producer module, total_sales = None => use context sales, market shares
     # come from the producer desired market shares
     # on the second time through, from the omega2 module, total_sales is determined by sales response, market shares
     # come from the consumer demanded market shares...
 
     if total_sales is None:
-        prefix = 'producer_'
+        prefix = 'producer_share_frac_'
         total_sales = consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']
+        tech_share_combos_total['context_sales'] = total_sales
     else:
-        prefix = 'consumer_'
+        prefix = 'consumer_share_frac_'
 
     total_target_co2_Mg = 0
     total_cert_co2_Mg = 0
     total_cost_dollars = 0
-    for new_veh in manufacturer_new_vehicles:
+    for new_veh in manufacturer_composite_vehicles:
         # assign sales to vehicle based on market share fractions and reg class share fractions
         market_class = new_veh.market_class_ID
-        if prefix == 'producer_':
+        if prefix == 'producer_share_frac_':
             substrs = market_class.split('.')
             chain = []
             for i in range(len(substrs)):
                 str = prefix
                 for j in range(i + 1):
                     str = str + substrs[j] + '.' * (j != i)
-                str = str + '_share_frac'
+                # str = str + ''
                 chain.append(str)
             vehicle_sales = total_sales
             for c in chain:
                 vehicle_sales = vehicle_sales * tech_share_combos_total[c]
         else:
-            vehicle_sales = total_sales * tech_share_combos_total['consumer_%s_abs_share_frac' % market_class]
+            vehicle_sales = total_sales * tech_share_combos_total['consumer_abs_share_frac_%s' % market_class]
         vehicle_sales = vehicle_sales * new_veh.reg_class_market_share_frac
         tech_share_combos_total['veh_%d_sales' % new_veh.vehicle_ID] = vehicle_sales
 

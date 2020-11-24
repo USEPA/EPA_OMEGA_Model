@@ -20,6 +20,7 @@ class ManufacturerAnnualData(SQABase):
     cert_co2_Mg = Column('cert_co2_megagrams', Numeric)
     cert_target_co2_Mg = Column('cert_target_co2_megagrams', Numeric)
     manufacturer_vehicle_cost_dollars = Column('manufacturer_vehicle_cost_dollars', Numeric)
+
     bev_non_hauling_share_frac = Column('bev_non_hauling_share_frac', Numeric)
     ice_non_hauling_share_frac = Column('ice_non_hauling_share_frac', Numeric)
     bev_hauling_share_frac = Column('bev_hauling_share_frac', Numeric)

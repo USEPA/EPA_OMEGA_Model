@@ -24,6 +24,9 @@ class ContextFuelPrices(SQABase, OMEGABase):
 
     @staticmethod
     def get_retail_fuel_price(calendar_year, fuel_ID):
+        if o2.options.flat_context:
+            calendar_year = o2.options.flat_context_year
+
         return o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
             filter(ContextFuelPrices.context_ID == o2.options.context_id).\
             filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
@@ -32,6 +35,9 @@ class ContextFuelPrices(SQABase, OMEGABase):
 
     @staticmethod
     def get_pretax_fuel_price(calendar_year, fuel_ID):
+        if o2.options.flat_context:
+            calendar_year = o2.options.flat_context_year
+
         return o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
             filter(ContextFuelPrices.context_ID == o2.options.context_id).\
             filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\

@@ -38,6 +38,9 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None):
+        if o2.options.flat_context:
+            calendar_year = o2.options.flat_context_year
+
         if context_size_class:
             return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)). \
                          filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \

@@ -21,6 +21,9 @@ def get_demanded_shares(market_class_data, calendar_year):
     from demanded_shares_gcam import DemandedSharesGCAM
     from market_classes import MarketClass
 
+    if o2.options.flat_context:
+        calendar_year = o2.options.flat_context_year
+
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
 
@@ -33,7 +36,7 @@ def get_demanded_shares(market_class_data, calendar_year):
 
     for pass_num in [0, 1]:
         for market_class_id in MarketClass.market_classes:
-            fuel_cost = market_class_data['average_%s_fuel_price' % market_class_id]
+            fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
             gcam_data_cy = o2.session.query(DemandedSharesGCAM). \
                 filter(DemandedSharesGCAM.calendar_year == calendar_year). \
@@ -44,8 +47,8 @@ def get_demanded_shares(market_class_data, calendar_year):
             annualization_factor = price_amortization_period + \
                                    price_amortization_period / (((1 + price_amortization_period) ** discount_rate) - 1)
 
-            total_capital_costs = market_class_data['average_%s_cost' % market_class_id]
-            average_co2_gpmi = market_class_data['average_%s_co2_gpmi' % market_class_id]
+            total_capital_costs = market_class_data['average_price_%s' % market_class_id]
+            average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
 
             if market_class_id == 'non hauling.BEV':
                 fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
@@ -78,13 +81,13 @@ def get_demanded_shares(market_class_data, calendar_year):
             else:
                 if 'non hauling' in market_class_id:
                     demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
-                    demanded_absolute_share = demanded_share * market_class_data['producer_non hauling_share_frac']
+                    demanded_absolute_share = demanded_share * market_class_data['producer_share_frac_non hauling']
                 else:
                     demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
-                    demanded_absolute_share = demanded_share * market_class_data['producer_hauling_share_frac']
+                    demanded_absolute_share = demanded_share * market_class_data['producer_share_frac_hauling']
 
-                market_class_data['consumer_%s_share_frac' % market_class_id] = demanded_share
-                market_class_data['consumer_%s_abs_share_frac' % market_class_id] = demanded_absolute_share
+                market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
+                market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
     return market_class_data.copy()
 
