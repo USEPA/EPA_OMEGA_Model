@@ -330,18 +330,21 @@ class VehicleFinal(SQABase, Vehicle):
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
+    _initial_registered_count = Column('_initial_registered_count', Float)
 
     @property
     def initial_registered_count(self):
-        from vehicle_annual_data import VehicleAnnualData
-        return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
+        # from vehicle_annual_data import VehicleAnnualData
+        # return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
+        return self._initial_registered_count
 
     @initial_registered_count.setter
     def initial_registered_count(self, initial_registered_count):
         from vehicle_annual_data import VehicleAnnualData
+        self._initial_registered_count = initial_registered_count
 
         o2.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
-        o2.session.flush()
+        # o2.session.flush()
 
         VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=self.model_year,

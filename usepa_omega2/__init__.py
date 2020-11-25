@@ -42,7 +42,7 @@ try:
             self.session_unique_name = 'OMEGA2 Demo'
             self.verbose = False
             self.output_folder = 'output' + os.sep
-            self.database_dump_folder = '__dump' + os.sep
+            self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.manufacturers_file = 'input_samples/manufacturers.csv'
             self.market_classes_file = 'input_samples/market_classes.csv'
             self.vehicles_file = 'input_samples/vehicles.csv'
@@ -83,6 +83,7 @@ try:
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
+            self.calc_effects = False
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
             self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
@@ -95,8 +96,11 @@ try:
             self.start_time = 0
             self.end_time = 0
 
+            # debugging options
+            self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
+            self.num_analysis_years = None  # number of years to run, if not all (None = run all)
 
 
     from omega2 import run_omega

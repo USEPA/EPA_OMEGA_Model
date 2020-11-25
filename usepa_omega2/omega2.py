@@ -27,8 +27,7 @@ def run_postproc(iteration_log, single_shot):
 
     import matplotlib.pyplot as plt
 
-    calc_effects = True
-    if calc_effects:
+    if o2.options.calc_effects:
         run_effects_calcs()
 
     if not single_shot:
@@ -226,7 +225,13 @@ def run_producer_consumer():
         omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID))
 
         iteration_log = pd.DataFrame()
-        for calendar_year in range(o2.options.analysis_initial_year, o2.options.analysis_final_year + 1):
+
+        if o2.options.num_analysis_years is None:
+            analysis_end_year = o2.options.analysis_final_year + 1
+        else:
+            analysis_end_year = o2.options.analysis_initial_year + o2.options.num_analysis_years
+
+        for calendar_year in range(o2.options.analysis_initial_year, analysis_end_year):
 
             winning_combo_with_sales_response = None
             iteration_num = 0
@@ -259,7 +264,7 @@ def run_producer_consumer():
                     if winning_combo_with_sales_response['total_combo_cost_dollars'] > best_winning_combo_with_sales_response['total_combo_cost_dollars']:
                         winning_combo_with_sales_response = best_winning_combo_with_sales_response
                         converged = True
-                        trashing = False
+                        thrashing = False
                         print('!!best price make a friend!!')
                     else:
                         converged, thrashing, convergence_error = \
@@ -298,6 +303,7 @@ def run_producer_consumer():
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          winning_combo_with_sales_response)
 
+            # adds about 400 seconds:
             stock.prior_year_stock_registered_count(calendar_year)
             stock.prior_year_stock_vmt(calendar_year)
             stock.age0_stock_vmt(calendar_year)
@@ -781,7 +787,7 @@ def init_omega(o2_options):
         return init_fail
 
 
-def run_omega(o2_options, single_shot=False, profile=False):
+def run_omega(o2_options, single_shot=False):
     import traceback
     import time
 
@@ -799,7 +805,7 @@ def run_omega(o2_options, single_shot=False, profile=False):
         omega_log.logwrite("Running: OMEGA 2 Version " + str(code_version))
 
         if not init_fail:
-            if profile:
+            if o2.options.run_profiler:
                 # run with profiler
                 import cProfile
                 import re
@@ -815,6 +821,9 @@ def run_omega(o2_options, single_shot=False, profile=False):
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             omega_log.end_logfile("\nSession Complete")
+
+            if o2.options.run_profiler:
+                os.system('snakeviz omega2_profile.dmp')
 
             # o2.session.close()
             o2.engine.dispose()
@@ -848,14 +857,13 @@ def publish_summary_results(session_summary_results, single_shot):
                 '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
         else:
             session_summary_results.to_csv(
-                '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a',
-                header=False)
+                '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a', header=False)
 
 
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True, profile=False)  # to view in terminal: snakeviz omega2_profile.dmp
+        run_omega(OMEGARuntimeOptions(), single_shot=True)  # to view in terminal: snakeviz omega2_profile.dmp
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

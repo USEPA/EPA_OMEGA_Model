@@ -77,7 +77,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
                                          registered_count=registered_count,
                                          age=age))
 
-        o2.session.flush()
+        # o2.session.flush()
 
     @staticmethod
     def update_vehicle_annual_data(vehicle, calendar_year, attribute, attribute_value):
