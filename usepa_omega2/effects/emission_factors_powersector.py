@@ -21,7 +21,7 @@ class EmissionFactorsPowersector(SQABase):
     pm25_grams_per_kWh = Column('pm25_grams_per_kWh', Float)
     sox_grams_per_kWh = Column('sox_grams_per_kWh', Float)
     benzene_grams_per_kWh = Column('benzene_grams_per_kWh', Float)
-    butadiene_grams_per_kWh = Column('13butadiene_grams_per_kWh', Float)
+    butadiene13_grams_per_kWh = Column('butadiene13_grams_per_kWh', Float)
     formaldehyde_grams_per_kWh = Column('formaldehyde_grams_per_kWh', Float)
     acetaldehyde_grams_per_kWh = Column('acetaldehyde_grams_per_kWh', Float)
     acrolein_grams_per_kWh = Column('acrolein_grams_per_kWh', Float)
@@ -41,7 +41,7 @@ class EmissionFactorsPowersector(SQABase):
         input_template_version = 0.1
         input_template_columns = {'calendar_year',
                                   'voc_grams_per_kWh', 'co_grams_per_kWh', 'nox_grams_per_kWh', 'pm25_grams_per_kWh', 'sox_grams_per_kWh',
-                                  'benzene_grams_per_kWh', '13butadiene_grams_per_kWh', 'formaldehyde_grams_per_kWh',
+                                  'benzene_grams_per_kWh', 'butadiene13_grams_per_kWh', 'formaldehyde_grams_per_kWh',
                                   'acetaldehyde_grams_per_kWh', 'acrolein_grams_per_kWh',
                                   'ch4_grams_per_kWh', 'n2o_grams_per_kWh', 'co2_grams_per_kWh'}
 
@@ -66,7 +66,7 @@ class EmissionFactorsPowersector(SQABase):
                         pm25_grams_per_kWh=df.loc[i, 'pm25_grams_per_kWh'],
                         sox_grams_per_kWh=df.loc[i, 'sox_grams_per_kWh'],
                         benzene_grams_per_kWh=df.loc[i, 'benzene_grams_per_kWh'],
-                        butadiene_grams_per_kWh=df.loc[i, '13butadiene_grams_per_kWh'],
+                        butadiene13_grams_per_kWh=df.loc[i, 'butadiene13_grams_per_kWh'],
                         formaldehyde_grams_per_kWh=df.loc[i, 'formaldehyde_grams_per_kWh'],
                         acetaldehyde_grams_per_kWh=df.loc[i, 'acetaldehyde_grams_per_kWh'],
                         acrolein_grams_per_kWh=df.loc[i, 'acrolein_grams_per_kWh'],
