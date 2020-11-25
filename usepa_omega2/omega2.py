@@ -312,10 +312,8 @@ def run_producer_consumer():
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          winning_combo_with_sales_response)
 
-            # adds about 400 seconds:
-            stock.prior_year_stock_registered_count(calendar_year)
-            stock.prior_year_stock_vmt(calendar_year)
-            stock.age0_stock_vmt(calendar_year)
+            # stock.update_stock_slow(calendar_year) # takes about 330 seconds
+            stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
@@ -792,6 +790,8 @@ def init_omega(o2_options):
         # final year = last year of cost curve data
         o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
         # o2.options.analysis_final_year = 2022
+
+        stock.update_stock(o2.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
     finally:
         return init_fail
 

@@ -7,7 +7,7 @@ stock.py
 from usepa_omega2 import *
 
 
-def prior_year_stock_registered_count_slow(calendar_year):
+def prior_year_stock_registered_count(calendar_year):
     """
     Deregister vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
 
@@ -27,79 +27,13 @@ def prior_year_stock_registered_count_slow(calendar_year):
 
         scrappage_factor = float(o2.session.query(o2.options.stock_scrappage.reregistered_proportion). \
                                  filter(o2.options.stock_scrappage.market_class_ID == vehicle.market_class_ID). \
-                                 filter(o2.options.stock_scrappage.age == ((calendar_year - vehicle.model_year) + 1)).
+                                 filter(o2.options.stock_scrappage.age == calendar_year - vehicle.model_year).
                                  scalar())
 
         VehicleAnnualData.update_registered_count(vehicle, calendar_year,
                                                   vehicle.initial_registered_count * scrappage_factor)
 
     o2.session.flush()
-
-
-def prior_year_stock_registered_count(calendar_year):
-    """
-    Deregister vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
-
-    :param calendar_year: calendar year
-    :return: updates vehicle annual data table
-    """
-
-    from vehicles import VehicleFinal
-    from vehicle_annual_data import VehicleAnnualData
-
-    # pull in last year's set of vehicle IDs (gets bigger every year!):
-    calendar_year_prior_vehicle_IDs = sql_unpack_result(o2.session.query(VehicleAnnualData.vehicle_ID). \
-                                                        filter(VehicleAnnualData.calendar_year == calendar_year - 1).all())
-
-    vad_list = []
-    for vehicle_ID in calendar_year_prior_vehicle_IDs:
-        vehicle = get_vehicle(vehicle_ID)
-
-        scrappage_factor = get_scrappage_factor(calendar_year, vehicle)
-
-        vad_list.append(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
-                                         calendar_year=calendar_year,
-                                         registered_count=vehicle.initial_registered_count * scrappage_factor,
-                                         age=(calendar_year - vehicle.model_year) + 1))
-
-    o2.session.add_all(vad_list)
-    o2.session.flush()
-
-
-def update_vad(vehicle, calendar_year, scrappage_factor):
-    from vehicle_annual_data import VehicleAnnualData
-    VehicleAnnualData.update_registered_count(vehicle, calendar_year,
-                                              vehicle.initial_registered_count * scrappage_factor)
-
-
-scrappage_dict = dict()
-def get_scrappage_factor(calendar_year, vehicle):
-    # get scrappage factor
-    age = ((calendar_year - vehicle.model_year) + 1)
-
-    scrappage_factor_id = '%s_%s' % (vehicle.market_class_ID, age)
-    if scrappage_factor_id in scrappage_dict:
-        scrappage_factor = scrappage_dict[scrappage_factor_id]
-    else:
-        scrappage_factor = float(o2.session.query(o2.options.stock_scrappage.reregistered_proportion). \
-                                filter(o2.options.stock_scrappage.market_class_ID == vehicle.market_class_ID). \
-                                filter(o2.options.stock_scrappage.age == age).scalar())
-        scrappage_dict[scrappage_factor_id] = scrappage_factor
-
-    return scrappage_factor
-
-
-vehicles_dict = dict()
-def get_vehicle(vehicle_ID):
-    from vehicles import VehicleFinal
-
-    if vehicle_ID in vehicles_dict:
-        vehicle = vehicles_dict[vehicle_ID]
-    else:
-        vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
-        vehicles_dict[vehicle_ID] = vehicle
-
-    return vehicle
 
 
 def prior_year_stock_vmt(calendar_year):
@@ -145,6 +79,119 @@ def age0_stock_vmt(calendar_year):
             filter(o2.options.stock_vmt.market_class_ID == veh_market_class). \
             filter(o2.options.stock_vmt.age == veh_age).scalar()
         VehicleAnnualData.insert_vmt(vehicle_ID, calendar_year, annual_vmt)
+
+
+def update_stock_slow(calendar_year):
+    prior_year_stock_registered_count(calendar_year)
+    prior_year_stock_vmt(calendar_year)
+    age0_stock_vmt(calendar_year)
+
+
+vmt_dict = dict()
+def get_annual_vmt(calendar_year, market_class_ID, model_year, query=False):
+    # get annual vmt
+    age = (calendar_year - model_year)
+
+    annual_vmt_id = '%s_%s' % (market_class_ID, age)
+
+    if annual_vmt_id in vmt_dict and not query:
+        annual_vmt = vmt_dict[annual_vmt_id]
+    else:
+        annual_vmt = float(o2.session.query(o2.options.stock_vmt.annual_vmt). \
+            filter(o2.options.stock_vmt.market_class_ID == market_class_ID). \
+            filter(o2.options.stock_vmt.age == age).scalar())
+
+        vmt_dict[annual_vmt_id] = annual_vmt
+
+    return annual_vmt
+
+
+scrappage_dict = dict()
+def get_scrappage_factor(calendar_year, market_class_ID, model_year, query=False):
+    # get scrappage factor
+    age = (calendar_year - model_year)
+
+    scrappage_factor_id = '%s_%s' % (market_class_ID, age)
+
+    if scrappage_factor_id in scrappage_dict and not query:
+        scrappage_factor = scrappage_dict[scrappage_factor_id]
+    else:
+        scrappage_factor = float(o2.session.query(o2.options.stock_scrappage.reregistered_proportion). \
+                                filter(o2.options.stock_scrappage.market_class_ID == market_class_ID). \
+                                filter(o2.options.stock_scrappage.age == age).scalar())
+        scrappage_dict[scrappage_factor_id] = scrappage_factor
+
+    return scrappage_factor
+
+
+vehicles_dict = dict()
+def get_vehicle_info(vehicle_ID, query=False):
+    from vehicles import VehicleFinal
+
+    if vehicle_ID in vehicles_dict and not query:
+        market_class_ID, model_year, initial_registered_count = vehicles_dict[vehicle_ID]
+    else:
+        market_class_ID, model_year, initial_registered_count = \
+            o2.session.query(VehicleFinal.market_class_ID, VehicleFinal.model_year, VehicleFinal._initial_registered_count).\
+            filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
+        vehicles_dict[vehicle_ID] = market_class_ID, model_year, initial_registered_count
+
+    return market_class_ID, model_year, initial_registered_count
+
+
+def update_stock(calendar_year):
+    """
+    Deregister vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
+    Update VMT
+    :param calendar_year: calendar year
+    :return: updates vehicle annual data table
+    """
+
+    from vehicles import VehicleFinal
+    from vehicle_annual_data import VehicleAnnualData
+
+    # pull in this year's vehicle ids:
+    this_years_vehicle_annual_data = o2.session.query(VehicleAnnualData).\
+        filter(VehicleAnnualData.calendar_year == calendar_year).all()
+
+    vad_list = []
+    # UPDATE vehicle annual data for this year's stock
+    for vad in this_years_vehicle_annual_data:
+        market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
+
+        scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year)
+
+        annual_vmt = get_annual_vmt(calendar_year, market_class_ID, model_year, query=True)
+
+        registered_count = initial_registered_count * scrappage_factor
+
+        vad.annual_vmt = annual_vmt
+        vad.vmt = annual_vmt * registered_count
+        vad_list.append(vad)
+
+    prior_year_vehicle_annual_data = o2.session.query(VehicleAnnualData).\
+        filter(VehicleAnnualData.calendar_year == calendar_year-1).all()
+
+    # CREATE vehicle annual data for last year's stock, now one year older:
+    if prior_year_vehicle_annual_data:
+        for vad in prior_year_vehicle_annual_data:
+            market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
+
+            scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year)
+
+            annual_vmt = get_annual_vmt(calendar_year, market_class_ID, model_year)
+
+            registered_count = initial_registered_count * scrappage_factor
+
+            vad_list.append(VehicleAnnualData(vehicle_ID=vad.vehicle_ID,
+                                              calendar_year=calendar_year,
+                                              registered_count=registered_count,
+                                              age=calendar_year-model_year,
+                                              annual_vmt=annual_vmt,
+                                              vmt=annual_vmt * registered_count)
+                            )
+
+    o2.session.add_all(vad_list)
 
 
 if __name__ == '__main__':

@@ -104,11 +104,11 @@ class VehicleAnnualData(SQABase, OMEGABase):
         vmt = o2.session.query(VehicleAnnualData.registered_count).\
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID).\
             filter(VehicleAnnualData.calendar_year==calendar_year).scalar() * annual_vmt
-        veh = o2.session.query(VehicleAnnualData).\
+        vad = o2.session.query(VehicleAnnualData).\
             filter(VehicleAnnualData.vehicle_ID==vehicle_ID).\
             filter(VehicleAnnualData.calendar_year==calendar_year).all()
-        veh[0].annual_vmt = annual_vmt
-        veh[0].vmt = vmt
+        vad[0].annual_vmt = annual_vmt
+        vad[0].vmt = vmt
 
 
 if __name__ == '__main__':
