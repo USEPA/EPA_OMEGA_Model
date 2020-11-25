@@ -21,7 +21,7 @@ class EmissionFactorsRefinery(SQABase):
     pm25_grams_per_gallon = Column('pm25_grams_per_gallon', Float)
     sox_grams_per_gallon = Column('sox_grams_per_gallon', Float)
     benzene_grams_per_gallon = Column('benzene_grams_per_gallon', Float)
-    butadiene_grams_per_gallon = Column('13butadiene_grams_per_gallon', Float)
+    butadiene13_grams_per_gallon = Column('butadiene13_grams_per_gallon', Float)
     formaldehyde_grams_per_gallon = Column('formaldehyde_grams_per_gallon', Float)
     acetaldehyde_grams_per_gallon = Column('acetaldehyde_grams_per_gallon', Float)
     acrolein_grams_per_gallon = Column('acrolein_grams_per_gallon', Float)
@@ -42,7 +42,7 @@ class EmissionFactorsRefinery(SQABase):
         input_template_version = 0.1
         input_template_columns = {'calendar_year',
                                   'voc_grams_per_gallon', 'co_grams_per_gallon', 'nox_grams_per_gallon', 'pm25_grams_per_gallon', 'sox_grams_per_gallon',
-                                  'benzene_grams_per_gallon', '13butadiene_grams_per_gallon', 'formaldehyde_grams_per_gallon',
+                                  'benzene_grams_per_gallon', 'butadiene13_grams_per_gallon', 'formaldehyde_grams_per_gallon',
                                   'acetaldehyde_grams_per_gallon', 'acrolein_grams_per_gallon', 'naphthalene_grams_per_gallon',
                                   'ch4_grams_per_gallon', 'n2o_grams_per_gallon', 'co2_grams_per_gallon'}
 
@@ -67,7 +67,7 @@ class EmissionFactorsRefinery(SQABase):
                         pm25_grams_per_gallon=df.loc[i, 'pm25_grams_per_gallon'],
                         sox_grams_per_gallon=df.loc[i, 'sox_grams_per_gallon'],
                         benzene_grams_per_gallon=df.loc[i, 'benzene_grams_per_gallon'],
-                        butadiene_grams_per_gallon=df.loc[i, '13butadiene_grams_per_gallon'],
+                        butadiene13_grams_per_gallon=df.loc[i, 'butadiene13_grams_per_gallon'],
                         formaldehyde_grams_per_gallon=df.loc[i, 'formaldehyde_grams_per_gallon'],
                         acetaldehyde_grams_per_gallon=df.loc[i, 'acetaldehyde_grams_per_gallon'],
                         acrolein_grams_per_gallon=df.loc[i, 'acrolein_grams_per_gallon'],

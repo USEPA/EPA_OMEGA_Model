@@ -28,7 +28,16 @@ def run_postproc(iteration_log, single_shot):
     import matplotlib.pyplot as plt
 
     if o2.options.calc_effects:
-        run_effects_calcs()
+        vf_df = pd.read_sql('SELECT * FROM vehicles', con=o2.engine)
+        vad_df = pd.read_sql('SELECT * FROM vehicle_annual_data', con=o2.engine)
+        vef_df = pd.read_sql('SELECT * FROM emission_factors_vehicles', con=o2.engine)
+        ref_df = pd.read_sql('SELECT * FROM emission_factors_refinery', con=o2.engine)
+        pef_df = pd.read_sql('SELECT * FROM emission_factors_powersector', con=o2.engine)
+
+        inventories = run_effects_calcs(vf_df, vad_df, vef_df, ref_df, pef_df)
+        from pathlib import Path
+        path_project = Path.cwd()
+        inventories.to_csv(path_project / 'inventories.csv', index=False)
 
     if not single_shot:
         omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)

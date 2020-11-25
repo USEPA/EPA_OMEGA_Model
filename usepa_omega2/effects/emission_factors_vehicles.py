@@ -24,7 +24,7 @@ class EmissionFactorsVehicles(SQABase):
     pm25_grams_per_mile = Column('pm25_grams_per_mile', Float)
     sox_grams_per_gallon = Column('sox_grams_per_gallon', Float)
     benzene_grams_per_mile = Column('benzene_grams_per_mile', Float)
-    butadiene_grams_per_mile = Column('13butadiene_grams_per_mile', Float)
+    butadiene13_grams_per_mile = Column('butadiene13_grams_per_mile', Float)
     formaldehyde_grams_per_mile = Column('formaldehyde_grams_per_mile', Float)
     acetaldehyde_grams_per_mile = Column('acetaldehyde_grams_per_mile', Float)
     acrolein_grams_per_mile = Column('acrolein_grams_per_mile', Float)
@@ -43,7 +43,7 @@ class EmissionFactorsVehicles(SQABase):
         input_template_version = 0.1
         input_template_columns = {'model_year', 'age', 'reg_class_id', 'in_use_fuel_id',
                                   'voc_grams_per_mile', 'co_grams_per_mile', 'nox_grams_per_mile', 'pm25_grams_per_mile', 'sox_grams_per_gallon',
-                                  'benzene_grams_per_mile', '13butadiene_grams_per_mile', 'formaldehyde_grams_per_mile',
+                                  'benzene_grams_per_mile', 'butadiene13_grams_per_mile', 'formaldehyde_grams_per_mile',
                                   'acetaldehyde_grams_per_mile', 'acrolein_grams_per_mile',
                                   'ch4_grams_per_mile', 'n2o_grams_per_mile'}
 
@@ -71,7 +71,7 @@ class EmissionFactorsVehicles(SQABase):
                         pm25_grams_per_mile=df.loc[i, 'pm25_grams_per_mile'],
                         sox_grams_per_gallon=df.loc[i, 'sox_grams_per_gallon'],
                         benzene_grams_per_mile=df.loc[i, 'benzene_grams_per_mile'],
-                        butadiene_grams_per_mile=df.loc[i, '13butadiene_grams_per_mile'],
+                        butadiene13_grams_per_mile=df.loc[i, 'butadiene13_grams_per_mile'],
                         formaldehyde_grams_per_mile=df.loc[i, 'formaldehyde_grams_per_mile'],
                         acetaldehyde_grams_per_mile=df.loc[i, 'acetaldehyde_grams_per_mile'],
                         acrolein_grams_per_mile=df.loc[i, 'acrolein_grams_per_mile'],
