@@ -83,7 +83,7 @@ try:
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            self.calc_effects = False
+            self.calc_effects = True
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
             self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
