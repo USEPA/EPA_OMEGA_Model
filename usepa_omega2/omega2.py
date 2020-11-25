@@ -327,6 +327,7 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
     import numpy as np
     from market_classes import MarketClass
     from omega_functions import cartesian_prod
+    import producer
     import consumer
     from consumer.sales_share_gcam import get_demanded_shares
 
