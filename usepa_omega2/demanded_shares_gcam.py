@@ -11,7 +11,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class DemandedSharesGCAM(SQABase):
+class DemandedSharesGCAM(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'demanded_shares_gcam'
     index = Column('index', Integer, primary_key=True)
@@ -25,9 +25,6 @@ class DemandedSharesGCAM(SQABase):
     share_weight = Column(Float)
     demanded_share= Column(Numeric)
     consumer_generalized_cost_dollars = Column(Float)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__, id(self))
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

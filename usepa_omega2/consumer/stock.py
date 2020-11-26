@@ -146,6 +146,7 @@ def update_stock(calendar_year):
     :param calendar_year: calendar year
     :return: updates vehicle annual data table
     """
+    query = False
 
     from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
@@ -154,36 +155,37 @@ def update_stock(calendar_year):
     this_years_vehicle_annual_data = o2.session.query(VehicleAnnualData).\
         filter(VehicleAnnualData.calendar_year == calendar_year).all()
 
-    vad_list = []
+    o2.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
-        market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
+        market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID, query=query)
 
-        scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year)
+        scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year, query=query)
 
-        annual_vmt = get_annual_vmt(calendar_year, market_class_ID, model_year, query=True)
+        annual_vmt = get_annual_vmt(calendar_year, market_class_ID, model_year, query=query)
 
         registered_count = initial_registered_count * scrappage_factor
 
         vad.annual_vmt = annual_vmt
         vad.vmt = annual_vmt * registered_count
-        vad_list.append(vad)
 
-    prior_year_vehicle_annual_data = o2.session.query(VehicleAnnualData).\
-        filter(VehicleAnnualData.calendar_year == calendar_year-1).all()
+    prior_year_vehicle_ids = sql_unpack_result(o2.session.query(VehicleAnnualData.vehicle_ID).\
+        filter(VehicleAnnualData.calendar_year == calendar_year-1).all())
+
+    vad_list = []
 
     # CREATE vehicle annual data for last year's stock, now one year older:
-    if prior_year_vehicle_annual_data:
-        for vad in prior_year_vehicle_annual_data:
-            market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
+    if prior_year_vehicle_ids:
+        for vehicle_ID in prior_year_vehicle_ids:
+            market_class_ID, model_year, initial_registered_count = get_vehicle_info(vehicle_ID, query=query)
 
-            scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year)
+            scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year, query=query)
 
-            annual_vmt = get_annual_vmt(calendar_year, market_class_ID, model_year)
+            annual_vmt = get_annual_vmt(calendar_year, market_class_ID, model_year, query=query)
 
             registered_count = initial_registered_count * scrappage_factor
 
-            vad_list.append(VehicleAnnualData(vehicle_ID=vad.vehicle_ID,
+            vad_list.append(VehicleAnnualData(vehicle_ID=vehicle_ID,
                                               calendar_year=calendar_year,
                                               registered_count=registered_count,
                                               age=calendar_year-model_year,

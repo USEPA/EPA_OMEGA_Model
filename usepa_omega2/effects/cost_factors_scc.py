@@ -11,7 +11,7 @@ from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 
 
-class CostFactorsSCC(SQABase):
+class CostFactorsSCC(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_scc'
     index = Column('index', Integer, primary_key=True)
@@ -22,9 +22,6 @@ class CostFactorsSCC(SQABase):
     dollar_basis = Column('dollar_basis', Numeric)
     scc_interim_domestic = Column('scc_interim_domestic', Numeric)
     scc_global = Column('scc_global', Numeric)
-
-    def __repr__(self):
-        return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

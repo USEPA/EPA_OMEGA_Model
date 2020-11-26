@@ -9,7 +9,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class EmissionFactorsRefinery(SQABase):
+class EmissionFactorsRefinery(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'emission_factors_refinery'
     index = Column('index', Integer, primary_key=True)
@@ -29,9 +29,6 @@ class EmissionFactorsRefinery(SQABase):
     ch4_grams_per_gallon = Column('ch4_grams_per_gallon', Float)
     n2o_grams_per_gallon = Column('n2o_grams_per_gallon', Float)
     co2_grams_per_gallon = Column('co2_grams_per_gallon', Float)
-
-    def __repr__(self):
-        return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

@@ -9,7 +9,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class EmissionFactorsVehicles(SQABase):
+class EmissionFactorsVehicles(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'emission_factors_vehicles'
     index = Column('index', Integer, primary_key=True)
@@ -30,9 +30,6 @@ class EmissionFactorsVehicles(SQABase):
     acrolein_grams_per_mile = Column('acrolein_grams_per_mile', Float)
     ch4_grams_per_mile = Column('ch4_grams_per_mile', Float)
     n2o_grams_per_mile = Column('n2o_grams_per_mile', Float)
-
-    def __repr__(self):
-        return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

@@ -79,7 +79,7 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
     return market_class_dict
 
 
-class MarketClass(SQABase):
+class MarketClass(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'market_classes'
     market_class_ID = Column('market_class_id', String, primary_key=True)
@@ -91,9 +91,6 @@ class MarketClass(SQABase):
     _market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
     _market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()
     _market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
-
-    def __repr__(self):
-        return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))
 
     @staticmethod
     def get_market_class_dict():

@@ -9,7 +9,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
-class AnnualVMTFixedByAge(SQABase):
+class AnnualVMTFixedByAge(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'annual_vmt_fixed_by_age'
     index = Column('index', Integer, primary_key=True)
@@ -17,9 +17,6 @@ class AnnualVMTFixedByAge(SQABase):
     age = Column('age', Numeric)
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     annual_vmt = Column('annual_vmt', Numeric)
-
-    def __repr__(self):
-        return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

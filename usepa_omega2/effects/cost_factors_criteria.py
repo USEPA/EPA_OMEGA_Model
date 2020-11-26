@@ -12,7 +12,7 @@ from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 
 
-class CostFactorsCriteria(SQABase):
+class CostFactorsCriteria(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_criteria'
     index = Column('index', Integer, primary_key=True)
@@ -26,9 +26,6 @@ class CostFactorsCriteria(SQABase):
     high_mortality_onroad = Column('high-mortality_onroad', Numeric)
     low_mortality_upstream = Column('low-mortality_upstream', Numeric)
     high_mortality_upstream = Column('high-mortality_upstream', Numeric)
-
-    def __repr__(self):
-        return f"<OMEGA2 {type(self).__name__} object at 0x{id(self)}>"
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
