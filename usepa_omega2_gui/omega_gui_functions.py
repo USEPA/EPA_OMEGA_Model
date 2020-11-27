@@ -180,7 +180,7 @@ def status_output_color(g):
 
 def test_plot_1(y_axis):
     """
-    Reads a csv file plots selected graph.
+    Reads a csv file and plots selected graph.
 
     :param y-axis: column to plot
 
@@ -190,10 +190,22 @@ def test_plot_1(y_axis):
 
     if len(y_axis) > 0:
         # print(y_axis)
-        ax = df.plot.scatter(x='calendar_year', y=y_axis)
-        ax.set_xlabel('Calendar Year')
-        ax.set_ylabel(y_axis)
-        ax.set_title('OMEGA Results - ' + y_axis)
-        plt.show()
+        x_data = 'calendar_year'  # Column from spreadsheet for x axis
+        y_data = y_axis  # Column from spreadsheet for y axis
+        line_color = 'green'  # Plot line color
+        line_style = 'solid'  # Plot line style
+        line_width = 2  # Plot line width
+        marker_type = 'o'  # MatPlotLib marker style
+        marker_size = 4  # Marker size
+        x_label = 'Calendar Year'  # Label for x axis
+        y_label = y_axis  # Label for y axis
+        plot_title = 'OMEGA Results - ' + y_axis  # Plot title
+
+        # Define plot using dataframe formed from spreadsheet
+        ax = df.plot(x=x_data, y=y_data, color=line_color, linestyle=line_style, marker=marker_type,
+                     linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
+                     title=plot_title)
+        ax.grid()  # Show grid
+        plt.show()  # Show plot
 
 

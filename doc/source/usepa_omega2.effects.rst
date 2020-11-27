@@ -20,14 +20,6 @@ usepa\_omega2.effects.cost\_factors\_scc module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.effects.cpi\_deflators module
--------------------------------------------
-
-.. automodule:: usepa_omega2.effects.cpi_deflators
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.effects.emission\_factors\_powersector module
 -----------------------------------------------------------
 
@@ -60,10 +52,18 @@ usepa\_omega2.effects.general\_functions module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.effects.ip\_deflators module
-------------------------------------------
+usepa\_omega2.effects.inventory module
+--------------------------------------
 
-.. automodule:: usepa_omega2.effects.ip_deflators
+.. automodule:: usepa_omega2.effects.inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.effects.o2\_effects module
+----------------------------------------
+
+.. automodule:: usepa_omega2.effects.o2_effects
    :members:
    :undoc-members:
    :show-inheritance:

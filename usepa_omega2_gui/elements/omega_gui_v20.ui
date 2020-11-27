@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -400,6 +400,9 @@ EPA Science Advisory Board - 2020</string>
         <pointsize>12</pointsize>
        </font>
       </property>
+      <property name="toolTip">
+       <string>Multiprocessor Selection</string>
+      </property>
       <property name="text">
        <string>Multiprocessor</string>
       </property>
@@ -494,6 +497,9 @@ EPA Science Advisory Board - 2020</string>
         <family>Consolas</family>
         <pointsize>10</pointsize>
        </font>
+      </property>
+      <property name="toolTip">
+       <string>Model Status</string>
       </property>
       <property name="text">
        <string/>
