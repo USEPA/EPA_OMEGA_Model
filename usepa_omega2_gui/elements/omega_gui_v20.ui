@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <property name="iconSize">
      <size>
@@ -543,7 +543,7 @@ EPA Science Advisory Board - 2020</string>
         <x>30</x>
         <y>41</y>
         <width>481</width>
-        <height>211</height>
+        <height>151</height>
        </rect>
       </property>
      </widget>
@@ -566,6 +566,61 @@ EPA Science Advisory Board - 2020</string>
       </property>
       <property name="text">
        <string>Available Plots</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="list_graphs_1">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>250</y>
+        <width>481</width>
+        <height>121</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="available_plots_1_label_2">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>220</y>
+        <width>481</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Available Plots 1</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="open_plot_2">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>250</y>
+        <width>71</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Opens an existing OMEGA 2 Configuration File</string>
+      </property>
+      <property name="text">
+       <string>Plot</string>
       </property>
      </widget>
     </widget>

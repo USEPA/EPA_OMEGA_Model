@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
+
 def open_file_action(filepath):
     data = yaml_loader(filepath)
     return data
@@ -208,6 +209,71 @@ def test_plot_1(y_axis):
         ax = df.plot(x=x_data, y=y_data, linestyle=line_style, marker=marker_type,
                      linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
                      title=plot_title, color=cmap(0))
+        # ax = df.plot(x=x_data, y=y_axis, color=line_color, linestyle=line_style, marker=marker_type,
+        #              linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
+        #              title=plot_title)
+        # Add more series in same plot
+        # df.plot(x=x_data, y="bev_non_hauling_share_frac", ax=ax, color=cmap(.1))
+        # df.plot(x=x_data, y="bev_hauling_share_frac", ax=ax, color=cmap(.2))
+
+        ax.grid()  # Show grid
+        plt.show()  # Show plot
+
+
+def test_plot_2(plot_selection):
+    """
+    Reads a csv file and plots selected graph.
+
+    :param y-axis: column to plot
+
+    :return: N/A
+    """
+    df = pandas.read_excel('usepa_omega2_gui/elements/plot_definition.xlsx', index_col=0, sheet_name='plot_definition')
+
+    if len(plot_selection) > 0:
+        print(plot_selection)
+        a = (df.loc[plot_selection, 'y_data_1'])
+        print(a, '*****')
+        # excel_data_df.loc['Batch Name', 'Value']
+        # df.iloc[0]['A']
+        # data.loc['Andrade':'Veness', ['first_name', 'address', 'city']]
+        x_data = 'calendar_year'  # Column from spreadsheet for x axis
+        # y_data = (df.loc[plot_selection, 'y_data_1'])  # Column from spreadsheet for y axis
+        file_name = (df.loc[plot_selection, 'plot_source'])  # Column from spreadsheet for file name
+        df1 = pandas.read_csv(file_name)
+
+        line_color = 'green'  # Plot line color
+        line_style = 'solid'  # Plot line style
+        line_width = 2  # Plot line width
+        marker_type = 'o'  # MatPlotLib marker style
+        marker_size = 4  # Marker size
+        x_label = 'Calendar Year'  # Label for x axis
+        y_label = (df.loc[plot_selection, 'y_data_label'])  # Label for y axis
+        plot_title = plot_selection  # Plot title
+
+        cmap = cm.get_cmap('tab10')  # Color map
+
+        # Define plot using dataframe formed from spreadsheet
+        if str(df.loc[plot_selection, 'y_data_1']) != "nan":
+            y_data = (df.loc[plot_selection, 'y_data_1'])  # Column from spreadsheet for y axis
+            ax = df1.plot(x=x_data, y=y_data, linestyle=line_style, marker=marker_type,
+                         linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
+                         title=plot_title, color=cmap(0))
+        if str(df.loc[plot_selection, 'y_data_2']) != "nan":
+            y_data = (df.loc[plot_selection, 'y_data_2'])  # Column from spreadsheet for y axis
+            df1.plot(x=x_data, y=y_data, ax=ax, color=cmap(.1))
+        if str(df.loc[plot_selection, 'y_data_3']) != "nan":
+            y_data = (df.loc[plot_selection, 'y_data_3'])  # Column from spreadsheet for y axis
+            df1.plot(x=x_data, y=y_data, ax=ax, color=cmap(.2))
+        if str(df.loc[plot_selection, 'y_data_4']) != "nan":
+            y_data = (df.loc[plot_selection, 'y_data_4'])  # Column from spreadsheet for y axis
+            df1.plot(x=x_data, y=y_data, ax=ax, color=cmap(.3))
+        if str(df.loc[plot_selection, 'y_data_5']) != "nan":
+            y_data = (df.loc[plot_selection, 'y_data_5'])  # Column from spreadsheet for y axis
+            df1.plot(x=x_data, y=y_data, ax=ax, color=cmap(.4))
+
+
+
         # ax = df.plot(x=x_data, y=y_axis, color=line_color, linestyle=line_style, marker=marker_type,
         #              linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
         #              title=plot_title)
