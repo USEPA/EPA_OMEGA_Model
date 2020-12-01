@@ -178,11 +178,11 @@ def cartesian_prod(left_df, right_df, drop=False):
     return leftXright
 
 
-def generate_nearby_shares(columns, combo, half_range_frac, num_steps, min_level=0.001, verbose=False):
+def generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_level=0.001, verbose=False):
     """
     Generate a partition of share values in the neighborhood of an initial set of share values
     :param columns: list-like, list of values that represent shares in combo
-    :param combo: dict-like, typically a Series or Dataframe that contains the initial set of share values
+    :param combos: dict-like, typically a Series or Dataframe that contains the initial set of share values
     :param half_range_frac: search "radius" [0..1], half the search range
     :param num_steps: number of values to divide the search range into
     :param min_level: specifies minimum share value (max will be 1-min_value), e.g. 0.001
@@ -193,17 +193,17 @@ def generate_nearby_shares(columns, combo, half_range_frac, num_steps, min_level
     import pandas as pd
 
     dfs = []
+
     for i in range(0, len(columns) - 1):
-        k = columns[i]
-        val = combo[k]
-        dfs.append(pd.DataFrame({k: unique(
-            # np.linspace(np.maximum(min_level, val - half_range_frac),
-            #             np.minimum(1.0 - min_level, val + half_range_frac),
-            #             num_steps))}
-            np.minimum(1-min_level, np.maximum(min_level, np.linspace(np.maximum(0, val - half_range_frac),
-                        np.minimum(1.0, val + half_range_frac),
-                        num_steps))))}
-        ))
+        shares = np.array([])
+        for idx, combo in combos.iterrows():
+            k = columns[i]
+            val = combo[k]
+            min_val = np.maximum(0, val - half_range_frac)
+            max_val = np.minimum(1.0, val + half_range_frac)
+            shares = np.append(np.append(shares, np.minimum(1-min_level, np.maximum(min_level,
+                            np.linspace(min_val, max_val, num_steps)))), val) # create new share spread and include previous value
+        dfs.append(pd.DataFrame({k: unique(shares)}))
 
     dfx = pd.DataFrame()
     for df in dfs:

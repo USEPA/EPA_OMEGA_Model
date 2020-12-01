@@ -103,6 +103,7 @@ def run_postproc(iteration_log, single_shot):
     ax1.plot(calendar_years, ice_hauling_share_frac, '.-')
     ax1.plot(calendar_years, hauling_share_frac, '.-')
     ax1.plot(calendar_years, non_hauling_share_frac, '.-')
+    ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_unique_name)
     ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling', 'hauling', 'non_hauling'])
     fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_unique_name)
@@ -230,8 +231,7 @@ def run_producer_consumer():
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
-        print(manufacturer_ID)
-        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID))
+        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID), True)
 
         iteration_log = pd.DataFrame()
 
@@ -250,13 +250,12 @@ def run_producer_consumer():
             best_winning_combo_with_sales_response = None
 
             while iterate:
-                print('%d_%d' % (calendar_year, iteration_num))
+                if 'producer' in o2.options.verbose_console:
+                    print('%d_%d' % (calendar_year, iteration_num))
                 omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
 
-                candidate_mfr_composite_vehicles, winning_combo, market_class_tree = \
+                candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
                     producer.run_compliance_model(manufacturer_ID, calendar_year, winning_combo_with_sales_response)
-
-                producer_compliant = winning_combo['total_combo_credits_co2_megagrams'] >= 0
 
                 if producer_compliant:
 
@@ -274,7 +273,8 @@ def run_producer_consumer():
                         winning_combo_with_sales_response = best_winning_combo_with_sales_response
                         converged = True
                         thrashing = False
-                        print('!!best price make a friend!!')
+                        if 'consumer' in o2.options.verbose_console:
+                            print('!!best price make a friend!!')
                     else:
                         converged, thrashing, convergence_error = \
                             detect_convergence_and_thrashing(winning_combo_with_sales_response, iteration_log,
@@ -306,13 +306,12 @@ def run_producer_consumer():
                           and producer_compliant
 
                 if iterate:
-                    # negotiate_market_shares(winning_combo_with_sales_response, iteration_num, market_class_vehicle_dict)
+                    negotiate_market_shares(winning_combo_with_sales_response, iteration_num, market_class_vehicle_dict)
                     iteration_num = iteration_num + 1
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          winning_combo_with_sales_response)
 
-            # stock.update_stock_slow(calendar_year) # takes about 330 seconds
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
@@ -341,8 +340,7 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
         consumer.sales_volume.new_vehicle_sales_response(calendar_year,
                                                          winning_combo['winning_combo_share_weighted_cost'])
 
-    winning_combo['initial_compliance_ratio'] = winning_combo['total_combo_cert_co2_megagrams'] / \
-                                                winning_combo['total_combo_target_co2_megagrams']
+    winning_combo['initial_compliance_ratio'] = winning_combo['compliance_ratio']
 
     unsubsidized_sales = winning_combo['total_sales']
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in MarketClass.market_classes]
@@ -350,40 +348,46 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
     producer_consumer_compliant = False
     producer_consumer_iteration = 0
     sales_demand = pd.DataFrame()
-    while not producer_consumer_compliant:
+    while not producer_consumer_compliant and producer_consumer_iteration <= o2.options.consumer_max_iterations:
         price_options_df = winning_combo.to_frame().transpose()
 
-        inc = 0.05
-        # price_options_df = cartesian_prod(price_options_df, pd.DataFrame(np.arange(inc, 2.0 + inc, inc), columns=[mcc]))
         half_range = 1 / (producer_consumer_iteration + 1)
-        range_size = 10 # min(40, int(10 * (1 + ((producer_consumer_iteration + 1) - 1) / 2)))
 
-        print('half_range = %f' % half_range)
+        if 'consumer' in o2.options.verbose_console:
+            print('half_range = %f' % half_range)
+
         if sales_demand.empty:
-            # multiplier_range = np.unique(np.append(np.linspace(0.01, 10.0, 10), 1))
-            multiplier_range = np.unique(np.append(np.linspace(0.01, 2.0, 20), 1))
-            # multiplier_range = np.unique(np.append(np.e**np.linspace(np.log(0.05), np.log(2), range_size) , 1))
+            multiplier_range = \
+                np.unique(
+                    np.append(
+                        np.linspace(o2.options.consumer_price_multiplier_min, o2.options.consumer_price_multiplier_max,
+                                    o2.options.consumer_num_market_share_price_options),
+                        1.0
+                    )
+                )
 
-            print(multiplier_range)
-            # prev_multiplier_range = dict()
+            if 'consumer' in o2.options.verbose_console:
+                print(multiplier_range)
 
         for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
             if not sales_demand.empty:
-                print('%s = %.5f' % (mcc, sales_demand[mcc]))
+                if 'consumer' in o2.options.verbose_console:
+                    print('%s = %.5f' % (mcc, sales_demand[mcc]))
 
-                # min_val = prev_multiplier_range[mcc][max(0, np.nonzero(prev_multiplier_range[mcc] == sales_demand[mcc])[0][0] - 1)]
-                # max_val = prev_multiplier_range[mcc][min(len(prev_multiplier_range[mcc]) - 1, np.nonzero(prev_multiplier_range[mcc] == sales_demand[mcc])[0][0] + 1)]
-
-                min_val = max(0.01, sales_demand[mcc] - half_range)
-                max_val = sales_demand[mcc] + half_range
+                min_val = max(o2.options.consumer_price_multiplier_min, sales_demand[mcc] - half_range)
+                max_val = min(o2.options.consumer_price_multiplier_max, sales_demand[mcc] + half_range)
 
                 # try new range, include prior value in range...
-                # multiplier_range = np.unique(np.append(np.linspace(min_val, max_val, int(max(range_size, sales_demand['producer_abs_market_share_frac_%s' % mc] * 40))), sales_demand[mcc]))
-                # multiplier_range = np.unique(np.append(np.linspace(min_val, max_val, int(max(range_size, sales_demand['producer_share_frac_%s' % mc] * 40))), sales_demand[mcc]))
-                multiplier_range = np.unique(np.append(np.linspace(min_val, max_val, range_size), sales_demand[mcc]))
-                # multiplier_range = np.unique(np.append(np.e ** np.linspace(np.log(min_val), np.log(max_val), range_size), sales_demand[mcc]))
+                multiplier_range = \
+                    np.unique(
+                        np.append(
+                            np.linspace(min_val, max_val, o2.options.consumer_num_market_share_price_options),
+                            sales_demand[mcc]
+                        )
+                    )
 
-                print(multiplier_range)
+                if 'consumer' in o2.options.verbose_console:
+                    print(multiplier_range)
 
             price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
             price_options_df['average_price_%s' % mc] = price_options_df['average_cost_%s' % mc] * price_options_df[mcc]
@@ -468,11 +472,12 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
             # sales_demand = sales_demand.loc[sales_demand['sales_ratio_delta'].idxmin()]
             # sales_demand = sales_demand.loc[sales_demand['score'].idxmin()]
 
-            for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
-                print('iteration %s = %.5f' % (mcc, sales_demand[mcc]))
+            if 'consumer' in o2.options.verbose_console:
+                for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
+                    print('iteration %s = %.5f' % (mcc, sales_demand[mcc]))
 
-            print('%d_%d_%d  SCORE:%f  PROFIT:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_consumer_iteration,
-                                        sales_demand['score'], sales_demand['profit'], sales_demand['share_weighted_share_delta'], sales_demand['sales_ratio']))
+                print('%d_%d_%d  SCORE:%f  PROFIT:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_consumer_iteration,
+                                            sales_demand['score'], sales_demand['profit'], sales_demand['share_weighted_share_delta'], sales_demand['sales_ratio']))
 
             if (best_sales_demand is None) or (sales_demand['score'] <= best_sales_demand['score']):
                 best_sales_demand = sales_demand.copy()
@@ -484,16 +489,16 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
                                                                                        market_class_vehicle_dict,
                                                                                        o2.options.verbose)
 
-            for mc in MarketClass.market_classes:
-                print('%d producer/consumer_share_frac_%s=%.4f / %.4f (DELTA:%f, CE:%f)' % (
-                    calendar_year, mc,
-                    sales_demand['producer_share_frac_%s' % mc],
-                    sales_demand['consumer_share_frac_%s' % mc],
-                    abs(sales_demand['producer_share_frac_%s' % mc] - sales_demand['consumer_share_frac_%s' % mc]),
-                    abs(1 - sales_demand['producer_share_frac_%s' % mc] / sales_demand['consumer_share_frac_%s' % mc])
-                ))
-
-            print('convergence_error = %f\n' % convergence_error)
+            if 'consumer' in o2.options.verbose_console:
+                for mc in MarketClass.market_classes:
+                    print('%d producer/consumer_share_frac_%s=%.4f / %.4f (DELTA:%f, CE:%f)' % (
+                        calendar_year, mc,
+                        sales_demand['producer_share_frac_%s' % mc],
+                        sales_demand['consumer_share_frac_%s' % mc],
+                        abs(sales_demand['producer_share_frac_%s' % mc] - sales_demand['consumer_share_frac_%s' % mc]),
+                        abs(1 - sales_demand['producer_share_frac_%s' % mc] / sales_demand['consumer_share_frac_%s' % mc])
+                    ))
+                print('convergence_error = %f\n' % convergence_error)
 
             update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
                                  producer_consumer_iteration, thrashing, producer_consumer_compliant,
@@ -513,7 +518,8 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
                 producer_consumer_compliant = converged  # (converged and (half_range <= range_size/100)) or (not converged and (sales_demand['score'] > best_sales_demand['score']))
 
         else:
-            print('%d_%d_%d' % (calendar_year, iteration_num, producer_consumer_iteration))
+            if 'producer' in o2.options.verbose_console:
+                print('%d_%d_%d' % (calendar_year, iteration_num, producer_consumer_iteration))
             producer_consumer_compliant = False
 
         prev_score = sales_demand['score']
@@ -523,9 +529,10 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
     # done iterating...
     sales_demand = best_sales_demand
 
-    for mc, cc in zip(MarketClass.market_classes, multiplier_columns):
-        print('FINAL %s = %.5f' % (cc, sales_demand[cc]))
-    print('')
+    if 'consumer' in o2.options.verbose_console:
+        for mc, cc in zip(MarketClass.market_classes, multiplier_columns):
+            print('FINAL %s = %.5f' % (cc, sales_demand[cc]))
+        print('')
 
     return best_sales_demand, convergence_error, iteration_log, sales_demand, thrashing
 
@@ -539,7 +546,9 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
     iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
-    iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
+
+    if o2.options.log_consumer_iteration_years is 'all' or calendar_year in o2.options.log_consumer_iteration_years:
+        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
 
 def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winning_combo):
@@ -624,7 +633,8 @@ def detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log
         thrashing = detect_thrashing(iteration_log, mc, thrashing)
 
     if thrashing and verbose:
-        print('!!THRASHING!!')
+        if 'consumer' in o2.options.verbose_console:
+            print('!!THRASHING!!')
 
     return converged, thrashing, convergence_error
 

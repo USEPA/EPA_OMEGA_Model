@@ -53,4 +53,4 @@ ICE-HEV Two Seater car,USA Motors,2020,car,Two Seaters,Two Seater,HEV,non haulin
 ICE Two Seater car,USA Motors,2020,car,Two Seaters,Two Seater,N,non hauling,ice_HPW,pump gasoline,MTE Gasoline,non hauling.ICE,46466,362.6335794,45.54409461,464.2806999,14.54169285,3746.018594
 ICE-PHEV Two Seater car,USA Motors,2020,car,Two Seaters,Two Seater,REEV,non hauling,ice_HPW,pump gasoline,MTE Gasoline,non hauling.ICE,1303,126.7,50.3,228,13.6,4000
 ICE Large Van truck Van,USA Motors,2020,truck,"Vans, Passenger Type",Large Van,N,non hauling,ice_MPW_HRL,pump gasoline,MTE Gasoline,non hauling.ICE,8320,447.6217067,61.6,278.0096154,23.36528846,6000
-BEV Hauling dummy,USA Motors,2020,truck,Standard Pick-up Trucks 4WD,Large Pickup,N,hauling,bev_300_Truck,US electricity,MTE US electricity,hauling.BEV,1,0,67.80602909,,19.44439635,5414.610054
+BEV Hauling dummy,USA Motors,2020,truck,Standard Pick-up Trucks 4WD,Large Pickup,EV,hauling,bev_300_Truck,US electricity,MTE US electricity,hauling.BEV,1,0,67.80602909,,19.44439635,5414.610054

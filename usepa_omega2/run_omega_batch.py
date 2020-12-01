@@ -263,15 +263,15 @@ class OMEGASessionObject(object):
         omega_log.logwrite('Getting Runtime Settings...')
 
         if not pd.isna(self.read_parameter('First Pass Num Market Share Options')):
-            self.settings.first_pass_num_market_share_options = int(
+            self.settings.producer_num_market_share_options = int(
                 self.read_parameter('First Pass Num Market Share Options'))
 
         if not pd.isna(self.read_parameter('First Pass Num Tech Options per ICE Vehicle')):
-            self.settings.first_pass_num_tech_options_per_ice_vehicle = int(
+            self.settings.producer_num_tech_options_per_ice_vehicle = int(
                 self.read_parameter('First Pass Num Tech Options per ICE Vehicle'))
 
         if not pd.isna(self.read_parameter('First Pass Num Tech Options per BEV Vehicle')):
-            self.settings.first_pass_num_tech_options_per_bev_vehicle = int(
+            self.settings.producer_num_tech_options_per_bev_vehicle = int(
                 self.read_parameter('First Pass Num Tech Options per BEV Vehicle'))
 
         if not pd.isna(self.read_parameter('Iteration Num Tech Options per ICE Vehicle')):

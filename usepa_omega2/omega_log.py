@@ -9,6 +9,23 @@ print('importing %s' % __file__)
 import o2  # import global variables
 
 
+class IterationLog():
+    def __init__(self, logfilename):
+        self.init = True
+        self.logfilename = logfilename
+
+        if not self.logfilename.endswith('.csv'):
+            self.logfilename += '.csv'
+
+    def write(self, dataframe):
+        import os
+        if self.init:
+            dataframe.to_csv(self.logfilename, mode='w')
+            self.init = False
+        else:
+            dataframe.to_csv(self.logfilename, mode='a', header=False)
+
+
 def init_logfile():
     import time, datetime
     import file_eye_oh as fileio
@@ -34,13 +51,13 @@ def end_logfile(message):
     logwrite(message, terminator='')
 
 
-def logwrite(message, terminator='\n'):
+def logwrite(message, verbose=False, terminator='\n'):
     log = open(o2.options.logfilename, 'a')
     if type(message) is list:
         for m in message:
             log.write(m + terminator)
     else:
         log.write(message + terminator)
-    if o2.options.verbose:
+    if o2.options.verbose or verbose:
         print(message)
     log.close()
