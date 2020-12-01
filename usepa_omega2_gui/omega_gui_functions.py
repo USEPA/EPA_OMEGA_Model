@@ -4,13 +4,14 @@ omega_gui_functions
 
 """
 
-from distutils.dir_util import copy_tree
+# from distutils.dir_util import copy_tree
 
 from PySide2.QtWidgets import QFileDialog
 import yaml
 
 import pandas
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 
 def open_file_action(filepath):
@@ -199,13 +200,20 @@ def test_plot_1(y_axis):
         marker_size = 4  # Marker size
         x_label = 'Calendar Year'  # Label for x axis
         y_label = y_axis  # Label for y axis
-        plot_title = 'OMEGA Results - ' + y_axis  # Plot title
+        plot_title = 'OMEGA Results'  # Plot title
+
+        cmap = cm.get_cmap('tab10')  # Color map
 
         # Define plot using dataframe formed from spreadsheet
-        ax = df.plot(x=x_data, y=y_data, color=line_color, linestyle=line_style, marker=marker_type,
+        ax = df.plot(x=x_data, y=y_data, linestyle=line_style, marker=marker_type,
                      linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
-                     title=plot_title)
+                     title=plot_title, color=cmap(0))
+        # ax = df.plot(x=x_data, y=y_axis, color=line_color, linestyle=line_style, marker=marker_type,
+        #              linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
+        #              title=plot_title)
+        # Add more series in same plot
+        # df.plot(x=x_data, y="bev_non_hauling_share_frac", ax=ax, color=cmap(.1))
+        # df.plot(x=x_data, y="bev_hauling_share_frac", ax=ax, color=cmap(.2))
+
         ax.grid()  # Show grid
         plt.show()  # Show plot
-
-
