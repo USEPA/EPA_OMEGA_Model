@@ -68,18 +68,24 @@ try:
             self.reregistration_fixed_by_age_file = 'input_samples/reregistration_fixed_by_age.csv'
             self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
             self.slice_tech_combo_cloud_tables = False
+
             self.allow_backsliding = True
-            self.producer_consumer_max_iterations = 20
+
+            self.producer_max_iterations = 10
+            self.producer_num_market_share_options = 5
+            self.producer_num_tech_options_per_ice_vehicle = 5
+            self.producer_num_tech_options_per_bev_vehicle = 2
+            self.producer_iteration_tolerance = 1e-4
+
+            self.iterate_producer_consumer = True
             self.producer_consumer_iteration_tolerance = 0.01
+            self.producer_consumer_max_iterations = 20
 
-            self.first_pass_num_market_share_options = 5
-            self.first_pass_num_tech_options_per_ice_vehicle = 5
-            self.first_pass_num_tech_options_per_bev_vehicle = 2
+            self.consumer_max_iterations = 1
+            self.consumer_num_market_share_price_options = 5
+            self.consumer_price_multiplier_min = 1
+            self.consumer_price_multiplier_max = 1
 
-            self.iteration_num_tech_options_per_ice_vehicle = 10
-            self.iteration_num_tech_options_per_bev_vehicle = 2
-
-            self.iterate_producer_consumer = False
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
@@ -97,10 +103,13 @@ try:
             self.end_time = 0
 
             # debugging options
+            self.verbose_console = ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
             self.num_analysis_years = None  # number of years to run, if not all (None = run all)
+            self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty to disable logging
+            self.log_consumer_iteration_years = []  # = 'all' or list of years to log, empty to disable logging
 
 
     from omega2 import run_omega
