@@ -71,10 +71,10 @@ try:
 
             self.allow_backsliding = True
 
-            self.producer_max_iterations = 20
+            self.producer_max_iterations = 11
             self.producer_num_market_share_options = 5
             self.producer_num_tech_options_per_ice_vehicle = 2
-            self.producer_num_tech_options_per_bev_vehicle = 2
+            self.producer_num_tech_options_per_bev_vehicle = 1
             self.producer_iteration_tolerance = 1e-4
 
             self.iterate_producer_consumer = True

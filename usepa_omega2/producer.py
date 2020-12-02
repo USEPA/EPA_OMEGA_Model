@@ -55,8 +55,6 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
             for new_veh in market_class_dict[k]:
                 df = pd.DataFrame()
 
-                # num_tech_options = o2.options.producer_num_tech_options_per_ice_vehicle
-
                 if new_veh.fueling_class == 'ICE':
                     num_tech_options = o2.options.producer_num_tech_options_per_ice_vehicle
                 else:
@@ -80,9 +78,15 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                             np.append(np.append(co2_gpmi_options,
                                       np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)), veh_co2_gpmi)
 
-                    co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
+                    if num_tech_options == 1:
+                        co2_gpmi_options = [max_co2_gpmi]
+                    else:
+                        co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
                 else: # first producer pass, generate normal range of options
-                    co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
+                    if num_tech_options == 1:
+                        co2_gpmi_options = [max_co2_gpmi]
+                    else:
+                        co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
                 # else:  # ICE vehicle and consumer_bev_share available
                 #     if o2.options.allow_backsliding:
@@ -170,7 +174,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
     producer_iteration = 0
     best_combo = None
     while iterate_producer and producer_iteration < o2.options.producer_max_iterations:
-        share_range = 0.75**producer_iteration
+        share_range = 0.5**producer_iteration
 
         manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
@@ -314,24 +318,6 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
                                         ice_hauling_share_frac=winning_combo['producer_share_frac_hauling.ICE'] *
                                                                winning_combo['producer_share_frac_hauling'],
                                         )
-    # tech_share_combos_total.to_csv('%stech_share_combos_total_%d.csv' % (o2.options.output_folder, calendar_year))
-    # if not o2.options.verbose:
-    #     # drop big ass table
-    #     o2.session.execute('DROP TABLE tech_share_combos_total_%d' % calendar_year)
-    #     # drop vehicle tech options tables
-    #     for k, tables in vehicle_tech_options.items():
-    #         for t in tables:
-    #             o2.session.execute('DROP TABLE %s' % t)
-    #     for k, tables in hauling_class_tech_combos.items():
-    #         for t in tables:
-    #             o2.session.execute('DROP TABLE %s' % t)
-    # elif o2.options.slice_tech_combo_cloud_tables:
-    #     # only preserve points within a range of target, to make a small ass table
-    #     slice_width = 0.01 * cert_co2_Mg
-    #     o2.session.execute(
-    #         'DELETE FROM tech_share_combos_total_%d WHERE total_combo_cert_co2_megagrams NOT BETWEEN %f AND %f' %
-    #         (calendar_year, cert_co2_Mg - slice_width, cert_co2_Mg + slice_width))
-
     o2.session.flush()
 
 
