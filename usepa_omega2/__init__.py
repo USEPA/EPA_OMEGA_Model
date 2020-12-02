@@ -71,9 +71,9 @@ try:
 
             self.allow_backsliding = True
 
-            self.producer_max_iterations = 10
+            self.producer_max_iterations = 20
             self.producer_num_market_share_options = 5
-            self.producer_num_tech_options_per_ice_vehicle = 5
+            self.producer_num_tech_options_per_ice_vehicle = 2
             self.producer_num_tech_options_per_bev_vehicle = 2
             self.producer_iteration_tolerance = 1e-4
 
@@ -109,7 +109,7 @@ try:
             self.flat_context_year = 2021
             self.num_analysis_years = None  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty to disable logging
-            self.log_consumer_iteration_years = []  # = 'all' or list of years to log, empty to disable logging
+            self.log_consumer_iteration_years = 'all'  # = 'all' or list of years to log, empty to disable logging
 
 
     from omega2 import run_omega

@@ -231,7 +231,7 @@ def run_producer_consumer():
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
-        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID), True)
+        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID), echo_console=True)
 
         iteration_log = pd.DataFrame()
 
@@ -255,37 +255,23 @@ def run_producer_consumer():
                 omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    producer.run_compliance_model(manufacturer_ID, calendar_year, winning_combo_with_sales_response)
+                    producer.run_compliance_model(manufacturer_ID, calendar_year, winning_combo_with_sales_response, iteration_num)
 
-                if producer_compliant:
+                if producer_compliant or True:
 
                     market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                        winning_combo)
 
                     best_winning_combo_with_sales_response, convergence_error, iteration_log, winning_combo_with_sales_response, thrashing = \
-                        iterate_producer_consumer(calendar_year, best_winning_combo_with_sales_response, candidate_mfr_composite_vehicles,
-                        iteration_log, iteration_num, market_class_vehicle_dict, winning_combo)
+                        iterate_producer_consumer_pricing(calendar_year, best_winning_combo_with_sales_response, candidate_mfr_composite_vehicles,
+                                                          iteration_log, iteration_num, market_class_vehicle_dict, winning_combo)
 
-                    producer_consumer_iteration = 999  # flag end of subiteration
+                    producer_consumer_iteration = 999  # flag end of pricing subiteration
 
-                    # if winning_combo_with_sales_response['score'] < best_winning_combo_with_sales_response['score']:
-                    if winning_combo_with_sales_response['total_combo_cost_dollars'] > best_winning_combo_with_sales_response['total_combo_cost_dollars']:
-                        winning_combo_with_sales_response = best_winning_combo_with_sales_response
-                        converged = True
-                        thrashing = False
-                        if 'consumer' in o2.options.verbose_console:
-                            print('!!best price make a friend!!')
-                    else:
-                        converged, thrashing, convergence_error = \
-                            detect_convergence_and_thrashing(winning_combo_with_sales_response, iteration_log,
-                                                             iteration_num, market_class_vehicle_dict,
-                                                             o2.options.verbose)
-
-                    # converged, thrashing = detect_convergence_and_thrashing(winning_combo_with_sales_response, iteration_log,
-                    #                                                         iteration_num, market_class_vehicle_dict,
-                    #                                                         o2.options.verbose)
-                    # for non-experiment (old school):
-                    # winning_combo_with_sales_response = get_demanded_shares(winning_combo, calendar_year)
+                    converged, thrashing, convergence_error = \
+                        detect_convergence_and_thrashing(winning_combo_with_sales_response, iteration_log,
+                                                         iteration_num, market_class_vehicle_dict,
+                                                         o2.options.verbose)
 
                     iteration_log = iteration_log.append(winning_combo_with_sales_response, ignore_index=True)
                     update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
@@ -303,11 +289,19 @@ def run_producer_consumer():
                           and iteration_num < o2.options.producer_consumer_max_iterations \
                           and not converged \
                           and not thrashing \
-                          and producer_compliant
 
                 if iterate:
+                    omega_log.logwrite('RENEGOTIATE MARKET SHARES...', echo_console=True)
                     negotiate_market_shares(winning_combo_with_sales_response, iteration_num, market_class_vehicle_dict)
                     iteration_num = iteration_num + 1
+                else:
+                    if iteration_num >= o2.options.producer_consumer_max_iterations:
+                        omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION', echo_console=True)
+                        winning_combo_with_sales_response = best_winning_combo_with_sales_response
+                    if converged:
+                        omega_log.logwrite('PRODUCER-CONSUMER CONVERGED', echo_console=True)
+                    if thrashing:
+                        omega_log.logwrite('PRODUCER-CONSUMER THRASHING', echo_console=True)
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          winning_combo_with_sales_response)
@@ -319,9 +313,9 @@ def run_producer_consumer():
     return iteration_log
 
 
-def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_composite_vehicles,
-                              iteration_log, iteration_num, market_class_vehicle_dict,
-                              winning_combo):
+def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidate_mfr_composite_vehicles,
+                                      iteration_log, iteration_num, market_class_vehicle_dict,
+                                      winning_combo):
 
     import numpy as np
     from market_classes import MarketClass
@@ -345,16 +339,17 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
     unsubsidized_sales = winning_combo['total_sales']
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in MarketClass.market_classes]
 
-    producer_consumer_compliant = False
+    producer_consumer_converged = False
     producer_consumer_iteration = 0
     sales_demand = pd.DataFrame()
-    while not producer_consumer_compliant and producer_consumer_iteration <= o2.options.consumer_max_iterations:
+    while not producer_consumer_converged and producer_consumer_iteration < o2.options.consumer_max_iterations:
         price_options_df = winning_combo.to_frame().transpose()
 
+        # half_range = 0.75**producer_consumer_iteration
         half_range = 1 / (producer_consumer_iteration + 1)
 
         if 'consumer' in o2.options.verbose_console:
-            print('half_range = %f' % half_range)
+            omega_log.logwrite('half_range = %f' % half_range, echo_console=True)
 
         if sales_demand.empty:
             multiplier_range = \
@@ -367,12 +362,12 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
                 )
 
             if 'consumer' in o2.options.verbose_console:
-                print(multiplier_range)
+                omega_log.logwrite('multiplier_range = %s' % multiplier_range, echo_console=True)
 
         for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
             if not sales_demand.empty:
                 if 'consumer' in o2.options.verbose_console:
-                    print('%s = %.5f' % (mcc, sales_demand[mcc]))
+                    omega_log.logwrite('%s = %.5f' % (mcc, sales_demand[mcc]), echo_console=True)
 
                 min_val = max(o2.options.consumer_price_multiplier_min, sales_demand[mcc] - half_range)
                 max_val = min(o2.options.consumer_price_multiplier_max, sales_demand[mcc] + half_range)
@@ -387,7 +382,7 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
                     )
 
                 if 'consumer' in o2.options.verbose_console:
-                    print(multiplier_range)
+                    omega_log.logwrite(multiplier_range, echo_console=True)
 
             price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
             price_options_df['average_price_%s' % mc] = price_options_df['average_cost_%s' % mc] * price_options_df[mcc]
@@ -456,83 +451,69 @@ def iterate_producer_consumer(calendar_year, best_sales_demand, candidate_mfr_co
         for hc in hauling_classes:
             sales_demand['score'] += abs(1 - sales_demand['average_price_%s' % hc] / sales_demand['average_cost_%s' % hc])
 
-        if not sales_demand.empty:
-            # sales_demand.to_csv('%ssales_demand_%s_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num, producer_consumer_iteration))
+        # sales_demand.to_csv('%ssales_demand_%s_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num, producer_consumer_iteration))
 
-                        # sales_demand.to_csv('%ssales_demand_%s_%s.csv' % (o2.options.output_folder, calendar_year, iteration_num))
-            # find best score
-            best_compliant_score = sales_demand['score'].loc[sales_demand['score'].idxmin()]
-            # calculate score ratio
-            sales_demand['score_ratio'] = sales_demand['score'] / best_compliant_score
-            # find all points within tolerance of best score
-            sales_demand = sales_demand[sales_demand['score_ratio'] <= 1.01]
-            # pick a 'tie-breaker' point, based on some metric
-            sales_demand = sales_demand.loc[sales_demand['price_modification_score'].idxmin()]
-            # sales_demand = sales_demand.loc[sales_demand['share_weighted_share_delta'].idxmin()]
-            # sales_demand = sales_demand.loc[sales_demand['sales_ratio_delta'].idxmin()]
-            # sales_demand = sales_demand.loc[sales_demand['score'].idxmin()]
+        # find best score
+        best_compliant_score = sales_demand['score'].loc[sales_demand['score'].idxmin()]
+        # calculate score ratio
+        sales_demand['score_ratio'] = sales_demand['score'] / best_compliant_score
+        # find all points within tolerance of best score
+        sales_demand = sales_demand[sales_demand['score_ratio'] <= 1.01]
 
-            if 'consumer' in o2.options.verbose_console:
-                for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
-                    print('iteration %s = %.5f' % (mcc, sales_demand[mcc]))
+        # pick a 'tie-breaker' point, based on some metric
+        sales_demand = sales_demand.loc[sales_demand['price_modification_score'].idxmin()]
+        # sales_demand = sales_demand.loc[sales_demand['share_weighted_share_delta'].idxmin()]
+        # sales_demand = sales_demand.loc[sales_demand['sales_ratio_delta'].idxmin()]
+        # sales_demand = sales_demand.loc[sales_demand['score'].idxmin()]
 
-                print('%d_%d_%d  SCORE:%f  PROFIT:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_consumer_iteration,
-                                            sales_demand['score'], sales_demand['profit'], sales_demand['share_weighted_share_delta'], sales_demand['sales_ratio']))
+        if 'consumer' in o2.options.verbose_console:
+            for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
+                omega_log.logwrite(('iteration %s' % mcc).ljust(50) + '= %.5f' % sales_demand[mcc], echo_console=True)
 
-            if (best_sales_demand is None) or (sales_demand['score'] <= best_sales_demand['score']):
-                best_sales_demand = sales_demand.copy()
+            omega_log.logwrite('%d_%d_%d  SCORE:%f  PROFIT:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_consumer_iteration,
+                                        sales_demand['score'], sales_demand['profit'], sales_demand['share_weighted_share_delta'], sales_demand['sales_ratio']), echo_console=True)
 
-            # log sub-iteration:
-            iteration_log = iteration_log.append(sales_demand, ignore_index=True)
-            converged, thrashing, convergence_error = detect_convergence_and_thrashing(sales_demand, iteration_log,
-                                                                                       iteration_num,
-                                                                                       market_class_vehicle_dict,
-                                                                                       o2.options.verbose)
+        if (best_sales_demand is None) or (sales_demand['score'] <= best_sales_demand['score']):
+            omega_log.logwrite('*** NEW BEST SCORE %f***' % sales_demand['score'], echo_console=True)
+            best_sales_demand = sales_demand.copy()
 
-            if 'consumer' in o2.options.verbose_console:
-                for mc in MarketClass.market_classes:
-                    print('%d producer/consumer_share_frac_%s=%.4f / %.4f (DELTA:%f, CE:%f)' % (
-                        calendar_year, mc,
-                        sales_demand['producer_share_frac_%s' % mc],
-                        sales_demand['consumer_share_frac_%s' % mc],
-                        abs(sales_demand['producer_share_frac_%s' % mc] - sales_demand['consumer_share_frac_%s' % mc]),
-                        abs(1 - sales_demand['producer_share_frac_%s' % mc] / sales_demand['consumer_share_frac_%s' % mc])
-                    ))
-                print('convergence_error = %f\n' % convergence_error)
+        # log sub-iteration:
+        iteration_log = iteration_log.append(sales_demand, ignore_index=True)
+        converged, thrashing, convergence_error = detect_convergence_and_thrashing(sales_demand, iteration_log,
+                                                                                   iteration_num,
+                                                                                   market_class_vehicle_dict,
+                                                                                   o2.options.verbose)
 
-            update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
-                                 producer_consumer_iteration, thrashing, producer_consumer_compliant,
-                                 convergence_error)
+        if 'consumer' in o2.options.verbose_console:
+            for mc in MarketClass.market_classes:
+                omega_log.logwrite(('%d producer/consumer_share_frac_%s' % (calendar_year, mc)).ljust(50) +
+                      '= %.4f / %.4f (DELTA:%f, CE:%f)' % (
+                    sales_demand['producer_share_frac_%s' % mc],
+                    sales_demand['consumer_share_frac_%s' % mc],
+                    abs(sales_demand['producer_share_frac_%s' % mc] - sales_demand['consumer_share_frac_%s' % mc]),
+                    abs(1 - sales_demand['producer_share_frac_%s' % mc] / sales_demand['consumer_share_frac_%s' % mc])
+                ), echo_console=True)
+            omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
 
-            if producer_consumer_iteration > 0:
-                # producer_consumer_compliant = sales_demand['score'] == prev_score or \
-                #                               (((sales_demand['score'] > best_sales_demand['score']) \
-                #                               or (abs(1 - sales_demand['score'] / best_sales_demand['score']) < 0.001)) \
-                #                               and sales_demand['score'] != best_sales_demand['score'] \
-                #                               and (converged or thrashing))
-                # producer_consumer_compliant = ((converged or (sales_demand['score'] > best_sales_demand['score']) \
-                #                               or (abs(1 - sales_demand['score'] / best_sales_demand['score']) < 0.001)) \
-                #                               and sales_demand['score'] != best_sales_demand['score'] \
-                #                               and (converged or thrashing) \
-                #                               and (half_range <= range_size/100))
-                producer_consumer_compliant = converged  # (converged and (half_range <= range_size/100)) or (not converged and (sales_demand['score'] > best_sales_demand['score']))
+        update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+                             producer_consumer_iteration, thrashing, producer_consumer_converged,
+                             convergence_error)
 
-        else:
-            if 'producer' in o2.options.verbose_console:
-                print('%d_%d_%d' % (calendar_year, iteration_num, producer_consumer_iteration))
-            producer_consumer_compliant = False
+        producer_consumer_converged = converged  # (converged and (half_range <= range_size/100)) or (not converged and (sales_demand['score'] > best_sales_demand['score']))
 
         prev_score = sales_demand['score']
 
         producer_consumer_iteration = producer_consumer_iteration + 1
 
-    # done iterating...
-    sales_demand = best_sales_demand
-
     if 'consumer' in o2.options.verbose_console:
         for mc, cc in zip(MarketClass.market_classes, multiplier_columns):
-            print('FINAL %s = %.5f' % (cc, sales_demand[cc]))
-        print('')
+            omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % sales_demand[cc], echo_console=True)
+        if converged:
+            omega_log.logwrite('PRODUCER-CONSUMER CONVERGED CE:%f' % convergence_error, echo_console=True)
+        if thrashing:
+            omega_log.logwrite('PRODUCER-CONSUMER THRASHING CE:%f' % convergence_error, echo_console=True)
+
+        omega_log.logwrite('', echo_console=True)
 
     return best_sales_demand, convergence_error, iteration_log, sales_demand, thrashing
 
@@ -631,10 +612,6 @@ def detect_convergence_and_thrashing(consumer_market_share_demand, iteration_log
             converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
 
         thrashing = detect_thrashing(iteration_log, mc, thrashing)
-
-    if thrashing and verbose:
-        if 'consumer' in o2.options.verbose_console:
-            print('!!THRASHING!!')
 
     return converged, thrashing, convergence_error
 

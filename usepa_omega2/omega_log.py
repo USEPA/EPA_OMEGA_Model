@@ -51,13 +51,13 @@ def end_logfile(message):
     logwrite(message, terminator='')
 
 
-def logwrite(message, verbose=False, terminator='\n'):
+def logwrite(message, echo_console=False, terminator='\n'):
     log = open(o2.options.logfilename, 'a')
     if type(message) is list:
         for m in message:
             log.write(m + terminator)
     else:
         log.write(message + terminator)
-    if o2.options.verbose or verbose:
+    if o2.options.verbose or echo_console:
         print(message)
     log.close()
