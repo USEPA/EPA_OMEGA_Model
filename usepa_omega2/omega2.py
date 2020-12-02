@@ -348,7 +348,13 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
     producer_consumer_converged = False
     producer_consumer_iteration = 0
     sales_demand = pd.DataFrame()
-    while not producer_consumer_converged and producer_consumer_iteration < o2.options.consumer_max_iterations:
+
+    if o2.options.consumer_price_multiplier_max - o2.options.consumer_price_multiplier_min == 0:
+        max_iterations = 1
+    else:
+        max_iterations = o2.options.consumer_max_iterations
+
+    while not producer_consumer_converged and producer_consumer_iteration < max_iterations:
         price_options_df = winning_combo.to_frame().transpose()
 
         # half_range = 0.75**producer_consumer_iteration
