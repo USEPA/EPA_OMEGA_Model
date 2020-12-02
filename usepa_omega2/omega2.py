@@ -97,9 +97,9 @@ def run_postproc(iteration_log, single_shot):
     hauling_share_frac = bev_hauling_share_frac + ice_hauling_share_frac
     non_hauling_share_frac = bev_non_hauling_share_frac + ice_non_hauling_share_frac
 
-    fig, ax1 = fplothg(calendar_years, bev_non_hauling_share_frac, '.-')
+    fig, ax1 = fplothg(calendar_years, bev_non_hauling_share_frac, '.--')
     ax1.plot(calendar_years, ice_non_hauling_share_frac, '.-')
-    ax1.plot(calendar_years, bev_hauling_share_frac, '.-')
+    ax1.plot(calendar_years, bev_hauling_share_frac, '.--')
     ax1.plot(calendar_years, ice_hauling_share_frac, '.-')
     ax1.plot(calendar_years, hauling_share_frac, '.-')
     ax1.plot(calendar_years, non_hauling_share_frac, '.-')
@@ -133,7 +133,10 @@ def run_postproc(iteration_log, single_shot):
                                          filter(VehicleFinal.model_year == cy).
                                          filter(VehicleFinal.market_class_ID == mc).
                                          filter(VehicleAnnualData.age == 0).scalar())
-        ax1.plot(calendar_years, average_cost_data[mc])
+        if 'ICE' in mc:
+            ax1.plot(calendar_years, average_cost_data[mc], '.-')
+        else:
+            ax1.plot(calendar_years, average_cost_data[mc], '.--')
 
     average_cost_data['total'] = []
     for cy in calendar_years:
@@ -175,7 +178,10 @@ def run_postproc(iteration_log, single_shot):
                                              filter(VehicleFinal.model_year == cy).
                                              filter(VehicleFinal.market_class_ID == mc).
                                              filter(VehicleAnnualData.age == 0).scalar())
-        ax1.plot(calendar_years, average_co2_gpmi_data[mc])
+        if 'ICE' in mc:
+            ax1.plot(calendar_years, average_co2_gpmi_data[mc], '.-')
+        else:
+            ax1.plot(calendar_years, average_co2_gpmi_data[mc], '.--')
 
     average_co2_gpmi_data['total'] = []
     for cy in calendar_years:
