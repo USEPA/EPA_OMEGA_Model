@@ -352,7 +352,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
         price_options_df = winning_combo.to_frame().transpose()
 
         # half_range = 0.75**producer_consumer_iteration
-        half_range = 1 / (producer_consumer_iteration + 1)
+        half_range = (1 / (producer_consumer_iteration + 1)) * \
+                     (o2.options.consumer_price_multiplier_max - o2.options.consumer_price_multiplier_min)/2
 
         if 'consumer' in o2.options.verbose_console:
             omega_log.logwrite('half_range = %f' % half_range, echo_console=True)
@@ -479,7 +480,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
             omega_log.logwrite('%d_%d_%d  SCORE:%f  PROFIT:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_consumer_iteration,
                                         sales_demand['score'], sales_demand['profit'], sales_demand['share_weighted_share_delta'], sales_demand['sales_ratio']), echo_console=True)
 
-        if (best_sales_demand is None) or (sales_demand['score'] <= best_sales_demand['score']):
+        if (best_sales_demand is None) or (sales_demand['score'] < best_sales_demand['score']):
             omega_log.logwrite('*** NEW BEST SCORE %f***' % sales_demand['score'], echo_console=True)
             best_sales_demand = sales_demand.copy()
 
