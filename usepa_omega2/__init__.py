@@ -81,10 +81,10 @@ try:
             self.producer_consumer_iteration_tolerance = 0.01
             self.producer_consumer_max_iterations = 20
 
-            self.consumer_max_iterations = 1
+            self.consumer_max_iterations = 20
             self.consumer_num_market_share_price_options = 5
-            self.consumer_price_multiplier_min = 1
-            self.consumer_price_multiplier_max = 1
+            self.consumer_price_multiplier_min = 0.8
+            self.consumer_price_multiplier_max = 1.2
 
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
@@ -107,7 +107,7 @@ try:
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
-            self.num_analysis_years = None  # number of years to run, if not all (None = run all)
+            self.num_analysis_years = 1  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty to disable logging
 

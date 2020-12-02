@@ -373,7 +373,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
         for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
             if not sales_demand.empty:
                 if 'consumer' in o2.options.verbose_console:
-                    omega_log.logwrite('%s = %.5f' % (mcc, sales_demand[mcc]), echo_console=True)
+                    omega_log.logwrite(('%s' % mcc).ljust(50) + '= %.5f' % sales_demand[mcc], echo_console=True)
 
                 min_val = max(o2.options.consumer_price_multiplier_min, sales_demand[mcc] - half_range)
                 max_val = min(o2.options.consumer_price_multiplier_max, sales_demand[mcc] + half_range)
@@ -388,7 +388,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
                     )
 
                 if 'consumer' in o2.options.verbose_console:
-                    omega_log.logwrite(multiplier_range, echo_console=True)
+                    omega_log.logwrite('multiplier_range'.ljust(50) + '= %s' % multiplier_range, echo_console=True)
 
             price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
             price_options_df['average_price_%s' % mc] = price_options_df['average_cost_%s' % mc] * price_options_df[mcc]
@@ -671,9 +671,11 @@ def detect_thrashing(iteration_log, mc, thrashing):
 
 
 def init_omega(o2_options):
+    from omega_log import OMEGALog
 
     # set up global variables:
     o2.options = o2_options
+
     omega_log.init_logfile()
 
     init_omega_db()

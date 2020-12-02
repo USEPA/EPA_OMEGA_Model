@@ -7,7 +7,8 @@ example usage:
     python run_omega_batch.py --batch_file inputs\phase0_default_batch_file.xlsx
 
 """
-from usepa_omega2 import omega_log
+
+batch_log = None
 
 print('importing %s' % __file__)
 
@@ -153,13 +154,13 @@ class OMEGABatchObject(object):
                                     value = self.dataframe.loc[param_name][df_column_index]  # else copy source value
                                 dfx.loc[param_name, dfx.columns[dfx_column_index]] = value
                                 if df_ff_dimensions_vector[param_index] > 1:
-                                    # omega_log.logwrite(param_name + ' has ' + str(df_ff_dimensions_vector[param_index]) + ' values ')
+                                    # batch_log.logwrite(param_name + ' has ' + str(df_ff_dimensions_vector[param_index]) + ' values ')
                                     if value in acronyms_dict:
                                         session_name = session_name + '-' + acronyms_dict[param_name] + '=' + \
                                                        acronyms_dict[value]
                                     else:
                                         session_name = session_name + '-' + acronyms_dict[param_name] + '=' + str(value)
-                                    # omega_log.logwrite(session_name)
+                                    # batch_log.logwrite(session_name)
                     # dfx.loc['Session Name', dfx.columns[dfx_column]] = column_name
                     dfx.loc['Session Name', column_name] = session_name
                 else:  # just copy column
@@ -179,16 +180,16 @@ class OMEGABatchObject(object):
 
     def add_sessions(self, verbose=True):
         if verbose:
-            omega_log.logwrite()
-            omega_log.logwrite("In Batch '{}':".format(self.name))
+            batch_log.logwrite()
+            batch_log.logwrite("In Batch '{}':".format(self.name))
         for s in range(0, self.num_sessions()):
             self.sessions.append(OMEGASessionObject("session_{%d}" % s))
             self.sessions[s].parent = self
             self.sessions[s].get_session_settings(s)
             if verbose:
-                omega_log.logwrite("Found Session %s:'%s'" % (s, batch.sessions[s].name))
+                batch_log.logwrite("Found Session %s:'%s'" % (s, batch.sessions[s].name))
         if verbose:
-            omega_log.logwrite()
+            batch_log.logwrite()
 
 
 class OMEGASessionObject(object):
@@ -217,7 +218,7 @@ class OMEGASessionObject(object):
 
     def get_io_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
-        omega_log.logwrite('Getting Session I/O settings...')
+        batch_log.logwrite('Getting Session I/O settings...')
 
         # setup IOSettings
         # if not options.dispy:
@@ -256,7 +257,7 @@ class OMEGASessionObject(object):
     def get_runtime_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
-        omega_log.logwrite('Getting Runtime Settings...')
+        batch_log.logwrite('Getting Runtime Settings...')
 
         if not pd.isna(self.read_parameter('Num Market Share Options')):
             self.settings.producer_num_market_share_options = int(
@@ -292,7 +293,7 @@ class OMEGASessionObject(object):
     def get_postproc_settings(self):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
-        omega_log.logwrite('Getting Postproc Settings...')
+        batch_log.logwrite('Getting Postproc Settings...')
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
         self.settings.emission_factors_powersector_file = self.read_parameter('Context Powersector Emission Factors File')
@@ -303,7 +304,7 @@ class OMEGASessionObject(object):
 
     def init(self, validate_only=False):
         if not validate_only:
-            omega_log.logwrite("Starting Session '%s' -> %s" % (self.name, self.output_path))
+            batch_log.logwrite("Starting Session '%s' -> %s" % (self.name, self.output_path))
         self.get_io_settings()
         self.get_runtime_settings()
         self.get_postproc_settings()
@@ -311,7 +312,7 @@ class OMEGASessionObject(object):
     def run(self):
         self.init()
 
-        omega_log.logwrite("Starting Compliance Run %s ..." % self.name)
+        batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
         run_omega(self.settings)
 
 
@@ -334,10 +335,12 @@ def validate_folder(batch_root, batch_name='', session_name=''):
 
 class OMEGABatchOptions(object):
     def __init__(self):
+        import time
         import socket
         hostname = socket.gethostname()
         ip_address = socket.gethostbyname(hostname)
 
+        self.start_time = time.time()
         self.validate_batch = True
         self.no_sim = False
         self.bundle_path_root = ''
@@ -360,7 +363,7 @@ class OMEGABatchOptions(object):
 
 if __name__ == '__main__':
     try:
-        import os, sys
+        import os, sys, time
         import argparse
 
         parser = argparse.ArgumentParser(
@@ -462,8 +465,11 @@ if __name__ == '__main__':
 
             options.logfilename = options.batch_path + options.logfilename
 
+            from omega_log import OMEGALog
+            batch_log = OMEGALog(options)
+
             if options.validate_batch:
-                omega_log.logwrite('Validating batch definition source files...')
+                batch_log.logwrite('Validating batch definition source files...')
                 # validate shared (batch) files
                 validate_file(options.batch_file)
 
@@ -471,29 +477,29 @@ if __name__ == '__main__':
 
                 for s in range(0, batch.num_sessions()):
                     session = batch.sessions[s]
-                    omega_log.logwrite("\nValidating Session %d ('%s') Files..." % (s, session.name))
+                    batch_log.logwrite("\nValidating Session %d ('%s') Files..." % (s, session.name))
 
                     # automatically validate files and folders based on parameter naming convention
                     for i in batch.dataframe.index:
                         # if options.verbose and (str(i).endswith(' Folder Name') or str(i).endswith(' File')):
-                        #     omega_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
+                        #     batch_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
                         # elif str(i).endswith(' Folder Name'):
                         #     validate_folder(session.read_parameter(i))
                         # elif str(i).endswith(' File'):
                         #     validate_file(session.read_parameter(i))
                         if options.verbose and (str(i).endswith(' File')):
-                            omega_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
+                            batch_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
                         elif str(i).endswith(' File'):
                             validate_file(session.read_parameter(i))
 
-                    omega_log.logwrite('Validating Session %d Parameters...' % s)
+                    batch_log.logwrite('Validating Session %d Parameters...' % s)
                     session.init(validate_only=True)
 
-            omega_log.logwrite("\n*** validation complete ***")
+            batch_log.logwrite("\n*** validation complete ***")
 
             # copy files to network_batch_path
             if not options.no_bundle:
-                omega_log.logwrite('Bundling Source Files...')
+                batch_log.logwrite('Bundling Source Files...')
                 for source_folder in ['usepa_omega2\\', 'usepa_omega2\\consumer\\']:
                     source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
                     validate_folder(options.batch_path + source_folder)
@@ -510,7 +516,7 @@ if __name__ == '__main__':
                 # copy session inputs to session folder(s) for active session(s)
                 for s in range(0, batch.num_sessions()):
                     if batch.sessions[s].enabled:
-                        omega_log.logwrite('Bundling Session %d Files...' % s)
+                        batch_log.logwrite('Bundling Session %d Files...' % s)
                         session = batch.sessions[s]
                         options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
                                                                session_name=session.name)
@@ -528,14 +534,14 @@ if __name__ == '__main__':
                         for i in batch.dataframe.index:
                             # if str(i).endswith(' Folder Name'):
                             #     if options.verbose:
-                            #         omega_log.logwrite('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
+                            #         batch_log.logwrite('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
                             #                                      session.name + os.sep + batch.dataframe.loc[i][
                             #                                          session.num]))
                             #     batch.dataframe.loc[i][session.num] = \
                             #         session.name + os.sep + batch.dataframe.loc[i][session.num]
                             if str(i).endswith(' File'):
                                 if options.verbose:
-                                    omega_log.logwrite('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
+                                    batch_log.logwrite('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
                                                                    options.session_path + session.read_parameter(i)))
                                 batch.dataframe.loc[i][session.num] = \
                                     session.name + os.sep + relocate_file(options.session_path,
@@ -551,7 +557,7 @@ if __name__ == '__main__':
             batch.dataframe.to_csv(remote_batchfile)
 
             # print("Batch name = " + batch.name)
-            omega_log.logwrite("Batch name = " + batch.name)
+            batch_log.logwrite("Batch name = " + batch.name)
 
             if options.session_num is None:
                 session_list = range(0, batch.num_sessions())
@@ -566,10 +572,10 @@ if __name__ == '__main__':
                     dispycluster.find_nodes()
                     dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root, options.batch_path + batch.name,
                                                  session_list)
-                    omega_log.logwrite("*** batch complete ***")
+                    batch_log.end_logfile("*** batch complete ***")
                 else:  # run from here
                     batch = OMEGABatchObject()
-                    omega_log.logwrite('REMOTE BATCHFILE = %s' % remote_batchfile)
+                    batch_log.logwrite('REMOTE BATCHFILE = %s' % remote_batchfile)
                     batch.dataframe = pd.read_csv(remote_batchfile, index_col=0)
                     batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False},
                                             inplace=True)
@@ -581,14 +587,15 @@ if __name__ == '__main__':
 
                     # process sessions:
                     for s_index in session_list:
-                        omega_log.logwrite("Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
+                        batch_log.logwrite("\nProcessing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
 
                         if not batch.sessions[s_index].enabled:
-                            omega_log.logwrite("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
-                            omega_log.logwrite('')
+                            batch_log.logwrite("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
+                            batch_log.logwrite('')
                         else:
                             batch.sessions[s_index].run()
-                        # omega_log.logwrite("*** batch complete ***")
+
+                    batch_log.end_logfile("*** batch complete ***")
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

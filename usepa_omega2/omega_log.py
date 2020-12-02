@@ -7,7 +7,7 @@ Functions to log diagnostic data
 print('importing %s' % __file__)
 
 import o2  # import global variables
-
+from o2 import OMEGABase
 
 class IterationLog():
     def __init__(self, logfilename):
@@ -24,6 +24,41 @@ class IterationLog():
             self.init = False
         else:
             dataframe.to_csv(self.logfilename, mode='a', header=False)
+
+
+class OMEGALog(OMEGABase):
+    def __init__(self, o2_options):
+        import datetime, time
+
+        self.logfilename = o2_options.logfilename
+        self.verbose = o2_options.verbose
+        self.start_time = time.time()
+
+        with open(self.logfilename, 'w') as log:
+            log.write('OMEGA log started at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
+
+    def logwrite(self, message, terminator='\n'):
+        with open(self.logfilename, 'a') as log:
+            if type(message) is list:
+                for m in message:
+                    log.write(m + terminator)
+            else:
+                log.write(message + terminator)
+            if self.verbose:
+                print(message)
+
+    def end_logfile(self, message, echo_console=True):
+        import time
+        elapsed_time = (time.time() - self.start_time)
+        import datetime
+
+        for msg in ('\nOMEGA log ended at %s %s\n' % (datetime.date.today(), time.strftime('%H:%M:%S')),
+                    'Elapsed Time %.2f Seconds\n' % elapsed_time):
+            self.logwrite(msg)
+            if self.verbose:
+                print(msg)
+
+        self.logwrite(message, terminator='')
 
 
 def init_logfile():
