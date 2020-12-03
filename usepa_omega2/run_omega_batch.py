@@ -412,10 +412,14 @@ if __name__ == '__main__':
 
         if options.no_bundle:
             batchfile_path = os.path.split(args.batch_file)[0]
+
             print('updating sys.path: %s' % [batchfile_path, batchfile_path + '\\usepa_omega2',
-                                             batchfile_path + '\\usepa_omega2\\consumer'])
+                                             batchfile_path + '\\usepa_omega2\\consumer'],
+                  batchfile_path + '\\usepa_omega2\\effects')
+
             sys.path.extend([batchfile_path, batchfile_path + '\\usepa_omega2',
-                             batchfile_path + '\\usepa_omega2\\consumer'])
+                             batchfile_path + '\\usepa_omega2\\consumer',
+                             batchfile_path + '\\usepa_omega2\\effects'])
 
         from usepa_omega2 import *
 
@@ -500,7 +504,7 @@ if __name__ == '__main__':
             # copy files to network_batch_path
             if not options.no_bundle:
                 batch_log.logwrite('Bundling Source Files...')
-                for source_folder in ['usepa_omega2\\', 'usepa_omega2\\consumer\\']:
+                for source_folder in ['usepa_omega2\\', 'usepa_omega2\\consumer\\', 'usepa_omega2\\effects\\']:
                     source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
                     validate_folder(options.batch_path + source_folder)
                     for f in source_files:
