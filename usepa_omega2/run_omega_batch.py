@@ -413,13 +413,14 @@ if __name__ == '__main__':
         if options.no_bundle:
             batchfile_path = os.path.split(args.batch_file)[0]
 
-            print('updating sys.path: %s' % [batchfile_path, batchfile_path + '\\usepa_omega2',
-                                             batchfile_path + '\\usepa_omega2\\consumer'],
-                  batchfile_path + '\\usepa_omega2\\effects')
+            package_folder = batchfile_path + os.sep + 'usepa_omega2'
 
-            sys.path.extend([batchfile_path, batchfile_path + '\\usepa_omega2',
-                             batchfile_path + '\\usepa_omega2\\consumer',
-                             batchfile_path + '\\usepa_omega2\\effects'])
+            subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
+                              if os.path.isdir(package_folder + os.sep + d)
+                              and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
+
+            print('updating sys.path: %s' % ([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list))
+            sys.path.extend([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list)
 
         from usepa_omega2 import *
 
@@ -504,11 +505,17 @@ if __name__ == '__main__':
             # copy files to network_batch_path
             if not options.no_bundle:
                 batch_log.logwrite('Bundling Source Files...')
-                for source_folder in ['usepa_omega2\\', 'usepa_omega2\\consumer\\', 'usepa_omega2\\effects\\']:
+
+                package_folder = 'usepa_omega2'
+                subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
+                                   if os.path.isdir(package_folder + os.sep + d)
+                                   and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
+
+                for source_folder in [package_folder] + subpackage_list:
                     source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
                     validate_folder(options.batch_path + source_folder)
                     for f in source_files:
-                        relocate_file(options.batch_path + source_folder, source_folder + f)
+                        relocate_file(options.batch_path + source_folder, source_folder + os.sep + f)
 
                 # write a copy of the expanded, validated batch to the source batch_file directory:
                 if '.csv' in options.batch_file:
