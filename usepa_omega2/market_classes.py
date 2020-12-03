@@ -110,6 +110,10 @@ class MarketClass(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        MarketClass._market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
+        MarketClass._market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()
+        MarketClass._market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
+
         input_template_name = 'market_classes'
         input_template_version = 0.0002
         input_template_columns = {'market_class_id', 'hauling_class', 'fueling_class', 'ownership_class'}

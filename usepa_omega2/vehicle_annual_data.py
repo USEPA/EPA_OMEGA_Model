@@ -52,7 +52,6 @@ class VehicleAnnualData(SQABase, OMEGABase):
     n2o_upstream_metrictons = Column(Float)
     co2_upstream_metrictons = Column(Float)
 
-
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
         """

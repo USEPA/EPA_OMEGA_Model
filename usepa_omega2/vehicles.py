@@ -177,33 +177,31 @@ class CompositeVehicle(OMEGABase):
 class Vehicle(OMEGABase):
     next_vehicle_ID = 0
 
-    name = ''
-    manufacturer_ID = None
-
-    model_year = None
-    fueling_class = None
-    hauling_class = None
-    cost_curve_class = None
-    reg_class_ID = None
-    reg_class_market_share_frac = 1.0
-    epa_size_class = None
-    context_size_class = None
-    context_size_class_share_frac = None
-    electrification_class = None
-    cert_CO2_grams_per_mile = None
-    cert_target_CO2_grams_per_mile = None
-    cert_CO2_Mg = None
-    cert_target_CO2_Mg = None
-    new_vehicle_mfr_cost_dollars = None
-    manufacturer_deemed_new_vehicle_generalized_cost_dollars = None
-    in_use_fuel_ID = None
-    cert_fuel_ID = None
-    market_class_ID = None
-    footprint_ft2 = None
-    _initial_registered_count = 0
-
     def __init__(self):
         self.vehicle_ID = Vehicle.next_vehicle_ID
+        self.name = ''
+        self.manufacturer_ID = None
+        self.model_year = None
+        self.fueling_class = None
+        self.hauling_class = None
+        self.cost_curve_class = None
+        self.reg_class_ID = None
+        self.reg_class_market_share_frac = 1.0
+        self.epa_size_class = None
+        self.context_size_class = None
+        self.context_size_class_share_frac = None
+        self.electrification_class = None
+        self.cert_CO2_grams_per_mile = None
+        self.cert_target_CO2_grams_per_mile = None
+        self.cert_CO2_Mg = None
+        self.cert_target_CO2_Mg = None
+        self.new_vehicle_mfr_cost_dollars = None
+        self.manufacturer_deemed_new_vehicle_generalized_cost_dollars = None
+        self.in_use_fuel_ID = None
+        self.cert_fuel_ID = None
+        self.market_class_ID = None
+        self.footprint_ft2 = None
+        self._initial_registered_count = 0
         Vehicle.set_next_vehicle_ID()
 
     @staticmethod
