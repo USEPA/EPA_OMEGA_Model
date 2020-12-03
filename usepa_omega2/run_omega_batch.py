@@ -12,6 +12,7 @@ batch_log = None
 
 print('importing %s' % __file__)
 
+from o2 import OMEGABase
 from file_eye_oh import validate_file, relocate_file
 
 
@@ -28,7 +29,7 @@ def validate_predefined_input(input_str, valid_inputs):
         raise Exception('Invalid input "%s", expecting %s' % (input_str, str(valid_inputs)))
 
 
-class OMEGABatchObject(object):
+class OMEGABatchObject(OMEGABase):
     def __init__(self, name='', **kwargs):
         self.name = name
         self.context_folder = ''
@@ -192,7 +193,7 @@ class OMEGABatchObject(object):
             batch_log.logwrite()
 
 
-class OMEGASessionObject(object):
+class OMEGASessionObject(OMEGABase):
     def __init__(self, name, **kwargs):
         self.parent = []
         self.name = name
@@ -333,7 +334,7 @@ def validate_folder(batch_root, batch_name='', session_name=''):
     return dstfolder
 
 
-class OMEGABatchOptions(object):
+class OMEGABatchOptions(OMEGABase):
     def __init__(self):
         import time
         import socket

@@ -2,9 +2,9 @@
 omega_gui_functions
 ===================
 
-"""
+Contains functions used by the GUI.
 
-# from distutils.dir_util import copy_tree
+"""
 
 from PySide2.QtWidgets import QFileDialog
 import yaml
@@ -12,7 +12,6 @@ import yaml
 import pandas
 import matplotlib.pyplot as plt
 from matplotlib import cm
-
 
 
 def open_file_action(filepath):
@@ -180,47 +179,7 @@ def status_output_color(g):
     return g
 
 
-def test_plot_1(y_axis):
-    """
-    Reads a csv file and plots selected graph.
-
-    :param y-axis: column to plot
-
-    :return: N/A
-    """
-    df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
-
-    if len(y_axis) > 0:
-        # print(y_axis)
-        x_data = 'calendar_year'  # Column from spreadsheet for x axis
-        y_data = y_axis  # Column from spreadsheet for y axis
-        line_color = 'green'  # Plot line color
-        line_style = 'solid'  # Plot line style
-        line_width = 2  # Plot line width
-        marker_type = 'o'  # MatPlotLib marker style
-        marker_size = 4  # Marker size
-        x_label = 'Calendar Year'  # Label for x axis
-        y_label = y_axis  # Label for y axis
-        plot_title = 'OMEGA Results'  # Plot title
-
-        cmap = cm.get_cmap('tab10')  # Color map
-
-        # Define plot using dataframe formed from spreadsheet
-        ax = df.plot(x=x_data, y=y_data, linestyle=line_style, marker=marker_type,
-                     linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
-                     title=plot_title, color=cmap(0))
-        # ax = df.plot(x=x_data, y=y_axis, color=line_color, linestyle=line_style, marker=marker_type,
-        #              linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
-        #              title=plot_title)
-        # Add more series in same plot
-        # df.plot(x=x_data, y="bev_non_hauling_share_frac", ax=ax, color=cmap(.1))
-        # df.plot(x=x_data, y="bev_hauling_share_frac", ax=ax, color=cmap(.2))
-
-        ax.grid()  # Show grid
-        plt.show()  # Show plot
-
-
-def test_plot_2(plot_selection):
+def test_plot_2(plot_selection, output_directory):
     """
     Reads a csv file and plots selected graph.
 
@@ -237,8 +196,6 @@ def test_plot_2(plot_selection):
         # y_data = (df.loc[plot_selection, 'y_data_1'])  # Column from spreadsheet for y axis
         file_name = (df.loc[plot_selection, 'plot_source'])  # Column from spreadsheet for file name
         df1 = pandas.read_csv(file_name)
-
-        line_color = 'green'  # Plot line color
         line_style = 'solid'  # Plot line style
         line_width = 2  # Plot line width
         marker_type = 'o'  # MatPlotLib marker style
@@ -256,17 +213,16 @@ def test_plot_2(plot_selection):
                           linewidth=line_width, markersize=marker_size, xlabel=x_label, ylabel=y_label,
                           title=plot_title, color=cmap(0))
 
-        data = ['y_data_2', 'y_data_3', 'y_data_4', 'y_data_5', 'y_data_6', 'y_data_7',
-                'y_data_8', 'y_data_9', 'y_data_10']  # Y data columns to search for data
-        plot_color = 0
-        for y_string in data:
-            if str(df.loc[plot_selection, y_string]) != "nan":  # Check for empty cell in spreadsheet
-                plot_color = plot_color + 0.1  # Increment color
-                y_data = (df.loc[plot_selection, y_string])  # Column from spreadsheet for y axis
-                # Add data series to plot
-                df1.plot(x=x_data, y=y_data, ax=ax, linestyle=line_style, marker=marker_type, xlabel=x_label,
-                         ylabel=y_label, linewidth=line_width, markersize=marker_size, color=cmap(plot_color))
+            data = ['y_data_2', 'y_data_3', 'y_data_4', 'y_data_5', 'y_data_6', 'y_data_7',
+                    'y_data_8', 'y_data_9', 'y_data_10']  # Y data columns to search for data
+            plot_color = 0
+            for y_string in data:
+                if str(df.loc[plot_selection, y_string]) != "nan":  # Check for empty cell in spreadsheet
+                    plot_color = plot_color + 0.1  # Increment color
+                    y_data = (df.loc[plot_selection, y_string])  # Column from spreadsheet for y axis
+                    # Add data series to plot
+                    df1.plot(x=x_data, y=y_data, ax=ax, linestyle=line_style, marker=marker_type, xlabel=x_label,
+                             ylabel=y_label, linewidth=line_width, markersize=marker_size, color=cmap(plot_color))
 
-
-        ax.grid()  # Show grid
-        plt.show()  # Show plot
+            ax.grid()  # Show grid
+            plt.show()  # Show plot
