@@ -8,7 +8,7 @@ import o2
 from usepa_omega2 import *
 
 
-grams_per_us_ton	= 907185
+grams_per_us_ton = 907185
 grams_per_metric_ton = 1000000
 transloss = 0.07
 gap_ice = 0.8
@@ -16,203 +16,228 @@ gap_bev = 0.7
 co2_indolene = 8887
 kwh_per_mile_cycle = 0.2 # TODO Placeholder - what are we doing about calculating energy consumption on vehicles?
 
-#
-# def calc_vehicle_co2_gallons():
-#     print('calc_vehicle_co2_gallons')
-#     from vehicles import VehicleFinal
-#     from vehicle_annual_data import VehicleAnnualData
-#
-#     vehicles = o2.session.query(VehicleFinal).filter(VehicleFinal.in_use_fuel_ID != 'US electricity').all()
-#     vehicle_IDs = []
-#     for idx, value in enumerate(vehicles):
-#         vehicle_IDs.append(vehicles[idx].vehicle_ID)
-#
-#     for idx, vehicle_ID in enumerate(vehicle_IDs):
-#         veh_ages = o2.session.query(VehicleAnnualData.age).filter(VehicleAnnualData.vehicle_ID == vehicle_ID).all()
-#         veh_my = o2.session.query(VehicleFinal.model_year).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
-#
-#         cert_co2 = o2.session.query(VehicleFinal.cert_CO2_grams_per_mile).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
-#         onroad_co2 = cert_co2 / gap_ice # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
-#         mpg = co2_indolene / onroad_co2 # TODO is this how we're doing this?
-#
-#         for idx, veh_age in enumerate(veh_ages):
-#             veh_vmt = o2.session.query(VehicleAnnualData.vmt).\
-#                 filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
-#                 filter(VehicleAnnualData.age == veh_age[0]).scalar()
-#
-#             vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)[0]
-#             cy = veh_my + veh_age[0]
-#             try:
-#                 valu_co2 = veh_vmt * onroad_co2 / grams_per_metric_ton
-#                 valu_gal = veh_vmt / mpg
-#                 co2_attr = 'co2_vehicle_metrictons' # TODO metrictons and gallons probably belong in calc_vehicle_inventory, not here
-#                 gal_attr = 'fuel_consumption'
-#                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'onroad_co2_grams_per_mile', onroad_co2)
-#                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'onroad_fuel_consumption_rate', mpg)
-#                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, co2_attr, valu_co2)
-#                 VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, gal_attr, valu_gal)
-#             except:
-#                 pass
-#
-#
-# def calc_vehicle_inventory(*args):
-#     print('calc_vehicle_inventory')
-#     from vehicles import VehicleFinal
-#     from vehicle_annual_data import VehicleAnnualData
-#     from effects.emission_factors_vehicles import EmissionFactorsVehicles
-#
-#     vehicles = o2.session.query(VehicleFinal).filter(VehicleFinal.in_use_fuel_ID != 'US electricity').all()
-#     vehicle_IDs = []
-#     for idx, value in enumerate(vehicles):
-#         vehicle_IDs.append(vehicles[idx].vehicle_ID)
-#
-#     for idx, vehicle_ID in enumerate(vehicle_IDs):
-#         veh_ages = o2.session.query(VehicleAnnualData.age).filter(VehicleAnnualData.vehicle_ID == vehicle_ID).all()
-#         veh_my = o2.session.query(VehicleFinal.model_year).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
-#         veh_regclass_id = o2.session.query(VehicleFinal.reg_class_ID).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
-#
-#         for arg in args:
-#             if arg == 'sox':
-#                 factor_attr = f'{arg}_grams_per_gallon'
-#             else:
-#                 factor_attr = f'{arg}_grams_per_mile'
-#             for idx, veh_age in enumerate(veh_ages):
-#                 factor_object = o2.session.query(EmissionFactorsVehicles).\
-#                     filter(EmissionFactorsVehicles.reg_class_id == veh_regclass_id).\
-#                     filter(EmissionFactorsVehicles.model_year == veh_my).\
-#                     filter(EmissionFactorsVehicles.age == veh_age[0]).all()
-#
-#                 factor = factor_object[0].__getattribute__(factor_attr)
-#                 veh_vmt = o2.session.query(VehicleAnnualData.vmt).\
-#                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
-#                     filter(VehicleAnnualData.age == veh_age[0]).scalar()
-#                 veh_gallons = o2.session.query(VehicleAnnualData.fuel_consumption).\
-#                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
-#                     filter(VehicleAnnualData.age == veh_age[0]).scalar()
-#
-#                 vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)[0]
-#                 cy = veh_my + veh_age[0]
-#                 if arg == 'sox':
-#                     try:
-#                         valu = veh_gallons * factor / grams_per_us_ton
-#                         inv_attr = f'{arg}_vehicle_ustons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#                 elif arg == 'ch4' or arg == 'n2o':
-#                     try:
-#                         valu = veh_vmt * factor / grams_per_metric_ton
-#                         inv_attr = f'{arg}_vehicle_metrictons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#                 else:
-#                     try:
-#                         valu = veh_vmt * factor / grams_per_us_ton
-#                         inv_attr = f'{arg}_vehicle_ustons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#
-#
-# def calc_refinery_inventory(*args):
-#     print('calc_refinery_inventory')
-#     from vehicles import VehicleFinal
-#     from vehicle_annual_data import VehicleAnnualData
-#     from effects.emission_factors_refinery import EmissionFactorsRefinery
-#
-#     vehicles = o2.session.query(VehicleFinal).filter(VehicleFinal.in_use_fuel_ID != 'US electricity').all()
-#     vehicle_IDs = []
-#     for idx, value in enumerate(vehicles):
-#         vehicle_IDs.append(vehicles[idx].vehicle_ID)
-#
-#     for idx, vehicle_ID in enumerate(vehicle_IDs):
-#         veh_cyears = o2.session.query(VehicleAnnualData.calendar_year).filter(VehicleAnnualData.vehicle_ID == vehicle_ID).all()
-#
-#         for arg in args:
-#             factor_attr = f'{arg}_grams_per_gallon'
-#             for idx, veh_cyear in enumerate(veh_cyears):
-#                 factor_object = o2.session.query(EmissionFactorsRefinery).\
-#                     filter(EmissionFactorsRefinery.calendar_year == veh_cyear[0]).all()
-#
-#                 factor = factor_object[0].__getattribute__(factor_attr)
-#                 veh_gallons = o2.session.query(VehicleAnnualData.fuel_consumption).\
-#                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
-#                     filter(VehicleAnnualData.calendar_year == veh_cyear[0]).scalar()
-#
-#                 vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)[0]
-#                 cy = veh_cyear[0]
-#                 if arg == 'ch4' or arg == 'n2o' or arg == 'co2':
-#                     try:
-#                         valu = veh_gallons * factor / grams_per_metric_ton
-#                         inv_attr = f'{arg}_upstream_metrictons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#                 else:
-#                     try:
-#                         valu = veh_gallons * factor / grams_per_us_ton
-#                         inv_attr = f'{arg}_upstream_ustons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#
-#
-# def calc_powersector_inventory(*args):
-#     print('calc_powersector_inventory')
-#     from vehicles import VehicleFinal
-#     from vehicle_annual_data import VehicleAnnualData
-#     from effects.emission_factors_powersector import EmissionFactorsPowersector
-#
-#     vehicles = o2.session.query(VehicleFinal).filter(VehicleFinal.in_use_fuel_ID == 'US electricity').all()
-#     vehicle_IDs = []
-#     for idx, value in enumerate(vehicles):
-#         vehicle_IDs.append(vehicles[idx].vehicle_ID)
-#
-#     for idx, vehicle_ID in enumerate(vehicle_IDs):
-#         veh_cyears = o2.session.query(VehicleAnnualData.calendar_year).filter(VehicleAnnualData.vehicle_ID == vehicle_ID).all()
-#
-#         # cert_kwh_per_mile = o2.session.query(VehicleFinal.cert_kWh_per_mile).filter(VehicleFinal.vehicle_ID == vehicle_ID).scalar()
-#         cert_kwh_per_mile = kwh_per_mile_cycle
-#         onroad_kwh_per_mile = cert_kwh_per_mile / gap_bev / (1 - transloss)  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
-#
-#         for arg in args:
-#             factor_attr = f'{arg}_grams_per_kWh'
-#             for idx, veh_cyear in enumerate(veh_cyears):
-#                 factor_object = o2.session.query(EmissionFactorsPowersector).\
-#                     filter(EmissionFactorsPowersector.calendar_year == veh_cyear[0]).all()
-#
-#                 factor = factor_object[0].__getattribute__(factor_attr)
-#                 veh_vmt = o2.session.query(VehicleAnnualData.vmt).\
-#                     filter(VehicleAnnualData.vehicle_ID == vehicle_ID).\
-#                     filter(VehicleAnnualData.calendar_year == veh_cyear[0]).scalar()
-#                 try:
-#                     veh_kWh = veh_vmt * onroad_kwh_per_mile
-#                 except:
-#                     pass
-#
-#                 vehicle = o2.session.query(VehicleFinal).filter(VehicleFinal.vehicle_ID == vehicle_ID)[0]
-#                 cy = veh_cyear[0]
-#                 if arg == 'ch4' or arg == 'n2o' or arg == 'co2':
-#                     try:
-#                         valu = veh_kWh * factor / grams_per_metric_ton
-#                         inv_attr = f'{arg}_upstream_metrictons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#                 else:
-#                     try:
-#                         valu = veh_kWh * factor / grams_per_us_ton
-#                         inv_attr = f'{arg}_upstream_ustons'
-#                         VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, inv_attr, valu)
-#                     except:
-#                         pass
-#                 try:
-#                     veh_kWh = veh_vmt * onroad_kwh_per_mile
-#                     VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'onroad_fuel_consumption_rate', onroad_kwh_per_mile)
-#                     VehicleAnnualData.update_vehicle_annual_data(vehicle, cy, 'fuel_consumption', veh_kWh)
-#                 except:
-#                     pass
+
+vehicles_dict = dict()
+vef_dict = dict()
+ref_dict = dict()
+pef_dict = dict()
+
+
+def get_vehicle_info(vehicle_ID, query=False):
+    from vehicles import VehicleFinal
+
+    if vehicle_ID in vehicles_dict and not query:
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_ID] # add kwh_per_mile_cycle here when available in VehicleFinal
+    else:
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = \
+            o2.session.query(VehicleFinal.model_year, VehicleFinal.reg_class_ID,
+                             VehicleFinal.in_use_fuel_ID, VehicleFinal.cert_CO2_grams_per_mile).\
+                filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
+        vehicles_dict[vehicle_ID] = model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
+
+    return model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
+
+
+def get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=False):
+    from effects.emission_factors_vehicles import EmissionFactorsVehicles
+
+    age = calendar_year - model_year
+    vef_dict_id = f'{model_year}_{age}_{reg_class_ID}'
+
+    if vef_dict_id in vef_dict and not query:
+        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o = vef_dict[vef_dict_id]
+    else:
+        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
+            = o2.session.query(EmissionFactorsVehicles.voc_grams_per_mile,
+                               EmissionFactorsVehicles.co_grams_per_mile,
+                               EmissionFactorsVehicles.nox_grams_per_mile,
+                               EmissionFactorsVehicles.pm25_grams_per_mile,
+                               EmissionFactorsVehicles.sox_grams_per_gallon,
+                               EmissionFactorsVehicles.benzene_grams_per_mile,
+                               EmissionFactorsVehicles.butadiene13_grams_per_mile,
+                               EmissionFactorsVehicles.formaldehyde_grams_per_mile,
+                               EmissionFactorsVehicles.acetaldehyde_grams_per_mile,
+                               EmissionFactorsVehicles.acrolein_grams_per_mile,
+                               EmissionFactorsVehicles.ch4_grams_per_mile,
+                               EmissionFactorsVehicles.n2o_grams_per_mile,).\
+            filter(EmissionFactorsVehicles.model_year == model_year).\
+            filter(EmissionFactorsVehicles.age == age).\
+            filter(EmissionFactorsVehicles.reg_class_id == reg_class_ID).one()
+
+        vef_dict[vef_dict_id] = voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o
+
+    return voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o
+
+
+def get_powersector_ef(calendar_year, query=False):
+    from effects.emission_factors_powersector import EmissionFactorsPowersector
+
+    pef_dict_id = f'{calendar_year}'
+
+    if pef_dict_id in pef_dict and not query:
+        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o = pef_dict[pef_dict_id]
+    else:
+        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
+            = o2.session.query(EmissionFactorsPowersector.voc_grams_per_kWh,
+                               EmissionFactorsPowersector.co_grams_per_kWh,
+                               EmissionFactorsPowersector.nox_grams_per_kWh,
+                               EmissionFactorsPowersector.pm25_grams_per_kWh,
+                               EmissionFactorsPowersector.sox_grams_per_kWh,
+                               EmissionFactorsPowersector.benzene_grams_per_kWh,
+                               EmissionFactorsPowersector.butadiene13_grams_per_kWh,
+                               EmissionFactorsPowersector.formaldehyde_grams_per_kWh,
+                               EmissionFactorsPowersector.acetaldehyde_grams_per_kWh,
+                               EmissionFactorsPowersector.acrolein_grams_per_kWh,
+                               EmissionFactorsPowersector.co2_grams_per_kWh,
+                               EmissionFactorsPowersector.ch4_grams_per_kWh,
+                               EmissionFactorsPowersector.n2o_grams_per_kWh,).\
+            filter(EmissionFactorsPowersector.calendar_year == calendar_year).one()
+
+        pef_dict[pef_dict_id] = voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o
+
+    return voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o
+
+
+def get_refinery_ef(calendar_year, query=False):
+    from effects.emission_factors_refinery import EmissionFactorsRefinery
+
+    ref_dict_id = f'{calendar_year}'
+
+    if ref_dict_id in ref_dict and not query:
+        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o = ref_dict[ref_dict_id]
+    else:
+        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o \
+            = o2.session.query(EmissionFactorsRefinery.voc_grams_per_gallon,
+                               EmissionFactorsRefinery.co_grams_per_gallon,
+                               EmissionFactorsRefinery.nox_grams_per_gallon,
+                               EmissionFactorsRefinery.pm25_grams_per_gallon,
+                               EmissionFactorsRefinery.sox_grams_per_gallon,
+                               EmissionFactorsRefinery.benzene_grams_per_gallon,
+                               EmissionFactorsRefinery.butadiene13_grams_per_gallon,
+                               EmissionFactorsRefinery.formaldehyde_grams_per_gallon,
+                               EmissionFactorsRefinery.acetaldehyde_grams_per_gallon,
+                               EmissionFactorsRefinery.acrolein_grams_per_gallon,
+                               EmissionFactorsRefinery.naphthalene_grams_per_gallon,
+                               EmissionFactorsRefinery.co2_grams_per_gallon,
+                               EmissionFactorsRefinery.ch4_grams_per_gallon,
+                               EmissionFactorsRefinery.n2o_grams_per_gallon,).\
+            filter(EmissionFactorsRefinery.calendar_year == calendar_year).one()
+
+        ref_dict[ref_dict_id] = voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o
+
+    return voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o
+
+
+def calc_inventory(calendar_year):
+    from vehicle_annual_data import VehicleAnnualData
+
+    query = False
+
+    vad_vehs = o2.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+
+    # UPDATE vehicle annual data related to effects
+    for vad_veh in vad_vehs:
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh.vehicle_ID, query=query) # add kwh_per_mile_cycle here
+
+        if in_use_fuel_ID == 'US electricity':
+            # co2 and fuel consumption for electric
+            vad_veh.onroad_co2_grams_per_mile = 0
+            vad_veh.onroad_fuel_consumption_rate = kwh_per_mile_cycle / gap_bev # TODO placeholder for now
+            vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
+
+            # upstream inventory for electric
+            voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
+                = get_powersector_ef(calendar_year, query=query)
+
+            vad_veh.voc_upstream_ustons = vad_veh.fuel_consumption * voc / grams_per_us_ton
+            vad_veh.co_upstream_ustons = vad_veh.fuel_consumption * co / grams_per_us_ton
+            vad_veh.nox_upstream_ustons = vad_veh.fuel_consumption * nox / grams_per_us_ton
+            vad_veh.pm25_upstream_ustons = vad_veh.fuel_consumption * pm25 / grams_per_us_ton
+            vad_veh.benzene_upstream_ustons = vad_veh.fuel_consumption * benzene / grams_per_us_ton
+            vad_veh.butadiene13_upstream_ustons = vad_veh.fuel_consumption * butadiene13 / grams_per_us_ton
+            vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
+            vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
+            vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
+
+            vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
+
+            vad_veh.ch4_upstream_metrictons = vad_veh.fuel_consumption * ch4 / grams_per_metric_ton
+            vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
+            vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
+
+        else:
+            # co2 and fuel consumption for petrol
+            vad_veh.onroad_co2_grams_per_mile = cert_CO2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
+            vad_veh.onroad_fuel_consumption_rate = vad_veh.onroad_co2_grams_per_mile / co2_indolene  # TODO is this how we're doing this?
+            vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
+
+            # vehicle inventory for petrol
+            voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
+                = get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=query)
+
+            # it seems like the below dicts and loops should work, but the inv_attr isn't working with vad_veh.inv_attr
+            # criteria = {'voc': voc,
+            #             'co': co,
+            #             'nox': nox,
+            #             'pm25': pm25,
+            #             'sox': sox,
+            #             'benzene': benzene,
+            #             'butadiene13': butadiene13,
+            #             'formaldehyde': formaldehyde,
+            #             'acetaldehyde': acetaldehyde,
+            #             'acrolein': acrolein,
+            #             }
+            # ghg = {'ch4': ch4,
+            #        'n2o': n2o,
+            #        }
+
+            # for k, v in criteria.items():
+            #     # inv_attr = f'{k}_vehicle_ustons'
+            #     # vad_veh.inv_attr = vad_veh.vmt * v / grams_per_us_ton
+            #
+            # for k, v in ghg.items():
+            #     inv_attr = f'{k}_vehicle_metrictons'
+            #     vad_veh.inv_attr = vad_veh.vmt * v / grams_per_metric_ton
+            #
+            # inv_attr = 'sox_vehicle_ustons'
+            # vad_veh.inv_attr = vad_veh.fuel_consumption * v / grams_per_us_ton
+
+            vad_veh.voc_vehicle_ustons = vad_veh.vmt * voc / grams_per_us_ton
+            vad_veh.co_vehicle_ustons = vad_veh.vmt * co / grams_per_us_ton
+            vad_veh.nox_vehicle_ustons = vad_veh.vmt * nox / grams_per_us_ton
+            vad_veh.pm25_vehicle_ustons = vad_veh.vmt * pm25 / grams_per_us_ton
+            vad_veh.benzene_vehicle_ustons = vad_veh.vmt * benzene / grams_per_us_ton
+            vad_veh.butadiene13_vehicle_ustons = vad_veh.vmt * butadiene13 / grams_per_us_ton
+            vad_veh.formaldehyde_vehicle_ustons = vad_veh.vmt * formaldehyde / grams_per_us_ton
+            vad_veh.acetaldehyde_vehicle_ustons = vad_veh.vmt * acetaldehyde / grams_per_us_ton
+            vad_veh.acrolein_vehicle_ustons = vad_veh.vmt * acrolein / grams_per_us_ton
+
+            vad_veh.sox_vehicle_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
+
+            vad_veh.ch4_vehicle_metrictons = vad_veh.vmt * ch4 / grams_per_metric_ton
+            vad_veh.n2o_vehicle_metrictons = vad_veh.vmt * n2o / grams_per_metric_ton
+            vad_veh.co2_vehicle_metrictons = vad_veh.vmt * vad_veh.onroad_co2_grams_per_mile / grams_per_metric_ton
+
+            # upstream inventory for petrol
+            voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o \
+                = get_refinery_ef(calendar_year, query=query)
+
+            vad_veh.voc_upstream_ustons = vad_veh.fuel_consumption * voc / grams_per_us_ton
+            vad_veh.co_upstream_ustons = vad_veh.fuel_consumption * co / grams_per_us_ton
+            vad_veh.nox_upstream_ustons = vad_veh.fuel_consumption * nox / grams_per_us_ton
+            vad_veh.pm25_upstream_ustons = vad_veh.fuel_consumption * pm25 / grams_per_us_ton
+            vad_veh.benzene_upstream_ustons = vad_veh.fuel_consumption * benzene / grams_per_us_ton
+            vad_veh.butadiene13_upstream_ustons = vad_veh.fuel_consumption * butadiene13 / grams_per_us_ton
+            vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
+            vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
+            vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
+            vad_veh.naphthalene_upstream_ustons = vad_veh.fuel_consumption * naphthalene / grams_per_us_ton
+
+            vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
+
+            vad_veh.ch4_upstream_metrictons = vad_veh.fuel_consumption * ch4 / grams_per_metric_ton
+            vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
+            vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
 
 
 def calc_vehicle_co2_gallons(vf_df, vad_df):
