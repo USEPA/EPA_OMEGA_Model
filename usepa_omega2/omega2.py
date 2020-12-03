@@ -833,10 +833,11 @@ def run_omega(o2_options, single_shot=False):
             if o2.options.run_profiler:
                 os.system('snakeviz omega2_profile.dmp')
 
-            # o2.session.close()
+            # shut down the db
+            o2.session.close()
             o2.engine.dispose()
             o2.engine = None
-            # o2.session = None
+            o2.session = None
             o2.options = None
         else:
             omega_log.logwrite("\n#INIT FAIL")
