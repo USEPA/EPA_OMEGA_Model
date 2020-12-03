@@ -304,10 +304,6 @@ def run_producer_consumer():
                     if iteration_num >= o2.options.producer_consumer_max_iterations:
                         omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION', echo_console=True)
                         winning_combo_with_sales_response = best_winning_combo_with_sales_response
-                    if converged:
-                        omega_log.logwrite('PRODUCER-CONSUMER CONVERGED', echo_console=True)
-                    if thrashing:
-                        omega_log.logwrite('PRODUCER-CONSUMER THRASHING', echo_console=True)
 
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          winning_combo_with_sales_response)
@@ -528,6 +524,9 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
 
         omega_log.logwrite('', echo_console=True)
 
+    if o2.options.log_consumer_iteration_years is 'all' or calendar_year in o2.options.log_consumer_iteration_years:
+        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
+
     return best_sales_demand, convergence_error, iteration_log, sales_demand, thrashing
 
 
@@ -540,9 +539,6 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
     iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
-
-    if o2.options.log_consumer_iteration_years is 'all' or calendar_year in o2.options.log_consumer_iteration_years:
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
 
 def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winning_combo):

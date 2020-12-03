@@ -27,11 +27,11 @@ class IterationLog():
 
 
 class OMEGALog(OMEGABase):
-    def __init__(self, o2_options):
+    def __init__(self, o2_options, verbose=True):
         import datetime, time
 
         self.logfilename = o2_options.logfilename
-        self.verbose = o2_options.verbose
+        self.verbose = verbose
         self.start_time = time.time()
 
         with open(self.logfilename, 'w') as log:
@@ -69,10 +69,9 @@ def init_logfile():
     fileio.validate_folder(o2.options.output_folder)
     o2.options.logfilename = '%s%s.txt' % (
         o2.options.output_folder + o2.options.logfile_prefix, o2.options.session_unique_name)
-    log = open(o2.options.logfilename, 'w')
-    log.write('OMEGA2 %s session %s started at %s %s\n\n' % (
-        code_version, o2.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
-    log.close()
+    with open(o2.options.logfilename, 'w') as log:
+        log.write('OMEGA2 %s session %s started at %s %s\n\n' % (
+            code_version, o2.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
 
 
 def end_logfile(message):
@@ -80,19 +79,18 @@ def end_logfile(message):
     o2.options.end_time = time.time()
     elapsed_time = (o2.options.end_time - o2.options.start_time)
     import datetime
-    logwrite('Session ended at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
-    logwrite('\nElapsed Time %.2f Seconds' % elapsed_time)
-    print('\nElapsed Time %.2f Seconds' % elapsed_time)
+    logwrite('\nSession ended at %s %s\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
+    logwrite('Elapsed Time %.2f Seconds\n' % elapsed_time)
+    print('Elapsed Time %.2f Seconds\n' % elapsed_time)
     logwrite(message, terminator='')
 
 
 def logwrite(message, echo_console=False, terminator='\n'):
-    log = open(o2.options.logfilename, 'a')
-    if type(message) is list:
-        for m in message:
-            log.write(m + terminator)
-    else:
-        log.write(message + terminator)
-    if o2.options.verbose or echo_console:
-        print(message)
-    log.close()
+    with open(o2.options.logfilename, 'a') as log:
+        if type(message) is list:
+            for m in message:
+                log.write(m + terminator)
+        else:
+            log.write(message + terminator)
+        if o2.options.verbose or echo_console:
+            print(message)

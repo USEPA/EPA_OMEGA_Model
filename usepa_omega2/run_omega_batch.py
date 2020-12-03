@@ -112,7 +112,7 @@ class OMEGABatchObject(object):
             'Num Tech Options per ICE Vehicle': 'NITO',
             'Num Tech Options per BEV Vehicle': 'NBTO',
             'New Vehicle Price Sales Response Elasticity': 'NVPSRE',
-            'Allow Backsliding': 'ABS',
+            'Allow Backsliding': 'BS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
             'GHG Standard Type': 'GHG',
