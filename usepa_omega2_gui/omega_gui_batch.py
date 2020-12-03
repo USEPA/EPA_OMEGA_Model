@@ -108,7 +108,6 @@ class Form(QObject):
         self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
-        self.window.open_plot_1.clicked.connect(self.open_plot_1)
         self.window.open_plot_2.clicked.connect(self.open_plot_2)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
@@ -155,7 +154,6 @@ class Form(QObject):
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
         self.window.run_model_button.setStyleSheet(stylesheet)
-        self.window.open_plot_1.setStyleSheet(stylesheet)
         self.window.open_plot_2.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
@@ -173,7 +171,6 @@ class Form(QObject):
         self.window.main_title_1_label.setStyleSheet(stylesheet)
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
-        self.window.available_plots_1_label_1.setStyleSheet(stylesheet)
         self.window.available_plots_1_label_2.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
 
@@ -752,7 +749,6 @@ class Form(QObject):
         log_counter_array = [0, 0]
         # log_status_array = [0, 0]
         # log_lines_array = [0, 0]
-        self.load_plots_1()
         self.load_plots_2()
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
@@ -810,7 +806,7 @@ class Form(QObject):
         self.enable_gui_run_functions(1)
         self.window.model_status_label.setText("Model Loaded")
 
-        self.load_plots_1()
+        self.load_plots_2()
 
     def showbox(self, message_title, message):
         """
@@ -891,18 +887,6 @@ class Form(QObject):
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
 
-    def load_plots_1(self):
-        self.window.list_graphs.clear()
-        df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
-        for col in df.columns:
-            # print(col)
-            self.window.list_graphs.addItem(col)
-
-    def open_plot_1(self):
-        if self.window.list_graphs.currentItem() is not None:
-            a = self.window.list_graphs.selectedIndexes()[0]
-            test_plot_1(a.data())
-
     def load_plots_2(self):
         self.window.list_graphs_1.clear()
         input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
@@ -915,7 +899,7 @@ class Form(QObject):
     def open_plot_2(self):
         if self.window.list_graphs_1.currentItem() is not None:
             a = self.window.list_graphs_1.selectedIndexes()[0]
-            test_plot_2(a.data())
+            test_plot_2(a.data(), output_batch_directory)
 
 
 def status_bar():
@@ -950,5 +934,5 @@ timer = multitimer.MultiTimer(interval=1, function=status_bar)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # Load the gui
-    form = Form('usepa_omega2_gui/elements/omega_gui_v20.ui')
+    form = Form('usepa_omega2_gui/elements/omega_gui_v22.ui')
     sys.exit(app.exec_())
