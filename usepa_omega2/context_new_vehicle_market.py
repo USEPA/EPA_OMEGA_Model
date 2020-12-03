@@ -75,6 +75,8 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        ContextNewVehicleMarket.hauling_context_size_class_info = dict()
+
         input_template_name = 'context_new_vehicle_market'
         input_template_version = 0.1
         input_template_columns = {'context_id',	'case_id', 'context_size_class', 'calendar_year', 'reg_class_id',
