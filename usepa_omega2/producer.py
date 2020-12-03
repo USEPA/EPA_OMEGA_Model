@@ -174,7 +174,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
     producer_iteration = 0
     best_combo = None
     while iterate_producer and producer_iteration < o2.options.producer_max_iterations:
-        share_range = 0.5**producer_iteration
+        share_range = 0.33**producer_iteration
 
         manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
@@ -204,6 +204,8 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         producer_iteration += 1
 
         iterate_producer = abs(1 - best_combo['compliance_ratio']) > o2.options.producer_iteration_tolerance
+
+    omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_combo['compliance_ratio']), echo_console=True)
 
     winning_combo = pd.to_numeric(best_combo)
 
@@ -393,8 +395,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     tech_share_combos_total['score'] = abs(1-tech_share_combos_total['compliance_ratio'])
     tech_share_combos_total['slope'] = 0
 
-    if o2.options.log_producer_iteration_years is 'all' or calendar_year in o2.options.log_producer_iteration_years:
-        producer_iteration_log.write(tech_share_combos_total)
+    # if o2.options.log_producer_iteration_years is 'all' or calendar_year in o2.options.log_producer_iteration_years:
+    #     producer_iteration_log.write(tech_share_combos_total)
 
     potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
     if not potential_winners.empty:
