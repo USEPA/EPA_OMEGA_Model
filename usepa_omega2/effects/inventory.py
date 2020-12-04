@@ -17,6 +17,7 @@ co2_indolene = 8887
 kwh_per_mile_cycle = 0.2 # TODO Placeholder - what are we doing about calculating energy consumption on vehicles?
 
 
+# create some empty dicts in which to store VehicleFinal objects and vehicle/refinery/powersector emission factors
 vehicles_dict = dict()
 vef_dict = dict()
 ref_dict = dict()
@@ -129,6 +130,12 @@ def get_refinery_ef(calendar_year, query=False):
 
 
 def calc_inventory(calendar_year):
+    """
+    Calculate onroad CO2 grams/mile, kWh/mile, fuel consumption, vehicle and upstream emission inventories
+    by calendar year for vehicles in the vehicle_annual_data table.
+    :param calendar_year: calendar year
+    :return: Fills data in the vehicle_annual_data table that has not been filled to this point.
+    """
     from vehicle_annual_data import VehicleAnnualData
 
     query = False
@@ -145,6 +152,23 @@ def calc_inventory(calendar_year):
             vad_veh.onroad_fuel_consumption_rate = kwh_per_mile_cycle / gap_bev # TODO placeholder for now
             vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
 
+            # vehicle inventory for electric
+            vad_veh.voc_vehicle_ustons = 0
+            vad_veh.co_vehicle_ustons = 0
+            vad_veh.nox_vehicle_ustons = 0
+            vad_veh.pm25_vehicle_ustons = 0
+            vad_veh.benzene_vehicle_ustons = 0
+            vad_veh.butadiene13_vehicle_ustons = 0
+            vad_veh.formaldehyde_vehicle_ustons = 0
+            vad_veh.acetaldehyde_vehicle_ustons = 0
+            vad_veh.acrolein_vehicle_ustons = 0
+
+            vad_veh.sox_vehicle_ustons = 0
+
+            vad_veh.ch4_vehicle_metrictons = 0
+            vad_veh.n2o_vehicle_metrictons = 0
+            vad_veh.co2_vehicle_metrictons = 0
+
             # upstream inventory for electric
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
                 = get_powersector_ef(calendar_year, query=query)
@@ -158,6 +182,7 @@ def calc_inventory(calendar_year):
             vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
             vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
             vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
+            vad_veh.naphthalene_upstream_ustons = 0
 
             vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
 
@@ -240,6 +265,7 @@ def calc_inventory(calendar_year):
             vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
 
 
+# pandas approach; delete if team prefers the above DB approach
 def calc_vehicle_co2_gallons(vf_df, vad_df):
     print('calc_vehicle_co2_gallons')
 

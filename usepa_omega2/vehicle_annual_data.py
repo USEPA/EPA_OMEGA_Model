@@ -51,6 +51,25 @@ class VehicleAnnualData(SQABase, OMEGABase):
     ch4_upstream_metrictons = Column(Float)
     n2o_upstream_metrictons = Column(Float)
     co2_upstream_metrictons = Column(Float)
+    co2_domestic_25_social_cost_dollars = Column(Float)
+    co2_domestic_30_social_cost_dollars = Column(Float)
+    co2_domestic_70_social_cost_dollars = Column(Float)
+    ch4_domestic_25_social_cost_dollars = Column(Float)
+    ch4_domestic_30_social_cost_dollars = Column(Float)
+    ch4_domestic_70_social_cost_dollars = Column(Float)
+    n2o_domestic_25_social_cost_dollars = Column(Float)
+    n2o_domestic_30_social_cost_dollars = Column(Float)
+    n2o_domestic_70_social_cost_dollars = Column(Float)
+    co2_global_25_social_cost_dollars = Column(Float)
+    co2_global_30_social_cost_dollars = Column(Float)
+    co2_global_70_social_cost_dollars = Column(Float)
+    ch4_global_25_social_cost_dollars = Column(Float)
+    ch4_global_30_social_cost_dollars = Column(Float)
+    ch4_global_70_social_cost_dollars = Column(Float)
+    n2o_global_25_social_cost_dollars = Column(Float)
+    n2o_global_30_social_cost_dollars = Column(Float)
+    n2o_global_70_social_cost_dollars = Column(Float)
+    
 
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
