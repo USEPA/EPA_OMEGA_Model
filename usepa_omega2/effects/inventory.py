@@ -264,6 +264,22 @@ def calc_inventory(calendar_year):
             vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
             vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
 
+        # sum vehicle and upstream into totals
+        vad_veh.voc_total_ustons = vad_veh.voc_vehicle_ustons + vad_veh.voc_upstream_ustons
+        vad_veh.co_total_ustons = vad_veh.co_vehicle_ustons + vad_veh.co_upstream_ustons
+        vad_veh.nox_total_ustons = vad_veh.nox_vehicle_ustons + vad_veh.nox_upstream_ustons
+        vad_veh.pm25_total_ustons = vad_veh.pm25_vehicle_ustons + vad_veh.pm25_upstream_ustons
+        vad_veh.benzene_total_ustons = vad_veh.benzene_vehicle_ustons + vad_veh.benzene_upstream_ustons
+        vad_veh.butadiene13_total_ustons = vad_veh.butadiene13_vehicle_ustons + vad_veh.butadiene13_upstream_ustons
+        vad_veh.formaldehyde_total_ustons = vad_veh.formaldehyde_vehicle_ustons + vad_veh.formaldehyde_upstream_ustons
+        vad_veh.acetaldehyde_total_ustons = vad_veh.acetaldehyde_vehicle_ustons + vad_veh.acetaldehyde_upstream_ustons
+        vad_veh.acrolein_total_ustons = vad_veh.acrolein_vehicle_ustons + vad_veh.acrolein_upstream_ustons
+        vad_veh.naphthalene_total_ustons = vad_veh.naphthalene_upstream_ustons
+        vad_veh.sox_total_ustons = vad_veh.sox_vehicle_ustons + vad_veh.sox_upstream_ustons
+        vad_veh.ch4_total_metrictons = vad_veh.ch4_vehicle_metrictons + vad_veh.ch4_upstream_metrictons
+        vad_veh.n2o_total_metrictons = vad_veh.n2o_vehicle_metrictons + vad_veh.n2o_upstream_metrictons
+        vad_veh.co2_total_metrictons = vad_veh.co2_vehicle_metrictons + vad_veh.co2_upstream_metrictons
+
 
 # pandas approach; delete if team prefers the above DB approach
 def calc_vehicle_co2_gallons(vf_df, vad_df):

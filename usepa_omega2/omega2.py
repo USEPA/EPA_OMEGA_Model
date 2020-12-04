@@ -696,6 +696,7 @@ def init_omega(o2_options):
     from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
+    from effects.monetized_effects_data import MonetizedEffectsData
 
     from GHG_standards_flat import input_template_name as flat_template_name
     from GHG_standards_footprint import input_template_name as footprint_template_name
