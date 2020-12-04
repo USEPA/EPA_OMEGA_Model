@@ -81,10 +81,10 @@ try:
             self.producer_consumer_iteration_tolerance = 0.01
             self.producer_consumer_max_iterations = 20
 
-            self.consumer_max_iterations = 20
-            self.consumer_num_market_share_price_options = 5
-            self.consumer_price_multiplier_min = 0.8
-            self.consumer_price_multiplier_max = 1.2
+            self.consumer_pricing_max_iterations = 50
+            self.consumer_pricing_num_options = 5
+            self.consumer_pricing_multiplier_min = 0.01
+            self.consumer_pricing_multiplier_max = 2.00
 
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
@@ -103,7 +103,7 @@ try:
             self.end_time = 0
 
             # debugging options
-            self.verbose_console = ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console = []  #['consumer'] # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021

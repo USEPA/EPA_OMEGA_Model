@@ -205,7 +205,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
         iterate_producer = abs(1 - best_combo['compliance_ratio']) > o2.options.producer_iteration_tolerance
 
-    omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_combo['compliance_ratio']), echo_console=True)
+    if 'producer' in o2.options.verbose_console:
+        omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_combo['compliance_ratio']),
+                           echo_console=True)
 
     winning_combo = pd.to_numeric(best_combo)
 

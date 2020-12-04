@@ -22,16 +22,22 @@ class ContextFuelPrices(SQABase, OMEGABase):
     retail_dollars_per_unit = Column(Float)
     pretax_dollars_per_unit = Column(Float)
 
+    retail_fuel_price_dict = dict()
+
     @staticmethod
     def get_retail_fuel_price(calendar_year, fuel_ID):
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        return o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
-            filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-            filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
-            filter(ContextFuelPrices.calendar_year == calendar_year).\
-            filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+        key = '%s_%s' % (calendar_year, fuel_ID)
+        if not key in ContextFuelPrices.retail_fuel_price_dict:
+            ContextFuelPrices.retail_fuel_price_dict[key] = o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
+                filter(ContextFuelPrices.context_ID == o2.options.context_id).\
+                filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
+                filter(ContextFuelPrices.calendar_year == calendar_year).\
+                filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+
+        return ContextFuelPrices.retail_fuel_price_dict[key]
 
     @staticmethod
     def get_pretax_fuel_price(calendar_year, fuel_ID):
@@ -48,6 +54,8 @@ class ContextFuelPrices(SQABase, OMEGABase):
     def init_database_from_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
+
+        retail_fuel_price_dict = dict()
 
         input_template_name = 'context_fuel_prices'
         input_template_version = 0.1

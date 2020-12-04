@@ -247,15 +247,13 @@ def run_producer_consumer():
             best_winning_combo_with_sales_response = None
 
             while iterate:
-                if 'producer' in o2.options.verbose_console:
-                    print('%d_%d' % (calendar_year, iteration_num))
-                omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num))
+                omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num),
+                                   echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
                     producer.run_compliance_model(manufacturer_ID, calendar_year, winning_combo_with_sales_response, iteration_num)
 
                 if producer_compliant or True:
-
                     market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                        winning_combo)
 
@@ -288,7 +286,8 @@ def run_producer_consumer():
                           and not thrashing \
 
                 if iterate:
-                    omega_log.logwrite('RENEGOTIATE MARKET SHARES...', echo_console=True)
+                    if 'consumer' in o2.options.verbose_console:
+                        omega_log.logwrite('RENEGOTIATE MARKET SHARES...', echo_console=True)
                     negotiate_market_shares(winning_combo_with_sales_response, iteration_num, market_class_vehicle_dict)
                     iteration_num = iteration_num + 1
                 else:
@@ -336,17 +335,16 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
     producer_consumer_iteration = 0
     sales_demand = pd.DataFrame()
 
-    if o2.options.consumer_price_multiplier_max - o2.options.consumer_price_multiplier_min == 0:
+    if o2.options.consumer_pricing_multiplier_max - o2.options.consumer_pricing_multiplier_min == 0:
         max_iterations = 1
     else:
-        max_iterations = o2.options.consumer_max_iterations
+        max_iterations = o2.options.consumer_pricing_max_iterations
 
     while not producer_consumer_converged and producer_consumer_iteration < max_iterations:
         price_options_df = winning_combo.to_frame().transpose()
 
-        # half_range = 0.75**producer_consumer_iteration
         half_range = (1 / (producer_consumer_iteration + 1)) * \
-                     (o2.options.consumer_price_multiplier_max - o2.options.consumer_price_multiplier_min)/2
+                     (o2.options.consumer_pricing_multiplier_max - o2.options.consumer_pricing_multiplier_min) / 2
 
         if 'consumer' in o2.options.verbose_console:
             omega_log.logwrite('half_range = %f' % half_range, echo_console=True)
@@ -355,8 +353,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
             multiplier_range = \
                 np.unique(
                     np.append(
-                        np.linspace(o2.options.consumer_price_multiplier_min, o2.options.consumer_price_multiplier_max,
-                                    o2.options.consumer_num_market_share_price_options),
+                        np.linspace(o2.options.consumer_pricing_multiplier_min, o2.options.consumer_pricing_multiplier_max,
+                                    o2.options.consumer_pricing_num_options),
                         1.0
                     )
                 )
@@ -369,14 +367,14 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
                 if 'consumer' in o2.options.verbose_console:
                     omega_log.logwrite(('%s' % mcc).ljust(50) + '= %.5f' % sales_demand[mcc], echo_console=True)
 
-                min_val = max(o2.options.consumer_price_multiplier_min, sales_demand[mcc] - half_range)
-                max_val = min(o2.options.consumer_price_multiplier_max, sales_demand[mcc] + half_range)
+                min_val = max(o2.options.consumer_pricing_multiplier_min, sales_demand[mcc] - half_range)
+                max_val = min(o2.options.consumer_pricing_multiplier_max, sales_demand[mcc] + half_range)
 
                 # try new range, include prior value in range...
                 multiplier_range = \
                     np.unique(
                         np.append(
-                            np.linspace(min_val, max_val, o2.options.consumer_num_market_share_price_options),
+                            np.linspace(min_val, max_val, o2.options.consumer_pricing_num_options),
                             sales_demand[mcc]
                         )
                     )
@@ -474,7 +472,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_sales_demand, candidat
                                         sales_demand['score'], sales_demand['profit'], sales_demand['share_weighted_share_delta'], sales_demand['sales_ratio']), echo_console=True)
 
         if (best_sales_demand is None) or (sales_demand['score'] < best_sales_demand['score']):
-            omega_log.logwrite('*** NEW BEST SCORE %f***' % sales_demand['score'], echo_console=True)
+            if 'consumer' in o2.options.verbose_console:
+                omega_log.logwrite('*** NEW BEST SCORE %f***' % sales_demand['score'], echo_console=True)
             best_sales_demand = sales_demand.copy()
 
         # log sub-iteration:
