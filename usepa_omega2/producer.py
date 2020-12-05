@@ -193,8 +193,8 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
         producer_compliance_possible = producer_compliance_possible or compliance_possible
 
-        if (best_combo is None) or (winning_combos['score'].min() < best_combo['score'].min()):
-            best_combo = winning_combos.loc[winning_combos['score'].idxmin()]
+        if (best_combo is None) or (winning_combos['compliance_score'].min() < best_combo['compliance_score'].min()):
+            best_combo = winning_combos.loc[winning_combos['compliance_score'].idxmin()]
 
         if 'producer' in o2.options.verbose_console:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, iteration_num,
@@ -394,7 +394,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
 
     tech_share_combos_total['producer_iteration'] = producer_iteration
     tech_share_combos_total['winner'] = False
-    tech_share_combos_total['score'] = abs(1-tech_share_combos_total['compliance_ratio'])
+    tech_share_combos_total['compliance_score'] = abs(1-tech_share_combos_total['compliance_ratio'])
     tech_share_combos_total['slope'] = 0
 
     # if o2.options.log_producer_iteration_years is 'all' or calendar_year in o2.options.log_producer_iteration_years:

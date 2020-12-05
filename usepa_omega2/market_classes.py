@@ -139,7 +139,8 @@ class MarketClass(SQABase, OMEGABase):
                 o2.session.add_all(obj_list)
                 o2.session.flush()
 
-                MarketClass.market_classes = tuple(df['market_class_id'].unique())
+                MarketClass.market_classes = list(df['market_class_id'].unique())
+                MarketClass.market_classes.sort()
                 for mc in MarketClass.market_classes:
                     MarketClass._market_class_dict[mc] = set()
 

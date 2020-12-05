@@ -82,7 +82,7 @@ try:
             self.producer_consumer_max_iterations = 20
 
             self.consumer_pricing_max_iterations = 50
-            self.consumer_pricing_num_options = 5
+            self.consumer_pricing_num_options = 4
             self.consumer_pricing_multiplier_min = 0.01
             self.consumer_pricing_multiplier_max = 2.00
 
@@ -103,14 +103,14 @@ try:
             self.end_time = 0
 
             # debugging options
-            self.verbose_console = []  #['consumer'] # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console = ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
             self.num_analysis_years = None  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
-
+            self.log_sales_demand_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
 
     from omega2 import run_omega
 
