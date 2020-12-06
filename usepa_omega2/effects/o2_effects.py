@@ -1,6 +1,7 @@
 """
 
 o2_effects.py
+=============
 """
 
 
@@ -16,15 +17,14 @@ def run_effects_calcs():
     calendar_years = sql_unpack_result(o2.session.query(VehicleAnnualData.calendar_year).all())
     calendar_years = pd.Series(calendar_years).unique()
 
-
     for calendar_year in calendar_years:
-        print(f'Calculating inventories for {calendar_year}')
+        print(f'Calculating inventories for {int(calendar_year)}')
         calc_inventory(calendar_year)
 
     for calendar_year in calendar_years:
-        print(f'Calculating carbon emission costs for {calendar_year}')
+        print(f'Calculating social costs of carbon emissions for {int(calendar_year)}')
         calc_carbon_emission_costs(calendar_year)
 
     for calendar_year in calendar_years:
-        print(f'Calculating criteria emission costs for {calendar_year}')
+        print(f'Calculating social costs of criteria emissions for {int(calendar_year)}')
         calc_criteria_emission_costs(calendar_year)

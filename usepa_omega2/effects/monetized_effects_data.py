@@ -60,26 +60,15 @@ class MonetizedEffectsData(SQABase, OMEGABase):
 
 
     @staticmethod
-    def update_undiscounted_monetized_effects_data(vehicle):
+    def update_undiscounted_monetized_effects_data(vehicle, med_dict):
 
         med = o2.session.query(MonetizedEffectsData).\
             filter(MonetizedEffectsData.vehicle_ID == vehicle.vehicle_ID).\
             filter(MonetizedEffectsData.calendar_year == vehicle.calendar_year).\
             filter(MonetizedEffectsData.age == vehicle.age).\
-            filter(MonetizedEffectsData.discount_status == 'undiscounted').one_or_none()
+            filter(MonetizedEffectsData.discount_status == vehicle.discount_status).one()
 
-        if med:
-            pass
-        else:
-            o2.session.add(MonetizedEffectsData(vehicle_ID=vehicle.vehicle_ID,
-                                                calendar_year=vehicle.calendar_year,
-                                                age=vehicle.age,
-                                                discount_status='undiscounted'))
+        for k, v in med_dict.items():
+            med.__setattr__(k, v)
 
-        med = o2.session.query(MonetizedEffectsData). \
-            filter(MonetizedEffectsData.vehicle_ID == vehicle.vehicle_ID). \
-            filter(MonetizedEffectsData.calendar_year == vehicle.calendar_year). \
-            filter(MonetizedEffectsData.age == vehicle.age).\
-            filter(MonetizedEffectsData.discount_status == 'undiscounted').one()
-
-        return med
+        o2.session.flush()

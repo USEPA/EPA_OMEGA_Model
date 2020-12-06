@@ -146,13 +146,18 @@ def calc_inventory(calendar_year):
     for vad_veh in vad_vehs:
         model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh.vehicle_ID, query=query) # add kwh_per_mile_cycle here
 
+        # co2 and fuel consumption
         if in_use_fuel_ID == 'US electricity':
-            # co2 and fuel consumption for electric
             vad_veh.onroad_co2_grams_per_mile = 0
             vad_veh.onroad_fuel_consumption_rate = kwh_per_mile_cycle / gap_bev # TODO placeholder for now
             vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
+        else:
+            vad_veh.onroad_co2_grams_per_mile = cert_CO2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
+            vad_veh.onroad_fuel_consumption_rate = vad_veh.onroad_co2_grams_per_mile / co2_indolene  # TODO is this how we're doing this?
+            vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
 
-            # vehicle inventory for electric
+        # vehicle inventory
+        if in_use_fuel_ID == 'US electricity':
             vad_veh.voc_vehicle_ustons = 0
             vad_veh.co_vehicle_ustons = 0
             vad_veh.nox_vehicle_ustons = 0
@@ -168,64 +173,9 @@ def calc_inventory(calendar_year):
             vad_veh.ch4_vehicle_metrictons = 0
             vad_veh.n2o_vehicle_metrictons = 0
             vad_veh.co2_vehicle_metrictons = 0
-
-            # upstream inventory for electric
-            voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
-                = get_powersector_ef(calendar_year, query=query)
-
-            vad_veh.voc_upstream_ustons = vad_veh.fuel_consumption * voc / grams_per_us_ton
-            vad_veh.co_upstream_ustons = vad_veh.fuel_consumption * co / grams_per_us_ton
-            vad_veh.nox_upstream_ustons = vad_veh.fuel_consumption * nox / grams_per_us_ton
-            vad_veh.pm25_upstream_ustons = vad_veh.fuel_consumption * pm25 / grams_per_us_ton
-            vad_veh.benzene_upstream_ustons = vad_veh.fuel_consumption * benzene / grams_per_us_ton
-            vad_veh.butadiene13_upstream_ustons = vad_veh.fuel_consumption * butadiene13 / grams_per_us_ton
-            vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
-            vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
-            vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
-            vad_veh.naphthalene_upstream_ustons = 0
-
-            vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
-
-            vad_veh.ch4_upstream_metrictons = vad_veh.fuel_consumption * ch4 / grams_per_metric_ton
-            vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
-            vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
-
         else:
-            # co2 and fuel consumption for petrol
-            vad_veh.onroad_co2_grams_per_mile = cert_CO2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
-            vad_veh.onroad_fuel_consumption_rate = vad_veh.onroad_co2_grams_per_mile / co2_indolene  # TODO is this how we're doing this?
-            vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
-
-            # vehicle inventory for petrol
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
                 = get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=query)
-
-            # it seems like the below dicts and loops should work, but the inv_attr isn't working with vad_veh.inv_attr
-            # criteria = {'voc': voc,
-            #             'co': co,
-            #             'nox': nox,
-            #             'pm25': pm25,
-            #             'sox': sox,
-            #             'benzene': benzene,
-            #             'butadiene13': butadiene13,
-            #             'formaldehyde': formaldehyde,
-            #             'acetaldehyde': acetaldehyde,
-            #             'acrolein': acrolein,
-            #             }
-            # ghg = {'ch4': ch4,
-            #        'n2o': n2o,
-            #        }
-
-            # for k, v in criteria.items():
-            #     # inv_attr = f'{k}_vehicle_ustons'
-            #     # vad_veh.inv_attr = vad_veh.vmt * v / grams_per_us_ton
-            #
-            # for k, v in ghg.items():
-            #     inv_attr = f'{k}_vehicle_metrictons'
-            #     vad_veh.inv_attr = vad_veh.vmt * v / grams_per_metric_ton
-            #
-            # inv_attr = 'sox_vehicle_ustons'
-            # vad_veh.inv_attr = vad_veh.fuel_consumption * v / grams_per_us_ton
 
             vad_veh.voc_vehicle_ustons = vad_veh.vmt * voc / grams_per_us_ton
             vad_veh.co_vehicle_ustons = vad_veh.vmt * co / grams_per_us_ton
@@ -243,26 +193,34 @@ def calc_inventory(calendar_year):
             vad_veh.n2o_vehicle_metrictons = vad_veh.vmt * n2o / grams_per_metric_ton
             vad_veh.co2_vehicle_metrictons = vad_veh.vmt * vad_veh.onroad_co2_grams_per_mile / grams_per_metric_ton
 
-            # upstream inventory for petrol
+        # upstream inventory
+        if in_use_fuel_ID == 'US electricity':
+            voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
+                = get_powersector_ef(calendar_year, query=query)
+        else:
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o \
                 = get_refinery_ef(calendar_year, query=query)
 
-            vad_veh.voc_upstream_ustons = vad_veh.fuel_consumption * voc / grams_per_us_ton
-            vad_veh.co_upstream_ustons = vad_veh.fuel_consumption * co / grams_per_us_ton
-            vad_veh.nox_upstream_ustons = vad_veh.fuel_consumption * nox / grams_per_us_ton
-            vad_veh.pm25_upstream_ustons = vad_veh.fuel_consumption * pm25 / grams_per_us_ton
-            vad_veh.benzene_upstream_ustons = vad_veh.fuel_consumption * benzene / grams_per_us_ton
-            vad_veh.butadiene13_upstream_ustons = vad_veh.fuel_consumption * butadiene13 / grams_per_us_ton
-            vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
-            vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
-            vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
+        vad_veh.voc_upstream_ustons = vad_veh.fuel_consumption * voc / grams_per_us_ton
+        vad_veh.co_upstream_ustons = vad_veh.fuel_consumption * co / grams_per_us_ton
+        vad_veh.nox_upstream_ustons = vad_veh.fuel_consumption * nox / grams_per_us_ton
+        vad_veh.pm25_upstream_ustons = vad_veh.fuel_consumption * pm25 / grams_per_us_ton
+        vad_veh.benzene_upstream_ustons = vad_veh.fuel_consumption * benzene / grams_per_us_ton
+        vad_veh.butadiene13_upstream_ustons = vad_veh.fuel_consumption * butadiene13 / grams_per_us_ton
+        vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
+        vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
+        vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
+
+        if in_use_fuel_ID == 'US electricity':
+            vad_veh.naphthalene_upstream_ustons = 0
+        else:
             vad_veh.naphthalene_upstream_ustons = vad_veh.fuel_consumption * naphthalene / grams_per_us_ton
 
-            vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
+        vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
 
-            vad_veh.ch4_upstream_metrictons = vad_veh.fuel_consumption * ch4 / grams_per_metric_ton
-            vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
-            vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
+        vad_veh.ch4_upstream_metrictons = vad_veh.fuel_consumption * ch4 / grams_per_metric_ton
+        vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
+        vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
 
         # sum vehicle and upstream into totals
         vad_veh.voc_total_ustons = vad_veh.voc_vehicle_ustons + vad_veh.voc_upstream_ustons
@@ -279,87 +237,3 @@ def calc_inventory(calendar_year):
         vad_veh.ch4_total_metrictons = vad_veh.ch4_vehicle_metrictons + vad_veh.ch4_upstream_metrictons
         vad_veh.n2o_total_metrictons = vad_veh.n2o_vehicle_metrictons + vad_veh.n2o_upstream_metrictons
         vad_veh.co2_total_metrictons = vad_veh.co2_vehicle_metrictons + vad_veh.co2_upstream_metrictons
-
-
-# pandas approach; delete if team prefers the above DB approach
-def calc_vehicle_co2_gallons(vf_df, vad_df):
-    print('calc_vehicle_co2_gallons')
-
-    df_return = vf_df[['vehicle_id', 'model_year', 'showroom_fuel_id', 'cert_co2_grams_per_mile']]
-    df_return = vad_df.merge(df_return, on='vehicle_id', how='left')
-    df_return['onroad_co2_grams_per_mile'] = df_return['cert_co2_grams_per_mile'] / gap_ice
-    # the following structure would be needed if vehicle_annual_data doesn't already include the needed columns
-    # df_return.insert(len(df_return.columns),
-    #                  'onroad_co2_grams_per_mile',
-    #                  df_return['cert_co2_grams_per_mile'] / gap_ice)
-    df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', 'onroad_fuel_consumption_rate'] \
-        = co2_indolene / df_return['onroad_co2_grams_per_mile']
-
-    df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', 'co2_vehicle_metrictons'] \
-        = df_return[['vmt', 'onroad_co2_grams_per_mile']].product(axis=1) / grams_per_metric_ton
-
-    df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', 'fuel_consumption'] \
-        = df_return['vmt'] / df_return['onroad_fuel_consumption_rate']
-
-    return df_return
-
-
-def calc_vehicle_inventory(df_effects, vf_df, vef_df, *args):
-    print('calc_vehicle_inventory')
-
-    df_return = df_effects.merge(vf_df[['vehicle_id', 'reg_class_id']], on='vehicle_id', how='left')
-    temp = df_return[['model_year', 'age', 'reg_class_id']].merge(vef_df, on=['model_year', 'age', 'reg_class_id'], how='left')
-
-    for arg in args:
-        if arg == 'sox':
-            df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', f'{arg}_vehicle_ustons'] \
-                = df_return['fuel_consumption'] * temp[f'{arg}_grams_per_gallon'] / grams_per_us_ton
-        elif arg == 'ch4' or arg == 'n2o':
-            df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', f'{arg}_vehicle_metrictons'] \
-                = df_return['vmt'] * temp[f'{arg}_grams_per_mile'] / grams_per_metric_ton
-        else:
-            df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', f'{arg}_vehicle_ustons'] \
-                = df_return['vmt'] * temp[f'{arg}_grams_per_mile'] / grams_per_us_ton
-
-    return df_return
-
-
-def calc_refinery_inventory(df_effects, ref_df, *args):
-    print('calc_refinery_inventory')
-
-    df_return = df_effects.copy()
-    temp = df_return[['calendar_year']].merge(ref_df, on=['calendar_year'], how='left')
-
-    for arg in args:
-        if arg == 'ch4' or arg == 'n2o' or arg == 'co2':
-            df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', f'{arg}_upstream_metrictons'] \
-                = df_return['fuel_consumption'] * temp[f'{arg}_grams_per_gallon'] / grams_per_metric_ton
-        else:
-            df_return.loc[df_return['showroom_fuel_id'] != 'US electricity', f'{arg}_upstream_ustons'] \
-                = df_return['fuel_consumption'] * temp[f'{arg}_grams_per_gallon'] / grams_per_us_ton
-
-    return df_return
-
-
-def calc_powersector_inventory(df_effects, pef_df, *args):
-    print('calc_powersector_inventory')
-
-    df_return = df_effects.copy()
-    temp = df_return[['calendar_year']].merge(pef_df, on=['calendar_year'], how='left')
-    cert_kwh_per_mile = kwh_per_mile_cycle
-
-    df_return.loc[df_return['showroom_fuel_id'] == 'US electricity', 'onroad_fuel_consumption_rate'] \
-        = cert_kwh_per_mile / gap_bev / (1 - transloss)  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
-
-    df_return.loc[df_return['showroom_fuel_id'] == 'US electricity', 'fuel_consumption'] \
-        = df_return[['vmt', 'onroad_fuel_consumption_rate']].product(axis=1)
-
-    for arg in args:
-            if arg == 'ch4' or arg == 'n2o' or arg == 'co2':
-                df_return.loc[df_return['showroom_fuel_id'] == 'US electricity', f'{arg}_upstream_metrictons'] \
-                    = df_return['fuel_consumption'] * temp[f'{arg}_grams_per_kWh'] / grams_per_metric_ton
-            else:
-                df_return.loc[df_return['showroom_fuel_id'] == 'US electricity', f'{arg}_upstream_ustons'] \
-                    = df_return['fuel_consumption'] * temp[f'{arg}_grams_per_kWh'] / grams_per_us_ton
-
-    return df_return

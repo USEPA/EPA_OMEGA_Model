@@ -1,7 +1,7 @@
 """
 
 emission_costs.py
-============
+=================
 """
 import pandas as pd
 from itertools import product
@@ -98,7 +98,7 @@ def calc_carbon_emission_costs(calendar_year):
     """
     Calculate social costs associated with carbon emissions by calendar year for vehicles in the vehicle_annual_data table.
     :param calendar_year: calendar year
-    :return: Fills data in the vehicle_annual_data table that has not been filled to this point.
+    :return: Fills data in the monetized effects data table that is empty at this point.
     """
     from vehicle_annual_data import VehicleAnnualData
     from effects.monetized_effects_data import MonetizedEffectsData
@@ -108,9 +108,10 @@ def calc_carbon_emission_costs(calendar_year):
     vad_vehs = o2.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
 
     # UPDATE monetized effects data
+    # Since the monetized effects data table is empty, the med_list will store all data for this calendar year
+    # and write to that table in bulk via the add all.
+    med_list = list()
     for vad_veh in vad_vehs:
-        med_veh = MonetizedEffectsData.update_undiscounted_monetized_effects_data(vad_veh)
-
         co2_domestic_25, co2_domestic_30, co2_domestic_70, \
         ch4_domestic_25, ch4_domestic_30, ch4_domestic_70, \
         n2o_domestic_25, n2o_domestic_30, n2o_domestic_70, \
@@ -119,29 +120,55 @@ def calc_carbon_emission_costs(calendar_year):
         n2o_global_25, n2o_global_30, n2o_global_70 \
             = get_scc_cf(calendar_year, query=query)
 
-        med_veh.co2_domestic_25_social_cost_dollars = vad_veh.co2_total_metrictons * co2_domestic_25
-        med_veh.co2_domestic_30_social_cost_dollars = vad_veh.co2_total_metrictons * co2_domestic_30
-        med_veh.co2_domestic_70_social_cost_dollars = vad_veh.co2_total_metrictons * co2_domestic_70
+        co2_domestic_25_social_cost_dollars = vad_veh.co2_total_metrictons * co2_domestic_25
+        co2_domestic_30_social_cost_dollars = vad_veh.co2_total_metrictons * co2_domestic_30
+        co2_domestic_70_social_cost_dollars = vad_veh.co2_total_metrictons * co2_domestic_70
 
-        med_veh.ch4_domestic_25_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_domestic_25
-        med_veh.ch4_domestic_30_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_domestic_30
-        med_veh.ch4_domestic_70_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_domestic_70
+        ch4_domestic_25_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_domestic_25
+        ch4_domestic_30_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_domestic_30
+        ch4_domestic_70_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_domestic_70
 
-        med_veh.n2o_domestic_25_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_domestic_25
-        med_veh.n2o_domestic_30_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_domestic_30
-        med_veh.n2o_domestic_70_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_domestic_70
-        
-        med_veh.co2_global_25_social_cost_dollars = vad_veh.co2_total_metrictons * co2_global_25
-        med_veh.co2_global_30_social_cost_dollars = vad_veh.co2_total_metrictons * co2_global_30
-        med_veh.co2_global_70_social_cost_dollars = vad_veh.co2_total_metrictons * co2_global_70
+        n2o_domestic_25_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_domestic_25
+        n2o_domestic_30_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_domestic_30
+        n2o_domestic_70_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_domestic_70
 
-        med_veh.ch4_global_25_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_global_25
-        med_veh.ch4_global_30_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_global_30
-        med_veh.ch4_global_70_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_global_70
+        co2_global_25_social_cost_dollars = vad_veh.co2_total_metrictons * co2_global_25
+        co2_global_30_social_cost_dollars = vad_veh.co2_total_metrictons * co2_global_30
+        co2_global_70_social_cost_dollars = vad_veh.co2_total_metrictons * co2_global_70
 
-        med_veh.n2o_global_25_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_global_25
-        med_veh.n2o_global_30_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_global_30
-        med_veh.n2o_global_70_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_global_70
+        ch4_global_25_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_global_25
+        ch4_global_30_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_global_30
+        ch4_global_70_social_cost_dollars = vad_veh.ch4_total_metrictons * ch4_global_70
+
+        n2o_global_25_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_global_25
+        n2o_global_30_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_global_30
+        n2o_global_70_social_cost_dollars = vad_veh.n2o_total_metrictons * n2o_global_70
+
+        med_list.append(MonetizedEffectsData(vehicle_ID = vad_veh.vehicle_ID,
+                                             calendar_year = vad_veh.calendar_year,
+                                             age = vad_veh.age,
+                                             discount_status = 'undiscounted',
+                                             co2_domestic_25_social_cost_dollars = co2_domestic_25_social_cost_dollars,
+                                             co2_domestic_30_social_cost_dollars = co2_domestic_30_social_cost_dollars,
+                                             co2_domestic_70_social_cost_dollars = co2_domestic_70_social_cost_dollars,
+                                             ch4_domestic_25_social_cost_dollars = ch4_domestic_25_social_cost_dollars,
+                                             ch4_domestic_30_social_cost_dollars = ch4_domestic_30_social_cost_dollars,
+                                             ch4_domestic_70_social_cost_dollars = ch4_domestic_70_social_cost_dollars,
+                                             n2o_domestic_25_social_cost_dollars = n2o_domestic_25_social_cost_dollars,
+                                             n2o_domestic_30_social_cost_dollars = n2o_domestic_30_social_cost_dollars,
+                                             n2o_domestic_70_social_cost_dollars = n2o_domestic_70_social_cost_dollars,
+                                             co2_global_25_social_cost_dollars = co2_global_25_social_cost_dollars,
+                                             co2_global_30_social_cost_dollars = co2_global_30_social_cost_dollars,
+                                             co2_global_70_social_cost_dollars = co2_global_70_social_cost_dollars,
+                                             ch4_global_25_social_cost_dollars = ch4_global_25_social_cost_dollars,
+                                             ch4_global_30_social_cost_dollars = ch4_global_30_social_cost_dollars,
+                                             ch4_global_70_social_cost_dollars = ch4_global_70_social_cost_dollars,
+                                             n2o_global_25_social_cost_dollars = n2o_global_25_social_cost_dollars,
+                                             n2o_global_30_social_cost_dollars = n2o_global_30_social_cost_dollars,
+                                             n2o_global_70_social_cost_dollars = n2o_global_70_social_cost_dollars,
+                                             )
+                        )
+    o2.session.add_all(med_list)
 
 
 def calc_criteria_emission_costs(calendar_year):
@@ -159,19 +186,34 @@ def calc_criteria_emission_costs(calendar_year):
 
     # UPDATE monetized effects data
     for vad_veh in vad_vehs:
-        med_veh = MonetizedEffectsData.update_undiscounted_monetized_effects_data(vad_veh)
-        
+        med_veh = o2.session.query(MonetizedEffectsData).\
+            filter(MonetizedEffectsData.vehicle_ID == vad_veh.vehicle_ID).\
+            filter(MonetizedEffectsData.calendar_year == calendar_year).\
+            filter(MonetizedEffectsData.age == vad_veh.age).filter(MonetizedEffectsData.discount_status == 'undiscounted').one()
+
         pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7 \
             = get_criteria_cf(calendar_year, query=query)
 
-        med_veh.pm25_low_mortality_30_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_low_3
-        med_veh.pm25_high_mortality_30_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_high_3
+        pm25_low_mortality_30_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_low_3
+        pm25_high_mortality_30_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_high_3
 
-        med_veh.nox_low_mortality_30_social_cost_dollars = vad_veh.nox_total_ustons * nox_low_3
-        med_veh.nox_high_mortality_30_social_cost_dollars = vad_veh.nox_total_ustons * nox_high_3
+        nox_low_mortality_30_social_cost_dollars = vad_veh.nox_total_ustons * nox_low_3
+        nox_high_mortality_30_social_cost_dollars = vad_veh.nox_total_ustons * nox_high_3
 
-        med_veh.pm25_low_mortality_70_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_low_7
-        med_veh.pm25_high_mortality_70_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_high_7
+        pm25_low_mortality_70_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_low_7
+        pm25_high_mortality_70_social_cost_dollars = vad_veh.pm25_total_ustons * pm25_high_7
 
-        med_veh.nox_low_mortality_70_social_cost_dollars = vad_veh.nox_total_ustons * nox_low_7
-        med_veh.nox_high_mortality_70_social_cost_dollars = vad_veh.nox_total_ustons * nox_high_7
+        nox_low_mortality_70_social_cost_dollars = vad_veh.nox_total_ustons * nox_low_7
+        nox_high_mortality_70_social_cost_dollars = vad_veh.nox_total_ustons * nox_high_7
+
+        med_dict = {'pm25_low_mortality_30_social_cost_dollars': pm25_low_mortality_30_social_cost_dollars,
+                    'pm25_high_mortality_30_social_cost_dollars': pm25_high_mortality_30_social_cost_dollars,
+                    'nox_low_mortality_30_social_cost_dollars': nox_low_mortality_30_social_cost_dollars,
+                    'nox_high_mortality_30_social_cost_dollars': nox_high_mortality_30_social_cost_dollars,
+                    'pm25_low_mortality_70_social_cost_dollars': pm25_low_mortality_70_social_cost_dollars,
+                    'pm25_high_mortality_70_social_cost_dollars': pm25_high_mortality_70_social_cost_dollars,
+                    'nox_low_mortality_70_social_cost_dollars': nox_low_mortality_70_social_cost_dollars,
+                    'nox_high_mortality_70_social_cost_dollars': nox_high_mortality_70_social_cost_dollars,
+                    }
+
+        MonetizedEffectsData.update_undiscounted_monetized_effects_data(med_veh, med_dict)
