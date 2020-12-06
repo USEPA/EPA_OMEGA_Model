@@ -1,0 +1,68 @@
+"""
+
+cost_effects_scc.py
+===================
+"""
+# import pandas as pd
+
+import o2
+from usepa_omega2 import *
+
+
+class CostEffectsSCC(SQABase, OMEGABase):
+    # --- database table properties ---
+    __tablename__ = 'cost_effects_scc'
+    index = Column('index', Integer, primary_key=True)
+    vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
+    calendar_year = Column(Numeric)
+    age = Column(Numeric)
+    discount_status = Column(String)
+    # fuel_30_social_cost_dollars = Column(Float)
+    # fuel_70_social_cost_dollars = Column(Float)
+    # congestion_30_social_cost_dollars = Column(Float)
+    # congestion_70_social_cost_dollars = Column(Float)
+    # maintenance_30_social_cost_dollars = Column(Float)
+    # maintenance_70_social_cost_dollars = Column(Float)
+    # refueling_30_social_cost_dollars = Column(Float)
+    # refueling_70_social_cost_dollars = Column(Float)
+    # driving_30_social_cost_dollars = Column(Float)
+    # driving_70_social_cost_dollars = Column(Float)
+    co2_domestic_25_social_cost_dollars = Column(Float)
+    co2_domestic_30_social_cost_dollars = Column(Float)
+    co2_domestic_70_social_cost_dollars = Column(Float)
+    ch4_domestic_25_social_cost_dollars = Column(Float)
+    ch4_domestic_30_social_cost_dollars = Column(Float)
+    ch4_domestic_70_social_cost_dollars = Column(Float)
+    n2o_domestic_25_social_cost_dollars = Column(Float)
+    n2o_domestic_30_social_cost_dollars = Column(Float)
+    n2o_domestic_70_social_cost_dollars = Column(Float)
+    co2_global_25_social_cost_dollars = Column(Float)
+    co2_global_30_social_cost_dollars = Column(Float)
+    co2_global_70_social_cost_dollars = Column(Float)
+    ch4_global_25_social_cost_dollars = Column(Float)
+    ch4_global_30_social_cost_dollars = Column(Float)
+    ch4_global_70_social_cost_dollars = Column(Float)
+    n2o_global_25_social_cost_dollars = Column(Float)
+    n2o_global_30_social_cost_dollars = Column(Float)
+    n2o_global_70_social_cost_dollars = Column(Float)
+    # pm25_low_mortality_30_social_cost_dollars = Column(Float)
+    # pm25_high_mortality_30_social_cost_dollars = Column(Float)
+    # nox_low_mortality_30_social_cost_dollars = Column(Float)
+    # nox_high_mortality_30_social_cost_dollars = Column(Float)
+    # sox_low_mortality_30_social_cost_dollars = Column(Float)
+    # sox_high_mortality_30_social_cost_dollars = Column(Float)
+    # pm25_low_mortality_70_social_cost_dollars = Column(Float)
+    # pm25_high_mortality_70_social_cost_dollars = Column(Float)
+    # nox_low_mortality_70_social_cost_dollars = Column(Float)
+    # nox_high_mortality_70_social_cost_dollars = Column(Float)
+    # sox_low_mortality_70_social_cost_dollars = Column(Float)
+    # sox_high_mortality_70_social_cost_dollars = Column(Float)
+
+
+    @staticmethod
+    def update_undiscounted_monetized_effects_data(med_veh, med_dict):
+
+        for k, v in med_dict.items():
+            med_veh.__setattr__(k, v)
+
+        o2.session.flush()
