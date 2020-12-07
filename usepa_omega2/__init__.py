@@ -107,7 +107,7 @@ try:
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
-            self.num_analysis_years = 2  # number of years to run, if not all (None = run all)
+            self.num_analysis_years = None  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_sales_demand_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
