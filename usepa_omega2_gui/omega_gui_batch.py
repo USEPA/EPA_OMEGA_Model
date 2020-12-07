@@ -743,6 +743,7 @@ class Form(QObject):
         # time.sleep(20)
         log_file_array = []  # Clear log file array
         log_counter_array = []  # Clear counter array
+        log_ident_array = []  # Clear log identifier array
         file_timer = 0  # Counter for file search timer
 
         self.load_plots_2()
@@ -775,8 +776,20 @@ class Form(QObject):
                             except ValueError:
                                 log_file_array.append(fullpath)  # Append filename to log file array
                                 log_counter_array.append(0)  # Add another log counter for new file
-                                # print('###777', 'New file found')
-                                # print('###000', fullpath)  # Debug for now
+                                f = open(fullpath)  # Get identifier for status output
+                                lines = f.readlines()  # Read file
+                                f.close()  # Close file
+                                j = lines[0]  # Get first line
+                                # h = j.find('session')  # Look for 'session'
+                                if j.find('session') > -1:  # See if 'session' found
+                                    l = j.find('session') + 8
+                                    i = j.find(' ', l)  # Find the end of the next word after 'session'
+                                    k = j[l:i]  # Save the next word
+                                elif j.find('batch') > -1:  # See if 'batch' found:
+                                    k = 'Batch'  # Dave the word for output
+                                else:
+                                    k = ""  # Not recognized
+                                log_ident_array.append(k)
 
             # Get number of lines in the log files if they exist
             for log_loop in range(0, len(log_file_array)):
@@ -792,9 +805,17 @@ class Form(QObject):
                     f = open(log_file_array[log_loop])
                     lines = f.readlines()
                     f.close()
+
+                    # j = lines[0]  # Get first line
+                    # h = j.find('session')
+                    # l = h + 8
+                    # i = j.find(' ', 21)
+                    # k = j[l:i]
+                    # print('&&&', j, h, i, k)
+
                     g = lines[log_counter_array[log_loop]]
                     g = g.rstrip("\n")
-                    g = '[Process ' + str(log_loop) + '] ' + g
+                    g = '[' + log_ident_array[log_loop] + '] ' + g
                     # Select output color
                     color = status_output_color(g)
                     # Output to event monitor
