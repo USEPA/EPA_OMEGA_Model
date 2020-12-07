@@ -34,19 +34,19 @@ def run_postproc(iteration_log, single_shot):
         omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
     year_iter_labels = ['%d_%d_%d' % (cy - 2000, it, it_sub) for cy, it, it_sub in
-                        zip(iteration_log['calendar_year'], iteration_log['iteration'], iteration_log['iteration_sub'])]
+                        zip(iteration_log['calendar_year'][iteration_log['iteration_sub'] == -1], iteration_log['iteration'][iteration_log['iteration_sub'] == -1], iteration_log['iteration_sub'][iteration_log['iteration_sub'] == -1])]
     for mc in MarketClass.get_market_class_dict():
         plt.figure()
-        plt.plot(year_iter_labels, iteration_log['producer_share_frac_%s' % mc])
-        plt.plot(year_iter_labels, iteration_log['consumer_share_frac_%s' % mc])
+        plt.plot(year_iter_labels, iteration_log['producer_share_frac_%s' % mc][iteration_log['iteration_sub'] == -1])
+        plt.plot(year_iter_labels, iteration_log['consumer_share_frac_%s' % mc][iteration_log['iteration_sub'] == -1])
         plt.title('%s iteration' % mc)
         plt.grid()
         plt.legend(['producer_share_frac_%s' % mc, 'consumer_share_frac_%s' % mc])
         plt.ylim([0,1])
         plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
 
-    fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'])
-    label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (2.0 * iteration_log['iteration'].mean()))
+    fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'][iteration_log['iteration_sub'] == -1])
+    label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (2.0 * iteration_log['iteration'][iteration_log['iteration_sub'] == -1].mean()))
     fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
 
     calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
