@@ -158,24 +158,24 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
         batch_path = os.path.join(network_batch_path_root, batch_name)
         if 'Session Complete' in last_line:
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))
-            sysprint('$$$ dispy_run_session Completed, Session %s $$$' % session_name)
+            sysprint('$$$ dispy_run_session Completed, Session "%s" $$$' % session_name)
             return True
         elif 'Session Fail' in last_line:
             os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '#FAIL_' + session_name))
-            sysprint('?!? dispy_run_session Failed, Session %s ?!?' % session_name)
+            sysprint('?!? dispy_run_session Failed, Session "%s" ?!?' % session_name)
             return False
         else:
-            sysprint('??? Weird Summary File for Session %s : last_line = "%s" ???' % (session_name, last_line))
+            sysprint('??? Weird Summary File for Session "%s" : last_line = "%s" ???' % (session_name, last_line))
             return False
     else:
-        sysprint('??? No Summary File for Session %s, path_exists=%d, non_zero=%d ???' % (
+        sysprint('??? No Summary File for Session "%s", path_exists=%d, non_zero=%d ???' % (
             session_name, os.path.exists(summary_filename), os.path.getsize(summary_filename) > 0))
         if retry_count < 3:
-            sysprint('@@@ Trying Session %s again (attempt %d)... @@@' % (session_name, retry_count + 1))
+            sysprint('@@@ Trying Session "%s" again (attempt %d)... @@@' % (session_name, retry_count + 1))
             dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,
                               retry_count=retry_count + 1)
         else:
-            sysprint('!!! Abandoning Session %s... !!!' % session_name)
+            sysprint('!!! Abandoning Session "%s"... !!!' % session_name)
         return False
 
 

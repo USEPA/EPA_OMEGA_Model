@@ -607,6 +607,33 @@ if __name__ == '__main__':
                         else:
                             batch.sessions[s_index].run()
 
+                            time.sleep(1)  # wait for files to close
+
+                            summary_filename = os.path.join(options.bundle_path_root, batch.name,
+                                                            batch.sessions[s_index].name, 'output',
+                                                            'o2log_%s_%s.txt' % (
+                                                            batch.name, batch.sessions[s_index].name))
+
+                            # check session completion status and add status prefix to session folder
+                            if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
+                                with open(summary_filename, "r") as f_read:
+                                    last_line = f_read.readlines()[-1]
+                                batch_path = os.path.join(options.bundle_path_root, batch.name)
+                                if 'Session Complete' in last_line:
+                                    completion_prefix = '_'
+                                    batch_log.logwrite('$$$ Session Completed, Session "%s" $$$' %
+                                                       batch.sessions[s_index].name)
+                                elif 'Session Fail' in last_line:
+                                    completion_prefix = '#FAIL_'
+                                    batch_log.logwrite('!!! Session Failed, Session "%s" !!!' % batch.sessions[s_index].name)
+                                else:
+                                    completion_prefix = '#WEIRD_'
+                                    batch_log.logwrite('??? Weird Summary File for Session "%s" : last_line = "%s" ???' % (
+                                    batch.sessions[s_index].name, last_line))
+
+                                os.rename(os.path.join(batch_path, batch.sessions[s_index].name),
+                                          os.path.join(batch_path, completion_prefix + batch.sessions[s_index].name))
+
                     batch_log.end_logfile("*** batch complete ***")
 
     except:
