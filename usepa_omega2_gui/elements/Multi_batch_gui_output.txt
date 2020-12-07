@@ -1,0 +1,190 @@
+12/04/2020 12:38:17  OMEGA Version 0.3.0 Ready
+----------
+Open a valid Configuration File or:
+    Select New Input Batch File, Select New Output Batch Directory, and Save Configuration File
+----------
+12/04/2020 12:38:26  Configuration File Loaded:
+    [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\OMEGA\GUI Test\Batch Test 1.om2]
+Configuration Loaded.
+Model Run Enabled.
+Punch It Chewie!
+----------
+12/04/2020 12:38:31  Start Model Run
+12/04/2020 12:38:35  [B log] OMEGA log started at 2020-12-04 12:38:35
+12/04/2020 12:38:35  [B log] 
+12/04/2020 12:38:35  [B log] Validating batch definition source files...
+12/04/2020 12:38:35  [B log] 
+12/04/2020 12:38:35  [B log] Validating Session 0 ('ReferencePolicy') Files...
+12/04/2020 12:38:35  [B log] Validating Session 0 Parameters...
+12/04/2020 12:38:35  [B log] Getting Session I/O settings...
+12/04/2020 12:38:35  [B log] Getting Runtime Settings...
+12/04/2020 12:38:35  [B log] Getting Postproc Settings...
+12/04/2020 12:38:35  [B log] 
+12/04/2020 12:38:35  [B log] *** validation complete ***
+12/04/2020 12:38:35  [B log] Bundling Source Files...
+12/04/2020 12:38:37  [B log] Bundling Session 0 Files...
+12/04/2020 12:38:42  [B log] Batch name = 2020_12_04_12_38_31_single_session_batch
+12/04/2020 12:38:42  [B log] REMOTE BATCHFILE = 2020_12_04_12_38_31_single_session_batch.csv
+12/04/2020 12:38:42  [B log] 
+12/04/2020 12:38:42  [B log] Processing Session 0 (ReferencePolicy):
+12/04/2020 12:38:42  [B log] Starting Session 'ReferencePolicy' -> output\
+12/04/2020 12:38:42  [B log] Getting Session I/O settings...
+12/04/2020 12:38:42  [B log] Getting Runtime Settings...
+12/04/2020 12:38:42  [B log] Getting Postproc Settings...
+12/04/2020 12:38:42  [B log] Starting Compliance Run ReferencePolicy ...
+12/04/2020 12:38:42  [S log] OMEGA2 0.3.0 session ReferencePolicy started at 2020-12-04 12:38:42
+12/04/2020 12:38:42  [S log] 
+12/04/2020 12:38:46  [S log] Running: OMEGA 2 Version 0.3.0
+12/04/2020 12:38:46  [S log] Running: Manufacturer=USA Motors
+12/04/2020 12:38:46  [S log] Running: Year=2021  Iteration=0
+12/04/2020 12:38:51  [S log] Running: Year=2022  Iteration=0
+12/04/2020 12:38:56  [S log] Running: Year=2023  Iteration=0
+12/04/2020 12:39:00  [S log] Running: Year=2024  Iteration=0
+12/04/2020 12:39:05  [S log] Running: Year=2025  Iteration=0
+12/04/2020 12:39:10  [S log] Running: Year=2026  Iteration=0
+12/04/2020 12:39:15  [S log] Running: Year=2027  Iteration=0
+12/04/2020 12:39:24  [S log] Running: Year=2028  Iteration=0
+12/04/2020 12:39:29  [S log] Running: Year=2029  Iteration=0
+12/04/2020 12:39:34  [S log] Running: Year=2030  Iteration=0
+12/04/2020 12:39:39  [S log] Running: Year=2031  Iteration=0
+12/04/2020 12:39:45  [S log] Running: Year=2032  Iteration=0
+12/04/2020 12:39:50  [S log] Running: Year=2033  Iteration=0
+12/04/2020 12:39:55  [S log] Running: Year=2034  Iteration=0
+12/04/2020 12:40:01  [S log] Running: Year=2035  Iteration=0
+12/04/2020 12:40:06  [S log] Running: Year=2036  Iteration=0
+12/04/2020 12:40:11  [S log] Running: Year=2037  Iteration=0
+12/04/2020 12:40:16  [S log] Running: Year=2038  Iteration=0
+12/04/2020 12:40:21  [S log] Running: Year=2039  Iteration=0
+12/04/2020 12:40:26  [S log] Running: Year=2040  Iteration=0
+12/04/2020 12:40:31  [S log] Running: Year=2041  Iteration=0
+12/04/2020 12:40:36  [S log] Running: Year=2042  Iteration=0
+12/04/2020 12:40:41  [S log] Running: Year=2043  Iteration=0
+12/04/2020 12:40:46  [S log] Running: Year=2044  Iteration=0
+12/04/2020 12:40:51  [S log] Running: Year=2045  Iteration=0
+12/04/2020 12:40:56  [S log] Running: Year=2046  Iteration=0
+12/04/2020 12:41:01  [S log] Running: Year=2047  Iteration=0
+12/04/2020 12:41:06  [S log] Running: Year=2048  Iteration=0
+12/04/2020 12:41:11  [S log] Running: Year=2049  Iteration=0
+12/04/2020 12:41:16  [S log] Running: Year=2050  Iteration=0
+12/04/2020 12:41:37  [S log] ReferencePolicy: Post Processing ...
+12/04/2020 12:41:53  [B log] 
+12/04/2020 12:41:53  [B log] OMEGA log ended at 2020-12-04 12:41:53
+12/04/2020 12:41:53  [B log] 
+12/04/2020 12:41:53  [B log] Elapsed Time 197.70 Seconds
+12/04/2020 12:41:53  [B log] 
+12/04/2020 12:41:53  [B log] *** batch complete ***
+12/04/2020 12:41:53  [S log] 
+12/04/2020 12:41:53  [S log] Session ended at 2020-12-04 12:41:53
+12/04/2020 12:41:53  [S log] 
+12/04/2020 12:41:53  [S log] Elapsed Time 190.77 Seconds
+12/04/2020 12:41:53  [S log] 
+12/04/2020 12:41:53  [S log] 
+12/04/2020 12:41:53  [S log] Session Complete
+12/04/2020 12:41:54  Model Run Time = 0 hours 3 mins 22 seconds
+12/04/2020 12:41:54  End Model Run
+----------
+12/04/2020 13:14:09  Configuration File Loaded:
+    [C:\Users\jcherr01\OneDrive - Environmental Protection Agency (EPA)\Documents\Jeff Documents\OMEGA\GUI Test\test100.om2]
+Configuration Loaded.
+Model Run Enabled.
+Punch It Chewie!
+----------
+12/04/2020 13:14:17  Multi Processor Mode Selected
+12/04/2020 13:14:24  Start Model Run
+12/04/2020 13:14:28  [B log] OMEGA log started at 2020-12-04 13:14:28
+12/04/2020 13:14:28  [B log] 
+12/04/2020 13:14:28  [B log] Validating batch definition source files...
+12/04/2020 13:14:28  [B log] 
+12/04/2020 13:14:28  [B log] Validating Session 0 ('ReferencePolicy') Files...
+12/04/2020 13:14:28  [B log] Validating Session 0 Parameters...
+12/04/2020 13:14:28  [B log] Getting Session I/O settings...
+12/04/2020 13:14:28  [B log] Getting Runtime Settings...
+12/04/2020 13:14:28  [B log] Getting Postproc Settings...
+12/04/2020 13:14:28  [B log] 
+12/04/2020 13:14:28  [B log] Validating Session 1 ('ActionAlternative-BS=0') Files...
+12/04/2020 13:14:28  [B log] Validating Session 1 Parameters...
+12/04/2020 13:14:28  [B log] Getting Session I/O settings...
+12/04/2020 13:14:28  [B log] Getting Runtime Settings...
+12/04/2020 13:14:28  [B log] Getting Postproc Settings...
+12/04/2020 13:14:28  [B log] 
+12/04/2020 13:14:28  [B log] Validating Session 2 ('ActionAlternative-BS=1') Files...
+12/04/2020 13:14:28  [B log] Validating Session 2 Parameters...
+12/04/2020 13:14:28  [B log] Getting Session I/O settings...
+12/04/2020 13:14:28  [B log] Getting Runtime Settings...
+12/04/2020 13:14:28  [B log] Getting Postproc Settings...
+12/04/2020 13:14:28  [B log] 
+12/04/2020 13:14:28  [B log] *** validation complete ***
+12/04/2020 13:14:28  [B log] Bundling Source Files...
+12/04/2020 13:14:29  [B log] Bundling Session 0 Files...
+12/04/2020 13:14:29  [B log] Bundling Session 1 Files...
+12/04/2020 13:14:29  [B log] Bundling Session 2 Files...
+12/04/2020 13:14:34  [B log] Batch name = 2020_12_04_13_14_24_multiple_session_batch
+12/04/2020 13:14:54  [S log] OMEGA2 0.3.0 session ReferencePolicy started at 2020-12-04 13:14:54
+12/04/2020 13:14:54  [S log] 
+12/04/2020 13:14:55  [B log] Getting Runtime Settings...
+12/04/2020 13:14:55  [B log] Getting Postproc Settings...
+12/04/2020 13:14:55  [B log] Starting Compliance Run ActionAlternative-BS=0 ...
+12/04/2020 13:15:04  [S log] Running: OMEGA 2 Version 0.3.0
+12/04/2020 13:15:04  [S log] Running: Manufacturer=USA Motors
+12/04/2020 13:15:04  [S log] Running: Year=2021  Iteration=0
+12/04/2020 13:15:10  [S log] Running: Year=2022  Iteration=0
+12/04/2020 13:15:18  [S log] Running: Year=2023  Iteration=0
+12/04/2020 13:15:24  [S log] Running: Year=2024  Iteration=0
+12/04/2020 13:15:30  [S log] Running: Year=2025  Iteration=0
+12/04/2020 13:15:36  [S log] Running: Year=2026  Iteration=0
+12/04/2020 13:15:43  [S log] Running: Year=2027  Iteration=0
+12/04/2020 13:15:50  [S log] Running: Year=2028  Iteration=0
+12/04/2020 13:15:56  [S log] Running: Year=2029  Iteration=0
+12/04/2020 13:16:03  [S log] Running: Year=2030  Iteration=0
+12/04/2020 13:16:10  [S log] Running: Year=2031  Iteration=0
+12/04/2020 13:16:17  [S log] Running: Year=2032  Iteration=0
+12/04/2020 13:16:24  [S log] Running: Year=2033  Iteration=0
+12/04/2020 13:16:30  [S log] Running: Year=2034  Iteration=0
+12/04/2020 13:16:37  [S log] Running: Year=2035  Iteration=0
+12/04/2020 13:16:45  [S log] Running: Year=2036  Iteration=0
+12/04/2020 13:16:51  [S log] Running: Year=2037  Iteration=0
+12/04/2020 13:16:58  [S log] Running: Year=2038  Iteration=0
+12/04/2020 13:17:05  [S log] Running: Year=2039  Iteration=0
+12/04/2020 13:17:12  [S log] Running: Year=2040  Iteration=0
+12/04/2020 13:17:19  [S log] Running: Year=2041  Iteration=0
+12/04/2020 13:17:26  [S log] Running: Year=2042  Iteration=0
+12/04/2020 13:17:32  [S log] Running: Year=2043  Iteration=0
+12/04/2020 13:17:39  [S log] Running: Year=2044  Iteration=0
+12/04/2020 13:17:46  [S log] Running: Year=2045  Iteration=0
+12/04/2020 13:17:54  [S log] Running: Year=2046  Iteration=0
+12/04/2020 13:18:00  [S log] Running: Year=2047  Iteration=0
+12/04/2020 13:18:07  [S log] Running: Year=2048  Iteration=0
+12/04/2020 13:18:15  [S log] Running: Year=2049  Iteration=0
+12/04/2020 13:18:22  [S log] Running: Year=2050  Iteration=0
+12/04/2020 13:18:52  [S log] ReferencePolicy: Post Processing ...
+12/04/2020 13:19:15  [S log] 
+12/04/2020 13:19:15  [S log] Session ended at 2020-12-04 13:19:15
+12/04/2020 13:19:15  [S log] 
+12/04/2020 13:19:15  [S log] Elapsed Time 261.05 Seconds
+12/04/2020 13:19:15  [S log] 
+12/04/2020 13:19:15  [S log] 
+12/04/2020 13:19:15  [S log] Session Complete
+12/04/2020 13:19:16  [B log] 
+12/04/2020 13:19:16  [B log] OMEGA log ended at 2020-12-04 13:19:15
+12/04/2020 13:19:16  [B log] 
+12/04/2020 13:19:16  [B log] Elapsed Time 266.16 Seconds
+12/04/2020 13:19:16  [B log] 
+12/04/2020 13:19:16  [B log] *** batch complete ***
+12/04/2020 13:26:24  [B log] OMEGA log ended at 2020-12-04 13:26:24
+12/04/2020 13:26:24  [B log] 
+12/04/2020 13:26:24  [B log] Elapsed Time 694.44 Seconds
+12/04/2020 13:26:24  [B log] 
+12/04/2020 13:26:24  [B log] *** batch complete ***
+12/04/2020 13:27:02  [B log] OMEGA log ended at 2020-12-04 13:27:02
+12/04/2020 13:27:02  [B log] 
+12/04/2020 13:27:02  [B log] Elapsed Time 732.46 Seconds
+12/04/2020 13:27:02  [B log] 
+12/04/2020 13:27:02  [B log] *** batch complete ***
+12/04/2020 13:27:04  [B log] OMEGA log ended at 2020-12-04 13:27:04
+12/04/2020 13:27:04  [B log] 
+12/04/2020 13:27:04  [B log] Elapsed Time 756.21 Seconds
+12/04/2020 13:27:04  [B log] 
+12/04/2020 13:27:04  [B log] *** batch complete ***
+12/04/2020 13:27:04  Model Run Time = 0 hours 12 mins 40 seconds
+12/04/2020 13:27:04  End Model Run
+----------

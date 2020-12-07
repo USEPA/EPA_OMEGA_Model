@@ -530,6 +530,8 @@ class Form(QObject):
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
+
+
     def wizard_logic(self):
         """
         Handles the gui logic to enable and disable various controls and launch event monitor messages.
@@ -737,18 +739,12 @@ class Form(QObject):
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # Complete paths to log files
-        status_file_batch = output_batch_subdirectory + "/" + log_file_batch
-        status_file_session = output_session_subdirectory + "/" + log_file_session_prefix + batch_time_stamp +\
-                              '_' + excel_data_df.loc['Batch Name', 'Value'] + log_file_session_suffix
-        # If more log files are monitored (currently 2) just add another element to the 3 arrays below
-        # Enter log file names into array
-        log_file_array = [status_file_batch, status_file_session]
-        # Give the log files a name
-        log_label_array = ['B log', 'S log']
-        # Temporary counter arrays
-        log_counter_array = [0, 0]
-        # log_status_array = [0, 0]
-        # log_lines_array = [0, 0]
+        # First find the log files
+        # time.sleep(20)
+        log_file_array = []  # Clear log file array
+        log_counter_array = []  # Clear counter array
+        file_timer = 0  # Counter for file search timer
+
         self.load_plots_2()
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
@@ -762,6 +758,26 @@ class Form(QObject):
             elapsed_time = str(elapsed_time)
             elapsed_time = "Model Running\n" + elapsed_time[:-7]
             self.window.model_status_label.setText(elapsed_time)
+
+            # Look for new log files
+            file_timer = file_timer + 1
+            if file_timer > 20:  # Look for new files every 2 seconds
+                file_timer = 0
+                directory = output_batch_subdirectory + "/"  # Define output directory to search
+                for root, dirs, files in os.walk(directory):  # Search includes subdirectories
+                    for file in files:  # Begin search
+                        if file.endswith('.txt'):  # Process if .txt file is found
+                            fullpath = os.path.join(root, file)  # Generate complete path of file
+                            # log_file_array.append(fullpath)
+                            # log_counter_array.append(0)
+                            try:
+                                log_file_array.index(fullpath)  # See if found .txt file already in log file
+                            except ValueError:
+                                log_file_array.append(fullpath)  # Append filename to log file array
+                                log_counter_array.append(0)  # Add another log counter for new file
+                                print('###777', 'New file found')
+                                print('###000', fullpath)  # Debug for now
+
             # Get number of lines in the log files if they exist
             for log_loop in range(0, len(log_file_array)):
                 if os.path.isfile(log_file_array[log_loop]):
@@ -778,7 +794,7 @@ class Form(QObject):
                     f.close()
                     g = lines[log_counter_array[log_loop]]
                     g = g.rstrip("\n")
-                    g = '[' + log_label_array[log_loop] + '] ' + g
+                    g = '[Process ' + str(log_loop) + '] ' + g
                     # Select output color
                     color = status_output_color(g)
                     # Output to event monitor
