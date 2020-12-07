@@ -35,7 +35,7 @@ class OMEGALog(OMEGABase):
         self.start_time = time.time()
 
         with open(self.logfilename, 'w') as log:
-            log.write('OMEGA log started at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
+            log.write('OMEGA batch log started at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
 
     def logwrite(self, message, terminator='\n'):
         with open(self.logfilename, 'a') as log:

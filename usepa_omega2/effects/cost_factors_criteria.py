@@ -18,14 +18,19 @@ class CostFactorsCriteria(SQABase, OMEGABase):
     index = Column('index', Integer, primary_key=True)
 
     calendar_year = Column('calendar_year', Numeric)
-    discount_rate = Column('discount_rate', Numeric)
-    fuel_id = Column('fuel_id', String)
-    pollutant = Column('pollutant', String)
     dollar_basis = Column('dollar_basis', Numeric)
-    low_mortality_onroad = Column('low-mortality_onroad', Numeric)
-    high_mortality_onroad = Column('high-mortality_onroad', Numeric)
-    low_mortality_upstream = Column('low-mortality_upstream', Numeric)
-    high_mortality_upstream = Column('high-mortality_upstream', Numeric)
+    pm25_low_mortality_30 = Column('pm25_low-mortality_3.0_USD_per_uston', Float)
+    pm25_high_mortality_30 = Column('pm25_high-mortality_3.0_USD_per_uston', Float)
+    nox_low_mortality_30 = Column('nox_low-mortality_3.0_USD_per_uston', Float)
+    nox_high_mortality_30 = Column('nox_high-mortality_3.0_USD_per_uston', Float)
+    sox_low_mortality_30 = Column('sox_low-mortality_3.0_USD_per_uston', Float)
+    sox_high_mortality_30 = Column('sox_high-mortality_3.0_USD_per_uston', Float)
+    pm25_low_mortality_70 = Column('pm25_low-mortality_7.0_USD_per_uston', Float)
+    pm25_high_mortality_70 = Column('pm25_high-mortality_7.0_USD_per_uston', Float)
+    nox_low_mortality_70 = Column('nox_low-mortality_7.0_USD_per_uston', Float)
+    nox_high_mortality_70 = Column('nox_high-mortality_7.0_USD_per_uston', Float)
+    sox_low_mortality_70 = Column('sox_low-mortality_7.0_USD_per_uston', Float)
+    sox_high_mortality_70 = Column('sox_high-mortality_7.0_USD_per_uston', Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -33,10 +38,14 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'context_cost_factors-criteria'
-        input_template_version = 0.1
-        input_template_columns = {'calendar_year', 'discount_rate', 'fuel_id', 'pollutant', 'dollar_basis',
-                                  'low-mortality_onroad', 'high-mortality_onroad',
-                                  'low-mortality_upstream', 'high-mortality_upstream'}
+        input_template_version = 0.2
+        input_template_columns = {'calendar_year', 'dollar_basis',
+                                  'pm25_low-mortality_3.0_USD_per_uston', 'pm25_high-mortality_3.0_USD_per_uston',
+                                  'nox_low-mortality_3.0_USD_per_uston', 'nox_high-mortality_3.0_USD_per_uston',
+                                  'sox_low-mortality_3.0_USD_per_uston', 'sox_high-mortality_3.0_USD_per_uston',
+                                  'pm25_low-mortality_7.0_USD_per_uston', 'pm25_high-mortality_7.0_USD_per_uston',
+                                  'nox_low-mortality_7.0_USD_per_uston', 'nox_high-mortality_7.0_USD_per_uston',
+                                  'sox_low-mortality_7.0_USD_per_uston', 'sox_high-mortality_7.0_USD_per_uston'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -49,7 +58,14 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             deflators = pd.read_csv(o2.options.cpi_deflators_file, skiprows=1, index_col=0)
-            df = gen_fxns.adjust_dollars(df, deflators, 'low-mortality_onroad', 'high-mortality_onroad', 'low-mortality_upstream', 'high-mortality_upstream')
+            df = gen_fxns.adjust_dollars(df, deflators, 
+                                         'pm25_low-mortality_3.0_USD_per_uston', 'pm25_high-mortality_3.0_USD_per_uston',
+                                         'nox_low-mortality_3.0_USD_per_uston', 'nox_high-mortality_3.0_USD_per_uston',
+                                         'sox_low-mortality_3.0_USD_per_uston', 'sox_high-mortality_3.0_USD_per_uston',
+                                         'pm25_low-mortality_7.0_USD_per_uston', 'pm25_high-mortality_7.0_USD_per_uston',
+                                         'nox_low-mortality_7.0_USD_per_uston', 'nox_high-mortality_7.0_USD_per_uston',
+                                         'sox_low-mortality_7.0_USD_per_uston', 'sox_high-mortality_7.0_USD_per_uston',
+                                         )
 
             if not template_errors:
                 obj_list = []
@@ -57,15 +73,20 @@ class CostFactorsCriteria(SQABase, OMEGABase):
                 for i in df.index:
                     obj_list.append(CostFactorsCriteria(
                         calendar_year=df.loc[i, 'calendar_year'],
-                        discount_rate=df.loc[i, 'discount_rate'],
-                        fuel_id=df.loc[i, 'fuel_id'],
-                        pollutant=df.loc[i, 'pollutant'],
                         dollar_basis=df.loc[i, 'dollar_basis'],
-                        low_mortality_onroad=df.loc[i, 'low-mortality_onroad'],
-                        high_mortality_onroad=df.loc[i, 'high-mortality_onroad'],
-                        low_mortality_upstream=df.loc[i, 'low-mortality_upstream'],
-                        high_mortality_upstream=df.loc[i, 'high-mortality_upstream'],
-                    ))
+                        pm25_low_mortality_30=df.loc[i, 'pm25_low-mortality_3.0_USD_per_uston'],
+                        pm25_high_mortality_30=df.loc[i, 'pm25_high-mortality_3.0_USD_per_uston'],
+                        nox_low_mortality_30=df.loc[i, 'nox_low-mortality_3.0_USD_per_uston'],
+                        nox_high_mortality_30=df.loc[i, 'nox_high-mortality_3.0_USD_per_uston'],
+                        sox_low_mortality_30=df.loc[i, 'sox_low-mortality_3.0_USD_per_uston'],
+                        sox_high_mortality_30=df.loc[i, 'sox_high-mortality_3.0_USD_per_uston'],
+                        pm25_low_mortality_70=df.loc[i, 'pm25_low-mortality_7.0_USD_per_uston'],
+                        pm25_high_mortality_70=df.loc[i, 'pm25_high-mortality_7.0_USD_per_uston'],
+                        nox_low_mortality_70=df.loc[i, 'nox_low-mortality_7.0_USD_per_uston'],
+                        nox_high_mortality_70=df.loc[i, 'nox_high-mortality_7.0_USD_per_uston'],
+                        sox_low_mortality_70=df.loc[i, 'sox_low-mortality_7.0_USD_per_uston'],
+                        sox_high_mortality_70=df.loc[i, 'sox_high-mortality_7.0_USD_per_uston'],
+                        ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
 
