@@ -775,8 +775,8 @@ class Form(QObject):
                             except ValueError:
                                 log_file_array.append(fullpath)  # Append filename to log file array
                                 log_counter_array.append(0)  # Add another log counter for new file
-                                print('###777', 'New file found')
-                                print('###000', fullpath)  # Debug for now
+                                # print('###777', 'New file found')
+                                # print('###000', fullpath)  # Debug for now
 
             # Get number of lines in the log files if they exist
             for log_loop in range(0, len(log_file_array)):
