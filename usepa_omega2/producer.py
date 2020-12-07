@@ -71,7 +71,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
                 if producer_bev_share is not None:  # and new_veh.fueling_class != 'BEV':
                     co2_gpmi_options = np.array([])
                     for idx, combo in producer_bev_share.iterrows():
-                        veh_co2_gpmi = combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
+                        veh_co2_gpmi = combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
                         min_co2_gpmi = max(min_co2_gpmi, veh_co2_gpmi * (1 - share_range))
                         max_co2_gpmi = min(max_co2_gpmi, veh_co2_gpmi * (1 + share_range))
                         co2_gpmi_options = \
@@ -90,18 +90,18 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
                 # else:  # ICE vehicle and consumer_bev_share available
                 #     if o2.options.allow_backsliding:
-                #         max_co2_gpmi = consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1
+                #         max_co2_gpmi = consumer_bev_share['veh_%s_co2_gpmi' % new_veh.vehicle_ID] * 1.1
                 #     else:
-                #         max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile, consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
+                #         max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile, consumer_bev_share['veh_%s_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
                 #
-                #     min_co2_gpmi = max(new_veh.get_min_co2_gpmi(), consumer_bev_share['veh_%d_co2_gpmi' % new_veh.vehicle_ID] * 0.9)
+                #     min_co2_gpmi = max(new_veh.get_min_co2_gpmi(), consumer_bev_share['veh_%s_co2_gpmi' % new_veh.vehicle_ID] * 0.9)
                 #
                 #     co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
                 tech_cost_options = new_veh.get_cost(co2_gpmi_options)
 
-                df['veh_%d_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
-                df['veh_%d_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
+                df['veh_%s_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
+                df['veh_%s_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
 
                 child_df_list.append(df)
 
@@ -222,8 +222,8 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_composite_vehicles:
-        new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
-        new_veh.initial_registered_count = winning_combo['veh_%d_sales' % new_veh.vehicle_ID]
+        new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
+        new_veh.initial_registered_count = winning_combo['veh_%s_sales' % new_veh.vehicle_ID]
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
         new_veh.set_cert_target_CO2_Mg()
@@ -359,21 +359,21 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
         else:
             vehicle_sales = total_sales * tech_share_combos_total['consumer_abs_share_frac_%s' % market_class]
         vehicle_sales = vehicle_sales * new_veh.reg_class_market_share_frac
-        tech_share_combos_total['veh_%d_sales' % new_veh.vehicle_ID] = vehicle_sales
+        tech_share_combos_total['veh_%s_sales' % new_veh.vehicle_ID] = vehicle_sales
 
         # calculate vehicle total cost
-        vehicle_total_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%d_cost_dollars' % new_veh.vehicle_ID]
-        tech_share_combos_total['veh_%d_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_cost_dollars
+        vehicle_total_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%s_cost_dollars' % new_veh.vehicle_ID]
+        tech_share_combos_total['veh_%s_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_cost_dollars
 
         # calculate cert and target Mg for the vehicle
-        co2_gpmi = tech_share_combos_total['veh_%d_co2_gpmi' % new_veh.vehicle_ID]
+        co2_gpmi = tech_share_combos_total['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
 
         cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(new_veh, co2_gpmi_variants=co2_gpmi,
                                                                     sales_variants=vehicle_sales)
         target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(new_veh,
                                                                         sales_variants=vehicle_sales)
-        tech_share_combos_total['veh_%d_cert_co2_megagrams' % new_veh.vehicle_ID] = cert_co2_Mg
-        tech_share_combos_total['veh_%d_target_co2_megagrams' % new_veh.vehicle_ID] = target_co2_Mg
+        tech_share_combos_total['veh_%s_cert_co2_megagrams' % new_veh.vehicle_ID] = cert_co2_Mg
+        tech_share_combos_total['veh_%s_target_co2_megagrams' % new_veh.vehicle_ID] = target_co2_Mg
         # update totals
         total_target_co2_Mg = total_target_co2_Mg + target_co2_Mg
         total_cert_co2_Mg = total_cert_co2_Mg + cert_co2_Mg

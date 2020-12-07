@@ -78,13 +78,13 @@ try:
             self.producer_iteration_tolerance = 1e-6
 
             self.iterate_producer_consumer = True
+            self.producer_consumer_max_iterations = 10
             self.producer_consumer_iteration_tolerance = 0.01
-            self.producer_consumer_max_iterations = 20
 
             self.consumer_pricing_max_iterations = 50
             self.consumer_pricing_num_options = 4
-            self.consumer_pricing_multiplier_min = 0.01
-            self.consumer_pricing_multiplier_max = 2.00
+            self.consumer_pricing_multiplier_min = 0.8
+            self.consumer_pricing_multiplier_max = 1.2
 
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
@@ -103,11 +103,11 @@ try:
             self.end_time = 0
 
             # debugging options
-            self.verbose_console = ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console = []  # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
-            self.num_analysis_years = None  # number of years to run, if not all (None = run all)
+            self.num_analysis_years = 2  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_sales_demand_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
