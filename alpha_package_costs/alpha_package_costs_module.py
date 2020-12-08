@@ -4,6 +4,7 @@ from pathlib import Path, PurePath
 from datetime import datetime
 from itertools import product
 import shutil
+import matplotlib.pyplot as plt
 from usepa_omega2.drive_cycle_energy_calcs import SAEJ2951_target_inertia_and_roadload_weight_combined_calcs
 from usepa_omega2 import *
 
@@ -283,6 +284,85 @@ def dollar_basis_year(df):
     return dollar_year
 
 
+def cost_vs_co2_plot(df, path, *years):
+    ice_classes = [x for x in df['cost_curve_class'].unique() if 'ice' in x]
+    bev_classes = [x for x in df['cost_curve_class'].unique() if 'bev' in x]
+    for year in years:
+        ice_data = dict()
+        ice_plot = list()
+        ice_legends = list()
+        bev_data = dict()
+        bev_plot = list()
+        bev_legends = list()
+        for cost_curve_class in ice_classes:
+            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_co2_grams_per_mile'],
+                                          df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
+            ice_plot.append(ice_data[cost_curve_class])
+            ice_legends.append(cost_curve_class)
+        for cost_curve_class in bev_classes:
+            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_co2_grams_per_mile'],
+                                          df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
+            bev_plot.append(bev_data[cost_curve_class])
+            bev_legends.append(cost_curve_class)
+        
+        ice_plot = tuple(ice_plot)
+        ice_legends = tuple(ice_legends)
+        bev_plot = tuple(bev_plot)
+        bev_legends = tuple(bev_legends)
+
+        # create ice plot
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.grid(True)
+        for ice_plot, ice_legends in zip(ice_plot, ice_legends):
+            x, y = ice_plot
+            ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=ice_legends)
+            ax.set(xlim=(0, 500), ylim=(10000, 60000))
+            plt.legend(loc=2)
+            plt.title(f'ice_{year}')
+            plt.savefig(path / f'ice_{year}.png')
+
+        # create bev plot
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.grid(True)
+        for bev_plot, bev_legends in zip(bev_plot, bev_legends):
+            x, y = bev_plot
+            ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=bev_legends)
+            ax.set(xlim=(0, 500), ylim=(10000, 60000))
+            plt.legend(loc=4)
+            plt.title(f'bev_{year}')
+            plt.savefig(path / f'bev_{year}.png')
+
+
+def cost_vs_co2_plot_combined(df, path, *years):
+    classes = [x for x in df['cost_curve_class'].unique()]
+    for year in years:
+        class_data = dict()
+        class_plot = list()
+        class_legends = list()
+        for cost_curve_class in classes:
+            class_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_co2_grams_per_mile'],
+                                            df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
+            class_plot.append(class_data[cost_curve_class])
+            class_legends.append(cost_curve_class)
+
+        class_plot = tuple(class_plot)
+        class_legends = tuple(class_legends)
+
+        # create ice plot
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1)
+        ax.grid(True)
+        for class_plot, class_legends in zip(class_plot, class_legends):
+            x, y = class_plot
+            ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=class_legends)
+            ax.set(xlim=(0, 500), ylim=(10000, 60000))
+            plt.legend(loc=1)
+            plt.title(f'{year}')
+            plt.savefig(path / f'{year}.png')
+
+
 def main():
     path_cwd = Path.cwd()
     path_inputs = path_cwd / 'alpha_package_costs/alpha_package_costs_inputs'
@@ -350,8 +430,8 @@ def main():
     upstream = upstream.to_dict('index')
 
     # get the price deflators
-    gdp_deflators = pd.read_csv(path_input_templates / 'price_deflators-aeo.csv', skiprows=1, index_col=0)
-    gdp_deflators = gdp_deflators.iloc[:, :-1]
+    gdp_deflators = pd.read_csv(path_input_templates / 'context_implicit_price_deflators.csv', skiprows=1, index_col=0)
+    # gdp_deflators = gdp_deflators.iloc[:, :-1]
     dollar_basis = dollar_basis_year(gdp_deflators)
     gdp_deflators = gdp_deflators.to_dict('index')
 
@@ -605,6 +685,9 @@ def main():
 
     with open(path_of_run_folder.joinpath('cost_clouds.csv'), 'a', newline='') as cloud_file:
         cost_clouds_df.to_csv(cloud_file, index=False)
+
+    cost_vs_co2_plot(cost_clouds_df, path_of_run_folder, 2020, 2030, 2040)
+    cost_vs_co2_plot_combined(cost_clouds_df, path_of_run_folder, 2020, 2030, 2040)
 
 
 if __name__ == '__main__':
