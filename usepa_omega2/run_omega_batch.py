@@ -377,12 +377,12 @@ if __name__ == '__main__':
         parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
         parser.add_argument('--no_bundle', action='store_true',
                             help='Do NOT gather and copy all source files to bundle_path')
-        parser.add_argument('--verbose', action='store_true', help='True = enable verbose omega_batch messages)')
+        parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
         parser.add_argument('--timestamp', type=str,
                             help='Timestamp string, overrides creating timestamp from system clock', default=None)
-        parser.add_argument('--dispy', action='store_true', help='True = run sessions on dispynode(s)')
-        parser.add_argument('--dispy_ping', action='store_true', help='True = ping dispynode(s)')
-        parser.add_argument('--dispy_debug', action='store_true', help='True = enable verbose dispy debug messages)')
+        parser.add_argument('--dispy', action='store_true', help='Run sessions on dispynode(s)')
+        parser.add_argument('--dispy_ping', action='store_true', help='Ping dispynode(s)')
+        parser.add_argument('--dispy_debug', action='store_true', help='Enable verbose dispy debug messages)')
         parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
         parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
                             default=None)
