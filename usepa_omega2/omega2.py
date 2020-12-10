@@ -285,9 +285,6 @@ def run_producer_consumer():
                           and iteration_num < o2.options.producer_consumer_max_iterations \
                           and not converged
                 if iterate:
-                    # if 'consumer' in o2.options.verbose_console:
-                    #     omega_log.logwrite('RENEGOTIATE MARKET SHARES...', echo_console=True)
-                    # negotiate_market_shares(producer_decision_and_response, iteration_num, market_class_vehicle_dict)
                     iteration_num += 1
                 else:
                     if iteration_num >= o2.options.producer_consumer_max_iterations:
@@ -621,20 +618,6 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
             converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
 
     return converged, convergence_error
-
-
-def negotiate_market_shares(producer_decision_and_response, iteration_num, market_class_dict):
-    for mc in market_class_dict:
-        if iteration_num < 1:
-            # try meeting partway (first pass)
-            producer_decision_and_response['consumer_share_frac_%s' % mc] = \
-                    (0.5 * producer_decision_and_response['producer_share_frac_%s' % mc] +
-                     0.5 * producer_decision_and_response['consumer_share_frac_%s' % mc])
-        else:
-            # try meeting partway
-            producer_decision_and_response['consumer_share_frac_%s' % mc] = \
-                (0.33 * producer_decision_and_response['producer_share_frac_%s' % mc] +
-                 0.67 * producer_decision_and_response['consumer_share_frac_%s' % mc])
 
 
 def init_omega(o2_options):
