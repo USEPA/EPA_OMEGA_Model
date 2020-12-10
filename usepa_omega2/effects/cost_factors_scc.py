@@ -103,9 +103,9 @@ class CostFactorsSCC(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(CostFactorsSCC(
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        dollar_basis=df.loc[i, 'dollar_basis'],
-                        co2_domestic_cost_factor_25=df.loc[i, 'co2_interimdomestic_2.5_USD_per_metricton'],
+                        calendar_year = df.loc[i, 'calendar_year'],
+                        dollar_basis = df.loc[i, 'dollar_basis'],
+                        co2_domestic_cost_factor_25 = df.loc[i, 'co2_interimdomestic_2.5_USD_per_metricton'],
                         co2_domestic_cost_factor_30 = df.loc[i, 'co2_interimdomestic_3.0_USD_per_metricton'],
                         co2_domestic_cost_factor_70 = df.loc[i, 'co2_interimdomestic_7.0_USD_per_metricton'],
                         ch4_domestic_cost_factor_25 = df.loc[i, 'ch4_interimdomestic_2.5_USD_per_metricton'],

@@ -90,11 +90,13 @@ try:
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = True
+            # self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
             self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
             self.scc_cost_factors_file = 'input_samples/context_cost_factors-scc.csv'
             self.criteria_cost_factors_file = 'input_samples/context_cost_factors-criteria.csv'
+            self.energysecurity_cost_factors_file = 'input_samples/context_cost_factors-energysecurity.csv'
             self.emission_factors_vehicles_file = 'input_samples/context_emission_factors-vehicles.csv'
             self.emission_factors_powersector_file = 'input_samples/context_emission_factors-powersector.csv'
             self.emission_factors_refinery_file = 'input_samples/context_emission_factors-refinery.csv'
