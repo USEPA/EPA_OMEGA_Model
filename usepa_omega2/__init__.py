@@ -88,7 +88,7 @@ try:
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            self.calc_effects = True
+            self.calc_effects = False
             # self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
@@ -104,7 +104,7 @@ try:
             self.end_time = 0
 
             # debugging options
-            self.verbose_console = []  # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console = [] # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
