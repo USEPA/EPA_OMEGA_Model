@@ -82,14 +82,14 @@ try:
             self.producer_consumer_iteration_tolerance = 5e-3
 
             self.consumer_pricing_num_options = 4
-            self.consumer_pricing_multiplier_min = 1
-            self.consumer_pricing_multiplier_max = 1
+            self.consumer_pricing_multiplier_min = 0.8
+            self.consumer_pricing_multiplier_max = 1.2
 
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = False
-            # self.calc_criteria_emission_costs = False
+            self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
             self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
