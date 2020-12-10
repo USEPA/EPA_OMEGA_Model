@@ -181,7 +181,7 @@ class OMEGABatchObject(OMEGABase):
 
     def add_sessions(self, verbose=True):
         if verbose:
-            batch_log.logwrite()
+            batch_log.logwrite('')
             batch_log.logwrite("In Batch '{}':".format(self.name))
         for s in range(0, self.num_sessions()):
             self.sessions.append(OMEGASessionObject("session_{%d}" % s))
@@ -190,7 +190,7 @@ class OMEGABatchObject(OMEGABase):
             if verbose:
                 batch_log.logwrite("Found Session %s:'%s'" % (s, batch.sessions[s].name))
         if verbose:
-            batch_log.logwrite()
+            batch_log.logwrite('')
 
 
 class OMEGASessionObject(OMEGABase):
@@ -453,13 +453,6 @@ if __name__ == '__main__':
             batch.expand_dataframe(verbose=options.verbose)
             batch.force_numeric_params()
             batch.get_batch_settings()
-            batch.add_sessions(verbose=options.verbose)
-
-            import copy
-
-            expanded_batch = copy.deepcopy(batch)
-            expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
-                                  os.path.splitext(options.batch_file)[1]
 
             if not options.no_bundle:
                 if not options.timestamp:
@@ -474,6 +467,14 @@ if __name__ == '__main__':
 
             from omega_log import OMEGALog
             batch_log = OMEGALog(options)
+
+            batch.add_sessions(verbose=options.verbose)
+
+            import copy
+
+            expanded_batch = copy.deepcopy(batch)
+            expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
+                                  os.path.splitext(options.batch_file)[1]
 
             if options.validate_batch:
                 batch_log.logwrite('Validating batch definition source files...')
