@@ -78,13 +78,12 @@ try:
             self.producer_iteration_tolerance = 1e-6
 
             self.iterate_producer_consumer = True
-            self.producer_consumer_max_iterations = 10
-            self.producer_consumer_iteration_tolerance = 0.01
+            self.producer_consumer_max_iterations = 20
+            self.producer_consumer_iteration_tolerance = 5e-3
 
-            self.consumer_pricing_max_iterations = 50
             self.consumer_pricing_num_options = 4
-            self.consumer_pricing_multiplier_min = 0.8
-            self.consumer_pricing_multiplier_max = 1.2
+            self.consumer_pricing_multiplier_min = 1
+            self.consumer_pricing_multiplier_max = 1
 
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
@@ -110,7 +109,7 @@ try:
             self.num_analysis_years = None  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
-            self.log_sales_demand_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_decision_and_response_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
 
     from omega2 import run_omega
 
