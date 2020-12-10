@@ -302,6 +302,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+        self.settings.energysecurity_cost_factors_file = self.read_parameter('Context Energy Security Cost Factors File')
 
     def init(self, validate_only=False):
         if not validate_only:
