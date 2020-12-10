@@ -90,7 +90,7 @@ try:
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = True
-            # self.calc_criteria_emission_costs = False
+            self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
             self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
