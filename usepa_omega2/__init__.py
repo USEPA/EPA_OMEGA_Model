@@ -88,7 +88,7 @@ try:
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            self.calc_effects = False
+            self.calc_effects = True
             self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
@@ -96,6 +96,7 @@ try:
             self.scc_cost_factors_file = 'input_samples/context_cost_factors-scc.csv'
             self.criteria_cost_factors_file = 'input_samples/context_cost_factors-criteria.csv'
             self.energysecurity_cost_factors_file = 'input_samples/context_cost_factors-energysecurity.csv'
+            self.congestion_noise_cost_factors_file = 'input_samples/context_cost_factors-congestion-noise.csv'
             self.emission_factors_vehicles_file = 'input_samples/context_emission_factors-vehicles.csv'
             self.emission_factors_powersector_file = 'input_samples/context_emission_factors-powersector.csv'
             self.emission_factors_refinery_file = 'input_samples/context_emission_factors-refinery.csv'

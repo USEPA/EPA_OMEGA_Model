@@ -25,6 +25,8 @@ class CostEffectsNonEmissions(SQABase, OMEGABase):
     energy_security_70_social_cost_dollars = Column(Float)
     congestion_30_social_cost_dollars = Column(Float)
     congestion_70_social_cost_dollars = Column(Float)
+    noise_30_social_cost_dollars = Column(Float)
+    noise_70_social_cost_dollars = Column(Float)
     maintenance_30_social_cost_dollars = Column(Float)
     maintenance_70_social_cost_dollars = Column(Float)
     refueling_30_social_cost_dollars = Column(Float)
