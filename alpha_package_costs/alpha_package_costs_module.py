@@ -96,6 +96,13 @@ class CalcCosts:
         self.df = self.df.merge(techcosts_nonaero[['nonaero', 'nonaero_cost']], on='nonaero', how='left')
         return self.df
 
+    def air_conditioning_cost(self, techcosts_ac, work_class):
+        df = techcosts_ac.copy()
+        df.set_index('work_class', inplace=True)
+        ac_cost = df.at[work_class, 'ac_cost']
+        self.df.insert(len(self.df.columns), 'ac_cost', ac_cost)
+        return self.df
+
     def weight_cost(self, start_year, techcosts_weight, work_class):
         """
         Weight costs are calculated as an absolute cost associated with the curb weight of the vehicle and are then adjusted according to the weight reduction.
@@ -124,7 +131,7 @@ class CalcCosts:
         :return:
         """
         self.df[f'powertrain_cost_{start_year}'] = \
-            self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost']].sum(axis=1)
+            self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost', 'ac_cost']].sum(axis=1)
         return self.df
 
     def roadload_cost(self, start_year):
@@ -425,6 +432,7 @@ def main():
     techcosts_weight = pd.read_excel(techcosts_file, 'weight', index_col=0)
     techcosts_aero = pd.read_excel(techcosts_file, 'aero')
     techcosts_nonaero = pd.read_excel(techcosts_file, 'nonaero')
+    techcosts_ac = pd.read_excel(techcosts_file, 'ac')
     techcosts_bev = pd.read_excel(techcosts_file, 'bev', index_col=0)
     upstream = pd.read_excel(techcosts_file, 'upstream', index_col=0)
     upstream = upstream.to_dict('index')
@@ -461,6 +469,7 @@ def main():
     techcosts_weight = CalcCosts(techcosts_weight).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'cost_per_pound', 'DMC_ln_coefficient', 'DMC_constant', 'IC_slope')
     techcosts_aero = CalcCosts(techcosts_aero).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'aero_cost')
     techcosts_nonaero = CalcCosts(techcosts_nonaero).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'nonaero_cost')
+    techcosts_ac = CalcCosts(techcosts_ac).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'ac_cost')
     techcosts_bev = CalcCosts(techcosts_bev).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'bev_cost_slope', 'bev_cost_intercept', 'dollar/kWh_0WR', 'dollar/kWh_20WR')
     techcosts_bev = techcosts_bev.to_dict('index')
 
@@ -554,6 +563,7 @@ def main():
             temp_df = cost_object.startstop_cost(techcosts_startstop)
             temp_df = cost_object.aero_cost(techcosts_aero, work_class)
             temp_df = cost_object.nonaero_cost(techcosts_nonaero)
+            temp_df = cost_object.air_conditioning_cost(techcosts_ac, work_class)
             for year in years:
                 temp_df.insert(len(temp_df.columns), f'weight_cost_{year}', 0)
             for year in years:
@@ -609,8 +619,12 @@ def main():
         utility_factor = bev['utility_factor']
 
         print(f'Working on bev_{bev_range}_{eff_class}')
-        bev_cost_co2[key] = pd.DataFrame({'effectiveness_class': eff_class, 'weight_reduction': pd.Series(bev_wr_range), 'Test Weight lbs': etw,
-                                          'Reg_Class': reg_class, 'Hauling_Class': work_class, 'bev_tech': f'bev_{bev_range}'})
+        bev_cost_co2[key] = pd.DataFrame({'effectiveness_class': eff_class,
+                                          'weight_reduction': pd.Series(bev_wr_range),
+                                          'Test Weight lbs': etw,
+                                          'Reg_Class': reg_class,
+                                          'Hauling_Class': work_class,
+                                          'bev_tech': f'bev_{bev_range}'})
 
         # calc the pack size and energy consumption
         bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
