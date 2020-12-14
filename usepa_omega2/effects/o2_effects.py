@@ -24,6 +24,7 @@ def run_effects_calcs():
 
     for calendar_year in calendar_years:
         print(f'Calculating non-emission-related social costs for {int(calendar_year)}')
+        omega_log.logwrite(f'Calculating non-emission-related social costs for {int(calendar_year)}')
         calc_non_emission_costs(calendar_year)
 
     for calendar_year in calendar_years:

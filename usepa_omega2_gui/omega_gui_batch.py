@@ -786,7 +786,7 @@ class Form(QObject):
                                     i = j.find(' ', l)  # Find the end of the next word after 'session'
                                     k = j[l:i]  # Save the next word
                                 elif j.find('batch') > -1:  # See if 'batch' found:
-                                    k = 'Batch'  # Dave the word for output
+                                    k = 'Batch'  # Save the word for output
                                 else:
                                     k = ""  # Not recognized
                                 log_ident_array.append(k)
