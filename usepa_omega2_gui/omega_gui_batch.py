@@ -28,7 +28,6 @@ from PySide2.QtCore import QFile, QObject
 
 from datetime import datetime
 
-# from win10toast import ToastNotifier
 from plyer import notification
 
 # Import functions from other files
@@ -739,8 +738,8 @@ class Form(QObject):
         # Send notification to Windows
         notification.notify(
             title="OMEGA Notification",
-            message="Model Run Started",
-            app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
+            message="Model Run Started\n" + "Input File =\n" + "  " + os.path.basename(input_batch_file),
+            # app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
             timeout=5
         )
 
@@ -748,9 +747,7 @@ class Form(QObject):
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
-        # Complete paths to log files
         # First find the log files
-        # time.sleep(20)
         log_file_array = []  # Clear log file array
         log_counter_array = []  # Clear counter array
         log_ident_array = []  # Clear log identifier array
@@ -862,8 +859,9 @@ class Form(QObject):
         # Send Notification to Windows
         notification.notify(
             title="OMEGA Notification",
-            message="Model Run Completed\n" + str(elapsed_time),
-            app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
+            message="Model Run Completed\n" + str(elapsed_time) + "\n" + "Output Directory =\n" +
+                    "  " + os.path.basename(output_batch_directory),
+            # app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
             timeout=5
         )
 
