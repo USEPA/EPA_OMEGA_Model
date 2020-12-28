@@ -9,6 +9,7 @@ This code launches and controls the OMEGA 2 GUI
 import os
 import sys
 import subprocess
+
 import pandas
 import psutil
 
@@ -26,6 +27,9 @@ from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
 
 from datetime import datetime
+
+# from win10toast import ToastNotifier
+from plyer import notification
 
 # Import functions from other files
 from usepa_omega2_gui.omega_gui_functions import *
@@ -530,8 +534,6 @@ class Form(QObject):
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
-
-
     def wizard_logic(self):
         """
         Handles the gui logic to enable and disable various controls and launch event monitor messages.
@@ -734,6 +736,14 @@ class Form(QObject):
         self.event_monitor("Start Model Run", "black", 'dt')
         # Call OMEGA 2 batch as a subprocess with command line options from above
         status_bar_message = "Status = Model Running ..."
+        # Send notification to Windows
+        notification.notify(
+            title="OMEGA Notification",
+            message="Model Run Started",
+            app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
+            timeout=5
+        )
+
         omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
@@ -839,11 +849,23 @@ class Form(QObject):
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Status = Ready"
 
+        # elapsed_end = datetime.now()
+        elapsed_time1 = elapsed_end - elapsed_start
+        elapsed_time1 = str(elapsed_time)
+        elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-7]
+        self.window.model_status_label.setText(elapsed_time1)
+        # self.window.model_status_label.setText("Model Run Completed")
         # Enable selected gui functions disabled during model run
         self.enable_gui_run_functions(1)
-        self.window.model_status_label.setText("Model Loaded")
-
         self.load_plots_2()
+
+        # Send Notification to Windows
+        notification.notify(
+            title="OMEGA Notification",
+            message="Model Run Completed\n" + str(elapsed_time),
+            app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
+            timeout=5
+        )
 
     def showbox(self, message_title, message):
         """
@@ -923,6 +945,7 @@ class Form(QObject):
         self.window.action_select_output_batch_directory.setEnabled(enable)
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
+        self.window.multiprocessor_checkbox.setEnabled(enable)
 
     def load_plots_2(self):
         self.window.list_graphs_1.clear()
