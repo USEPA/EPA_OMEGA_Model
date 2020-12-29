@@ -15,8 +15,8 @@ Using The Graphical User Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The EPA OMEGA Model by nature is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.
 
-Running the GUI
-----------------
+GUI Basics
+----------
 After launching the GUI, the 'Run Model' page will appear as shown in :numref:`ug_label1`.
 
 .. _ug_label1:
@@ -62,6 +62,71 @@ Description of the 'Run Model' page elements:
 
 * Element 8 - Model Run
     When everything is properly configured, this button will be enabled for initiation of the OMEGA model run.
+
+Loading The Model Requirements
+------------------------------
+The user has two options at this point to use an existing Configuration File or create a new Configuration File.
+
+::
+
+    Note: The Event Monitor will provide additional guidance through the model loading process.
+
+Existing Configuration File
++++++++++++++++++++++++++++
+With the 'Run Model' page displayed, press 'Open' to launch a standard File Explorer window to load an existing Configuration File.  When properly loaded, the 'Run Model' page will look similar to :numref:`ug_label3` below.  The green checkmarks in the selection fields indicate valid files and paths.
+
+Create New Configuration File
++++++++++++++++++++++++++++++
+If a Configuration File is not available, create a new one using these steps:
+
+* Press 'Select' to load an existing OMEGA Input Batch File
+* Press 'Select' to load a new or existing OMEGA Output Batch Directory
+* Add an optional Project Description
+* Press 'Save' to store the new Configuration File
+
+The 'Run Model' page should look similar to :numref:`ug_label3` below.
+
+.. _ug_label3:
+.. figure:: _static/ug_figures/gui_model_loaded.jpg
+    :align: center
+
+    GUI Configuration File Loaded
+
+Run The Model
+-------------
+With all of the model requirements loaded, the 'Model Run' button will be enabled.  Press the 'Model Run' button to start the model run.
+
+As the model is running, the 'Run Model' page will look similar to :numref:`ug_label4` below.
+
+.. _ug_label4:
+.. figure:: _static/ug_figures/gui_model_running.jpg
+    :align: center
+
+    Model Running
+
+The GUI provides real time information during the model run:
+
+* The model starting information is detailed in the event monitor and is also sent to the Windows Notification Center.  This includes the time and Input Batch File used.
+* The model status and elapsed time from model start is continuously updated below the 'Run Model' button.
+* The load on the CPU and Memory is monitored in the Windows Status Bar at the bottom of the GUI window.
+* The Event Monitor provides a continuous stream of information gathered from the simultaneous OMEGA processes.
+
+When the model run is completed, the 'Run Model' page will look similar to :numref:`ug_label5` below.
+
+.. _ug_label5:
+.. figure:: _static/ug_figures/gui_model_complete.jpg
+    :align: center
+
+    Model Running
+
+Final GUI Data:
+
+* The model ending information is detailed in the event monitor and is also sent to the Windows Notification Center.  This includes the time and the Output Batch Directory used.
+* The model status and elapsed time from model start is displayed below the 'Run Model' button.
+
+
+
+
 
 
 

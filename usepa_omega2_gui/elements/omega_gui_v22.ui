@@ -38,7 +38,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>OMEGA Model Setup</string>
+     <string/>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -262,7 +262,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Selects a new Output Batch Directory</string>
+       <string>Selects a new OMEGA Output Batch Directory</string>
       </property>
       <property name="text">
        <string>Select</string>
@@ -289,7 +289,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Selects a new Input Batch File</string>
+       <string>Selects a new OMEGA Input Batch File</string>
       </property>
       <property name="text">
        <string>Select</string>
@@ -313,7 +313,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Opens an existing OMEGA 2 Configuration File</string>
+       <string>Opens an existing OMEGA Configuration File</string>
       </property>
       <property name="text">
        <string>Open</string>
@@ -337,7 +337,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Saves an OMEGA 2 Configuration File</string>
+       <string>Saves an OMEGA Configuration File</string>
       </property>
       <property name="text">
        <string>Save</string>
@@ -401,7 +401,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Multiprocessor Selection</string>
+       <string>OMEGA Multiprocessor Selection</string>
       </property>
       <property name="text">
        <string>Multiprocessor</string>
@@ -474,7 +474,7 @@ EPA Science Advisory Board - 2020</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Run Model</string>
+       <string>Run OMEGA Model</string>
       </property>
       <property name="iconSize">
        <size>
@@ -627,7 +627,7 @@ EPA Science Advisory Board - 2020</string>
      </font>
     </property>
     <property name="toolTip">
-     <string>Status Monitor records ongoing program events</string>
+     <string>Event Monitor records ongoing program events</string>
     </property>
     <property name="text">
      <string>Event Monitor</string>
@@ -668,7 +668,7 @@ EPA Science Advisory Board - 2020</string>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Goto EPA Website</string>
+     <string/>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -683,7 +683,7 @@ EPA Science Advisory Board - 2020</string>
       </rect>
      </property>
      <property name="toolTip">
-      <string>Opens EPA Website</string>
+      <string>Open EPA Website</string>
      </property>
      <property name="text">
       <string/>
