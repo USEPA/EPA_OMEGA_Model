@@ -53,6 +53,7 @@ exclude_patterns = []
 # html_theme = 'alabaster'
 # html_theme = 'bizstyle'
 html_theme = 'classic'
+numfig = True
 
 # Default Palette
 # html_theme_options = {
