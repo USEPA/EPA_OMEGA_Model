@@ -65,7 +65,7 @@ Description of the 'Run Model' page elements:
 
 Loading The Model Requirements
 ------------------------------
-The model requirements are loaded using an existing Configuration File  (:numref:`ug_label6`) or creating a new Configuration File (:numref:`ug_label7`).
+The model requirements are loaded using an existing Configuration File  (:numref:`ug_label6`) or by creating a new Configuration File (:numref:`ug_label7`).
 
 ::
 

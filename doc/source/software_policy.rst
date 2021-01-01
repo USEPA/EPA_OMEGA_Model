@@ -7,6 +7,16 @@ Copyright Status
 ----------------
 The United States (U.S.) Government retains a non-exclusive, royalty-free license to publish or reproduce these software products and associated documents, or allow others to do so, for U.S. Government purposes. These software products and documents may be freely distributed and used for non-commercial, scientific, and/or educational purposes. Commercial use of these software products and documents may be protected under the U.S. and Foreign Copyright Laws. Individual documents on this server may have different copyright conditions, and that will be noted in those documents.
 
+Downloadable Documents
+----------------------
+A complete copy of this documentation is available in various formats and is downloadable using the following links:
+
+* `OMEGA Documentation in PDF format <https://omega2.readthedocs.io/_/downloads/en/latest/pdf/>`_
+
+* `OMEGA Documentation in HTML format <https://omega2.readthedocs.io/_/downloads/en/latest/htmlzip/>`_
+
+* `OMEGA Documentation in Epub format <https://omega2.readthedocs.io/_/downloads/en/latest/epub/>`_
+
 Disclaimer of Liability
 -----------------------
 With respect to this multimedia system of HTML pages and the EPA software products and their documentation, neither the U.S. Government nor any of their employees, makes any warranty, express or implied, including the warranties of merchantability and fitness for a particular purpose, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness of any information, apparatus, product, or process disclosed, or represents that its use would not infringe privately owned rights.
