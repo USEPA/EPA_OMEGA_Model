@@ -175,6 +175,7 @@ class Form(QObject):
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
         self.window.available_plots_1_label_2.setStyleSheet(stylesheet)
+        self.window.available_plots_1_label_3.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
@@ -954,10 +955,22 @@ class Form(QObject):
             # print(row['plot_name'])
             self.window.list_graphs_1.addItem(row['plot_name'])
 
+        self.window.list_graphs_2.clear()
+        input_file = 'usepa_omega2_gui/elements/summary_results.csv'
+        plot_data_df1 = pandas.read_csv(input_file)
+        plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
+        for index, row in plot_data_df1.iterrows():
+            # print(row['plot_name'])
+            self.window.list_graphs_2.addItem(row['session_name'])
+
     def open_plot_2(self):
-        if self.window.list_graphs_1.currentItem() is not None:
+        # See if valid selections have been made
+        if self.window.list_graphs_1.currentItem() is not None and self.window.list_graphs_2.currentItem() is not None:
+            # Get plot selections
             a = self.window.list_graphs_1.selectedIndexes()[0]
-            test_plot_2(a.data(), output_batch_directory)
+            b = self.window.list_graphs_2.selectedIndexes()[0]
+            # Send plot selections to plot function
+            test_plot_2(a.data(), b.data(), output_batch_directory)
 
 
 def status_bar():

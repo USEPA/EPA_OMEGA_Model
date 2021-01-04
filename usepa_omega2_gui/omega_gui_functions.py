@@ -179,7 +179,7 @@ def status_output_color(g):
     return g
 
 
-def test_plot_2(plot_selection, output_directory):
+def test_plot_2(plot_selection, scenario_selection, output_directory):
     """
     Reads a csv file and plots selected graph.
 
@@ -195,14 +195,15 @@ def test_plot_2(plot_selection, output_directory):
         x_data = (df.loc[plot_selection, 'x_data'])  # Column from spreadsheet for x axis
         # y_data = (df.loc[plot_selection, 'y_data_1'])  # Column from spreadsheet for y axis
         file_name = (df.loc[plot_selection, 'plot_source'])  # Column from spreadsheet for file name
-        df1 = pandas.read_csv(file_name)
+        df1 = pandas.read_csv(file_name)  # Read source filename into dataframe
+        df1 = df1.loc[df1['session_name'] == scenario_selection]  # Strip off all rows except selected scenario
         line_style = 'solid'  # Plot line style
         line_width = 2  # Plot line width
         marker_type = 'o'  # MatPlotLib marker style
         marker_size = 4  # Marker size
         x_label = (df.loc[plot_selection, 'x_label'])  # Label for x axis
         y_label = (df.loc[plot_selection, 'y_data_label'])  # Label for y axis
-        plot_title = plot_selection  # Plot title
+        plot_title = plot_selection + ' (' + scenario_selection + ')'  # Plot title
 
         cmap = cm.get_cmap('tab10')  # Color map
 
