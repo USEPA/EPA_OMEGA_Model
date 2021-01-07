@@ -87,52 +87,38 @@ def Edmunds_Interact(url):
         try:
             driver.set_page_load_timeout(time)
             driver.get(url)
-
-            menu_item = driver.find_elements_by_xpath("//*[@class='dropdown-item']")[0]
-            menu_item.click()
-                # if "Unit Price" in i.text:
-                    #i.click()
-                    # break
-
-
-            menus1 = driver.find_elements_by_xpath("//*[@class='dropdown-menu']")
-            for menu1 in menus1:
-                dropdown1 = Select(menu1)
-
-            # menus1 = driver.find_elements_by_xpath("//select[@class = 'style-select h5 mb-0 w-100 bg-white font-weight-bold' and \
-            # @data-fas-column = '1']")
-            # for menu in menus1:
-                # if menu.is_displayed():
-                #     menu1 = menu
-                #     break
-            for menu1 in menus1:
-                dropdown1 = Select(menu1)
+            # find and click main button to reveal drop-down menu
+            menu1 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[0]
+            menu1.click()
+            # find trim buttons in drop-down menu
+            trim_buttons = driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")
+            # collapse drop-down menu
+            menu1.click()
             break
         except (NoSuchElementException, TimeoutException, UnboundLocalError):
             driver.quit()
             pass
 
     try:
-        total_trims = len(dropdown1.options)
+        total_trims = len(trim_buttons)
     except UnboundLocalError:
-        if geturl_attempt+1 == max_attempts:
-            return('N', 'READIN_ERROR')
+        if geturl_attempt + 1 == max_attempts:
+            return ('N', 'READIN_ERROR')
     trim_group_length = 1
+
     if total_trims >= 2:
-        menu2 = driver.find_element_by_xpath("//select[@class = 'style-select h5 mb-0 w-100 bg-white font-weight-bold' and \
-        @data-fas-column = '2']")
-        dropdown2 = Select(menu2)
+        menu2 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[1]
+        # dropdown2 = Select(menu2)
         trim_group_length = 2
     if total_trims >= 3:
-        menu3 = driver.find_element_by_xpath("//select[@class = 'style-select h5 mb-0 w-100 bg-white font-weight-bold' and \
-        @data-fas-column = '3']")
-        dropdown3 = Select(menu3)
+        menu3 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[2]
+        # dropdown3 = Select(menu3)
         trim_group_length = 3
 
     trim_groups_count = math.ceil(total_trims / 3) #Number of trim groups (in groups of 3, add one if only 1-2 trims left)
     last_group_count = total_trims % 3 #Length of last group
     readin_check = pd.Series(np.zeros(total_trims), name = 'Readin_Error').replace(0,'')
-    for table_list_count in range(1, 2):
+    for table_list_count in range(0, 1):
         if table_list_count == 0:
             save_name = 'pandas list.csv'
         else:
@@ -150,23 +136,32 @@ def Edmunds_Interact(url):
             else:
                 trims = pd.Series(range(trim_group_length)) + trim_group_length*trim_group
             if len(trims) >= 1:
-                dropdown1.select_by_index(trims[0]) #Choose first option
                 try:
-                    element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown1.options)[trims[0]].text)))
+                    menu1.click()
+                    #Choose first option
+                    driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")[0].click()
+                    # dropdown1.select_by_index(trims[0]) #Choose first option
+                    # element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown1.options)[trims[0]].text)))
                 except TimeoutException:
                     errorflag_1 = 1
                     readin_check[trims[0]] = 'READIN_ERROR'
             if len(trims) >= 2: #Choose second option (if applicable)
-                dropdown2.select_by_index(trims[1])
                 try:
-                    element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown2.options)[trims[1]].text)))
+                    menu2.click()
+                    # Choose second option
+                    driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")[1].click()
+                    # dropdown2.select_by_index(trims[1])
+                    # element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown2.options)[trims[1]].text)))
                 except TimeoutException:
                     errorflag_2 = 1
                     readin_check[trims[1]] = 'READIN_ERROR'
             if len(trims) >= 3: #Choose third option (if applicable)
-                dropdown3.select_by_index(trims[2])
                 try:
-                    element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown3.options)[trims[2]].text)))
+                    menu3.click()
+                    # Choose third option
+                    driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")[2].click()
+                    # dropdown3.select_by_index(trims[2])
+                    # element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown3.options)[trims[2]].text)))
                 except TimeoutException:
                     errorflag_3 = 1
                     readin_check[trims[2]] = 'READIN_ERROR'
