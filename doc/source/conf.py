@@ -52,7 +52,8 @@ exclude_patterns = []
 # html_theme = 'default'
 # html_theme = 'alabaster'
 # html_theme = 'bizstyle'
-html_theme = 'bizstyle'
+html_theme = 'classic'
+numfig = True
 
 # EPA Palette
 html_theme_options = {
