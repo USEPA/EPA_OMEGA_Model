@@ -9,6 +9,7 @@ This code launches and controls the OMEGA 2 GUI
 import os
 import sys
 import subprocess
+
 import pandas
 import psutil
 
@@ -27,6 +28,8 @@ from PySide2.QtCore import QFile, QObject
 
 from datetime import datetime
 
+from plyer import notification
+
 # Import functions from other files
 from usepa_omega2_gui.omega_gui_functions import *
 from usepa_omega2_gui.omega_gui_stylesheets import *
@@ -44,6 +47,7 @@ output_batch_subdirectory = ""
 status_bar_message = "Status = Ready"
 # Python dictionary containing contents of the configuration file
 scenario = ""
+plot_select_directory = ""
 # Multiprocessor flag
 multiprocessor_mode_selected = False
 # Logic elements for program control
@@ -109,6 +113,8 @@ class Form(QObject):
         self.window.action_about_omega.triggered.connect(self.launch_about)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
         self.window.open_plot_2.clicked.connect(self.open_plot_2)
+        self.window.select_plot_2.clicked.connect(self.select_plot_2)
+        self.window.select_plot_3.clicked.connect(self.select_plot_3)
         # Catch close event for clean exit
         app.aboutToQuit.connect(self.closeprogram)
         # Show gui
@@ -155,6 +161,8 @@ class Form(QObject):
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
         self.window.run_model_button.setStyleSheet(stylesheet)
         self.window.open_plot_2.setStyleSheet(stylesheet)
+        self.window.select_plot_2.setStyleSheet(stylesheet)
+        self.window.select_plot_3.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -172,6 +180,7 @@ class Form(QObject):
         self.window.event_monitor_label.setStyleSheet(stylesheet)
         self.window.model_status_label.setStyleSheet(stylesheet)
         self.window.available_plots_1_label_2.setStyleSheet(stylesheet)
+        self.window.available_plots_1_label_3.setStyleSheet(stylesheet)
         self.window.intro_label.setStyleSheet(stylesheet)
 
         # Load stylesheet for checkboxes
@@ -530,8 +539,6 @@ class Form(QObject):
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
-
-
     def wizard_logic(self):
         """
         Handles the gui logic to enable and disable various controls and launch event monitor messages.
@@ -726,7 +733,6 @@ class Form(QObject):
 
         # Combine command line options
         x = a + b + c + d
-        # print("***", x, "***")
 
         # Disable selected gui functions during model run
         self.enable_gui_run_functions(0)
@@ -734,19 +740,25 @@ class Form(QObject):
         self.event_monitor("Start Model Run", "black", 'dt')
         # Call OMEGA 2 batch as a subprocess with command line options from above
         status_bar_message = "Status = Model Running ..."
+        # Send notification to Windows
+        notification.notify(
+            title="OMEGA Notification",
+            message="Model Run Started\n" + "Input File =\n" + "  " + os.path.basename(input_batch_file),
+            # app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
+            timeout=5
+        )
+
         omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
                                         x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
-        # Complete paths to log files
         # First find the log files
-        # time.sleep(20)
         log_file_array = []  # Clear log file array
         log_counter_array = []  # Clear counter array
         log_ident_array = []  # Clear log identifier array
         file_timer = 0  # Counter for file search timer
 
-        self.load_plots_2()
+        # self.load_plots_2()
         # Keep looking for communication from other processes through the log files
         while omega_batch.poll() is None:
             # This command allows the GUI to catch up and repaint itself
@@ -786,7 +798,7 @@ class Form(QObject):
                                     i = j.find(' ', l)  # Find the end of the next word after 'session'
                                     k = j[l:i]  # Save the next word
                                 elif j.find('batch') > -1:  # See if 'batch' found:
-                                    k = 'Batch'  # Dave the word for output
+                                    k = 'Batch'  # Save the word for output
                                 else:
                                     k = ""  # Not recognized
                                 log_ident_array.append(k)
@@ -839,11 +851,24 @@ class Form(QObject):
         self.event_monitor(event_separator, "black", '')
         status_bar_message = "Status = Ready"
 
+        # elapsed_end = datetime.now()
+        elapsed_time1 = elapsed_end - elapsed_start
+        elapsed_time1 = str(elapsed_time)
+        elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-7]
+        self.window.model_status_label.setText(elapsed_time1)
+        # self.window.model_status_label.setText("Model Run Completed")
         # Enable selected gui functions disabled during model run
         self.enable_gui_run_functions(1)
-        self.window.model_status_label.setText("Model Loaded")
+        # self.load_plots_2()
 
-        self.load_plots_2()
+        # Send Notification to Windows
+        notification.notify(
+            title="OMEGA Notification",
+            message="Model Run Completed\n" + str(elapsed_time) + "\n" + "Output Directory =\n" +
+                    "  " + os.path.basename(output_batch_directory),
+            # app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
+            timeout=5
+        )
 
     def showbox(self, message_title, message):
         """
@@ -923,8 +948,22 @@ class Form(QObject):
         self.window.action_select_output_batch_directory.setEnabled(enable)
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
+        self.window.multiprocessor_checkbox.setEnabled(enable)
 
-    def load_plots_2(self):
+    def select_plot_2(self):
+        global plot_select_directory
+        file_name = ""
+        file_type = ""
+        file_dialog_title = 'Select Run Directory'
+        file_name, file_type, file_dialog_title = directory_dialog(file_name, file_type, file_dialog_title)
+        if file_name == "":
+            self.window.list_graphs_1.clear()
+            self.window.list_graphs_2.clear()
+            return()
+
+        plot_select_directory_path = file_name
+        plot_select_directory_name = os.path.basename(os.path.normpath(file_name))
+
         self.window.list_graphs_1.clear()
         input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
         plot_data_df = pandas.read_excel(input_file)
@@ -933,10 +972,52 @@ class Form(QObject):
             # print(row['plot_name'])
             self.window.list_graphs_1.addItem(row['plot_name'])
 
+        self.window.list_graphs_2.clear()
+        # input_file = 'usepa_omega2_gui/elements/summary_results.csv'
+        input_file = plot_select_directory_path + '/' + plot_select_directory_name + '_summary_results.csv'
+        if not os.path.exists(input_file):
+            self.window.list_graphs_1.clear()
+            self.window.list_graphs_2.clear()
+            return()
+        plot_data_df1 = pandas.read_csv(input_file)
+        plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
+        for index, row in plot_data_df1.iterrows():
+            # print(row['plot_name'])
+            self.window.list_graphs_2.addItem(row['session_name'])
+
+    def select_plot_3(self):
+        self.window.list_graphs_1.clear()
+        input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
+        plot_data_df = pandas.read_excel(input_file)
+        # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
+        for index, row in plot_data_df.iterrows():
+            # print(row['plot_name'])
+            self.window.list_graphs_1.addItem(row['plot_name'])
+
+        self.window.list_graphs_2.clear()
+        plot_select_directory_path = output_batch_subdirectory
+        plot_select_directory_name = os.path.basename(os.path.normpath(output_batch_subdirectory))
+        input_file = plot_select_directory_path + '/' + plot_select_directory_name + '_summary_results.csv'
+        if not os.path.exists(input_file):
+            self.window.list_graphs_1.clear()
+            self.window.list_graphs_2.clear()
+            return()
+        # print(input_file)
+        # input_file = 'usepa_omega2_gui/elements/summary_results.csv'
+        plot_data_df1 = pandas.read_csv(input_file)
+        plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
+        for index, row in plot_data_df1.iterrows():
+            # print(row['plot_name'])
+            self.window.list_graphs_2.addItem(row['session_name'])
+
     def open_plot_2(self):
-        if self.window.list_graphs_1.currentItem() is not None:
+        # See if valid selections have been made
+        if self.window.list_graphs_1.currentItem() is not None and self.window.list_graphs_2.currentItem() is not None:
+            # Get plot selections
             a = self.window.list_graphs_1.selectedIndexes()[0]
-            test_plot_2(a.data(), output_batch_directory)
+            b = self.window.list_graphs_2.selectedIndexes()[0]
+            # Send plot selections to plot function
+            test_plot_2(a.data(), b.data(), output_batch_directory)
 
 
 def status_bar():

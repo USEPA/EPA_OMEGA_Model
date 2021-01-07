@@ -38,7 +38,7 @@
      </font>
     </property>
     <property name="toolTip">
-     <string>OMEGA Model Setup</string>
+     <string/>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="iconSize">
      <size>
@@ -262,7 +262,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Selects a new Output Batch Directory</string>
+       <string>Selects a new OMEGA Output Batch Directory</string>
       </property>
       <property name="text">
        <string>Select</string>
@@ -289,7 +289,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Selects a new Input Batch File</string>
+       <string>Selects a new OMEGA Input Batch File</string>
       </property>
       <property name="text">
        <string>Select</string>
@@ -313,7 +313,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Opens an existing OMEGA 2 Configuration File</string>
+       <string>Opens an existing OMEGA Configuration File</string>
       </property>
       <property name="text">
        <string>Open</string>
@@ -337,7 +337,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Saves an OMEGA 2 Configuration File</string>
+       <string>Saves an OMEGA Configuration File</string>
       </property>
       <property name="text">
        <string>Save</string>
@@ -401,7 +401,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Multiprocessor Selection</string>
+       <string>OMEGA Multiprocessor Selection</string>
       </property>
       <property name="text">
        <string>Multiprocessor</string>
@@ -474,7 +474,7 @@ EPA Science Advisory Board - 2020</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Run Model</string>
+       <string>Run OMEGA Model</string>
       </property>
       <property name="iconSize">
        <size>
@@ -486,9 +486,9 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QLabel" name="model_status_label">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>490</x>
         <y>200</y>
-        <width>111</width>
+        <width>151</width>
         <height>31</height>
        </rect>
       </property>
@@ -517,18 +517,18 @@ EPA Science Advisory Board - 2020</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>220</y>
         <width>501</width>
-        <height>321</height>
+        <height>141</height>
        </rect>
       </property>
      </widget>
      <widget class="QLabel" name="available_plots_1_label_2">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>501</width>
+        <x>20</x>
+        <y>190</y>
+        <width>481</width>
         <height>31</height>
        </rect>
       </property>
@@ -547,8 +547,8 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QPushButton" name="open_plot_2">
       <property name="geometry">
        <rect>
-        <x>520</x>
-        <y>50</y>
+        <x>530</x>
+        <y>220</y>
         <width>71</width>
         <height>31</height>
        </rect>
@@ -566,6 +566,85 @@ EPA Science Advisory Board - 2020</string>
       </property>
       <property name="text">
        <string>Plot</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="list_graphs_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>501</width>
+        <height>141</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="available_plots_1_label_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>471</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Available Scenarios</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_plot_2">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>80</y>
+        <width>171</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Opens an existing OMEGA 2 Configuration File</string>
+      </property>
+      <property name="text">
+       <string>Select Previous Run</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_plot_3">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>40</y>
+        <width>171</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Opens an existing OMEGA 2 Configuration File</string>
+      </property>
+      <property name="text">
+       <string>Select Current Run</string>
       </property>
      </widget>
     </widget>
@@ -627,7 +706,7 @@ EPA Science Advisory Board - 2020</string>
      </font>
     </property>
     <property name="toolTip">
-     <string>Status Monitor records ongoing program events</string>
+     <string>Event Monitor records ongoing program events</string>
     </property>
     <property name="text">
      <string>Event Monitor</string>
@@ -668,7 +747,7 @@ EPA Science Advisory Board - 2020</string>
      </rect>
     </property>
     <property name="toolTip">
-     <string>Goto EPA Website</string>
+     <string/>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -683,7 +762,7 @@ EPA Science Advisory Board - 2020</string>
       </rect>
      </property>
      <property name="toolTip">
-      <string>Opens EPA Website</string>
+      <string>Open EPA Website</string>
      </property>
      <property name="text">
       <string/>

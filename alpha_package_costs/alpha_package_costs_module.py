@@ -18,28 +18,28 @@ class CreatePackageDictTuple:
         self.alpha_file = alpha_file
 
     def effectiveness_class(self):
-        effectiveness_classes = pd.Series(self.alpha_file['Vehicle Type']).unique()
+        effectiveness_classes = self.alpha_file['Vehicle Type'].unique()
         return effectiveness_classes[0]
 
     def engine_architecture(self):
-        engine_architectures = pd.Series(self.alpha_file['engine_architecture']).unique()
+        engine_architectures = self.alpha_file['engine_architecture'].unique()
         return engine_architectures
 
     def percent_weight_reduction(self):
-        percent_weight_reductions = pd.Series(self.alpha_file['weight_reduction']).unique()
+        percent_weight_reductions = self.alpha_file['weight_reduction'].unique()
         return percent_weight_reductions
 
     def aero_improvement(self):
-        aero_improvements = pd.Series(self.alpha_file['aero']).unique()
+        aero_improvements = self.alpha_file['aero'].unique()
         return aero_improvements
 
     def nonaero_improvement(self):
-        nonaero_improvements = pd.Series(self.alpha_file['nonaero']).unique()
+        nonaero_improvements = self.alpha_file['nonaero'].unique()
         return nonaero_improvements
 
     def work_class_identifier(self):
-        temp = CreatePackageDictTuple(self.alpha_file).effectiveness_class()
-        if temp == 'Truck':
+        # temp = CreatePackageDictTuple(self.alpha_file).effectiveness_class()
+        if self.effectiveness_class() == 'Truck':
             work_class = 'haul'
         else:
             work_class = 'nohaul'
@@ -53,6 +53,35 @@ class CalcCosts:
     """
     def __init__(self, df):
         self.df = df
+
+    def engine_cylinder_cost(self, dollars_for_cyls_8, dollars_for_cyls_6, dollars_for_cyls_4, dollars_for_cyls_3):
+        self.df.insert(len(self.df.columns), 'engine_cylinder_cost', 0)
+        self.df.loc[self.df['Engine Cylinders'] == 8, 'engine_cylinder_cost'] = dollars_for_cyls_8
+        self.df.loc[self.df['Engine Cylinders'] == 6, 'engine_cylinder_cost'] = dollars_for_cyls_6
+        self.df.loc[self.df['Engine Cylinders'] == 4, 'engine_cylinder_cost'] = dollars_for_cyls_4
+        self.df.loc[self.df['Engine Cylinders'] == 3, 'engine_cylinder_cost'] = dollars_for_cyls_3
+        return self.df
+
+    def engine_displacement_cost(self, dollars_per_liter):
+        self.df.insert(len(self.df.columns),
+                       'engine_displacement_cost',
+                       self.df['Engine Displacement L'] * dollars_per_liter)
+        return self.df
+
+    def engine_boost_cost(self, boost_multiplier):
+        """The engine_boost_cost is the cost associated with making the boosted engine more robust.
+        The cost of the turbo charger is included in the engine_tech_cost."""
+        self.df.insert(len(self.df.columns), 'boost_add', 0)
+        self.df.loc[self.df['engine_architecture'].str.contains('TURB'), 'boost_add'] \
+            = (self.df['engine_cylinder_cost'] + self.df['engine_displacement_cost']) * (boost_multiplier - 1)
+        self.df['boost_add'].fillna(0)
+        return self.df
+
+    def engine_cost(self):
+        self.df.insert(len(self.df.columns),
+                           'engine_cost',
+                           self.df[['engine_tech_cost', 'engine_cylinder_cost', 'engine_displacement_cost', 'boost_add']].sum(axis=1))
+        return self.df
 
     def trans_cost(self, techcosts_trans):
         self.df = self.df.merge(techcosts_trans[['trans', 'trans_cost']], on='trans', how='left')
@@ -96,6 +125,13 @@ class CalcCosts:
         self.df = self.df.merge(techcosts_nonaero[['nonaero', 'nonaero_cost']], on='nonaero', how='left')
         return self.df
 
+    def air_conditioning_cost(self, techcosts_ac, work_class):
+        df = techcosts_ac.copy()
+        df.set_index('work_class', inplace=True)
+        ac_cost = df.at[work_class, 'ac_cost']
+        self.df.insert(len(self.df.columns), 'ac_cost', ac_cost)
+        return self.df
+
     def weight_cost(self, start_year, techcosts_weight, work_class):
         """
         Weight costs are calculated as an absolute cost associated with the curb weight of the vehicle and are then adjusted according to the weight reduction.
@@ -124,7 +160,7 @@ class CalcCosts:
         :return:
         """
         self.df[f'powertrain_cost_{start_year}'] = \
-            self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost']].sum(axis=1)
+            self.df[['engine_cost', 'trans_cost', 'deac_cost', 'accessory_cost', 'start-stop_cost', 'ac_cost']].sum(axis=1)
         return self.df
 
     def roadload_cost(self, start_year):
@@ -284,7 +320,7 @@ def dollar_basis_year(df):
     return dollar_year
 
 
-def cost_vs_co2_plot(df, path, *years):
+def cost_vs_co2_plot(df, path, name_id, *years):
     ice_classes = [x for x in df['cost_curve_class'].unique() if 'ice' in x]
     bev_classes = [x for x in df['cost_curve_class'].unique() if 'bev' in x]
     for year in years:
@@ -320,7 +356,7 @@ def cost_vs_co2_plot(df, path, *years):
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
             plt.legend(loc=2)
             plt.title(f'ice_{year}')
-            plt.savefig(path / f'ice_{year}.png')
+            plt.savefig(path / f'ice_{year}_{name_id}.png')
 
         # create bev plot
         fig = plt.figure()
@@ -332,10 +368,10 @@ def cost_vs_co2_plot(df, path, *years):
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
             plt.legend(loc=4)
             plt.title(f'bev_{year}')
-            plt.savefig(path / f'bev_{year}.png')
+            plt.savefig(path / f'bev_{year}_{name_id}.png')
 
 
-def cost_vs_co2_plot_combined(df, path, *years):
+def cost_vs_co2_plot_combined(df, path, name_id, *years):
     classes = [x for x in df['cost_curve_class'].unique()]
     for year in years:
         class_data = dict()
@@ -360,7 +396,7 @@ def cost_vs_co2_plot_combined(df, path, *years):
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
             plt.legend(loc=1)
             plt.title(f'{year}')
-            plt.savefig(path / f'{year}.png')
+            plt.savefig(path / f'{year}_{name_id}.png')
 
 
 def main():
@@ -417,7 +453,7 @@ def main():
 
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
     techcosts_file = pd.ExcelFile(path_inputs.joinpath('alpha_package_costs_module_inputs.xlsx'))
-    techcosts_engine = pd.read_excel(techcosts_file, 'engine')
+    techcosts_engine = pd.read_excel(techcosts_file, 'engine_tech')
     techcosts_deac = pd.read_excel(techcosts_file, 'deac', index_col='Cylinders')
     techcosts_trans = pd.read_excel(techcosts_file, 'trans')
     techcosts_accessories = pd.read_excel(techcosts_file, 'accessories')
@@ -425,6 +461,7 @@ def main():
     techcosts_weight = pd.read_excel(techcosts_file, 'weight', index_col=0)
     techcosts_aero = pd.read_excel(techcosts_file, 'aero')
     techcosts_nonaero = pd.read_excel(techcosts_file, 'nonaero')
+    techcosts_ac = pd.read_excel(techcosts_file, 'ac')
     techcosts_bev = pd.read_excel(techcosts_file, 'bev', index_col=0)
     upstream = pd.read_excel(techcosts_file, 'upstream', index_col=0)
     upstream = upstream.to_dict('index')
@@ -445,15 +482,26 @@ def main():
     learning_rate_powertrain = inputs['learning_rate_powertrain']['value']
     learning_rate_roadload = inputs['learning_rate_roadload']['value']
     learning_rate_bev = inputs['learning_rate_bev']['value']
+    boost_multiplier = inputs['boost_multiplier']['value']
 
     ghg_standards = inputs['ghg_standards']['value']
 
     coefficients = pd.read_csv(path_input_templates / f'ghg_standards-{ghg_standards}.csv', skiprows=1, index_col='model_year')
 
+    # read the code inputs for engine costs ($/cyl; $/liter) and convert dollar_basis
+    engine_cost = pd.read_excel(techcosts_file, 'engine', index_col=0)
+    engine_cost = CalcCosts(engine_cost).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'item_cost')
+    engine_cost = engine_cost.to_dict('index')
+    dollars_for_cyls_8 = engine_cost['dollars_per_cyl_8']['item_cost'] * 8
+    dollars_for_cyls_6 = engine_cost['dollars_per_cyl_6']['item_cost'] * 6
+    dollars_for_cyls_4 = engine_cost['dollars_per_cyl_4']['item_cost'] * 4
+    dollars_for_cyls_3 = engine_cost['dollars_per_cyl_3']['item_cost'] * 3
+    dollars_per_liter = engine_cost['dollars_per_liter']['item_cost']
+
     techcosts_engine.insert(0, 'ALPHA_engine, Cylinders', list(zip(techcosts_engine['ALPHA_engine'], techcosts_engine['actual_cylinders'])))
 
     # convert all dollars in to consistent, analysis dollars
-    techcosts_engine = CalcCosts(techcosts_engine).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'engine_cost')
+    techcosts_engine = CalcCosts(techcosts_engine).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'engine_tech_cost')
     techcosts_deac = CalcCosts(techcosts_deac).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'deac_cost')
     techcosts_trans = CalcCosts(techcosts_trans).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'trans_cost')
     techcosts_accessories = CalcCosts(techcosts_accessories).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'accessory_cost')
@@ -461,6 +509,7 @@ def main():
     techcosts_weight = CalcCosts(techcosts_weight).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'cost_per_pound', 'DMC_ln_coefficient', 'DMC_constant', 'IC_slope')
     techcosts_aero = CalcCosts(techcosts_aero).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'aero_cost')
     techcosts_nonaero = CalcCosts(techcosts_nonaero).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'nonaero_cost')
+    techcosts_ac = CalcCosts(techcosts_ac).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'ac_cost')
     techcosts_bev = CalcCosts(techcosts_bev).convert_dollars_to_analysis_basis(gdp_deflators, dollar_basis, 'bev_cost_slope', 'bev_cost_intercept', 'dollar/kWh_0WR', 'dollar/kWh_20WR')
     techcosts_bev = techcosts_bev.to_dict('index')
 
@@ -514,8 +563,15 @@ def main():
         # create an ALPHA_engine, #Cylinders column for merging necessary engine cost metrics into file
         alpha_file[file_num].insert(len(alpha_file[file_num].columns), 'ALPHA_engine, Cylinders',
                                     list(zip(alpha_file[file_num]['Engine'], alpha_file[file_num]['Engine Cylinders'])))
-        alpha_file[file_num] = alpha_file[file_num].merge(techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost']],
+        alpha_file[file_num] = alpha_file[file_num].merge(techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_tech_cost']],
                                                           on=['ALPHA_engine, Cylinders'], how='left')
+
+        # with engine tech costs merged in, now add to those costs the $/cyl, $/liter and $ for boost costs
+        alpha_file[file_num] = CalcCosts(alpha_file[file_num]).engine_cylinder_cost(dollars_for_cyls_8, dollars_for_cyls_6,
+                                                                                    dollars_for_cyls_4, dollars_for_cyls_3)
+        alpha_file[file_num] = CalcCosts(alpha_file[file_num]).engine_displacement_cost(dollars_per_liter)
+        alpha_file[file_num] = CalcCosts(alpha_file[file_num]).engine_boost_cost(boost_multiplier)
+        alpha_file[file_num] = CalcCosts(alpha_file[file_num]).engine_cost()
 
     # this loop breaks each ALPHA file into package dictionaries identified by the identifying tuple
     # the inner loop then uses the CalcCosts class to calculate package costs
@@ -554,6 +610,7 @@ def main():
             temp_df = cost_object.startstop_cost(techcosts_startstop)
             temp_df = cost_object.aero_cost(techcosts_aero, work_class)
             temp_df = cost_object.nonaero_cost(techcosts_nonaero)
+            temp_df = cost_object.air_conditioning_cost(techcosts_ac, work_class)
             for year in years:
                 temp_df.insert(len(temp_df.columns), f'weight_cost_{year}', 0)
             for year in years:
@@ -609,8 +666,12 @@ def main():
         utility_factor = bev['utility_factor']
 
         print(f'Working on bev_{bev_range}_{eff_class}')
-        bev_cost_co2[key] = pd.DataFrame({'effectiveness_class': eff_class, 'weight_reduction': pd.Series(bev_wr_range), 'Test Weight lbs': etw,
-                                          'Reg_Class': reg_class, 'Hauling_Class': work_class, 'bev_tech': f'bev_{bev_range}'})
+        bev_cost_co2[key] = pd.DataFrame({'effectiveness_class': eff_class,
+                                          'weight_reduction': pd.Series(bev_wr_range),
+                                          'Test Weight lbs': etw,
+                                          'Reg_Class': reg_class,
+                                          'Hauling_Class': work_class,
+                                          'bev_tech': f'bev_{bev_range}'})
 
         # calc the pack size and energy consumption
         bev_cost_co2[key].insert(len(bev_cost_co2[key].columns),
@@ -652,7 +713,7 @@ def main():
 
     # save outputs
     modified_costs = pd.ExcelWriter(path_of_run_folder.joinpath(f'techcosts_in_{dollar_basis}_dollars.xlsx'))
-    techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='engine', index=False)
+    techcosts_engine[['ALPHA_engine, Cylinders', 'engine_architecture', 'engine_tech_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='engine', index=False)
     techcosts_deac[['Tech', 'deac_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='deac', index=False)
     techcosts_trans[['trans', 'trans_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='trans', index=False)
     techcosts_aero[['work_class', 'aero', 'aero_cost', 'dollar_basis']].to_excel(modified_costs, sheet_name='aero', index=False)
@@ -686,8 +747,8 @@ def main():
     with open(path_of_run_folder.joinpath('cost_clouds.csv'), 'a', newline='') as cloud_file:
         cost_clouds_df.to_csv(cloud_file, index=False)
 
-    cost_vs_co2_plot(cost_clouds_df, path_of_run_folder, 2020, 2030, 2040)
-    cost_vs_co2_plot_combined(cost_clouds_df, path_of_run_folder, 2020, 2030, 2040)
+    cost_vs_co2_plot(cost_clouds_df, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
+    cost_vs_co2_plot_combined(cost_clouds_df, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
 
 
 if __name__ == '__main__':

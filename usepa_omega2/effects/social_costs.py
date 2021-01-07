@@ -15,6 +15,7 @@ scf_dict = dict()
 ccf_dict = dict()
 fp_dict = dict()
 es_dict = dict()
+cn_dict = dict()
 
 
 def get_vehicle_info(vehicle_ID, query=False):
@@ -134,15 +135,32 @@ def get_energysecurity_cf(calendar_year, query=False):
     es_dict_id = f'{calendar_year}'
 
     if es_dict_id in es_dict and not query:
-        es_cf = es_dict[es_dict_id]
+        es_cf, foreign_oil_fraction = es_dict[es_dict_id]
     else:
-        es_cf = o2.session.query(CostFactorsEnergySecurity.dollars_per_gallon). \
-            filter(CostFactorsEnergySecurity.calendar_year == calendar_year).scalar()
+        es_cf, foreign_oil_fraction = o2.session.query(CostFactorsEnergySecurity.dollars_per_gallon,
+                                                       CostFactorsEnergySecurity.foreign_oil_fraction). \
+            filter(CostFactorsEnergySecurity.calendar_year == calendar_year).one()
 
-        es_dict[es_dict_id] = es_cf
+        es_dict[es_dict_id] = es_cf, foreign_oil_fraction
 
-    return es_cf
+    return es_cf, foreign_oil_fraction
 
+
+def get_congestion_noise_cf(reg_class_id, query=False):
+    from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
+
+    cn_dict_id = f'{reg_class_id}'
+
+    if cn_dict_id in cn_dict and not query:
+        congestion_cf, noise_cf = cn_dict[cn_dict_id]
+    else:
+        congestion_cf, noise_cf = o2.session.query(CostFactorsCongestionNoise.congestion_cost_dollars_per_mile,
+                                                   CostFactorsCongestionNoise.noise_cost_dollars_per_mile). \
+            filter(CostFactorsCongestionNoise.reg_class_id == reg_class_id).one()
+
+        cn_dict[cn_dict_id] = congestion_cf, noise_cf
+
+    return congestion_cf, noise_cf
 
 
 def calc_carbon_emission_costs(calendar_year):
@@ -323,14 +341,23 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
         fuel_70_social_cost_dollars = fuel_consumption * pretax
 
         # get energy security cost factors
-        es_cost_factor = get_energysecurity_cf(calendar_year, query=query)
+        es_cost_factor, foreign_oil_fraction = get_energysecurity_cf(calendar_year, query=query)
 
         # energy security
         if in_use_fuel_ID == 'pump gasoline':
-            energy_security_30_social_cost_dollars = fuel_consumption * es_cost_factor
-            energy_security_70_social_cost_dollars = fuel_consumption * es_cost_factor
+            energy_security_30_social_cost_dollars = fuel_consumption * es_cost_factor * foreign_oil_fraction
+            energy_security_70_social_cost_dollars = fuel_consumption * es_cost_factor * foreign_oil_fraction
         else:
             energy_security_30_social_cost_dollars, energy_security_70_social_cost_dollars = 0, 0
+
+        # get congestion and noise cost factors
+        congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_ID, query=query)
+
+        # congestion and noise costs
+        congestion_30_social_cost_dollars = vmt * congestion_cf
+        congestion_70_social_cost_dollars = vmt * congestion_cf
+        noise_30_social_cost_dollars = vmt * noise_cf
+        noise_70_social_cost_dollars = vmt * noise_cf
 
         ed_list.append(CostEffectsNonEmissions(vehicle_ID=vehicle_ID,
                                                calendar_year=calendar_year,
@@ -342,6 +369,10 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
                                                fuel_70_social_cost_dollars=fuel_70_social_cost_dollars,
                                                energy_security_30_social_cost_dollars=energy_security_30_social_cost_dollars,
                                                energy_security_70_social_cost_dollars=energy_security_70_social_cost_dollars,
+                                               congestion_30_social_cost_dollars=congestion_30_social_cost_dollars,
+                                               congestion_70_social_cost_dollars=congestion_70_social_cost_dollars,
+                                               noise_30_social_cost_dollars=noise_30_social_cost_dollars,
+                                               noise_70_social_cost_dollars=noise_70_social_cost_dollars,
                                                )
                         )
     o2.session.add_all(ed_list)

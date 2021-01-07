@@ -82,8 +82,8 @@ try:
             self.producer_consumer_iteration_tolerance = 5e-3
 
             self.consumer_pricing_num_options = 4
-            self.consumer_pricing_multiplier_min = 0.8
-            self.consumer_pricing_multiplier_max = 1.2
+            self.consumer_pricing_multiplier_min = 0.95
+            self.consumer_pricing_multiplier_max = 1.05
 
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
@@ -96,6 +96,7 @@ try:
             self.scc_cost_factors_file = 'input_samples/context_cost_factors-scc.csv'
             self.criteria_cost_factors_file = 'input_samples/context_cost_factors-criteria.csv'
             self.energysecurity_cost_factors_file = 'input_samples/context_cost_factors-energysecurity.csv'
+            self.congestion_noise_cost_factors_file = 'input_samples/context_cost_factors-congestion-noise.csv'
             self.emission_factors_vehicles_file = 'input_samples/context_emission_factors-vehicles.csv'
             self.emission_factors_powersector_file = 'input_samples/context_emission_factors-powersector.csv'
             self.emission_factors_refinery_file = 'input_samples/context_emission_factors-refinery.csv'

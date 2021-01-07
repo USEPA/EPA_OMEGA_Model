@@ -651,6 +651,7 @@ def init_omega(o2_options):
     from effects.cost_factors_criteria import CostFactorsCriteria
     from effects.cost_factors_scc import CostFactorsSCC
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
+    from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
     from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
@@ -730,6 +731,8 @@ def init_omega(o2_options):
                                                                        verbose=o2.options.verbose)
         init_fail = init_fail + CostFactorsEnergySecurity.init_database_from_file(o2.options.energysecurity_cost_factors_file,
                                                                                   verbose=o2.options.verbose)
+        init_fail = init_fail + CostFactorsCongestionNoise.init_database_from_file(o2.options.congestion_noise_cost_factors_file,
+                                                                                   verbose=o2.options.verbose)
         init_fail = init_fail + EmissionFactorsPowersector.init_database_from_file(o2.options.emission_factors_powersector_file,
                                                                                    verbose=o2.options.verbose)
         init_fail = init_fail + EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,

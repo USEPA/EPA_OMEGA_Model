@@ -19,6 +19,7 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
     calendar_year = Column(Numeric)
     dollar_basis = Column(Numeric)
     dollars_per_gallon = Column(Float)
+    foreign_oil_fraction = Column(Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -26,10 +27,11 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'context_cost_factors-energysecurity'
-        input_template_version = 0.1
+        input_template_version = 0.2
         input_template_columns = {'calendar_year',
                                   'dollar_basis',
                                   'dollars_per_gallon',
+                                  'foreign_oil_fraction',
                                   }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -53,6 +55,7 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
                         calendar_year = df.loc[i, 'calendar_year'],
                         dollar_basis = df.loc[i, 'dollar_basis'],
                         dollars_per_gallon = df.loc[i, 'dollars_per_gallon'],
+                        foreign_oil_fraction = df.loc[i, 'foreign_oil_fraction'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()

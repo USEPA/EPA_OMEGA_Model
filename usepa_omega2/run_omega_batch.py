@@ -297,12 +297,13 @@ class OMEGASessionObject(OMEGABase):
         batch_log.logwrite('Getting Postproc Settings...')
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
+        self.settings.energysecurity_cost_factors_file = self.read_parameter('Context Energy Security Cost Factors File')
+        self.settings.congestion_noise_cost_factors_file = self.read_parameter('Context Congestion-Noise Cost Factors File')
         self.settings.emission_factors_powersector_file = self.read_parameter('Context Powersector Emission Factors File')
         self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
-        self.settings.energysecurity_cost_factors_file = self.read_parameter('Context Energy Security Cost Factors File')
 
     def init(self, validate_only=False):
         if not validate_only:

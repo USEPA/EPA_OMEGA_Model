@@ -29,3 +29,5 @@ setuptools~=49.4.0
 Sphinx==3.2.1
 
 bumpversion==0.6.0
+
+plyer~=2.0.0
