@@ -52,13 +52,7 @@ exclude_patterns = []
 # html_theme = 'default'
 # html_theme = 'alabaster'
 # html_theme = 'bizstyle'
-html_theme = 'classic'
-
-# Default Palette
-# html_theme_options = {
-#     "stickysidebar": "true",
-#     "sidebarwidth": "30em"
-# }
+html_theme = 'bizstyle'
 
 # EPA Palette
 html_theme_options = {
@@ -88,5 +82,3 @@ html_static_path = ['_static']
 
 # set top level document to index.rst:
 master_doc = 'index'
-
-

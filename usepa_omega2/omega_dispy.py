@@ -215,6 +215,7 @@ class DispyCluster(object):
 
         print("Finding dispynodes...")
         self.master_ip = socket.gethostbyname(socket.gethostname())
+        print('Master IP = %s' % self.master_ip)
         if not self.options.local and (self.options.dispy_ping or self.options.network):
             self.desired_node_list = ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63',
                                       '204.47.184.59']
