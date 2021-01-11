@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -388,7 +388,7 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QCheckBox" name="multiprocessor_checkbox">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>530</x>
         <y>40</y>
         <width>151</width>
         <height>20</height>
@@ -467,7 +467,7 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QPushButton" name="run_model_button">
       <property name="geometry">
        <rect>
-        <x>509</x>
+        <x>529</x>
         <y>80</y>
         <width>111</width>
         <height>111</height>
@@ -488,7 +488,7 @@ EPA Science Advisory Board - 2020</string>
        <rect>
         <x>490</x>
         <y>200</y>
-        <width>151</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
