@@ -52,24 +52,25 @@ exclude_patterns = []
 # html_theme = 'default'
 # html_theme = 'alabaster'
 # html_theme = 'bizstyle'
-html_theme = 'classic'
+# html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 numfig = True
 
 # EPA Palette
-html_theme_options = {
-    "stickysidebar": "true",
-    "sidebarwidth": "30em",
-    "sidebarbgcolor": "#0071BC",
-    "sidebartextcolor": "#FFFFFF",
-    "sidebarlinkcolor": "#FFFFFF",
-    "relbarbgcolor": "#205493",
-    "textcolor": "#205493",
-    "linkcolor": "#205493",
-    "visitedlinkcolor": "#205493",
-    "headtextcolor": "#205493",
-    "headlinkcolor": "#205493",
-    "footerbgcolor": "#112E51"
-}
+# html_theme_options = {
+#     "stickysidebar": "true",
+#     "sidebarwidth": "30em",
+#     "sidebarbgcolor": "#0071BC",
+#     "sidebartextcolor": "#FFFFFF",
+#     "sidebarlinkcolor": "#FFFFFF",
+#     "relbarbgcolor": "#205493",
+#     "textcolor": "#205493",
+#     "linkcolor": "#205493",
+#     "visitedlinkcolor": "#205493",
+#     "headtextcolor": "#205493",
+#     "headlinkcolor": "#205493",
+#     "footerbgcolor": "#112E51"
+# }
 
 html_sidebars = {
    '**': ['globaltoc.html', 'sourcelink.html', 'searchbox.html'],
