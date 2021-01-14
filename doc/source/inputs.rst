@@ -13,7 +13,7 @@ Tips body text
 
 Graphical User Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^
-The EPA OMEGA Model by nature is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.
+The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.
 
 GUI Basics
 ----------
