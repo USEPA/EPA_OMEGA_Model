@@ -48,6 +48,7 @@ status_bar_message = "Status = Ready"
 # Python dictionary containing contents of the configuration file
 scenario = ""
 plot_select_directory = ""
+plot_select_directory_name = ""
 # Multiprocessor flag
 multiprocessor_mode_selected = False
 # Logic elements for program control
@@ -647,6 +648,7 @@ class Form(QObject):
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
         self.window.model_status_label.setText("Model Idle")
+        self.window.select_plot_3.setEnabled(0)
 
     def clear_entries(self):
         """
@@ -768,8 +770,10 @@ class Form(QObject):
             # Update model run time
             elapsed_end = datetime.now()
             elapsed_time = elapsed_end - elapsed_start
-            elapsed_time = str(elapsed_time)
-            elapsed_time = "Model Running\n" + elapsed_time[:-7]
+            elapsed_time = sec_to_hours(elapsed_time.seconds)
+            # elapsed_time = str(elapsed_time)
+            # elapsed_time = "Model Running\n" + elapsed_time[:-7]
+            elapsed_time = "Model Running\n" + elapsed_time[:-4]
             self.window.model_status_label.setText(elapsed_time)
 
             # Look for new log files
@@ -854,7 +858,7 @@ class Form(QObject):
         # elapsed_end = datetime.now()
         elapsed_time1 = elapsed_end - elapsed_start
         elapsed_time1 = str(elapsed_time)
-        elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-7]
+        elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-4]
         self.window.model_status_label.setText(elapsed_time1)
         # self.window.model_status_label.setText("Model Run Completed")
         # Enable selected gui functions disabled during model run
@@ -949,9 +953,11 @@ class Form(QObject):
         self.window.action_run_model.setEnabled(enable)
         self.window.run_model_button.setEnabled(enable)
         self.window.multiprocessor_checkbox.setEnabled(enable)
+        self.window.select_plot_3.setEnabled(enable)
 
     def select_plot_2(self):
         global plot_select_directory
+        global plot_select_directory_name
         file_name = ""
         file_type = ""
         file_dialog_title = 'Select Run Directory'
@@ -963,6 +969,7 @@ class Form(QObject):
 
         plot_select_directory_path = file_name
         plot_select_directory_name = os.path.basename(os.path.normpath(file_name))
+        # print(plot_select_directory_name)
 
         self.window.list_graphs_1.clear()
         input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
@@ -986,6 +993,7 @@ class Form(QObject):
             self.window.list_graphs_2.addItem(row['session_name'])
 
     def select_plot_3(self):
+        global plot_select_directory_name
         self.window.list_graphs_1.clear()
         input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
         plot_data_df = pandas.read_excel(input_file)
@@ -1011,13 +1019,14 @@ class Form(QObject):
             self.window.list_graphs_2.addItem(row['session_name'])
 
     def open_plot_2(self):
+        global plot_select_directory_name
         # See if valid selections have been made
         if self.window.list_graphs_1.currentItem() is not None and self.window.list_graphs_2.currentItem() is not None:
             # Get plot selections
             a = self.window.list_graphs_1.selectedIndexes()[0]
             b = self.window.list_graphs_2.selectedIndexes()[0]
             # Send plot selections to plot function
-            test_plot_2(a.data(), b.data(), output_batch_directory)
+            test_plot_2(a.data(), b.data(), plot_select_directory_name)
 
 
 def status_bar():

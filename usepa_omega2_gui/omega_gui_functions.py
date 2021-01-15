@@ -179,7 +179,7 @@ def status_output_color(g):
     return g
 
 
-def test_plot_2(plot_selection, scenario_selection, output_directory):
+def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name):
     """
     Reads a csv file and plots selected graph.
 
@@ -203,7 +203,8 @@ def test_plot_2(plot_selection, scenario_selection, output_directory):
         marker_size = 4  # Marker size
         x_label = (df.loc[plot_selection, 'x_label'])  # Label for x axis
         y_label = (df.loc[plot_selection, 'y_data_label'])  # Label for y axis
-        plot_title = plot_selection + ' (' + scenario_selection + ')'  # Plot title
+        # Plot title
+        plot_title = plot_selection + '\n(' + scenario_selection + ')' + '\n(' + plot_select_directory_name + ')'
 
         cmap = cm.get_cmap('tab10')  # Color map
 
