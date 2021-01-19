@@ -4,6 +4,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -80,6 +81,9 @@ def Edmunds_Interact(url):
     max_attempts = 10
     max_time = 60
     trim_options = []
+    trim_dropdown_buttons_xpath = "//button[@data-test='select-menu']"  # The xpath for the trim selection drop-down button, which is repeated in 1-3 columns and multiple rows for each table
+    trim_select_buttons_xpath = "//div[@class='dropdown-menu show']//button[@class='dropdown-item']"
+
     for geturl_attempt in range(0, max_attempts):
         print('URL Attempt ' + str(geturl_attempt + 1))
         # time = (max_time)*(0.125 + ((geturl_attempt+1)/max_attempts))
@@ -88,70 +92,26 @@ def Edmunds_Interact(url):
 
         os.environ["webdriver.chrome.driver"] = chromedriver
         chromeOptions = Options()
+        caps = DesiredCapabilities().CHROME
+        caps["pageLoadStrategy"] = "none"
         # chromeOptions.add_argument("--kiosk")
         chromeOptions.add_argument("--start-maximized")
-        driver = webdriver.Chrome(executable_path=chromedriver)
+        driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
         driver.maximize_window()
         driver.implicitly_wait(5)
         try:
             driver.set_page_load_timeout(time)
             driver.get(url)
             # find and click main button to reveal drop-down menu
-            menu1 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[0]
-            menu1.click()
-
-            # menus1 = driver.find_elements_by_xpath("//select[@class = 'style-select h5 mb-0 w-100 bg-white font-weight-bold' and @data-fas-column = '1']")
-            # for menu in menus1:
-            #     if menu.is_displayed():
-            #         menu1 = menu
-            #         break
-            # dropdown1 = Select(menu1)
-            # # signal.alarm(0)
-
+            menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
+            element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
+            menus[0].click() # click the first dropdown menu button. Assumes all menus contain the same trim list.
             # find trim buttons in drop-down menu
-            trim_buttons = driver.find_elements_by_xpath("//div[@class='dropdown-menu show']/button[@class='dropdown-item']")
-
-            # find trim buttons in drop-down menu
-            trim_buttons = driver.find_elements_by_xpath("//div[@class='dropdown-menu show']/button[@class='dropdown-item']")
-            # menu1.click()
+            trim_buttons = driver.find_elements_by_xpath(trim_select_buttons_xpath)
             for i, trim in zip(range(len(trim_buttons)), trim_buttons):
                 print(trim.text)
                 trim_options.append(trim.text)
-
-            option_text = trim_options[3]
-
-            # # https://stackoverflow.com/questions/50354157/select-from-a-dropdown-box-without-using-the-select-or-option-tags-selenium-pyt
-            # # menu2 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[1]
-            # # menu2.click()
-            # Dropdown_Element = driver.find_element_by_xpath("//button[text()='{}']".format(str(option_text)))
-            # actions = ActionChains(driver)
-
-            # # Click on the element using the click(on_element=)
-            # actions.click(on_element=Dropdown_Element)
-            # driver.implicitly_wait(2)
-            # #actions.move_to_element(Dropdown_Element)
-
-            # actions.perform()
-            # actions.reset_actions()
-
-            # #ActionChains = 4
-            # menu1.click()
-            # actions = ActionChains(driver)
-            # option_text = trim_options[4]
-            # dropdown_element = driver.find_element_by_xpath("//button[text()='{}']".format(str(option_text)))
-
-            # # Click on the element using the click(on_element=)
-            # actions.click(on_element=dropdown_element)
-            # driver.implicitly_wait(2)
-            # actions.perform()
-
-            # webdriver.ActionChains(driver).move_to_element(Dropdown_Element).click(Dropdown_Element).perform()
-
-            # https://stackoverflow.com/questions/57648236/how-to-handle-a-non-select-dropdown-menu-in-selenium-with-dynamic-class-value
-            # WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//div[starts-with(@class, 'responsiveDropdownMenu__title--')]//following::span[starts-with(@class, 'responsiveDropdownMenu__label--')]"))).click()
-            # WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//div[starts-with(@class, 'responsiveDropdownMenu__menu--')]//a[@id='desc__ratings_count']"))).click()
-
-            # https://www.lambdatest.com/blog/how-to-get-text-of-an-element-in-selenium/
+            menus[0].click()  # close the dropdown menu.
             break
         except (NoSuchElementException, TimeoutException, UnboundLocalError):
             driver.quit()
@@ -162,16 +122,16 @@ def Edmunds_Interact(url):
     except UnboundLocalError:
         if geturl_attempt + 1 == max_attempts:
             return ('N', 'READIN_ERROR')
-    trim_group_length = 1
-
-    if total_trims >= 2:
-        menu2 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[1]
-        # dropdown2 = Select(menu2)
-        trim_group_length = 2
-    if total_trims >= 3:
-        menu3 = driver.find_elements_by_xpath("//button[@data-test='select-menu']")[2]
-        # dropdown3 = Select(menu3)
-        trim_group_length = 3
+    # trim_group_length = 1
+    #
+    # if total_trims >= 2:
+    #     #menu2 = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)[1]
+    #     # dropdown2 = Select(menu2)
+    #     trim_group_length = 2
+    # if total_trims >= 3:
+    #     #menu3 = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)[2]
+    #     # dropdown3 = Select(menu3)
+    #     trim_group_length = 3
 
     trim_groups_count = math.ceil(total_trims / 3)  # Number of trim groups (in groups of 3, add one if only 1-2 trims left)
     last_group_count = total_trims % 3  # Length of last group
@@ -191,36 +151,33 @@ def Edmunds_Interact(url):
             except NameError:
                 pass
             if trim_group == trim_groups_count - 1 and last_group_count != 0:  # Last (or only) trim group and less than 3 entries
-                trims = pd.Series(range(last_group_count)) + trim_group_length * trim_group
+                trims = pd.Series(range(last_group_count)) + trim_groups_count * trim_group
             else:
-                trims = pd.Series(range(trim_group_length)) + trim_group_length * trim_group
+                trims = pd.Series(range(trim_groups_count)) + trim_groups_count * trim_group
             if len(trims) >= 1:
                 try:
-                    menu1.click()
+                    menus[0].click()
                     # Choose first option
-                    driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")[_index * 3 + 0].click()
-                    # dropdown1.select_by_index(trims[0]) #Choose first option
-                    # element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown1.options)[trims[0]].text)))
+                    element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
+                    driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + 0].click()
                 except TimeoutException:
                     errorflag_1 = 1
                     readin_check[trims[0]] = 'READIN_ERROR'
             if len(trims) >= 2:  # Choose second option (if applicable)
                 try:
-                    menu2.click()
+                    menus[1].click()
                     # Choose second option
-                    driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")[_index * 3 + 1].click()
-                    # dropdown2.select_by_index(trims[1])
-                    # element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown2.options)[trims[1]].text)))
+                    element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
+                    driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + 1].click()
                 except TimeoutException:
                     errorflag_2 = 1
                     readin_check[trims[1]] = 'READIN_ERROR'
             if len(trims) >= 3:  # Choose third option (if applicable)
                 try:
-                    menu3.click()
+                    menus[2].click()
                     # Choose third option
-                    driver.find_elements_by_xpath("//div[@class='dropdown-menu show']//button[@class='dropdown-item']")[_index * 3 + 2].click()
-                    # dropdown3.select_by_index(trims[2])
-                    # element = WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.LINK_TEXT, (dropdown3.options)[trims[2]].text)))
+                    element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
+                    driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + 2].click()
                 except TimeoutException:
                     errorflag_3 = 1
                     readin_check[trims[2]] = 'READIN_ERROR'
@@ -259,8 +216,7 @@ def Edmunds_Interact(url):
                             msrp = column[column.find('$'):].strip()
                             # msrp=msrp.split(" ")[0]; msrp=msrp.strip('$'); msrp=msrp.replace(',', '')
                             raw_table = raw_table.rename \
-                                (columns={column: column[column.rfind(')', 0, column.rfind(')')):column.rfind(')') + 1].strip() \
-                                 .replace('  ', '').strip() + ' ' + msrp})
+                                (columns={column: column[column.rfind(')', 0, column.rfind(')')):column.rfind(')') + 1].strip().replace('  ', '').strip() + ' ' + msrp})
                         # raw_table.to_csv('/Users/Brandon/PycharmProjects/Web_Scraping/'+'Raw Table.csv')
                         try:
                             important_tables = pd.concat([important_tables, raw_table])
@@ -277,7 +233,7 @@ def Edmunds_Interact(url):
             for i in range(len(table_list)):
                 tmp_table = table_list[i]
                 tmp_table_cname = table_list[i].columns[0]
-                df.at[k, df.columns[0]] = tmp_table_cname
+                df.at[k:k+len(tmp_table)-1, df.columns[0]] = tmp_table_cname
                 if i == 0:
                     df.at[k, df.columns[1]] = tmp_table[tmp_table_cname][0]
                     df.drop(table_list[1].columns[0], axis=1, inplace=True)
@@ -302,14 +258,13 @@ def Edmunds_Interact(url):
                 else:
                     category = category.str.cat(important_tables.iloc[:, s], sep='')
             category = pd.Series(category, name='Category')
-            important_array = pd.concat([important_tables.iloc[:, 0:min(3, total_trims)], category], axis=1) \
-                .reset_index(drop=True)
+            important_array = pd.concat([important_tables.iloc[:, 0:min(3, total_trims)], category], axis=1).reset_index(drop=True)
             if trim_group == 0:
                 output_array = important_array
             else:
-                merge_array = pd.concat([important_array['Category'], \
-                                         important_array[important_array.columns.difference(output_array.columns)]], axis=1)
+                merge_array = pd.concat([important_array['Category'], important_array[important_array.columns.difference(output_array.columns)]], axis=1)
                 output_array = pd.merge(output_array, merge_array, on='Category', how='outer')
 
     driver.close()
-    return (df, output_array, readin_check)
+    # return (output_array, readin_check)
+    return (df, readin_check)

@@ -4,7 +4,7 @@ import Edmunds_Interact
 
 working_directory = 'C:/Users/KBolon/Documents/Python/Edmunds_web_vehicle_specs/'
 run_controller = pd.read_csv(working_directory+'Edmunds Run Controller'+'.csv')
-start_count = 0 #Set to 0 when time permitts
+start_count = 0 #Set to 0 when time permits
 for run_count in range (0,len(run_controller)):
     continued_readin = str(run_controller['Continue Readin'][run_count])
     input_name = str(run_controller['URL Filename'][run_count])
@@ -37,22 +37,21 @@ for run_count in range (0,len(run_controller)):
                 weberror[len(weberror)] = url
                 weberror.to_csv(working_directory + 'Non-Functioning Websites_MY'+str(model_year)+'.csv',index=False)
                 continue
-            categories = original_output_table['Category']
-            output_table = original_output_table.drop('Category',axis=1)
-            trims_msrp = output_table.columns.str[1:].str.strip()
+            specification_name = original_output_table['Specifications']
+            output_table = original_output_table.drop('Specifications',axis=1)
+            trims_msrp = output_table.columns.str.strip()
             try:
                 msrp = pd.Series(trims_msrp.str.rsplit('$').str[1].str.strip(), name = 'MSRP')
             except AttributeError:
                 msrp = pd.Series(np.zeros(len(trims_msrp)), name = 'MSRP').astype(str)
-            trims = pd.Series(trims_msrp.str.rsplit('$').str[0].str.strip(), name='Trims')
+            trims = pd.Series(trims_msrp.str.rsplit('(').str[0].str.strip(), name='Trims')
             output_table.columns = trims
             new_output_table = output_table.T.reset_index(drop=True)
-            new_output_table.columns = categories.str.upper()
+            new_output_table.columns = specification_name.str.upper()
             make_info = pd.Series(np.zeros(len(new_output_table)),name = 'Make').replace(0,make)
             model_info = pd.Series(np.zeros(len(new_output_table)),name = 'Model').replace(0,model)
             url_info = pd.Series(np.zeros(len(new_output_table)), name='URL').replace(0, url)
-            reformatted_table = pd.concat([make_info, model_info, trims, msrp, url_info, new_output_table],axis=1)\
-            .reset_index(drop=True)
+            reformatted_table = pd.concat([make_info, model_info, trims, msrp, url_info, new_output_table],axis=1).reset_index(drop=True)
 
             reformatted_table = pd.concat([readin_check,reformatted_table],axis=1)
             reformatted_table_T = reformatted_table.T
@@ -60,9 +59,9 @@ for run_count in range (0,len(run_controller)):
             reformatted_table = reformatted_table_T2.T
             #Remove columns with duplicate names and non-duplicate values (They aren't reliable)
             # reformatted_table.to_csv('/Users/Brandon/Desktop/Individual Runs/' + url.replace('/','-')[url.find('.com')+len('.com'):url.find('features-specs')] + '.csv', index=False)
-            for column in pd.Series(reformatted_table.columns).unique():
-                if (pd.Series(reformatted_table.columns) == column).sum() > 1:
-                    reformatted_table = reformatted_table.drop(column,axis=1)
+            # for column in pd.Series(reformatted_table.columns).unique():
+            #     if (pd.Series(reformatted_table.columns) == column).sum() > 1:
+            #         reformatted_table = reformatted_table.drop(column,axis=1)
             try:
                 non_merge_columns = list(reformatted_table.columns.difference(final_table.columns))
                 merge_columns = list(reformatted_table.columns.difference(non_merge_columns))
