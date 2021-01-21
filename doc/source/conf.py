@@ -15,6 +15,7 @@ import sys
 path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2'))
 sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2_gui'))
+sys.path.insert(0, os.path.join(path, '..', '..', 'code_doc_samples'))
 sys.path.insert(0, os.path.join(path, '..', '..'))
 
 # -- Project information -----------------------------------------------------
