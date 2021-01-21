@@ -157,6 +157,14 @@ usepa\_omega2.omega2 module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.omega2\_goofy module
+----------------------------------
+
+.. automodule:: usepa_omega2.omega2_goofy
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.omega\_db module
 ------------------------------
 
