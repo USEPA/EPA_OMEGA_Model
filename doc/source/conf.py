@@ -13,7 +13,6 @@
 import os
 import sys
 path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(path, '..', 'code_doc_samples'))
 sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2'))
 sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2_gui'))
 sys.path.insert(0, os.path.join(path, '..', '..'))
@@ -38,6 +37,8 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode'
 ]
+
+autodoc_member_order = 'bysource'  # 'bysource' presents autodocs in the same order as they appear in the code, as opposed to alphabetical
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
