@@ -2,7 +2,8 @@
 omega_gui_batch.py
 ==================
 
-This code launches and controls the OMEGA 2 GUI
+This code launches and controls the OMEGA GUI.
+The GUI uses QT Designer for the layout and PySide2 as the Python interface.
 
 """
 
@@ -77,8 +78,8 @@ class Form(QObject):
 
     def __init__(self, ui_file, parent=None):
         """
-        This function runs once upon program start.
-        Loads the gui and defines all connections and element defaults.
+        This function runs once during program start.
+        Loads the gui along with defining all connections and element defaults.
         """
         # Load the gui.
         super(Form, self).__init__(parent)
@@ -956,6 +957,10 @@ class Form(QObject):
         self.window.select_plot_3.setEnabled(enable)
 
     def select_plot_2(self):
+        """
+        Opens a Windows dialog to select a previous model run for plotting.
+
+        """
         global plot_select_directory
         global plot_select_directory_name
         file_name = ""
@@ -993,6 +998,10 @@ class Form(QObject):
             self.window.list_graphs_2.addItem(row['session_name'])
 
     def select_plot_3(self):
+        """
+        Opens the current model run for plotting.
+
+        """
         global plot_select_directory_name
         self.window.list_graphs_1.clear()
         input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
@@ -1019,6 +1028,10 @@ class Form(QObject):
             self.window.list_graphs_2.addItem(row['session_name'])
 
     def open_plot_2(self):
+        """
+        Plots the selected data.
+
+        """
         global plot_select_directory_name
         # See if valid selections have been made
         if self.window.list_graphs_1.currentItem() is not None and self.window.list_graphs_2.currentItem() is not None:
