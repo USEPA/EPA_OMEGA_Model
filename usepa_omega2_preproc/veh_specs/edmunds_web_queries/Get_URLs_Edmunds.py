@@ -16,24 +16,26 @@ import numpy as np
 
 
 def Get_URLs_Edmunds(model_year):
+    max_URLs = 220
+
     url_list = pd.Series(np.zeros(1000)).replace(0,'')
     url_list_count = 0
-    working_directory = 'C:/Users/KBolon/Documents/Python/Edmunds_web_vehicle_specs/'
+    working_directory = os.environ['userprofile'] + '/Documents/Python/Edmunds_web_vehicle_specs/'
     base_url = 'https://www.edmunds.com/car-reviews/'
     chromedriver = 'chromedriver.exe'
     os.environ["webdriver.chrome.driver"] = chromedriver
     chromeOptions = Options()
-    caps = DesiredCapabilities().CHROME
-    caps["pageLoadStrategy"] = "none"
-    # chromeOptions.add_argument("--kiosk")
+    # caps = DesiredCapabilities().CHROME
+    # caps["pageLoadStrategy"] = "none"
+    # # chromeOptions.add_argument("--kiosk")
     chromeOptions.add_argument("--start-maximized")
     #prefs = {'profile.managed_default_content_settings.images':2}
     # prefs = {"plugins.plugins_disabled": ["Chrome PDF Viewer"]}
     #chromeOptions.add_experimental_option('prefs', prefs)
     #chromeOptions.add_argument("--disable-extensions")
-    driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
+    # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
+    driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
     driver.get(base_url)
-
 
     # used_car_element = driver.find_element_by_xpath("//a[@data-tracking-id = 'nav_mmy_select_used_car']")
     # actions = ActionChains(driver)
@@ -44,8 +46,8 @@ def Get_URLs_Edmunds(model_year):
     element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//select[@name = 'select-make']")))
     make_dropdown = Select(driver.find_element_by_xpath("//select[@name = 'select-make']"))
     total_make_options = len(make_dropdown.options)
-    for make_idx in range(1, 3):
-    # for make_idx in range (1,total_make_options):
+    # for make_idx in range(1, 2):
+    for make_idx in range (1,total_make_options):
             make_dropdown.select_by_index(make_idx)
             try:
                 element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//select[@name = 'select-model']")))
@@ -84,5 +86,30 @@ def Get_URLs_Edmunds(model_year):
             # driver.get(base_url)
         # driver.get(base_url)
 
-    url_list = url_list[url_list != ''].reset_index(drop=True)
-    url_list.to_csv(working_directory + 'Edmunds URLs_'+str(model_year)+'.csv', index=False)
+    url_column_name = 'Link ' + str(model_year)
+    url_list = pd.DataFrame(url_list, columns=[url_column_name])
+    url_list.insert(0, 'Make', '')
+    url_list.insert(1, 'Model', '')
+    rows, cols = url_list.shape
+    last_rows = 0
+    for i in range(rows):
+        url_str= url_list[url_column_name][i]
+        if url_str == '':
+            last_rows=i+1
+            break
+        str_make_model = url_str.replace('//', '/').split('/')
+        url_list['Make'][i] = str_make_model[2].capitalize()
+        url_list['Model'][i] = str_make_model[3].upper()
+        if str_make_model[4].isnumeric() == False: url_str = url_str + str(model_year) + '/'
+        if str_make_model[-1] != 'features-specs':
+            url_str = url_str + 'features-specs/'
+            url_list[url_column_name][i] = url_str
+
+    num_csv_files = math.ceil(last_rows/max_URLs)
+    for i in range(num_csv_files):
+        if last_rows-1 < max_URLs:
+            url_list.iloc[i*max_URLs:(i+1)*max_URLs,:].to_csv(working_directory + 'Edmunds URLs_'+str(model_year)+'_all.csv', index=False)
+        elif last_rows - 1 > (i + 1) * max_URLs:
+            url_list.iloc[i * max_URLs:(i + 1) * max_URLs, :].to_csv(working_directory + 'Edmunds URLs_' + str(model_year) + '_part' + str(i+1) + '.csv', index=False)
+        else:
+            url_list.iloc[i*max_URLs:last_rows-1, :].to_csv(working_directory + 'Edmunds URLs_' + str(model_year) + '_part' + str(i+1) + '.csv', index=False)

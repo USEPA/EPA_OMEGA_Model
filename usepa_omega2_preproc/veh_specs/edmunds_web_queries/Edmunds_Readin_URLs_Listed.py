@@ -1,11 +1,17 @@
 import pandas as pd
 import numpy as np
 import Edmunds_Interact
+import os
+import time
+from datetime import datetime
 
-working_directory = 'C:/Users/KBolon/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller'+'.csv')
+#pip install pandas numpy selenium beautifulsoup4 html5lib lxml
+start_time = datetime.now()
+working_directory = os.environ['userprofile'] + '/Documents/Python/Edmunds_web_vehicle_specs/'
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019'+'.csv')
 start_count = 0 #Set to 0 when time permits
 for run_count in range (0,len(run_controller)):
+    if run_count > 0: del final_table, reformatted_table
     continued_readin = str(run_controller['Continue Readin'][run_count])
     input_name = str(run_controller['URL Filename'][run_count])
     output_name = str(run_controller['Output Filename'][run_count])
@@ -17,7 +23,7 @@ for run_count in range (0,len(run_controller)):
     edmunds_models = edmunds_info['Model']
     url_list = edmunds_info[url_column_name]
     if continued_readin == 'y':
-        readin_table = pd.read_csv(working_directory+output_name, encoding = "ISO-8859-1")
+        readin_table = pd.read_csv(working_directory+output_name, dtype=object, encoding = "ISO-8859-1")
         readin_error_models = pd.Series(readin_table['Model'][pd.isnull(readin_table['Readin_Error'])==False]\
             .unique()).reset_index(drop=True)
         final_table = readin_table
@@ -37,7 +43,9 @@ for run_count in range (0,len(run_controller)):
                 weberror[len(weberror)] = url
                 weberror.to_csv(working_directory + 'Non-Functioning Websites_MY'+str(model_year)+'.csv',index=False)
                 continue
+            category_name = original_output_table['Category']
             specification_name = original_output_table['Specifications']
+            original_output_table = original_output_table.drop('Category', axis=1)
             output_table = original_output_table.drop('Specifications',axis=1)
             trims_msrp = output_table.columns.str.strip()
             try:
@@ -52,27 +60,47 @@ for run_count in range (0,len(run_controller)):
             model_info = pd.Series(np.zeros(len(new_output_table)),name = 'Model').replace(0,model)
             url_info = pd.Series(np.zeros(len(new_output_table)), name='URL').replace(0, url)
             reformatted_table = pd.concat([make_info, model_info, trims, msrp, url_info, new_output_table],axis=1).reset_index(drop=True)
-
             reformatted_table = pd.concat([readin_check,reformatted_table],axis=1)
             reformatted_table_T = reformatted_table.T
             reformatted_table_T2 = reformatted_table_T[~reformatted_table_T.index.duplicated(keep='first')]
             reformatted_table = reformatted_table_T2.T
             #Remove columns with duplicate names and non-duplicate values (They aren't reliable)
             # reformatted_table.to_csv('/Users/Brandon/Desktop/Individual Runs/' + url.replace('/','-')[url.find('.com')+len('.com'):url.find('features-specs')] + '.csv', index=False)
-            # for column in pd.Series(reformatted_table.columns).unique():
-            #     if (pd.Series(reformatted_table.columns) == column).sum() > 1:
-            #         reformatted_table = reformatted_table.drop(column,axis=1)
+            for column in pd.Series(reformatted_table.columns).unique():
+                if (pd.Series(reformatted_table.columns) == column).sum() > 1:
+                    reformatted_table = reformatted_table.drop(column,axis=1)
             try:
                 non_merge_columns = list(reformatted_table.columns.difference(final_table.columns))
                 merge_columns = list(reformatted_table.columns.difference(non_merge_columns))
+                reformatted_table = reformatted_table.loc[:, ~reformatted_table.columns.duplicated()]
+                reformatted_table = reformatted_table.dropna(how='all', axis=1)
+                final_table = final_table.loc[:, ~final_table.columns.duplicated()]
                 final_table = final_table.merge(reformatted_table, how='outer', on=merge_columns).sort_values('URL')
+                final_table = final_table.dropna(how='all', axis=1)
             except NameError:
+                reformatted_table = reformatted_table.dropna(how='all', axis=1)
                 final_table = reformatted_table
             except TypeError:
                 reformatted_table.to_csv(working_directory + 'Merge Error Table' + '.csv', index=False)
         # raise SystemExit
-            final_table.to_csv(working_directory+output_name, index=False)
+            final_table = final_table.dropna(how='all')
+            if url_count in [50, 100, 150, 200, 250, 300, 350]:
+                final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + str(url_count) + '.csv', index=False)
+                if len(Edmunds_Interact.super_option_url_list) > 0:
+                    timestr = time.strftime("%Y%m%d-%H%M%S")
+                    df_super_option_url_list = pd.DataFrame(Edmunds_Interact.super_option_url_list, columns=['URL'])
+                    df_super_option_url_list.to_csv(working_directory + output_name.split('.')[0] + '_high_options_url_' + timestr + '.csv' , index=False)
+
     final_table['URL'] = final_table['URL'].str.upper()
     final_table = final_table.sort_values('URL')
-    final_table.to_csv(working_directory + output_name, index=False)
+    final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
+    final_table = final_table.fillna('')
+    final_table = final_table.reset_index(drop=True)
+    final_table.to_csv(working_directory + output_name.split('.')[0] + '_ALL.csv', index=False)
 
+    final_table_category_specs = pd.DataFrame([category_name, specification_name], columns=['Category', 'Specifications'])
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    final_table_category_specs.to_csv(working_directory + output_name.split('.')[0] + '_Category_Specifications_' + timestr + '.csv', index=False)
+
+    time_elapsed = datetime.now() - start_time
+    print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
