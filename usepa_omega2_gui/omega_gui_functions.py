@@ -23,9 +23,14 @@ def yaml_loader(filepath):
     """
     Loads a yaml formatted file and converts to a Python formatted dictionary.
 
-    :param filepath: Full path to yaml formatted source file
+    Args:
+        filepath: Full path to yaml formatted source file
 
-    :return: Python formatted dictionary
+    Returns:
+        Python formatted dictionary
+
+    Todo:
+        We have much to do!
     """
     with open(filepath, "r") as file_descriptor:
         data = yaml.full_load(file_descriptor)
@@ -36,10 +41,12 @@ def yaml_dump(filepath, data):
     """
     Dumps data to a yaml file.
 
-    :param filepath: Full path to destination file
-    :param data: Dictionary to save
+    Args:
+        filepath: Full path to destination file
+        data: Dictionary to save
 
-    :return: N/A
+    Returns:
+        N/A
     """
     with open(filepath, "w") as file_descriptor:
         yaml.dump(data, file_descriptor)
@@ -54,10 +61,12 @@ def save_file_action(filepath, data):
     """
     Dumps data to a yaml file.
 
-    :param filepath: Full path to destination file
-    :param data: Dictionary to save
-    
-    :return: N/A
+    Args:
+        filepath: Full path to destination file
+        data: Dictionary to save
+        
+    Returns:    
+        N/A
     """
 
 
@@ -65,11 +74,13 @@ def file_dialog_save(file_name, file_type, file_dialog_title):
     """
     Opens a file dialog to select a file with extension options.
 
-    :param file_name: Default file name
-    :param file_type: Specifies extension filter type
-    :param file_dialog_title: Title for dialog box
+    Args:
+        file_name: Default file name
+        file_type: Specifies extension filter type
+        file_dialog_title: Title for dialog box
 
-    :return: User selected file name, Echo file_type, Echo file_dialog_title
+    Returns:
+        User selected file name, Echo file_type, Echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -93,11 +104,13 @@ def file_dialog(file_name, file_type, file_dialog_title):
     """
     Opens a file dialog to select a file with extension options.
 
-    :param file_name: Default file name
-    :param file_type: Specifies extension filter type
-    :param file_dialog_title: Title for dialog box
+    Args:
+        file_name: Default file name
+        file_type: Specifies extension filter type
+        file_dialog_title: Title for dialog box
 
-    :return: User selected file name, echo file_type, echo file_dialog_title
+    Returns:
+        User selected file name, echo file_type, echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -120,11 +133,13 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     """
     Opens a file dialog to select a directory.
 
-    :param file_name: Default file name
-    :param file_type: Specifies extension filter type
-    :param file_dialog_title: Title for dialog box
+    Args:
+        file_name: Default file name
+        file_type: Specifies extension filter type
+        file_dialog_title: Title for dialog box
 
-    :return: User selected directory name, echo file_type, echo file_dialog_title
+    Returns:
+        User selected directory name, echo file_type, echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -150,9 +165,11 @@ def sec_to_hours(seconds):
     """
     Converts seconds to hours, minutes, and seconds.
 
-    :param seconds: seconds
+    Args:
+        seconds: seconds
 
-    :return: formatted xx hours  xx mins  xx seconds
+    Returns:
+        formatted xx hours  xx mins  xx seconds
     """
     a = str(seconds//3600)
     b = str((seconds % 3600)//60)
@@ -165,9 +182,11 @@ def status_output_color(g):
     """
     Examines strings for specific cases to change the color for display.
 
-    :param g: input string
+    Args:
+        g: input string
 
-    :return: color for display
+    Returns:
+        color for display
     """
     if g.find("Manufacturer=") != -1:
         g = "green"
@@ -183,9 +202,11 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name):
     """
     Reads a csv file and plots selected graph.
 
-    :param y-axis: column to plot
+    Args:
+        y-axis: column to plot
 
-    :return: N/A
+    Returns:
+        N/A
     """
     df = pandas.read_excel('usepa_omega2_gui/elements/plot_definition.xlsx', index_col=0, sheet_name='plot_definition')
 

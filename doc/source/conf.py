@@ -36,7 +36,8 @@ release = '0.3.0'
 extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autosummary',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinx.ext.todo'
 ]
 
 autodoc_member_order = 'bysource'  # 'bysource' presents autodocs in the same order as they appear in the code, as opposed to alphabetical
@@ -57,6 +58,7 @@ exclude_patterns = ['*setup*']
 #
 html_theme = 'sphinx_rtd_theme'
 numfig = True
+todo_include_todos = True
 
 # EPA Palette
 # html_theme_options = {
