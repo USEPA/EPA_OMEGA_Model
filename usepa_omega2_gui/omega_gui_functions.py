@@ -15,29 +15,21 @@ from matplotlib import cm
 
 
 def open_file_action(filepath):
-    data = yaml_loader(filepath)
-    return data
-
-
-def yaml_loader(filepath):
     """
     Loads a yaml formatted file and converts to a Python formatted dictionary.
 
     Args:
-        filepath: Full path to yaml formatted source file
+        filepath: Full path of yaml source file
 
     Returns:
         Python formatted dictionary
-
-    Todo:
-        We have much to do!
     """
     with open(filepath, "r") as file_descriptor:
         data = yaml.full_load(file_descriptor)
     return data
 
 
-def yaml_dump(filepath, data):
+def save_file_action(filepath, data):
     """
     Dumps data to a yaml file.
 
@@ -50,24 +42,6 @@ def yaml_dump(filepath, data):
     """
     with open(filepath, "w") as file_descriptor:
         yaml.dump(data, file_descriptor)
-
-        # yaml.dump(data)
-
-    # print("Open File")
-
-
-def save_file_action(filepath, data):
-    yaml_dump(filepath, data)
-    """
-    Dumps data to a yaml file.
-
-    Args:
-        filepath: Full path to destination file
-        data: Dictionary to save
-        
-    Returns:    
-        N/A
-    """
 
 
 def file_dialog_save(file_name, file_type, file_dialog_title):
@@ -110,7 +84,7 @@ def file_dialog(file_name, file_type, file_dialog_title):
         file_dialog_title: Title for dialog box
 
     Returns:
-        User selected file name, echo file_type, echo file_dialog_title
+        User selected file name, Echo file_type, Echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -139,7 +113,7 @@ def directory_dialog(file_name, file_type, file_dialog_title):
         file_dialog_title: Title for dialog box
 
     Returns:
-        User selected directory name, echo file_type, echo file_dialog_title
+        User selected directory name, Echo file_type, Echo file_dialog_title
     """
     dialog = QFileDialog()
     dialog.selectFile(file_name)
@@ -166,7 +140,7 @@ def sec_to_hours(seconds):
     Converts seconds to hours, minutes, and seconds.
 
     Args:
-        seconds: seconds
+        seconds: Seconds
 
     Returns:
         formatted xx hours  xx mins  xx seconds
@@ -186,7 +160,7 @@ def status_output_color(g):
         g: input string
 
     Returns:
-        color for display
+        Color for display
     """
     if g.find("Manufacturer=") != -1:
         g = "green"
