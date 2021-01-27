@@ -4,7 +4,7 @@ import datetime
 def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_path, exceptions_table, \
                    bodyid_filename, matched_bodyid_filename, unit_table, year, \
                    ftp_drivecycle_filename, hwfet_drivecycle_filename, ratedhp_filename, lineageid_filename):
-    raw_Edmunds_data = pd.read_csv(rawdata_input_path+'\\'+input_filename, encoding="ISO-8859-1")
+    raw_Edmunds_data = pd.read_csv(rawdata_input_path+'\\'+input_filename, dtype=object, encoding="ISO-8859-1")
     Edmunds_Data = raw_Edmunds_data
     Edmunds_Data['Model'] = Edmunds_Data['Model'].astype(str)
     Edmunds_Data['ELECTRIC POWER STEERING'] = Edmunds_Data['ELECTRIC POWER STEERING'].replace([False,str(False).upper()], 'NOT EPS')\

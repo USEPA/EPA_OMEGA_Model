@@ -10,9 +10,9 @@ from pathlib import *
 # pip install pandas numpy selenium beautifulsoup4 html5lib lxml
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller'+'.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019'+'.csv')
 start_count = 0 #Set to 0 when time permits
-final_table_to_csv_inc = 50 # print final_table csv file at every final_table_to_csv_inc increments
+final_table_to_csv_inc = 50 # print final_table csv file at the final_table_to_csv_inc increments
 for run_count in range (0,len(run_controller)):
     if run_count > 0: del final_table, reformatted_table
     continued_readin = str(run_controller['Continue Readin'][run_count])
@@ -25,7 +25,7 @@ for run_count in range (0,len(run_controller)):
     edmunds_makes = edmunds_info['Make']
     edmunds_models = edmunds_info['Model']
     url_list = edmunds_info[url_column_name]
-    final_table_to_csv_list = [i*final_table_to_csv_inc for i in range(1, math.ceil(len(url_list/final_table_to_csv_inc)))] # print every final_table_to_csv_inc URLs
+    final_table_to_csv_list = [i*final_table_to_csv_inc for i in range(1, math.ceil(len(url_list)/final_table_to_csv_inc))] # print every final_table_to_csv_inc URLs
     if continued_readin == 'y':
         readin_table = pd.read_csv(working_directory+output_name, dtype=object, encoding = "ISO-8859-1")
         readin_error_models = pd.Series(readin_table['Model'][pd.isnull(readin_table['Readin_Error'])==False]\

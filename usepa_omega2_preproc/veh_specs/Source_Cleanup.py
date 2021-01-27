@@ -5,8 +5,9 @@ import time
 from pathlib import *
 
 
-main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
-            +'\\'+'techspecconsolidator\Source Cleanup Runs'
+# main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
+#             +'\\'+'techspecconsolidator\Source Cleanup Runs'
+main_path = 'I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Source Cleanup Runs'
 main_path = str(Path.home()) +  '/Documents/Python/Source Cleanup Runs/'
 run_controller = pd.read_csv(main_path + 'Source Cleanup Run Controller.csv')
 full_unit_table = pd.read_csv(main_path + 'Source Cleanup Unit Conversion.csv')

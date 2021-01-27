@@ -16,7 +16,7 @@ import numpy as np
 from pathlib import *
 
 def Get_URLs_Edmunds(model_year):
-    max_URLs = 220
+    max_URLs = 500
 
     url_list = pd.Series(np.zeros(1000)).replace(0,'')
     url_list_count = 0
