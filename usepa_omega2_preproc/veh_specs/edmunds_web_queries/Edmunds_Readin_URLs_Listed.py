@@ -3,13 +3,16 @@ import numpy as np
 import Edmunds_Interact
 import os
 import time
+import math
 from datetime import datetime
+from pathlib import *
 
-#pip install pandas numpy selenium beautifulsoup4 html5lib lxml
+# pip install pandas numpy selenium beautifulsoup4 html5lib lxml
 start_time = datetime.now()
-working_directory = os.environ['userprofile'] + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019'+'.csv')
+working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller'+'.csv')
 start_count = 0 #Set to 0 when time permits
+final_table_to_csv_inc = 50 # print final_table csv file at every final_table_to_csv_inc increments
 for run_count in range (0,len(run_controller)):
     if run_count > 0: del final_table, reformatted_table
     continued_readin = str(run_controller['Continue Readin'][run_count])
@@ -22,6 +25,7 @@ for run_count in range (0,len(run_controller)):
     edmunds_makes = edmunds_info['Make']
     edmunds_models = edmunds_info['Model']
     url_list = edmunds_info[url_column_name]
+    final_table_to_csv_list = [i*final_table_to_csv_inc for i in range(1, math.ceil(len(url_list/final_table_to_csv_inc)))] # print every final_table_to_csv_inc URLs
     if continued_readin == 'y':
         readin_table = pd.read_csv(working_directory+output_name, dtype=object, encoding = "ISO-8859-1")
         readin_error_models = pd.Series(readin_table['Model'][pd.isnull(readin_table['Readin_Error'])==False]\
@@ -84,23 +88,27 @@ for run_count in range (0,len(run_controller)):
                 reformatted_table.to_csv(working_directory + 'Merge Error Table' + '.csv', index=False)
         # raise SystemExit
             final_table = final_table.dropna(how='all')
-            if url_count in [50, 100, 150, 200, 250, 300, 350]:
+            if url_count in final_table_to_csv_list:
                 final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + str(url_count) + '.csv', index=False)
-                if len(Edmunds_Interact.super_option_url_list) > 0:
+                if len(Edmunds_Interact.super_trim_url_list) > 0:
                     timestr = time.strftime("%Y%m%d-%H%M%S")
-                    df_super_option_url_list = pd.DataFrame(Edmunds_Interact.super_option_url_list, columns=['URL'])
-                    df_super_option_url_list.to_csv(working_directory + output_name.split('.')[0] + '_high_options_url_' + timestr + '.csv' , index=False)
+                    df_super_trim_url_list = pd.DataFrame(Edmunds_Interact.super_trim_url_list, columns=['URL'])
+                    df_super_trim_url_list.to_csv(working_directory + output_name.split('.')[0] + '_high_options_url_' + timestr + '.csv' , index=False)
+            if url_count == 0:
+                final_table_category_specs = pd.DataFrame([category_name, specification_name], columns=['Category', 'Specifications'])
+                timestr = time.strftime("%Y%m%d-%H%M%S")
+                final_table_category_specs.to_csv(
+                    working_directory + output_name.split('.')[0] + '_Category_Specifications_' + timestr + '.csv',
+                    index=False)
 
     final_table['URL'] = final_table['URL'].str.upper()
     final_table = final_table.sort_values('URL')
     final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
     final_table = final_table.fillna('')
     final_table = final_table.reset_index(drop=True)
-    final_table.to_csv(working_directory + output_name.split('.')[0] + '_ALL.csv', index=False)
+    timestr = time.strftime("%Y%m%d")
+    final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + timestr + '.csv', index=False)
 
-    final_table_category_specs = pd.DataFrame([category_name, specification_name], columns=['Category', 'Specifications'])
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    final_table_category_specs.to_csv(working_directory + output_name.split('.')[0] + '_Category_Specifications_' + timestr + '.csv', index=False)
 
     time_elapsed = datetime.now() - start_time
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))

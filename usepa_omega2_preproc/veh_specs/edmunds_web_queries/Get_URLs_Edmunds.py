@@ -13,14 +13,14 @@ import pandas as pd
 import math
 from bs4 import BeautifulSoup
 import numpy as np
-
+from pathlib import *
 
 def Get_URLs_Edmunds(model_year):
     max_URLs = 220
 
     url_list = pd.Series(np.zeros(1000)).replace(0,'')
     url_list_count = 0
-    working_directory = os.environ['userprofile'] + '/Documents/Python/Edmunds_web_vehicle_specs/'
+    working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
     base_url = 'https://www.edmunds.com/car-reviews/'
     chromedriver = 'chromedriver.exe'
     os.environ["webdriver.chrome.driver"] = chromedriver

@@ -18,8 +18,8 @@ import numpy as np
 
 # import signal
 
-global super_option_url_list
-super_option_url_list = []
+global super_trim_url_list
+super_trim_url_list = []
 
 class HTMLTableParser:
     def get_html_table(self, soup, trim_group, errorflag_1, errorflag_2, errorflag_3):
@@ -168,7 +168,7 @@ def Edmunds_Interact(url):
             _trim_buttons = len(trim_buttons)
             if _trim_buttons > _max_trim_buttons:
                 _trim_buttons = _max_trim_buttons
-                super_option_url_list.append(url)
+                super_trim_url_list.append(url)
 
             for i, trim in zip(range(_trim_buttons), trim_buttons): trim_options.append(trim.text)
             menus[0].click()  # close the dropdown menu.
