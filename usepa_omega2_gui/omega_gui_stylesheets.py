@@ -1,10 +1,12 @@
 def tab_stylesheet(stylesheet):
     """
-        Loads the stylesheet for the tab area of the gui.
+    Loads the stylesheet for the tab area of the gui.
 
-        :param stylesheet: Not used.
+    Args:
+        N/A
 
-        :return: String containing stylesheet.
+    Returns:
+        String containing stylesheet.
         """
     stylesheet = """
             QTabBar::tab { 
@@ -43,11 +45,13 @@ def tab_stylesheet(stylesheet):
 
 def background_stylesheet(stylesheet):
     """
-        Loads the stylesheet for the main window of the gui.
+    Loads the stylesheet for the main window of the gui.
 
-        :param stylesheet: Not used.
+    Args:
+        N/A
 
-        :return: String containing stylesheet.
+    Returns:
+        String containing stylesheet.
         """
     stylesheet = """
         QWidget {
@@ -60,11 +64,13 @@ def background_stylesheet(stylesheet):
 
 def button_stylesheet(stylesheet):
     """
-        Loads the stylesheet for buttons contained in the gui.
+    Loads the stylesheet for buttons contained in the gui.
 
-        :param stylesheet: Not used.
+    Args:
+        N/A
 
-        :return: String containing stylesheet.
+    Returns:
+        String containing stylesheet.
         """
     stylesheet = """
         QPushButton {
@@ -95,11 +101,13 @@ def button_stylesheet(stylesheet):
 
 def logo_button_stylesheet(stylesheet):
     """
-        Loads the stylesheet for logo buttons contained in the gui.
+    Loads the stylesheet for logo buttons contained in the gui.
 
-        :param stylesheet: Not used.
+    Args:
+        N/A
 
-        :return: String containing stylesheet.
+    Returns:
+        String containing stylesheet.
         """
     stylesheet = """
         QPushButton {
@@ -130,11 +138,13 @@ def logo_button_stylesheet(stylesheet):
 
 def label_stylesheet(stylesheet):
     """
-        Loads the stylesheet for labels contained in the gui.
+    Loads the stylesheet for labels contained in the gui.
 
-        :param stylesheet: Not used.
+    Args:
+        N/A
 
-        :return: String containing stylesheet.
+    Returns:
+        String containing stylesheet.
         """
     stylesheet = """
         QLabel { color : white; }
@@ -144,11 +154,13 @@ def label_stylesheet(stylesheet):
 
 def checkbox_stylesheet(stylesheet):
     """
-        Loads the stylesheet for checkboxes contained in the gui.
+    Loads the stylesheet for checkboxes contained in the gui.
 
-        :param stylesheet: Not used.
+    Args:
+        N/A
 
-        :return: String containing stylesheet.
+    Returns:
+        String containing stylesheet.
         """
     stylesheet = """
         QCheckBox { color : white; }

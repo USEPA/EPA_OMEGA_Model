@@ -5,6 +5,7 @@ Code Details
    :maxdepth: 4
 
    alpha_package_costs
+   code_doc_samples
    setup
    test_omega2
    usepa_omega2
