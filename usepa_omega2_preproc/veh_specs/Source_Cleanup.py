@@ -1,10 +1,18 @@
 import pandas as pd
 import importlib
+import os
+import time
+from pathlib import *
 
-main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
-            +'\\'+'techspecconsolidator\Source Cleanup Runs'
-run_controller = pd.read_csv('Source Cleanup Run Controller.csv')
-full_unit_table = pd.read_csv('Source Cleanup Unit Conversion.csv')
+
+# main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
+#             +'\\'+'techspecconsolidator\Source Cleanup Runs'
+main_path = 'I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Source Cleanup Runs'
+main_path = str(Path.home()) +  '/Documents/Python/Source Cleanup Runs/'
+run_controller = pd.read_csv(main_path + 'Source Cleanup Run Controller.csv')
+full_unit_table = pd.read_csv(main_path + 'Source Cleanup Unit Conversion.csv')
+# run_controller = pd.read_csv('Source Cleanup Run Controller.csv')
+# full_unit_table = pd.read_csv('Source Cleanup Unit Conversion.csv')
 for run_count in range(0,len(run_controller)):
     run_folder = str(run_controller['Run Folder'][run_count])
     input_path = main_path+'\\'+run_folder+'\\'+'inputs'
