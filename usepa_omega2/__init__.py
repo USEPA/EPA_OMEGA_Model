@@ -9,7 +9,15 @@ __init.py__
 code_version = "0.3.1"
 print('loading usepa_omega2 version %s' % code_version)
 
-import os, traceback
+import os, sys
+print(os.path.abspath(__file__))
+# print(sys._MEIPASS)
+path = os.path.dirname(os.path.abspath(__file__))
+print(sys.path)
+sys.path.insert(0, path)
+print(sys.path)
+
+import traceback
 
 try:
     import pandas as pd
@@ -43,18 +51,18 @@ try:
             self.verbose = False
             self.output_folder = 'output' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
-            self.manufacturers_file = 'input_samples/manufacturers.csv'
-            self.market_classes_file = 'input_samples/market_classes.csv'
-            self.vehicles_file = 'input_samples/vehicles.csv'
-            self.demanded_shares_file = 'input_samples/demanded_shares-gcam.csv'
-            self.fuels_file = 'input_samples/fuels.csv'
+            self.manufacturers_file = 'test_inputs/manufacturers.csv'
+            self.market_classes_file = 'test_inputs/market_classes.csv'
+            self.vehicles_file = 'test_inputs/vehicles.csv'
+            self.demanded_shares_file = 'test_inputs/demanded_shares-gcam.csv'
+            self.fuels_file = 'test_inputs/fuels.csv'
             self.context_folder = ''
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
-            self.context_fuel_prices_file = 'input_samples/context_fuel_prices.csv'
-            self.context_fuel_upstream_file = 'input_samples/context_fuel_upstream.csv'
-            self.context_new_vehicle_market_file = 'input_samples/context_new_vehicle_market.csv'
-            self.cost_file = 'input_samples/cost_curves.csv'
+            self.context_fuel_prices_file = 'test_inputs/context_fuel_prices.csv'
+            self.context_fuel_upstream_file = 'test_inputs/context_fuel_upstream.csv'
+            self.context_new_vehicle_market_file = 'test_inputs/context_new_vehicle_market.csv'
+            self.cost_file = 'test_inputs/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = None
@@ -62,11 +70,11 @@ try:
             self.logfilename = ''
             self.producer_calculate_generalized_cost = None
             self.consumer_calculate_generalized_cost = None
-            self.ghg_standards_file = 'input_samples/ghg_standards-flat.csv'
-            self.ghg_standards_fuels_file = 'input_samples/ghg_standards-fuels.csv'
-            self.required_zev_share_file = 'input_samples/required_zev_share.csv'
-            self.reregistration_fixed_by_age_file = 'input_samples/reregistration_fixed_by_age.csv'
-            self.annual_vmt_fixed_by_age_file = 'input_samples/annual_vmt_fixed_by_age.csv'
+            self.ghg_standards_file = 'test_inputs/ghg_standards-flat.csv'
+            self.ghg_standards_fuels_file = 'test_inputs/ghg_standards-fuels.csv'
+            self.required_zev_share_file = 'test_inputs/required_zev_share.csv'
+            self.reregistration_fixed_by_age_file = 'test_inputs/reregistration_fixed_by_age.csv'
+            self.annual_vmt_fixed_by_age_file = 'test_inputs/annual_vmt_fixed_by_age.csv'
             self.slice_tech_combo_cloud_tables = False
 
             self.allow_backsliding = False
@@ -91,15 +99,15 @@ try:
             self.calc_effects = False
             self.calc_criteria_emission_costs = False
             # effects modeling files
-            self.ip_deflators_file = 'input_samples/context_implicit_price_deflators.csv'
-            self.cpi_deflators_file = 'input_samples/context_cpi_price_deflators.csv'
-            self.scc_cost_factors_file = 'input_samples/context_cost_factors-scc.csv'
-            self.criteria_cost_factors_file = 'input_samples/context_cost_factors-criteria.csv'
-            self.energysecurity_cost_factors_file = 'input_samples/context_cost_factors-energysecurity.csv'
-            self.congestion_noise_cost_factors_file = 'input_samples/context_cost_factors-congestion-noise.csv'
-            self.emission_factors_vehicles_file = 'input_samples/context_emission_factors-vehicles.csv'
-            self.emission_factors_powersector_file = 'input_samples/context_emission_factors-powersector.csv'
-            self.emission_factors_refinery_file = 'input_samples/context_emission_factors-refinery.csv'
+            self.ip_deflators_file = 'test_inputs/context_implicit_price_deflators.csv'
+            self.cpi_deflators_file = 'test_inputs/context_cpi_price_deflators.csv'
+            self.scc_cost_factors_file = 'test_inputs/context_cost_factors-scc.csv'
+            self.criteria_cost_factors_file = 'test_inputs/context_cost_factors-criteria.csv'
+            self.energysecurity_cost_factors_file = 'test_inputs/context_cost_factors-energysecurity.csv'
+            self.congestion_noise_cost_factors_file = 'test_inputs/context_cost_factors-congestion-noise.csv'
+            self.emission_factors_vehicles_file = 'test_inputs/context_emission_factors-vehicles.csv'
+            self.emission_factors_powersector_file = 'test_inputs/context_emission_factors-powersector.csv'
+            self.emission_factors_refinery_file = 'test_inputs/context_emission_factors-refinery.csv'
 
             self.start_time = 0
             self.end_time = 0

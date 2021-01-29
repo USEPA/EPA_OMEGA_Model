@@ -14,7 +14,7 @@ path_aeo_inputs = path_cwd / 'usepa_omega2_preproc/aeo_tables'
 path_bea_inputs = path_cwd / 'usepa_omega2_preproc/bea_tables'
 path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
 path_outputs.mkdir(exist_ok=True)
-path_input_templates = path_cwd / 'input_samples'
+path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
 
 vehicles_context_template = 'context_new_vehicle_market.csv'
 fuels_context_template = 'context_fuel_prices.csv'

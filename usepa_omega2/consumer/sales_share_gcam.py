@@ -114,7 +114,7 @@ if __name__ == '__main__':
         from GHG_standards_footprint import GHGStandardFootprint
 
         o2.options.GHG_standard = GHGStandardFootprint
-        o2.options.ghg_standards_file = 'input_samples/ghg_standards-footprint.csv'
+        o2.options.ghg_standards_file = 'test_inputs/ghg_standards-footprint.csv'
         from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
 

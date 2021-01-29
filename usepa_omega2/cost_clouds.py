@@ -145,7 +145,7 @@ if __name__ == '__main__':
         o2.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        o2.options.cost_file = 'input_samples/cost_clouds.csv'
+        o2.options.cost_file = 'test_inputs/cost_clouds.csv'
 
         import cost_curves
 
