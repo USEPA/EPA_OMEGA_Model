@@ -22,7 +22,7 @@ from PySide2.QtWidgets import QWidget, QMessageBox
 from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
-# import PySide2.QtXml
+import PySide2.QtXml
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
