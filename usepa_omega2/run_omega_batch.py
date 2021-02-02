@@ -484,6 +484,10 @@ if __name__ == '__main__':
 
                 sys.path.insert(0, os.getcwd())
 
+                batch_definition_path = os.path.dirname(os.path.abspath(options.batch_file)) + os.sep
+
+                print('\nbatch_definition_path = %s\n' % batch_definition_path)
+
                 for s in range(0, batch.num_sessions()):
                     session = batch.sessions[s]
                     batch_log.logwrite("\nValidating Session %d ('%s') Files..." % (s, session.name))
@@ -497,9 +501,9 @@ if __name__ == '__main__':
                         # elif str(i).endswith(' File'):
                         #     validate_file(session.read_parameter(i))
                         if options.verbose and (str(i).endswith(' File')):
-                            batch_log.logwrite('validating %s=%s' % (i, session.read_parameter(i)))
-                        elif str(i).endswith(' File'):
-                            validate_file(session.read_parameter(i))
+                            batch_log.logwrite('validating %s=%s' % (i, batch_definition_path + session.read_parameter(i)))
+                        if str(i).endswith(' File'):
+                            validate_file(batch_definition_path + session.read_parameter(i))
 
                     batch_log.logwrite('Validating Session %d Parameters...' % s)
                     session.init(validate_only=True)
@@ -509,6 +513,9 @@ if __name__ == '__main__':
             # copy files to network_batch_path
             if not options.no_bundle:
                 batch_log.logwrite('Bundling Source Files...')
+
+                # go to project top level so we can copy source files
+                os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
                 package_folder = 'usepa_omega2'
                 subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
@@ -556,11 +563,11 @@ if __name__ == '__main__':
                             #         session.name + os.sep + batch.dataframe.loc[i][session.num]
                             if str(i).endswith(' File'):
                                 if options.verbose:
-                                    batch_log.logwrite('relocating %s to %s' % (batch.dataframe.loc[i][session.num],
+                                    batch_log.logwrite('relocating %s to %s' % (batch_definition_path + batch.dataframe.loc[i][session.num],
                                                                    options.session_path + session.read_parameter(i)))
                                 batch.dataframe.loc[i][session.num] = \
                                     session.name + os.sep + relocate_file(options.session_path,
-                                                                          session.read_parameter(i))
+                                                                          batch_definition_path + session.read_parameter(i))
 
             import time
 

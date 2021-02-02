@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
         results = {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}
 
-        for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer']:
+        for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer', 'usepa_omega2\\effects']:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
 

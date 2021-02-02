@@ -136,7 +136,7 @@ if __name__ == '__main__':
         o2.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        o2.options.cost_file = 'test_inputs/cost_curves.csv'
+        o2.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_curves.csv'
 
         SQABase.metadata.create_all(o2.engine)
 

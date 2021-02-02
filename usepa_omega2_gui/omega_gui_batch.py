@@ -35,6 +35,11 @@ from plyer import notification
 from usepa_omega2_gui.omega_gui_functions import *
 from usepa_omega2_gui.omega_gui_stylesheets import *
 
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
+
+print('omega_gui_batch.py path = %s' % path)
+print('SYS Path = %s' % sys.path)
+
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
 configuration_file = ""
@@ -57,11 +62,11 @@ configuration_file_valid = False
 input_batch_file_valid = False
 output_batch_directory_valid = False
 # Images for model run button
-run_button_image_disabled = "usepa_omega2_gui/elements/green_car_1.jpg"
-run_button_image_enabled = "usepa_omega2_gui/elements/green_car_1.jpg"
-epa_button_image = "usepa_omega2_gui/elements/epa_seal_large_trim.gif"
-green_check_image = "usepa_omega2_gui/elements/green_check.png"
-red_x_image = "usepa_omega2_gui/elements/red_x.png"
+run_button_image_disabled = path + "usepa_omega2_gui/elements/green_car_1.jpg"
+run_button_image_enabled = path + "usepa_omega2_gui/elements/green_car_1.jpg"
+epa_button_image = path + "usepa_omega2_gui/elements/epa_seal_large_trim.gif"
+green_check_image = path + "usepa_omega2_gui/elements/green_check.png"
+red_x_image = path + "usepa_omega2_gui/elements/red_x.png"
 # Common spacer between events
 event_separator = "----------"
 # OMEGA 2 version
@@ -71,7 +76,7 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
-button_click_sound = 'usepa_omega2_gui/elements/click.mp3'
+button_click_sound = path + 'usepa_omega2_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -100,7 +105,7 @@ class Form(QObject):
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
-        self.window.setWindowIcon(QIcon("usepa_omega2_gui/elements/omega2_icon.jpg"))
+        self.window.setWindowIcon(QIcon(path + "usepa_omega2_gui/elements/omega2_icon.jpg"))
 
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
@@ -665,17 +670,9 @@ class Form(QObject):
                       " Select New Output Batch Directory," \
                       " and Save Configuration File\n" \
                       "----------"
-        # Search file for OMEGA 2 version #.
-        searchfile = open("usepa_omega2/__init__.py", "r")
-        version_line = "Not Found"
-        for line in searchfile:
-            if "code_version =" in line:
-                version_line = line
-        searchfile.close()
-        # Strip version number from text
-        start_pt = version_line.find("\"")
-        end_pt = version_line.find("\"", start_pt + 1)
-        omega2_version = version_line[start_pt + 1: end_pt]
+
+        # Get OMEGA 2 version #.
+        from usepa_omega2 import code_version as omega2_version
 
         # Prime the status monitor
         color = "black"
@@ -804,16 +801,21 @@ class Form(QObject):
         self.event_monitor("Start Model Run", "black", 'dt')
         # Call OMEGA 2 batch as a subprocess with command line options from above
         status_bar_message = "Status = Model Running ..."
-        # Send notification to Windows
-        notification.notify(
-            title="OMEGA Notification",
-            message="Model Run Started\n" + "Input File =\n" + "  " + os.path.basename(input_batch_file),
-            # app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
-            timeout=5
-        )
 
-        omega_batch = subprocess.Popen(['python', os.path.realpath('usepa_omega2_gui/run_omega_batch_gui.py'),
-                                        x], close_fds=True)
+        # # Send notification to Windows
+        # notification.notify(
+        #     title="OMEGA Notification",
+        #     message="Model Run Started\n" + "Input File =\n" + "  " + os.path.basename(input_batch_file),
+        #     # app_icon=path + "usepa_omega2_gui/elements/omega2_icon.ico",
+        #     timeout=5
+        # )
+
+        print('sys.executable = %s' % sys.exec_file)
+        print('Popen(%s)' % ['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'), x])
+
+        # omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
+        #                                 x], close_fds=True)
+        omega_batch = subprocess.Popen([sys.executable, '-?', x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # First find the log files
@@ -928,13 +930,13 @@ class Form(QObject):
         # self.load_plots_2()
 
         # Send Notification to Windows
-        notification.notify(
-            title="OMEGA Notification",
-            message="Model Run Completed\n" + str(elapsed_time) + "\n" + "Output Directory =\n" +
-                    "  " + os.path.basename(output_batch_directory),
-            # app_icon="usepa_omega2_gui/elements/omega2_icon.ico",
-            timeout=5
-        )
+        # notification.notify(
+        #     title="OMEGA Notification",
+        #     message="Model Run Completed\n" + str(elapsed_time) + "\n" + "Output Directory =\n" +
+        #             "  " + os.path.basename(output_batch_directory),
+        #     # app_icon= path + "usepa_omega2_gui/elements/omega2_icon.ico",
+        #     timeout=5
+        # )
 
     def showbox(self, message_title, message):
         """
@@ -1070,7 +1072,7 @@ class Form(QObject):
         # print(plot_select_directory_name)
 
         self.window.list_graphs_1.clear()
-        input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
+        input_file = path + 'usepa_omega2_gui/elements/plot_definition.xlsx'
         plot_data_df = pandas.read_excel(input_file)
         # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
         for index, row in plot_data_df.iterrows():
@@ -1102,7 +1104,7 @@ class Form(QObject):
         """
         global plot_select_directory_name
         self.window.list_graphs_1.clear()
-        input_file = 'usepa_omega2_gui/elements/plot_definition.xlsx'
+        input_file = path + 'usepa_omega2_gui/elements/plot_definition.xlsx'
         plot_data_df = pandas.read_excel(input_file)
         # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
         for index, row in plot_data_df.iterrows():
@@ -1178,8 +1180,17 @@ def status_bar():
 # Run the function 'status_bar' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
-if __name__ == '__main__':
+def run_gui():
+    global app
+    global form
+
     app = QApplication(sys.argv)
     # Load the gui
-    form = Form('usepa_omega2_gui/elements/omega_gui_v22.ui')
+    uifilename = path + 'usepa_omega2_gui/elements/omega_gui_v22.ui'
+    print('uifilename = %s' % uifilename)
+    form = Form(uifilename)
     sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    run_gui()
