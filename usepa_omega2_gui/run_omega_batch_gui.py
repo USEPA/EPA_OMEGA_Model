@@ -17,6 +17,6 @@ else:
 
     pythonpathstr = 'set PYTHONPATH="%s"' % path
 
-    a = '%s & python -u "%s/usepa_omega2/run_omega_batch.py" "%s"' % (pythonpathstr, path,  sys.argv[1])
+    a = '%s & python -u "%s/usepa_omega2/run_omega_batch.py" %s' % (pythonpathstr, path,  sys.argv[1])
     print(a)
     os.system(a)
