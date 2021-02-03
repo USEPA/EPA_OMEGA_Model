@@ -815,7 +815,6 @@ class Form(QObject):
 
         omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
                                          x], close_fds=True)
-        # omega_batch = subprocess.Popen([sys.executable, '-?', x], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # First find the log files
