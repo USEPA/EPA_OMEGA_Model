@@ -15,7 +15,7 @@ if not len(sys.argv) > 1:
 else:
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    pythonpathstr = 'set PYTHONPATH="%s"' % path
+    pythonpathstr = "set PYTHONPATH=%s" % path
 
     a = '%s & python -u "%s/usepa_omega2/run_omega_batch.py" %s' % (pythonpathstr, path,  sys.argv[1])
     print(a)
