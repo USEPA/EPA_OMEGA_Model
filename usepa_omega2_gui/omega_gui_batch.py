@@ -810,7 +810,7 @@ class Form(QObject):
         #     timeout=5
         # )
 
-        print('sys.executable = %s' % sys.exec_file)
+        print('sys.executable = %s' % sys.executable)
         print('Popen(%s)' % ['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'), x])
 
         # omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
