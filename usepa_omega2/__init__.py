@@ -10,7 +10,7 @@ code_version = "0.3.1"
 print('loading usepa_omega2 version %s' % code_version)
 
 import os, sys
-print('usepa_omega2 __init__.py path = %s' %  os.path.abspath(__file__))
+print('usepa_omega2 __init__.py path = %s' % os.path.abspath(__file__))
 print('SYS Path = %s' % sys.path)
 
 # print(sys._MEIPASS)

@@ -16,6 +16,10 @@ import os, sys
 print('usepa_omega2 run_omega_batch.py path = %s' %  os.path.abspath(__file__))
 print('SYS Path = %s' % sys.path)
 
+import os, sys
+print('usepa_omega2 %s path = %s' %  (__file__, os.path.abspath(__file__)))
+print('SYS Path = %s' % sys.path)
+
 from o2 import OMEGABase
 from file_eye_oh import validate_file, relocate_file
 
