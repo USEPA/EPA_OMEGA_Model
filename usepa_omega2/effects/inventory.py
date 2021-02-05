@@ -24,17 +24,21 @@ ref_dict = dict()
 pef_dict = dict()
 
 
-def get_vehicle_info(vehicle_ID, query=False):
+def get_vehicle_info(vehicle_obj, query=False):
     from vehicles import VehicleFinal
 
-    if vehicle_ID in vehicles_dict and not query:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_ID] # add kwh_per_mile_cycle here when available in VehicleFinal
+    attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_CO2_grams_per_mile']
+
+    if vehicle_obj.vehicle_ID in vehicles_dict.keys() and not query:
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_obj.vehicle_ID] # add kwh_per_mile_cycle here when available in VehicleFinal
     else:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = \
-            o2.session.query(VehicleFinal.model_year, VehicleFinal.reg_class_ID,
-                             VehicleFinal.in_use_fuel_ID, VehicleFinal.cert_CO2_grams_per_mile).\
-                filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
-        vehicles_dict[vehicle_ID] = model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
+        # model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = \
+        #     o2.session.query(VehicleFinal.model_year, VehicleFinal.reg_class_ID,
+        #                      VehicleFinal.in_use_fuel_ID, VehicleFinal.cert_CO2_grams_per_mile).\
+        #         filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile \
+            = VehicleFinal.get_vehicle_attributes(vehicle_obj, *attribute_list)
+        vehicles_dict[vehicle_obj.vehicle_ID] = model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
 
     return model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
 
@@ -140,11 +144,13 @@ def calc_inventory(calendar_year):
 
     query = False
 
-    vad_vehs = o2.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+    # vad_vehs = o2.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+    vad_vehs = VehicleAnnualData.get_vehicles_by_cy(calendar_year)
 
     # UPDATE vehicle annual data related to effects
     for vad_veh in vad_vehs:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh.vehicle_ID, query=query) # add kwh_per_mile_cycle here
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh, query=query)  # add kwh_per_mile_cycle here
+        # model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh.vehicle_ID, query=query) # add kwh_per_mile_cycle here
 
         # co2 and fuel consumption
         if in_use_fuel_ID == 'US electricity':

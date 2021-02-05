@@ -435,6 +435,12 @@ class VehicleFinal(SQABase, Vehicle):
 
         return template_errors
 
+    def get_vehicle_attributes(self, object, *args):
+        return_list = []
+        for arg in args:
+            return_list.append(object.__getattribute__(arg))
+        return return_list
+
 
 if __name__ == '__main__':
     try:
