@@ -31,5 +31,5 @@ Initial Analysis Year,,,,One year after the initial year. It is the first analys
 Sample,,,,
 Default,,,,
 Context Scenarios,,,,"The set of Analysis Contexts that encompass a range of possible inputs representing the future (fuel prices, sales, adoption rates, etc.)"
-Market Class,,,,
-Regulatory Class,,,,
+Market Class,,,,The categorization of vehicles used for projecting market shares and modeling consumer response to policy through shifts in market shares
+Regulatory Class,,,,The categorization of vehicles defined by the Policy Alternative and considered in the producers compliance decisions and not neccesarilly related to market class classification considered by the consumer
