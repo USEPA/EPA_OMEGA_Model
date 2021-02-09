@@ -63,7 +63,7 @@ try:
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
-            self.context_fuel_upstream_file = path + 'test_inputs/fuel_upstream.csv'
+            self.fuel_upstream_file = path + 'test_inputs/fuel_upstream.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
             self.cost_file = path + 'test_inputs/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75

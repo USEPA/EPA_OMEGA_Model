@@ -690,8 +690,8 @@ def init_omega(o2_options):
         init_fail = init_fail + ContextFuelPrices.init_database_from_file(
             o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + ContextFuelUpstream.init_database_from_file(o2.options.context_fuel_upstream_file,
-                                                                          verbose=o2.options.verbose)
+        init_fail = init_fail + ContextFuelUpstream.init_database_from_file(o2.options.fuel_upstream_file,
+                                                                            verbose=o2.options.verbose)
 
         init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
