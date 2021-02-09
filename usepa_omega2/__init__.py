@@ -63,7 +63,7 @@ try:
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
-            self.context_fuel_upstream_file = path + 'test_inputs/context_fuel_upstream.csv'
+            self.context_fuel_upstream_file = path + 'test_inputs/fuel_upstream.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
             self.cost_file = path + 'test_inputs/cost_curves.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
@@ -102,15 +102,15 @@ try:
             self.calc_effects = False
             self.calc_criteria_emission_costs = False
             # effects modeling files
-            self.ip_deflators_file = path + 'test_inputs/context_implicit_price_deflators.csv'
-            self.cpi_deflators_file = path + 'test_inputs/context_cpi_price_deflators.csv'
-            self.scc_cost_factors_file = path + 'test_inputs/context_cost_factors-scc.csv'
-            self.criteria_cost_factors_file = path + 'test_inputs/context_cost_factors-criteria.csv'
-            self.energysecurity_cost_factors_file = path + 'test_inputs/context_cost_factors-energysecurity.csv'
-            self.congestion_noise_cost_factors_file = path + 'test_inputs/context_cost_factors-congestion-noise.csv'
-            self.emission_factors_vehicles_file = path + 'test_inputs/context_emission_factors-vehicles.csv'
-            self.emission_factors_powersector_file = path + 'test_inputs/context_emission_factors-powersector.csv'
-            self.emission_factors_refinery_file = path + 'test_inputs/context_emission_factors-refinery.csv'
+            self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
+            self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
+            self.scc_cost_factors_file = path + 'test_inputs/cost_factors-scc.csv'
+            self.criteria_cost_factors_file = path + 'test_inputs/cost_factors-criteria.csv'
+            self.energysecurity_cost_factors_file = path + 'test_inputs/cost_factors-energysecurity.csv'
+            self.congestion_noise_cost_factors_file = path + 'test_inputs/cost_factors-congestion-noise.csv'
+            self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors-vehicles.csv'
+            self.emission_factors_powersector_file = path + 'test_inputs/emission_factors-powersector.csv'
+            self.emission_factors_refinery_file = path + 'test_inputs/emission_factors-refinery.csv'
 
             self.start_time = 0
             self.end_time = 0
