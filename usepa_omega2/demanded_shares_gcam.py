@@ -10,6 +10,8 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
+params_dict = dict()
+
 
 class DemandedSharesGCAM(SQABase, OMEGABase):
     # --- database table properties ---
@@ -23,8 +25,27 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
     price_amortization_period = Column(Float)
     discount_rate = Column(Float)
     share_weight = Column(Float)
-    demanded_share= Column(Numeric)
+    demanded_share = Column(Numeric)
     consumer_generalized_cost_dollars = Column(Float)
+
+    @staticmethod
+    def get_gcam_params(calendar_year, market_class_id):
+        """
+
+        Args:
+            calendar_year:
+            market_class_id:
+
+        Returns:
+
+        """
+        key = '%s_%s' % (calendar_year, market_class_id)
+        if not key in params_dict:
+            params_dict[key] = o2.session.query(DemandedSharesGCAM). \
+                filter(DemandedSharesGCAM.calendar_year == calendar_year). \
+                filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
+
+        return params_dict[key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

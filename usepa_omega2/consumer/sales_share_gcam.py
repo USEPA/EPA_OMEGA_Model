@@ -9,7 +9,6 @@ sales_gcam.py
 from usepa_omega2 import *
 import numpy as np
 
-gcam_params_dict = dict()
 
 def get_demanded_shares(market_class_data, calendar_year):
     """
@@ -39,13 +38,7 @@ def get_demanded_shares(market_class_data, calendar_year):
         for market_class_id in MarketClass.market_classes:
             fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
-            key = '%s_%s' % (calendar_year, market_class_id)
-            if not key in gcam_params_dict:
-                gcam_params_dict[key] = o2.session.query(DemandedSharesGCAM). \
-                    filter(DemandedSharesGCAM.calendar_year == calendar_year). \
-                    filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
-
-            gcam_data_cy = gcam_params_dict[key]
+            gcam_data_cy = DemandedSharesGCAM.get_gcam_params(calendar_year, market_class_id)
 
             price_amortization_period = gcam_data_cy.price_amortization_period
             discount_rate = gcam_data_cy.discount_rate
