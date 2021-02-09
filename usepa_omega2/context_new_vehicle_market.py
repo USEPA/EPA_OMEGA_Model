@@ -10,6 +10,8 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
+
 
 class ContextNewVehicleMarket(SQABase, OMEGABase):
     # --- database table properties ---
@@ -41,17 +43,22 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        if context_size_class:
-            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
-                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
-                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
-                         filter(ContextNewVehicleMarket.context_size_class == context_size_class).
-                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
-        else:
-            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
-                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
-                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
-                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+        cache_key = '%s_%s_%s_%s_new_vehicle_sales' % (o2.options.context_id, o2.options.context_case_id, calendar_year, context_size_class)
+
+        if cache_key not in cache:
+            if context_size_class:
+                cache[cache_key] = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
+                                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
+                                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
+                                         filter(ContextNewVehicleMarket.context_size_class == context_size_class).
+                                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+            else:
+                cache[cache_key] = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
+                                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
+                                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
+                                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+
+        return cache[cache_key]
 
     # TODO: was going to use this to calculate P0 for the consumer sales response, but there's no ice/bev split and some of the bevs have a zero price, which is bogus, even in 2050...
     # @staticmethod
@@ -72,6 +79,8 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 

@@ -10,6 +10,8 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
+
 
 class VehicleAnnualData(SQABase, OMEGABase):
     # --- database table properties ---
@@ -65,8 +67,6 @@ class VehicleAnnualData(SQABase, OMEGABase):
     ch4_total_metrictons = Column(Float)
     n2o_total_metrictons = Column(Float)
     co2_total_metrictons = Column(Float)
-    _initial_registered_count = None
-    _initial_fueling_class_registered_count = dict()
 
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
@@ -117,12 +117,14 @@ class VehicleAnnualData(SQABase, OMEGABase):
         Returns: registered count of vehicles prior to initial analysis year
 
         """
-        if VehicleAnnualData._initial_registered_count is None:
-            VehicleAnnualData._initial_registered_count = float(
+
+        cache_key = '%s_initial_registered_count' % (o2.options.analysis_initial_year - 1)
+        if cache_key not in cache:
+            cache[cache_key] = float(
                 o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
                     VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
 
-        return VehicleAnnualData._initial_registered_count
+        return cache[cache_key]
 
     @staticmethod
     def get_initial_fueling_class_registered_count(fueling_class):
@@ -134,14 +136,15 @@ class VehicleAnnualData(SQABase, OMEGABase):
         Returns: registered count of vehicles of the given ``fueling_class`` prior to initial analysis year
 
         """
-        from vehicles import VehicleFinal
-        if fueling_class not in VehicleAnnualData._initial_fueling_class_registered_count:
-            VehicleAnnualData._initial_fueling_class_registered_count[fueling_class] = float(
+        cache_key = '%s_%s_initial_registered_count' % (o2.options.analysis_initial_year - 1, fueling_class)
+        if cache_key not in cache:
+            from vehicles import VehicleFinal
+            cache[cache_key] = float(
                 o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
                     VehicleFinal.fueling_class == fueling_class).filter(
                     VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
 
-        return VehicleAnnualData._initial_fueling_class_registered_count[fueling_class]
+        return cache[cache_key]
 
     @staticmethod
     def insert_vmt(vehicle_ID, calendar_year, annual_vmt):

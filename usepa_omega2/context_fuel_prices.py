@@ -13,6 +13,8 @@ print(sys.path)
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
+
 
 class ContextFuelPrices(SQABase, OMEGABase):
     # --- database table properties ---
@@ -25,40 +27,40 @@ class ContextFuelPrices(SQABase, OMEGABase):
     retail_dollars_per_unit = Column(Float)
     pretax_dollars_per_unit = Column(Float)
 
-    retail_fuel_price_dict = dict()
-
     @staticmethod
     def get_retail_fuel_price(calendar_year, fuel_ID):
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        key = '%s_%s' % (calendar_year, fuel_ID)
-        if not key in ContextFuelPrices.retail_fuel_price_dict:
-            ContextFuelPrices.retail_fuel_price_dict[key] = o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
+        cache_key = '%s_%s_%s_%s_retail_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_ID)
+        if cache_key not in cache:
+            cache[cache_key] = o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
                 filter(ContextFuelPrices.context_ID == o2.options.context_id).\
                 filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
                 filter(ContextFuelPrices.calendar_year == calendar_year).\
                 filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
-
-        return ContextFuelPrices.retail_fuel_price_dict[key]
+        return cache[cache_key]
 
     @staticmethod
     def get_pretax_fuel_price(calendar_year, fuel_ID):
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        return o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
-            filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-            filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
-            filter(ContextFuelPrices.calendar_year == calendar_year).\
-            filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+        cache_key = '%s_%s_%s_%s_pretax_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_ID)
+        if cache_key not in cache:
+            cache[cache_key] = o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
+                filter(ContextFuelPrices.context_ID == o2.options.context_id).\
+                filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
+                filter(ContextFuelPrices.calendar_year == calendar_year).\
+                filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+        return cache[cache_key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
-
-        retail_fuel_price_dict = dict()
 
         input_template_name = 'context_fuel_prices'
         input_template_version = 0.1

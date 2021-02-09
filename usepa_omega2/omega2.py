@@ -17,7 +17,7 @@ import os
 from usepa_omega2.consumer import stock
 
 
-def run_postproc(iteration_log, single_shot):
+def run_postproc(iteration_log: pd.DataFrame, single_shot: bool):
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData

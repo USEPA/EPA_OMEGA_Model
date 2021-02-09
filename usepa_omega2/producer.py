@@ -135,7 +135,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
     return tech_share_combos_df
 
 
-calendar_year_initial_vehicle_data = dict()
+cache = dict()
 
 
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, iteration_num):
@@ -230,7 +230,8 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     from vehicles import VehicleFinal, Vehicle
     from market_classes import MarketClass, populate_market_classes
 
-    if calendar_year not in calendar_year_initial_vehicle_data:
+    cache_key = calendar_year
+    if cache_key not in cache:
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_ID)
 
@@ -268,12 +269,12 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for new_veh in manufacturer_composite_vehicles:
             populate_market_classes(market_class_tree, new_veh.market_class_ID, new_veh)
 
-        calendar_year_initial_vehicle_data[calendar_year] = {'manufacturer_composite_vehicles': manufacturer_composite_vehicles,
-                                                             'market_class_tree': market_class_tree}
+        cache[cache_key] = {'manufacturer_composite_vehicles': manufacturer_composite_vehicles,
+                            'market_class_tree': market_class_tree}
     else:
         # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
-        manufacturer_composite_vehicles = calendar_year_initial_vehicle_data[calendar_year]['manufacturer_composite_vehicles']
-        market_class_tree = calendar_year_initial_vehicle_data[calendar_year]['market_class_tree']
+        manufacturer_composite_vehicles = cache[cache_key]['manufacturer_composite_vehicles']
+        market_class_tree = cache[cache_key]['market_class_tree']
 
     return manufacturer_composite_vehicles, market_class_tree
 

@@ -12,6 +12,9 @@ from usepa_omega2 import *
 
 input_template_name = 'ghg_standards-footprint'
 
+cache = dict()
+
+
 class GHGStandardFootprint(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_footprint'
@@ -28,6 +31,8 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -66,9 +71,12 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calculate_target_co2_gpmi(vehicle):
-        coefficients = o2.session.query(GHGStandardFootprint). \
-            filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
-            filter(GHGStandardFootprint.model_year == vehicle.model_year).one()
+        cache_key = '%s_%s_coefficients' % (vehicle.model_year, vehicle.reg_class_ID)
+        if cache_key not in cache:
+            cache[cache_key] = o2.session.query(GHGStandardFootprint). \
+                filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
+                filter(GHGStandardFootprint.model_year == vehicle.model_year).one()
+        coefficients = cache[cache_key]
 
         if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
             target_co2_gpmi = coefficients.coeff_a
@@ -81,9 +89,12 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calculate_cert_lifetime_vmt(reg_class_id, model_year):
-        return o2.session.query(GHGStandardFootprint.lifetime_VMT). \
-            filter(GHGStandardFootprint.reg_class_ID == reg_class_id). \
-            filter(GHGStandardFootprint.model_year == model_year).scalar()
+        cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
+        if cache_key not in cache:
+            cache[cache_key] = o2.session.query(GHGStandardFootprint.lifetime_VMT). \
+                filter(GHGStandardFootprint.reg_class_ID == reg_class_id). \
+                filter(GHGStandardFootprint.model_year == model_year).scalar()
+        return cache[cache_key]
 
     @staticmethod
     def calculate_target_co2_Mg(vehicle, sales_variants=None):
