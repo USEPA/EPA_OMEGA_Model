@@ -36,7 +36,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
             calendar_year:
             market_class_id:
 
-        Returns:
+        Returns: GCAM parameters for the given calendar year and market class
 
         """
         key = '%s_%s' % (calendar_year, market_class_id)

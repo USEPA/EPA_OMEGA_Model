@@ -49,11 +49,10 @@ def run_postproc(iteration_log, single_shot):
     label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (2.0 * iteration_log['iteration'][iteration_log['pricing_iteration'] == -1].mean()))
     fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
 
-    calendar_years = sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
-    cert_target_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
-    cert_co2_Mg = sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all())
-    total_cost_billions = float(
-        o2.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar()) / 1e9
+    calendar_years = ManufacturerAnnualData.get_calendar_years()
+    cert_target_co2_Mg = ManufacturerAnnualData.get_cert_target_co2_Mg()
+    cert_co2_Mg = ManufacturerAnnualData.get_cert_co2_Mg()
+    total_cost_billions = ManufacturerAnnualData.get_total_cost_billions()
 
     # compliance chart
     fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, '.-')

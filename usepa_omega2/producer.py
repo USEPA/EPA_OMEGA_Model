@@ -14,13 +14,6 @@ import numpy as np
 import consumer
 
 
-def calculate_cert_target_co2_Mg(model_year, manufacturer_id):
-    from vehicles import VehicleFinal
-    return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
-        filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
-        filter(VehicleFinal.model_year == model_year).scalar()
-
-
 # placeholder for producer deemed generalized vehicle cost:
 def calculate_generalized_cost(cost_factors):
     pass
@@ -238,11 +231,8 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     from market_classes import MarketClass, populate_market_classes
 
     if calendar_year not in calendar_year_initial_vehicle_data:
-        # pull in last year's vehicles from database:
-        manufacturer_prior_vehicles = o2.session.query(VehicleFinal). \
-            filter(VehicleFinal.manufacturer_ID == manufacturer_ID). \
-            filter(VehicleFinal.model_year == calendar_year - 1). \
-                all()
+        # pull in last year's vehicles:
+        manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_ID)
 
         Vehicle.reset_vehicle_IDs()
 
@@ -306,7 +296,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
 
     o2.session.add_all(manufacturer_new_vehicles)
 
-    cert_target_co2_Mg = calculate_cert_target_co2_Mg(calendar_year, manufacturer_ID)
+    cert_target_co2_Mg = VehicleFinal.calc_cert_target_CO2_Mg(calendar_year, manufacturer_ID)
 
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(calendar_year=calendar_year,

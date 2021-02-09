@@ -65,7 +65,8 @@ class VehicleAnnualData(SQABase, OMEGABase):
     ch4_total_metrictons = Column(Float)
     n2o_total_metrictons = Column(Float)
     co2_total_metrictons = Column(Float)
-    
+    _initial_registered_count = None
+    _initial_fueling_class_registered_count = dict()
 
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
@@ -84,13 +85,12 @@ class VehicleAnnualData(SQABase, OMEGABase):
             filter(VehicleAnnualData.age == age).one_or_none()
 
         if vad:
-            vad.registered_count=registered_count
+            vad.registered_count = registered_count
         else:
             o2.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
-                                         calendar_year=calendar_year,
-                                         registered_count=registered_count,
-                                         age=age))
-
+                                             calendar_year=calendar_year,
+                                             registered_count=registered_count,
+                                             age=age))
 
     @staticmethod
     def update_vehicle_annual_data(vehicle, calendar_year, attribute, attribute_value):
@@ -107,19 +107,50 @@ class VehicleAnnualData(SQABase, OMEGABase):
         o2.session.flush()
 
     @staticmethod
-    def get_registered_count(vehicle_ID, age):
-        return float(o2.session.query(VehicleAnnualData.registered_count). \
-            filter(VehicleAnnualData.vehicle_ID==vehicle_ID). \
-            filter(VehicleAnnualData.age==age).scalar())
+    def get_calendar_years():
+        return sql_unpack_result(o2.session.query(VehicleAnnualData.calendar_year).all())
+
+    @staticmethod
+    def get_initial_registered_count():
+        """
+
+        Returns: registered count of vehicles prior to initial analysis year
+
+        """
+        if VehicleAnnualData._initial_registered_count is None:
+            VehicleAnnualData._initial_registered_count = float(
+                o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
+                    VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
+
+        return VehicleAnnualData._initial_registered_count
+
+    @staticmethod
+    def get_initial_fueling_class_registered_count(fueling_class):
+        """
+
+        Args:
+            fueling_class: fueling class to filter results by
+
+        Returns: registered count of vehicles of the given ``fueling_class`` prior to initial analysis year
+
+        """
+        from vehicles import VehicleFinal
+        if fueling_class not in VehicleAnnualData._initial_fueling_class_registered_count:
+            VehicleAnnualData._initial_fueling_class_registered_count[fueling_class] = float(
+                o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+                    VehicleFinal.fueling_class == fueling_class).filter(
+                    VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
+
+        return VehicleAnnualData._initial_fueling_class_registered_count[fueling_class]
 
     @staticmethod
     def insert_vmt(vehicle_ID, calendar_year, annual_vmt):
-        vmt = o2.session.query(VehicleAnnualData.registered_count).\
-            filter(VehicleAnnualData.vehicle_ID==vehicle_ID).\
-            filter(VehicleAnnualData.calendar_year==calendar_year).scalar() * annual_vmt
-        vad = o2.session.query(VehicleAnnualData).\
-            filter(VehicleAnnualData.vehicle_ID==vehicle_ID).\
-            filter(VehicleAnnualData.calendar_year==calendar_year).all()
+        vmt = o2.session.query(VehicleAnnualData.registered_count). \
+                  filter(VehicleAnnualData.vehicle_ID == vehicle_ID). \
+                  filter(VehicleAnnualData.calendar_year == calendar_year).scalar() * annual_vmt
+        vad = o2.session.query(VehicleAnnualData). \
+            filter(VehicleAnnualData.vehicle_ID == vehicle_ID). \
+            filter(VehicleAnnualData.calendar_year == calendar_year).all()
         vad[0].annual_vmt = annual_vmt
         vad[0].vmt = vmt
 

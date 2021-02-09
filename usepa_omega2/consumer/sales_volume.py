@@ -34,13 +34,9 @@ def context_new_vehicle_sales(model_year):
     # get total sales from context
     total_sales = ContextNewVehicleMarket.new_vehicle_sales(model_year)
 
-    total_sales_initial = float(o2.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar())
-
-    # get ICE share from initial fleet (for now)
-    ICE_share = float(o2.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
-        VehicleFinal.fueling_class == 'ICE').filter(
-        VehicleAnnualData.calendar_year == o2.options.analysis_initial_year - 1).scalar()) / total_sales_initial
+    total_sales_initial = VehicleAnnualData.get_initial_registered_count()
+    ICE_share = VehicleAnnualData.get_initial_fueling_class_registered_count('ICE') / total_sales_initial
+    BEV_share = VehicleAnnualData.get_initial_fueling_class_registered_count('BEV') / total_sales_initial
 
     # pulling in hauling sales, non hauling = total minus hauling
     hauling_sales = 0
@@ -52,7 +48,7 @@ def context_new_vehicle_sales(model_year):
     sales_dict['hauling'] = hauling_sales
     sales_dict['non hauling'] = total_sales - hauling_sales
     sales_dict['ICE'] = total_sales * ICE_share
-    sales_dict['BEV'] = total_sales * (1 - ICE_share)
+    sales_dict['BEV'] = total_sales * BEV_share
     sales_dict['total'] = total_sales
 
     return sales_dict
@@ -142,7 +138,7 @@ if __name__ == '__main__':
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
 
         if not init_fail:
-            o2.options.analysis_initial_year = o2.session.query(func.max(VehicleFinal.model_year)).scalar() + 1
+            o2.options.analysis_initial_year = VehicleFinal.get_max_model_year() + 1
 
             sales_demand = context_new_vehicle_sales(o2.options.analysis_initial_year)
         else:

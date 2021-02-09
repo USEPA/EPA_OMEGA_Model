@@ -144,7 +144,6 @@ def calc_inventory(calendar_year):
 
     query = False
 
-    # vad_vehs = o2.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
     vad_vehs = VehicleAnnualData.get_vehicles_by_cy(calendar_year)
 
     # UPDATE vehicle annual data related to effects

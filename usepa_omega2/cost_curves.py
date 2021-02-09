@@ -21,6 +21,8 @@ class CostCurve(SQABase, OMEGABase):
     model_year = Column(Numeric)
     cost_dollars = Column(Float)
     cert_CO2_grams_per_mile = Column(Float)
+    _min_cost_curve_year = None
+    _max_cost_curve_year = None
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -52,6 +54,9 @@ class CostCurve(SQABase, OMEGABase):
                 o2.session.add_all(obj_list)
                 o2.session.flush()
 
+            CostCurve._min_cost_curve_year = o2.session.query(func.min(CostCurve.model_year)).scalar()
+            CostCurve._max_cost_curve_year = o2.session.query(func.max(CostCurve.model_year)).scalar()
+
         return template_errors
 
     @staticmethod
@@ -70,28 +75,29 @@ class CostCurve(SQABase, OMEGABase):
         o2.session.add_all(obj_list)
         o2.session.flush()
 
+        CostCurve._min_cost_curve_year = o2.session.query(func.min(CostCurve.model_year)).scalar()
+        CostCurve._max_cost_curve_year = o2.session.query(func.max(CostCurve.model_year)).scalar()
+
     @staticmethod
     def get_cost(cost_curve_class, model_year, target_co2_gpmi):
         if o2.options.flat_context:
             model_year = o2.options.flat_context_year
 
-        min_cost_curve_year = o2.session.query(func.min(CostCurve.model_year)).scalar()
-        max_cost_curve_year = o2.session.query(func.max(CostCurve.model_year)).scalar()
-
-        if model_year < min_cost_curve_year:
+        if model_year < CostCurve._min_cost_curve_year:
             omega_log.logwrite(
                 "\n### WARNING: Attempt to access %s cost curve for year (%d) below minimum (%d) ###\n" % (
-                    cost_curve_class, model_year, min_cost_curve_year))
-            model_year = min_cost_curve_year
+                    cost_curve_class, model_year, CostCurve._min_cost_curve_year))
+            model_year = CostCurve._min_cost_curve_year
 
-        if model_year > max_cost_curve_year:
+        if model_year > CostCurve._max_cost_curve_year:
             omega_log.logwrite(
                 "\n### WARNING: Attempt to access %s cost curve for year (%d) above maximum (%d) ###\n" % (
-                    cost_curve_class, model_year, max_cost_curve_year))
-            model_year = min_cost_curve_year
+                    cost_curve_class, model_year, CostCurve._max_cost_curve_year))
+            model_year = CostCurve._max_cost_curve_year
 
         result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_CO2_grams_per_mile).filter(
             CostCurve.model_year == model_year).filter(CostCurve.cost_curve_class == cost_curve_class)
+
         curve_cost_dollars = [r[0] for r in result]
         curve_co2_gpmi = [r[1] for r in result]
 

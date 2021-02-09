@@ -42,15 +42,15 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
             calendar_year = o2.options.flat_context_year
 
         if context_size_class:
-            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)). \
-                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
-                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
-                         filter(ContextNewVehicleMarket.context_size_class == context_size_class). \
+            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
+                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
+                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
+                         filter(ContextNewVehicleMarket.context_size_class == context_size_class).
                          filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
         else:
-            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)). \
-                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
-                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
+            return float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
+                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
+                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
                          filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
 
     # TODO: was going to use this to calculate P0 for the consumer sales response, but there's no ice/bev split and some of the bevs have a zero price, which is bogus, even in 2050...

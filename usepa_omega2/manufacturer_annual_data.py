@@ -43,6 +43,23 @@ class ManufacturerAnnualData(SQABase):
                                               ))
         o2.session.flush()
 
+    @staticmethod
+    def get_calendar_years():
+        return sql_unpack_result(o2.session.query(ManufacturerAnnualData.calendar_year).all())
+
+    @staticmethod
+    def get_cert_target_co2_Mg():
+        return sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
+
+    @staticmethod
+    def get_cert_co2_Mg():
+        return sql_unpack_result(o2.session.query(ManufacturerAnnualData.cert_co2_Mg).all())
+
+    @staticmethod
+    def get_total_cost_billions():
+        return float(
+            o2.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar()) / 1e9
+
 
 if __name__ == '__main__':
     try:

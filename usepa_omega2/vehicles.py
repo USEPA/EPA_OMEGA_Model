@@ -332,8 +332,6 @@ class VehicleFinal(SQABase, Vehicle):
 
     @property
     def initial_registered_count(self):
-        # from vehicle_annual_data import VehicleAnnualData
-        # return VehicleAnnualData.get_registered_count(vehicle_ID=self.vehicle_ID, age=0)
         return self._initial_registered_count
 
     @initial_registered_count.setter
@@ -347,6 +345,10 @@ class VehicleFinal(SQABase, Vehicle):
         VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=self.model_year,
                                                   registered_count=initial_registered_count)
+
+    @staticmethod
+    def get_max_model_year():
+        return o2.session.query(func.max(VehicleFinal.model_year)).scalar()
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -435,11 +437,28 @@ class VehicleFinal(SQABase, Vehicle):
 
         return template_errors
 
-    def get_vehicle_attributes(self, object, *args):
-        return_list = []
-        for arg in args:
-            return_list.append(object.__getattribute__(arg))
-        return return_list
+    @staticmethod
+    def get_vehicle_attributes(obj, *args):
+        # TODO: this could literally apply to any class or object, there is nothing specific here about VehicleFinal
+        # return_list = []
+        # for arg in args:
+        #     return_list.append(obj.__getattribute__(arg))
+        # return return_list
+        # simpler as a list comprehension:
+        return [obj.__getattribute__(arg) for arg in args]
+
+    @staticmethod
+    def get_manufacturer_vehicles(calendar_year, manufacturer_id):
+        return o2.session.query(VehicleFinal). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.model_year == calendar_year).all()
+
+
+    @staticmethod
+    def calc_cert_target_CO2_Mg(model_year, manufacturer_id):
+        return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.model_year == model_year).scalar()
 
 
 if __name__ == '__main__':
