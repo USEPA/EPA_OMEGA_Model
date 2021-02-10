@@ -10,25 +10,10 @@ import o2
 from usepa_omega2 import *
 
 # create some empty dicts in which to store VehicleFinal objects and scc/criteria cost factors
-vehicles_dict = dict()
 scf_dict = dict()
 ccf_dict = dict()
 es_dict = dict()
 cn_dict = dict()
-
-
-def get_vehicle_info(vehicle_ID, query=False):
-    from vehicles import VehicleFinal
-
-    if vehicle_ID in vehicles_dict and not query:
-        reg_class_ID, in_use_fuel_ID = vehicles_dict[vehicle_ID]
-    else:
-        reg_class_ID, in_use_fuel_ID = o2.session.query(VehicleFinal.reg_class_ID, VehicleFinal.in_use_fuel_ID).\
-            filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
-
-        vehicles_dict[vehicle_ID] = reg_class_ID, in_use_fuel_ID
-
-    return reg_class_ID, in_use_fuel_ID
 
 
 def get_scc_cf(calendar_year, query=False):
@@ -295,6 +280,7 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
     from vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
     from context_fuel_prices import ContextFuelPrices
+    from vehicles import VehicleFinal
 
     query = False
 
@@ -311,7 +297,7 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
         vehicle_ID, age, fuel_consumption, vmt = vad_veh[0], vad_veh[1], vad_veh[2], vad_veh[3]
 
         # get vehicle final data
-        reg_class_ID, in_use_fuel_ID = get_vehicle_info(vehicle_ID, query=query)
+        reg_class_ID, in_use_fuel_ID = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['reg_class_ID', 'in_use_fuel_ID'])
 
         # get fuel prices
         retail, pretax = ContextFuelPrices.get_fuel_prices(calendar_year,

@@ -220,13 +220,13 @@ class Vehicle(OMEGABase):
         from context_fuel_prices import ContextFuelPrices
         if calendar_year is None:
             calendar_year = self.model_year
-        return ContextFuelPrices.get_retail_fuel_price(calendar_year, self.in_use_fuel_ID)
+        return ContextFuelPrices.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', self.in_use_fuel_ID)
 
     def pretax_fuel_price(self, calendar_year=None):
         from context_fuel_prices import ContextFuelPrices
         if calendar_year is None:
             calendar_year = self.model_year
-        return ContextFuelPrices.get_pretax_fuel_price(calendar_year, self.in_use_fuel_ID)
+        return ContextFuelPrices.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', self.in_use_fuel_ID)
 
     @initial_registered_count.setter
     def initial_registered_count(self, initial_registered_count):

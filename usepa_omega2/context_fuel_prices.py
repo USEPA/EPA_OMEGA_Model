@@ -65,34 +65,6 @@ class ContextFuelPrices(SQABase, OMEGABase):
         return cache[cache_key]
 
     @staticmethod
-    def get_retail_fuel_price(calendar_year, fuel_id):
-        if o2.options.flat_context:
-            calendar_year = o2.options.flat_context_year
-
-        cache_key = '%s_%s_%s_%s_retail_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_id)
-        if cache_key not in cache:
-            cache[cache_key] = o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
-                filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-                filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
-                filter(ContextFuelPrices.calendar_year == calendar_year).\
-                filter(ContextFuelPrices.fuel_ID == fuel_id).one()[0]
-        return cache[cache_key]
-
-    @staticmethod
-    def get_pretax_fuel_price(calendar_year, fuel_id):
-        if o2.options.flat_context:
-            calendar_year = o2.options.flat_context_year
-
-        cache_key = '%s_%s_%s_%s_pretax_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_id)
-        if cache_key not in cache:
-            cache[cache_key] = o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
-                filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-                filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
-                filter(ContextFuelPrices.calendar_year == calendar_year).\
-                filter(ContextFuelPrices.fuel_ID == fuel_id).one()[0]
-        return cache[cache_key]
-
-    @staticmethod
     def init_database_from_file(filename, verbose=False):
         cache.clear()
 
