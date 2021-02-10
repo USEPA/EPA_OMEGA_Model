@@ -10,7 +10,6 @@ import o2
 from usepa_omega2 import *
 
 # create some empty dicts in which to store VehicleFinal objects and scc/criteria cost factors
-ccf_dict = dict()
 es_dict = dict()
 cn_dict = dict()
 
@@ -35,7 +34,8 @@ def get_scc_cf(calendar_year, query=False):
                     'ch4_global_cost_factor_70',
                     'n2o_global_cost_factor_25',
                     'n2o_global_cost_factor_30',
-                    'n2o_global_cost_factor_70']
+                    'n2o_global_cost_factor_70',
+                    ]
 
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
@@ -43,25 +43,17 @@ def get_scc_cf(calendar_year, query=False):
 def get_criteria_cf(calendar_year, query=False):
     from effects.cost_factors_criteria import CostFactorsCriteria
 
-    ccf_dict_id = f'{calendar_year}'
+    cost_factors = ['pm25_low_mortality_30',
+                    'pm25_high_mortality_30',
+                    'nox_low_mortality_30',
+                    'nox_high_mortality_30',
+                    'pm25_low_mortality_70',
+                    'pm25_high_mortality_70',
+                    'nox_low_mortality_70',
+                    'nox_high_mortality_70',
+                    ]
 
-    if ccf_dict_id in ccf_dict and not query:
-        pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7 = ccf_dict[ccf_dict_id]
-    else:
-        pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7 \
-            = o2.session.query(CostFactorsCriteria.pm25_low_mortality_30, 
-                               CostFactorsCriteria.pm25_high_mortality_30, 
-                               CostFactorsCriteria.nox_low_mortality_30,
-                               CostFactorsCriteria.nox_high_mortality_30,
-                               CostFactorsCriteria.pm25_low_mortality_70,
-                               CostFactorsCriteria.pm25_high_mortality_70,
-                               CostFactorsCriteria.nox_low_mortality_70,
-                               CostFactorsCriteria.nox_high_mortality_70).\
-            filter(CostFactorsCriteria.calendar_year == calendar_year).one()
-
-        ccf_dict[ccf_dict_id] = pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7
-
-    return pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7
+    return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
 
 
 def get_energysecurity_cf(calendar_year, query=False):

@@ -12,6 +12,8 @@ from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 
 
+cache = dict()
+
 class CostFactorsCriteria(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_criteria'
@@ -33,7 +35,36 @@ class CostFactorsCriteria(SQABase, OMEGABase):
     sox_high_mortality_70 = Column('sox_high-mortality_7.0_USD_per_uston', Float)
 
     @staticmethod
+    def get_cost_factors(calendar_year, cost_factors):
+        """
+
+        Args:
+            calendar_year: calendar year to get cost factors for
+            cost_factors: name of cost factor or list of cost factor attributes to get
+
+        Returns: cost factor or list of cost factors
+
+        """
+        cache_key = '%s_%s' % (calendar_year, cost_factors)
+
+        if cache_key not in cache:
+            if type(cost_factors) is not list:
+                cost_factors = [cost_factors]
+            attrs = CostFactorsCriteria.get_class_attributes(cost_factors)
+
+            result = o2.session.query(*attrs).filter(CostFactorsCriteria.calendar_year == calendar_year).all()[0]
+
+            if len(cost_factors) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
