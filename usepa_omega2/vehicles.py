@@ -526,10 +526,7 @@ if __name__ == '__main__':
 
         if not init_fail:
 
-            vehicles_list = o2.session.query(VehicleFinal). \
-                filter(VehicleFinal.manufacturer_ID == 'USA Motors'). \
-                filter(VehicleFinal.model_year == 2020). \
-                all()
+            vehicles_list = VehicleFinal.get_manufacturer_vehicles(2020, 'USA Motors')
 
             # update vehicle annual data, registered count must be update first:
             VehicleAnnualData.update_registered_count(vehicles_list[0], 2021, 54321)
