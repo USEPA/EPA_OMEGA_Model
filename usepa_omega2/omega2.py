@@ -750,7 +750,7 @@ def init_omega(o2_options):
         return init_fail
 
 
-def run_omega(o2_options, single_shot=False):
+def run_omega(o2_options, standalone_run=False):
     import traceback
     import time
 
@@ -773,13 +773,13 @@ def run_omega(o2_options, single_shot=False):
                 import cProfile
                 import re
                 cProfile.run('iteration_log = run_producer_consumer()', filename='omega2_profile.dmp')
-                session_summary_results = run_postproc(globals()['iteration_log'], single_shot)  # return values of cProfile.run() show up in the globals namespace
+                session_summary_results = run_postproc(globals()['iteration_log'], standalone_run)  # return values of cProfile.run() show up in the globals namespace
             else:
                 # run without profiler
                 iteration_log = run_producer_consumer()
-                session_summary_results = run_postproc(iteration_log, single_shot)
+                session_summary_results = run_postproc(iteration_log, standalone_run)
 
-            publish_summary_results(session_summary_results, single_shot)
+            publish_summary_results(session_summary_results, standalone_run)
 
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
@@ -827,7 +827,7 @@ def publish_summary_results(session_summary_results, single_shot):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), single_shot=True)  # to view in terminal: snakeviz omega2_profile.dmp
+        run_omega(OMEGARuntimeOptions(), standalone_run=True)  # to view in terminal: snakeviz omega2_profile.dmp
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
