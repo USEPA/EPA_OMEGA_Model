@@ -5,7 +5,6 @@ cost_effects_nonemissions.py
 """
 # import pandas as pd
 
-import o2
 from usepa_omega2 import *
 
 

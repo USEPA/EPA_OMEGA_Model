@@ -6,7 +6,6 @@ emission_costs.py
 # import pandas as pd
 # from itertools import product
 
-import o2
 from usepa_omega2 import *
 
 

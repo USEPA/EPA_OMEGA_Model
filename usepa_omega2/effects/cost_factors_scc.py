@@ -5,12 +5,11 @@ cost_factors_scc.py
 
 """
 
-import pandas as pd
-import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 
 cache = dict()
+
 
 class CostFactorsSCC(SQABase, OMEGABase):
     # --- database table properties ---

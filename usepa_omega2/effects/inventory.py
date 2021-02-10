@@ -3,10 +3,6 @@
 inventory.py
 ============
 """
-import pandas as pd
-import o2
-from usepa_omega2 import *
-
 
 grams_per_us_ton = 907185
 grams_per_metric_ton = 1000000
@@ -14,8 +10,7 @@ transloss = 0.07
 gap_ice = 0.8
 gap_bev = 0.7
 co2_indolene = 8887
-kwh_per_mile_cycle = 0.2 # TODO Placeholder - what are we doing about calculating energy consumption on vehicles?
-
+kwh_per_mile_cycle = 0.2  # TODO Placeholder - what are we doing about calculating energy consumption on vehicles?
 
 # create some empty dicts in which to store VehicleFinal objects and vehicle/refinery/powersector emission factors
 vehicles_dict = dict()

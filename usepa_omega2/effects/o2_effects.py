@@ -4,8 +4,6 @@ o2_effects.py
 =============
 """
 
-
-import o2
 from usepa_omega2 import *
 from effects.inventory import calc_inventory
 from effects.social_costs import calc_carbon_emission_costs, calc_criteria_emission_costs, calc_non_emission_costs

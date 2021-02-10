@@ -5,7 +5,6 @@ cost_effects_criteria.py
 """
 
 
-import o2
 from usepa_omega2 import *
 
 

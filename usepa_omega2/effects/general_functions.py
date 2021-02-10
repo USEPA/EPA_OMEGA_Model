@@ -4,9 +4,7 @@ general_functions.py
 ====================
 """
 
-import pandas as pd
 from math import log10, floor
-from usepa_omega2 import *
 
 
 def adjust_dollars(df, deflators, *args):

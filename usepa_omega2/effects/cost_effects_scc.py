@@ -3,9 +3,7 @@
 cost_effects_scc.py
 ===================
 """
-# import pandas as pd
 
-import o2
 from usepa_omega2 import *
 
 

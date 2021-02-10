@@ -5,9 +5,6 @@ cost_factors_criteria.py
 
 """
 
-import pandas as pd
-
-import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 

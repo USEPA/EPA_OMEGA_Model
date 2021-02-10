@@ -5,7 +5,6 @@ emission_factors_power_sector.py
 
 """
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 cache = dict()
