@@ -9,18 +9,30 @@ print('importing %s' % __file__)
 
 class OMEGABase:
     # define common behaviors for all OMEGA objects
-    @staticmethod
-    def get_attributes(obj, *args):
+    @classmethod
+    def get_class_attributes(cls, attribute_list):
         """
 
         Args:
-            obj: the object to get attributes from
-            *args: a list of attribute names
+            cls: the class to get attributes from
+            attribute_list: a list of attribute names
 
         Returns: a list containing the values of the requested attributes
 
         """
-        return [obj.__getattribute__(arg) for arg in args]
+        return [cls.__dict__[attr] for attr in attribute_list]
+
+    def get_object_attributes(self, attribute_list):
+        """
+
+        Args:
+            self: the object to get attributes from
+            attribute_list: a list of attribute names
+
+        Returns: a list containing the values of the requested attributes
+
+        """
+        return [self.__getattribute__(attr) for attr in attribute_list]
 
     def __repr__(self):
         return "<OMEGA2 %s object at 0x%x>" % (type(self).__name__,  id(self))

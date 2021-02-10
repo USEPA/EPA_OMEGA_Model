@@ -24,19 +24,16 @@ ref_dict = dict()
 pef_dict = dict()
 
 
-def get_vehicle_info(vehicle_id, query=False):
+def get_vehicle_info(vehicle_id):
     from vehicles import VehicleFinal
 
+    # add kwh_per_mile_cycle here when available in VehicleFinal
     attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_CO2_grams_per_mile']
 
-    if vehicle_id in vehicles_dict.keys() and not query:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_id] # add kwh_per_mile_cycle here when available in VehicleFinal
-    else:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile \
-            = VehicleFinal.get_vehicle_inventory_attributes(vehicle_id)  # , *attribute_list)
-        vehicles_dict[vehicle_id] = float(model_year), reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
+    if vehicle_id not in vehicles_dict:
+        vehicles_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)
 
-    return model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
+    return vehicles_dict[vehicle_id]
 
 
 def get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=False):
@@ -144,7 +141,7 @@ def calc_inventory(calendar_year):
 
     # UPDATE vehicle annual data related to effects
     for vad in vads:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad.vehicle_ID, query=query)  # add kwh_per_mile_cycle here
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad.vehicle_ID)  # add kwh_per_mile_cycle here
 
         # co2 and fuel consumption
         if in_use_fuel_ID == 'US electricity':
