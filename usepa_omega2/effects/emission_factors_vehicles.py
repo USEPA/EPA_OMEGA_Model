@@ -8,6 +8,8 @@ emission_factors_vehicles.py
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
+
 
 class EmissionFactorsVehicles(SQABase, OMEGABase):
     # --- database table properties ---
@@ -17,7 +19,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
     model_year = Column('model_year', Numeric)
     age = Column('age', Numeric)
     in_use_fuel_id = Column('in_use_fuel_id', String)
-    reg_class_id = Column('reg_class_id', String)
+    reg_class_ID = Column('reg_class_id', String)
     voc_grams_per_mile = Column('voc_grams_per_mile', Float)
     co_grams_per_mile = Column('co_grams_per_mile', Float)
     nox_grams_per_mile = Column('nox_grams_per_mile', Float)
@@ -32,7 +34,41 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
     n2o_grams_per_mile = Column('n2o_grams_per_mile', Float)
 
     @staticmethod
+    def get_emission_factors(model_year, age, reg_class_id, emission_factors):
+        """
+
+        Args:
+            model_year: vehicle model year to get emission factors for
+            emission_factors: name of emission factor or list of emission factor attributes to get
+
+        Returns: emission factor or list of emission factors
+
+        """
+        cache_key = '%s_%s_%s_%s' % (model_year, age, reg_class_id, emission_factors)
+
+        if cache_key not in cache:
+            if type(emission_factors) is not list:
+                cost_factors = [emission_factors]
+            attrs = EmissionFactorsVehicles.get_class_attributes(emission_factors)
+
+            result = o2.session.query(*attrs) \
+                .filter(EmissionFactorsVehicles.model_year == model_year) \
+                .filter(EmissionFactorsVehicles.age == age) \
+                .filter(EmissionFactorsVehicles.reg_class_ID == reg_class_id) \
+                .all()[0]
+
+            if len(emission_factors) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
@@ -60,7 +96,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
                     obj_list.append(EmissionFactorsVehicles(
                         model_year=df.loc[i, 'model_year'],
                         age=df.loc[i, 'age'],
-                        reg_class_id=df.loc[i, 'reg_class_id'],
+                        reg_class_ID=df.loc[i, 'reg_class_id'],
                         in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                         voc_grams_per_mile=df.loc[i, 'voc_grams_per_mile'],
                         co_grams_per_mile=df.loc[i, 'co_grams_per_mile'],

@@ -8,6 +8,8 @@ emission_factors_power_sector.py
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
+
 
 class EmissionFactorsPowersector(SQABase, OMEGABase):
     # --- database table properties ---
@@ -30,7 +32,37 @@ class EmissionFactorsPowersector(SQABase, OMEGABase):
     co2_grams_per_kWh = Column('co2_grams_per_kWh', Float)
 
     @staticmethod
+    def get_emission_factors(calendar_year, emission_factors):
+        """
+
+        Args:
+            calendar_year: calendar year to get emission factors for
+            emission_factors: name of emission factor or list of emission factor attributes to get
+
+        Returns: emission factor or list of emission factors
+
+        """
+        cache_key = '%s_%s' % (calendar_year, emission_factors)
+
+        if cache_key not in cache:
+            if type(emission_factors) is not list:
+                cost_factors = [emission_factors]
+            attrs = EmissionFactorsPowersector.get_class_attributes(emission_factors)
+
+            result = o2.session.query(*attrs).filter(EmissionFactorsPowersector.calendar_year == calendar_year).all()[0]
+
+            if len(emission_factors) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 

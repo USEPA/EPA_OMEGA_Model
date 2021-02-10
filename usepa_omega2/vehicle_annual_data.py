@@ -158,7 +158,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
         vad[0].vmt = vmt
 
     @staticmethod
-    def get_vehicles_by_cy(calendar_year):
+    def get_vehicle_annual_data(calendar_year):
         return o2.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
 
 

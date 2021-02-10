@@ -19,9 +19,6 @@ kwh_per_mile_cycle = 0.2 # TODO Placeholder - what are we doing about calculatin
 
 # create some empty dicts in which to store VehicleFinal objects and vehicle/refinery/powersector emission factors
 vehicles_dict = dict()
-vef_dict = dict()
-ref_dict = dict()
-pef_dict = dict()
 
 
 def get_vehicle_info(vehicle_id):
@@ -36,94 +33,72 @@ def get_vehicle_info(vehicle_id):
     return vehicles_dict[vehicle_id]
 
 
-def get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=False):
+def get_vehicle_ef(calendar_year, model_year, reg_class_id, query=False):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
 
+    emission_factors = [
+        'voc_grams_per_mile',
+        'co_grams_per_mile',
+        'nox_grams_per_mile',
+        'pm25_grams_per_mile',
+        'sox_grams_per_gallon',
+        'benzene_grams_per_mile',
+        'butadiene13_grams_per_mile',
+        'formaldehyde_grams_per_mile',
+        'acetaldehyde_grams_per_mile',
+        'acrolein_grams_per_mile',
+        'ch4_grams_per_mile',
+        'n2o_grams_per_mile',
+    ]
+
     age = calendar_year - model_year
-    vef_dict_id = f'{model_year}_{age}_{reg_class_ID}'
 
-    if vef_dict_id in vef_dict and not query:
-        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o = vef_dict[vef_dict_id]
-    else:
-        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
-            = o2.session.query(EmissionFactorsVehicles.voc_grams_per_mile,
-                               EmissionFactorsVehicles.co_grams_per_mile,
-                               EmissionFactorsVehicles.nox_grams_per_mile,
-                               EmissionFactorsVehicles.pm25_grams_per_mile,
-                               EmissionFactorsVehicles.sox_grams_per_gallon,
-                               EmissionFactorsVehicles.benzene_grams_per_mile,
-                               EmissionFactorsVehicles.butadiene13_grams_per_mile,
-                               EmissionFactorsVehicles.formaldehyde_grams_per_mile,
-                               EmissionFactorsVehicles.acetaldehyde_grams_per_mile,
-                               EmissionFactorsVehicles.acrolein_grams_per_mile,
-                               EmissionFactorsVehicles.ch4_grams_per_mile,
-                               EmissionFactorsVehicles.n2o_grams_per_mile,).\
-            filter(EmissionFactorsVehicles.model_year == model_year).\
-            filter(EmissionFactorsVehicles.age == age).\
-            filter(EmissionFactorsVehicles.reg_class_id == reg_class_ID).one()
-
-        vef_dict[vef_dict_id] = voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o
-
-    return voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o
+    return EmissionFactorsVehicles.get_emission_factors(model_year, age, reg_class_id, emission_factors)
 
 
 def get_powersector_ef(calendar_year, query=False):
     from effects.emission_factors_powersector import EmissionFactorsPowersector
 
-    pef_dict_id = f'{calendar_year}'
+    emission_factors = [
+        'voc_grams_per_kWh',
+        'co_grams_per_kWh',
+        'nox_grams_per_kWh',
+        'pm25_grams_per_kWh',
+        'sox_grams_per_kWh',
+        'benzene_grams_per_kWh',
+        'butadiene13_grams_per_kWh',
+        'formaldehyde_grams_per_kWh',
+        'acetaldehyde_grams_per_kWh',
+        'acrolein_grams_per_kWh',
+        'co2_grams_per_kWh',
+        'ch4_grams_per_kWh',
+        'n2o_grams_per_kWh',
+    ]
 
-    if pef_dict_id in pef_dict and not query:
-        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o = pef_dict[pef_dict_id]
-    else:
-        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
-            = o2.session.query(EmissionFactorsPowersector.voc_grams_per_kWh,
-                               EmissionFactorsPowersector.co_grams_per_kWh,
-                               EmissionFactorsPowersector.nox_grams_per_kWh,
-                               EmissionFactorsPowersector.pm25_grams_per_kWh,
-                               EmissionFactorsPowersector.sox_grams_per_kWh,
-                               EmissionFactorsPowersector.benzene_grams_per_kWh,
-                               EmissionFactorsPowersector.butadiene13_grams_per_kWh,
-                               EmissionFactorsPowersector.formaldehyde_grams_per_kWh,
-                               EmissionFactorsPowersector.acetaldehyde_grams_per_kWh,
-                               EmissionFactorsPowersector.acrolein_grams_per_kWh,
-                               EmissionFactorsPowersector.co2_grams_per_kWh,
-                               EmissionFactorsPowersector.ch4_grams_per_kWh,
-                               EmissionFactorsPowersector.n2o_grams_per_kWh,).\
-            filter(EmissionFactorsPowersector.calendar_year == calendar_year).one()
-
-        pef_dict[pef_dict_id] = voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o
-
-    return voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o
+    return EmissionFactorsPowersector.get_emission_factors(calendar_year, emission_factors)
 
 
-def get_refinery_ef(calendar_year, query=False):
+def get_refinery_ef(calendar_year):
     from effects.emission_factors_refinery import EmissionFactorsRefinery
 
-    ref_dict_id = f'{calendar_year}'
+    emission_factors = [
+        'voc_grams_per_gallon',
+        'co_grams_per_gallon',
+        'nox_grams_per_gallon',
+        'pm25_grams_per_gallon',
+        'sox_grams_per_gallon',
+        'benzene_grams_per_gallon',
+        'butadiene13_grams_per_gallon',
+        'formaldehyde_grams_per_gallon',
+        'acetaldehyde_grams_per_gallon',
+        'acrolein_grams_per_gallon',
+        'naphthalene_grams_per_gallon',
+        'co2_grams_per_gallon',
+        'ch4_grams_per_gallon',
+        'n2o_grams_per_gallon',
+    ]
 
-    if ref_dict_id in ref_dict and not query:
-        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o = ref_dict[ref_dict_id]
-    else:
-        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o \
-            = o2.session.query(EmissionFactorsRefinery.voc_grams_per_gallon,
-                               EmissionFactorsRefinery.co_grams_per_gallon,
-                               EmissionFactorsRefinery.nox_grams_per_gallon,
-                               EmissionFactorsRefinery.pm25_grams_per_gallon,
-                               EmissionFactorsRefinery.sox_grams_per_gallon,
-                               EmissionFactorsRefinery.benzene_grams_per_gallon,
-                               EmissionFactorsRefinery.butadiene13_grams_per_gallon,
-                               EmissionFactorsRefinery.formaldehyde_grams_per_gallon,
-                               EmissionFactorsRefinery.acetaldehyde_grams_per_gallon,
-                               EmissionFactorsRefinery.acrolein_grams_per_gallon,
-                               EmissionFactorsRefinery.naphthalene_grams_per_gallon,
-                               EmissionFactorsRefinery.co2_grams_per_gallon,
-                               EmissionFactorsRefinery.ch4_grams_per_gallon,
-                               EmissionFactorsRefinery.n2o_grams_per_gallon,).\
-            filter(EmissionFactorsRefinery.calendar_year == calendar_year).one()
-
-        ref_dict[ref_dict_id] = voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o
-
-    return voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o
+    return EmissionFactorsRefinery.get_emission_factors(calendar_year, emission_factors)
 
 
 def calc_inventory(calendar_year):
@@ -137,7 +112,7 @@ def calc_inventory(calendar_year):
 
     query = False
 
-    vads = VehicleAnnualData.get_vehicles_by_cy(calendar_year)
+    vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
     # UPDATE vehicle annual data related to effects
     for vad in vads:
