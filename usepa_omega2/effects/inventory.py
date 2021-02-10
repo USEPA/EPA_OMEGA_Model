@@ -32,12 +32,8 @@ def get_vehicle_info(vehicle_obj, query=False):
     if vehicle_obj.vehicle_ID in vehicles_dict.keys() and not query:
         model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_obj.vehicle_ID] # add kwh_per_mile_cycle here when available in VehicleFinal
     else:
-        # model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = \
-        #     o2.session.query(VehicleFinal.model_year, VehicleFinal.reg_class_ID,
-        #                      VehicleFinal.in_use_fuel_ID, VehicleFinal.cert_CO2_grams_per_mile).\
-        #         filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
         model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile \
-            = VehicleFinal.get_vehicle_attributes(vehicle_obj, *attribute_list)
+            = VehicleFinal.get_attributes(vehicle_obj, *attribute_list)
         vehicles_dict[vehicle_obj.vehicle_ID] = model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
 
     return model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile

@@ -438,16 +438,6 @@ class VehicleFinal(SQABase, Vehicle):
         return template_errors
 
     @staticmethod
-    def get_vehicle_attributes(obj, *args):
-        # TODO: this could literally apply to any class or object, there is nothing specific here about VehicleFinal
-        # return_list = []
-        # for arg in args:
-        #     return_list.append(obj.__getattribute__(arg))
-        # return return_list
-        # simpler as a list comprehension:
-        return [obj.__getattribute__(arg) for arg in args]
-
-    @staticmethod
     def get_manufacturer_vehicles(calendar_year, manufacturer_id):
         return o2.session.query(VehicleFinal). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
