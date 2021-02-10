@@ -104,33 +104,43 @@ class CostCloud(SQABase, OMEGABase):
 
     @staticmethod
     def calculate_frontier(cloud, GHG_gpmi, GHG_cost):
+        """
+        Args:
+            cloud:
+            GHG_gpmi:
+            GHG_cost:
+
+        Returns:
+
+        """
         cloud = cloud.copy()
 
-        result_df = pd.DataFrame()
+        frontier_pts = []
 
         # find frontier starting point, lowest GHGs, and add to frontier
-        result_df = result_df.append(cloud.loc[cloud[GHG_gpmi].idxmin()])
+        frontier_pts.append(cloud.loc[cloud[GHG_gpmi].idxmin()])
 
         # keep lower cost points
-        cloud = cloud[cloud[GHG_cost] < result_df[GHG_cost].iloc[-1]]
+        cloud = cloud[cloud[GHG_cost] < frontier_pts[-1][GHG_cost]]
 
         while len(cloud):
             # calculate frontier factor (more negative is more better) = slope of each point relative
             # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-            cloud['frontier_factor'] = (cloud[GHG_cost] - result_df[GHG_cost].iloc[-1]) \
-                                       / (cloud[GHG_gpmi] - result_df[GHG_gpmi].iloc[-1]) \
+            cloud['frontier_factor'] = (cloud[GHG_cost] - frontier_pts[-1][GHG_cost]) \
+                                       / (cloud[GHG_gpmi] - frontier_pts[-1][GHG_gpmi]) \
                                        ** o2.options.cost_curve_frontier_affinity_factor
 
-            # find next frontier point, lowest slope, and add to frontier lists
-            result_df = result_df.append(cloud.loc[cloud['frontier_factor'].idxmin()])
+            # find next frontier point (lowest slope) and add to frontier list
+            frontier_pts.append(cloud.loc[cloud['frontier_factor'].idxmin()])
 
-            # keep lower cost points
-            cloud = cloud[cloud[GHG_cost] < result_df[GHG_cost].iloc[-1]]
+            # keep lower cost points (smaller cloud)
+            cloud = cloud[cloud[GHG_cost] < frontier_pts[-1][GHG_cost]]
 
-        result_df = result_df.drop('frontier_factor', axis=1)
+        result_df_foo = pd.concat(frontier_pts, axis=1)
+        result_df_foo = result_df_foo.transpose()
+        # result_df_foo = result_df_foo.drop('frontier_factor', axis=1)
 
-        return result_df
-
+        return result_df_foo
 
     def calculate_generalized_cost(self, cost_curve_class):
         print(cost_curve_class)
