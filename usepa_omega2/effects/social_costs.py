@@ -10,7 +10,6 @@ import o2
 from usepa_omega2 import *
 
 # create some empty dicts in which to store VehicleFinal objects and scc/criteria cost factors
-scf_dict = dict()
 ccf_dict = dict()
 es_dict = dict()
 cn_dict = dict()
@@ -19,56 +18,26 @@ cn_dict = dict()
 def get_scc_cf(calendar_year, query=False):
     from effects.cost_factors_scc import CostFactorsSCC
 
-    scf_dict_id = f'{calendar_year}'
+    cost_factors = ['co2_domestic_cost_factor_25',
+                    'co2_domestic_cost_factor_30',
+                    'co2_domestic_cost_factor_70',
+                    'ch4_domestic_cost_factor_25',
+                    'ch4_domestic_cost_factor_30',
+                    'ch4_domestic_cost_factor_70',
+                    'n2o_domestic_cost_factor_25',
+                    'n2o_domestic_cost_factor_30',
+                    'n2o_domestic_cost_factor_70',
+                    'co2_global_cost_factor_25',
+                    'co2_global_cost_factor_30',
+                    'co2_global_cost_factor_70',
+                    'ch4_global_cost_factor_25',
+                    'ch4_global_cost_factor_30',
+                    'ch4_global_cost_factor_70',
+                    'n2o_global_cost_factor_25',
+                    'n2o_global_cost_factor_30',
+                    'n2o_global_cost_factor_70']
 
-    if scf_dict_id in scf_dict and not query:
-        co2_domestic_25, co2_domestic_30, co2_domestic_70, \
-        ch4_domestic_25, ch4_domestic_30, ch4_domestic_70, \
-        n2o_domestic_25, n2o_domestic_30, n2o_domestic_70, \
-        co2_global_25, co2_global_30, co2_global_70, \
-        ch4_global_25, ch4_global_30, ch4_global_70, \
-        n2o_global_25, n2o_global_30, n2o_global_70 \
-            = scf_dict[scf_dict_id]
-    else:
-        co2_domestic_25, co2_domestic_30, co2_domestic_70, \
-        ch4_domestic_25, ch4_domestic_30, ch4_domestic_70, \
-        n2o_domestic_25, n2o_domestic_30, n2o_domestic_70, \
-        co2_global_25, co2_global_30, co2_global_70, \
-        ch4_global_25, ch4_global_30, ch4_global_70, \
-        n2o_global_25, n2o_global_30, n2o_global_70 \
-            = o2.session.query(CostFactorsSCC.co2_domestic_cost_factor_25, 
-                               CostFactorsSCC.co2_domestic_cost_factor_30, 
-                               CostFactorsSCC.co2_domestic_cost_factor_70,
-                               CostFactorsSCC.ch4_domestic_cost_factor_25,
-                               CostFactorsSCC.ch4_domestic_cost_factor_30,
-                               CostFactorsSCC.ch4_domestic_cost_factor_70,
-                               CostFactorsSCC.n2o_domestic_cost_factor_25,
-                               CostFactorsSCC.n2o_domestic_cost_factor_30,
-                               CostFactorsSCC.n2o_domestic_cost_factor_70,
-                               CostFactorsSCC.co2_global_cost_factor_25,
-                               CostFactorsSCC.co2_global_cost_factor_30,
-                               CostFactorsSCC.co2_global_cost_factor_70,
-                               CostFactorsSCC.ch4_global_cost_factor_25,
-                               CostFactorsSCC.ch4_global_cost_factor_30,
-                               CostFactorsSCC.ch4_global_cost_factor_70,
-                               CostFactorsSCC.n2o_global_cost_factor_25,
-                               CostFactorsSCC.n2o_global_cost_factor_30,
-                               CostFactorsSCC.n2o_global_cost_factor_70).\
-            filter(CostFactorsSCC.calendar_year == calendar_year).one()
-
-        scf_dict[scf_dict_id] = co2_domestic_25, co2_domestic_30, co2_domestic_70, \
-                                ch4_domestic_25, ch4_domestic_30, ch4_domestic_70, \
-                                n2o_domestic_25, n2o_domestic_30, n2o_domestic_70, \
-                                co2_global_25, co2_global_30, co2_global_70, \
-                                ch4_global_25, ch4_global_30, ch4_global_70, \
-                                n2o_global_25, n2o_global_30, n2o_global_70
-
-    return co2_domestic_25, co2_domestic_30, co2_domestic_70, \
-           ch4_domestic_25, ch4_domestic_30, ch4_domestic_70, \
-           n2o_domestic_25, n2o_domestic_30, n2o_domestic_70, \
-           co2_global_25, co2_global_30, co2_global_70, \
-           ch4_global_25, ch4_global_30, ch4_global_70, \
-           n2o_global_25, n2o_global_30, n2o_global_70
+    return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
 
 def get_criteria_cf(calendar_year, query=False):

@@ -10,6 +10,7 @@ import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 
+cache = dict()
 
 class CostFactorsSCC(SQABase, OMEGABase):
     # --- database table properties ---
@@ -37,9 +38,39 @@ class CostFactorsSCC(SQABase, OMEGABase):
     n2o_global_cost_factor_30 = Column('n2o_global_3.0_USD_per_metricton', Float)
     n2o_global_cost_factor_70 = Column('n2o_global_7.0_USD_per_metricton', Float)
 
+    @staticmethod
+    def get_cost_factors(calendar_year, cost_factors):
+        """
+
+        Args:
+            calendar_year: calendar year to get cost factors for
+            cost_factors: name of cost factor or list of cost factor attributes to get
+
+        Returns: cost factor or list of cost factors
+
+        """
+        cache_key = '%s_%s' % (calendar_year, cost_factors)
+
+        if cache_key not in cache:
+            if type(cost_factors) is not list:
+                cost_factors = [cost_factors]
+            attrs = CostFactorsSCC.get_class_attributes(cost_factors)
+
+            result = o2.session.query(*attrs).filter(CostFactorsSCC.calendar_year == calendar_year).all()[0]
+
+            if len(cost_factors) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
