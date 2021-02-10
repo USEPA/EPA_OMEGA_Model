@@ -9,10 +9,6 @@ emission_costs.py
 import o2
 from usepa_omega2 import *
 
-# create some empty dicts in which to store VehicleFinal objects and scc/criteria cost factors
-es_dict = dict()
-cn_dict = dict()
-
 
 def get_scc_cf(calendar_year, query=False):
     from effects.cost_factors_scc import CostFactorsSCC
@@ -59,35 +55,23 @@ def get_criteria_cf(calendar_year, query=False):
 def get_energysecurity_cf(calendar_year, query=False):
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
-    es_dict_id = f'{calendar_year}'
+    cost_factors = [
+        'dollars_per_gallon',
+        'foreign_oil_fraction',
+    ]
 
-    if es_dict_id in es_dict and not query:
-        es_cf, foreign_oil_fraction = es_dict[es_dict_id]
-    else:
-        es_cf, foreign_oil_fraction = o2.session.query(CostFactorsEnergySecurity.dollars_per_gallon,
-                                                       CostFactorsEnergySecurity.foreign_oil_fraction). \
-            filter(CostFactorsEnergySecurity.calendar_year == calendar_year).one()
-
-        es_dict[es_dict_id] = es_cf, foreign_oil_fraction
-
-    return es_cf, foreign_oil_fraction
+    return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
 
 
 def get_congestion_noise_cf(reg_class_id, query=False):
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
 
-    cn_dict_id = f'{reg_class_id}'
+    cost_factors = [
+        'congestion_cost_dollars_per_mile',
+        'noise_cost_dollars_per_mile',
+    ]
 
-    if cn_dict_id in cn_dict and not query:
-        congestion_cf, noise_cf = cn_dict[cn_dict_id]
-    else:
-        congestion_cf, noise_cf = o2.session.query(CostFactorsCongestionNoise.congestion_cost_dollars_per_mile,
-                                                   CostFactorsCongestionNoise.noise_cost_dollars_per_mile). \
-            filter(CostFactorsCongestionNoise.reg_class_id == reg_class_id).one()
-
-        cn_dict[cn_dict_id] = congestion_cf, noise_cf
-
-    return congestion_cf, noise_cf
+    return CostFactorsCongestionNoise.get_cost_factors(reg_class_id, cost_factors)
 
 
 def calc_carbon_emission_costs(calendar_year):
@@ -101,20 +85,20 @@ def calc_carbon_emission_costs(calendar_year):
 
     query = False
 
-    vad_vehs = o2.session.query(VehicleAnnualData.vehicle_ID,
-                                VehicleAnnualData.age,
-                                VehicleAnnualData.co2_total_metrictons,
-                                VehicleAnnualData.ch4_total_metrictons,
-                                VehicleAnnualData.n2o_vehicle_metrictons).\
+    vads = o2.session.query(VehicleAnnualData.vehicle_ID,
+                            VehicleAnnualData.age,
+                            VehicleAnnualData.co2_total_metrictons,
+                            VehicleAnnualData.ch4_total_metrictons,
+                            VehicleAnnualData.n2o_vehicle_metrictons). \
         filter(VehicleAnnualData.calendar_year == calendar_year).all()
 
     # UPDATE cost effects data
     # Since the monetized effects data table is empty, the med_list will store all data for this calendar year
     # and write to that table in bulk via the add all.
     ed_list = list()
-    for vad_veh in vad_vehs:
+    for vad in vads:
         # get tons
-        vehicle_ID, age, co2_tons, ch4_tons, n2o_tons = vad_veh[0], vad_veh[1], vad_veh[2], vad_veh[3], vad_veh[4]
+        vehicle_ID, age, co2_tons, ch4_tons, n2o_tons = vad[0], vad[1], vad[2], vad[3], vad[4]
         
         # get cost factors
         co2_domestic_25, co2_domestic_30, co2_domestic_70, \

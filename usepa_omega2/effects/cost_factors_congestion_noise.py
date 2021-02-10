@@ -11,18 +11,49 @@ import o2  # import global variables
 from usepa_omega2 import *
 import usepa_omega2.effects.general_functions as gen_fxns
 
+cache = dict()
+
 
 class CostFactorsCongestionNoise(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_congestion_noise'
     index = Column('index', Integer, primary_key=True)
-    reg_class_id = Column(String)
+    reg_class_ID = Column(String)
     dollar_basis = Column(Numeric)
     congestion_cost_dollars_per_mile = Column(Float)
     noise_cost_dollars_per_mile = Column(Float)
 
     @staticmethod
+    def get_cost_factors(reg_class_id, cost_factors):
+        """
+
+        Args:
+            reg_class_id: reg class to get cost factors for
+            cost_factors: name of cost factor or list of cost factor attributes to get
+
+        Returns: cost factor or list of cost factors
+
+        """
+        cache_key = '%s_%s' % (reg_class_id, cost_factors)
+
+        if cache_key not in cache:
+            if type(cost_factors) is not list:
+                cost_factors = [cost_factors]
+            attrs = CostFactorsCongestionNoise.get_class_attributes(cost_factors)
+
+            result = o2.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_ID == reg_class_id).all()[0]
+
+            if len(cost_factors) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
@@ -52,7 +83,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(CostFactorsCongestionNoise(
-                        reg_class_id = df.loc[i, 'reg_class_id'],
+                        reg_class_ID = df.loc[i, 'reg_class_id'],
                         dollar_basis = df.loc[i, 'dollar_basis'],
                         congestion_cost_dollars_per_mile = df.loc[i, 'congestion_cost_dollars_per_mile'],
                         noise_cost_dollars_per_mile = df.loc[i, 'noise_cost_dollars_per_mile'],
