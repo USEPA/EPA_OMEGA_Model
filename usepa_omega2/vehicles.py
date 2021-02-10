@@ -444,8 +444,10 @@ class VehicleFinal(SQABase, Vehicle):
             filter(VehicleFinal.model_year == calendar_year).all()
 
     @staticmethod
-    def get_vehicle_attributes(vehicle_id, attribute_list):
-        attrs = VehicleFinal.get_class_attributes(attribute_list)
+    def get_vehicle_attributes(vehicle_id, attributes):
+        if type(attributes) is not list:
+            attributes = [attributes]
+        attrs = VehicleFinal.get_class_attributes(attributes)
         return o2.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
 
     @staticmethod

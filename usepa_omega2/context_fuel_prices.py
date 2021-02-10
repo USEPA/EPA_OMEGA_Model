@@ -28,31 +28,68 @@ class ContextFuelPrices(SQABase, OMEGABase):
     pretax_dollars_per_unit = Column(Float)
 
     @staticmethod
-    def get_retail_fuel_price(calendar_year, fuel_ID):
+    def get_fuel_prices(calendar_year, price_types, fuel_id):
+        """
+
+        Args:
+            calendar_year: calendar year to get price for
+            price_types: a string or list of strings of the ContextFuelPrices attributes to get
+            fuel_id: fuel ID
+
+        Returns: fuel price or tuple of fuel prices
+
+        """
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        cache_key = '%s_%s_%s_%s_retail_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_ID)
+        cache_key = '%s_%s_%s_%s_%s' % \
+                    (o2.options.context_id, o2.options.context_case_id, calendar_year, price_types, fuel_id)
+
+        if cache_key not in cache:
+            if type(price_types) is not list:
+                price_types = [price_types]
+
+            attrs = ContextFuelPrices.get_class_attributes(price_types)
+
+            result = o2.session.query(*attrs).\
+                filter(ContextFuelPrices.context_ID == o2.options.context_id).\
+                filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
+                filter(ContextFuelPrices.calendar_year == calendar_year).\
+                filter(ContextFuelPrices.fuel_ID == fuel_id).all()[0]
+
+            if len(price_types) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+    @staticmethod
+    def get_retail_fuel_price(calendar_year, fuel_id):
+        if o2.options.flat_context:
+            calendar_year = o2.options.flat_context_year
+
+        cache_key = '%s_%s_%s_%s_retail_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_id)
         if cache_key not in cache:
             cache[cache_key] = o2.session.query(ContextFuelPrices.retail_dollars_per_unit).\
                 filter(ContextFuelPrices.context_ID == o2.options.context_id).\
                 filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
                 filter(ContextFuelPrices.calendar_year == calendar_year).\
-                filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+                filter(ContextFuelPrices.fuel_ID == fuel_id).one()[0]
         return cache[cache_key]
 
     @staticmethod
-    def get_pretax_fuel_price(calendar_year, fuel_ID):
+    def get_pretax_fuel_price(calendar_year, fuel_id):
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        cache_key = '%s_%s_%s_%s_pretax_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_ID)
+        cache_key = '%s_%s_%s_%s_pretax_fuel_price' % (o2.options.context_id, o2.options.context_case_id, calendar_year, fuel_id)
         if cache_key not in cache:
             cache[cache_key] = o2.session.query(ContextFuelPrices.pretax_dollars_per_unit).\
                 filter(ContextFuelPrices.context_ID == o2.options.context_id).\
                 filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
                 filter(ContextFuelPrices.calendar_year == calendar_year).\
-                filter(ContextFuelPrices.fuel_ID == fuel_ID).one()[0]
+                filter(ContextFuelPrices.fuel_ID == fuel_id).one()[0]
         return cache[cache_key]
 
     @staticmethod
@@ -117,6 +154,11 @@ if __name__ == '__main__':
 
             print(ContextFuelPrices.get_retail_fuel_price(2020, 'pump gasoline'))
             print(ContextFuelPrices.get_pretax_fuel_price(2020, 'pump gasoline'))
+
+            print(ContextFuelPrices.get_fuel_price(2020, 'retail_dollars_per_unit', 'pump gasoline'))
+            print(ContextFuelPrices.get_fuel_price(2020, 'pretax_dollars_per_unit', 'pump gasoline'))
+            print(ContextFuelPrices.get_fuel_price(2020, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline'))
+
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

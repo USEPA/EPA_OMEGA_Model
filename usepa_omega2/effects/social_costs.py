@@ -13,7 +13,6 @@ from usepa_omega2 import *
 vehicles_dict = dict()
 scf_dict = dict()
 ccf_dict = dict()
-fp_dict = dict()
 es_dict = dict()
 cn_dict = dict()
 
@@ -109,24 +108,6 @@ def get_criteria_cf(calendar_year, query=False):
         ccf_dict[ccf_dict_id] = pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7
 
     return pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7
-
-
-def get_fuel_prices(calendar_year, fuel_id, query=False):
-    from context_fuel_prices import ContextFuelPrices
-
-    fp_dict_id = f'{calendar_year}_{fuel_id}'
-
-    if fp_dict_id in fp_dict and not query:
-        retail, pretax = fp_dict[fp_dict_id]
-    else:
-        retail, pretax = o2.session.query(ContextFuelPrices.retail_dollars_per_unit,
-                                          ContextFuelPrices.pretax_dollars_per_unit). \
-            filter(ContextFuelPrices.calendar_year == calendar_year).\
-            filter(ContextFuelPrices.fuel_ID == fuel_id).one()
-
-        fp_dict[fp_dict_id] = retail, pretax
-
-    return retail, pretax
 
 
 def get_energysecurity_cf(calendar_year, query=False):
@@ -313,6 +294,7 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
     """
     from vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
+    from context_fuel_prices import ContextFuelPrices
 
     query = False
 
@@ -332,7 +314,9 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
         reg_class_ID, in_use_fuel_ID = get_vehicle_info(vehicle_ID, query=query)
 
         # get fuel prices
-        retail, pretax = get_fuel_prices(calendar_year, in_use_fuel_ID, query=query)
+        retail, pretax = ContextFuelPrices.get_fuel_prices(calendar_year,
+                                                          ['retail_dollars_per_unit', 'pretax_dollars_per_unit'],
+                                                          in_use_fuel_ID)
 
         # fuel costs
         fuel_30_retail_cost_dollars = fuel_consumption * retail
