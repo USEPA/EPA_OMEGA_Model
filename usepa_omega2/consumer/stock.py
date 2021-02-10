@@ -44,18 +44,14 @@ def get_scrappage_factor(calendar_year, market_class_ID, model_year, query=False
 
 
 vehicles_dict = dict()
-def get_vehicle_info(vehicle_ID, query=False):
+def get_vehicle_info(vehicle_ID):
     from vehicles import VehicleFinal
 
-    if vehicle_ID in vehicles_dict and not query:
-        market_class_ID, model_year, initial_registered_count = vehicles_dict[vehicle_ID]
-    else:
-        market_class_ID, model_year, initial_registered_count = \
-            o2.session.query(VehicleFinal.market_class_ID, VehicleFinal.model_year, VehicleFinal._initial_registered_count).\
-            filter(VehicleFinal.vehicle_ID == vehicle_ID).one()
-        vehicles_dict[vehicle_ID] = market_class_ID, model_year, initial_registered_count
+    if vehicle_ID not in vehicles_dict:
+        vehicles_dict[vehicle_ID] = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['market_class_ID', 'model_year',
+                                                                                     '_initial_registered_count'])
 
-    return market_class_ID, model_year, initial_registered_count
+    return vehicles_dict[vehicle_ID]
 
 
 def update_stock(calendar_year):
@@ -67,7 +63,6 @@ def update_stock(calendar_year):
     """
     query = False
 
-    from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
 
     # pull in this year's vehicle ids:
@@ -76,7 +71,7 @@ def update_stock(calendar_year):
     o2.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
-        market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID, query=query)
+        market_class_ID, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
 
         scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year, query=query)
 
@@ -94,7 +89,7 @@ def update_stock(calendar_year):
     # CREATE vehicle annual data for last year's stock, now one year older:
     if prior_year_vehicle_ids:
         for vehicle_ID in prior_year_vehicle_ids:
-            market_class_ID, model_year, initial_registered_count = get_vehicle_info(vehicle_ID, query=query)
+            market_class_ID, model_year, initial_registered_count = get_vehicle_info(vehicle_ID)
 
             scrappage_factor = get_scrappage_factor(calendar_year, market_class_ID, model_year, query=query)
 
