@@ -24,17 +24,17 @@ ref_dict = dict()
 pef_dict = dict()
 
 
-def get_vehicle_info(vehicle_obj, query=False):
+def get_vehicle_info(vehicle_id, query=False):
     from vehicles import VehicleFinal
 
     attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_CO2_grams_per_mile']
 
-    if vehicle_obj.vehicle_ID in vehicles_dict.keys() and not query:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_obj.vehicle_ID] # add kwh_per_mile_cycle here when available in VehicleFinal
+    if vehicle_id in vehicles_dict.keys() and not query:
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = vehicles_dict[vehicle_id] # add kwh_per_mile_cycle here when available in VehicleFinal
     else:
         model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile \
-            = VehicleFinal.get_attributes(vehicle_obj, *attribute_list)
-        vehicles_dict[vehicle_obj.vehicle_ID] = model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
+            = VehicleFinal.get_vehicle_inventory_attributes(vehicle_id)  # , *attribute_list)
+        vehicles_dict[vehicle_id] = float(model_year), reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
 
     return model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile
 
@@ -140,59 +140,58 @@ def calc_inventory(calendar_year):
 
     query = False
 
-    vad_vehs = VehicleAnnualData.get_vehicles_by_cy(calendar_year)
+    vads = VehicleAnnualData.get_vehicles_by_cy(calendar_year)
 
     # UPDATE vehicle annual data related to effects
-    for vad_veh in vad_vehs:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh, query=query)  # add kwh_per_mile_cycle here
-        # model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad_veh.vehicle_ID, query=query) # add kwh_per_mile_cycle here
+    for vad in vads:
+        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad.vehicle_ID, query=query)  # add kwh_per_mile_cycle here
 
         # co2 and fuel consumption
         if in_use_fuel_ID == 'US electricity':
-            vad_veh.onroad_co2_grams_per_mile = 0
-            vad_veh.onroad_fuel_consumption_rate = kwh_per_mile_cycle / gap_bev # TODO placeholder for now
-            vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
+            vad.onroad_co2_grams_per_mile = 0
+            vad.onroad_fuel_consumption_rate = kwh_per_mile_cycle / gap_bev  # TODO placeholder for now
+            vad.fuel_consumption = vad.vmt * vad.onroad_fuel_consumption_rate
         else:
-            vad_veh.onroad_co2_grams_per_mile = cert_CO2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
-            vad_veh.onroad_fuel_consumption_rate = vad_veh.onroad_co2_grams_per_mile / co2_indolene  # TODO is this how we're doing this?
-            vad_veh.fuel_consumption = vad_veh.vmt * vad_veh.onroad_fuel_consumption_rate
+            vad.onroad_co2_grams_per_mile = cert_CO2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
+            vad.onroad_fuel_consumption_rate = vad.onroad_co2_grams_per_mile / co2_indolene  # TODO is this how we're doing this?
+            vad.fuel_consumption = vad.vmt * vad.onroad_fuel_consumption_rate
 
         # vehicle inventory
         if in_use_fuel_ID == 'US electricity':
-            vad_veh.voc_vehicle_ustons = 0
-            vad_veh.co_vehicle_ustons = 0
-            vad_veh.nox_vehicle_ustons = 0
-            vad_veh.pm25_vehicle_ustons = 0
-            vad_veh.benzene_vehicle_ustons = 0
-            vad_veh.butadiene13_vehicle_ustons = 0
-            vad_veh.formaldehyde_vehicle_ustons = 0
-            vad_veh.acetaldehyde_vehicle_ustons = 0
-            vad_veh.acrolein_vehicle_ustons = 0
+            vad.voc_vehicle_ustons = 0
+            vad.co_vehicle_ustons = 0
+            vad.nox_vehicle_ustons = 0
+            vad.pm25_vehicle_ustons = 0
+            vad.benzene_vehicle_ustons = 0
+            vad.butadiene13_vehicle_ustons = 0
+            vad.formaldehyde_vehicle_ustons = 0
+            vad.acetaldehyde_vehicle_ustons = 0
+            vad.acrolein_vehicle_ustons = 0
 
-            vad_veh.sox_vehicle_ustons = 0
+            vad.sox_vehicle_ustons = 0
 
-            vad_veh.ch4_vehicle_metrictons = 0
-            vad_veh.n2o_vehicle_metrictons = 0
-            vad_veh.co2_vehicle_metrictons = 0
+            vad.ch4_vehicle_metrictons = 0
+            vad.n2o_vehicle_metrictons = 0
+            vad.co2_vehicle_metrictons = 0
         else:
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
                 = get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=query)
 
-            vad_veh.voc_vehicle_ustons = vad_veh.vmt * voc / grams_per_us_ton
-            vad_veh.co_vehicle_ustons = vad_veh.vmt * co / grams_per_us_ton
-            vad_veh.nox_vehicle_ustons = vad_veh.vmt * nox / grams_per_us_ton
-            vad_veh.pm25_vehicle_ustons = vad_veh.vmt * pm25 / grams_per_us_ton
-            vad_veh.benzene_vehicle_ustons = vad_veh.vmt * benzene / grams_per_us_ton
-            vad_veh.butadiene13_vehicle_ustons = vad_veh.vmt * butadiene13 / grams_per_us_ton
-            vad_veh.formaldehyde_vehicle_ustons = vad_veh.vmt * formaldehyde / grams_per_us_ton
-            vad_veh.acetaldehyde_vehicle_ustons = vad_veh.vmt * acetaldehyde / grams_per_us_ton
-            vad_veh.acrolein_vehicle_ustons = vad_veh.vmt * acrolein / grams_per_us_ton
+            vad.voc_vehicle_ustons = vad.vmt * voc / grams_per_us_ton
+            vad.co_vehicle_ustons = vad.vmt * co / grams_per_us_ton
+            vad.nox_vehicle_ustons = vad.vmt * nox / grams_per_us_ton
+            vad.pm25_vehicle_ustons = vad.vmt * pm25 / grams_per_us_ton
+            vad.benzene_vehicle_ustons = vad.vmt * benzene / grams_per_us_ton
+            vad.butadiene13_vehicle_ustons = vad.vmt * butadiene13 / grams_per_us_ton
+            vad.formaldehyde_vehicle_ustons = vad.vmt * formaldehyde / grams_per_us_ton
+            vad.acetaldehyde_vehicle_ustons = vad.vmt * acetaldehyde / grams_per_us_ton
+            vad.acrolein_vehicle_ustons = vad.vmt * acrolein / grams_per_us_ton
 
-            vad_veh.sox_vehicle_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
+            vad.sox_vehicle_ustons = vad.fuel_consumption * sox / grams_per_us_ton
 
-            vad_veh.ch4_vehicle_metrictons = vad_veh.vmt * ch4 / grams_per_metric_ton
-            vad_veh.n2o_vehicle_metrictons = vad_veh.vmt * n2o / grams_per_metric_ton
-            vad_veh.co2_vehicle_metrictons = vad_veh.vmt * vad_veh.onroad_co2_grams_per_mile / grams_per_metric_ton
+            vad.ch4_vehicle_metrictons = vad.vmt * ch4 / grams_per_metric_ton
+            vad.n2o_vehicle_metrictons = vad.vmt * n2o / grams_per_metric_ton
+            vad.co2_vehicle_metrictons = vad.vmt * vad.onroad_co2_grams_per_mile / grams_per_metric_ton
 
         # upstream inventory
         if in_use_fuel_ID == 'US electricity':
@@ -202,39 +201,39 @@ def calc_inventory(calendar_year):
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o \
                 = get_refinery_ef(calendar_year, query=query)
 
-        vad_veh.voc_upstream_ustons = vad_veh.fuel_consumption * voc / grams_per_us_ton
-        vad_veh.co_upstream_ustons = vad_veh.fuel_consumption * co / grams_per_us_ton
-        vad_veh.nox_upstream_ustons = vad_veh.fuel_consumption * nox / grams_per_us_ton
-        vad_veh.pm25_upstream_ustons = vad_veh.fuel_consumption * pm25 / grams_per_us_ton
-        vad_veh.benzene_upstream_ustons = vad_veh.fuel_consumption * benzene / grams_per_us_ton
-        vad_veh.butadiene13_upstream_ustons = vad_veh.fuel_consumption * butadiene13 / grams_per_us_ton
-        vad_veh.formaldehyde_upstream_ustons = vad_veh.fuel_consumption * formaldehyde / grams_per_us_ton
-        vad_veh.acetaldehyde_upstream_ustons = vad_veh.fuel_consumption * acetaldehyde / grams_per_us_ton
-        vad_veh.acrolein_upstream_ustons = vad_veh.fuel_consumption * acrolein / grams_per_us_ton
+        vad.voc_upstream_ustons = vad.fuel_consumption * voc / grams_per_us_ton
+        vad.co_upstream_ustons = vad.fuel_consumption * co / grams_per_us_ton
+        vad.nox_upstream_ustons = vad.fuel_consumption * nox / grams_per_us_ton
+        vad.pm25_upstream_ustons = vad.fuel_consumption * pm25 / grams_per_us_ton
+        vad.benzene_upstream_ustons = vad.fuel_consumption * benzene / grams_per_us_ton
+        vad.butadiene13_upstream_ustons = vad.fuel_consumption * butadiene13 / grams_per_us_ton
+        vad.formaldehyde_upstream_ustons = vad.fuel_consumption * formaldehyde / grams_per_us_ton
+        vad.acetaldehyde_upstream_ustons = vad.fuel_consumption * acetaldehyde / grams_per_us_ton
+        vad.acrolein_upstream_ustons = vad.fuel_consumption * acrolein / grams_per_us_ton
 
         if in_use_fuel_ID == 'US electricity':
-            vad_veh.naphthalene_upstream_ustons = 0
+            vad.naphthalene_upstream_ustons = 0
         else:
-            vad_veh.naphthalene_upstream_ustons = vad_veh.fuel_consumption * naphthalene / grams_per_us_ton
+            vad.naphthalene_upstream_ustons = vad.fuel_consumption * naphthalene / grams_per_us_ton
 
-        vad_veh.sox_upstream_ustons = vad_veh.fuel_consumption * sox / grams_per_us_ton
+        vad.sox_upstream_ustons = vad.fuel_consumption * sox / grams_per_us_ton
 
-        vad_veh.ch4_upstream_metrictons = vad_veh.fuel_consumption * ch4 / grams_per_metric_ton
-        vad_veh.n2o_upstream_metrictons = vad_veh.fuel_consumption * n2o / grams_per_metric_ton
-        vad_veh.co2_upstream_metrictons = vad_veh.fuel_consumption * co2 / grams_per_metric_ton
+        vad.ch4_upstream_metrictons = vad.fuel_consumption * ch4 / grams_per_metric_ton
+        vad.n2o_upstream_metrictons = vad.fuel_consumption * n2o / grams_per_metric_ton
+        vad.co2_upstream_metrictons = vad.fuel_consumption * co2 / grams_per_metric_ton
 
         # sum vehicle and upstream into totals
-        vad_veh.voc_total_ustons = vad_veh.voc_vehicle_ustons + vad_veh.voc_upstream_ustons
-        vad_veh.co_total_ustons = vad_veh.co_vehicle_ustons + vad_veh.co_upstream_ustons
-        vad_veh.nox_total_ustons = vad_veh.nox_vehicle_ustons + vad_veh.nox_upstream_ustons
-        vad_veh.pm25_total_ustons = vad_veh.pm25_vehicle_ustons + vad_veh.pm25_upstream_ustons
-        vad_veh.benzene_total_ustons = vad_veh.benzene_vehicle_ustons + vad_veh.benzene_upstream_ustons
-        vad_veh.butadiene13_total_ustons = vad_veh.butadiene13_vehicle_ustons + vad_veh.butadiene13_upstream_ustons
-        vad_veh.formaldehyde_total_ustons = vad_veh.formaldehyde_vehicle_ustons + vad_veh.formaldehyde_upstream_ustons
-        vad_veh.acetaldehyde_total_ustons = vad_veh.acetaldehyde_vehicle_ustons + vad_veh.acetaldehyde_upstream_ustons
-        vad_veh.acrolein_total_ustons = vad_veh.acrolein_vehicle_ustons + vad_veh.acrolein_upstream_ustons
-        vad_veh.naphthalene_total_ustons = vad_veh.naphthalene_upstream_ustons
-        vad_veh.sox_total_ustons = vad_veh.sox_vehicle_ustons + vad_veh.sox_upstream_ustons
-        vad_veh.ch4_total_metrictons = vad_veh.ch4_vehicle_metrictons + vad_veh.ch4_upstream_metrictons
-        vad_veh.n2o_total_metrictons = vad_veh.n2o_vehicle_metrictons + vad_veh.n2o_upstream_metrictons
-        vad_veh.co2_total_metrictons = vad_veh.co2_vehicle_metrictons + vad_veh.co2_upstream_metrictons
+        vad.voc_total_ustons = vad.voc_vehicle_ustons + vad.voc_upstream_ustons
+        vad.co_total_ustons = vad.co_vehicle_ustons + vad.co_upstream_ustons
+        vad.nox_total_ustons = vad.nox_vehicle_ustons + vad.nox_upstream_ustons
+        vad.pm25_total_ustons = vad.pm25_vehicle_ustons + vad.pm25_upstream_ustons
+        vad.benzene_total_ustons = vad.benzene_vehicle_ustons + vad.benzene_upstream_ustons
+        vad.butadiene13_total_ustons = vad.butadiene13_vehicle_ustons + vad.butadiene13_upstream_ustons
+        vad.formaldehyde_total_ustons = vad.formaldehyde_vehicle_ustons + vad.formaldehyde_upstream_ustons
+        vad.acetaldehyde_total_ustons = vad.acetaldehyde_vehicle_ustons + vad.acetaldehyde_upstream_ustons
+        vad.acrolein_total_ustons = vad.acrolein_vehicle_ustons + vad.acrolein_upstream_ustons
+        vad.naphthalene_total_ustons = vad.naphthalene_upstream_ustons
+        vad.sox_total_ustons = vad.sox_vehicle_ustons + vad.sox_upstream_ustons
+        vad.ch4_total_metrictons = vad.ch4_vehicle_metrictons + vad.ch4_upstream_metrictons
+        vad.n2o_total_metrictons = vad.n2o_vehicle_metrictons + vad.n2o_upstream_metrictons
+        vad.co2_total_metrictons = vad.co2_vehicle_metrictons + vad.co2_upstream_metrictons

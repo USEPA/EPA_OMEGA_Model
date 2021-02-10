@@ -443,6 +443,10 @@ class VehicleFinal(SQABase, Vehicle):
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
             filter(VehicleFinal.model_year == calendar_year).all()
 
+    @staticmethod
+    def get_vehicle_inventory_attributes(vehicle_id):
+        return o2.session.query(VehicleFinal.model_year, VehicleFinal.reg_class_ID,
+                             VehicleFinal.in_use_fuel_ID, VehicleFinal.cert_CO2_grams_per_mile).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
 
     @staticmethod
     def calc_cert_target_CO2_Mg(model_year, manufacturer_id):
