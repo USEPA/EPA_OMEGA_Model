@@ -10,7 +10,7 @@ import o2
 from usepa_omega2 import *
 
 
-def get_scc_cf(calendar_year, query=False):
+def get_scc_cf(calendar_year):
     from effects.cost_factors_scc import CostFactorsSCC
 
     cost_factors = ['co2_domestic_cost_factor_25',
@@ -36,7 +36,7 @@ def get_scc_cf(calendar_year, query=False):
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
 
-def get_criteria_cf(calendar_year, query=False):
+def get_criteria_cf(calendar_year):
     from effects.cost_factors_criteria import CostFactorsCriteria
 
     cost_factors = ['pm25_low_mortality_30',
@@ -52,7 +52,7 @@ def get_criteria_cf(calendar_year, query=False):
     return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
 
 
-def get_energysecurity_cf(calendar_year, query=False):
+def get_energysecurity_cf(calendar_year):
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
     cost_factors = [
@@ -63,7 +63,7 @@ def get_energysecurity_cf(calendar_year, query=False):
     return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
 
 
-def get_congestion_noise_cf(reg_class_id, query=False):
+def get_congestion_noise_cf(reg_class_id):
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
 
     cost_factors = [
@@ -83,17 +83,11 @@ def calc_carbon_emission_costs(calendar_year):
     from vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_scc import CostEffectsSCC
 
-    query = False
-
-    vads = o2.session.query(VehicleAnnualData.vehicle_ID,
-                            VehicleAnnualData.age,
-                            VehicleAnnualData.co2_total_metrictons,
-                            VehicleAnnualData.ch4_total_metrictons,
-                            VehicleAnnualData.n2o_vehicle_metrictons). \
-        filter(VehicleAnnualData.calendar_year == calendar_year).all()
+    vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year, ['vehicle_ID', 'age', 'co2_total_metrictons',
+                                                                     'ch4_total_metrictons', 'n2o_vehicle_metrictons'])
 
     # UPDATE cost effects data
-    # Since the monetized effects data table is empty, the med_list will store all data for this calendar year
+    # Since the monetized effects data table is empty, the ed_list will store all data for this calendar year
     # and write to that table in bulk via the add all.
     ed_list = list()
     for vad in vads:
@@ -107,7 +101,7 @@ def calc_carbon_emission_costs(calendar_year):
         co2_global_25, co2_global_30, co2_global_70, \
         ch4_global_25, ch4_global_30, ch4_global_70, \
         n2o_global_25, n2o_global_30, n2o_global_70 \
-            = get_scc_cf(calendar_year, query=query)
+            = get_scc_cf(calendar_year)
 
         co2_domestic_25_social_cost_dollars = co2_tons * co2_domestic_25
         co2_domestic_30_social_cost_dollars = co2_tons * co2_domestic_30
@@ -169,23 +163,18 @@ def calc_criteria_emission_costs(calendar_year):
     from vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_criteria import CostEffectsCriteria
 
-    query = False
-
-    vad_vehs = o2.session.query(VehicleAnnualData.vehicle_ID,
-                                VehicleAnnualData.age,
-                                VehicleAnnualData.pm25_total_ustons,
-                                VehicleAnnualData.nox_total_ustons,).\
-        filter(VehicleAnnualData.calendar_year == calendar_year).all()
+    vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year,
+                                                     ['vehicle_ID', 'age', 'pm25_total_ustons', 'nox_total_ustons'])
 
     # UPDATE cost effects data
     ed_list = list()
-    for vad_veh in vad_vehs:
+    for vad in vads:
         # get tons
-        vehicle_ID, age, pm25_tons, nox_tons = vad_veh[0], vad_veh[1], vad_veh[2], vad_veh[3]
+        vehicle_ID, age, pm25_tons, nox_tons = vad[0], vad[1], vad[2], vad[3]
 
         # get cost factors
         pm25_low_3, pm25_high_3, nox_low_3, nox_high_3, pm25_low_7, pm25_high_7, nox_low_7, nox_high_7 \
-            = get_criteria_cf(calendar_year, query=query)
+            = get_criteria_cf(calendar_year)
 
         pm25_low_mortality_30_social_cost_dollars = pm25_tons * pm25_low_3
         pm25_high_mortality_30_social_cost_dollars = pm25_tons * pm25_high_3
@@ -227,19 +216,13 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
     from context_fuel_prices import ContextFuelPrices
     from vehicles import VehicleFinal
 
-    query = False
-
-    vad_vehs = o2.session.query(VehicleAnnualData.vehicle_ID,
-                                VehicleAnnualData.age,
-                                VehicleAnnualData.fuel_consumption,
-                                VehicleAnnualData.vmt, ). \
-        filter(VehicleAnnualData.calendar_year == calendar_year).all()
+    vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year, ['vehicle_ID', 'age', 'fuel_consumption', 'vmt'])
 
     # UPDATE cost effects data
     ed_list = list()
-    for vad_veh in vad_vehs:
+    for vad in vads:
         # get vehicle annual data
-        vehicle_ID, age, fuel_consumption, vmt = vad_veh[0], vad_veh[1], vad_veh[2], vad_veh[3]
+        vehicle_ID, age, fuel_consumption, vmt = vad[0], vad[1], vad[2], vad[3]
 
         # get vehicle final data
         reg_class_ID, in_use_fuel_ID = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['reg_class_ID', 'in_use_fuel_ID'])
@@ -256,7 +239,7 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
         fuel_70_social_cost_dollars = fuel_consumption * pretax
 
         # get energy security cost factors
-        es_cost_factor, foreign_oil_fraction = get_energysecurity_cf(calendar_year, query=query)
+        es_cost_factor, foreign_oil_fraction = get_energysecurity_cf(calendar_year)
 
         # energy security
         if in_use_fuel_ID == 'pump gasoline':
@@ -266,7 +249,7 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
             energy_security_30_social_cost_dollars, energy_security_70_social_cost_dollars = 0, 0
 
         # get congestion and noise cost factors
-        congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_ID, query=query)
+        congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_ID)
 
         # congestion and noise costs
         congestion_30_social_cost_dollars = vmt * congestion_cf

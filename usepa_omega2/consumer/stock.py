@@ -71,8 +71,7 @@ def update_stock(calendar_year):
     from vehicle_annual_data import VehicleAnnualData
 
     # pull in this year's vehicle ids:
-    this_years_vehicle_annual_data = o2.session.query(VehicleAnnualData).\
-        filter(VehicleAnnualData.calendar_year == calendar_year).all()
+    this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
     o2.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
@@ -88,8 +87,7 @@ def update_stock(calendar_year):
         vad.annual_vmt = annual_vmt
         vad.vmt = annual_vmt * registered_count
 
-    prior_year_vehicle_ids = sql_unpack_result(o2.session.query(VehicleAnnualData.vehicle_ID).\
-        filter(VehicleAnnualData.calendar_year == calendar_year-1).all())
+    prior_year_vehicle_ids = sql_unpack_result(VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, 'vehicle_ID'))
 
     vad_list = []
 

@@ -33,7 +33,7 @@ def get_vehicle_info(vehicle_id):
     return vehicles_dict[vehicle_id]
 
 
-def get_vehicle_ef(calendar_year, model_year, reg_class_id, query=False):
+def get_vehicle_ef(calendar_year, model_year, reg_class_id):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
 
     emission_factors = [
@@ -56,7 +56,7 @@ def get_vehicle_ef(calendar_year, model_year, reg_class_id, query=False):
     return EmissionFactorsVehicles.get_emission_factors(model_year, age, reg_class_id, emission_factors)
 
 
-def get_powersector_ef(calendar_year, query=False):
+def get_powersector_ef(calendar_year):
     from effects.emission_factors_powersector import EmissionFactorsPowersector
 
     emission_factors = [
@@ -110,8 +110,6 @@ def calc_inventory(calendar_year):
     """
     from vehicle_annual_data import VehicleAnnualData
 
-    query = False
-
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
     # UPDATE vehicle annual data related to effects
@@ -147,7 +145,7 @@ def calc_inventory(calendar_year):
             vad.co2_vehicle_metrictons = 0
         else:
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
-                = get_vehicle_ef(calendar_year, model_year, reg_class_ID, query=query)
+                = get_vehicle_ef(calendar_year, model_year, reg_class_ID)
 
             vad.voc_vehicle_ustons = vad.vmt * voc / grams_per_us_ton
             vad.co_vehicle_ustons = vad.vmt * co / grams_per_us_ton
@@ -168,10 +166,10 @@ def calc_inventory(calendar_year):
         # upstream inventory
         if in_use_fuel_ID == 'US electricity':
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, co2, ch4, n2o \
-                = get_powersector_ef(calendar_year, query=query)
+                = get_powersector_ef(calendar_year)
         else:
             voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, naphthalene, co2, ch4, n2o \
-                = get_refinery_ef(calendar_year, query=query)
+                = get_refinery_ef(calendar_year)
 
         vad.voc_upstream_ustons = vad.fuel_consumption * voc / grams_per_us_ton
         vad.co_upstream_ustons = vad.fuel_consumption * co / grams_per_us_ton
