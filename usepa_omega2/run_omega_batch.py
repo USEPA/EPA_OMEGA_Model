@@ -13,12 +13,8 @@ batch_log = None
 print('importing %s' % __file__)
 
 import os, sys
-print('usepa_omega2 run_omega_batch.py path = %s' %  os.path.abspath(__file__))
-print('SYS Path = %s' % sys.path)
-
-import os, sys
-print('usepa_omega2 %s path = %s' %  (__file__, os.path.abspath(__file__)))
-print('SYS Path = %s' % sys.path)
+# print('usepa_omega2 run_omega_batch.py path = %s' %  os.path.abspath(__file__))
+# print('SYS Path = %s' % sys.path)
 
 from o2 import OMEGABase
 from file_eye_oh import validate_file, relocate_file
@@ -430,7 +426,7 @@ if __name__ == '__main__':
                               if os.path.isdir(package_folder + os.sep + d)
                               and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
 
-            print('updating sys.path: %s' % ([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list))
+            # print('updating sys.path: %s' % ([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list))
             sys.path.extend([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list)
 
         from usepa_omega2 import *

@@ -8,7 +8,6 @@ context_fuel_prices.py
 print('importing %s' % __file__)
 
 import sys
-print(sys.path)
 
 import o2  # import global variables
 from usepa_omega2 import *
