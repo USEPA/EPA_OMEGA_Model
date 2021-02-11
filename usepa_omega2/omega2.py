@@ -580,8 +580,9 @@ def run_omega(o2_options, standalone_run=False):
                 iteration_log = run_producer_consumer()
                 session_summary_results = postproc_session.run_postproc(iteration_log, standalone_run)
 
-            publish_summary_results(session_summary_results, standalone_run)
-
+            # write output files
+            summary_filename = o2.options.output_folder + o2.options.session_unique_name + '_summary_results.csv'
+            session_summary_results.to_csv(summary_filename)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             omega_log.end_logfile("\nSession Complete")
@@ -611,18 +612,6 @@ def run_omega(o2_options, standalone_run=False):
         omega_log.logwrite("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
         dump_omega_db_to_csv(o2.options.database_dump_folder)
-
-
-def publish_summary_results(session_summary_results, single_shot):
-    if single_shot:
-        session_summary_results.to_csv(o2.options.output_folder + 'summary_results.csv', mode='w')
-    else:
-        if not os.access('%s_summary_results.csv' % fileio.get_filename(os.getcwd()), os.F_OK):
-            session_summary_results.to_csv(
-                '%s_summary_results.csv' % fileio.get_filename(os.getcwd()), mode='w')
-        else:
-            session_summary_results.to_csv(
-                '%s_summary_results.csv ' % fileio.get_filename(os.getcwd()), mode='a', header=False)
 
 
 if __name__ == "__main__":
