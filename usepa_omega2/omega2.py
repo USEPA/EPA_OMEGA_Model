@@ -582,7 +582,7 @@ def run_omega(o2_options, standalone_run=False):
 
             # write output files
             summary_filename = o2.options.output_folder + o2.options.session_unique_name + '_summary_results.csv'
-            session_summary_results.to_csv(summary_filename)
+            session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             omega_log.end_logfile("\nSession Complete")

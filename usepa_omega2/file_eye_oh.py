@@ -34,7 +34,7 @@ def validate_folder(dstfolder):
 
 def validate_file(filename):
     """
-    Verify the existence of filename and try to create it if doesn't exist
+    Verify the existence of filename
 
     :param filename: File pathname of the file to validate
 
