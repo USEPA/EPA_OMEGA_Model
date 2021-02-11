@@ -7,8 +7,6 @@ omega_db.py
 print('importing %s' % __file__)
 
 import o2  # import global variables
-# from usepa_omega2 import *
-
 import omega_log
 import file_eye_oh as fileio
 import pandas as pd
