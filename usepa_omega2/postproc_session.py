@@ -36,7 +36,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
         run_effects_calcs()
 
     if not standalone_run:
-        standalone_run.logwrite('%s: Post Processing ...' % o2.options.session_name)
+        omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
     year_iter_labels = ['%d_%d_%d' % (cy - 2000, it, it_sub) for cy, it, it_sub in
                         zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == -1], iteration_log['iteration'][iteration_log['pricing_iteration'] == -1], iteration_log['pricing_iteration'][iteration_log['pricing_iteration'] == -1])]
