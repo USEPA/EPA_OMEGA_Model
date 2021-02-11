@@ -8,6 +8,8 @@ reregistration_fixed_by_age.py
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
+
 
 class ReregistrationFixedByAge(SQABase, OMEGABase):
     # --- database table properties ---
@@ -19,7 +21,20 @@ class ReregistrationFixedByAge(SQABase, OMEGABase):
     reregistered_proportion = Column('reregistered_proportion', Numeric)
 
     @staticmethod
+    def get_reregistered_proportion(market_class_id, age):
+        cache_key = '%s_%s' % (market_class_id, age)
+
+        if cache_key not in cache:
+            cache[cache_key] = float(o2.session.query(ReregistrationFixedByAge.reregistered_proportion).
+                                     filter(ReregistrationFixedByAge.market_class_ID == market_class_id).
+                                     filter(ReregistrationFixedByAge.age == age).scalar())
+
+        return cache[cache_key]
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
