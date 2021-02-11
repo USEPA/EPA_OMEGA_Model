@@ -35,6 +35,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     if not standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
+    # TODO: this stuff has no business being in the mad
     bev_non_hauling_share_frac = np.array(sql_unpack_result(
         o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all()))
     ice_non_hauling_share_frac = np.array(sql_unpack_result(
@@ -44,9 +45,9 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     ice_hauling_share_frac = np.array(
         sql_unpack_result(o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all()))
 
-    plot_iteration(iteration_log)
-
     calendar_years = ManufacturerAnnualData.get_calendar_years()
+
+    plot_iteration(iteration_log)
 
     cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = plot_manufacturer_compliance(calendar_years)
 
