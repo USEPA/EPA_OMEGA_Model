@@ -62,11 +62,11 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
 
     elif status == dispy.DispyJob.Terminated:
         if dispy_debug: sysprint('---- Job Terminated %s \n' % str(job_id_str))
-        restart_job(job)
+        # restart_job(job)
 
     elif status == dispy.DispyJob.Abandoned:
         if dispy_debug: sysprint('---- Job Abandoned %s : Exception %s\n' % (job_id_str, job.exception))
-        restart_job(job)
+        # restart_job(job)
 
     else:
         if dispy_debug: sysprint('*** uncaught job callback %s %s ***\n' % (job_id_str, status))
@@ -147,13 +147,14 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
 
     subprocess.call(cmd)
 
-    summary_filename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
+    logfilename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
                                     'o2log_%s_%s.txt' % (batch_name, session_name))
 
     time.sleep(1)  # wait for summary file to finish writing?
 
-    if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
-        with open(summary_filename, "r") as f_read:
+    if os.path.exists(logfilename) and os.path.getsize(logfilename) > 0:
+        sysprint('@@@ checking logfile %s @@@' % logfilename)
+        with open(logfilename, "r") as f_read:
             last_line = f_read.readlines()[-1]
         batch_path = os.path.join(network_batch_path_root, batch_name)
         if 'Session Complete' in last_line:
@@ -165,11 +166,12 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
             sysprint('?!? dispy_run_session Failed, Session "%s" ?!?' % session_name)
             return False
         else:
-            sysprint('??? Weird Summary File for Session "%s" : last_line = "%s" ???' % (session_name, last_line))
+            sysprint('??? Weird Log File for Session "%s" : last_line = "%s" ???' % (session_name, last_line))
+            sysprint(f_read.readlines())
             return False
     else:
         sysprint('??? No Summary File for Session "%s", path_exists=%d, non_zero=%d ???' % (
-            session_name, os.path.exists(summary_filename), os.path.getsize(summary_filename) > 0))
+            session_name, os.path.exists(logfilename), os.path.getsize(logfilename) > 0))
         if retry_count < 3:
             sysprint('@@@ Trying Session "%s" again (attempt %d)... @@@' % (session_name, retry_count + 1))
             dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,

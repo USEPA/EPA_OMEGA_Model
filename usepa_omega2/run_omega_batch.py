@@ -600,7 +600,8 @@ if __name__ == '__main__':
 
                     dispycluster = DispyCluster(options)
                     dispycluster.find_nodes()
-                    dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root, options.batch_path + batch.name,
+                    dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root,
+                                                 options.batch_path + batch.name,
                                                  session_list)
                     batch_log.end_logfile("*** batch complete ***")
                 else:  # run from here
@@ -653,6 +654,26 @@ if __name__ == '__main__':
                                           os.path.join(batch_path, completion_prefix + batch.sessions[s_index].name))
 
                     batch_log.end_logfile("*** batch complete ***")
+
+                # if not running a session inside a dispy batch (i.e. we are the top-level batch):
+                if options.session_num is None:
+                    # post-process sessions (collate summary files)
+                    for s_index in session_list:
+                        batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
+                        session_summary_filename = options.batch_path + '_' + batch.sessions[s_index].settings.output_folder + batch.sessions[s_index].settings.session_unique_name + '_summary_results.csv'
+                        batch_summary_filename = options.batch_path + 'summary_results.csv'
+                        if os.access(session_summary_filename, os.F_OK):
+                            if not os.access(batch_summary_filename, os.F_OK):
+                                # copy the summary verbatim to create batch summary
+                                shutil.copyfile(session_summary_filename, batch_summary_filename)
+                            else:
+                                # add subsequent sessions to batch summary
+                                df = pd.read_csv(session_summary_filename)
+                                df.to_csv(batch_summary_filename, header=False, index=False, mode='a')
+
+                    # perform batch post-process
+                    import postproc_batch
+                    postproc_batch.run_postproc(batch_log, batch_summary_filename)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
