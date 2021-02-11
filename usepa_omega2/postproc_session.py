@@ -178,7 +178,7 @@ def plot_vehicle_cost(calendar_years):
     ax1.plot(calendar_years, average_cost_data['total'])
     label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]',
               '%s\nAverage Vehicle Cost v Year' % o2.options.session_unique_name)
-    ax1.set_ylim(15e3, 80e3)
+    # ax1.set_ylim(15e3, 80e3)
     ax1.legend(average_cost_data.keys())
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_unique_name)
     return average_cost_data
