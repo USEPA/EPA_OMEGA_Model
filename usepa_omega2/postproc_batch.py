@@ -21,11 +21,12 @@ def run_postproc(batch_log, batch_summary_filename):
     summary_df['session_name'] = 0
 
     delta_df = summary_df.copy()
+    num_rows = delta_df.shape[0]
 
-    num_analysis_years = int(delta_df.shape[0] / len(session_names))
+    num_analysis_years = int(num_rows / len(session_names))
 
     # sanity check rows per session
-    if num_analysis_years * len(session_names) == delta_df.shape[0]:
+    if num_analysis_years * len(session_names) == num_rows:
         for i, row in enumerate(summary_df.iterrows()):
             reference_index = int(i % num_analysis_years)
             delta_df.iloc[i] = summary_df.iloc[i] - summary_df.iloc[reference_index]
@@ -34,6 +35,8 @@ def run_postproc(batch_log, batch_summary_filename):
         delta_df['session_name'] = sessions
 
         delta_df.to_csv(batch_delta_filename, index=False)
+    else:
+        batch_log.logwrite('\nUnexpected number of summary rows per session')
 
 
 if __name__ == '__main__':
