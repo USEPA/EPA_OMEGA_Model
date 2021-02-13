@@ -1,39 +1,93 @@
 import pandas as pd
 import numpy as np
 import datetime
+pd.options.mode.chained_assignment = None  # default='warn'
+
 def weighed_average(grp):
-    return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp)).multiply(grp[weighting_field],axis=0).sum())
+    # _rows, _cols = grp.shape
+    # return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/(~pd.isnull(grp._get_numeric_data()).multiply(grp[weighting_field], axis=0).sum())
+    # print(num1, divider1)
+    # if (grp[information_toget_source_column_name].any() == str) or grp[information_toget_source_column_name] == '':
+    #     print('grp string can not convert to float ', grp[information_toget_source_column_name])
+    #     grp[information_toget_source_column_name] = 0
+    # else:
+    #     grp[information_toget_source_column_name] = grp[information_toget_source_column_name].astype(float)._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp[information_toget_source_column_name].astype(float))).multiply(grp[weighting_field],axis=0).sum())
+    grp[information_toget_source_column_name] = grp[information_toget_source_column_name].str.strip().astype(float).multiply(grp[weighting_field], axis=0).sum() / (pd.notnull(
+    grp[information_toget_source_column_name])).multiply(grp[weighting_field], axis=0).sum()
+    return grp
+
+
+# return grp
+
 def mode(df, key_cols, value_col, count_col):
     return df.groupby(key_cols + [value_col]).size() \
         .to_frame(count_col).reset_index() \
         .sort_values(count_col, ascending=False) \
         .drop_duplicates(subset=key_cols)
+
+main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications' \
+            + '\\' + 'techspecconsolidator\Query Runs'
 run_folder = str(input('Enter Run Folder Name: '))
-model_year = input('Enter Model Year: ')
-master_index_source = str(input('Enter Master Index File Source: '))
-while True:
-    user_input = input('Enter Aggregating Field (or "Done" to continue): ')
-    if user_input.upper() == 'DONE':
+run_controller = pd.read_csv(main_path + '\\' + run_folder + '\Run Query Controller.csv')
+run_controller = run_controller.replace(np.nan, '', regex=True)
+_rows, _cols = run_controller.shape
+model_year = []
+# master_index_source = []
+aggregating_fields_input = []
+for _row in range (_rows):
+    MY = run_controller['model_year'][_row]
+    if MY != '' and str(MY).replace('.', '').isnumeric():
+        model_year.append(int(MY))
+    elif MY == '' or MY == 'Done':
         break
-    else:
-        try:
-            aggregating_fields_input = aggregating_fields_input + ',' + user_input
-        except NameError:
-            aggregating_fields_input = user_input
+
+for _row in range (_rows):
+    _master_index_source = run_controller['master_index_source'][_row]
+    if _master_index_source != '' and len(_master_index_source) > 0:
+        master_index_source = _master_index_source
+    elif _master_index_source == '' or _master_index_source == 'Done':
+        break
+
+for _row in range (_rows):
+    query_field_input = run_controller['aggregating_fields_input'][_row]
+    if query_field_input != '' and len(query_field_input) > 0:
+        aggregating_fields_input.append(query_field_input)
+    elif query_field_input == '' or query_field_input == 'Done':
+        break
+
+# model_year = input('Enter Model Year: ')
+# master_index_source = str(input('Enter Master Index File Source: '))
+# while True:
+#     user_input = input('Enter Aggregating Field (or "Done" to continue): ')
+#     if user_input.upper() == 'DONE':
+#         break
+#     else:
+#         try:
+#             aggregating_fields_input = aggregating_fields_input + ',' + user_input
+#         except NameError:
+#             aggregating_fields_input = user_input
+#
+# run_folder = '20210210'
+# model_year = 2019
+# master_index_source = 'Master Index'
+# aggregating_fields_input = 'Calc ID, Fuel Usage, Fuel Usage Description, BodyID, Carline Class Description, Compliance Category Code'
+
 if ',' in aggregating_fields_input:
-    aggregating_fields = pd.Series(list(aggregating_fields_input.split(',')), name='Category').str.strip()
+    aggregating_fields = pd.Series(aggregating_fields_input.split(','), name='Category').str.strip()
+    # aggregating_fields = pd.Series(list(aggregating_fields_input.split(',')), name='Category').str.strip()
 else:
     aggregating_fields = pd.Series(aggregating_fields_input, name='Category').str.strip()
 if ',' in str(model_year):
     model_years = pd.Series(list(model_year.split(',')), name='Category').str.strip()
 else:
-    model_years = pd.Series([model_year])
-model_years = model_years.astype(int)
+    model_years = pd.Series(model_year)
+model_years = model_years
+# model_years = model_years.astype(int)
 
 for model_year in model_years:
-    main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
-                +'\\'+'techspecconsolidator\Query Runs'
-    run_controller = pd.read_csv('Aggregating Run Controller.csv')
+    # main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
+    #             +'\\'+'techspecconsolidator\Query Runs'
+    run_controller = pd.read_csv(main_path + '\\' + run_folder + '\Run Query Controller.csv')
     run_controller = run_controller[run_controller['USE_YN']=='y'].reset_index(drop=True)
     input_path = main_path+'\\'+run_folder+'\\'+'inputs'
     output_path = main_path+'\\'+run_folder+'\\'+'outputs'
@@ -41,10 +95,8 @@ for model_year in model_years:
     data_sources_df = pd.read_csv(input_path + '\\' + 'Data Sources.csv')
     master_category_check_file = pd.read_csv(input_path + '\\' + 'Main Mapping Category Key.csv')
     master_category_check_df = master_category_check_file.set_index(master_category_check_file['Readin Sources'].values)
-
     aggregating_columns = pd.Series(np.zeros(len(aggregating_fields))).replace(0, '')
-    master_schema = data_sources_df['SourceSchema'][data_sources_df['SourceSchema'][(data_sources_df['SourceName']==master_index_source) & \
-        (data_sources_df['MY']==model_year)].index[0]]
+    master_schema = data_sources_df['SourceSchema'][data_sources_df['SourceSchema'][(data_sources_df['SourceName']==master_index_source) & (data_sources_df['MY']==model_year)].index[0]]
     for i in range(0, len(aggregating_fields)):
         aggregating_columns[i] = field_mapping_df[master_schema+'Field'][field_mapping_df[master_schema+'Field'][ \
             field_mapping_df['UserFriendlyName'] == aggregating_fields[i]].index[0]]
@@ -83,6 +135,9 @@ for model_year in model_years:
             [field_mapping_df['UserFriendlyName'] == information_toget].drop('FieldName',axis=1).reset_index(drop=True)
         source_column_names = column_names.iloc[0][~pd.isnull(column_names.iloc[0])].reset_index(drop=True)
         priority_values = information_priority.iloc[0][~pd.isnull(information_priority.iloc[0])].reset_index(drop=True)
+        # if information_toget == 'MSRP' or information_toget == 'Redesign Length':
+        #     print(source_schemas)
+
         all_schemas[schema_track:schema_track+len(source_schemas)] = source_schemas
         all_column_names[schema_track:schema_track+len(source_column_names)] = source_column_names
         all_query_types[schema_track:schema_track+len(source_schemas)] = query_type_input
@@ -93,6 +148,8 @@ for model_year in model_years:
         schema_track += len(source_schemas)
     model_year_column = pd.Series(np.zeros(total_schema_count), name = 'MY').replace(0,model_year)
     controller_index = pd.Series(all_schemas.index.values, name = 'Controller Index')
+    # if controller_index.dtypes != 'object': controller_index=controller_index.astype(object)
+    # if all_schemas.dtypes != 'object': all_schemas=all_schemas.astype(object)
     all_array = pd.merge_ordered(pd.concat([controller_index, all_schemas, all_column_names, all_query_types, all_weighting_fields, all_bounding_fields,\
         all_priority_values, all_desired_fields,model_year_column],axis=1),data_sources_df,how='left',on=['SourceSchema','MY'])\
         .replace(str(np.nan), np.nan)
@@ -272,15 +329,26 @@ for model_year in model_years:
             del source_file
         else:
             master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
+
+        # print('all_subarray: ', all_subarray) #', data type: ', master_index_file_with_desired_field_all_merges[information_toget_source_column_name].dtypes)
+
         for all_subarray_count in range(0,len(all_subarray)):
+            # if all_subarray['Column Name'][all_subarray_count] == 'FOOTPRINT_SUBCONFIG_VOLUMES':
+            #     print(all_subarray_count)
             query_type = all_subarray['QueryType'][all_subarray_count]
             weighting_field = all_subarray['AvgWtField'][all_subarray_count]
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
+            if information_toget == 'MSRP':
+                print(information_toget, query_type)
             if (aggregating_fields==information_toget).sum() == 0 and len(master_index_file_with_desired_fields_all_merges[\
                     ~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name])]) > 0:
                 print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
+                if information_toget == 'MSRP':
+                    master_index_file_with_desired_fields_all_merges[information_toget_source_column_name] = \
+                        master_index_file_with_desired_fields_all_merges[information_toget_source_column_name].str.replace(',', '').astype(float)
+                    # print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
                 try:
                     master_index_file_with_desired_field_all_merges = master_index_file_with_desired_fields_all_merges[\
                         (~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name]))].reset_index(drop=True)
@@ -289,67 +357,64 @@ for model_year in model_years:
                 if query_type == 'max' or query_type == 'min' or query_type == 'avg' \
                         or query_type == 'std' or query_type == 'sum':
                     try:
-                        master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(
-                                float)
+                       master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name]   # .astype(float)  # ValueError: could not convert string to float: '3549 lbs.'
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
                             information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
                         if pd.isnull(testing_column).sum() >= 0:
                             master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                                master_index_file_with_desired_field_all_merges[
-                                    information_toget_source_column_name].str.extract(
-                                    '(\d+)').astype(float)
+                                master_index_file_with_desired_field_all_merges[information_toget_source_column_name].str.extract('(\d+)').astype(float)
                         else:
                             master_index_file_with_desired_field_all_merges[
                                 information_toget_source_column_name] = testing_column
                 if query_type == 'max':
+                    # if bounding_field == 'TOT_ROAD_LOAD_HP':
+                    #     print(bounding_field)
                     if bounding_field == str(np.nan) or pd.isnull(bounding_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).max().reset_index()
+                            .groupby(list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: x.astype(float).max()).reset_index()
                     else:
-                        master_index_with_boundingfield_max = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [bounding_field]] \
-                            .groupby(list(aggregating_columns)).max().reset_index() \
+                        query_output_source = master_index_with_boundingfield_max = master_index_file_with_desired_field_all_merges[ \
+                            list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]] \
+                            .groupby(list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: x.astype(float).max()).reset_index() \
                             .rename(columns={bounding_field: bounding_field + '_max'})
-                        query_output_source = master_index_with_boundingfield_max.merge( \
-                            master_index_file_with_desired_field_all_merges[ \
-                                list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
-                            how='left', \
-                            left_on=list(aggregating_columns) + [bounding_field + '_max'],
-                            right_on=list(aggregating_columns) + [bounding_field]) \
-                            .groupby(list(aggregating_columns) + [bounding_field + '_max']).median().reset_index() \
-                            .drop([bounding_field + '_max'], axis=1)
+                        # query_output_source = master_index_with_boundingfield_max.merge( \
+                        #   master_index_file_with_desired_field_all_merges[ \
+                        #         list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
+                        #     how='left', \
+                        #     left_on=list(aggregating_columns) + [bounding_field + '_max'],
+                        #     right_on=list(aggregating_columns) + [bounding_field]).groupby(list(aggregating_columns) + [bounding_field + '_max']).median().reset_index() \
+                        #     .drop([bounding_field + '_max'], axis=1)
                         del master_index_with_boundingfield_max
                 elif query_type == 'min':
+                    # if bounding_field == 'TOT_ROAD_LOAD_HP':
+                    #     print(bounding_field)
                     if bounding_field == str(np.nan) or  pd.isnull(bounding_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).min().reset_index()
+                            .groupby(list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: x.astype(float).min()).reset_index()
                     else:
-                        master_index_with_boundingfield_min = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [bounding_field]] \
-                            .groupby(list(aggregating_columns)).min().reset_index() \
+                        query_output_source = master_index_with_boundingfield_min = master_index_file_with_desired_field_all_merges[ \
+                            list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]] \
+                            .groupby(list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: x.astype(float).min()).reset_index() \
                             .rename(columns={bounding_field: bounding_field + '_min'})
-                        query_output_source = master_index_with_boundingfield_min.merge( \
-                            master_index_file_with_desired_field_all_merges[ \
-                                list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
-                            how='left', \
-                            left_on=list(aggregating_columns) + [bounding_field + '_min'],
-                            right_on=list(aggregating_columns) + [bounding_field]) \
-                            .groupby(list(aggregating_columns) + [bounding_field + '_min']).median().reset_index() \
-                            .drop([bounding_field + '_min'], axis=1)
+                        # query_output_source = master_index_with_boundingfield_min.merge( \
+                        #     master_index_file_with_desired_field_all_merges[ \
+                        #         list(aggregating_columns) + [bounding_field] + [information_toget_source_column_name]],
+                        #     how='left', \
+                        #     left_on=list(aggregating_columns) + [bounding_field + '_min'],
+                        #     right_on=list(aggregating_columns) + [bounding_field]).groupby(list(aggregating_columns) + [bounding_field + '_min'])
+                        # query_output_source = query_output_source.groupby(list(aggregating_columns) + [bounding_field + '_min']).median().reset_index().drop([bounding_field + '_min'], axis=1)
                         del master_index_with_boundingfield_min
                 elif query_type == 'top1':
                     query_output_source = mode(master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]], list(aggregating_columns), \
                         information_toget_source_column_name, 'count')
                 elif query_type == 'sum':
-                    query_output_source = master_index_file_with_desired_field_all_merges[ \
-                        list(aggregating_columns) + [information_toget_source_column_name]].groupby(
-                        list(aggregating_columns)) \
-                        .sum().reset_index()
+                    df = master_index_file_with_desired_field_all_merges[list(aggregating_columns) + [information_toget_source_column_name]]
+                    query_output_source = df.groupby(list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: x.astype(float).sum()).reset_index() #.sum().reset_index()
                 elif query_type == 'all':
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]].groupby(\
@@ -364,12 +429,21 @@ for model_year in model_years:
                             list(aggregating_columns) + [information_toget_source_column_name]].groupby(
                             list(aggregating_columns)).mean().reset_index()
                     else:
-                        query_output_source = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).apply(weighed_average)
-                        query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan)
+                        if information_toget_source_column_name == 'COMBINED MPG Edmunds' or information_toget_source_column_name == 'EPA_CAFE_MT_CALC_COMB_FE_4':
+                            print(information_toget_source_column_name)
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]]
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != '0.0']
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges.drop_duplicates(list(aggregating_columns)).reset_index()                        # master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != '']
+                        # query_output_source = master_index_file_with_desired_field_all_merges[ \
+                        #  list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]].groupby(list(aggregating_columns)).apply(weighed_average)  # apply(weighed_average)
+                        query_output_source = master_index_file_with_desired_field_all_merges.groupby(list(aggregating_columns)).apply(weighed_average)  # apply(weighed_average)
+                        if weighting_field in query_output_source.columns:
+                            query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan)
                     try:
-                        query_output_source = query_output_source.drop(list(aggregating_columns), axis=1).reset_index()
+                        if query_type == 'avg':
+                            query_output_source = query_output_source.drop_duplicates(list(aggregating_columns)).reset_index()
+                        else:
+                            query_output_source = query_output_source.drop(list(aggregating_columns)).reset_index()
                     except KeyError:
                         query_output_source = query_output_source.reset_index()
                 # master_index_with_desired_field = master_index_with_desired_field.drop(weighting_field, axis=1)
@@ -408,6 +482,8 @@ for model_year in model_years:
     query_output = query_output.replace([np.nan, str(np.nan)], '')
     query_output = query_output[list(aggregating_columns) + list(all_array['Output Column'].unique())+list(all_array['Output Column Name'].unique())]
     query_output = query_output.sort_values(list(aggregating_columns)).reset_index(drop=True)
+    query_output = query_output.loc[:, ~query_output.columns.duplicated()]
+    query_output = query_output.dropna(axis=1, how='all')
     query_output.to_csv(output_path + '\\' + str(model_year) + ' Query' + ' ' + date_and_time + '.csv',index=False)
     del query_output
     del all_array

@@ -20,6 +20,14 @@ import numpy as np
 
 global super_trim_url_list
 super_trim_url_list = []
+SKIP_PRINTING_EXTERIOR_OPTIONS = True # skip printing tire brands, etc
+SKIP_PRINTING_INTERIOR_OPTIONS = True
+SKIP_PRINTING_COMFORT_CONVENIENCE = True
+SKIP_PRINTING_PACKAGES = True
+SKIP_IN_CAR_ENTERTAINMENT = True
+SKIP_POWER_FEATURE = True
+SKIP_PRINTING_COLORS = True # skip printingg interior and exterior colors
+DELETE_DISCONTINUED_MODELS = False
 
 class HTMLTableParser:
     def get_html_table(self, soup, trim_group, errorflag_1, errorflag_2, errorflag_3):
@@ -79,37 +87,105 @@ class HTMLTableParser:
 
         return df
 
-def merge_trim_options(tmp_raw_table0, _menu_columns, df_options, option_str):
+def merge_trim_options(tmp_raw_table0, _menu_columns, df_options, _trim_str):
     tmp_raw_table = tmp_raw_table0.copy(deep=True)
     _row_drop_start = 0
-    _row_option_str_init = 0
+    _row_trim_str_init = 0
     for k in range(len(df_options)):
         _row = df_options.index[k]
-        _option_spec_str = tmp_raw_table['Specifications'][_row].split(' ' + option_str)
+        _option_spec_str = tmp_raw_table['Specifications'][_row].split(' ' + _trim_str)
         _option_spec = _option_spec_str[0]
-        if (_option_spec in ['All season', 'all season', 'painted alloy']) or len(_option_spec) == 0:
+        _option_spec_no_spaces = _option_spec.replace(' ', '')
+        # if (_option_spec in ['All season', 'all season', 'painted alloy', 'steel', 'Run flat', 'Performance']) or \
+        if (_option_spec_no_spaces.isalpha() == True) or len(_option_spec) == 0:
+            # print(_option_spec_no_spaces)
             continue
         else:
-            if k == 0 or _row_option_str_init == 0:
-                tmp_raw_table['Specifications'][_row] = option_str
-                _option_str_row = _row
-                if k>0 and _row_option_str_init == 0:
+            if k == 0 or _row_trim_str_init == 0:
+                tmp_raw_table['Specifications'][_row] = _trim_str
+                _trim_str_row = _row
+                if k>0 and _row_trim_str_init == 0:
                     _row_drop_start = k
-                    _row_option_str_init = k
+                    _row_trim_str_init = k
                 elif k == 0:
-                    _row_option_str_init  = 1
+                    _row_trim_str_init  = 1
 
             for _index_col in range(_menu_columns):
                 trim_col = tmp_raw_table.columns[_index_col+2]
                 ioption = str(tmp_raw_table[trim_col][_row])
                 if ioption.lower() == 'yes':
-                    tmp_raw_table[trim_col][_option_str_row] = _option_spec
-                elif ioption.lower() == 'no' and tmp_raw_table[trim_col][_option_str_row] == 'no':
-                    tmp_raw_table[trim_col][_option_str_row] = np.nan
+                    tmp_raw_table[trim_col][_trim_str_row] = _option_spec
+                elif ioption.lower() == 'no' and tmp_raw_table[trim_col][_trim_str_row] == 'no':
+                    tmp_raw_table[trim_col][_trim_str_row] = np.nan
                 if k > _row_drop_start: tmp_raw_table[trim_col][_row] = np.nan
             # if k > _row_drop_start:
             #     # tmp_raw_table =[trim_col][_row] = ''
             #     tmp_raw_table = tmp_raw_table.drop(index=_row)
+
+    return tmp_raw_table
+
+def trim_tires_wheels(tmp_raw_table, _menu_columns):
+    tmp_raw_table1 = tmp_raw_table.copy(deep=True)
+
+    _index_all_season_tires = tmp_raw_table.index[tmp_raw_table['Specifications'].str.contains('All season tires')]
+    wheels_index = tires_index = all_season_tires_index = run_flat_tires_index = performance_tires_index = all_terrain_tires_index = -1
+    for _index in range(len(tmp_raw_table)):
+        if tmp_raw_table['Specifications'][_index] == 'tires':
+            tires_index = _index
+            break
+    for _index in range(len(tmp_raw_table)):
+        if tmp_raw_table['Specifications'][_index] == 'wheels':
+            wheels_index = _index
+            break
+    for _index in range(len(tmp_raw_table)):
+        if str(tmp_raw_table['Specifications'][_index]).lower() == 'all season tires' or \
+                tmp_raw_table['Specifications'][_index] == 'All season tires':
+            all_season_tires_index = _index
+            break
+    for _index in range(len(tmp_raw_table)):
+        if str(tmp_raw_table['Specifications'][_index]).lower() == 'performance tires' or \
+                tmp_raw_table['Specifications'][_index] == 'Performance tires':
+            performance_tires_index = _index
+            break
+    for _index in range(len(tmp_raw_table)):
+        if str(tmp_raw_table['Specifications'][_index]).lower() == 'run flat tires' or \
+                tmp_raw_table['Specifications'][_index] == 'Run flat tires':
+            run_flat_tires_index = _index
+            break
+    for _index in range(len(tmp_raw_table)):
+        if str(tmp_raw_table['Specifications'][_index]).lower() == 'all terrain tires' or \
+                tmp_raw_table['Specifications'][_index] == 'All terrain tires':
+            all_terrain_tires_index = _index
+            break
+
+    tmp_raw_table1.iloc[0, 1] = 'wheels'
+    tmp_raw_table1.iloc[1, 1] = 'tires'
+    tmp_raw_table1.iloc[2, 1] = 'tire types'
+    for _jcol in range(_menu_columns):
+        tmp_raw_table1.iloc[0, _jcol + 2] = tmp_raw_table.iloc[wheels_index, _jcol + 2]
+        if tires_index < 0 or len(str(tmp_raw_table.iloc[tires_index, _jcol + 2])) == 0:
+            tmp_raw_table1.iloc[1, _jcol + 2] = 'NA'
+        else:
+            tmp_raw_table1.iloc[1, _jcol + 2] = tmp_raw_table.iloc[tires_index, _jcol + 2]
+        if wheels_index < 0 or len(str(tmp_raw_table.iloc[wheels_index, _jcol + 2])) == 0:
+            tmp_raw_table1.iloc[0, _jcol + 2] = 'NA'
+    for _jcol in range(_menu_columns):
+        if all_season_tires_index >= 0:
+            tmp_raw_table1.iloc[2, _jcol + 2] = 'All season tires'
+        if run_flat_tires_index >= 0:
+            tmp_raw_table1.iloc[2, _jcol + 2] = 'Run flat tires'
+            if all_season_tires_index >= 0: tmp_raw_table1.iloc[2, _jcol + 2] = 'All season tires, Run flat tires'
+        if all_terrain_tires_index >= 0:
+            tmp_raw_table1.iloc[2, _jcol + 2] = 'All terrain tires'
+            if all_season_tires_index >= 0: tmp_raw_table1.iloc[2, _jcol + 2] = 'All season tires, All terrain tires'
+        if performance_tires_index >= 0:
+            tmp_raw_table1.iloc[2, _jcol + 2] = 'Performance tires'
+            if all_season_tires_index >= 0: tmp_raw_table1.iloc[2, _jcol + 2] = 'All season tires, Performance tires'
+        if all_season_tires_index == -1 and performance_tires_index == -1 and run_flat_tires_index == -1 and all_terrain_tires_index == -1:
+            tmp_raw_table1.iloc[2, _jcol + 2] = 'NA'
+
+    tmp_raw_table = drop_merged_option(tmp_raw_table1, _menu_columns)
+    tmp_raw_table = tmp_raw_table.drop_duplicates(subset=['Specifications']).reset_index(drop=True)
 
     return tmp_raw_table
 
@@ -125,13 +201,273 @@ def drop_merged_option(tmp_raw_table, _menu_columns):
 
     return tmp_raw_table
 
+def update_raw_tables(tmp_raw_table0, _menu_columns):
+    tmp_raw_table = tmp_raw_table0.copy(deep=True)
+    _overview_list = ['Engine Type', 'Transmission', 'Drive Type', 'Combined MPG', 'Total Seating', 'Basic Warranty', 'Cylinders']
+    _drivetrain_simple_list =['Drive type', 'Transmission']
+    _drivetrain_list =['Drive type', 'Transmission', 'part time 4WD', 'on demand 4WD', 'automatic locking hubs', 'electronic hi-lo gear selection']
+    _engine_list = ['Torque', 'Base engine size', 'Horsepower', 'Turning circle', 'Valves', 'direct injection', 'Base engine type', \
+                    'Valve timing', 'Cam type', 'Cylinders', 'cylinder deactivation']
+    _measurements_list = ['Length', 'Maximum towing capacity', 'Wheel base', 'Width', 'Curb weight', 'Maximum payload', 'Gross weight', 'Height', \
+                        'Ground clearance']
+    _fuel_mpg_list = ['EPA mileage est. (cty/hwy)', 'Combined MPG', 'Fuel type', 'Fuel tank capacity', 'Range in miles (cty/hwy)']
+    _PHEV_fuel_mpg_list = ['EPA Combined MPGe', 'Range in miles (cty/hwy)',  'EPA Time to charge battery (at 240v)', 'Fuel tank capacity', \
+                           'Combined MPG', 'EPA kWh/100 mi', 'Fuel type', 'EPA Electricity Range']
+    _BEV_fuel_mpg_list = ['EPA City MPGe', 'EPA Combined MPGe', 'EPA mileage est. (cty/hwy)', \
+                          'Range in miles (cty/hwy)', 'EPA Time to charge battery (at 240v)', 'EPA Highway MPGe', \
+                           'Combined MPG', 'EPA kWh/100 mi', 'Fuel type', 'EPA Electricity Range', 'Fuel tank capacity']
+    _BEV_simple_fuel_mpg_list = ['Range in miles (cty/hwy)', 'Fuel type']
+    _warrenty_list = ['Free maintenance', 'Basic', 'Drivetrain', 'Rust', 'Roadside', 'Hybrid Component', 'EV Battery']
+    _no_to_nan_list =  ['MSRP', 'Torque', 'Cylinders', 'Total Seating', 'Basic Warranty', 'Horsepower', 'Turning circle', 'Valves' \
+                        'Engine Type', 'Base engine size', 'EPA Time to charge battery (at 240v)', 'EPA Highway MPGe'] + \
+                       _drivetrain_list + _fuel_mpg_list + _BEV_fuel_mpg_list + _measurements_list + _warrenty_list
+
+    _num_specs_list = len(tmp_raw_table)
+    _num_specs = len(tmp_raw_table0)
+    _specs_list = []
+    for i in range (_num_specs):
+        _specs_list.append(tmp_raw_table0[tmp_raw_table0.columns[1]][i])
+
+    _category = tmp_raw_table0[tmp_raw_table0.columns[0]][0]
+    if _category == 'Overview': _new_specs_list = _overview_list
+    if _category == 'Drivetrain': _new_specs_list = _drivetrain_simple_list
+    if _category == 'Fuel & MPG':
+        _new_specs_list = _fuel_mpg_list
+        _fuel_list = list(tmp_raw_table0[tmp_raw_table0.columns[1]])
+        if 'Fuel type' in _fuel_list:
+            _row_fuel_type = _fuel_list.index('Fuel type')
+            _fuel = tmp_raw_table0[tmp_raw_table0.columns[2]][_row_fuel_type]
+            if _fuel == 'Electric fuel' and _num_specs_list > 8:
+                _new_specs_list = _BEV_fuel_mpg_list
+            elif _fuel == 'Electric fuel' and _num_specs_list == 2:
+                _new_specs_list = _BEV_simple_fuel_mpg_list
+            elif _num_specs_list > 5 and _num_specs_list <= 8:
+                _new_specs_list = _PHEV_fuel_mpg_list
+    if _category == 'Engine': _new_specs_list = _engine_list
+    if _category == 'Measurements':
+        _new_specs_list = _measurements_list
+        if 'Maximum towing capacity'in _specs_list:
+            _index_towing_capacity = _specs_list.index('Maximum towing capacity')
+    if _category == 'Warranty': _new_specs_list = _warrenty_list
+
+    _specs_seq = []
+    _new_specs_pos = []
+    _num_new_specs_inserted = 0
+    _num_specs_skipped = 0
+    _specs_skipped_pos = []
+
+    for i in range(len(_new_specs_list)):
+        _new_spec = _new_specs_list[i]
+        if _new_spec in _specs_list:
+            ispec_no = _specs_list.index(_new_spec)
+            if ispec_no > i:
+                _specs_skipped_pos.append('yes')
+            else:
+                _specs_skipped_pos.append('no')
+            _specs_seq.append(str(ispec_no))
+            _new_specs_pos.append('no')
+        else:
+            df1 = pd.DataFrame([[''] * len(tmp_raw_table.columns)], columns=tmp_raw_table.columns)
+            df1["Category"][0] = _category
+            df1['Specifications'][0] = _new_spec
+            if i == 0:
+                tmp_raw_table = pd.concat([df1, tmp_raw_table], ignore_index=True)
+            else:
+                tmp_raw_table = pd.concat([tmp_raw_table, df1], ignore_index=True)
+            tmp_raw_table.reset_index()
+            _new_specs_pos.append('yes')
+            _specs_skipped_pos.append('no')
+            _num_new_specs_inserted = _num_new_specs_inserted + 1
+            _specs_seq.append(str('-1'))
+
+    _num_specs_seq = len(_specs_seq)
+
+    _num_new_specs_inserted = 0
+    _num_specs_skipped = 0
+    _new_spec_inserted = False
+    _new_spec_skipped = False
+    for i in range((_num_specs_seq)):
+        _irow_adjusted = i
+        ispec_no = int(_specs_seq[i])
+        _irow = ispec_no = ispec_no
+        if ispec_no >= 0:
+            _specs = tmp_raw_table0[tmp_raw_table0.columns[1]][ispec_no]
+        if _new_specs_pos[i] == 'yes' and ispec_no < 0:
+            _new_specs_text = _new_specs_list[i]
+            tmp_raw_table[tmp_raw_table.columns[1]][i] = _new_specs_text
+            _num_new_specs_inserted = _num_new_specs_inserted + 1
+            _irow = ispec_no + _num_new_specs_inserted
+            for j in range (_menu_columns):
+                tmp_raw_table[tmp_raw_table.columns[j+2]][i] = ''
+                _new_spec_inserted = True
+        elif _specs_skipped_pos[i] == 'yes':
+            _num_specs_skipped = _num_specs_skipped + 1
+            _new_spec_skipped = True
+            _irow = ispec_no - _num_specs_skipped
+            _irow_adjusted = i
+
+        if ispec_no >= 0:
+            _new_specs_text = tmp_raw_table0[tmp_raw_table0.columns[1]][ispec_no]
+            if _new_specs_text == 'Maximum towing capacity': _index_towing_capacity = _irow
+            tmp_raw_table[tmp_raw_table.columns[1]][_irow_adjusted] = _new_specs_text
+            for j in range (_menu_columns):
+                _item = tmp_raw_table0[tmp_raw_table0.columns[j + 2]][ispec_no]
+                if _item == 'no' or _item == '' or  _item == np.nan:
+                    if _specs in _no_to_nan_list: _item = ''
+                tmp_raw_table[tmp_raw_table.columns[j+2]][_irow_adjusted] = _item
+
+    return tmp_raw_table
+
+def est_max_towing_capacity(df):
+    _rows, _cols = df.shape
+    _specs_list = df['Specifications'].tolist()
+
+    _towing_cols = []
+    _towing_missing_col = []
+    _index_towing_capacity = _specs_list.index('Maximum towing capacity')
+    _index_torque = _specs_list.index('Torque')
+    _index_curb_weight = _specs_list.index('Curb weight')
+    _index_gross_weight = _specs_list.index('Gross weight')
+    _index_max_payload = _specs_list.index('Maximum payload')
+    _menu_columns = _cols - 2
+
+    for j in range(_menu_columns):
+        max_payload = df.iloc[_index_max_payload, j+2]
+        gross_weight = df.iloc[_index_gross_weight, j+2]
+        curb_weight = df.iloc[_index_curb_weight, j+2]
+        max_payload_str1 = gross_weight_str1 = ''
+        if len(curb_weight) == 0 or (curb_weight == 'no' or curb_weight == '') and len(gross_weight) > 0 and len(max_payload) > 0:
+            if 'lbs.' in max_payload:  max_payload_str1 = max_payload.split(' ')[0]
+            if 'lbs.' in gross_weight:  gross_weight_str1 = gross_weight.split(' ')[0]
+            if len(gross_weight_str1) > 0 and len(max_payload_str1) > 0:
+                df.iloc[_index_curb_weight, j + 2] = str(float(gross_weight_str1) - float(max_payload_str1)) + ' lbs.'
+    for j in range(_menu_columns):
+        _item = df.iloc[_index_towing_capacity, j+2]
+        if len(_item) > 0 and _item != 'no' and ('lbs.' in _item):
+            _towing_cols.append(j)
+        elif _item == 'no' or _item == '':
+            df.iloc[_index_towing_capacity, j+2] = ''
+            _towing_missing_col.append(j)
+    _num_towing_cols = len(_towing_cols)
+    _num_towing_missing_col = len(_towing_missing_col)
+    if _num_towing_cols > 0 and _num_towing_missing_col > 0:
+        _towing_est = 0
+        _towing_capacity1_first = 0
+        _towing_capacity2_first = 0
+        if len(_towing_cols) < 4:
+            num_sampling = 1
+        else:
+            num_sampling = 2
+        for j in range (_num_towing_missing_col):
+            _icol = int(_towing_missing_col[j])
+            _towing_capacity1 = 0
+            _towing_capacity = ''
+            k = 0
+            sampling_lower = []
+            for _istart in range (_icol-1, 1, -1):
+                if _istart in _towing_cols:
+                    _item = df.iloc[_index_towing_capacity, _istart + 2]
+                    _towing_capacity1 = _towing_capacity1 + float(_item.split(' ')[0])
+                    if k == 0: _towing_capacity1_first = _towing_capacity1
+                    k = k + 1
+                    sampling_lower.append(_istart)
+                    if k == num_sampling: break
+            if k == 0 and _towing_capacity1 == 0:
+                num_towing_capacity1 = 0
+            else:
+                num_towing_capacity1 = num_sampling
+
+            _towing_capacity2 = 0
+            k = 0
+            sampling_upper = []
+            for _iend in range (_icol+1, _cols):
+                if _iend in _towing_cols:
+                    _item = df.iloc[_index_towing_capacity, _iend + 2]
+                    _towing_capacity2 = _towing_capacity2 + float(_item.split(' ')[0])
+                    if k == 0: _towing_capacity2_first = _towing_capacity2
+                    k = k + 1
+                    sampling_upper.append(_iend)
+                    if k == num_sampling: break
+            if k == 0 and _towing_capacity2 == 0:
+                num_towing_capacity2 = 0
+            else:
+                num_towing_capacity2 = num_sampling
+
+            if num_towing_capacity1 > 0 or num_towing_capacity2 > 0:
+                _towing_capacity = (_towing_capacity1 + _towing_capacity2)/(num_towing_capacity1 + num_towing_capacity2)
+
+            if _towing_capacity != '':
+                _towing_est = str(_towing_capacity) + ' lbs. (Estimated)'
+
+            _towing_capacity_lower = 0
+            _towing_capacity_upper = 0
+            if len(sampling_lower) > 0:
+                _item = df.iloc[_index_towing_capacity, sampling_lower[0] + 2]
+                _towing_capacity_lower = float(_item.split(' ')[0])
+            if len(sampling_upper) > 0:
+                _item = df.iloc[_index_towing_capacity, sampling_upper[0] + 2]
+                _towing_capacity_upper = float(_item.split(' ')[0])
+
+            _towing_capacity_diff1 = _towing_capacity_diff2 = 0
+            _towing_capacity_max = max(_towing_capacity_upper, _towing_capacity_lower)
+            _towing_capacity_min = min(_towing_capacity_upper, _towing_capacity_lower)
+
+            if _towing_capacity_min > 0:
+                _towing_capacity_diff1 = abs(_towing_capacity - _towing_capacity_max) / _towing_capacity_max * 100
+            if  _towing_capacity_min > 0:
+                _towing_capacity_diff2 = abs(_towing_capacity - _towing_capacity_min) / _towing_capacity_min * 100
+            if (_towing_capacity_diff1 > 10) or (_towing_capacity_diff2 > 10):
+                curb_weight_lower = 0
+                curb_weight_upper = 0
+                curb_weight = 0
+                curb_weight_max = 0
+                if num_towing_capacity1 > 0 and (df.iloc[_index_curb_weight, sampling_lower[0] + 2] != 'no' and df.iloc[_index_curb_weight, sampling_lower[0] + 2] != '') \
+                    and 'lbs.' in df.iloc[_index_curb_weight, sampling_lower[0] + 2] and len(sampling_lower) > 0:
+                    curb_weight_lower = float(df.iloc[_index_curb_weight, sampling_lower[0] + 2].split(' ')[0])
+                if num_towing_capacity2 > 0 and (df.iloc[_index_curb_weight, sampling_upper[0] + 2] != 'no' and df.iloc[_index_curb_weight, sampling_upper[0] + 2] != '') \
+                        and 'lbs.' in df.iloc[_index_curb_weight, sampling_upper[0] + 2] and len(sampling_upper) > 0 and (sampling_upper[0] + 2) < _menu_columns:
+                    curb_weight_upper = float(df.iloc[_index_curb_weight, sampling_upper[0] + 2].split(' ')[0])
+                if curb_weight_upper > 0 or curb_weight_lower > 0:
+                    curb_weight_max = max(curb_weight_lower, curb_weight_upper)
+                if (df.iloc[_index_curb_weight, _icol + 2] != 'no' and df.iloc[_index_curb_weight, _icol + 2] != '') \
+                    and 'lbs.' in df.iloc[_index_curb_weight, _icol + 2]:
+                    curb_weight = float(df.iloc[_index_curb_weight, _icol + 2].split(' ')[0])
+
+                torque = torque_lower = torque_upper = 0
+                if num_towing_capacity1 > 0 and len(df.iloc[_index_torque, sampling_lower[0] + 2]) > 0:
+                    torque_lower = float(df.iloc[_index_torque, sampling_lower[0] + 2].split(' ')[0])
+                if num_towing_capacity2 > 0 and len(df.iloc[_index_torque, sampling_upper[0] + 2]) > 0:
+                    torque_upper = float(df.iloc[_index_torque, sampling_upper[0] + 2].split(' ')[0])
+                torque_max = max(torque_lower, torque_upper)
+                if len(df.iloc[_index_torque, _icol + 2]) > 0 and 'libs.' in df.iloc[_index_torque, _icol + 2]:
+                    torque = float(df.iloc[_index_torque, _icol + 2].split(' ')[0])
+
+                curb_weight_diff1 = abs(curb_weight - curb_weight_lower)
+                curb_weight_diff2 = abs(curb_weight - curb_weight_upper)
+                torque_diff1 = abs(torque - torque_lower)
+                torque_diff2 = abs(torque - torque_upper)
+
+                if curb_weight > curb_weight_max and torque > torque_max:
+                    _towing_est = _towing_capacity_max
+                elif torque_diff1 < torque_diff2 and curb_weight_diff1 < curb_weight_diff2:
+                    _towing_est = _towing_capacity_lower
+                elif torque_diff1 > torque_diff2 and curb_weight_diff1 > curb_weight_diff2:
+                    _towing_est = _towing_capacity_upper
+                elif (curb_weight > 1.05*curb_weight_max and curb_weight_max > 0) or (torque > 1.1*torque_max and torque_max > 0):
+                    _towing_est = _towing_capacity_max
+                else:
+                    _towing_est = _towing_capacity
+                _towing_est = str(_towing_est) + ' lbs. (Estimated)'
+
+            df.iloc[_index_towing_capacity, _icol+2] = _towing_est
+
+    return df
 
 def Edmunds_Interact(url):
     max_attempts = 10
     max_time = 60
     _max_trim_groups_count = 20 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
     _max_trim_buttons =  60     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
-
     trim_options = []
     trim_dropdown_buttons_xpath = "//button[@data-test='select-menu']"  # The xpath for the trim selection drop-down button, which is repeated in 1-3 columns and multiple rows for each table
     trim_select_buttons_xpath = "//div[@class='dropdown-menu show']//button[@class='dropdown-item']"
@@ -229,7 +565,7 @@ def Edmunds_Interact(url):
                     for i in range(_menu_columns):
                         WebDriverWait(driver, 60).until(
                             EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
-                        time.sleep(2)
+                        time.sleep(3)
                         menus[i].click()
                         trims_text.append(trim_options[_index * 3 + i])
                         option_text = trims_text[i]
@@ -318,13 +654,14 @@ def Edmunds_Interact(url):
                             # important_tables = important_tables.loc[:, ~important_tables.columns.duplicated()]
                             # important_tables = pd.concat([important_tables, raw_table])
                             if table_count == 0: df_tmp = pd.concat([df_tmp, raw_table])
+                                # df_tmp = table_list[table_count]
                             raw_table = raw_table.loc[:, ~raw_table.columns.duplicated()]
                             name_category = table_list[table_count].columns[0]
                             for i in range(_menu_columns):
                                 table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i]})
                             tmp_raw_table = table_list[table_count]
                             if tmp_raw_table.columns[0] != 'Category': tmp_raw_table.insert(0, 'Category', '')
-                            tmp_raw_table.iloc[0, 0] = name_category
+                            tmp_raw_table['Category'] = name_category
                             tmp_raw_table = tmp_raw_table.rename(columns={name_category: 'Specifications'})
                             front_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" front headrests")]
                             rear_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" rear headrests")]
@@ -342,41 +679,58 @@ def Edmunds_Interact(url):
                                 tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, front_headrests, 'front headrests')
                                 tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, rear_headrests, 'rear headrests')
                                 tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            if str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and (len(subwoofers)  > 0 or len(total_speakers)  > 0 or len(months_of_provided_satellite_radio_service) > 0 or len(watts_stereo_output) > 0):
-                                if len(subwoofers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, subwoofers, 'subwoofer(s)')
-                                if len(total_speakers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, total_speakers, 'total speakers')
-                                if len(months_of_provided_satellite_radio_service) > 0:
-                                    tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, months_of_provided_satellite_radio_service, 'Months of provided satellite radio service')
-                                if len(watts_stereo_output) > 0: merge_trim_options(tmp_raw_table, _menu_columns, watts_stereo_output, 'watts stereo output')
-                                tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            if str(tmp_raw_table['Category'][0]).lower() == 'tires & wheels' and (len(tires)  > 0 or len(wheels) > 0):
+                            # elif str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and (len(subwoofers)  > 0 or len(total_speakers)  > 0 or len(months_of_provided_satellite_radio_service) > 0 or len(watts_stereo_output) > 0):
+                            #     if len(subwoofers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, subwoofers, 'subwoofer(s)')
+                            #     if len(total_speakers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, total_speakers, 'total speakers')
+                            #     if len(months_of_provided_satellite_radio_service) > 0:
+                            #         tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, months_of_provided_satellite_radio_service, 'Months of provided satellite radio service')
+                            #     if len(watts_stereo_output) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, watts_stereo_output, 'watts stereo output')
+                            #     tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
+                            elif str(tmp_raw_table['Category'][0]).lower() == 'tires & wheels' and (len(tires)  > 0 or len(wheels) > 0):
                                 tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, tires, 'tires')
                                 tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, wheels, 'wheels')
+                                tmp_raw_table = trim_tires_wheels(tmp_raw_table, _menu_columns)
                                 tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            if str(tmp_raw_table['Category'][0]).lower() == 'front seats' and (len(power_driver_seat)  > 0 or len(power_passenger_seat)  > 0 or len(manual_driver_seat_adjustment) > 0 or len(manual_passenger_seat_adjustment) > 0):
+                            elif str(tmp_raw_table['Category'][0]).lower() == 'front seats' and (len(power_driver_seat)  > 0 or len(power_passenger_seat)  > 0 or len(manual_driver_seat_adjustment) > 0 or len(manual_passenger_seat_adjustment) > 0):
                                 if len(power_driver_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, power_driver_seat, 'power driver seat')
                                 if len(power_passenger_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, power_passenger_seat, 'power passenger seat')
                                 if len(manual_driver_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, manual_driver_seat_adjustment, 'manual driver seat adjustment')
                                 if len(manual_passenger_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, manual_passenger_seat_adjustment, 'manual passenger seat adjustment')
                                 tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
+                            elif str(tmp_raw_table['Category'][0]).lower() == 'overview' or str(tmp_raw_table['Category'][0]).lower() == 'drivetrain' or \
+                                    str(tmp_raw_table['Category'][0]).lower() == 'fuel & mpg' or str(tmp_raw_table['Category'][0]).lower() == 'engine' or \
+                                    str(tmp_raw_table['Category'][0]).lower() == 'measurements' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
+                                tmp_raw_table = update_raw_tables(tmp_raw_table, _menu_columns)
+                                tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
 
-                            df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
-                            df_tmp.fillna('', inplace=True)
+                            if (str(tmp_raw_table['Category'][0]).lower() == 'colors' and SKIP_PRINTING_COLORS == True) or \
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'exterior options' and SKIP_PRINTING_EXTERIOR_OPTIONS == True) or \
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == True) or \
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'packages' and SKIP_PRINTING_PACKAGES == True) or \
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and SKIP_IN_CAR_ENTERTAINMENT == True) or \
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'power feature' and SKIP_POWER_FEATURE == True) or \
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'interior options' and SKIP_PRINTING_INTERIOR_OPTIONS == True):
+                                continue
+                            else:
+                                df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
+                                df_tmp.fillna('', inplace=True)
                             if table_count == (num_table_list-1):
                                 if trim_group == 0:
                                     df = df_tmp
                                 else:
-                                    df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'])
+                                    df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='inner')
                                     df = df.drop_duplicates(subset=['Specifications'])
                         except NameError:
                             # important_tables = raw_table
                             df_tmp = table_list[table_count]
                             name_category = table_list[table_count].columns[0]
                             if df_tmp.columns[0] != 'Category': df_tmp.insert(0, 'Category', '')
-                            df_tmp.iloc[0, 0] = name_category
+                            df_tmp['Category'] = name_category
                             if df_tmp.columns[1] != 'Specifications': df_tmp = df_tmp.rename(
                                 columns={df_tmp.columns[0]: 'Category', df_tmp.columns[1]: 'Specifications'})
                             for i in range(_menu_columns): df_tmp = df_tmp.rename(columns={df_tmp.columns[2 + i]: trims_text[i]})
+                            df_tmp = update_raw_tables(df_tmp, _menu_columns)
+                            df_tmp = drop_merged_option(df_tmp, _menu_columns)
 
             # important_array = important_array.replace(np.nan, '').astype(str).applymap(lambda x: x.strip()).reset_index(drop=True)
             # important_tables.to_csv('/Users/Brandon/PycharmProjects/Web_Scraping/' + 'Important Tables.csv')
@@ -393,6 +747,20 @@ def Edmunds_Interact(url):
             # else:
             #     merge_array = pd.concat([important_array['Category'], important_array[important_array.columns.difference(output_array.columns)]], axis=1)
             #     output_array = pd.merge(output_array, merge_array, on='Category', how='outer')
-    driver.close()
     # return (output_array, readin_check)
+    if DELETE_DISCONTINUED_MODELS == True:
+        dfo = df.copy(deep=True)
+        num_models = len(dfo.columns)
+        for i in range(num_models-1, 1, -1): # deleted the "Discontinued' model
+            _model_name = df.columns[i]
+            print(i, _model_name)
+            if 'Discontinued' in _model_name:
+                df.drop(_model_name, axis=1, inplace=True)
+                # df.drop(_model_name, axis=1, inplace=True)
+        df.reset_index(drop=True, inplace=True)
+
+    df = est_max_towing_capacity(df)
+
+    driver.close()
+
     return (df, readin_check)

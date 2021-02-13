@@ -10,7 +10,7 @@ from pathlib import *
 # pip install pandas numpy selenium beautifulsoup4 html5lib lxml
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019'+'.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019_test'+'.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 50 # print final_table csv file at the final_table_to_csv_inc increments
 for run_count in range (0,len(run_controller)):
@@ -56,7 +56,7 @@ for run_count in range (0,len(run_controller)):
                 msrp = pd.Series(trims_msrp.str.rsplit('$').str[1].str.strip(), name = 'MSRP')
             except AttributeError:
                 msrp = pd.Series(np.zeros(len(trims_msrp)), name = 'MSRP').astype(str)
-            trims = pd.Series(trims_msrp.str.rsplit('(').str[0].str.strip(), name='Trims')
+            trims = pd.Series(trims_msrp.str.rsplit(' - ').str[0].str.strip(), name='Trims')
             output_table.columns = trims
             new_output_table = output_table.T.reset_index(drop=True)
             new_output_table.columns = specification_name.str.upper()
@@ -94,21 +94,20 @@ for run_count in range (0,len(run_controller)):
                     timestr = time.strftime("%Y%m%d-%H%M%S")
                     df_super_trim_url_list = pd.DataFrame(Edmunds_Interact.super_trim_url_list, columns=['URL'])
                     df_super_trim_url_list.to_csv(working_directory + output_name.split('.')[0] + '_high_options_url_' + timestr + '.csv' , index=False)
-            if url_count == 0:
-                final_table_category_specs = pd.DataFrame([category_name, specification_name], columns=['Category', 'Specifications'])
-                timestr = time.strftime("%Y%m%d-%H%M%S")
-                final_table_category_specs.to_csv(
-                    working_directory + output_name.split('.')[0] + '_Category_Specifications_' + timestr + '.csv',
-                    index=False)
+            # if url_count == 0:
+            #     final_table_category_specs = pd.DataFrame([category_name, specification_name], columns=['Category', 'Specifications'])
+            #     timestr = time.strftime("%Y%m%d-%H%M%S")
+            #     final_table_category_specs.to_csv(
+            #         working_directory + output_name.split('.')[0] + '_Category_Specifications_' + timestr + '.csv',
+            #         index=False)
 
     final_table['URL'] = final_table['URL'].str.upper()
     final_table = final_table.sort_values('URL')
     final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
     final_table = final_table.fillna('')
     final_table = final_table.reset_index(drop=True)
-    timestr = time.strftime("%Y%m%d")
+    timestr = time.strftime("%Y%m%d-%H%M%S")
     final_table.to_csv(working_directory + output_name.split('.')[0] + '_' + timestr + '.csv', index=False)
-
 
     time_elapsed = datetime.now() - start_time
     print('Time elapsed (hh:mm:ss.ms) {}'.format(time_elapsed))
