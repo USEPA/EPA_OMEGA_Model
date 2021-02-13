@@ -4,20 +4,11 @@ import datetime
 pd.options.mode.chained_assignment = None  # default='warn'
 
 def weighed_average(grp):
-    # _rows, _cols = grp.shape
     # return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/(~pd.isnull(grp._get_numeric_data()).multiply(grp[weighting_field], axis=0).sum())
-    # print(num1, divider1)
-    # if (grp[information_toget_source_column_name].any() == str) or grp[information_toget_source_column_name] == '':
-    #     print('grp string can not convert to float ', grp[information_toget_source_column_name])
-    #     grp[information_toget_source_column_name] = 0
-    # else:
-    #     grp[information_toget_source_column_name] = grp[information_toget_source_column_name].astype(float)._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp[information_toget_source_column_name].astype(float))).multiply(grp[weighting_field],axis=0).sum())
-    grp[information_toget_source_column_name] = grp[information_toget_source_column_name].str.strip().astype(float).multiply(grp[weighting_field], axis=0).sum() / (pd.notnull(
-    grp[information_toget_source_column_name])).multiply(grp[weighting_field], axis=0).sum()
+
+    grp[information_toget_source_column_name] = grp[information_toget_source_column_name].astype(float).multiply(grp[weighting_field], axis=0).sum() \
+                                                / pd.notnull(grp[information_toget_source_column_name]._get_numeric_data()).multiply(grp[weighting_field], axis=0).sum()
     return grp
-
-
-# return grp
 
 def mode(df, key_cols, value_col, count_col):
     return df.groupby(key_cols + [value_col]).size() \
@@ -340,25 +331,46 @@ for model_year in model_years:
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
-            if information_toget == 'MSRP':
-                print(information_toget, query_type)
             if (aggregating_fields==information_toget).sum() == 0 and len(master_index_file_with_desired_fields_all_merges[\
                     ~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name])]) > 0:
                 print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
-                if information_toget == 'MSRP':
-                    master_index_file_with_desired_fields_all_merges[information_toget_source_column_name] = \
-                        master_index_file_with_desired_fields_all_merges[information_toget_source_column_name].str.replace(',', '').astype(float)
-                    # print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
+                # if information_toget == 'MSRP':
+                #     master_index_file_with_desired_fields_all_merges[information_toget_source_column_name] = \
+                #         master_index_file_with_desired_fields_all_merges[information_toget_source_column_name].str.replace(',', '').astype(float)
                 try:
                     master_index_file_with_desired_field_all_merges = master_index_file_with_desired_fields_all_merges[\
                         (~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name]))].reset_index(drop=True)
                 except KeyError:
                     continue
-                if query_type == 'max' or query_type == 'min' or query_type == 'avg' \
-                        or query_type == 'std' or query_type == 'sum':
+                if query_type == 'max' or query_type == 'min' or query_type == 'avg' or query_type == 'std' or query_type == 'sum':
                     try:
-                       master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name]   # .astype(float)  # ValueError: could not convert string to float: '3549 lbs.'
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != 'FALSE']
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != '0.0']
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != '']
+                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges.drop_duplicates(list(aggregating_columns)).reset_index()
+
+                        if information_toget_source_column_name == 'GROUND CLEARANCE':
+                            print(information_toget_source_column_name)
+                        if ' lbs.' in str(master_index_file_with_desired_field_all_merges.loc[:, information_toget_source_column_name]):
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = master_index_file_with_desired_field_all_merges[information_toget_source_column_name].map(
+                                lambda x: x.rstrip(' lbs.'))
+                        if  ' in.' in str(master_index_file_with_desired_field_all_merges.loc[:, information_toget_source_column_name]):
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = master_index_file_with_desired_field_all_merges[information_toget_source_column_name].map(
+                                lambda x: x.rstrip(' in.'))
+                        if  ' ft.' in str(master_index_file_with_desired_field_all_merges.loc[:, information_toget_source_column_name]):
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = master_index_file_with_desired_field_all_merges[information_toget_source_column_name].map(
+                                lambda x: x.rstrip(' ft.'))
+                        if ' cu.ft.' in str(master_index_file_with_desired_field_all_merges.loc[:, information_toget_source_column_name]):
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = master_index_file_with_desired_field_all_merges[information_toget_source_column_name].map(
+                                lambda x: x.rstrip(' cu.ft.'))
+                        if information_toget_source_column_name == 'MSRP':
+                            if ',' in str(master_index_file_with_desired_field_all_merges.loc[:, information_toget_source_column_name]):                            # if [',', ' (Most Popular)'] in master_index_file_with_desired_field_all_merges.loc[:, information_toget_source_column_name].any():
+                                master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = master_index_file_with_desired_field_all_merges[information_toget_source_column_name].map(lambda x: x.replace(',', ''))
+                            if ' (Most Popular)' in str(master_index_file_with_desired_field_all_merges.loc[0:0, information_toget_source_column_name]):
+                                master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = master_index_file_with_desired_field_all_merges[information_toget_source_column_name].map(lambda x: x.replace(' (Most Popular)', ''))
+
+                        # master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
+                        #     master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
                             information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
@@ -366,8 +378,7 @@ for model_year in model_years:
                             master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                                 master_index_file_with_desired_field_all_merges[information_toget_source_column_name].str.extract('(\d+)').astype(float)
                         else:
-                            master_index_file_with_desired_field_all_merges[
-                                information_toget_source_column_name] = testing_column
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = testing_column
                 if query_type == 'max':
                     # if bounding_field == 'TOT_ROAD_LOAD_HP':
                     #     print(bounding_field)
@@ -427,16 +438,12 @@ for model_year in model_years:
                     if weighting_field == str(np.nan) or pd.isnull(weighting_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [information_toget_source_column_name]].groupby(
-                            list(aggregating_columns)).mean().reset_index()
+                            list(aggregating_columns)).apply(lambda x: x.astype(float).min()).reset_index()
                     else:
-                        if information_toget_source_column_name == 'COMBINED MPG Edmunds' or information_toget_source_column_name == 'EPA_CAFE_MT_CALC_COMB_FE_4':
-                            print(information_toget_source_column_name)
-                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]]
-                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != '0.0']
-                        master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges.drop_duplicates(list(aggregating_columns)).reset_index()                        # master_index_file_with_desired_field_all_merges = master_index_file_with_desired_field_all_merges[master_index_file_with_desired_field_all_merges[information_toget_source_column_name] != '']
-                        # query_output_source = master_index_file_with_desired_field_all_merges[ \
-                        #  list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]].groupby(list(aggregating_columns)).apply(weighed_average)  # apply(weighed_average)
-                        query_output_source = master_index_file_with_desired_field_all_merges.groupby(list(aggregating_columns)).apply(weighed_average)  # apply(weighed_average)
+                        # if information_toget_source_column_name == 'GROUND CLEARANCE': # or information_toget_source_column_name == 'EPA_CAFE_MT_CALC_COMB_FE_4':
+                            # print(information_toget_source_column_name)
+                        query_output_source = master_index_file_with_desired_field_all_merges[ \
+                         list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]].groupby(list(aggregating_columns)).apply(weighed_average)  # apply(weighed_average)
                         if weighting_field in query_output_source.columns:
                             query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan)
                     try:
