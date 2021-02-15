@@ -4,12 +4,11 @@ import os
 import time
 from pathlib import *
 
-run_folder = '20210202'
 main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
             +'\\'+'techspecconsolidator\Source Cleanup Runs'
 # main_path = 'I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Source Cleanup Runs'
 # main_path = str(Path.home()) +  '/Documents/Python/Source Cleanup Runs'
-
+run_folder = str(input('Enter Run Folder Name: '))
 run_controller = pd.read_csv(main_path + '\\' + run_folder + '/Source Cleanup Run Controller.csv')
 full_unit_table = pd.read_csv(main_path + '\\' + run_folder +  '/Source Cleanup Unit Conversion.csv')
 # run_controller = pd.read_csv('Source Cleanup Run Controller.csv')

@@ -3,7 +3,7 @@ import numpy as np
 import datetime
 pd.options.mode.chained_assignment = None  # default='warn'
 
-def weighed_average(grp):
+def weighted_average(grp):
     return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp)).multiply(grp[weighting_field],axis=0).sum())
 
 def mode(df, key_cols, value_col, count_col):
@@ -42,6 +42,11 @@ for _row in range (_rows):
     elif query_field_input == '' or query_field_input == 'Done':
         break
 
+field_mapping_filename = run_controller['database_definition_files'][0]
+data_sources_filename = run_controller['database_definition_files'][1]
+main_mapping_category_key_filename = run_controller['database_definition_files'][2]
+
+
 if ',' in aggregating_fields_input:
     aggregating_fields = pd.Series(aggregating_fields_input.split(','), name='Category').str.strip()
     # aggregating_fields = pd.Series(list(aggregating_fields_input.split(',')), name='Category').str.strip()
@@ -59,9 +64,9 @@ for model_year in model_years:
     run_controller = run_controller[run_controller['USE_YN']=='y'].reset_index(drop=True)
     input_path = main_path+'\\'+run_folder+'\\'+'inputs'
     output_path = main_path+'\\'+run_folder+'\\'+'outputs'
-    field_mapping_df = pd.read_csv(input_path + '\\' + 'Field Mapping.csv')
-    data_sources_df = pd.read_csv(input_path + '\\' + 'Data Sources.csv')
-    master_category_check_file = pd.read_csv(input_path + '\\' + 'Main Mapping Category Key.csv')
+    field_mapping_df = pd.read_csv(input_path + '\\' + field_mapping_filename)
+    data_sources_df = pd.read_csv(input_path + '\\' + data_sources_filename)
+    master_category_check_file = pd.read_csv(input_path + '\\' + main_mapping_category_key_filename)
     master_category_check_df = master_category_check_file.set_index(master_category_check_file['Readin Sources'].values)
 
     aggregating_columns = pd.Series(np.zeros(len(aggregating_fields))).replace(0, '')
@@ -388,7 +393,7 @@ for model_year in model_years:
                     else:
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).apply(weighed_average)
+                            .groupby(list(aggregating_columns)).apply(weighted_average)
                         query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan)
                     try:
                         query_output_source = query_output_source.drop(list(aggregating_columns), axis=1).reset_index()

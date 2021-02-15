@@ -8,8 +8,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                         ftp_drivecycle_filename, hwfet_drivecycle_filename):
     footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding = "ISO-8859-1", na_values=['-']) # EVCIS Qlik Sense query results contain hyphens for nan
     lineage_file = pd.read_csv(input_path + '\\' + footprint_lineage_filename, encoding = "ISO-8859-1")
-    body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, \
-                                         converters={'LineageID': int, 'BodyID': int})
+    # body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
+    body_id_table_readin = pd.read_csv(input_path + '\\' + bodyid_filename, na_values={''}, keep_default_na=False, encoding="ISO-8859-1")
     body_id_table_readin = body_id_table_readin[body_id_table_readin['BodyID EndYear'] != 'xx'].reset_index(drop=True)
     body_id_table_int = body_id_table_readin[(~pd.isnull(body_id_table_readin['BodyID EndYear'])) \
                                              & (body_id_table_readin['BodyID StartYear'] <= year)].reset_index(drop=True)
@@ -56,11 +56,11 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     try:
         #BodyID table is found, no new manual filter sought
-        previous_filter_table = pd.read_csv(input_path+'\\'+manual_filter_name + '.csv', encoding = "ISO-8859-1")
+        previous_filter_table = pd.read_csv(input_path+'\\'+manual_filter_name, encoding = "ISO-8859-1")
         previous_filter_table = previous_filter_table[previous_filter_table['MODEL_YEAR']==year].reset_index(drop=True)
     except OSError:
         #New BodyID table to be made, no previous data
-        full_filter_table_save_name = manual_filter_name + ' ' + date_and_time + '.csv'
+        full_filter_table_save_name = manual_filter_name.replace('csv', '') + ' ' + date_and_time + '.csv'
         full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') \
                                                     + '\\' + full_filter_table_save_name, index=False)
     else:
@@ -327,6 +327,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             #full_expanded_footprint_filter_table['POSSIBLE_BODYID']
             changed_lineageids = pd.Series(full_expanded_footprint_filter_table['LineageID'][pd.isnull(full_expanded_footprint_filter_table['POSSIBLE_BODYID'])]).unique()
             full_expanded_footprint_filter_table['POSSIBLE_BODYID'][full_expanded_footprint_filter_table['LineageID'].isin(changed_lineageids)] = np.nan
-            full_filter_table_save_name = manual_filter_name + ' ' + date_and_time + '.csv'
+            full_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
             full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') \
                                                         + '\\' + full_filter_table_save_name, index=False)
