@@ -102,6 +102,7 @@ for run_count in range (0,len(run_controller)):
             #         index=False)
 
     final_table['URL'] = final_table['URL'].str.upper()
+    final_table = final_table.rename(columns={'WHEEL BASE': 'WHEELBASE'})
     final_table = final_table.sort_values('URL')
     final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
     final_table = final_table.fillna('')
