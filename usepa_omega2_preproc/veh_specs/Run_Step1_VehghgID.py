@@ -2,9 +2,11 @@
 import pandas as pd
 main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
             +'\\'+'techspecconsolidator\VehGHG Runs'
-run_controller = pd.read_csv('VehghgID Run Controller.csv')
+run_folder = str(input('Enter Run Folder Name: '))
+run_controller = pd.read_csv(main_path + '\\' + run_folder + '\\' + 'VehghgID Run Controller.csv')
+# run_controller = pd.read_csv('VehghgID Run Controller.csv')
 for run_count in range (0,len(run_controller)):
-    run_folder = str(run_controller['Run Folder'][run_count])
+    # run_folder = str(run_controller['Run Folder'][run_count])
     input_path = main_path + '\\' + run_folder + '\\' + 'inputs'
     output_path_vehghgid = main_path + '\\' + run_folder + '\\' + 'outputs'
     output_path_intermediate = main_path + '\\' + run_folder + '\\' + 'intermediate files'

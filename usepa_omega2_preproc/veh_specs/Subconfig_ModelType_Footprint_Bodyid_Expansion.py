@@ -6,10 +6,10 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                         subconfig_filename, model_type_filename, vehghg_filename, output_path, \
                         footprint_exceptions_table, modeltype_exceptions_table, year, roadload_coefficient_table_filename, \
                         ftp_drivecycle_filename, hwfet_drivecycle_filename):
-    footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding = "ISO-8859-1" )
+    footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding = "ISO-8859-1", na_values=['-']) # EVCIS Qlik Sense query results contain hyphens for nan
     lineage_file = pd.read_csv(input_path + '\\' + footprint_lineage_filename, encoding = "ISO-8859-1")
-    body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, \
-                                         converters={'LineageID': int, 'BodyID': int})
+    # body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
+    body_id_table_readin = pd.read_csv(input_path + '\\' + bodyid_filename, na_values={''}, keep_default_na=False, encoding="ISO-8859-1")
     body_id_table_readin = body_id_table_readin[body_id_table_readin['BodyID EndYear'] != 'xx'].reset_index(drop=True)
     body_id_table_int = body_id_table_readin[(~pd.isnull(body_id_table_readin['BodyID EndYear'])) \
                                              & (body_id_table_readin['BodyID StartYear'] <= year)].reset_index(drop=True)
@@ -49,23 +49,18 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 footprint_exceptions_table['New Value'][error_check_count]
     footprint_id_categories = ['MODEL_YEAR', 'FOOTPRINT_INDEX', 'CAFE_ID', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_CARLINE_NM', \
                                'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_DIVISION_NM']
-    footprint_filter_table = footprint_file[list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC']].merge(
-        lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', \
-        on=footprint_id_categories)
-    footprint_file_with_lineage = footprint_file\
-        .merge(lineage_file[list(footprint_id_categories) + ['LineageID']],how='left', on=footprint_id_categories)
-    full_expanded_footprint_filter_table = footprint_filter_table.merge(
-        body_id_table, how='left', on='LineageID')
-    full_expanded_footprint_file = footprint_file_with_lineage\
-        .merge(body_id_table, how='left', on='LineageID')
+    footprint_filter_table = footprint_file[list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC']].merge(lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
+    footprint_file_with_lineage = footprint_file.merge(lineage_file[list(footprint_id_categories) + ['LineageID']],how='left', on=footprint_id_categories)
+    full_expanded_footprint_filter_table = footprint_filter_table.merge(body_id_table, how='left', on='LineageID')
+    full_expanded_footprint_file = footprint_file_with_lineage.merge(body_id_table, how='left', on='LineageID')
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     try:
         #BodyID table is found, no new manual filter sought
-        previous_filter_table = pd.read_csv(input_path+'\\'+manual_filter_name + '.csv', encoding = "ISO-8859-1")
+        previous_filter_table = pd.read_csv(input_path+'\\'+manual_filter_name, encoding = "ISO-8859-1")
         previous_filter_table = previous_filter_table[previous_filter_table['MODEL_YEAR']==year].reset_index(drop=True)
     except OSError:
         #New BodyID table to be made, no previous data
-        full_filter_table_save_name = manual_filter_name + ' ' + date_and_time + '.csv'
+        full_filter_table_save_name = manual_filter_name.replace('csv', '') + ' ' + date_and_time + '.csv'
         full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') \
                                                     + '\\' + full_filter_table_save_name, index=False)
     else:
@@ -78,9 +73,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                  on=list(footprint_id_categories) + ['BodyID'])
             full_expanded_footprint_file = full_expanded_footprint_file[\
                 full_expanded_footprint_file['POSSIBLE_BODYID'] == 'y'].reset_index(drop=True)
-            subconfig_file = pd.read_csv(input_path + '\\' + subconfig_filename)
+            subconfig_file = pd.read_csv(input_path + '\\' + subconfig_filename, encoding = "ISO-8859-1", na_values=['-']) # EVCIS Qlik Sense query results contain hyphens for nan
             subconfig_file = subconfig_file[subconfig_file['MODEL_YEAR'] == year].reset_index(drop=True)
-            model_type_file = pd.read_csv(input_path + '\\' + model_type_filename, encoding = "ISO-8859-1")
+            model_type_file = pd.read_csv(input_path + '\\' + model_type_filename, encoding = "ISO-8859-1", na_values=['-']) # EVCIS Qlik Sense query results contain hyphens for nan)
             model_type_file = model_type_file[model_type_file['CAFE_MODEL_YEAR']==year].reset_index(drop=True)
             footprint_indexing_categories = ['FOOTPRINT_DIVISION_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_INDEX']
             subconfig_indexing_categories = ['MFR_DIVISION_NM', 'MODEL_TYPE_INDEX', 'SS_ENGINE_FAMILY', 'CARLINE_CODE', \
@@ -188,15 +183,14 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 'PROD_VOL_GHG_TOTAL_50_STATE','PRODUCTION_VOLUME_GHG_50_STATE',\
                        'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'],axis=1).columns)
             #Powertrain Efficiency
-            roadload_coefficient_table = pd.read_csv(input_path+'\\'+roadload_coefficient_table_filename)
+            roadload_coefficient_table = pd.read_csv(input_path+'\\'+roadload_coefficient_table_filename, encoding = "ISO-8859-1", na_values=['-']) # EVCIS Qlik Sense query results contain hyphens for nan
             roadload_coefficient_table = roadload_coefficient_table[roadload_coefficient_table['MODEL_YEAR']==year]\
                 .groupby(['LDFE_CAFE_SUBCONFIG_INFO_ID','TARGET_COEF_A','TARGET_COEF_B','TARGET_COEF_C',\
                 'FUEL_NET_HEATING_VALUE','FUEL_GRAVITY']).first().reset_index().drop('MODEL_YEAR',axis=1).reset_index(drop=True)
             vehghg_file_nonflexfuel = pd.merge_ordered(vehghg_file_nonflexfuel, roadload_coefficient_table, \
                 how='left', on=['LDFE_CAFE_SUBCONFIG_INFO_ID','LDFE_CAFE_ID','LDFE_CAFE_MODEL_TYPE_CALC_ID','CAFE_MFR_CD','LABEL_MFR_CD','MODEL_TYPE_INDEX','MFR_DIVISION_SHORT_NM','CARLINE_NAME','INERTIA_WT_CLASS','CONFIG_INDEX','SUBCONFIG_INDEX','TRANS_TYPE','HYBRID_YN']).reset_index(drop=True)
 
-            vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(\
-                vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE']*vehghg_file_nonflexfuel['FUEL_GRAVITY']*btu2mj*kg2lbm)
+            vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE'].astype(float) * vehghg_file_nonflexfuel['FUEL_GRAVITY'].astype(float) * btu2mj * kg2lbm)
             import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, \
                 vehghg_file_nonflexfuel],axis=1)
@@ -333,6 +327,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             #full_expanded_footprint_filter_table['POSSIBLE_BODYID']
             changed_lineageids = pd.Series(full_expanded_footprint_filter_table['LineageID'][pd.isnull(full_expanded_footprint_filter_table['POSSIBLE_BODYID'])]).unique()
             full_expanded_footprint_filter_table['POSSIBLE_BODYID'][full_expanded_footprint_filter_table['LineageID'].isin(changed_lineageids)] = np.nan
-            full_filter_table_save_name = manual_filter_name + ' ' + date_and_time + '.csv'
+            full_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
             full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') \
                                                         + '\\' + full_filter_table_save_name, index=False)

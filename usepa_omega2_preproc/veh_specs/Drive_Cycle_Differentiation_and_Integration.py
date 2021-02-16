@@ -3,7 +3,7 @@ def Drive_Cycle_Differentiation_and_Integration(input_path, drivecycle_file_FTP,
     import numpy as np
 #Read in FTP and HWFET drive cycle
     #print ('Evaluating Drive Cycles')
-    FTP_ws = pd.read_csv(input_path + '\\' + drivecycle_file_FTP,skiprows=1)
+    FTP_ws = pd.read_csv(input_path + '\\' + drivecycle_file_FTP, encoding='ISO-8859-1', skiprows=1)
     FTP_time = FTP_ws['Test Time, secs']
     FTP_velocity_mph = FTP_ws['Target Speed, mph']
     FTP_length = len(FTP_time)
@@ -25,7 +25,7 @@ def Drive_Cycle_Differentiation_and_Integration(input_path, drivecycle_file_FTP,
     
     FTP_Array = pd.concat([FTP_time, FTP_velocity_mph, FTP_disp_mi, FTP_acceleration_mph2],axis=1)
 #Read in HWFET drive cycle
-    HWFET_ws = pd.read_csv(input_path + '\\' + drivecycle_file_HWFET,skiprows=1)
+    HWFET_ws = pd.read_csv(input_path + '\\' + drivecycle_file_HWFET, encoding='ISO-8859-1', skiprows=1)
     HWFET_time = HWFET_ws['Test Time, secs']
     HWFET_velocity_mph = HWFET_ws['Target Speed, mph']
     HWFET_length = len(HWFET_time)
