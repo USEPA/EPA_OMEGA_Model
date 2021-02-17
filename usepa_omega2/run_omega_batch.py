@@ -39,7 +39,7 @@ class OMEGABatchObject(OMEGABase):
         self.context_folder = ''
         self.context_id = ''
         self.context_case_id = ''
-        self.output_path = ".\\"
+        self.output_path = "." + os.sep
         self.sessions = []
         self.dataframe = pd.DataFrame()
 
@@ -202,7 +202,7 @@ class OMEGASessionObject(OMEGABase):
         self.parent = []
         self.name = name
         self.num = 0
-        self.output_path = ".\\"
+        self.output_path = "." + os.sep
         self.enabled = False
         self.settings = OMEGARuntimeOptions()
 
@@ -534,9 +534,9 @@ if __name__ == '__main__':
 
                 # write a copy of the expanded, validated batch to the source batch_file directory:
                 if '.csv' in options.batch_file:
-                    expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name)
+                    expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
                 else:
-                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + '\\' + expanded_batch.name,
+                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
                                                       "Sessions")
 
                 # copy session inputs to session folder(s) for active session(s)

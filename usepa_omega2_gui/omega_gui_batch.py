@@ -258,7 +258,7 @@ class Form(QObject):
         temp1 = os.path.normpath(temp1)
         # Get path of selected file
         temp2 = os.path.dirname(file_name)
-        temp2 = os.path.normpath(temp2) + '\\'
+        temp2 = os.path.normpath(temp2) + os.sep
         # working_directory = temp2
         configuration_file = temp2 + temp1
         # Place path in gui
@@ -384,7 +384,7 @@ class Form(QObject):
         temp1 = os.path.normpath(temp1)
         # Get path of selected file
         temp2 = os.path.dirname(file_name)
-        temp2 = os.path.normpath(temp2) + '\\'
+        temp2 = os.path.normpath(temp2) + os.sep
         # working_directory = temp2
         configuration_file = temp2 + temp1
         # Place path in gui
@@ -424,7 +424,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA 2 Batch Files (*.xlsx)"
+        file_type = "OMEGA 2 Batch Files (*.xlsx, *.csv)"
         # Add file dialog title
         file_dialog_title = "Select Input Batch File"
         # Call file dialog function
@@ -437,7 +437,7 @@ class Form(QObject):
         temp1 = os.path.normpath(temp1)
         # Get path of selected directory
         temp2 = os.path.dirname(file_name)
-        temp2 = os.path.normpath(temp2) + '\\'
+        temp2 = os.path.normpath(temp2) + os.sep
         # working_directory = temp2
         input_batch_file = temp2 + temp1
         # Update dictionary entry
@@ -492,7 +492,7 @@ class Form(QObject):
         temp1 = os.path.normpath(temp1)
         # Get path of selected directory
         temp2 = os.path.dirname(file_name)
-        temp2 = os.path.normpath(temp2) + '\\'
+        temp2 = os.path.normpath(temp2) + os.sep
         # working_directory = temp2
         output_batch_directory = temp2 + temp1
         # Update dictionary entry
@@ -746,15 +746,19 @@ class Form(QObject):
 
         # This call works but gui freezes until new process ends
         # os.system("python usepa_omega2/__main__.py")
-        # Open batch excel spreadsheet
-        excel_data_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
+        # Open batch definition
+        if '.xls' in input_batch_file:
+            batch_definition_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
+        else:
+            batch_definition_df = pandas.read_csv(input_batch_file, index_col=0)
         # Create timestamp for batch filename
         batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         # Create path to batch log file
-        output_batch_subdirectory = output_batch_directory + "/" + batch_time_stamp + '_' + \
-            excel_data_df.loc['Batch Name', 'Value']
+        output_batch_subdirectory = output_batch_directory + os.sep + batch_time_stamp + '_' + \
+            batch_definition_df.loc['Batch Name', 'Value']
+
         # Create path to session log file
-        output_session_subdirectory = output_batch_subdirectory + "/ReferencePolicy/output"
+        # output_session_subdirectory = output_batch_subdirectory + os.sep + "ReferencePolicy" + os.sep + "output"
         # print('*****', output_session_subdirectory)
 
         # Delete contents of comm_file.txt used to communicate with other processes
@@ -1071,8 +1075,8 @@ class Form(QObject):
         # print(plot_select_directory_name)
 
         self.window.list_graphs_1.clear()
-        input_file = path + 'usepa_omega2_gui/elements/plot_definition.xlsx'
-        plot_data_df = pandas.read_excel(input_file)
+        input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
+        plot_data_df = pandas.read_csv(input_file)
         # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
         for index, row in plot_data_df.iterrows():
             # print(row['plot_name'])
@@ -1103,8 +1107,8 @@ class Form(QObject):
         """
         global plot_select_directory_name
         self.window.list_graphs_1.clear()
-        input_file = path + 'usepa_omega2_gui/elements/plot_definition.xlsx'
-        plot_data_df = pandas.read_excel(input_file)
+        input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
+        plot_data_df = pandas.read_csv(input_file)
         # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
         for index, row in plot_data_df.iterrows():
             # print(row['plot_name'])
@@ -1192,4 +1196,11 @@ def run_gui():
 
 
 if __name__ == '__main__':
+    import platform
+
+    if platform.system() == 'Darwin':
+        # workaround for PySide2 on MacOS Big Sur
+        import os
+        os.environ['QT_MAC_WANTS_LAYER'] = '1'
+
     run_gui()

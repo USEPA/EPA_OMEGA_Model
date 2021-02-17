@@ -20,10 +20,11 @@ retry_count = dict()  # track retry attempts for terminated or abandoned jobs
 
 
 def restart_job(job):
+    import os
     global dispycluster
     global dispy_debug
 
-    job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id['session_name'] + ': #' + str(
+    job_id_str = job.id['batch_path'] + os.sep + job.id['batch_name'] + os.sep + job.id['session_name'] + ': #' + str(
         job.id['session_num'])
 
     if retry_count.__contains__(str(job.id)):
@@ -44,11 +45,12 @@ def restart_job(job):
 
 
 def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, DispyJob.Abandoned)
+    import os
     import dispy
     global dispy_debug
 
     if job is not None:
-        job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id['session_name'] + ': #' + str(
+        job_id_str = job.id['batch_path'] + os.sep + job.id['batch_name'] + os.sep + job.id['session_name'] + ': #' + str(
             job.id['session_num'])
     else:
         job_id_str = 'NONE'
@@ -77,13 +79,14 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
 # 'cluster_status' callback function. It is called by dispy (client)
 # to indicate node / job status changes.
 def status_cb(status, node, job):
+    import os
     import dispy
     global dispy_debug
 
     # job comes in as an int before the job.id is initialized
     if job is not None:
         try:
-            job_id_str = job.id['batch_path'] + '\\' + job.id['batch_name'] + '\\' + job.id[
+            job_id_str = job.id['batch_path'] + os.sep + job.id['batch_name'] + os.sep + job.id[
                 'session_name'] + ': #' + str(
                 job.id['session_num'])
         except:
@@ -137,15 +140,15 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     # call shell command
     pythonpath = sys.exec_prefix
     if 'env' in pythonpath:
-        pythonpath = pythonpath + "\\Scripts"
-    cmd = '"{}\\python" "{}\\{}\\usepa_omega2\\run_omega_batch.py" --bundle_path "{}" \
+        pythonpath = pythonpath + "/bin" # "/Scripts"
+    cmd = '"{}/python" "{}/{}/usepa_omega2/run_omega_batch.py" --bundle_path "{}" \
             --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
         pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
     sysprint('.')
     sysprint(cmd)
     sysprint('.')
 
-    subprocess.call(cmd)
+    subprocess.call(cmd, shell=True)
 
     logfilename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
                                     'o2log_%s_%s.txt' % (batch_name, session_name))
@@ -212,11 +215,29 @@ class DispyCluster(object):
         global dispycluster
         dispycluster = self
 
+    def get_ip_address(self):
+        """
+        Attempt to get "local" IP address
+        
+        Example (The second IP address is the one we want):
+
+        ::
+            
+            >>> socket.gethostbyname_ex(socket.gethostname())
+            ('kevins-mac-mini.local', [], ['127.0.0.1', '192.168.1.20'])
+        
+        Returns:
+
+        """
+        import socket
+        # socket.gethostbyname(socket.gethostname())
+        return socket.gethostbyname_ex(socket.gethostname())[2][-1]
+
     def find_nodes(self):
         import dispy, socket, time, sys
 
         print("Finding dispynodes...")
-        self.master_ip = socket.gethostbyname(socket.gethostname())
+        self.master_ip = self.get_ip_address()
         print('Master IP = %s' % self.master_ip)
         if not self.options.local and (self.options.dispy_ping or self.options.network):
             self.desired_node_list = ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63',
