@@ -196,7 +196,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         omega_log.logwrite('', echo_console=True)
 
-    if o2.options.log_consumer_iteration_years is 'all' or calendar_year in o2.options.log_consumer_iteration_years:
+    if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
@@ -334,7 +334,7 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
     iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
-    if o2.options.log_consumer_iteration_years is 'all' or calendar_year in o2.options.log_consumer_iteration_years:
+    if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
 
