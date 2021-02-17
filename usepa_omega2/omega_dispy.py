@@ -137,17 +137,16 @@ def status_cb(status, node, job):
 
 def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, retry_count=0):
     import sys, subprocess, os, time
-    # call shell command
-    pythonpath = sys.exec_prefix
-    if 'env' in pythonpath:
-        pythonpath = pythonpath + "/bin" # "/Scripts"
-    cmd = '"{}/python" "{}/{}/usepa_omega2/run_omega_batch.py" --bundle_path "{}" \
+    # build shell command
+    cmd = '"{}" "{}/{}/usepa_omega2/run_omega_batch.py" --bundle_path "{}" \
             --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
-        pythonpath, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num)
+        sys.executable, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num).replace('/', os.sep)
+
     sysprint('.')
     sysprint(cmd)
     sysprint('.')
 
+    # run shell command
     subprocess.call(cmd, shell=True)
 
     logfilename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
