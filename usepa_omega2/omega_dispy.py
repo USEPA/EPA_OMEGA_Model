@@ -12,7 +12,7 @@ def sysprint(str):
 
 def dispy_node_setup():
     import socket
-    sysprint('node {} standing by...'.format(socket.gethostbyname(socket.gethostname())))
+    sysprint('node {} standing by...'.format(socket.gethostbyname_ex(socket.gethostname())[2][-1]))
     sysprint('.')
 
 
