@@ -60,7 +60,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
         previous_filter_table = previous_filter_table[previous_filter_table['MODEL_YEAR']==year].reset_index(drop=True)
     except OSError:
         #New BodyID table to be made, no previous data
-        full_filter_table_save_name = manual_filter_name.replace('csv', '') + ' ' + date_and_time + '.csv'
+        full_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
         full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') \
                                                     + '\\' + full_filter_table_save_name, index=False)
     else:
