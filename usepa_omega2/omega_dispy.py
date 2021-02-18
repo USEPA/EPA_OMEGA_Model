@@ -5,6 +5,7 @@ from usepa_omega2 import omega_log
 
 print('importing %s' % __file__)
 
+
 def sysprint(str):
     import os
     os.system('echo {}'.format(str))
@@ -50,7 +51,8 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
     global dispy_debug
 
     if job is not None:
-        job_id_str = job.id['batch_path'] + os.sep + job.id['batch_name'] + os.sep + job.id['session_name'] + ': #' + str(
+        job_id_str = job.id['batch_path'] + os.sep + job.id['batch_name'] + os.sep + job.id[
+            'session_name'] + ': #' + str(
             job.id['session_num'])
     else:
         job_id_str = 'NONE'
@@ -140,7 +142,8 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     # build shell command
     cmd = '"{}" "{}/{}/usepa_omega2/run_omega_batch.py" --bundle_path "{}" \
             --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
-        sys.executable, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num).replace('/', os.sep)
+        sys.executable, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num).replace(
+        '/', os.sep)
 
     sysprint('.')
     sysprint(cmd)
@@ -150,7 +153,7 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     subprocess.call(cmd, shell=True)
 
     logfilename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
-                                    'o2log_%s_%s.txt' % (batch_name, session_name))
+                               'o2log_%s_%s.txt' % (batch_name, session_name))
 
     time.sleep(1)  # wait for summary file to finish writing?
 
@@ -216,31 +219,31 @@ class DispyCluster(object):
 
     def get_ip_address(self):
         """
-        Attempt to get "local" IP address
+        Attempt to get "local" IP address(es)
         
-        Example (The second IP address is the one we want):
+        Example:
 
         ::
             
             >>> socket.gethostbyname_ex(socket.gethostname())
             ('kevins-mac-mini.local', [], ['127.0.0.1', '192.168.1.20'])
         
-        Returns:
+        Returns: list of local IP address(es)
 
         """
         import socket
         # socket.gethostbyname(socket.gethostname())
-        return socket.gethostbyname_ex(socket.gethostname())[2][-1]
+        # return socket.gethostbyname_ex(socket.gethostname())[2][-1]
+        return socket.gethostbyname_ex(socket.gethostname())[2]
 
     def find_nodes(self):
-        import dispy, socket, time, sys
+        import dispy, time, sys
 
         print("Finding dispynodes...")
         self.master_ip = self.get_ip_address()
         print('Master IP = %s' % self.master_ip)
         if not self.options.local and (self.options.dispy_ping or self.options.network):
-            self.desired_node_list = ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63',
-                                      '204.47.184.59']
+            self.desired_node_list = []  # ['204.47.184.69', '204.47.184.60', '204.47.184.72', '204.47.184.63', '204.47.184.59']
         elif self.options.local:
             self.desired_node_list = self.master_ip  # for local run
         else:
@@ -278,7 +281,7 @@ class DispyCluster(object):
                 info_jobs.append(job)
                 self.found_node_list.append(node.ip_addr)
 
-        if self.found_node_list == []:
+        if not self.found_node_list:
             print('No dispy nodes found, exiting...', file=sys.stderr)
             omega_log.logwrite('ERROR - No Multiprocessor nodes found, exiting...')
             sys.exit(-1)  # exit, no nodes found
@@ -291,7 +294,7 @@ class DispyCluster(object):
         cluster.shutdown()
 
     def submit_sessions(self, batch, batch_name, batch_path, batch_file, session_list):
-        import dispy, socket, time, usepa_omega2, sys
+        import dispy, time, sys
 
         if self.options.dispy_exclusive:
             print('Starting JobCluster...')
@@ -315,14 +318,11 @@ class DispyCluster(object):
             print("Processing Session %d: " % session_num, end='')
             if not batch.sessions[session_num].enabled:
                 print("Skipping Disabled Session '%s'" % batch.sessions[session_num].name)
-                # print('')
             else:
                 print("Submitting Session '%s' to Cluster..." % batch.sessions[session_num].name)
-                # print('')
                 job = self.cluster.submit(batch_name, batch_path, batch_file, session_num,
                                           batch.sessions[session_num].name)
                 if job is not None:
-                    # job.id = (batch_name, batch_path, batch_file, session_num, batch.sessions[session_num].name)
                     job.id = dict({'batch_name': batch_name, 'batch_path': batch_path, 'batch_file': batch_file,
                                    'session_num': session_num, 'session_name': batch.sessions[session_num].name})
                     session_jobs.append(job)
