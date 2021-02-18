@@ -353,6 +353,8 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         from context_new_vehicle_market import ContextNewVehicleMarket
+        from consumer.market_classes import MarketClass
+
         context_size_class_dict = dict()
         vehicles_list = []
 
@@ -360,10 +362,10 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.1
+        input_template_version = 0.2
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
                                   'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
-                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'market_class_id',
+                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id',
                                   'sales', 'cert_co2_grams_per_mile', 'footprint_ft2'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
@@ -389,7 +391,6 @@ class VehicleFinal(SQABase, Vehicle):
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         in_use_fuel_ID=df.loc[i, 'in_use_fuel_id'],
                         cert_fuel_ID=df.loc[i, 'cert_fuel_id'],
-                        market_class_ID=df.loc[i, 'market_class_id'],
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
@@ -398,6 +399,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
+                    veh.market_class_ID = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_CO2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
                     veh.set_new_vehicle_mfr_cost_dollars()

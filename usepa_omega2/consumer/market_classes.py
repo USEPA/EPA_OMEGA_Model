@@ -106,6 +106,26 @@ class MarketClass(SQABase, OMEGABase):
             return copy.deepcopy(MarketClass._market_class_tree_dict)
 
     @staticmethod
+    def get_vehicle_market_class(vehicle):
+        """
+        Get vehicle market class ID based on vehicle characteristics
+
+        :param vehicle: a vehicles.VehicleFinal object
+        :return: the vehicle's market class ID based on vehicle characteristics
+        """
+
+        if vehicle.hauling_class == 'hauling' and vehicle.electrification_class == 'EV':
+            market_class_ID = 'hauling.BEV'
+        elif vehicle.hauling_class == 'hauling' and vehicle.electrification_class != 'EV':
+            market_class_ID = 'hauling.ICE'
+        elif vehicle.electrification_class == 'EV':
+            market_class_ID = 'non hauling.BEV'
+        else:
+            market_class_ID = 'non hauling.ICE'
+
+        return market_class_ID
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
