@@ -206,7 +206,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
     winning_combo = pd.to_numeric(best_combo)
 
     if 'producer' in o2.options.verbose_console:
-        from market_classes import MarketClass
+        from consumer.market_classes import MarketClass
         for mc in MarketClass.market_classes:
             omega_log.logwrite(('%d producer_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' % (winning_combo['producer_share_frac_%s' % mc]), echo_console=True)
         omega_log.logwrite('', echo_console=True)
@@ -228,7 +228,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
 def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     from vehicles import VehicleFinal, Vehicle
-    from market_classes import MarketClass, populate_market_classes
+    from consumer.market_classes import MarketClass, populate_market_classes
 
     cache_key = calendar_year
     if cache_key not in cache:

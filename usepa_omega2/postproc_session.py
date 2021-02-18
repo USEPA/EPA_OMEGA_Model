@@ -24,7 +24,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     """
 
     from manufacturer_annual_data import ManufacturerAnnualData
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
     import pandas as pd
     import numpy as np
 
@@ -88,7 +88,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 def plot_co2_gpmi(calendar_years):
     from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
 
     # g/mi chart
     fig, ax1 = figure()
@@ -138,7 +138,7 @@ def plot_co2_gpmi(calendar_years):
 def plot_vehicle_cost(calendar_years):
     from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
 
     # cost/vehicle chart
     fig, ax1 = figure()
@@ -238,7 +238,7 @@ def plot_manufacturer_compliance(calendar_years):
 
 
 def plot_iteration(iteration_log):
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
 
     year_iter_labels = ['%d_%d_%d' % (cy - 2000, it, it_sub) for cy, it, it_sub in
                         zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == -1],

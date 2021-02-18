@@ -95,7 +95,7 @@ if __name__ == '__main__':
         from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
         from manufacturers import Manufacturer  # needed for manufacturers table
-        from market_classes import MarketClass  # needed for market class ID
+        from consumer.market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
         from cost_curves import CostCurve, input_template_name as cost_curve_template_name # needed for vehicle cost from CO2
         from cost_clouds import CostCloud  # needed for vehicle cost from CO2

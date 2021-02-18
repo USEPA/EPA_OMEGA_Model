@@ -59,7 +59,7 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         from fuels import Fuel
-        from market_classes import MarketClass
+        from consumer.market_classes import MarketClass
         from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
 

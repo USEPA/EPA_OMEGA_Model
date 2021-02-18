@@ -473,7 +473,7 @@ if __name__ == '__main__':
         from omega_functions import weighted_value, unweighted_value
 
         from manufacturers import Manufacturer  # needed for manufacturers table
-        from market_classes import MarketClass  # needed for market class ID
+        from consumer.market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
         from context_fuel_prices import ContextFuelPrices # needed for retail fuel price
         from context_new_vehicle_market import ContextNewVehicleMarket # needed for context size class hauling info

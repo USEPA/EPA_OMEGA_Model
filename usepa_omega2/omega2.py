@@ -105,7 +105,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
                                       iteration_log, iteration_num, market_class_vehicle_dict,
                                       producer_decision):
 
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
     import producer
     import consumer
     from consumer.sales_share_gcam import get_demanded_shares
@@ -233,7 +233,7 @@ def calculate_price_options(continue_search, multiplier_columns, prev_multiplier
                             producer_decision_and_response):
 
     import numpy as np
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
 
     if producer_decision_and_response.empty:
         # first time through, span full range
@@ -294,7 +294,7 @@ def tighten_multiplier_range(mcc, prev_multiplier_range, producer_decision_and_r
 
 
 def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decision_and_response, iteration_num, producer_pricing_iteration):
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
 
     for mc in MarketClass.market_classes:
         omega_log.logwrite(('%d producer/consumer_share_frac_%s' % (calendar_year, mc)).ljust(50) +
@@ -348,7 +348,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
             sales-weighted average cost and CO2 g/mi by market class
     """
 
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
     from omega_functions import weighted_value
 
     # group vehicles by market class
@@ -388,7 +388,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
 
 
 def calculate_hauling_class_data(winning_combo):
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
 
     for hc in hauling_classes:
         winning_combo['average_cost_%s' % hc] = 0
@@ -438,7 +438,7 @@ def init_omega(o2_options):
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
     from context_fuel_upstream import ContextFuelUpstream
-    from market_classes import MarketClass
+    from consumer.market_classes import MarketClass
     from cost_curves import CostCurve, input_template_name as cost_curve_template_name
     from cost_clouds import CostCloud
     from consumer.demanded_shares_gcam import DemandedSharesGCAM

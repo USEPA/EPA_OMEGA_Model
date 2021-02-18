@@ -91,7 +91,7 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(fileio.get_filenameext(__file__))
 
-        from market_classes import MarketClass  # needed for market class ID
+        from consumer.market_classes import MarketClass  # needed for market class ID
 
         # set up global variables:
         o2.options = OMEGARuntimeOptions()

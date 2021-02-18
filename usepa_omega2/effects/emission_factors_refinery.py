@@ -119,7 +119,7 @@ if __name__ == '__main__':
         init_omega_db()
         omega_log.init_logfile()
 
-        from usepa_omega2.market_classes import MarketClass  # needed for market class ID
+        from consumer.market_classes import MarketClass  # needed for market class ID
 
         SQABase.metadata.create_all(o2.engine)
 
