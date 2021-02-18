@@ -30,44 +30,17 @@ class GHGStandardFootprint(SQABase, OMEGABase):
     lifetime_VMT = Column('lifetime_vmt', Float)
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
-        cache.clear()
+    def get_vehicle_reg_class(vehicle):
+        """
+        Return vehicle reg class based on vehicle characteristics
+        Args:
+            vehicle: vehicle object
 
-        if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+        Returns: vehicle reg class based on vehicle characteristics
 
-        input_template_version = 0.0003
-        input_template_columns = {'model_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
-                                  'd_coeff', 'lifetime_vmt'}
-
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
-                                                         verbose=verbose)
-
-        if not template_errors:
-            # read in the data portion of the input file
-            df = pd.read_csv(filename, skiprows=1)
-
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
-
-            if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(GHGStandardFootprint(
-                        model_year=df.loc[i, 'model_year'],
-                        reg_class_ID=df.loc[i, 'reg_class_id'],
-                        footprint_min_sqft=df.loc[i, 'fp_min'],
-                        footprint_max_sqft=df.loc[i, 'fp_max'],
-                        coeff_a=df.loc[i, 'a_coeff'],
-                        coeff_b=df.loc[i, 'b_coeff'],
-                        coeff_c=df.loc[i, 'c_coeff'],
-                        coeff_d=df.loc[i, 'd_coeff'],
-                        lifetime_VMT=df.loc[i, 'lifetime_vmt'],
-                    ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
-
-        return template_errors
+        """
+        reg_class_ID = vehicle.reg_class_ID
+        return reg_class_ID
 
     @staticmethod
     def calculate_target_co2_gpmi(vehicle):
@@ -135,6 +108,46 @@ class GHGStandardFootprint(SQABase, OMEGABase):
             co2_gpmi = vehicle.cert_CO2_grams_per_mile
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
+
+    @staticmethod
+    def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
+
+        input_template_version = 0.0003
+        input_template_columns = {'model_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
+                                  'd_coeff', 'lifetime_vmt'}
+
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
+
+        if not template_errors:
+            # read in the data portion of the input file
+            df = pd.read_csv(filename, skiprows=1)
+
+            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+
+            if not template_errors:
+                obj_list = []
+                # load data into database
+                for i in df.index:
+                    obj_list.append(GHGStandardFootprint(
+                        model_year=df.loc[i, 'model_year'],
+                        reg_class_ID=df.loc[i, 'reg_class_id'],
+                        footprint_min_sqft=df.loc[i, 'fp_min'],
+                        footprint_max_sqft=df.loc[i, 'fp_max'],
+                        coeff_a=df.loc[i, 'a_coeff'],
+                        coeff_b=df.loc[i, 'b_coeff'],
+                        coeff_c=df.loc[i, 'c_coeff'],
+                        coeff_d=df.loc[i, 'd_coeff'],
+                        lifetime_VMT=df.loc[i, 'lifetime_vmt'],
+                    ))
+                o2.session.add_all(obj_list)
+                o2.session.flush()
+
+        return template_errors
 
 
 if __name__ == '__main__':

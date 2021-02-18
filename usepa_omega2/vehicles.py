@@ -399,6 +399,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
+                    veh.reg_class_ID = o2.options.GHG_standard.get_vehicle_reg_class(veh)
                     veh.market_class_ID = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_CO2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
