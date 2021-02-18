@@ -441,7 +441,7 @@ def init_omega(o2_options):
     from market_classes import MarketClass
     from cost_curves import CostCurve, input_template_name as cost_curve_template_name
     from cost_clouds import CostCloud
-    from demanded_shares_gcam import DemandedSharesGCAM
+    from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from manufacturers import Manufacturer
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import VehicleFinal

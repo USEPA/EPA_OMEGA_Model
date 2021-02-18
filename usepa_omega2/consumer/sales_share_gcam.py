@@ -18,7 +18,7 @@ def get_demanded_shares(market_class_data, calendar_year):
     :param calendar_year: calendar year to calculate market shares in
     :return: dict of demanded ICE/BEV share by hauling / non_hauling market segments
     """
-    from demanded_shares_gcam import DemandedSharesGCAM
+    from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from market_classes import MarketClass
 
     if o2.options.flat_context:
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         from manufacturers import Manufacturer  # needed for manufacturers table
         from market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
-        from demanded_shares_gcam import DemandedSharesGCAM
+        from consumer.demanded_shares_gcam import DemandedSharesGCAM
         from cost_curves import CostCurve
         from GHG_standards_footprint import GHGStandardFootprint
 
