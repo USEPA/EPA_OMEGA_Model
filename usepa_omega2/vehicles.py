@@ -220,13 +220,25 @@ class Vehicle(OMEGABase):
         from context_fuel_prices import ContextFuelPrices
         if calendar_year is None:
             calendar_year = self.model_year
-        return ContextFuelPrices.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', self.in_use_fuel_ID)
+
+        price = 0
+        fuel_dict = eval(self.in_use_fuel_ID)
+        for fuel, fuel_share in fuel_dict.items():
+            price += ContextFuelPrices.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+
+        return price
 
     def pretax_fuel_price(self, calendar_year=None):
         from context_fuel_prices import ContextFuelPrices
         if calendar_year is None:
             calendar_year = self.model_year
-        return ContextFuelPrices.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', self.in_use_fuel_ID)
+
+        price = 0
+        fuel_dict = eval(self.in_use_fuel_ID)
+        for fuel, fuel_share in fuel_dict.items():
+            price += ContextFuelPrices.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel) * fuel_share
+
+        return price
 
     @initial_registered_count.setter
     def initial_registered_count(self, initial_registered_count):
@@ -323,8 +335,8 @@ class VehicleFinal(SQABase, Vehicle):
     cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
     new_vehicle_mfr_cost_dollars = Column(Float)
     manufacturer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    in_use_fuel_ID = Column('showroom_fuel_id', String, ForeignKey('fuels.fuel_id'))
-    cert_fuel_ID = Column('cert_fuel_id', String, ForeignKey('fuels.fuel_id'))
+    in_use_fuel_ID = Column('showroom_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
+    cert_fuel_ID = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
@@ -349,6 +361,25 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def get_max_model_year():
         return o2.session.query(func.max(VehicleFinal.model_year)).scalar()
+
+    @staticmethod
+    def get_manufacturer_vehicles(calendar_year, manufacturer_id):
+        return o2.session.query(VehicleFinal). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.model_year == calendar_year).all()
+
+    @staticmethod
+    def get_vehicle_attributes(vehicle_id, attributes):
+        if type(attributes) is not list:
+            attributes = [attributes]
+        attrs = VehicleFinal.get_class_attributes(attributes)
+        return o2.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
+
+    @staticmethod
+    def calc_cert_target_CO2_Mg(model_year, manufacturer_id):
+        return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.model_year == model_year).scalar()
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -439,25 +470,6 @@ class VehicleFinal(SQABase, Vehicle):
                         context_size_class_dict[hsc]
 
         return template_errors
-
-    @staticmethod
-    def get_manufacturer_vehicles(calendar_year, manufacturer_id):
-        return o2.session.query(VehicleFinal). \
-            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
-            filter(VehicleFinal.model_year == calendar_year).all()
-
-    @staticmethod
-    def get_vehicle_attributes(vehicle_id, attributes):
-        if type(attributes) is not list:
-            attributes = [attributes]
-        attrs = VehicleFinal.get_class_attributes(attributes)
-        return o2.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
-
-    @staticmethod
-    def calc_cert_target_CO2_Mg(model_year, manufacturer_id):
-        return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
-            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
-            filter(VehicleFinal.model_year == model_year).scalar()
 
 
 if __name__ == '__main__':

@@ -227,9 +227,19 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
         reg_class_ID, in_use_fuel_ID = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['reg_class_ID', 'in_use_fuel_ID'])
 
         # get fuel prices
-        retail, pretax = ContextFuelPrices.get_fuel_prices(calendar_year,
-                                                          ['retail_dollars_per_unit', 'pretax_dollars_per_unit'],
-                                                          in_use_fuel_ID)
+        # retail, pretax = ContextFuelPrices.get_fuel_prices(calendar_year,
+        #                                                   ['retail_dollars_per_unit', 'pretax_dollars_per_unit'],
+        #                                                   in_use_fuel_ID)
+
+        retail = 0
+        fuel_dict = eval(in_use_fuel_ID)
+        for fuel, fuel_share in fuel_dict.items():
+            retail += ContextFuelPrices.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+
+        pretax = 0
+        fuel_dict = eval(in_use_fuel_ID)
+        for fuel, fuel_share in fuel_dict.items():
+            pretax += ContextFuelPrices.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel) * fuel_share
 
         # fuel costs
         fuel_30_retail_cost_dollars = fuel_consumption * retail

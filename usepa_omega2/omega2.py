@@ -420,6 +420,7 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     return converged, convergence_error
 
 
+# noinspection PyUnresolvedReferences
 def init_omega(o2_options):
     from omega_log import OMEGALog
 
