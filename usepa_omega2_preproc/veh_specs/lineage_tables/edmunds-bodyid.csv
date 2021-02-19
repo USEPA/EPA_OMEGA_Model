@@ -16850,14 +16850,14 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Buick,REGAL-TOURX,Essence 4dr Wagon AWD (2.0L 4cyl Turbo 8A),58.4 in.,196.3 in.,111.4 in.,-9,-9
 2019,Buick,REGAL-TOURX,Preferred 4dr Wagon AWD (2.0L 4cyl Turbo 8A),58.4 in.,196.3 in.,111.4 in.,-9,-9
 2019,Buick,REGAL-TOURX,4dr Wagon AWD (2.0L 4cyl Turbo 8A),58.4 in.,196.3 in.,111.4 in.,-9,-9
-2019,Cadillac,ATS-COUPE,2dr Coupe (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-COUPE,Luxury 2dr Coupe AWD (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-COUPE,Premium Luxury 2dr Coupe (3.6L 6cyl 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-COUPE,2dr Coupe AWD (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-COUPE,Premium Performance 2dr Coupe (3.6L 6cyl 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-COUPE,Premium Luxury 2dr Coupe AWD (3.6L 6cyl 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-COUPE,Luxury 2dr Coupe (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,-9
-2019,Cadillac,ATS-V,2dr Coupe (3.6L 6cyl Turbo 6M),54.5 in.,184.7 in.,109.3 in.,-9,-9
+2019,Cadillac,ATS-COUPE,2dr Coupe (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-COUPE,Luxury 2dr Coupe AWD (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-COUPE,Premium Luxury 2dr Coupe (3.6L 6cyl 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-COUPE,2dr Coupe AWD (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-COUPE,Premium Performance 2dr Coupe (3.6L 6cyl 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-COUPE,Premium Luxury 2dr Coupe AWD (3.6L 6cyl 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-COUPE,Luxury 2dr Coupe (2.0L 4cyl Turbo 8A),54.8 in.,183.6 in.,109.3 in.,-9,56
+2019,Cadillac,ATS-V,2dr Coupe (3.6L 6cyl Turbo 6M),54.5 in.,184.7 in.,109.3 in.,-9,56
 2019,Cadillac,CT6-V,4dr Sedan AWD (4.2L 8cyl Turbo 10A),58.0 in.,205.8 in.,122.4 in.,-9,-9
 2019,Cadillac,CT6,Luxury 4dr Sedan AWD (3.6L 6cyl 10A),58.0 in.,205.8 in.,122.4 in.,-9,-9
 2019,Cadillac,CT6,Premium Luxury 4dr Sedan (2.0L 4cyl Turbo 10A),58.0 in.,205.8 in.,122.4 in.,-9,-9
@@ -18014,19 +18014,19 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Jaguar,E-PACE,P250 SE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
 2019,Jaguar,E-PACE,P300 R-Dynamic S 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
 2019,Jaguar,E-PACE,P250 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
-2019,Jaguar,F-PACE,20d Premium 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,20d R-Sport 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,SVR 4dr SUV AWD (5.0L 8cyl S/C 8A),65.7 in.,186.5 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,30t Portfolio 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,20d Prestige 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,30t Prestige 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,30t Premium 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,25t R-Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,25t Prestige 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,25t Premium 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,30t R-Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,S 4dr SUV AWD (3.0L 6cyl S/C 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
-2019,Jaguar,F-PACE,25t 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,-9,-9
+2019,Jaguar,F-PACE,20d Premium 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,20d R-Sport 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,SVR 4dr SUV AWD (5.0L 8cyl S/C 8A),65.7 in.,186.5 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,30t Portfolio 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,20d Prestige 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,30t Prestige 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,30t Premium 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,25t R-Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,25t Prestige 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,25t Premium 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,30t R-Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,S 4dr SUV AWD (3.0L 6cyl S/C 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
+2019,Jaguar,F-PACE,25t 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
 2019,Jaguar,F-TYPE,SVR 2dr Convertible AWD (5.0L 8cyl S/C 8A),51.5 in.,176.2 in.,103.2 in.,-9,-9
 2019,Jaguar,F-TYPE,R-Dynamic 2dr Coupe (3.0L 6cyl S/C 6M),51.6 in.,176.0 in.,103.2 in.,-9,-9
 2019,Jaguar,F-TYPE,R-Dynamic 2dr Convertible (3.0L 6cyl S/C 6M),51.5 in.,176.0 in.,103.2 in.,-9,-9

@@ -22,7 +22,7 @@ global super_trim_url_list
 super_trim_url_list = []
 SKIP_PRINTING_EXTERIOR_OPTIONS = True # skip printing tire brands, etc
 SKIP_PRINTING_INTERIOR_OPTIONS = True
-SKIP_PRINTING_COMFORT_CONVENIENCE = True
+SKIP_PRINTING_COMFORT_CONVENIENCE = False # set false, for electric power steering
 SKIP_PRINTING_PACKAGES = True
 SKIP_IN_CAR_ENTERTAINMENT = True
 SKIP_POWER_FEATURE = True
@@ -208,8 +208,9 @@ def update_raw_tables(tmp_raw_table0, _menu_columns):
     _drivetrain_list =['Drive type', 'Transmission', 'part time 4WD', 'on demand 4WD', 'automatic locking hubs', 'electronic hi-lo gear selection']
     _engine_list = ['Torque', 'Base engine size', 'Horsepower', 'Turning circle', 'Valves', 'direct injection', 'Base engine type', \
                     'Valve timing', 'Cam type', 'Cylinders', 'cylinder deactivation']
+    _comfort_convenience_list = ['electric power steering', 'power steering']
     _measurements_list = ['Length', 'Maximum towing capacity', 'Wheel base', 'Width', 'Curb weight', 'Maximum payload', 'Gross weight', 'Height', \
-                        'Ground clearance']
+                        'Ground clearance', 'Cargo capacity, all seats in place']
     _fuel_mpg_list = ['EPA mileage est. (cty/hwy)', 'Combined MPG', 'Fuel type', 'Fuel tank capacity', 'Range in miles (cty/hwy)']
     _PHEV_fuel_mpg_list = ['EPA Combined MPGe', 'Range in miles (cty/hwy)',  'EPA Time to charge battery (at 240v)', 'Fuel tank capacity', \
                            'Combined MPG', 'EPA kWh/100 mi', 'Fuel type', 'EPA Electricity Range']
@@ -244,6 +245,8 @@ def update_raw_tables(tmp_raw_table0, _menu_columns):
             elif _num_specs_list > 5 and _num_specs_list <= 8:
                 _new_specs_list = _PHEV_fuel_mpg_list
     if _category == 'Engine': _new_specs_list = _engine_list
+    if _category == 'Comfort & Convenience':
+        _new_specs_list = _comfort_convenience_list
     if _category == 'Measurements':
         _new_specs_list = _measurements_list
         if 'Maximum towing capacity'in _specs_list:
@@ -699,7 +702,8 @@ def Edmunds_Interact(url):
                                 tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
                             elif str(tmp_raw_table['Category'][0]).lower() == 'overview' or str(tmp_raw_table['Category'][0]).lower() == 'drivetrain' or \
                                     str(tmp_raw_table['Category'][0]).lower() == 'fuel & mpg' or str(tmp_raw_table['Category'][0]).lower() == 'engine' or \
-                                    str(tmp_raw_table['Category'][0]).lower() == 'measurements' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
+                                    (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == False) or \
+                                str(tmp_raw_table['Category'][0]).lower() == 'measurements' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
                                 tmp_raw_table = update_raw_tables(tmp_raw_table, _menu_columns)
                                 tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
 
