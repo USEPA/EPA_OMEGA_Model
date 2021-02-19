@@ -16563,63 +16563,63 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Volvo,XC90 SUV,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
 2017,Volvo,XC90 SUV,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,1079,
 2017,Volvo,XC90 SUV,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2019,Acura,ILX,Premium Package 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,-9,-9
-2019,Acura,ILX,4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,-9,-9
-2019,Acura,ILX,Premium and A-SPEC Packages 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,-9,-9
-2019,Acura,ILX,Technology Package 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,-9,-9
-2019,Acura,ILX,Technology and A-SPEC Packages 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,-9,-9
-2019,Acura,MDX,SH-AWD A-Spec 4dr SUV AWD (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,Technology Package 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Advance and Entertainment Packages (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,Technology and Entertainment Packages 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,Advance Package 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,Sport Hybrid SH-AWD 4dr SUV AWD w/Technology Package (3.0L 6cyl gas/electric hybrid 7AM),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Advance Package (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,Sport Hybrid SH-AWD 4dr SUV AWD w/Advance Package (3.0L 6cyl gas/electric hybrid 7AM),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,SH-AWD 4dr SUV AWD (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,Advance and Entertainment Packages 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Technology and Entertainment Packages (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Technology Package (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
-2019,Acura,MDX,4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,-9,-9
+2019,Acura,ILX,Premium Package 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
+2019,Acura,ILX,4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
+2019,Acura,ILX,Premium and A-SPEC Packages 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
+2019,Acura,ILX,Technology Package 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
+2019,Acura,ILX,Technology and A-SPEC Packages 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
+2019,Acura,MDX,SH-AWD A-Spec 4dr SUV AWD (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,Technology Package 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Advance and Entertainment Packages (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,Technology and Entertainment Packages 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,Advance Package 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,Sport Hybrid SH-AWD 4dr SUV AWD w/Technology Package (3.0L 6cyl gas/electric hybrid 7AM),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Advance Package (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,Sport Hybrid SH-AWD 4dr SUV AWD w/Advance Package (3.0L 6cyl gas/electric hybrid 7AM),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,SH-AWD 4dr SUV AWD (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,Advance and Entertainment Packages 4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Technology and Entertainment Packages (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,SH-AWD 4dr SUV AWD w/Technology Package (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
+2019,Acura,MDX,4dr SUV (3.5L 6cyl 9A),67.4 in.,196.2 in.,111.0 in.,272,2
 2019,Acura,NSX,2dr Coupe AWD (3.5L 6cyl Turbo gas/electric hybrid 9AM),47.8 in.,176.1 in.,103.5 in.,-9,-9
-2019,Acura,RDX,Advance Package 4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,SH-AWD 4dr SUV AWD (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,Technology Package 4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,A-Spec 4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,SH-AWD 4dr SUV AWD w/Advance Package (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,SH-AWD A-Spec 4dr SUV AWD (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RDX,SH-AWD 4dr SUV AWD w/Technology Package (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,-9,-9
-2019,Acura,RLX,P-AWS 4dr Sedan (3.5L 6cyl 10A),57.7 in.,198.1 in.,112.2 in.,-9,-9
-2019,Acura,RLX,Sport Hybrid SH-AWD 4dr Sedan AWD (3.5L 6cyl gas/electric hybrid 7AM),57.7 in.,198.1 in.,112.2 in.,-9,-9
-2019,Acura,TLX,A-Spec Red 4dr Sedan (2.4L 4cyl 8AM),57.0 in.,191.0 in.,109.3 in.,-9,-9
-2019,Acura,TLX,A-Spec Red 4dr Sedan (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,-9,-9
-2019,Acura,TLX,SH-AWD 4dr Sedan AWD w/Technology Package (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,SH-AWD A-Spec Red 4dr Sedan AWD (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,-9,-9
-2019,Acura,TLX,Advance Package 4dr Sedan (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,SH-AWD 4dr Sedan AWD w/Advance Package (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,A-Spec 4dr Sedan (2.4L 4cyl 8AM),57.0 in.,191.0 in.,109.3 in.,-9,-9
-2019,Acura,TLX,A-Spec 4dr Sedan (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,-9,-9
-2019,Acura,TLX,SH-AWD A-Spec 4dr Sedan AWD (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,-9,-9
-2019,Acura,TLX,4dr Sedan (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,4dr Sedan (2.4L 4cyl 8AM),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,Technology Package 4dr Sedan (2.4L 4cyl 8AM),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,Technology Package 4dr Sedan (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Acura,TLX,SH-AWD 4dr Sedan AWD (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,-9,-9
-2019,Alfa-romeo,4C,Spider 2dr Coupe (1.7L 4cyl Turbo 6AM),46.7 in.,157.0 in.,93.7 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Quadrifoglio 4dr Sedan (2.9L 6cyl Turbo 8A),56.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti Sport 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti Sport Carbon 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti Lusso 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,4dr Sedan AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti Lusso 4dr Sedan (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti 4dr Sedan (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti Sport 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Sport 4dr Sedan AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Sport 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,GIULIA,Ti Sport Carbon 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,-9,-9
+2019,Acura,RDX,Advance Package 4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,SH-AWD 4dr SUV AWD (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,Technology Package 4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,A-Spec 4dr SUV (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,SH-AWD 4dr SUV AWD w/Advance Package (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,SH-AWD A-Spec 4dr SUV AWD (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,3
+2019,Acura,RDX,SH-AWD 4dr SUV AWD w/Technology Package (2.0L 4cyl Turbo 10A),65.7 in.,186.8 in.,108.3 in.,890,890
+2019,Acura,RLX,P-AWS 4dr Sedan (3.5L 6cyl 10A),57.7 in.,198.1 in.,112.2 in.,277,4
+2019,Acura,RLX,Sport Hybrid SH-AWD 4dr Sedan AWD (3.5L 6cyl gas/electric hybrid 7AM),57.7 in.,198.1 in.,112.2 in.,277,4
+2019,Acura,TLX,A-Spec Red 4dr Sedan (2.4L 4cyl 8AM),57.0 in.,191.0 in.,109.3 in.,280,6
+2019,Acura,TLX,A-Spec Red 4dr Sedan (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,280,6
+2019,Acura,TLX,SH-AWD 4dr Sedan AWD w/Technology Package (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,SH-AWD A-Spec Red 4dr Sedan AWD (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,280,6
+2019,Acura,TLX,Advance Package 4dr Sedan (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,SH-AWD 4dr Sedan AWD w/Advance Package (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,A-Spec 4dr Sedan (2.4L 4cyl 8AM),57.0 in.,191.0 in.,109.3 in.,280,6
+2019,Acura,TLX,A-Spec 4dr Sedan (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,280,6
+2019,Acura,TLX,SH-AWD A-Spec 4dr Sedan AWD (3.5L 6cyl 9A),57.0 in.,191.0 in.,109.3 in.,280,6
+2019,Acura,TLX,4dr Sedan (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,4dr Sedan (2.4L 4cyl 8AM),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,Technology Package 4dr Sedan (2.4L 4cyl 8AM),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,Technology Package 4dr Sedan (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Acura,TLX,SH-AWD 4dr Sedan AWD (3.5L 6cyl 9A),57.0 in.,190.7 in.,109.3 in.,280,6
+2019,Alfa-romeo,4C,Spider 2dr Coupe (1.7L 4cyl Turbo 6AM),46.7 in.,157.0 in.,93.7 in.,815,413
+2019,Alfa-romeo,GIULIA,Quadrifoglio 4dr Sedan (2.9L 6cyl Turbo 8A),56.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti Sport 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti Sport Carbon 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti Lusso 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,4dr Sedan AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti Lusso 4dr Sedan (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti 4dr Sedan (2.0L 4cyl Turbo 8A),57.1 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti Sport 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Sport 4dr Sedan AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Sport 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
+2019,Alfa-romeo,GIULIA,Ti Sport Carbon 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
 2019,Alfa-romeo,STELVIO,Ti Lusso 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
 2019,Alfa-romeo,STELVIO,4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
 2019,Alfa-romeo,STELVIO,Ti Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
@@ -16628,181 +16628,181 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Alfa-romeo,STELVIO,Ti 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
 2019,Alfa-romeo,STELVIO,Quadrifoglio 4dr SUV AWD (2.9L 6cyl Turbo 8A),66.3 in.,185.1 in.,111.0 in.,-9,-9
 2019,Alfa-romeo,STELVIO,Sport 4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Aston-martin,DB11,V8 2dr Coupe (4.0L 8cyl Turbo 8A),50.4 in.,186.6 in.,110.4 in.,-9,-9
-2019,Aston-martin,DB11,V8 Volante 2dr Convertible (4.0L 8cyl Turbo 8A),51.2 in.,187.0 in.,,-9,-9
-2019,Aston-martin,DB11,AMR 2dr Coupe (5.2L 12cyl Turbo 8A),50.8 in.,187.0 in.,110.4 in.,-9,-9
-2019,Aston-martin,DBS-SUPERLEGGERA,TAG Heuer Edition 2dr Coupe (5.2L 12cyl Turbo 8A),50.4 in.,185.5 in.,110.4 in.,-9,-9
-2019,Aston-martin,DBS-SUPERLEGGERA,2dr Coupe (5.2L 12cyl Turbo 8A),50.4 in.,185.5 in.,110.4 in.,-9,-9
-2019,Aston-martin,RAPIDE-AMR,4dr Sedan (6.0L 12cyl 8A),,,117.7 in.,-9,-9
-2019,Aston-martin,VANTAGE,2dr Coupe (4.0L 8cyl Turbo 8A),50.1 in.,175.8 in.,106.4 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium Plus 2dr Convertible (2.0L 4cyl Turbo 7AM),55.5 in.,174.3 in.,102.2 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium Plus quattro 2dr Convertible AWD (2.0L 4cyl Turbo 6AM),55.5 in.,174.3 in.,102.2 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Prestige quattro 2dr Convertible AWD (2.0L 4cyl Turbo 6AM),55.5 in.,174.3 in.,102.2 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium 2dr Convertible (2.0L 4cyl Turbo 7AM),55.5 in.,174.1 in.,102.2 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Prestige quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium quattro 2dr Convertible AWD (2.0L 4cyl Turbo 6AM),55.5 in.,174.1 in.,102.2 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Prestige 4dr Sedan (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Titanium 4dr Sedan (2.0L 4cyl Turbo 7AM),55.7 in.,175.5 in.,103.8 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium Plus 4dr Sedan (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Prestige 2dr Convertible (2.0L 4cyl Turbo 7AM),55.5 in.,174.3 in.,102.2 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium 4dr Sedan w/Prod. End 4/19 (2.0L 4cyl Turbo 7AM),55.7 in.,175.5 in.,103.8 in.,-9,-9
-2019,Audi,A3,2.0 TFSI Premium quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),55.7 in.,175.5 in.,103.8 in.,-9,-9
-2019,Audi,A4-ALLROAD,2.0 TFSI Prestige quattro 4dr Wagon AWD (2.0L 4cyl Turbo 7AM),58.8 in.,187.0 in.,110.9 in.,-9,-9
-2019,Audi,A4-ALLROAD,2.0 TFSI Premium Plus quattro 4dr Wagon AWD (2.0L 4cyl Turbo 7AM),58.8 in.,187.0 in.,110.9 in.,-9,-9
-2019,Audi,A4-ALLROAD,2.0 TFSI Premium quattro 4dr Wagon AWD (2.0L 4cyl Turbo 7AM),58.8 in.,187.0 in.,110.9 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Titanium 4dr Sedan (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Premium Plus 4dr Sedan (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Premium quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Premium 4dr Sedan w/Prod. End 4/19 (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Prestige 4dr Sedan (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A4,2.0 TFSI Prestige quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Premium Plus quattro 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),54.6 in.,186.3 in.,111.2 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Premium Plus quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),54.4 in.,184.0 in.,108.9 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Prestige quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),54.0 in.,184.0 in.,108.8 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Premium quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),54.4 in.,184.0 in.,108.9 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Premium Plus quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),54.0 in.,184.0 in.,108.8 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Prestige quattro 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),54.6 in.,186.3 in.,111.2 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Premium quattro 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),54.6 in.,186.3 in.,111.2 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Prestige quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),54.4 in.,184.0 in.,108.9 in.,-9,-9
-2019,Audi,A5,2.0 TFSI Premium quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),54.0 in.,184.0 in.,108.8 in.,-9,-9
-2019,Audi,A6,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,-9,-9
-2019,Audi,A6,2.0 TFSI Premium quattro 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,-9,-9
-2019,Audi,A6,3.0 TFSI Premium Plus quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,-9,-9
-2019,Audi,A6,3.0 TFSI Prestige quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,-9,-9
-2019,Audi,A6,3.0 TFSI Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,-9,-9
-2019,Audi,A7,3.0 TFSI Premium Plus quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,-9,-9
-2019,Audi,A7,3.0 TFSI Prestige quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,-9,-9
-2019,Audi,A7,3.0 TFSI Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,-9,-9
-2019,Audi,A8,L 4.0 TFSI quattro 4dr Sedan AWD (4.0L 8cyl Turbo gas/electric hybrid 8A),58.5 in.,208.7 in.,123.1 in.,-9,-9
-2019,Audi,A8,L 3.0 TFSI quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),58.5 in.,208.7 in.,123.1 in.,-9,-9
-2019,Audi,E-TRON,Premium Plus quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,-9,-9
-2019,Audi,E-TRON,Prestige quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,-9,-9
-2019,Audi,Q3,Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,-9,-9
-2019,Audi,Q3,S line Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,-9,-9
-2019,Audi,Q3,Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,-9,-9
-2019,Audi,Q3,S line Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,-9,-9
-2019,Audi,Q3,S line Prestige quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,-9,-9
-2019,Audi,Q5,2.0 TFSI Prestige quattro 4dr SUV AWD (2.0L 4cyl Turbo 7AM),65.3 in.,183.6 in.,111.0 in.,-9,-9
-2019,Audi,Q5,2.0 TFSI Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 7AM),65.3 in.,183.6 in.,111.0 in.,-9,-9
-2019,Audi,Q5,2.0 TFSI Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 7AM),65.3 in.,183.6 in.,111.0 in.,-9,-9
-2019,Audi,Q7,3.0 TFSI Prestige quattro 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,3.0 TFSI Premium quattro 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,3.0 TFSI Premium Plus quattro 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,2.0 TFSI Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,2.0 TFSI Premium Plus quattro SE 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,2.0 TFSI Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,3.0 TFSI Premium quattro SE 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,2.0 TFSI Premium quattro SE 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q7,3.0 TFSI Premium Plus quattro SE 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,-9
-2019,Audi,Q8,3.0 TFSI Prestige quattro 4dr SUV AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),67.1 in.,196.3 in.,117.9 in.,-9,-9
-2019,Audi,Q8,3.0 TFSI Premium quattro 4dr SUV AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),67.1 in.,196.3 in.,117.9 in.,-9,-9
-2019,Audi,Q8,3.0 TFSI Premium Plus quattro 4dr SUV AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),67.1 in.,196.3 in.,117.9 in.,-9,-9
-2019,Audi,RS-3,quattro 4dr Sedan AWD (2.5L 5cyl Turbo 7AM),55.0 in.,176.3 in.,103.6 in.,-9,-9
-2019,Audi,RS-5,quattro 2dr Coupe AWD (2.9L 6cyl Turbo 8A),53.5 in.,186.0 in.,108.9 in.,-9,-9
-2019,Audi,RS-5,quattro 4dr Hatchback AWD (2.9L 6cyl Turbo 8A),54.6 in.,188.3 in.,111.2 in.,-9,-9
-2019,Audi,S3,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),54.8 in.,175.8 in.,103.6 in.,-9,-9
-2019,Audi,S3,2.0 TFSI Prestige quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),54.8 in.,175.8 in.,103.6 in.,-9,-9
-2019,Audi,S4,Prestige quattro 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,186.8 in.,111.2 in.,-9,-9
-2019,Audi,S4,Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,186.8 in.,111.2 in.,-9,-9
-2019,Audi,S4,Premium Plus quattro 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,186.8 in.,111.2 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Prestige quattro 2dr Convertible AWD (3.0L 6cyl Turbo 8A),54.4 in.,184.7 in.,108.9 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Prestige quattro 2dr Coupe AWD (3.0L 6cyl Turbo 8A),53.9 in.,184.7 in.,108.8 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Premium quattro 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),54.5 in.,187.1 in.,111.2 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Premium Plus quattro 2dr Coupe AWD (3.0L 6cyl Turbo 8A),53.9 in.,184.7 in.,108.8 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Premium Plus quattro 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),54.4 in.,184.7 in.,108.9 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Premium quattro 2dr Coupe AWD (3.0L 6cyl Turbo 8A),53.9 in.,184.7 in.,108.8 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Prestige quattro 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),54.5 in.,187.1 in.,111.2 in.,-9,-9
-2019,Audi,S5,3.0 TFSI Premium Plus quattro 2dr Convertible AWD (3.0L 6cyl Turbo 8A),54.4 in.,184.7 in.,108.9 in.,-9,-9
-2019,Audi,SQ5,3.0 TFSI Premium Plus quattro 4dr SUV AWD (3.0L 6cyl Turbo 8A),65.3 in.,183.9 in.,111.2 in.,-9,-9
-2019,Audi,SQ5,3.0 TFSI Premium quattro 4dr SUV AWD (3.0L 6cyl Turbo 8A),65.3 in.,183.9 in.,111.2 in.,-9,-9
-2019,Audi,SQ5,3.0 TFSI Prestige quattro 4dr SUV AWD (3.0L 6cyl Turbo 8A),65.3 in.,183.9 in.,111.2 in.,-9,-9
-2019,Audi,TT-RS,quattro 2dr Coupe AWD (2.5L 5cyl Turbo 7AM),52.9 in.,165.0 in.,98.6 in.,-9,-9
-2019,Audi,TT,2.0 TFSI quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),53.4 in.,165.0 in.,98.6 in.,-9,-9
-2019,Audi,TT,2.0 TFSI quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),53.3 in.,165.0 in.,98.6 in.,-9,-9
-2019,Audi,TTS,quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),52.8 in.,165.0 in.,98.6 in.,-9,-9
-2019,Bentley,BENTAYGA,V8 4dr SUV AWD (4.0L 8cyl Turbo 8A),68.6 in.,202.4 in.,117.9 in.,-9,-9
-2019,Bentley,BENTAYGA,Mulliner 4dr SUV AWD (6.0L 12cyl Turbo 8A),68.6 in.,202.4 in.,117.9 in.,-9,-9
-2019,Bentley,BENTAYGA,W12 4dr SUV AWD (6.0L 12cyl Turbo 8A),68.6 in.,202.4 in.,117.9 in.,-9,-9
-2019,Bentley,MULSANNE,4dr Sedan (6.8L 8cyl Turbo 8A),59.9 in.,219.5 in.,128.6 in.,-9,-9
-2019,Bentley,MULSANNE,Speed 4dr Sedan (6.8L 8cyl Turbo 8A),59.9 in.,219.5 in.,128.6 in.,-9,-9
-2019,Bmw,2-SERIES,M240i xDrive 2dr Coupe AWD (3.0L 6cyl Turbo 8A),55.4 in.,175.9 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,230i 2dr Convertible (2.0L 4cyl Turbo 8A),55.6 in.,174.7 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,230i 2dr Coupe (2.0L 4cyl Turbo 8A),55.8 in.,174.7 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,M240i 2dr Coupe (3.0L 6cyl Turbo 8A),55.4 in.,175.9 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,230i xDrive 2dr Coupe AWD (2.0L 4cyl Turbo 8A),55.8 in.,174.7 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,230i xDrive 2dr Convertible AWD (2.0L 4cyl Turbo 8A),55.6 in.,174.7 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,M240i 2dr Convertible (3.0L 6cyl Turbo 8A),55.2 in.,175.9 in.,105.9 in.,-9,-9
-2019,Bmw,2-SERIES,M240i xDrive 2dr Convertible AWD (3.0L 6cyl Turbo 8A),55.2 in.,175.9 in.,105.9 in.,-9,-9
-2019,Bmw,3-SERIES-GRAN-TURISMO,330i xDrive 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),59.4 in.,190.0 in.,115.0 in.,-9,-9
-2019,Bmw,3-SERIES-GRAN-TURISMO,340i xDrive 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),59.4 in.,190.0 in.,115.0 in.,-9,-9
-2019,Bmw,3-SERIES,330i xDrive 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.0 in.,185.7 in.,112.2 in.,-9,-9
-2019,Bmw,3-SERIES,330i xDrive 4dr Wagon AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.8 in.,110.6 in.,-9,-9
-2019,Bmw,3-SERIES,330i 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,185.7 in.,112.2 in.,-9,-9
-2019,Bmw,4-SERIES-GRAN-COUPE,430i 4dr Sedan (2.0L 4cyl Turbo 8A),54.7 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES-GRAN-COUPE,430i xDrive 4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.3 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES-GRAN-COUPE,440i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES-GRAN-COUPE,440i 4dr Sedan (3.0L 6cyl Turbo 8A),54.7 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,430i xDrive 2dr Convertible AWD (2.0L 4cyl Turbo 8A),55.1 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,440i xDrive 2dr Coupe AWD (3.0L 6cyl Turbo 8A),54.8 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,430i 2dr Convertible (2.0L 4cyl Turbo 8A),54.5 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,440i xDrive 2dr Convertible AWD (3.0L 6cyl Turbo 8A),55.1 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,440i 2dr Coupe (3.0L 6cyl Turbo 8A),54.2 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,430i xDrive 2dr Coupe AWD (2.0L 4cyl Turbo 8A),54.8 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,430i 2dr Coupe (2.0L 4cyl Turbo 8A),54.2 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,4-SERIES,440i 2dr Convertible (3.0L 6cyl Turbo 8A),54.5 in.,182.7 in.,110.6 in.,-9,-9
-2019,Bmw,5-SERIES,540i 4dr Sedan (3.0L 6cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,-9,-9
-2019,Bmw,5-SERIES,530i xDrive 4dr Sedan AWD (2.0L 4cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,-9,-9
-2019,Bmw,5-SERIES,530i 4dr Sedan (2.0L 4cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,-9,-9
-2019,Bmw,5-SERIES,530e xDrive iPerformance 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 8A),58.4 in.,194.6 in.,117.1 in.,-9,-9
-2019,Bmw,5-SERIES,M550i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),57.8 in.,195.4 in.,117.1 in.,-9,-9
-2019,Bmw,5-SERIES,540i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,-9,-9
-2019,Bmw,5-SERIES,530e iPerformance 4dr Sedan (2.0L 4cyl Turbo gas/electric hybrid 8A),58.4 in.,194.6 in.,117.1 in.,-9,-9
-2019,Bmw,6-SERIES-GRAN-COUPE,650i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,-9,-9
-2019,Bmw,6-SERIES-GRAN-COUPE,650i 4dr Sedan (4.4L 8cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,-9,-9
-2019,Bmw,6-SERIES-GRAN-COUPE,640i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,-9,-9
-2019,Bmw,6-SERIES-GRAN-COUPE,640i 4dr Sedan (3.0L 6cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,-9,-9
-2019,Bmw,6-SERIES-GRAN-TURISMO,640i xDrive 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),60.6 in.,200.9 in.,120.9 in.,-9,-9
-2019,Bmw,7-SERIES,750i 4dr Sedan (4.4L 8cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,-9,-9
-2019,Bmw,7-SERIES,740i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,-9,-9
-2019,Bmw,7-SERIES,740e xDrive iPerformance 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 8A),58.2 in.,206.6 in.,126.4 in.,-9,-9
-2019,Bmw,7-SERIES,750i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,-9,-9
-2019,Bmw,7-SERIES,M760i xDrive 4dr Sedan AWD (6.6L 12cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,-9,-9
-2019,Bmw,7-SERIES,740i 4dr Sedan (3.0L 6cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,-9,-9
+2019,Aston-martin,DB11,V8 2dr Coupe (4.0L 8cyl Turbo 8A),50.4 in.,186.6 in.,110.4 in.,-9,11
+2019,Aston-martin,DB11,V8 Volante 2dr Convertible (4.0L 8cyl Turbo 8A),51.2 in.,187.0 in.,,-9,11
+2019,Aston-martin,DB11,AMR 2dr Coupe (5.2L 12cyl Turbo 8A),50.8 in.,187.0 in.,110.4 in.,-9,11
+2019,Aston-martin,DBS-SUPERLEGGERA,TAG Heuer Edition 2dr Coupe (5.2L 12cyl Turbo 8A),50.4 in.,185.5 in.,110.4 in.,-9,11
+2019,Aston-martin,DBS-SUPERLEGGERA,2dr Coupe (5.2L 12cyl Turbo 8A),50.4 in.,185.5 in.,110.4 in.,-9,11
+2019,Aston-martin,RAPIDE-AMR,4dr Sedan (6.0L 12cyl 8A),,,117.7 in.,-9,11
+2019,Aston-martin,VANTAGE,2dr Coupe (4.0L 8cyl Turbo 8A),50.1 in.,175.8 in.,106.4 in.,-9,13
+2019,Audi,A3,2.0 TFSI Premium Plus 2dr Convertible (2.0L 4cyl Turbo 7AM),55.5 in.,174.3 in.,102.2 in.,818,16
+2019,Audi,A3,2.0 TFSI Premium Plus quattro 2dr Convertible AWD (2.0L 4cyl Turbo 6AM),55.5 in.,174.3 in.,102.2 in.,818,16
+2019,Audi,A3,2.0 TFSI Prestige quattro 2dr Convertible AWD (2.0L 4cyl Turbo 6AM),55.5 in.,174.3 in.,102.2 in.,818,16
+2019,Audi,A3,2.0 TFSI Premium 2dr Convertible (2.0L 4cyl Turbo 7AM),55.5 in.,174.1 in.,102.2 in.,294,16
+2019,Audi,A3,2.0 TFSI Prestige quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,818,16
+2019,Audi,A3,2.0 TFSI Premium quattro 2dr Convertible AWD (2.0L 4cyl Turbo 6AM),55.5 in.,174.1 in.,102.2 in.,294,16
+2019,Audi,A3,2.0 TFSI Prestige 4dr Sedan (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,294,16
+2019,Audi,A3,2.0 TFSI Titanium 4dr Sedan (2.0L 4cyl Turbo 7AM),55.7 in.,175.5 in.,103.8 in.,294,16
+2019,Audi,A3,2.0 TFSI Premium Plus 4dr Sedan (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,294,16
+2019,Audi,A3,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),55.7 in.,175.7 in.,103.8 in.,294,16
+2019,Audi,A3,2.0 TFSI Prestige 2dr Convertible (2.0L 4cyl Turbo 7AM),55.5 in.,174.3 in.,102.2 in.,294,16
+2019,Audi,A3,2.0 TFSI Premium 4dr Sedan w/Prod. End 4/19 (2.0L 4cyl Turbo 7AM),55.7 in.,175.5 in.,103.8 in.,294,16
+2019,Audi,A3,2.0 TFSI Premium quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),55.7 in.,175.5 in.,103.8 in.,294,16
+2019,Audi,A4-ALLROAD,2.0 TFSI Prestige quattro 4dr Wagon AWD (2.0L 4cyl Turbo 7AM),58.8 in.,187.0 in.,110.9 in.,1045,17
+2019,Audi,A4-ALLROAD,2.0 TFSI Premium Plus quattro 4dr Wagon AWD (2.0L 4cyl Turbo 7AM),58.8 in.,187.0 in.,110.9 in.,1045,17
+2019,Audi,A4-ALLROAD,2.0 TFSI Premium quattro 4dr Wagon AWD (2.0L 4cyl Turbo 7AM),58.8 in.,187.0 in.,110.9 in.,1045,17
+2019,Audi,A4,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A4,2.0 TFSI Titanium 4dr Sedan (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A4,2.0 TFSI Premium Plus 4dr Sedan (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A4,2.0 TFSI Premium quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A4,2.0 TFSI Premium 4dr Sedan w/Prod. End 4/19 (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A4,2.0 TFSI Prestige 4dr Sedan (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A4,2.0 TFSI Prestige quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.2 in.,186.1 in.,111.0 in.,1045,17
+2019,Audi,A5,2.0 TFSI Premium Plus quattro 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),54.6 in.,186.3 in.,111.2 in.,1048,18
+2019,Audi,A5,2.0 TFSI Premium Plus quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),54.4 in.,184.0 in.,108.9 in.,1047,18
+2019,Audi,A5,2.0 TFSI Prestige quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),54.0 in.,184.0 in.,108.8 in.,1048,18
+2019,Audi,A5,2.0 TFSI Premium quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),54.4 in.,184.0 in.,108.9 in.,1047,18
+2019,Audi,A5,2.0 TFSI Premium Plus quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),54.0 in.,184.0 in.,108.8 in.,1048,18
+2019,Audi,A5,2.0 TFSI Prestige quattro 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),54.6 in.,186.3 in.,111.2 in.,1048,18
+2019,Audi,A5,2.0 TFSI Premium quattro 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),54.6 in.,186.3 in.,111.2 in.,1048,18
+2019,Audi,A5,2.0 TFSI Prestige quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),54.4 in.,184.0 in.,108.9 in.,1047,18
+2019,Audi,A5,2.0 TFSI Premium quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),54.0 in.,184.0 in.,108.8 in.,1048,18
+2019,Audi,A6,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,1049,19
+2019,Audi,A6,2.0 TFSI Premium quattro 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,1049,19
+2019,Audi,A6,3.0 TFSI Premium Plus quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,1049,19
+2019,Audi,A6,3.0 TFSI Prestige quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,1049,19
+2019,Audi,A6,3.0 TFSI Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),57.4 in.,194.4 in.,115.1 in.,1049,19
+2019,Audi,A7,3.0 TFSI Premium Plus quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,1130,20
+2019,Audi,A7,3.0 TFSI Prestige quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,1130,20
+2019,Audi,A7,3.0 TFSI Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,1130,20
+2019,Audi,A8,L 4.0 TFSI quattro 4dr Sedan AWD (4.0L 8cyl Turbo gas/electric hybrid 8A),58.5 in.,208.7 in.,123.1 in.,1316,21
+2019,Audi,A8,L 3.0 TFSI quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),58.5 in.,208.7 in.,123.1 in.,1316,21
+2019,Audi,E-TRON,Premium Plus quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,1042,16
+2019,Audi,E-TRON,Prestige quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,1042,16
+2019,Audi,Q3,Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
+2019,Audi,Q3,S line Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
+2019,Audi,Q3,Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
+2019,Audi,Q3,S line Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
+2019,Audi,Q3,S line Prestige quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
+2019,Audi,Q5,2.0 TFSI Prestige quattro 4dr SUV AWD (2.0L 4cyl Turbo 7AM),65.3 in.,183.6 in.,111.0 in.,1052,24
+2019,Audi,Q5,2.0 TFSI Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 7AM),65.3 in.,183.6 in.,111.0 in.,1052,24
+2019,Audi,Q5,2.0 TFSI Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 7AM),65.3 in.,183.6 in.,111.0 in.,1052,24
+2019,Audi,Q7,3.0 TFSI Prestige quattro 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,3.0 TFSI Premium quattro 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,3.0 TFSI Premium Plus quattro 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,2.0 TFSI Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,2.0 TFSI Premium Plus quattro SE 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,2.0 TFSI Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,3.0 TFSI Premium quattro SE 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,2.0 TFSI Premium quattro SE 4dr SUV AWD (2.0L 4cyl Turbo 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q7,3.0 TFSI Premium Plus quattro SE 4dr SUV AWD (3.0L 6cyl S/C 8A),68.5 in.,199.6 in.,117.9 in.,-9,25
+2019,Audi,Q8,3.0 TFSI Prestige quattro 4dr SUV AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),67.1 in.,196.3 in.,117.9 in.,1316,21
+2019,Audi,Q8,3.0 TFSI Premium quattro 4dr SUV AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),67.1 in.,196.3 in.,117.9 in.,1316,21
+2019,Audi,Q8,3.0 TFSI Premium Plus quattro 4dr SUV AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),67.1 in.,196.3 in.,117.9 in.,1316,21
+2019,Audi,RS-3,quattro 4dr Sedan AWD (2.5L 5cyl Turbo 7AM),55.0 in.,176.3 in.,103.6 in.,1374,16
+2019,Audi,RS-5,quattro 2dr Coupe AWD (2.9L 6cyl Turbo 8A),53.5 in.,186.0 in.,108.9 in.,1131,22
+2019,Audi,RS 5 Sportback,quattro 4dr Hatchback AWD (2.9L 6cyl Turbo 8A),54.6 in.,188.3 in.,111.2 in.,1049,19
+2019,Audi,S3,2.0 TFSI Premium Plus quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),54.8 in.,175.8 in.,103.6 in.,1357,16
+2019,Audi,S3,2.0 TFSI Prestige quattro 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),54.8 in.,175.8 in.,103.6 in.,1357,16
+2019,Audi,S4,Prestige quattro 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,186.8 in.,111.2 in.,925,17
+2019,Audi,S4,Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,186.8 in.,111.2 in.,925,17
+2019,Audi,S4,Premium Plus quattro 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,186.8 in.,111.2 in.,925,17
+2019,Audi,S5,3.0 TFSI Prestige quattro 2dr Convertible AWD (3.0L 6cyl Turbo 8A),54.4 in.,184.7 in.,108.9 in.,926,18
+2019,Audi,S5,3.0 TFSI Prestige quattro 2dr Coupe AWD (3.0L 6cyl Turbo 8A),53.9 in.,184.7 in.,108.8 in.,1085,18
+2019,Audi,S5,3.0 TFSI Premium quattro 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),54.5 in.,187.1 in.,111.2 in.,1085,18
+2019,Audi,S5,3.0 TFSI Premium Plus quattro 2dr Coupe AWD (3.0L 6cyl Turbo 8A),53.9 in.,184.7 in.,108.8 in.,1085,18
+2019,Audi,S5,3.0 TFSI Premium Plus quattro 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),54.4 in.,184.7 in.,108.9 in.,1085,18
+2019,Audi,S5,3.0 TFSI Premium quattro 2dr Coupe AWD (3.0L 6cyl Turbo 8A),53.9 in.,184.7 in.,108.8 in.,1085,18
+2019,Audi,S5,3.0 TFSI Prestige quattro 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),54.5 in.,187.1 in.,111.2 in.,1085,18
+2019,Audi,S5,3.0 TFSI Premium Plus quattro 2dr Convertible AWD (3.0L 6cyl Turbo 8A),54.4 in.,184.7 in.,108.9 in.,926,18
+2019,Audi,SQ5,3.0 TFSI Premium Plus quattro 4dr SUV AWD (3.0L 6cyl Turbo 8A),65.3 in.,183.9 in.,111.2 in.,930,21
+2019,Audi,SQ5,3.0 TFSI Premium quattro 4dr SUV AWD (3.0L 6cyl Turbo 8A),65.3 in.,183.9 in.,111.2 in.,930,21
+2019,Audi,SQ5,3.0 TFSI Prestige quattro 4dr SUV AWD (3.0L 6cyl Turbo 8A),65.3 in.,183.9 in.,111.2 in.,930,21
+2019,Audi,TT-RS,quattro 2dr Coupe AWD (2.5L 5cyl Turbo 7AM),52.9 in.,165.0 in.,98.6 in.,932,27
+2019,Audi,TT,2.0 TFSI quattro 2dr Convertible AWD (2.0L 4cyl Turbo 7AM),53.4 in.,165.0 in.,98.6 in.,1054,27
+2019,Audi,TT,2.0 TFSI quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),53.3 in.,165.0 in.,98.6 in.,1053,27
+2019,Audi,TTS,quattro 2dr Coupe AWD (2.0L 4cyl Turbo 7AM),52.8 in.,165.0 in.,98.6 in.,932,27
+2019,Bentley,BENTAYGA,V8 4dr SUV AWD (4.0L 8cyl Turbo 8A),68.6 in.,202.4 in.,117.9 in.,1163,446
+2019,Bentley,BENTAYGA,Mulliner 4dr SUV AWD (6.0L 12cyl Turbo 8A),68.6 in.,202.4 in.,117.9 in.,1163,446
+2019,Bentley,BENTAYGA,W12 4dr SUV AWD (6.0L 12cyl Turbo 8A),68.6 in.,202.4 in.,117.9 in.,1163,446
+2019,Bentley,MULSANNE,4dr Sedan (6.8L 8cyl Turbo 8A),59.9 in.,219.5 in.,128.6 in.,327,33
+2019,Bentley,MULSANNE,Speed 4dr Sedan (6.8L 8cyl Turbo 8A),59.9 in.,219.5 in.,128.6 in.,327,33
+2019,Bmw,2-SERIES,M240i xDrive 2dr Coupe AWD (3.0L 6cyl Turbo 8A),55.4 in.,175.9 in.,105.9 in.,1088,35
+2019,Bmw,2-SERIES,230i 2dr Convertible (2.0L 4cyl Turbo 8A),55.6 in.,174.7 in.,105.9 in.,331,35
+2019,Bmw,2-SERIES,230i 2dr Coupe (2.0L 4cyl Turbo 8A),55.8 in.,174.7 in.,105.9 in.,330,35
+2019,Bmw,2-SERIES,M240i 2dr Coupe (3.0L 6cyl Turbo 8A),55.4 in.,175.9 in.,105.9 in.,330,35
+2019,Bmw,2-SERIES,230i xDrive 2dr Coupe AWD (2.0L 4cyl Turbo 8A),55.8 in.,174.7 in.,105.9 in.,330,35
+2019,Bmw,2-SERIES,230i xDrive 2dr Convertible AWD (2.0L 4cyl Turbo 8A),55.6 in.,174.7 in.,105.9 in.,331,35
+2019,Bmw,2-SERIES,M240i 2dr Convertible (3.0L 6cyl Turbo 8A),55.2 in.,175.9 in.,105.9 in.,1087,35
+2019,Bmw,2-SERIES,M240i xDrive 2dr Convertible AWD (3.0L 6cyl Turbo 8A),55.2 in.,175.9 in.,105.9 in.,1088,35
+2019,Bmw,3-SERIES-GRAN-TURISMO,330i xDrive 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),59.4 in.,190.0 in.,115.0 in.,337,36
+2019,Bmw,3-SERIES-GRAN-TURISMO,340i xDrive 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),59.4 in.,190.0 in.,115.0 in.,337,36
+2019,Bmw,3-SERIES,330i xDrive 4dr Sedan AWD (2.0L 4cyl Turbo 8A),57.0 in.,185.7 in.,112.2 in.,336,36
+2019,Bmw,3-SERIES,330i xDrive 4dr Wagon AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.8 in.,110.6 in.,338,36
+2019,Bmw,3-SERIES,330i 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,185.7 in.,112.2 in.,336,36
+2019,Bmw,4-SERIES-GRAN-COUPE,430i 4dr Sedan (2.0L 4cyl Turbo 8A),54.7 in.,182.7 in.,110.6 in.,340,37
+2019,Bmw,4-SERIES-GRAN-COUPE,430i xDrive 4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.3 in.,182.7 in.,110.6 in.,340,37
+2019,Bmw,4-SERIES-GRAN-COUPE,440i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),55.3 in.,182.7 in.,110.6 in.,340,37
+2019,Bmw,4-SERIES-GRAN-COUPE,440i 4dr Sedan (3.0L 6cyl Turbo 8A),54.7 in.,182.7 in.,110.6 in.,340,37
+2019,Bmw,4-SERIES,430i xDrive 2dr Convertible AWD (2.0L 4cyl Turbo 8A),55.1 in.,182.7 in.,110.6 in.,341,37
+2019,Bmw,4-SERIES,440i xDrive 2dr Coupe AWD (3.0L 6cyl Turbo 8A),54.8 in.,182.7 in.,110.6 in.,339,37
+2019,Bmw,4-SERIES,430i 2dr Convertible (2.0L 4cyl Turbo 8A),54.5 in.,182.7 in.,110.6 in.,341,37
+2019,Bmw,4-SERIES,440i xDrive 2dr Convertible AWD (3.0L 6cyl Turbo 8A),55.1 in.,182.7 in.,110.6 in.,340,37
+2019,Bmw,4-SERIES,440i 2dr Coupe (3.0L 6cyl Turbo 8A),54.2 in.,182.7 in.,110.6 in.,339,37
+2019,Bmw,4-SERIES,430i xDrive 2dr Coupe AWD (2.0L 4cyl Turbo 8A),54.8 in.,182.7 in.,110.6 in.,339,37
+2019,Bmw,4-SERIES,430i 2dr Coupe (2.0L 4cyl Turbo 8A),54.2 in.,182.7 in.,110.6 in.,339,37
+2019,Bmw,4-SERIES,440i 2dr Convertible (3.0L 6cyl Turbo 8A),54.5 in.,182.7 in.,110.6 in.,341,37
+2019,Bmw,5-SERIES,540i 4dr Sedan (3.0L 6cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,344,38
+2019,Bmw,5-SERIES,530i xDrive 4dr Sedan AWD (2.0L 4cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,344,38
+2019,Bmw,5-SERIES,530i 4dr Sedan (2.0L 4cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,344,38
+2019,Bmw,5-SERIES,530e xDrive iPerformance 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 8A),58.4 in.,194.6 in.,117.1 in.,344,38
+2019,Bmw,5-SERIES,M550i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),57.8 in.,195.4 in.,117.1 in.,344,38
+2019,Bmw,5-SERIES,540i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),58.2 in.,194.6 in.,117.1 in.,344,38
+2019,Bmw,5-SERIES,530e iPerformance 4dr Sedan (2.0L 4cyl Turbo gas/electric hybrid 8A),58.4 in.,194.6 in.,117.1 in.,344,38
+2019,Bmw,6-SERIES-GRAN-COUPE,650i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,829,39
+2019,Bmw,6-SERIES-GRAN-COUPE,650i 4dr Sedan (4.4L 8cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,829,39
+2019,Bmw,6-SERIES-GRAN-COUPE,640i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,829,39
+2019,Bmw,6-SERIES-GRAN-COUPE,640i 4dr Sedan (3.0L 6cyl Turbo 8A),54.8 in.,197.2 in.,116.9 in.,829,39
+2019,Bmw,6-SERIES-GRAN-TURISMO,640i xDrive 4dr Hatchback AWD (3.0L 6cyl Turbo 8A),60.6 in.,200.9 in.,120.9 in.,829,39
+2019,Bmw,7-SERIES,750i 4dr Sedan (4.4L 8cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
+2019,Bmw,7-SERIES,740i xDrive 4dr Sedan AWD (3.0L 6cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
+2019,Bmw,7-SERIES,740e xDrive iPerformance 4dr Sedan AWD (2.0L 4cyl Turbo gas/electric hybrid 8A),58.2 in.,206.6 in.,126.4 in.,831,40
+2019,Bmw,7-SERIES,750i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
+2019,Bmw,7-SERIES,M760i xDrive 4dr Sedan AWD (6.6L 12cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
+2019,Bmw,7-SERIES,740i 4dr Sedan (3.0L 6cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
 2019,Bmw,8-SERIES,M850i xDrive 2dr Convertible AWD (4.4L 8cyl Turbo 8A),53.0 in.,191.2 in.,111.1 in.,-9,-9
 2019,Bmw,8-SERIES,M850i xDrive 2dr Coupe AWD (4.4L 8cyl Turbo 8A),53.0 in.,191.2 in.,111.1 in.,-9,-9
 2019,Bmw,ALPINA-B6-GRAN-COUPE,xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),55.0 in.,197.1 in.,116.9 in.,-9,-9
 2019,Bmw,ALPINA-B7,xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.7 in.,206.7 in.,126.4 in.,-9,-9
-2019,Bmw,I3,4dr Hatchback (electric DD),62.9 in.,158.3 in.,101.2 in.,-9,-9
-2019,Bmw,I3,4dr Hatchback w/Range Extender (electric DD),62.9 in.,158.3 in.,101.2 in.,-9,-9
-2019,Bmw,I3,s 4dr Hatchback w/Range Extender (electric DD),62.6 in.,158.1 in.,101.2 in.,-9,-9
-2019,Bmw,I3,s 4dr Hatchback (electric DD),62.6 in.,158.1 in.,101.2 in.,-9,-9
-2019,Bmw,I8,2dr Convertible AWD (1.5L 3cyl Turbo gas/electric hybrid 6A),50.7 in.,184.9 in.,110.2 in.,-9,-9
-2019,Bmw,I8,2dr Coupe AWD (1.5L 3cyl Turbo gas/electric hybrid 6A),50.8 in.,184.9 in.,110.2 in.,-9,-9
-2019,Bmw,M2,Competition 2dr Coupe (3.0L 6cyl Turbo 6M),55.5 in.,176.2 in.,106.0 in.,-9,-9
+2019,Bmw,I3,4dr Hatchback (electric DD),62.9 in.,158.3 in.,101.2 in.,356,41
+2019,Bmw,I3,4dr Hatchback w/Range Extender (electric DD),62.9 in.,158.3 in.,101.2 in.,356,41
+2019,Bmw,I3,s 4dr Hatchback w/Range Extender (electric DD),62.6 in.,158.1 in.,101.2 in.,356,41
+2019,Bmw,I3,s 4dr Hatchback (electric DD),62.6 in.,158.1 in.,101.2 in.,356,41
+2019,Bmw,I8,2dr Convertible AWD (1.5L 3cyl Turbo gas/electric hybrid 6A),50.7 in.,184.9 in.,110.2 in.,357,42
+2019,Bmw,I8,2dr Coupe AWD (1.5L 3cyl Turbo gas/electric hybrid 6A),50.8 in.,184.9 in.,110.2 in.,357,42
+2019,Bmw,M2,Competition 2dr Coupe (3.0L 6cyl Turbo 6M),55.5 in.,176.2 in.,106.0 in.,1086,35
 2019,Bmw,M4-CS,2dr Coupe (3.0L 6cyl Turbo 7AM),54.4 in.,,110.7 in.,-9,-9
 2019,Bmw,M4,2dr Coupe (3.0L 6cyl Turbo 6M),54.4 in.,184.5 in.,110.7 in.,-9,-9
 2019,Bmw,M4,2dr Convertible (3.0L 6cyl Turbo 6M),54.6 in.,184.5 in.,110.7 in.,-9,-9
-2019,Bmw,M5,4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.0 in.,195.5 in.,117.4 in.,-9,-9
-2019,Bmw,M5,Competition 4dr Sedan AWD (4.4L 8cyl Turbo 8A),57.8 in.,195.5 in.,117.4 in.,-9,-9
-2019,Bmw,M6-GRAN-COUPE,4dr Sedan (4.4L 8cyl Turbo 7AM),54.9 in.,197.5 in.,116.7 in.,-9,-9
-2019,Bmw,X1,xDrive28i 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,175.4 in.,105.1 in.,-9,-9
-2019,Bmw,X1,sDrive28i 4dr SUV (2.0L 4cyl Turbo 8A),62.9 in.,175.4 in.,105.1 in.,-9,-9
+2019,Bmw,M5,4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.0 in.,195.5 in.,117.4 in.,1092,38
+2019,Bmw,M5,Competition 4dr Sedan AWD (4.4L 8cyl Turbo 8A),57.8 in.,195.5 in.,117.4 in.,1092,38
+2019,Bmw,M6-GRAN-COUPE,4dr Sedan (4.4L 8cyl Turbo 7AM),54.9 in.,197.5 in.,116.7 in.,1317,39
+2019,Bmw,X1,xDrive28i 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,175.4 in.,105.1 in.,832,43
+2019,Bmw,X1,sDrive28i 4dr SUV (2.0L 4cyl Turbo 8A),62.9 in.,175.4 in.,105.1 in.,832,43
 2019,Bmw,X2,M35i 4dr SUV AWD (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,-9,-9
 2019,Bmw,X2,xDrive28i 4dr SUV AWD (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,-9,-9
 2019,Bmw,X2,sDrive28i 4dr SUV (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,-9,-9
-2019,Bmw,X3,xDrive30i 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,185.9 in.,112.8 in.,-9,-9
-2019,Bmw,X3,M40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.0 in.,186.1 in.,112.8 in.,-9,-9
-2019,Bmw,X3,sDrive30i 4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,185.9 in.,112.8 in.,-9,-9
-2019,Bmw,X4,xDrive30i 4dr SUV AWD (2.0L 4cyl Turbo 8A),63.8 in.,187.5 in.,112.7 in.,-9,-9
-2019,Bmw,X4,M40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),63.8 in.,187.5 in.,112.7 in.,-9,-9
-2019,Bmw,X5,xDrive40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),69.0 in.,194.3 in.,117.1 in.,-9,-9
-2019,Bmw,X5,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),69.0 in.,194.3 in.,117.1 in.,-9,-9
-2019,Bmw,X6-M,4dr SUV AWD (4.4L 8cyl Turbo 8A),66.5 in.,193.8 in.,115.5 in.,-9,-9
-2019,Bmw,X6,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,-9,-9
-2019,Bmw,X6,sDrive35i 4dr SUV (3.0L 6cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,-9,-9
-2019,Bmw,X6,xDrive35i 4dr SUV AWD (3.0L 6cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,-9,-9
+2019,Bmw,X3,xDrive30i 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,185.9 in.,112.8 in.,360,44
+2019,Bmw,X3,M40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.0 in.,186.1 in.,112.8 in.,360,44
+2019,Bmw,X3,sDrive30i 4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,185.9 in.,112.8 in.,360,44
+2019,Bmw,X4,xDrive30i 4dr SUV AWD (2.0L 4cyl Turbo 8A),63.8 in.,187.5 in.,112.7 in.,820,412
+2019,Bmw,X4,M40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),63.8 in.,187.5 in.,112.7 in.,820,412
+2019,Bmw,X5,xDrive40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),69.0 in.,194.3 in.,117.1 in.,362,45
+2019,Bmw,X5,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),69.0 in.,194.3 in.,117.1 in.,362,45
+2019,Bmw,X6-M,4dr SUV AWD (4.4L 8cyl Turbo 8A),66.5 in.,193.8 in.,115.5 in.,1319,46
+2019,Bmw,X6,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,363,46
+2019,Bmw,X6,sDrive35i 4dr SUV (3.0L 6cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,363,46
+2019,Bmw,X6,xDrive35i 4dr SUV AWD (3.0L 6cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,363,46
 2019,Bmw,X7,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),71.1 in.,203.3 in.,122.2 in.,-9,-9
 2019,Bmw,X7,xDrive40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),71.1 in.,203.3 in.,122.2 in.,-9,-9
 2019,Bmw,Z4,sDrive30i 2dr Convertible (2.0L 4cyl Turbo 8A),51.4 in.,170.7 in.,97.2 in.,-9,-9
