@@ -2427,7 +2427,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2012,Volkswagen,Jetta-Sportwagen,"TDI 4dr Wagon w/Sunroof, Navigation (2.0L 4cyl Turbodiesel 6AM) )",59.2 in.,179.4 in.,101.5 in.,784,396
 2012,Volkswagen,Jetta-Sportwagen,TDI 4dr Wagon (2.0L 4cyl Turbodiesel 6M) ),59.2 in.,179.4 in.,101.5 in.,784,396
 2012,Volkswagen,Jetta-Sportwagen,TDI 4dr Wagon (2.0L 4cyl Turbodiesel 6AM) ),59.2 in.,179.4 in.,101.5 in.,784,396
-2012,Volkswagen,Jetta,TDI 4dr Sedan (2.0L 4cyl Turbodiesel 6M) ),57.2 in.,182.2 in.,104.4 in.,779,394
+2012,Volkswagen,Jetta,TDI 4dr Sedan (2.0L 4cyl Turbodiesel 6M) ),57.2 in.,182.2 in.,104.4 in.,779,395
 2012,Volkswagen,Jetta,"TDI 4dr Sedan w/Premium, Navigation (2.0L 4cyl Turbodiesel 6AM) )",57.2 in.,182.2 in.,104.4 in.,782,395
 2012,Volkswagen,Jetta,TDI 4dr Sedan w/Premium (2.0L 4cyl Turbodiesel 6M) ),57.2 in.,182.2 in.,104.4 in.,782,395
 2012,Volkswagen,Jetta,TDI 4dr Sedan w/Premium (2.0L 4cyl Turbodiesel 6AM) ),57.2 in.,182.2 in.,104.4 in.,782,395
@@ -16449,120 +16449,120 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Toyota,Yaris Hatchback,SE 4dr Hatchback (1.5L 4cyl 5M),59.4 in.,155.5 in.,98.8 in.,1195,
 2017,Toyota,Yaris-Ia Sedan,4dr Sedan (1.5L 4cyl 6A),58.5 in.,171.7 in.,101.2 in.,921,
 2017,Toyota,Yaris-Ia Sedan,4dr Sedan (1.5L 4cyl 6M),58.5 in.,171.7 in.,101.2 in.,921,
-2017,Volkswagen,Beetle-Convertible Convertible,1.8T Classic 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,
-2017,Volkswagen,Beetle-Convertible Convertible,1.8T S 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,
-2017,Volkswagen,Beetle-Convertible Convertible,1.8T SE 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,
-2017,Volkswagen,Beetle-Convertible Convertible,#PinkBeetle 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,
-2017,Volkswagen,Beetle-Convertible Convertible,1.8T Dune 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.7 in.,100.0 in.,1211,
-2017,Volkswagen,Beetle-Convertible Convertible,1.8T SEL 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,
-2017,Volkswagen,Beetle Hatchback,1.8T Classic 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,
-2017,Volkswagen,Beetle Hatchback,1.8T S 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,
-2017,Volkswagen,Beetle Hatchback,1.8T SE 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,
-2017,Volkswagen,Beetle Hatchback,#PinkBeetle 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,
-2017,Volkswagen,Beetle Hatchback,1.8T Dune 2dr Hatchback (1.8L 4cyl Turbo 6A),59.1 in.,168.7 in.,100.0 in.,1210,
-2017,Volkswagen,Beetle Hatchback,1.8T SEL 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,
-2017,Volkswagen,Beetle Hatchback,R-Line SEL 2dr Hatchback (2.0L Turbo 4cyl 6AM),58.5 in.,168.4 in.,100.0 in.,1063,
-2017,Volkswagen,Cc Sedan,2.0T R-Line Executive PZEV 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,
-2017,Volkswagen,Cc Sedan,2.0T Sport 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1065,
-2017,Volkswagen,Cc Sedan,2.0T Sport PZEV 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1065,
-2017,Volkswagen,Cc Sedan,2.0T R-Line Executive 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,
-2017,Volkswagen,Cc Sedan,2.0T R-Line Executive w/Carbon 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,
-2017,Volkswagen,Cc Sedan,2.0T R-Line Executive w/Carbon PZEV 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,
-2017,Volkswagen,Golf-Alltrack Wagon,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.7 in.,179.6 in.,103.5 in.,1786,
-2017,Volkswagen,Golf-Alltrack Wagon,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.7 in.,179.6 in.,103.5 in.,1786,
-2017,Volkswagen,Golf-Alltrack Wagon,TSI SEL 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.7 in.,179.6 in.,103.5 in.,1786,
-2017,Volkswagen,Golf-Alltrack Wagon,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.7 in.,179.6 in.,103.5 in.,1786,
-2017,Volkswagen,Golf-Alltrack Wagon,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.7 in.,179.6 in.,103.5 in.,1786,
-2017,Volkswagen,Golf-Gti Hatchback,S 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,S 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,Sport 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,SE 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,SE 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,Sport 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,
-2017,Volkswagen,Golf-Gti Hatchback,S 2dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,940,
-2017,Volkswagen,Golf-Gti Hatchback,S 2dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,940,
-2017,Volkswagen,Golf Hatchback,TSI S 4dr Hatchback (1.8L 4cyl Turbo 5M),57.2 in.,167.5 in.,103.8 in.,1068,
-2017,Volkswagen,Golf Hatchback,TSI S 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,
-2017,Volkswagen,Golf Hatchback,TSI Wolfsburg Edition 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,
-2017,Volkswagen,Golf Hatchback,TSI SE 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,
-2017,Volkswagen,Golf Hatchback,TSI SEL 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,
-2017,Volkswagen,Golf Hatchback,TSI Wolfsburg Edition 4dr Hatchback (1.8L 4cyl Turbo 5M),57.2 in.,167.5 in.,103.8 in.,1068,
-2017,Volkswagen,Golf-R Hatchback,4dr Hatchback AWD (2.0L 4cyl Turbo 6M),56.5 in.,168.4 in.,103.5 in.,1787,
-2017,Volkswagen,Golf-R Hatchback,w/Dynamic Chassis Control and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 6AM),56.5 in.,168.4 in.,103.5 in.,1787,
-2017,Volkswagen,Golf-R Hatchback,w/Dynamic Chassis Control and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 6M),56.5 in.,168.4 in.,103.5 in.,1787,
-2017,Volkswagen,Golf-R Hatchback,4dr Hatchback AWD (2.0L 4cyl Turbo 6AM),56.5 in.,168.4 in.,103.5 in.,1787,
-2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4Motion 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),58.3 in.,179.6 in.,103.7 in.,824,
-2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4dr Wagon (1.8L 4cyl Turbo 6A),58.3 in.,179.6 in.,103.7 in.,824,
-2017,Volkswagen,Golf-Sportwagen Wagon,TSI SE 4dr Wagon (1.8L 4cyl Turbo 6A),58.3 in.,179.6 in.,103.7 in.,824,
-2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4Motion 4dr Wagon AWD (1.8L 4cyl Turbo 6M),58.3 in.,179.6 in.,103.7 in.,824,
-2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4dr Wagon (1.8L 4cyl Turbo 5M),58.3 in.,179.6 in.,103.7 in.,824,
-2017,Volkswagen,Golf-Sportwagen Wagon,TSI SEL 4dr Wagon (1.8L 4cyl Turbo 6A),58.3 in.,179.6 in.,103.7 in.,824,
-2017,Volkswagen,Jetta 20T-Gli,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6AM),56.6 in.,182.2 in.,104.4 in.,1256,
-2017,Volkswagen,Jetta 20T-Gli,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6M),56.6 in.,182.2 in.,104.4 in.,1256,
-2017,Volkswagen,Jetta Sedan,1.4T S 4dr Sedan (1.4L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,1.4T SE 4dr Sedan (1.4L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,1.8T Sport 4dr Sedan (1.8L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,1.4T S 4dr Sedan (1.4L 4cyl Turbo 5M),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,1.4T SE 4dr Sedan (1.4L 4cyl Turbo 5M),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,1.8T SEL 4dr Sedan (1.8L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,1.8T SEL Premium 4dr Sedan (1.8L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,
-2017,Volkswagen,Jetta Sedan,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6AM),56.6 in.,182.2 in.,104.4 in.,1256,
-2017,Volkswagen,Jetta Sedan,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6M),56.6 in.,182.2 in.,104.4 in.,1256,
-2017,Volkswagen,Passat Sedan,R-Line 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Passat Sedan,SE 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Passat Sedan,SE w/Technology 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Passat Sedan,S 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Passat Sedan,SEL Premium 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Passat Sedan,V6 SEL Premium 4dr Sedan (3.6L 6cyl 6AM),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Passat Sedan,V6 SE w/Technology 4dr Sedan (3.6L 6cyl 6AM),58.5 in.,191.9 in.,110.0 in.,1070,
-2017,Volkswagen,Tiguan SUV,S 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,S 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,Wolfsburg Edition 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,Sport 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,Sport 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,Wolfsburg Edition 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,SEL 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Tiguan SUV,SEL 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,
-2017,Volkswagen,Touareg SUV,V6 Executive 4dr SUV AWD (3.6L 6cyl 8A),68.2 in.,188.8 in.,113.9 in.,1074,
-2017,Volkswagen,Touareg SUV,V6 Sport w/Technology 4dr SUV AWD (3.6L 6cyl 8A),68.2 in.,188.8 in.,113.9 in.,1074,
-2017,Volkswagen,Touareg SUV,V6 Wolfsburg Edition 4dr SUV AWD (3.6L 6cyl 8A),68.2 in.,188.8 in.,113.9 in.,1074,
-2017,Volvo,S60-Cross-Country Sedan,T5 Platinum 4dr Sedan AWD (2.0L 4cyl Turbo 8A),60.6 in.,182.5 in.,109.3 in.,1799,
-2017,Volvo,S60 Sedan,T5 Dynamic 4dr Sedan (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1075,
-2017,Volvo,S60 Sedan,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),58.4 in.,185.6 in.,112.4 in.,1257,
-2017,Volvo,S60 Sedan,T5 Inscription Platinum 4dr Sedan (2.0L 4cyl Turbo 8A),58.4 in.,185.6 in.,112.4 in.,1257,
-2017,Volvo,S60 Sedan,T6 Polestar 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1075,
-2017,Volvo,S60 Sedan,T6 R-Design Platinum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1075,
-2017,Volvo,S90 Sedan,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,
-2017,Volvo,S90 Sedan,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,
-2017,Volvo,S90 Sedan,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,
-2017,Volvo,S90 Sedan,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,
-2017,Volvo,V60-Cross-Country Wagon,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.8 in.,182.6 in.,109.2 in.,1259,
-2017,Volvo,V60-Cross-Country Wagon,T5 Platinum 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.8 in.,182.6 in.,109.2 in.,1259,
-2017,Volvo,V60 Wagon,T5 Platinum 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,
-2017,Volvo,V60 Wagon,T5 Premier 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,
-2017,Volvo,V60 Wagon,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1077,
-2017,Volvo,V60 Wagon,T5 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,
-2017,Volvo,V60 Wagon,T5 Dynamic 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,
-2017,Volvo,V60 Wagon,T6 Polestar 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1077,
-2017,Volvo,V90-Cross-Country Wagon,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,
-2017,Volvo,XC60 SUV,T5 Dynamic 4dr SUV (2.0L 4cyl Turbo 8A),67.4 in.,182.8 in.,109.2 in.,1078,
-2017,Volvo,XC60 SUV,T5 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),67.4 in.,182.8 in.,109.2 in.,1078,
-2017,Volvo,XC60 SUV,T6 Dynamic 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,
-2017,Volvo,XC60 SUV,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,
-2017,Volvo,XC60 SUV,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,
-2017,Volvo,XC90 Hybrid,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 Hybrid,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 Hybrid,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T6 Momentum 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T5 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,1079,
-2017,Volvo,XC90 SUV,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,
+2017,Volkswagen,Beetle-Convertible Convertible,1.8T Classic 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,391
+2017,Volkswagen,Beetle-Convertible Convertible,1.8T S 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,391
+2017,Volkswagen,Beetle-Convertible Convertible,1.8T SE 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,391
+2017,Volkswagen,Beetle-Convertible Convertible,#PinkBeetle 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,391
+2017,Volkswagen,Beetle-Convertible Convertible,1.8T Dune 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.7 in.,100.0 in.,1211,391
+2017,Volkswagen,Beetle-Convertible Convertible,1.8T SEL 2dr Convertible (1.8L 4cyl Turbo 6A),58.0 in.,168.4 in.,100.0 in.,773,391
+2017,Volkswagen,Beetle Hatchback,1.8T Classic 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,391
+2017,Volkswagen,Beetle Hatchback,1.8T S 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,391
+2017,Volkswagen,Beetle Hatchback,1.8T SE 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,391
+2017,Volkswagen,Beetle Hatchback,#PinkBeetle 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,391
+2017,Volkswagen,Beetle Hatchback,1.8T Dune 2dr Hatchback (1.8L 4cyl Turbo 6A),59.1 in.,168.7 in.,100.0 in.,1210,391
+2017,Volkswagen,Beetle Hatchback,1.8T SEL 2dr Hatchback (1.8L 4cyl Turbo 6A),58.5 in.,168.4 in.,100.0 in.,772,391
+2017,Volkswagen,Beetle Hatchback,R-Line SEL 2dr Hatchback (2.0L Turbo 4cyl 6AM),58.5 in.,168.4 in.,100.0 in.,1063,391
+2017,Volkswagen,Cc Sedan,2.0T R-Line Executive PZEV 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,392
+2017,Volkswagen,Cc Sedan,2.0T Sport 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1065,392
+2017,Volkswagen,Cc Sedan,2.0T Sport PZEV 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1065,392
+2017,Volkswagen,Cc Sedan,2.0T R-Line Executive 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,392
+2017,Volkswagen,Cc Sedan,2.0T R-Line Executive w/Carbon 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,392
+2017,Volkswagen,Cc Sedan,2.0T R-Line Executive w/Carbon PZEV 4dr Sedan (2.0L 4cyl Turbo 6AM),55.8 in.,189.1 in.,106.7 in.,1066,392
+2017,Volkswagen,Golf-Alltrack Wagon,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.7 in.,179.6 in.,103.5 in.,1786,394
+2017,Volkswagen,Golf-Alltrack Wagon,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.7 in.,179.6 in.,103.5 in.,1786,394
+2017,Volkswagen,Golf-Alltrack Wagon,TSI SEL 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.7 in.,179.6 in.,103.5 in.,1786,394
+2017,Volkswagen,Golf-Alltrack Wagon,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.7 in.,179.6 in.,103.5 in.,1786,394
+2017,Volkswagen,Golf-Alltrack Wagon,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.7 in.,179.6 in.,103.5 in.,1786,394
+2017,Volkswagen,Golf-Gti Hatchback,S 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,S 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,Sport 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,SE 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,SE 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,Sport 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,941,394
+2017,Volkswagen,Golf-Gti Hatchback,S 2dr Hatchback (2.0L 4cyl Turbo 6M),56.8 in.,168.0 in.,103.6 in.,940,394
+2017,Volkswagen,Golf-Gti Hatchback,S 2dr Hatchback (2.0L 4cyl Turbo 6AM),56.8 in.,168.0 in.,103.6 in.,940,394
+2017,Volkswagen,Golf Hatchback,TSI S 4dr Hatchback (1.8L 4cyl Turbo 5M),57.2 in.,167.5 in.,103.8 in.,1068,394
+2017,Volkswagen,Golf Hatchback,TSI S 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,394
+2017,Volkswagen,Golf Hatchback,TSI Wolfsburg Edition 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,394
+2017,Volkswagen,Golf Hatchback,TSI SE 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,394
+2017,Volkswagen,Golf Hatchback,TSI SEL 4dr Hatchback (1.8L 4cyl Turbo 6A),57.2 in.,167.5 in.,103.8 in.,1068,394
+2017,Volkswagen,Golf Hatchback,TSI Wolfsburg Edition 4dr Hatchback (1.8L 4cyl Turbo 5M),57.2 in.,167.5 in.,103.8 in.,1068,394
+2017,Volkswagen,Golf-R Hatchback,4dr Hatchback AWD (2.0L 4cyl Turbo 6M),56.5 in.,168.4 in.,103.5 in.,1787,394
+2017,Volkswagen,Golf-R Hatchback,w/Dynamic Chassis Control and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 6AM),56.5 in.,168.4 in.,103.5 in.,1787,394
+2017,Volkswagen,Golf-R Hatchback,w/Dynamic Chassis Control and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 6M),56.5 in.,168.4 in.,103.5 in.,1787,394
+2017,Volkswagen,Golf-R Hatchback,4dr Hatchback AWD (2.0L 4cyl Turbo 6AM),56.5 in.,168.4 in.,103.5 in.,1787,394
+2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4Motion 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),58.3 in.,179.6 in.,103.7 in.,824,394
+2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4dr Wagon (1.8L 4cyl Turbo 6A),58.3 in.,179.6 in.,103.7 in.,824,394
+2017,Volkswagen,Golf-Sportwagen Wagon,TSI SE 4dr Wagon (1.8L 4cyl Turbo 6A),58.3 in.,179.6 in.,103.7 in.,824,394
+2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4Motion 4dr Wagon AWD (1.8L 4cyl Turbo 6M),58.3 in.,179.6 in.,103.7 in.,824,394
+2017,Volkswagen,Golf-Sportwagen Wagon,TSI S 4dr Wagon (1.8L 4cyl Turbo 5M),58.3 in.,179.6 in.,103.7 in.,824,394
+2017,Volkswagen,Golf-Sportwagen Wagon,TSI SEL 4dr Wagon (1.8L 4cyl Turbo 6A),58.3 in.,179.6 in.,103.7 in.,824,394
+2017,Volkswagen,Jetta 20T-Gli,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6AM),56.6 in.,182.2 in.,104.4 in.,1256,395
+2017,Volkswagen,Jetta 20T-Gli,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6M),56.6 in.,182.2 in.,104.4 in.,1256,395
+2017,Volkswagen,Jetta Sedan,1.4T S 4dr Sedan (1.4L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,1.4T SE 4dr Sedan (1.4L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,1.8T Sport 4dr Sedan (1.8L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,1.4T S 4dr Sedan (1.4L 4cyl Turbo 5M),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,1.4T SE 4dr Sedan (1.4L 4cyl Turbo 5M),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,1.8T SEL 4dr Sedan (1.8L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,1.8T SEL Premium 4dr Sedan (1.8L 4cyl Turbo 6A),56.6 in.,182.2 in.,104.4 in.,1069,395
+2017,Volkswagen,Jetta Sedan,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6AM),56.6 in.,182.2 in.,104.4 in.,1256,395
+2017,Volkswagen,Jetta Sedan,2.0T GLI 4dr Sedan (2.0L 4cyl Turbo 6M),56.6 in.,182.2 in.,104.4 in.,1256,395
+2017,Volkswagen,Passat Sedan,R-Line 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Passat Sedan,SE 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Passat Sedan,SE w/Technology 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Passat Sedan,S 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Passat Sedan,SEL Premium 4dr Sedan (1.8L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Passat Sedan,V6 SEL Premium 4dr Sedan (3.6L 6cyl 6AM),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Passat Sedan,V6 SE w/Technology 4dr Sedan (3.6L 6cyl 6AM),58.5 in.,191.9 in.,110.0 in.,1070,397
+2017,Volkswagen,Tiguan SUV,S 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,S 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,Wolfsburg Edition 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,Sport 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,Sport 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,Wolfsburg Edition 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,SEL 4Motion 4dr SUV AWD (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Tiguan SUV,SEL 4dr SUV (2.0L 4cyl Turbo 6A),67.1 in.,174.5 in.,102.5 in.,1794,400
+2017,Volkswagen,Touareg SUV,V6 Executive 4dr SUV AWD (3.6L 6cyl 8A),68.2 in.,188.8 in.,113.9 in.,1074,401
+2017,Volkswagen,Touareg SUV,V6 Sport w/Technology 4dr SUV AWD (3.6L 6cyl 8A),68.2 in.,188.8 in.,113.9 in.,1074,401
+2017,Volkswagen,Touareg SUV,V6 Wolfsburg Edition 4dr SUV AWD (3.6L 6cyl 8A),68.2 in.,188.8 in.,113.9 in.,1074,401
+2017,Volvo,S60-Cross-Country Sedan,T5 Platinum 4dr Sedan AWD (2.0L 4cyl Turbo 8A),60.6 in.,182.5 in.,109.3 in.,1799,405
+2017,Volvo,S60 Sedan,T5 Dynamic 4dr Sedan (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1075,405
+2017,Volvo,S60 Sedan,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),58.4 in.,185.6 in.,112.4 in.,1257,405
+2017,Volvo,S60 Sedan,T5 Inscription Platinum 4dr Sedan (2.0L 4cyl Turbo 8A),58.4 in.,185.6 in.,112.4 in.,1257,405
+2017,Volvo,S60 Sedan,T6 Polestar 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1075,405
+2017,Volvo,S60 Sedan,T6 R-Design Platinum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1075,405
+2017,Volvo,S90 Sedan,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,405
+2017,Volvo,S90 Sedan,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,405
+2017,Volvo,S90 Sedan,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,405
+2017,Volvo,S90 Sedan,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,405
+2017,Volvo,V60-Cross-Country Wagon,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.8 in.,182.6 in.,109.2 in.,1259,433
+2017,Volvo,V60-Cross-Country Wagon,T5 Platinum 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.8 in.,182.6 in.,109.2 in.,1259,433
+2017,Volvo,V60 Wagon,T5 Platinum 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
+2017,Volvo,V60 Wagon,T5 Premier 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
+2017,Volvo,V60 Wagon,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
+2017,Volvo,V60 Wagon,T5 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
+2017,Volvo,V60 Wagon,T5 Dynamic 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
+2017,Volvo,V60 Wagon,T6 Polestar 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
+2017,Volvo,V90-Cross-Country Wagon,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,444
+2017,Volvo,XC60 SUV,T5 Dynamic 4dr SUV (2.0L 4cyl Turbo 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
+2017,Volvo,XC60 SUV,T5 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
+2017,Volvo,XC60 SUV,T6 Dynamic 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
+2017,Volvo,XC60 SUV,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
+2017,Volvo,XC60 SUV,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
+2017,Volvo,XC90 Hybrid,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 Hybrid,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 Hybrid,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T6 Momentum 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T5 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
+2017,Volvo,XC90 SUV,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,1079,411
 2019,Acura,ILX,Premium Package 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
 2019,Acura,ILX,4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
 2019,Acura,ILX,Premium and A-SPEC Packages 4dr Sedan (2.4L 4cyl 8AM),55.6 in.,182.2 in.,105.1 in.,889,1
@@ -19433,119 +19433,119 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Volkswagen,ATLAS,V6 SE 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
 2019,Volkswagen,ATLAS,V6 S 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
 2019,Volkswagen,ATLAS,V6 SEL Premium 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T Final Edition SE 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T SE 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T Final Edition SEL 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T S 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE,2.0T S 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE,2.0T SE 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE,2.0T Final Edition SE 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,BEETLE,2.0T Final Edition SEL 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,-9
-2019,Volkswagen,E-GOLF,SEL Premium 4dr Hatchback (electric DD),57.2 in.,168.1 in.,103.5 in.,-9,-9
-2019,Volkswagen,E-GOLF,SE 4dr Hatchback (electric DD),57.2 in.,168.1 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-ALLTRACK,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.6 in.,180.2 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-ALLTRACK,TSI SEL 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.6 in.,180.2 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-ALLTRACK,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.6 in.,180.2 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-ALLTRACK,TSI SEL 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.6 in.,180.2 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-ALLTRACK,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.6 in.,180.2 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-ALLTRACK,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.6 in.,180.2 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,S 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,SE 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,S 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,SE 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,Rabbit Edition 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,Rabbit Edition 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-GTI,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,-9
-2019,Volkswagen,GOLF-R,2.0T w/DCC and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 6M),56.5 in.,168.4 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-R,2.0T w/DCC and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),56.5 in.,168.4 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-SPORTWAGEN,1.4T S 4dr Wagon (1.4L 4cyl Turbo 6M),58.3 in.,179.8 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-SPORTWAGEN,1.4T S 4dr Wagon (1.4L 4cyl Turbo 8A),58.3 in.,179.8 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-SPORTWAGEN,1.4T SE 4dr Wagon (1.4L 4cyl Turbo 8A),58.3 in.,179.8 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-SPORTWAGEN,1.8T S 4MOTION 4dr Wagon AWD (1.8L 4cyl Turbo 6M),58.2 in.,179.6 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF-SPORTWAGEN,1.8T S 4MOTION 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),58.2 in.,179.6 in.,103.5 in.,-9,-9
-2019,Volkswagen,GOLF,1.4T S 4dr Hatchback (1.4L 4cyl Turbo 6M),58.2 in.,167.6 in.,103.8 in.,-9,-9
-2019,Volkswagen,GOLF,1.4T SE 4dr Hatchback (1.4L 4cyl Turbo 8A),58.2 in.,167.6 in.,103.8 in.,-9,-9
-2019,Volkswagen,GOLF,1.4T SE 4dr Hatchback (1.4L 4cyl Turbo 6M),58.2 in.,167.6 in.,103.8 in.,-9,-9
-2019,Volkswagen,GOLF,1.4T S 4dr Hatchback (1.4L 4cyl Turbo 8A),58.2 in.,167.6 in.,103.8 in.,-9,-9
-2019,Volkswagen,JETTA-GLI,S 4dr Sedan (2.0L 4cyl Turbo 7AM),56.8 in.,185.2 in.,105.6 in.,-9,-9
-2019,Volkswagen,JETTA-GLI,Autobahn 4dr Sedan (2.0L 4cyl Turbo 6M),56.8 in.,185.2 in.,105.6 in.,-9,-9
-2019,Volkswagen,JETTA-GLI,Autobahn 4dr Sedan (2.0L 4cyl Turbo 7AM),56.8 in.,185.2 in.,105.6 in.,-9,-9
-2019,Volkswagen,JETTA-GLI,S 4dr Sedan (2.0L 4cyl Turbo 6M),56.8 in.,185.2 in.,105.6 in.,-9,-9
-2019,Volkswagen,JETTA-GLI,35th Anniversary Edition 4dr Sedan (2.0L 4cyl Turbo 6M),56.8 in.,185.2 in.,105.6 in.,-9,-9
-2019,Volkswagen,JETTA-GLI,35th Anniversary Edition 4dr Sedan (2.0L 4cyl Turbo 7AM),56.8 in.,185.2 in.,105.6 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SE ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SEL Premium w/CWP ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T S ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SEL ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SEL Premium 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T R-Line 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T R-Line ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SEL Premium w/CWP 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T S 4dr Sedan (1.4L 4cyl Turbo 6M),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T S 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SE 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,JETTA,1.4T SEL 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,-9
-2019,Volkswagen,PASSAT,SE R-Line 4dr Sedan (2.0L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.4 in.,-9,-9
-2019,Volkswagen,PASSAT,Wolfsburg Edition 4dr Sedan (2.0L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.4 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL R-Line 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL Premium R-Line 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL R-Line Jet-Black 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,S 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SE 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,S 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL Premium 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SE 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL R-Line Jet-Black 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volkswagen,TIGUAN,SEL R-Line 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,-9
-2019,Volvo,S60,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T6 R-Design 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T8 R-Design Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T8 Inscription Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T5 R-Design 4dr Sedan (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S60,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,S90,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),57.1 in.,200.1 in.,120.5 in.,-9,-9
-2019,Volvo,S90,T8 Inscription Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),57.1 in.,200.1 in.,120.5 in.,-9,-9
-2019,Volvo,S90,T8 Momentum Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),57.1 in.,200.1 in.,120.5 in.,-9,-9
-2019,Volvo,S90,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),57.1 in.,200.1 in.,120.5 in.,-9,-9
-2019,Volvo,S90,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),57.1 in.,200.1 in.,120.5 in.,-9,-9
-2019,Volvo,V60,T6 Inscription 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,V60,T5 R-Design 4dr Wagon (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,V60,T5 Momentum 4dr Wagon (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,V60,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,V60,T6 Momentum 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,-9
-2019,Volvo,V90-CROSS-COUNTRY,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.7 in.,194.4 in.,115.8 in.,-9,-9
-2019,Volvo,V90-CROSS-COUNTRY,T6 Volvo Ocean Race 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,-9,-9
-2019,Volvo,V90-CROSS-COUNTRY,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,-9,-9
-2019,Volvo,V90,T5 R-Design 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,-9,-9
-2019,Volvo,V90,T5 Inscription 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,-9,-9
-2019,Volvo,V90,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,-9,-9
-2019,Volvo,V90,T6 Inscription 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,-9,-9
-2019,Volvo,XC40,T5 Momentum 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,-9
-2019,Volvo,XC40,T5 Inscription 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,-9
-2019,Volvo,XC40,T5 R-Design 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,-9
-2019,Volvo,XC40,T4 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,-9
-2019,Volvo,XC40,T4 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,-9
-2019,Volvo,XC40,T4 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,-9
-2019,Volvo,XC60,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T5 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T5 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T8 Momentum Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC60,T6 Momentum 4dr SUV AWD (2.0L 4cyl Twincharger 8A),65.3 in.,184.6 in.,112.8 in.,-9,-9
-2019,Volvo,XC90,T8 Momentum Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T6 Momentum 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T5 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
-2019,Volvo,XC90,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,-9
+2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T Final Edition SE 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T SE 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T Final Edition SEL 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE-CONVERTIBLE,2.0T S 2dr Convertible (2.0L 4cyl Turbo 6A),58.0 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE,2.0T S 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE,2.0T SE 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE,2.0T Final Edition SE 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,BEETLE,2.0T Final Edition SEL 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,-9,391
+2019,Volkswagen,E-GOLF,SEL Premium 4dr Hatchback (electric DD),57.2 in.,168.1 in.,103.5 in.,-9,394
+2019,Volkswagen,E-GOLF,SE 4dr Hatchback (electric DD),57.2 in.,168.1 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-ALLTRACK,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.6 in.,180.2 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-ALLTRACK,TSI SEL 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.6 in.,180.2 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-ALLTRACK,TSI SE 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.6 in.,180.2 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-ALLTRACK,TSI SEL 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.6 in.,180.2 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-ALLTRACK,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),59.6 in.,180.2 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-ALLTRACK,TSI S 4dr Wagon AWD (1.8L 4cyl Turbo 6M),59.6 in.,180.2 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-GTI,S 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,SE 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,S 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,SE 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,Rabbit Edition 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,Rabbit Edition 4dr Hatchback (2.0L 4cyl Turbo 7AM),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-GTI,Autobahn 4dr Hatchback (2.0L 4cyl Turbo 6M),57.8 in.,168.0 in.,103.6 in.,-9,394
+2019,Volkswagen,GOLF-R,2.0T w/DCC and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 6M),56.5 in.,168.4 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-R,2.0T w/DCC and Navigation 4dr Hatchback AWD (2.0L 4cyl Turbo 7AM),56.5 in.,168.4 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-SPORTWAGEN,1.4T S 4dr Wagon (1.4L 4cyl Turbo 6M),58.3 in.,179.8 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-SPORTWAGEN,1.4T S 4dr Wagon (1.4L 4cyl Turbo 8A),58.3 in.,179.8 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-SPORTWAGEN,1.4T SE 4dr Wagon (1.4L 4cyl Turbo 8A),58.3 in.,179.8 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-SPORTWAGEN,1.8T S 4MOTION 4dr Wagon AWD (1.8L 4cyl Turbo 6M),58.2 in.,179.6 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF-SPORTWAGEN,1.8T S 4MOTION 4dr Wagon AWD (1.8L 4cyl Turbo 6AM),58.2 in.,179.6 in.,103.5 in.,-9,394
+2019,Volkswagen,GOLF,1.4T S 4dr Hatchback (1.4L 4cyl Turbo 6M),58.2 in.,167.6 in.,103.8 in.,-9,394
+2019,Volkswagen,GOLF,1.4T SE 4dr Hatchback (1.4L 4cyl Turbo 8A),58.2 in.,167.6 in.,103.8 in.,-9,394
+2019,Volkswagen,GOLF,1.4T SE 4dr Hatchback (1.4L 4cyl Turbo 6M),58.2 in.,167.6 in.,103.8 in.,-9,394
+2019,Volkswagen,GOLF,1.4T S 4dr Hatchback (1.4L 4cyl Turbo 8A),58.2 in.,167.6 in.,103.8 in.,-9,394
+2019,Volkswagen,JETTA-GLI,S 4dr Sedan (2.0L 4cyl Turbo 7AM),56.8 in.,185.2 in.,105.6 in.,-9,395
+2019,Volkswagen,JETTA-GLI,Autobahn 4dr Sedan (2.0L 4cyl Turbo 6M),56.8 in.,185.2 in.,105.6 in.,-9,395
+2019,Volkswagen,JETTA-GLI,Autobahn 4dr Sedan (2.0L 4cyl Turbo 7AM),56.8 in.,185.2 in.,105.6 in.,-9,395
+2019,Volkswagen,JETTA-GLI,S 4dr Sedan (2.0L 4cyl Turbo 6M),56.8 in.,185.2 in.,105.6 in.,-9,395
+2019,Volkswagen,JETTA-GLI,35th Anniversary Edition 4dr Sedan (2.0L 4cyl Turbo 6M),56.8 in.,185.2 in.,105.6 in.,-9,395
+2019,Volkswagen,JETTA-GLI,35th Anniversary Edition 4dr Sedan (2.0L 4cyl Turbo 7AM),56.8 in.,185.2 in.,105.6 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SE ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SEL Premium w/CWP ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T S ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SEL ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SEL Premium 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T R-Line 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T R-Line ULEV 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SEL Premium w/CWP 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T S 4dr Sedan (1.4L 4cyl Turbo 6M),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T S 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SE 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,JETTA,1.4T SEL 4dr Sedan (1.4L 4cyl Turbo 8A),57.4 in.,185.1 in.,105.7 in.,-9,395
+2019,Volkswagen,PASSAT,SE R-Line 4dr Sedan (2.0L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.4 in.,-9,397
+2019,Volkswagen,PASSAT,Wolfsburg Edition 4dr Sedan (2.0L 4cyl Turbo 6A),58.5 in.,191.9 in.,110.4 in.,-9,397
+2019,Volkswagen,TIGUAN,SEL R-Line 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL Premium R-Line 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL R-Line Jet-Black 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,S 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SE 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,S 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL Premium 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SE 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL R-Line Jet-Black 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL 4MOTION 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volkswagen,TIGUAN,SEL R-Line 4dr SUV (2.0L 4cyl Turbo 8A),66.3 in.,185.1 in.,109.8 in.,-9,400
+2019,Volvo,S60,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T6 R-Design 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T8 R-Design Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T8 Inscription Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T5 R-Design 4dr Sedan (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S60,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,405
+2019,Volvo,S90,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),57.1 in.,200.1 in.,120.5 in.,-9,405
+2019,Volvo,S90,T8 Inscription Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),57.1 in.,200.1 in.,120.5 in.,-9,405
+2019,Volvo,S90,T8 Momentum Twin Engine Plug-In Hybrid 4dr Sedan AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),57.1 in.,200.1 in.,120.5 in.,-9,405
+2019,Volvo,S90,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),57.1 in.,200.1 in.,120.5 in.,-9,405
+2019,Volvo,S90,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),57.1 in.,200.1 in.,120.5 in.,-9,405
+2019,Volvo,V60,T6 Inscription 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,433
+2019,Volvo,V60,T5 R-Design 4dr Wagon (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,433
+2019,Volvo,V60,T5 Momentum 4dr Wagon (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,-9,433
+2019,Volvo,V60,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,433
+2019,Volvo,V60,T6 Momentum 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,-9,433
+2019,Volvo,V90-CROSS-COUNTRY,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.7 in.,194.4 in.,115.8 in.,-9,444
+2019,Volvo,V90-CROSS-COUNTRY,T6 Volvo Ocean Race 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,-9,444
+2019,Volvo,V90-CROSS-COUNTRY,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,-9,444
+2019,Volvo,V90,T5 R-Design 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,-9,444
+2019,Volvo,V90,T5 Inscription 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,-9,444
+2019,Volvo,V90,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,-9,444
+2019,Volvo,V90,T6 Inscription 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,-9,444
+2019,Volvo,XC40,T5 Momentum 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
+2019,Volvo,XC40,T5 Inscription 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
+2019,Volvo,XC40,T5 R-Design 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
+2019,Volvo,XC40,T4 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
+2019,Volvo,XC40,T4 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
+2019,Volvo,XC40,T4 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
+2019,Volvo,XC60,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T5 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T5 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T8 Momentum Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC60,T6 Momentum 4dr SUV AWD (2.0L 4cyl Twincharger 8A),65.3 in.,184.6 in.,112.8 in.,-9,409
+2019,Volvo,XC90,T8 Momentum Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T5 R-Design 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T6 Momentum 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T6 Inscription 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T5 Momentum 4dr SUV (2.0L 4cyl Turbo 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T6 R-Design 4dr SUV AWD (2.0L 4cyl Twincharger 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T8 Excellence Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T8 R-Design Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,411
+2019,Volvo,XC90,T8 Inscription Twin Engine Plug-In Hybrid 4dr SUV AWD (2.0L 4cyl Twincharger gas/electric hybrid 8A),69.9 in.,194.9 in.,117.5 in.,-9,411

@@ -8372,8 +8372,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3139,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan,160,2,Tiguan SEL   215/65R16,400
 2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 CC AWD,28,1,S60CC AWD. Footprint 235 Tire Width,405
 2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 CC AWD,63,1,V60CC AWD. Footprint 235 Tire Width,433
-2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,1,V90CC AWD. Footprint 235 Tire Width,479
-2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,2,V90CC AWD. Footprint 245 Tire Width,479
+2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,1,V90CC AWD. Footprint 235 Tire Width,444
+2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,2,V90CC AWD. Footprint 245 Tire Width,444
 2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 AWD,93,1,XC60 AWD All tire sizes,409
 2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC90 AWD,54,1,[ATM=1.00] XC90 AWD without Air Suspension. 235 Tire Width,411
 2017,3085,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC90 AWD,54,2,[ATM=1.00] XC90 AWD without Air Suspension. 275 Tire Width,411
@@ -8388,10 +8388,10 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 Inscription AWD,26,1,S60 Inscription AWD. Footprint for 235 tire width,405
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 Inscription FWD,23,1,S60 Inscription FWD. Footprint for 235 tire width,405
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 Polestar AWD,60,1,S60 Polestar AWD. Footprint for 245 tire width,405
-2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,72,1,S90 AWD. Footprint for 245 tire width,478
-2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,72,2,S90 AWD. Footprint for 255 tire width,478
-2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,71,1,S90 FWD. Footprint for 245 tire width,478
-2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,71,2,S90 FWD. Footprint for 255 tire width,478
+2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,72,1,S90 AWD. Footprint for 245 tire width,405
+2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,72,2,S90 AWD. Footprint for 255 tire width,405
+2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,71,1,S90 FWD. Footprint for 245 tire width,405
+2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,71,2,S90 FWD. Footprint for 255 tire width,405
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 AWD,27,1,V60 AWD. Footprint for 215 tire width,433
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 AWD,27,2,V60 AWD. Footprint for 235 tire width,433
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 FWD,24,1,V60 FWD. Footprint for 215 tire width,433
@@ -10141,8 +10141,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan Limited,160,1,Tiguan Ltd  215/65R16,400
 2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 CC AWD,28,1,S60CC AWD. Footprint 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 CC AWD,63,1,V60CC AWD. Footprint 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
-2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,1,V90CC AWD. Footprint 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
-2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,2,V90CC AWD. Footprint 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
+2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,1,V90CC AWD. Footprint 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
+2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,2,V90CC AWD. Footprint 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
 2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 AWD,79,1,[ATM=1.00] XC60 AWD. 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
 2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 AWD,79,2,[ATM=1.00] XC60 AWD. 255/45R20 tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
 2018,3109,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 AWD,79,3,[ATM=1.00] XC60 AWD. 255/40R21 tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
@@ -10169,16 +10169,16 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 Inscription AWD,26,1,S60 Inscription AWD. Footprint for 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 Inscription FWD,23,1,S60 Inscription FWD. Footprint for 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 Polestar AWD,60,1,S60 Polestar AWD. Footprint for 245 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,1,[ATM=1.00] S90 AWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,2,[ATM=1.00] S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,3,[ATM=1.60] PHEV S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,1,S90 FWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,2,S90 FWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,1,[ATM=1.00] S90 AWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,2,[ATM=1.00] S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,3,[ATM=1.60] PHEV S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,1,S90 FWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,2,S90 FWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 AWD,27,1,V60 AWD. Footprint for 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 FWD,24,1,V60 FWD. Footprint for 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 Polestar AWD,61,1,V60 Polestar AWD. Footprint for 245 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 AWD,74,1,V90 AWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
-2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 FWD,73,1,V90 FWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 AWD,74,1,V90 AWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
+2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 FWD,73,1,V90 FWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
 2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,1,MDX AWD 18inch,
 2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch (245/50R20),
 2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,3,MDX AWD 20inch (265/45R20),
@@ -11904,8 +11904,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Jetta,221,2,Jetta (GLI) 225/40 R18,395
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Passat,280,1,Passat 2.0L 215/60R16,397
 2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 CC AWD,87,1,V60CC AWD. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
-2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,1,V90CC AWD. Footprint 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
-2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,2,V90CC AWD. Footprint 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
+2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,1,V90CC AWD. Footprint 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
+2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 CC AWD,75,2,V90CC AWD. Footprint 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
 2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC40 AWD,82,1,XC40 AWD. All tire sizes. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),480
 2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 AWD,79,1,[ATM=1.00] XC60 AWD. 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
 2019,3121,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 AWD,79,2,[ATM=1.00] XC60 AWD. 255/45R20 tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
@@ -11932,16 +11932,16 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 AWD,84,3,[ATM=1.60] PHEV S60 AWD 235 Tire Width 235/40R19 for PHEV. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 FWD,83,1,S60 FWD 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S60 FWD,83,2,S60 FWD 225 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,1,[ATM=1.00] S90 AWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,2,[ATM=1.00] S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,3,[ATM=1.60] PHEV S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,1,S90 FWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,2,S90 FWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),478
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,1,[ATM=1.00] S90 AWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,2,[ATM=1.00] S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 AWD,77,3,[ATM=1.60] PHEV S90 AWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,1,S90 FWD 245 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,S90 FWD,76,2,S90 FWD 255 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),405
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 AWD,86,1,V60 AWD 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 FWD,85,1,V60 FWD 225 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 FWD,85,2,V60 FWD 235 Tire Width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),433
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 AWD,74,1,V90 AWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
-2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 FWD,73,1,V90 FWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),479
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 AWD,74,1,V90 AWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
+2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 FWD,73,1,V90 FWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),444
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC40 FWD,81,1,XC40 FWD All Tire Widths. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),480
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 FWD,78,1,XC60 FWD. 235 tire width. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
 2019,3165,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 FWD,78,2,XC60 FWD. 255/45R20 tire. CO2 Standards calculated according to alternative phase-In. Ref. §86.1818-12(e)(3)(ii)(A),409
