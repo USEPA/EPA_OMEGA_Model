@@ -5979,7 +5979,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE Coupe,70,1,"F-TYPE Coupe 18""",185
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE Coupe,70,2,"F-TYPE Coupe 19""",185
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE Coupe,70,3,"F-TYPE Coupe 20""",185
-2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE R Coupe,72,1,F-TYPE R Coupé,185
+2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE R Coupe,72,1,F-TYPE R Coupï¿½,185
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE S Convertible,76,1,"F-TYPE S Convertible 19""",185
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE S Convertible,76,2,"F-TYPE S Convertible 20""",185
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,F-TYPE S Coupe,71,1,"F-TYPE S Coupe 19""",185
@@ -6006,7 +6006,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XJL FFV,37,3,"XJ 3.0 LWB 20""",188
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK,60,1,"XK Coupe 19""/XKR Coupe 19""",189
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK,60,2,"XK Coupe 20""/XKR Coupe 20""",189
-2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK,60,3,XKR-S Coupé,189
+2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK,60,3,XKR-S Coupï¿½,189
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK Convertible,65,1,"XK Convertible 19""/XKR Convertible 19""",189
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK Convertible,65,2,"XK Convertible 20""/XKR Convertible 20""",189
 2015,1917,Jaguar Land Rover Limited,JLX,Jaguar,3,XK Convertible,65,3,XKR-S Convertible,189
@@ -6699,10 +6699,10 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2015,1851,"Volvo Cars USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC70 AWD,16,1,XC70 AWD,410
 2015,1847,"Volvo Cars USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC70 FWD,18,1,XC70 FWD,410
 2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,1,MDX AWD 18inch,
-2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch,
-2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,1,MDX FWD 18inch,
-2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,2,MDX FWD 20inch,
-2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD,101,1,RDX AWD,
+2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch,2
+2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,1,MDX FWD 18inch,2
+2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,2,MDX FWD 20inch,2
+2017,2271,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD,101,1,RDX AWD,3
 2017,2271,"American Honda Motor Co., Inc.",HNX,Honda,1,CR-V AWD,101,1,CR-V AWD 17inch,
 2017,2271,"American Honda Motor Co., Inc.",HNX,Honda,1,CR-V AWD,101,2,CR-V AWD 18inch,
 2017,2271,"American Honda Motor Co., Inc.",HNX,Honda,1,ODYSSEY FWD,201,1,ODYSSEY FWD 17inch,
@@ -6713,14 +6713,14 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,2271,"American Honda Motor Co., Inc.",HNX,Honda,1,PILOT FWD,302,2,PILOT FWD 20inch,
 2017,2271,"American Honda Motor Co., Inc.",HNX,Honda,1,RIDGELINE AWD,501,1,RIDGELINE AWD,
 2017,2271,"American Honda Motor Co., Inc.",HNX,Honda,1,RIDGELINE FWD,502,1,RIDGELINE FWD,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,1,ILX 17inch,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,2,ILX 18inch,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,NSX,20,1,NSX,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD,102,1,RDX 2WD,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,RLX,120,1,RLX,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD,60,1,TLX 4WD,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,1,TLX 2WD 17inch,
-2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,2,TLX 2WD 18inch,
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,1,ILX 17inch,1
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,2,ILX 18inch,1
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,NSX,20,1,NSX,-9
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD,102,1,RDX 2WD,3
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,RLX,120,1,RLX,4
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD,60,1,TLX 4WD,6
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,1,TLX 2WD 17inch,6
+2017,3145,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,2,TLX 2WD 18inch,6
 2017,3145,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,1,ACCORD SEDAN 16inch,
 2017,3145,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,2,ACCORD SEDAN 17inch,
 2017,3145,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,3,ACCORD SEDAN 19inch,
@@ -6744,290 +6744,290 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3145,"American Honda Motor Co., Inc.",HNX,Honda,1,FIT,80,2,FIT 16inch,
 2017,3145,"American Honda Motor Co., Inc.",HNX,Honda,1,HR-V AWD,110,1,HR-V 4WD,
 2017,3145,"American Honda Motor Co., Inc.",HNX,Honda,1,HR-V FWD,111,1,HR-V 2WD,
-2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V12,500,1,DB11 Coupe V12 - corrections for 2017MY CAFE,
-2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Rapide S,283,1,Rapide S,
-2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,V12 Vantage S,281,1,V12 Vantage S,
-2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,"Vanquish, S and Zagato",282,1,Vanquish,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28d,165,1,X3 xDrive28d R18,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28d,165,2,X3 xDrive28d R19,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28d,165,3,X3 xDrive28d R19 mixed,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,1,X3 xDrive28i R18,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,2,X3 xDrive28i R19,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,3,X3 xDrive28i R19 mixed,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,4,X3 xDrive28i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,1,X3 xDrive35i  R18,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,2,X3 xDrive35i  R19,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,3,X3 xDrive35i  R19 mixed,
-2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,4,X3 xDrive35i  R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X4 M40i,178,1,X4 M40i R19 mixed,
-2017,3223,BMW,BMX,BMW,1,X4 M40i,178,2,X4 M40i R19,
-2017,3223,BMW,BMX,BMW,1,X4 M40i,178,3,X4 M40i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,1,X4 xDrive28i R18,
-2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,2,X4 xDrive28i R19,
-2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,3,X4 xDrive28i R19 mixed,
-2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,4,X4 xDrive28i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 M,168,1,X5 M R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 M,168,2,X5 M R21 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,1,X5 sDrive35i R19,
-2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,2,X5 sDrive35i R19 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,3,X5 sDrive35i R19 M-Sport,
-2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,4,X5 sDrive35i R19 M-Sport 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,5,X5 sDrive35i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,6,X5 sDrive35i R20 mixed 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,1,X5 xDrive35d R19,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,2,X5 xDrive35d R19 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,3,X5 xDrive35d R19 M-Sport,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,4,X5 xDrive35d R19 M-Sport 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,5,X5 xDrive35d R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,6,X5 xDrive35d R20 mixed 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,1,X5 xDrive35i R19,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,2,X5 xDrive35i R19 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,3,X5 xDrive35i R19 M-Sport,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,4,X5 xDrive35i R19 M-Sport 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,5,X5 xDrive35i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,6,X5 xDrive35i R20 mixed 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive40e,170,1,X5 xDrive40e R19,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive40e,170,2,X5 xDrive40e R19 M-Sport,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive40e,170,3,X5 xDrive40e R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,1,X5 xDrive50i R19,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,2,X5 xDrive50i R19 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,3,X5 xDrive50i R19 M-Sport,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,4,X5 xDrive50i R19 M-Sport 3rd row,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,5,X5 xDrive50i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,6,X5 xDrive50i R20 mixed 3rd row,
-2017,3223,BMW,BMX,BMW,1,X6 M,96,1,X6 M R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X6 M,96,2,X6 M R21 mixed,
-2017,3223,BMW,BMX,BMW,1,X6 sDrive35i,169,1,X6 sDrive35i R19,
-2017,3223,BMW,BMX,BMW,1,X6 sDrive35i,169,2,X6 sDrive35i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X6 xDrive35i,94,1,X6 xDrive35i R19,
-2017,3223,BMW,BMX,BMW,1,X6 xDrive35i,94,2,X6 xDrive35i R20 mixed,
-2017,3223,BMW,BMX,BMW,1,X6 xDrive50i,95,1,X6 xDrive50i R19,
-2017,3223,BMW,BMX,BMW,1,X6 xDrive50i,95,2,X6 xDrive50i R20 mixed,
-2017,3224,BMW,BMX,BMW,1,230i Convertible,194,1,230i Convertible R17,
-2017,3224,BMW,BMX,BMW,1,230i Convertible,194,2,230i Convertible R18,
-2017,3224,BMW,BMX,BMW,1,230i Convertible,194,3,230i Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,230i Coupe,192,1,230i Coupe R17,
-2017,3224,BMW,BMX,BMW,1,230i Coupe,192,2,230i Coupe R18,
-2017,3224,BMW,BMX,BMW,1,230i Coupe,192,3,230i Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,230i xDrive Convertible,195,1,230i xDrive Convertible R17,
-2017,3224,BMW,BMX,BMW,1,230i xDrive Convertible,195,2,230i xDrive Convertible R18,
-2017,3224,BMW,BMX,BMW,1,230i xDrive Convertible,195,3,230i xDrive Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,230i xDrive Coupe,193,1,230i xDrive Coupe R17,
-2017,3224,BMW,BMX,BMW,1,230i xDrive Coupe,193,2,230i xDrive Coupe R18,
-2017,3224,BMW,BMX,BMW,1,230i xDrive Coupe,193,3,230i xDrive Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,320i,29,1,320i R17,
-2017,3224,BMW,BMX,BMW,1,320i,29,2,320i R18,
-2017,3224,BMW,BMX,BMW,1,320i,29,3,320i R18 mixed,
-2017,3224,BMW,BMX,BMW,1,320i xDrive,117,1,320i xDrive R17,
-2017,3224,BMW,BMX,BMW,1,320i xDrive,117,2,320i xDrive R18,
-2017,3224,BMW,BMX,BMW,1,320i xDrive,117,3,320i xDrive R18 mixed,
-2017,3224,BMW,BMX,BMW,1,328d,138,1,328d R17,
-2017,3224,BMW,BMX,BMW,1,328d,138,2,328d R18,
-2017,3224,BMW,BMX,BMW,1,328d,138,3,328d R18 mixed,
-2017,3224,BMW,BMX,BMW,1,328d xDrive,139,1,328d xDrive R17,
-2017,3224,BMW,BMX,BMW,1,328d xDrive,139,2,328d xDrive R18,
-2017,3224,BMW,BMX,BMW,1,328d xDrive,139,3,328d xDrive R18 mixed,
-2017,3224,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,1,328d xDrive Sports Wagon R17,
-2017,3224,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,2,328d xDrive Sports Wagon R18,
-2017,3224,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,3,328d xDrive Sports Wagon R18 mixed,
-2017,3224,BMW,BMX,BMW,1,330e,176,1,330e iPerformance R17,
-2017,3224,BMW,BMX,BMW,1,330e,176,2,330e iPerformance R18,
-2017,3224,BMW,BMX,BMW,1,330e,176,3,330e iPerformance R18 mixed,
-2017,3224,BMW,BMX,BMW,1,330i,196,1,330i R17,
-2017,3224,BMW,BMX,BMW,1,330i,196,2,330i R18,
-2017,3224,BMW,BMX,BMW,1,330i,196,3,330i R18 mixed,
-2017,3224,BMW,BMX,BMW,1,330i xDrive,197,1,330i xDrive R17,
-2017,3224,BMW,BMX,BMW,1,330i xDrive,197,2,330i xDrive R18,
-2017,3224,BMW,BMX,BMW,1,330i xDrive,197,3,330i xDrive R18 mixed,
-2017,3224,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,1,330i xDrive Gran Turismo R18,
-2017,3224,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,2,330i xDrive Gran Turismo R19,
-2017,3224,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,3,330i xDrive Gran Turismo R19 mixed,
-2017,3224,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,1,330i xDrive Sports Wagon R17,
-2017,3224,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,2,330i xDrive Sports Wagon R18,
-2017,3224,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,3,330i xDrive Sports Wagon R18 mixed,
-2017,3224,BMW,BMX,BMW,1,340i,172,1,340i R18,
-2017,3224,BMW,BMX,BMW,1,340i,172,2,340i R18 mixed,
-2017,3224,BMW,BMX,BMW,1,340i,172,3,340i R19 mixed,
-2017,3224,BMW,BMX,BMW,1,340i xDrive,173,1,340i xDrive R18,
-2017,3224,BMW,BMX,BMW,1,340i xDrive,173,2,340i xDrive R18 mixed,
-2017,3224,BMW,BMX,BMW,1,340i xDrive,173,3,340i xDrive R19 mixed,
-2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,1,340i xDrive Gran Turismo R18,
-2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,2,340i xDrive Gran Turismo R19,
-2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,3,340i xDrive Gran Turismo R18 mixed,
-2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,4,340i xDrive Gran Turismo R19 mixed,
-2017,3224,BMW,BMX,BMW,1,430i Convertible,204,1,430i Convertible R18,
-2017,3224,BMW,BMX,BMW,1,430i Convertible,204,2,430i Convertible R19,
-2017,3224,BMW,BMX,BMW,1,430i Convertible,204,3,430i Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,430i Convertible,204,4,430i Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,430i Coupe,200,1,430i Coupe R18,
-2017,3224,BMW,BMX,BMW,1,430i Coupe,200,2,430i Coupe R19,
-2017,3224,BMW,BMX,BMW,1,430i Coupe,200,3,430i Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,430i Coupe,200,4,430i Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,1,430i Gran Coupe R18,
-2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,2,430i Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,3,430i Gran Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,4,430i Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,1,430i xDrive Convertible R18,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,2,430i xDrive Convertible R19,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,3,430i xDrive Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,4,430i xDrive Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,1,430i xDrive Coupe R18,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,2,430i xDrive Coupe R19,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,3,430i xDrive Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,4,430i xDrive Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,1,430i xDrive Gran Coupe R18,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,2,430i xDrive Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,3,430i xDrive Gran Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,4,430i xDrive Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,440i Convertible,213,1,440i Convertible R18,
-2017,3224,BMW,BMX,BMW,1,440i Convertible,213,2,440i Convertible R19,
-2017,3224,BMW,BMX,BMW,1,440i Convertible,213,3,440i Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,440i Convertible,213,4,440i Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,440i Coupe,214,1,440i Coupe R18,
-2017,3224,BMW,BMX,BMW,1,440i Coupe,214,2,440i Coupe R19,
-2017,3224,BMW,BMX,BMW,1,440i Coupe,214,3,440i Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,440i Coupe,214,4,440i Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,1,440i Gran Coupe R18,
-2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,2,440i Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,3,440i Gran Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,4,440i Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,1,440i xDrive Convertible R18,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,2,440i xDrive Convertible R19,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,3,440i xDrive Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,4,440i xDrive Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,1,440i xDrive Coupe R18,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,2,440i xDrive Coupe R19,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,3,440i xDrive Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,4,440i xDrive Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,1,440i xDrive Gran Coupe R18,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,2,440i xDrive Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,3,440i xDrive Gran Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,4,440i xDrive Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,530i,206,1,530i R18,
-2017,3224,BMW,BMX,BMW,1,530i,206,2,530i R19,
-2017,3224,BMW,BMX,BMW,1,530i,206,3,530i R19 mixed,
-2017,3224,BMW,BMX,BMW,1,530i xDrive,207,1,530i xDrive R18,
-2017,3224,BMW,BMX,BMW,1,530i xDrive,207,2,530i xDrive R19,
-2017,3224,BMW,BMX,BMW,1,530i xDrive,207,3,530i xDrive R19 mixed,
-2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,1,535i Gran Turismo R18,
-2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,2,535i Gran Turismo R19,
-2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,3,535i Gran Turismo R19 mixed,
-2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,4,535i Gran Turismo R20 mixed,
-2017,3224,BMW,BMX,BMW,1,535i xDrive Gran Turismo,70,1,535i xDrive Gran Turismo R18,
-2017,3224,BMW,BMX,BMW,1,535i xDrive Gran Turismo,70,2,535i xDrive Gran Turismo R19,
-2017,3224,BMW,BMX,BMW,1,535i xDrive Gran Turismo,70,3,535i xDrive Gran Turismo R20 mixed,
-2017,3224,BMW,BMX,BMW,1,540i,220,1,540i R18,
-2017,3224,BMW,BMX,BMW,1,540i,220,2,540i R19,
-2017,3224,BMW,BMX,BMW,1,540i,220,3,540i R19 mixed,
-2017,3224,BMW,BMX,BMW,1,540i,220,4,540i R20 mixed,
-2017,3224,BMW,BMX,BMW,1,540i xDrive,221,1,540i xDrive  R18,
-2017,3224,BMW,BMX,BMW,1,540i xDrive,221,2,540i xDrive  R19,
-2017,3224,BMW,BMX,BMW,1,540i xDrive,221,3,540i xDrive  R19 mixed,
-2017,3224,BMW,BMX,BMW,1,540i xDrive,221,4,540i xDrive  R20 mixed,
-2017,3224,BMW,BMX,BMW,1,550i xDrive Gran Turismo,69,1,550i xDrive Gran Turismo R18,
-2017,3224,BMW,BMX,BMW,1,550i xDrive Gran Turismo,69,2,550i xDrive Gran Turismo R19,
-2017,3224,BMW,BMX,BMW,1,550i xDrive Gran Turismo,69,3,550i xDrive Gran Turismo R20 mixed,
-2017,3224,BMW,BMX,BMW,1,640i Convertible,105,1,640i Convertible R18,
-2017,3224,BMW,BMX,BMW,1,640i Convertible,105,2,640i Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,640i Convertible,105,3,640i Convertible R20 mixed,
-2017,3224,BMW,BMX,BMW,1,640i Convertible,105,4,640i Convertible R19,
-2017,3224,BMW,BMX,BMW,1,640i Coupe,106,1,640i Coupe R18,
-2017,3224,BMW,BMX,BMW,1,640i Coupe,106,2,640i Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,640i Coupe,106,3,640i Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,640i Coupe,106,4,640i Coupe R19,
-2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,1,640i Gran Coupe R18,
-2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,2,640i Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,3,640i Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,4,640i Gran Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,1,640i xDrive Convertible R18,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,2,640i xDrive Convertible R19,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,3,640i xDrive Convertible R20 mixed,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,4,640i xDrive Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,1,640i xDrive Coupe R18,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,2,640i xDrive Coupe R19,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,3,640i xDrive Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,4,640i xDrive Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,1,640i xDrive Gran Coupe R18,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,2,640i xDrive Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,3,640i xDrive Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,4,640i xDrive Gran Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i Convertible,104,1,650i Convertible R19,
-2017,3224,BMW,BMX,BMW,1,650i Convertible,104,2,650i Convertible R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i Convertible,104,3,650i Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,650i Coupe,102,1,650i Coupe R19,
-2017,3224,BMW,BMX,BMW,1,650i Coupe,102,2,650i Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i Coupe,102,3,650i Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,650i Gran Coupe,113,1,650i Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,650i Gran Coupe,113,2,650i Gran Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i Gran Coupe,113,3,650i Gran Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Convertible,110,1,650i xDrive Convertible R19,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Convertible,110,2,650i xDrive Convertible R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Coupe,111,1,650i xDrive Coupe R19,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Coupe,111,2,650i xDrive Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Coupe,111,3,650i xDrive Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,1,650i xDrive Gran Coupe R19,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,2,650i xDrive Gran Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,3,650i xDrive Gran Coupe R19 mixed,
+2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V12,500,1,DB11 Coupe V12 - corrections for 2017MY CAFE,11
+2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Rapide S,283,1,Rapide S,12
+2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,V12 Vantage S,281,1,V12 Vantage S,13
+2017,2493,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,"Vanquish, S and Zagato",282,1,Vanquish,14
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28d,165,1,X3 xDrive28d R18,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28d,165,2,X3 xDrive28d R19,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28d,165,3,X3 xDrive28d R19 mixed,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,1,X3 xDrive28i R18,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,2,X3 xDrive28i R19,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,3,X3 xDrive28i R19 mixed,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive28i,83,4,X3 xDrive28i R20 mixed,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,1,X3 xDrive35i  R18,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,2,X3 xDrive35i  R19,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,3,X3 xDrive35i  R19 mixed,44
+2017,3223,BMW,BMX,BMW,1,X3 xDrive35i,88,4,X3 xDrive35i  R20 mixed,44
+2017,3223,BMW,BMX,BMW,1,X4 M40i,178,1,X4 M40i R19 mixed,412
+2017,3223,BMW,BMX,BMW,1,X4 M40i,178,2,X4 M40i R19,412
+2017,3223,BMW,BMX,BMW,1,X4 M40i,178,3,X4 M40i R20 mixed,412
+2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,1,X4 xDrive28i R18,412
+2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,2,X4 xDrive28i R19,412
+2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,3,X4 xDrive28i R19 mixed,412
+2017,3223,BMW,BMX,BMW,1,X4 xDrive28i,166,4,X4 xDrive28i R20 mixed,412
+2017,3223,BMW,BMX,BMW,1,X5 M,168,1,X5 M R20 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 M,168,2,X5 M R21 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,1,X5 sDrive35i R19,45
+2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,2,X5 sDrive35i R19 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,3,X5 sDrive35i R19 M-Sport,45
+2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,4,X5 sDrive35i R19 M-Sport 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,5,X5 sDrive35i R20 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 sDrive35i,145,6,X5 sDrive35i R20 mixed 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,1,X5 xDrive35d R19,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,2,X5 xDrive35d R19 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,3,X5 xDrive35d R19 M-Sport,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,4,X5 xDrive35d R19 M-Sport 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,5,X5 xDrive35d R20 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive 35d,147,6,X5 xDrive35d R20 mixed 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,1,X5 xDrive35i R19,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,2,X5 xDrive35i R19 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,3,X5 xDrive35i R19 M-Sport,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,4,X5 xDrive35i R19 M-Sport 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,5,X5 xDrive35i R20 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive35i,146,6,X5 xDrive35i R20 mixed 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive40e,170,1,X5 xDrive40e R19,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive40e,170,2,X5 xDrive40e R19 M-Sport,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive40e,170,3,X5 xDrive40e R20 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,1,X5 xDrive50i R19,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,2,X5 xDrive50i R19 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,3,X5 xDrive50i R19 M-Sport,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,4,X5 xDrive50i R19 M-Sport 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,5,X5 xDrive50i R20 mixed,45
+2017,3223,BMW,BMX,BMW,1,X5 xDrive50i,148,6,X5 xDrive50i R20 mixed 3rd row,45
+2017,3223,BMW,BMX,BMW,1,X6 M,96,1,X6 M R20 mixed,46
+2017,3223,BMW,BMX,BMW,1,X6 M,96,2,X6 M R21 mixed,46
+2017,3223,BMW,BMX,BMW,1,X6 sDrive35i,169,1,X6 sDrive35i R19,46
+2017,3223,BMW,BMX,BMW,1,X6 sDrive35i,169,2,X6 sDrive35i R20 mixed,46
+2017,3223,BMW,BMX,BMW,1,X6 xDrive35i,94,1,X6 xDrive35i R19,46
+2017,3223,BMW,BMX,BMW,1,X6 xDrive35i,94,2,X6 xDrive35i R20 mixed,46
+2017,3223,BMW,BMX,BMW,1,X6 xDrive50i,95,1,X6 xDrive50i R19,46
+2017,3223,BMW,BMX,BMW,1,X6 xDrive50i,95,2,X6 xDrive50i R20 mixed,46
+2017,3224,BMW,BMX,BMW,1,230i Convertible,194,1,230i Convertible R17,35
+2017,3224,BMW,BMX,BMW,1,230i Convertible,194,2,230i Convertible R18,35
+2017,3224,BMW,BMX,BMW,1,230i Convertible,194,3,230i Convertible R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,230i Coupe,192,1,230i Coupe R17,35
+2017,3224,BMW,BMX,BMW,1,230i Coupe,192,2,230i Coupe R18,35
+2017,3224,BMW,BMX,BMW,1,230i Coupe,192,3,230i Coupe R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,230i xDrive Convertible,195,1,230i xDrive Convertible R17,35
+2017,3224,BMW,BMX,BMW,1,230i xDrive Convertible,195,2,230i xDrive Convertible R18,35
+2017,3224,BMW,BMX,BMW,1,230i xDrive Convertible,195,3,230i xDrive Convertible R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,230i xDrive Coupe,193,1,230i xDrive Coupe R17,35
+2017,3224,BMW,BMX,BMW,1,230i xDrive Coupe,193,2,230i xDrive Coupe R18,35
+2017,3224,BMW,BMX,BMW,1,230i xDrive Coupe,193,3,230i xDrive Coupe R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,320i,29,1,320i R17,36
+2017,3224,BMW,BMX,BMW,1,320i,29,2,320i R18,36
+2017,3224,BMW,BMX,BMW,1,320i,29,3,320i R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,320i xDrive,117,1,320i xDrive R17,36
+2017,3224,BMW,BMX,BMW,1,320i xDrive,117,2,320i xDrive R18,36
+2017,3224,BMW,BMX,BMW,1,320i xDrive,117,3,320i xDrive R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,328d,138,1,328d R17,36
+2017,3224,BMW,BMX,BMW,1,328d,138,2,328d R18,36
+2017,3224,BMW,BMX,BMW,1,328d,138,3,328d R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,328d xDrive,139,1,328d xDrive R17,36
+2017,3224,BMW,BMX,BMW,1,328d xDrive,139,2,328d xDrive R18,36
+2017,3224,BMW,BMX,BMW,1,328d xDrive,139,3,328d xDrive R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,1,328d xDrive Sports Wagon R17,36
+2017,3224,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,2,328d xDrive Sports Wagon R18,36
+2017,3224,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,3,328d xDrive Sports Wagon R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,330e,176,1,330e iPerformance R17,36
+2017,3224,BMW,BMX,BMW,1,330e,176,2,330e iPerformance R18,36
+2017,3224,BMW,BMX,BMW,1,330e,176,3,330e iPerformance R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,330i,196,1,330i R17,36
+2017,3224,BMW,BMX,BMW,1,330i,196,2,330i R18,36
+2017,3224,BMW,BMX,BMW,1,330i,196,3,330i R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive,197,1,330i xDrive R17,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive,197,2,330i xDrive R18,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive,197,3,330i xDrive R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,1,330i xDrive Gran Turismo R18,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,2,330i xDrive Gran Turismo R19,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,3,330i xDrive Gran Turismo R19 mixed,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,1,330i xDrive Sports Wagon R17,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,2,330i xDrive Sports Wagon R18,36
+2017,3224,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,3,330i xDrive Sports Wagon R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,340i,172,1,340i R18,36
+2017,3224,BMW,BMX,BMW,1,340i,172,2,340i R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,340i,172,3,340i R19 mixed,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive,173,1,340i xDrive R18,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive,173,2,340i xDrive R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive,173,3,340i xDrive R19 mixed,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,1,340i xDrive Gran Turismo R18,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,2,340i xDrive Gran Turismo R19,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,3,340i xDrive Gran Turismo R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,4,340i xDrive Gran Turismo R19 mixed,36
+2017,3224,BMW,BMX,BMW,1,430i Convertible,204,1,430i Convertible R18,37
+2017,3224,BMW,BMX,BMW,1,430i Convertible,204,2,430i Convertible R19,37
+2017,3224,BMW,BMX,BMW,1,430i Convertible,204,3,430i Convertible R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i Convertible,204,4,430i Convertible R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i Coupe,200,1,430i Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,430i Coupe,200,2,430i Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,430i Coupe,200,3,430i Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i Coupe,200,4,430i Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,1,430i Gran Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,2,430i Gran Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,3,430i Gran Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i Gran Coupe,202,4,430i Gran Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,1,430i xDrive Convertible R18,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,2,430i xDrive Convertible R19,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,3,430i xDrive Convertible R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Convertible,205,4,430i xDrive Convertible R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,1,430i xDrive Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,2,430i xDrive Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,3,430i xDrive Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Coupe,201,4,430i xDrive Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,1,430i xDrive Gran Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,2,430i xDrive Gran Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,3,430i xDrive Gran Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,4,430i xDrive Gran Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i Convertible,213,1,440i Convertible R18,37
+2017,3224,BMW,BMX,BMW,1,440i Convertible,213,2,440i Convertible R19,37
+2017,3224,BMW,BMX,BMW,1,440i Convertible,213,3,440i Convertible R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i Convertible,213,4,440i Convertible R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i Coupe,214,1,440i Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,440i Coupe,214,2,440i Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,440i Coupe,214,3,440i Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i Coupe,214,4,440i Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,1,440i Gran Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,2,440i Gran Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,3,440i Gran Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i Gran Coupe,215,4,440i Gran Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,1,440i xDrive Convertible R18,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,2,440i xDrive Convertible R19,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,3,440i xDrive Convertible R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Convertible,216,4,440i xDrive Convertible R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,1,440i xDrive Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,2,440i xDrive Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,3,440i xDrive Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Coupe,217,4,440i xDrive Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,1,440i xDrive Gran Coupe R18,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,2,440i xDrive Gran Coupe R19,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,3,440i xDrive Gran Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,4,440i xDrive Gran Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,530i,206,1,530i R18,38
+2017,3224,BMW,BMX,BMW,1,530i,206,2,530i R19,38
+2017,3224,BMW,BMX,BMW,1,530i,206,3,530i R19 mixed,38
+2017,3224,BMW,BMX,BMW,1,530i xDrive,207,1,530i xDrive R18,38
+2017,3224,BMW,BMX,BMW,1,530i xDrive,207,2,530i xDrive R19,38
+2017,3224,BMW,BMX,BMW,1,530i xDrive,207,3,530i xDrive R19 mixed,38
+2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,1,535i Gran Turismo R18,38
+2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,2,535i Gran Turismo R19,38
+2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,3,535i Gran Turismo R19 mixed,38
+2017,3224,BMW,BMX,BMW,1,535i Gran Turismo,64,4,535i Gran Turismo R20 mixed,38
+2017,3224,BMW,BMX,BMW,1,535i xDrive Gran Turismo,70,1,535i xDrive Gran Turismo R18,38
+2017,3224,BMW,BMX,BMW,1,535i xDrive Gran Turismo,70,2,535i xDrive Gran Turismo R19,38
+2017,3224,BMW,BMX,BMW,1,535i xDrive Gran Turismo,70,3,535i xDrive Gran Turismo R20 mixed,38
+2017,3224,BMW,BMX,BMW,1,540i,220,1,540i R18,38
+2017,3224,BMW,BMX,BMW,1,540i,220,2,540i R19,38
+2017,3224,BMW,BMX,BMW,1,540i,220,3,540i R19 mixed,38
+2017,3224,BMW,BMX,BMW,1,540i,220,4,540i R20 mixed,38
+2017,3224,BMW,BMX,BMW,1,540i xDrive,221,1,540i xDrive  R18,38
+2017,3224,BMW,BMX,BMW,1,540i xDrive,221,2,540i xDrive  R19,38
+2017,3224,BMW,BMX,BMW,1,540i xDrive,221,3,540i xDrive  R19 mixed,38
+2017,3224,BMW,BMX,BMW,1,540i xDrive,221,4,540i xDrive  R20 mixed,38
+2017,3224,BMW,BMX,BMW,1,550i xDrive Gran Turismo,69,1,550i xDrive Gran Turismo R18,38
+2017,3224,BMW,BMX,BMW,1,550i xDrive Gran Turismo,69,2,550i xDrive Gran Turismo R19,38
+2017,3224,BMW,BMX,BMW,1,550i xDrive Gran Turismo,69,3,550i xDrive Gran Turismo R20 mixed,38
+2017,3224,BMW,BMX,BMW,1,640i Convertible,105,1,640i Convertible R18,39
+2017,3224,BMW,BMX,BMW,1,640i Convertible,105,2,640i Convertible R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i Convertible,105,3,640i Convertible R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i Convertible,105,4,640i Convertible R19,39
+2017,3224,BMW,BMX,BMW,1,640i Coupe,106,1,640i Coupe R18,39
+2017,3224,BMW,BMX,BMW,1,640i Coupe,106,2,640i Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i Coupe,106,3,640i Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i Coupe,106,4,640i Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,1,640i Gran Coupe R18,39
+2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,2,640i Gran Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,3,640i Gran Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i Gran Coupe,112,4,640i Gran Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,1,640i xDrive Convertible R18,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,2,640i xDrive Convertible R19,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,3,640i xDrive Convertible R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Convertible,135,4,640i xDrive Convertible R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,1,640i xDrive Coupe R18,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,2,640i xDrive Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,3,640i xDrive Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Coupe,133,4,640i xDrive Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,1,640i xDrive Gran Coupe R18,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,2,640i xDrive Gran Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,3,640i xDrive Gran Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,4,640i xDrive Gran Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i Convertible,104,1,650i Convertible R19,39
+2017,3224,BMW,BMX,BMW,1,650i Convertible,104,2,650i Convertible R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i Convertible,104,3,650i Convertible R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i Coupe,102,1,650i Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,650i Coupe,102,2,650i Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i Coupe,102,3,650i Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i Gran Coupe,113,1,650i Gran Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,650i Gran Coupe,113,2,650i Gran Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i Gran Coupe,113,3,650i Gran Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Convertible,110,1,650i xDrive Convertible R19,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Convertible,110,2,650i xDrive Convertible R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Coupe,111,1,650i xDrive Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Coupe,111,2,650i xDrive Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Coupe,111,3,650i xDrive Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,1,650i xDrive Gran Coupe R19,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,2,650i xDrive Gran Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,3,650i xDrive Gran Coupe R19 mixed,39
 2017,3224,BMW,BMX,BMW,1,740e xDrive,226,1,740e xDrive iPerformance R18,
-2017,3224,BMW,BMX,BMW,1,740e xDrive,226,2,740e xDrive iPerformance R19,
-2017,3224,BMW,BMX,BMW,1,740i,54,1,740i R18,
-2017,3224,BMW,BMX,BMW,1,740i,54,2,740i R19,
-2017,3224,BMW,BMX,BMW,1,740i,54,3,740i R19 mixed,
-2017,3224,BMW,BMX,BMW,1,740i,54,4,740i R20 mixed,
-2017,3224,BMW,BMX,BMW,1,740i xDrive,58,1,740i xDrive R18,
-2017,3224,BMW,BMX,BMW,1,740i xDrive,58,2,740i xDrive R19,
-2017,3224,BMW,BMX,BMW,1,740i xDrive,58,3,740i xDrive R20 mixed,
-2017,3224,BMW,BMX,BMW,1,750i,80,1,750i R18,
-2017,3224,BMW,BMX,BMW,1,750i,80,2,750i R19,
-2017,3224,BMW,BMX,BMW,1,750i,80,3,750i R19 mixed,
-2017,3224,BMW,BMX,BMW,1,750i,80,4,750i R20 mixed,
-2017,3224,BMW,BMX,BMW,1,750i xDrive,86,1,750i xDrive  R18,
-2017,3224,BMW,BMX,BMW,1,750i xDrive,86,2,750i xDrive  R19,
-2017,3224,BMW,BMX,BMW,1,750i xDrive,86,3,750i xDrive  R19 mixed,
-2017,3224,BMW,BMX,BMW,1,750i xDrive,86,4,750i xDrive  R20 mixed,
-2017,3224,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,1,Alpina B6 xDrive Gran Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,2,Alpina B6 xDrive Gran Coupe R20 mixed V2,
-2017,3224,BMW,BMX,BMW,1,Alpina B7 xDrive,212,1,Alpina B7 xDrive R20 mixed,
-2017,3224,BMW,BMX,BMW,1,Alpina B7 xDrive,212,2,Alpina B7 xDrive R21 mixed,
-2017,3224,BMW,BMX,BMW,1,I3 BEV,143,1,i3 94 R19,
-2017,3224,BMW,BMX,BMW,1,I3 BEV,143,2,i3 94 R20 mixed,
-2017,3224,BMW,BMX,BMW,1,I3 BEV,143,3,i3 94 R19 mixed,
-2017,3224,BMW,BMX,BMW,1,I3 REX,224,1,i3 94 REX R19 mixed,
-2017,3224,BMW,BMX,BMW,1,I3 REX,224,2,i3 94 REX R20 mixed,
-2017,3224,BMW,BMX,BMW,1,I8,144,1,i8 R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M2,177,1,M2 R19 mixed,
-2017,3224,BMW,BMX,BMW,1,M3,149,1,M3 R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M3,149,2,M3 R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M3,149,3,M3 R19 mixed,
-2017,3224,BMW,BMX,BMW,1,M4 Convertible,151,1,M4 Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M4 Convertible,151,2,M4 Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,M4 Convertible,151,3,M4 Convertible R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M4 Coupe,150,1,M4 Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M4 Coupe,150,2,M4 Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,M4 Coupe,150,3,M4 Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M6 Convertible,103,1,M6 Convertible R19 mixed,
-2017,3224,BMW,BMX,BMW,1,M6 Convertible,103,2,M6 Convertible R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M6 Coupe,109,1,M6 Coupe R19 mixed,
-2017,3224,BMW,BMX,BMW,1,M6 Coupe,109,2,M6 Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M6 Gran Coupe,107,1,M6 Gran Coupe R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M240i Convertible,209,1,M240i Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M240i Convertible,209,2,M240i Convertible R18,
-2017,3224,BMW,BMX,BMW,1,M240i Coupe,208,1,M240i Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M240i Coupe,208,2,M240i Coupe R18,
-2017,3224,BMW,BMX,BMW,1,M240i xDrive Convertible,211,1,M240i xDrive Convertible R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M240i xDrive Convertible,211,2,M240i xDrive Convertible R18,
-2017,3224,BMW,BMX,BMW,1,M240i xDrive Coupe,210,1,M240i xDrive Coupe R18 mixed,
-2017,3224,BMW,BMX,BMW,1,M240i xDrive Coupe,210,2,M240i xDrive Coupe R18,
-2017,3224,BMW,BMX,BMW,1,M760i xDrive,222,1,M760i xDrive R20 mixed,
-2017,3224,BMW,BMX,BMW,1,M760i xDrive,222,2,M760i xDrive R19,
-2017,3224,BMW,BMX,BMW,1,X1 sDrive28i,175,1,X1 sDrive28i R18,
-2017,3224,BMW,BMX,BMW,1,X1 sDrive28i,175,2,X1 sDrive28i R19,
-2017,3224,BMW,BMX,BMW,1,X1 xDrive28i,174,1,X1 xDrive28i R18,
-2017,3224,BMW,BMX,BMW,1,X1 xDrive28i,174,2,X1 xDrive28i R19,
-2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,1,X3 sDrive28i R18,
-2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,2,X3 sDrive28i R19,
-2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,3,X3 sDrive28i R19 mixed,
-2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,4,X3 sDrive28i R20 mixed,
+2017,3224,BMW,BMX,BMW,1,740e xDrive,226,2,740e xDrive iPerformance R19,40
+2017,3224,BMW,BMX,BMW,1,740i,54,1,740i R18,40
+2017,3224,BMW,BMX,BMW,1,740i,54,2,740i R19,40
+2017,3224,BMW,BMX,BMW,1,740i,54,3,740i R19 mixed,40
+2017,3224,BMW,BMX,BMW,1,740i,54,4,740i R20 mixed,40
+2017,3224,BMW,BMX,BMW,1,740i xDrive,58,1,740i xDrive R18,40
+2017,3224,BMW,BMX,BMW,1,740i xDrive,58,2,740i xDrive R19,40
+2017,3224,BMW,BMX,BMW,1,740i xDrive,58,3,740i xDrive R20 mixed,40
+2017,3224,BMW,BMX,BMW,1,750i,80,1,750i R18,40
+2017,3224,BMW,BMX,BMW,1,750i,80,2,750i R19,40
+2017,3224,BMW,BMX,BMW,1,750i,80,3,750i R19 mixed,40
+2017,3224,BMW,BMX,BMW,1,750i,80,4,750i R20 mixed,40
+2017,3224,BMW,BMX,BMW,1,750i xDrive,86,1,750i xDrive  R18,40
+2017,3224,BMW,BMX,BMW,1,750i xDrive,86,2,750i xDrive  R19,40
+2017,3224,BMW,BMX,BMW,1,750i xDrive,86,3,750i xDrive  R19 mixed,40
+2017,3224,BMW,BMX,BMW,1,750i xDrive,86,4,750i xDrive  R20 mixed,40
+2017,3224,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,1,Alpina B6 xDrive Gran Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,2,Alpina B6 xDrive Gran Coupe R20 mixed V2,39
+2017,3224,BMW,BMX,BMW,1,Alpina B7 xDrive,212,1,Alpina B7 xDrive R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,Alpina B7 xDrive,212,2,Alpina B7 xDrive R21 mixed,39
+2017,3224,BMW,BMX,BMW,1,I3 BEV,143,1,i3 94 R19,41
+2017,3224,BMW,BMX,BMW,1,I3 BEV,143,2,i3 94 R20 mixed,41
+2017,3224,BMW,BMX,BMW,1,I3 BEV,143,3,i3 94 R19 mixed,41
+2017,3224,BMW,BMX,BMW,1,I3 REX,224,1,i3 94 REX R19 mixed,41
+2017,3224,BMW,BMX,BMW,1,I3 REX,224,2,i3 94 REX R20 mixed,41
+2017,3224,BMW,BMX,BMW,1,I8,144,1,i8 R20 mixed,42
+2017,3224,BMW,BMX,BMW,1,M2,177,1,M2 R19 mixed,35
+2017,3224,BMW,BMX,BMW,1,M3,149,1,M3 R18 mixed,36
+2017,3224,BMW,BMX,BMW,1,M3,149,2,M3 R20 mixed,36
+2017,3224,BMW,BMX,BMW,1,M3,149,3,M3 R19 mixed,36
+2017,3224,BMW,BMX,BMW,1,M4 Convertible,151,1,M4 Convertible R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,M4 Convertible,151,2,M4 Convertible R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,M4 Convertible,151,3,M4 Convertible R20 mixed,37
+2017,3224,BMW,BMX,BMW,1,M4 Coupe,150,1,M4 Coupe R18 mixed,37
+2017,3224,BMW,BMX,BMW,1,M4 Coupe,150,2,M4 Coupe R19 mixed,37
+2017,3224,BMW,BMX,BMW,1,M4 Coupe,150,3,M4 Coupe R20 mixed,37
+2017,3224,BMW,BMX,BMW,1,M6 Convertible,103,1,M6 Convertible R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,M6 Convertible,103,2,M6 Convertible R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,M6 Coupe,109,1,M6 Coupe R19 mixed,39
+2017,3224,BMW,BMX,BMW,1,M6 Coupe,109,2,M6 Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,M6 Gran Coupe,107,1,M6 Gran Coupe R20 mixed,39
+2017,3224,BMW,BMX,BMW,1,M240i Convertible,209,1,M240i Convertible R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,M240i Convertible,209,2,M240i Convertible R18,35
+2017,3224,BMW,BMX,BMW,1,M240i Coupe,208,1,M240i Coupe R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,M240i Coupe,208,2,M240i Coupe R18,35
+2017,3224,BMW,BMX,BMW,1,M240i xDrive Convertible,211,1,M240i xDrive Convertible R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,M240i xDrive Convertible,211,2,M240i xDrive Convertible R18,35
+2017,3224,BMW,BMX,BMW,1,M240i xDrive Coupe,210,1,M240i xDrive Coupe R18 mixed,35
+2017,3224,BMW,BMX,BMW,1,M240i xDrive Coupe,210,2,M240i xDrive Coupe R18,35
+2017,3224,BMW,BMX,BMW,1,M760i xDrive,222,1,M760i xDrive R20 mixed,-9
+2017,3224,BMW,BMX,BMW,1,M760i xDrive,222,2,M760i xDrive R19,-9
+2017,3224,BMW,BMX,BMW,1,X1 sDrive28i,175,1,X1 sDrive28i R18,43
+2017,3224,BMW,BMX,BMW,1,X1 sDrive28i,175,2,X1 sDrive28i R19,43
+2017,3224,BMW,BMX,BMW,1,X1 xDrive28i,174,1,X1 xDrive28i R18,43
+2017,3224,BMW,BMX,BMW,1,X1 xDrive28i,174,2,X1 xDrive28i R19,43
+2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,1,X3 sDrive28i R18,44
+2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,2,X3 sDrive28i R19,44
+2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,3,X3 sDrive28i R19 mixed,44
+2017,3224,BMW,BMX,BMW,1,X3 sDrive 28i,164,4,X3 sDrive28i R20 mixed,44
 2017,3224,BMW,BMX,Mini,2,JOHN COOPER WORKS CLUBMAN ALL4,189,1,John Cooper Works Clubman ALL4 R18,
 2017,3224,BMW,BMX,Mini,2,JOHN COOPER WORKS CLUBMAN ALL4,189,2,John Cooper Works Clubman ALL4 R19,
 2017,3224,BMW,BMX,Mini,2,JOHN COOPER WORKS CONVERTIBLE,190,1,John Cooper Works Convertible R17,
@@ -7116,8 +7116,8 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,2217,Computer Science,CSC,Verify Manager Division,3,CAMARO,970,1,CAMARO PV,
 2017,2217,Computer Science,CSC,Verify Manager Division,3,EQUINOX AWD Truck,950,1,EQUINOX AWD PV,
 2017,2217,Computer Science,CSC,Verify Manager Division,3,EQUINOX FWD,42,1,EQUINOX FWD PV,
-2017,3102,FCA US LLC,CRX,Chrysler,1,Pacifica,180,1,Pacifica,
-2017,3102,FCA US LLC,CRX,Chrysler,1,Pacifica Hybrid,181,1,Pacifica Hybrid,
+2017,3102,FCA US LLC,CRX,Chrysler,1,Pacifica,180,1,Pacifica,467
+2017,3102,FCA US LLC,CRX,Chrysler,1,Pacifica Hybrid,181,1,Pacifica Hybrid,467
 2017,3102,FCA US LLC,CRX,Dodge,2,Durango AWD,295,1,Durango AWD,
 2017,3102,FCA US LLC,CRX,Dodge,2,Durango AWD,295,2,Durango AWD,
 2017,3102,FCA US LLC,CRX,Dodge,2,Durango RWD,290,1,Durango RWD,
@@ -7157,18 +7157,18 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3102,FCA US LLC,CRX,RAM,12,Promaster City,981,2,Promaster City (cargo van),
 2017,3102,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,Levante,
 2017,3102,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,Levante S,
-2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,4C,600,1,4C,
-2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,1,Giulia,
-2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,2,Giulia,
-2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,3,Giulia,
-2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,1,Giulia AWD,
-2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,2,Giulia AWD,
-2017,3101,FCA US LLC,CRX,Chrysler,1,200,150,1,200,
-2017,3101,FCA US LLC,CRX,Chrysler,1,200,150,2,200,
-2017,3101,FCA US LLC,CRX,Chrysler,1,200 AWD,155,1,200 AWD,
-2017,3101,FCA US LLC,CRX,Chrysler,1,200 AWD,155,2,200 AWD,
-2017,3101,FCA US LLC,CRX,Chrysler,1,300,170,1,300,
-2017,3101,FCA US LLC,CRX,Chrysler,1,300 AWD,175,1,300 AWD,
+2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,4C,600,1,4C,413
+2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,1,Giulia,465
+2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,2,Giulia,465
+2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,3,Giulia,465
+2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,1,Giulia AWD,465
+2017,3101,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,2,Giulia AWD,465
+2017,3101,FCA US LLC,CRX,Chrysler,1,200,150,1,200,90
+2017,3101,FCA US LLC,CRX,Chrysler,1,200,150,2,200,90
+2017,3101,FCA US LLC,CRX,Chrysler,1,200 AWD,155,1,200 AWD,90
+2017,3101,FCA US LLC,CRX,Chrysler,1,200 AWD,155,2,200 AWD,90
+2017,3101,FCA US LLC,CRX,Chrysler,1,300,170,1,300,90
+2017,3101,FCA US LLC,CRX,Chrysler,1,300 AWD,175,1,300 AWD,92
 2017,3101,FCA US LLC,CRX,Dodge,2,Challenger,272,1,Challenger,
 2017,3101,FCA US LLC,CRX,Dodge,2,Challenger,272,2,Challenger,
 2017,3101,FCA US LLC,CRX,Dodge,2,Challenger,272,3,Challenger,
@@ -7428,45 +7428,45 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3222,"Roush Industries, Inc.",RII,"Roush Industries, Inc.",1,Roush Stage 3 Mustang,1,2,2/26/18:Mustang Convertible Auto Trans,
 2017,3222,"Roush Industries, Inc.",RII,"Roush Industries, Inc.",1,Roush Stage 3 Mustang,1,3,2/26/18pzj:Mustang Coupe Manual Trans,
 2017,3222,"Roush Industries, Inc.",RII,"Roush Industries, Inc.",1,Roush Stage 3 Mustang,1,4,2/26/18:Mustang Coupe Auto Trans,
-2017,2428,General Motors LLC,GMX,Buick,1,ENCLAVE AWD,115,1,ENCLAVE AWD,
-2017,2428,General Motors LLC,GMX,Buick,1,ENCLAVE FWD,114,1,ENCLAVE FWD,
-2017,2428,General Motors LLC,GMX,Buick,1,ENCORE AWD,118,1,ENCORE AWD,
-2017,2428,General Motors LLC,GMX,Buick,1,ENVISION AWD,121,1,ENVISION AWD,
-2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,1,ESCALADE 2WD,
-2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,2,ESCALADE 2WD,
-2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,1,ESCALADE 4WD,
-2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,2,ESCALADE 4WD,
-2017,2428,General Motors LLC,GMX,Cadillac,2,XT5,561,1,XT5,
-2017,2428,General Motors LLC,GMX,Cadillac,2,XT5 AWD,562,1,XT5 AWD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,1,C15 SILVERADO CREW CAB,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,2,C15 SILVERADO  - CREW CAB,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,3,C15 SILVERADO,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,4,C15 SILVERADO,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,5,C15 SILVERADO EXTENDED CAB,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD CAB CHASSIS,968,1,C15 SILVERADO CAB CHASSIS,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C1500 SUBURBAN 2WD,66,1,C1500 SUBURBAN,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,C1500 TAHOE 2WD,24,1,C1500 TAHOE,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,1,COLORADO EXT CAB 2WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,2,COLORADO CREW CAB 2WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,1,COLORADO CREW CAB 4WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,2,COLORADO CREW CAB 4WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO CAB CHASSIS 2WD,966,1,COLORADO CAB CHASSIS 2WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO ZR2 4WD,982,1,COLORADO ZR2 4WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,44,1,EQUINOX AWD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,G2500 EXPRESS 2WD PASS MDPV,938,1,G2500 EXPRESS 2WD PASS MDPV,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,G3500 EXPRESS 2WD PASS MDPV,939,1,G3500 EXPRESS 2WD PASS MDPV,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,G3500 EXPRESS 2WD PASS MDPV,939,4,G3500 EXPRESS 2WD PASS MPDV,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,1,K1500 SILVERADO CREW CAB,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,2,K1500 SILVERADO,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,3,K1500 SILVERADO,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,4,K15 SILVERADO - CREW CAB,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,5,K1500 SILVERADO - EXTENDED CAB,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD CAB CHASSIS,967,1,K1500 SILVERADO CAB CHASSIS,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K1500 SUBURBAN 4WD,82,1,K1500 SUBURBAN 4WD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,K1500 TAHOE 4WD,77,1,K1500 TAHOE,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,TRAVERSE AWD,111,1,TRAVERSE AWD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,TRAVERSE FWD,110,1,TRAVERSE FWD,
-2017,2428,General Motors LLC,GMX,Chevrolet,3,TRAX AWD,949,1,TRAX AWD,
+2017,2428,General Motors LLC,GMX,Buick,1,ENCLAVE AWD,115,1,ENCLAVE AWD,49
+2017,2428,General Motors LLC,GMX,Buick,1,ENCLAVE FWD,114,1,ENCLAVE FWD,49
+2017,2428,General Motors LLC,GMX,Buick,1,ENCORE AWD,118,1,ENCORE AWD,50
+2017,2428,General Motors LLC,GMX,Buick,1,ENVISION AWD,121,1,ENVISION AWD,432
+2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,1,ESCALADE 2WD,60
+2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,2,ESCALADE 2WD,60
+2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,1,ESCALADE 4WD,60
+2017,2428,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,2,ESCALADE 4WD,60
+2017,2428,General Motors LLC,GMX,Cadillac,2,XT5,561,1,XT5,64
+2017,2428,General Motors LLC,GMX,Cadillac,2,XT5 AWD,562,1,XT5 AWD,64
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,1,C15 SILVERADO CREW CAB,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,2,C15 SILVERADO  - CREW CAB,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,3,C15 SILVERADO,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,4,C15 SILVERADO,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,5,C15 SILVERADO EXTENDED CAB,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD CAB CHASSIS,968,1,C15 SILVERADO CAB CHASSIS,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C1500 SUBURBAN 2WD,66,1,C1500 SUBURBAN,83
+2017,2428,General Motors LLC,GMX,Chevrolet,3,C1500 TAHOE 2WD,24,1,C1500 TAHOE,84
+2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,1,COLORADO EXT CAB 2WD,71
+2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,2,COLORADO CREW CAB 2WD,71
+2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,1,COLORADO CREW CAB 4WD,71
+2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,2,COLORADO CREW CAB 4WD,71
+2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO CAB CHASSIS 2WD,966,1,COLORADO CAB CHASSIS 2WD,71
+2017,2428,General Motors LLC,GMX,Chevrolet,3,COLORADO ZR2 4WD,982,1,COLORADO ZR2 4WD,71
+2017,2428,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,44,1,EQUINOX AWD,74
+2017,2428,General Motors LLC,GMX,Chevrolet,3,G2500 EXPRESS 2WD PASS MDPV,938,1,G2500 EXPRESS 2WD PASS MDPV,75
+2017,2428,General Motors LLC,GMX,Chevrolet,3,G3500 EXPRESS 2WD PASS MDPV,939,1,G3500 EXPRESS 2WD PASS MDPV,75
+2017,2428,General Motors LLC,GMX,Chevrolet,3,G3500 EXPRESS 2WD PASS MDPV,939,4,G3500 EXPRESS 2WD PASS MPDV,75
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,1,K1500 SILVERADO CREW CAB,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,2,K1500 SILVERADO,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,3,K1500 SILVERADO,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,4,K15 SILVERADO - CREW CAB,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,5,K1500 SILVERADO - EXTENDED CAB,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD CAB CHASSIS,967,1,K1500 SILVERADO CAB CHASSIS,79
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K1500 SUBURBAN 4WD,82,1,K1500 SUBURBAN 4WD,83
+2017,2428,General Motors LLC,GMX,Chevrolet,3,K1500 TAHOE 4WD,77,1,K1500 TAHOE,84
+2017,2428,General Motors LLC,GMX,Chevrolet,3,TRAVERSE AWD,111,1,TRAVERSE AWD,86
+2017,2428,General Motors LLC,GMX,Chevrolet,3,TRAVERSE FWD,110,1,TRAVERSE FWD,86
+2017,2428,General Motors LLC,GMX,Chevrolet,3,TRAX AWD,949,1,TRAX AWD,87
 2017,2428,General Motors LLC,GMX,GMC,4,ACADIA AWD,942,1,ACADIA AWD,138
 2017,2428,General Motors LLC,GMX,GMC,4,ACADIA FWD,941,1,ACADIA FWD,138
 2017,2428,General Motors LLC,GMX,GMC,4,ACADIA LIMITED AWD,122,1,ACADIA AWD,138
@@ -7495,49 +7495,49 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,2428,General Motors LLC,GMX,GMC,4,K1500 YUKON 4WD,65,1,K1500 YUKON 4WD,
 2017,2428,General Motors LLC,GMX,GMC,4,K1500 YUKON XL 4WD,63,1,K1500 YUKON XL,
 2017,2428,General Motors LLC,GMX,GMC,4,TERRAIN AWD,91,1,TERRAIN AWD,
-2017,2464,General Motors LLC,GMX,Buick,1,CASCADA,122,1,CASCADA,
-2017,2464,General Motors LLC,GMX,Buick,1,ENCORE,117,1,ENCORE,
-2017,2464,General Motors LLC,GMX,Buick,1,ENVISION FWD,120,1,ENVISION FWD,
-2017,2464,General Motors LLC,GMX,Buick,1,LACROSSE,25,1,LACROSSE,
-2017,2464,General Motors LLC,GMX,Buick,1,LACROSSE AWD,26,1,LACROSSE,
-2017,2464,General Motors LLC,GMX,Buick,1,REGAL,20,1,REGAL,
-2017,2464,General Motors LLC,GMX,Buick,1,REGAL AWD,119,1,REGAL AWD,
-2017,2464,General Motors LLC,GMX,Buick,1,VERANO,116,1,VERANO,
+2017,2464,General Motors LLC,GMX,Buick,1,CASCADA,122,1,CASCADA,416
+2017,2464,General Motors LLC,GMX,Buick,1,ENCORE,117,1,ENCORE,50
+2017,2464,General Motors LLC,GMX,Buick,1,ENVISION FWD,120,1,ENVISION FWD,432
+2017,2464,General Motors LLC,GMX,Buick,1,LACROSSE,25,1,LACROSSE,51
+2017,2464,General Motors LLC,GMX,Buick,1,LACROSSE AWD,26,1,LACROSSE,51
+2017,2464,General Motors LLC,GMX,Buick,1,REGAL,20,1,REGAL,53
+2017,2464,General Motors LLC,GMX,Buick,1,REGAL AWD,119,1,REGAL AWD,53
+2017,2464,General Motors LLC,GMX,Buick,1,VERANO,116,1,VERANO,54
 2017,2464,General Motors LLC,GMX,Cadillac,2,ATS,542,1,ATS,56
 2017,2464,General Motors LLC,GMX,Cadillac,2,ATS,542,2,ATS,56
 2017,2464,General Motors LLC,GMX,Cadillac,2,ATS AWD,545,1,ATS AWD,56
 2017,2464,General Motors LLC,GMX,Cadillac,2,ATS AWD,545,2,ATS AWD,56
 2017,2464,General Motors LLC,GMX,Cadillac,2,ATS-V,557,1,ATS-V,56
 2017,2464,General Motors LLC,GMX,Cadillac,2,ATS-V,557,2,ATS-V,56
-2017,2464,General Motors LLC,GMX,Cadillac,2,CT6,559,1,CT6,
-2017,2464,General Motors LLC,GMX,Cadillac,2,CT6 AWD,560,1,CT6 AWD,
-2017,2464,General Motors LLC,GMX,Cadillac,2,CT6 HYBRID,563,1,CT6 HYRBID,
-2017,2464,General Motors LLC,GMX,Cadillac,2,CTS,548,1,CTS SEDAN,
-2017,2464,General Motors LLC,GMX,Cadillac,2,CTS AWD,549,1,CTS SEDAN AWD,
-2017,2464,General Motors LLC,GMX,Cadillac,2,CTS-V,558,1,CTS-V,
-2017,2464,General Motors LLC,GMX,Cadillac,2,XTS,543,1,XTS,
-2017,2464,General Motors LLC,GMX,Cadillac,2,XTS AWD,544,1,XTS AWD,
-2017,2464,General Motors LLC,GMX,Cadillac,2,XTS HEARSE,546,1,XTS HEARSE,
-2017,2464,General Motors LLC,GMX,Cadillac,2,XTS LIMO,547,1,XTS LIMO,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,BOLT EV,975,1,BOLT,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CAMARO,970,1,CAMARO,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,1,CORVETTE CONVERTIBLE,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,2,CORVETTE HATCHBACK COUPE,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE,972,1,CRUZE,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE HATCHBACK,978,1,CRUZE HATCHBACK,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER,977,1,CRUZE PREMIER,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER HATCHBACK,979,1,CRUZE PREMIER HATCHBACK,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,950,1,EQUINOX AWD,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,EQUINOX FWD,42,1,EQUINOX FWD,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,IMPALA,952,1,IMPALA,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,MALIBU,973,1,MALIBU,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,SONIC,131,1,SONIC,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,1,SONIC 5,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,SPARK,971,1,SPARK,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,SPARK ACTIV,980,1,SPARK ACTIV,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,SS,954,1,CHEVY SS,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,TRAX,948,1,TRAX,
-2017,2464,General Motors LLC,GMX,Chevrolet,3,VOLT,121,1,VOLT,
+2017,2464,General Motors LLC,GMX,Cadillac,2,CT6,559,1,CT6,417
+2017,2464,General Motors LLC,GMX,Cadillac,2,CT6 AWD,560,1,CT6 AWD,417
+2017,2464,General Motors LLC,GMX,Cadillac,2,CT6 HYBRID,563,1,CT6 HYRBID,417
+2017,2464,General Motors LLC,GMX,Cadillac,2,CTS,548,1,CTS SEDAN,57
+2017,2464,General Motors LLC,GMX,Cadillac,2,CTS AWD,549,1,CTS SEDAN AWD,57
+2017,2464,General Motors LLC,GMX,Cadillac,2,CTS-V,558,1,CTS-V,57
+2017,2464,General Motors LLC,GMX,Cadillac,2,XTS,543,1,XTS,64
+2017,2464,General Motors LLC,GMX,Cadillac,2,XTS AWD,544,1,XTS AWD,64
+2017,2464,General Motors LLC,GMX,Cadillac,2,XTS HEARSE,546,1,XTS HEARSE,64
+2017,2464,General Motors LLC,GMX,Cadillac,2,XTS LIMO,547,1,XTS LIMO,64
+2017,2464,General Motors LLC,GMX,Chevrolet,3,BOLT EV,975,1,BOLT,447
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CAMARO,970,1,CAMARO,67
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,1,CORVETTE CONVERTIBLE,72
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,2,CORVETTE HATCHBACK COUPE,72
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE,972,1,CRUZE,70
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE HATCHBACK,978,1,CRUZE HATCHBACK,70
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER,977,1,CRUZE PREMIER,70
+2017,2464,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER HATCHBACK,979,1,CRUZE PREMIER HATCHBACK,70
+2017,2464,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,950,1,EQUINOX AWD,74
+2017,2464,General Motors LLC,GMX,Chevrolet,3,EQUINOX FWD,42,1,EQUINOX FWD,74
+2017,2464,General Motors LLC,GMX,Chevrolet,3,IMPALA,952,1,IMPALA,77
+2017,2464,General Motors LLC,GMX,Chevrolet,3,MALIBU,973,1,MALIBU,78
+2017,2464,General Motors LLC,GMX,Chevrolet,3,SONIC,131,1,SONIC,80
+2017,2464,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,1,SONIC 5,80
+2017,2464,General Motors LLC,GMX,Chevrolet,3,SPARK,971,1,SPARK,81
+2017,2464,General Motors LLC,GMX,Chevrolet,3,SPARK ACTIV,980,1,SPARK ACTIV,81
+2017,2464,General Motors LLC,GMX,Chevrolet,3,SS,954,1,CHEVY SS,82
+2017,2464,General Motors LLC,GMX,Chevrolet,3,TRAX,948,1,TRAX,87
+2017,2464,General Motors LLC,GMX,Chevrolet,3,VOLT,121,1,VOLT,89
 2017,2464,General Motors LLC,GMX,GMC,4,TERRAIN AWD,935,1,TERRAIN AWD,
 2017,2464,General Motors LLC,GMX,GMC,4,TERRAIN FWD,90,1,TERRAIN FWD,
 2017,2338,Hyundai Motor Company,HYX,HYUNDAI MOTOR COMPANY,1,Santa Fe AWD,83,1,Santa Fe AWD 3.3 AT,
@@ -8270,7 +8270,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3138,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q7,320,1,Audi Q7 2.0L    255/60 R18,25
 2017,3138,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q7,320,2,Audi Q7 3.0L    255/55 R19,25
 2017,3138,"Volkswagen Group of America, Inc.",VGA,Audi,2,SQ5,335,1,Audi SQ5  255/45 R20,24
-2017,3138,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Bentayga,33,1,Bentayga  275/50 R20,
+2017,3138,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Bentayga,33,1,Bentayga  275/50 R20,446
 2017,3138,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan 4Motion,165,1,Tiguan 4Motion   215/65 R17,400
 2017,3138,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan 4Motion,165,2,Tiguan SEL 4Motion   235/50 R19,400
 2017,3138,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Touareg,140,1,Touareg   255/55R18,401
@@ -8398,11 +8398,11 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 FWD,24,2,V60 FWD. Footprint for 235 tire width,433
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 Polestar AWD,61,1,V60 Polestar AWD. Footprint for 245 tire width,433
 2017,3163,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,XC60 FWD,94,1,XC60 FWD All tire sizes,409
-2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,1,MDX AWD 18inch,
-2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch,
-2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,1,MDX FWD 18inch,
-2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,2,MDX FWD 20inch,
-2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD,101,1,RDX AWD,
+2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,1,MDX AWD 18inch,2
+2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch,2
+2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,1,MDX FWD 18inch,2
+2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,2,MDX FWD 20inch,2
+2018,2515,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD,101,1,RDX AWD,3
 2018,2515,"American Honda Motor Co., Inc.",HNX,Honda,1,CR-V AWD,101,1,CR-V AWD 17inch,
 2018,2515,"American Honda Motor Co., Inc.",HNX,Honda,1,CR-V AWD,101,2,CR-V AWD 18inch,
 2018,2515,"American Honda Motor Co., Inc.",HNX,Honda,1,ODYSSEY FWD,201,1,ODYSSEY FWD 18inch,
@@ -8413,16 +8413,16 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,2515,"American Honda Motor Co., Inc.",HNX,Honda,1,PILOT FWD,302,2,PILOT FWD 20inch,
 2018,2515,"American Honda Motor Co., Inc.",HNX,Honda,1,RIDGELINE AWD,501,1,RIDGELINE AWD,
 2018,2515,"American Honda Motor Co., Inc.",HNX,Honda,1,RIDGELINE FWD,502,1,RIDGELINE FWD,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,1,ILX 17inch,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,2,ILX 18inch,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,NSX,20,1,NSX,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD,102,1,RDX FWD,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,RLX,120,1,RLX,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD,60,1,TLX AWD 18inch,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD A-SPEC,62,1,TLX AWD ASPEC 19inch,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,1,TLX FWD 17inch,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,2,TLX FWD 18inch,
-2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD A-SPEC,63,1,TLX FWD ASPEC 19inch,
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,1,ILX 17inch,1
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,2,ILX 18inch,1
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,NSX,20,1,NSX,-9
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD,102,1,RDX FWD,3
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,RLX,120,1,RLX,4
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD,60,1,TLX AWD 18inch,6
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD A-SPEC,62,1,TLX AWD ASPEC 19inch,6
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,1,TLX FWD 17inch,6
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,2,TLX FWD 18inch,6
+2018,3123,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD A-SPEC,63,1,TLX FWD ASPEC 19inch,6
 2018,3123,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,1,ACCORD SEDAN 17inch,
 2018,3123,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,2,ACCORD SEDAN 19inch,
 2018,3123,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD 2.0T SPORT/TOURING,21,1,ACCORD 20T SPTT 19inch,
@@ -8444,285 +8444,285 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3123,"American Honda Motor Co., Inc.",HNX,Honda,1,FIT,80,2,FIT 16inch,
 2018,3123,"American Honda Motor Co., Inc.",HNX,Honda,1,HR-V AWD,110,1,HR-V AWD 17inch,
 2018,3123,"American Honda Motor Co., Inc.",HNX,Honda,1,HR-V FWD,111,1,HR-V FWD 17inch,
-2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V8,562,1,DB11 V8 Coupe,
-2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V12,500,1,DB11 V12 Coupe,
-2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Rapide S,283,1,Rapide S,
-2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,"Vanquish, S and Zagato",282,1,Vanquish & Vanquish Zagato,
-2018,3148,BMW,BMX,BMW,1,X3 M40i,233,1,X3 M40i R19,
-2018,3148,BMW,BMX,BMW,1,X3 M40i,233,2,X3 M40i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X3 M40i,233,3,X3 M40i R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,1,X3 xDrive30i R18,
-2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,2,X3 xDrive30i R19,
-2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,3,X3 xDrive30i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,4,X3 xDrive30i R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X4 M40i,178,1,X4 M40i R19,
-2018,3148,BMW,BMX,BMW,1,X4 M40i,178,2,X4 M40i R19 mixed,
-2018,3148,BMW,BMX,BMW,1,X4 M40i,178,3,X4 M40i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,1,X4 xDrive28i R18,
-2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,2,X4 xDrive28i R19,
-2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,3,X4 xDrive28i R19 mixed,
-2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,4,X4 xDrive28i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 M,168,1,X5 M R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 M,168,2,X5 M R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,1,X5 sDrive35i R19,
-2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,2,X5 sDrive35i R19,
-2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,3,X5 sDrive35i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,4,X5 sDrive35i R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,5,X5 sDrive35i R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,6,X5 sDrive35i R20 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,1,X5 xDrive35d R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,2,X5 xDrive35d R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,3,X5 xDrive35d R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,4,X5 xDrive35d R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,5,X5 xDrive35d R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,6,X5 xDrive35d R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,7,X5 xDrive35d R20 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,8,X5 xDrive35d R21 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,1,X5 xDrive35i R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,2,X5 xDrive35i R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,3,X5 xDrive35i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,4,X5 xDrive35i R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,5,X5 xDrive35i R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,6,X5 xDrive35i R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,7,X5 xDrive35i R20 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,8,X5 xDrive35i R21 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive40e,170,1,X5 xDrive40e R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive40e,170,2,X5 xDrive40e R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive40e,170,3,X5 xDrive40e R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,1,X5 xDrive50i R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,2,X5 xDrive50i R19,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,3,X5 xDrive50i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,4,X5 xDrive50i R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,5,X5 xDrive50i R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,6,X5 xDrive50i R19 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,7,X5 xDrive50i R20 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,8,X5 xDrive50i R21 mixed 3rd row,
-2018,3148,BMW,BMX,BMW,1,X6 M,96,1,X6 M R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X6 M,96,2,X6 M R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X6 sDrive35i,169,1,X6 sDrive35i R19,
-2018,3148,BMW,BMX,BMW,1,X6 sDrive35i,169,2,X6 sDrive35i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X6 xDrive35i,94,1,X6 xDrive35i R19,
-2018,3148,BMW,BMX,BMW,1,X6 xDrive35i,94,2,X6 xDrive35i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X6 xDrive35i,94,3,X6 xDrive35i R21 mixed,
-2018,3148,BMW,BMX,BMW,1,X6 xDrive50i,95,1,X6 xDrive50i R19,
-2018,3148,BMW,BMX,BMW,1,X6 xDrive50i,95,2,X6 xDrive50i R20 mixed,
-2018,3148,BMW,BMX,BMW,1,X6 xDrive50i,95,3,X6 xDrive50i R21 mixed,
-2018,3181,BMW,BMX,BMW,1,230i Convertible,194,1,230i Convertible R17,
-2018,3181,BMW,BMX,BMW,1,230i Convertible,194,2,230i Convertible R18,
-2018,3181,BMW,BMX,BMW,1,230i Convertible,194,3,230i Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,230i Coupe,192,1,230i Coupe R17,
-2018,3181,BMW,BMX,BMW,1,230i Coupe,192,2,230i Coupe R18,
-2018,3181,BMW,BMX,BMW,1,230i Coupe,192,3,230i Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,230i xDrive Convertible,195,1,230i xDrive Convertible R17,
-2018,3181,BMW,BMX,BMW,1,230i xDrive Convertible,195,2,230i xDrive Convertible R18,
-2018,3181,BMW,BMX,BMW,1,230i xDrive Convertible,195,3,230i xDrive Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,230i xDrive Coupe,193,1,230i xDrive Coupe R17,
-2018,3181,BMW,BMX,BMW,1,230i xDrive Coupe,193,2,230i xDrive Coupe R18,
-2018,3181,BMW,BMX,BMW,1,230i xDrive Coupe,193,3,230i xDrive Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,320i,29,1,320i Sedan R17,
-2018,3181,BMW,BMX,BMW,1,320i,29,2,320i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,320i,29,3,320i Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,320i xDrive,117,1,320i xDrive Sedan R17,
-2018,3181,BMW,BMX,BMW,1,320i xDrive,117,2,320i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,320i xDrive,117,3,320i xDrive Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,328d,138,1,328d Sedan R17,
-2018,3181,BMW,BMX,BMW,1,328d,138,2,328d Sedan R18,
-2018,3181,BMW,BMX,BMW,1,328d,138,3,328d Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,328d xDrive,139,1,328d xDrive Sedan R17,
-2018,3181,BMW,BMX,BMW,1,328d xDrive,139,2,328d xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,328d xDrive,139,3,328d xDrive Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,1,328d xDrive Sports Wagon R17,
-2018,3181,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,2,328d xDrive Sports Wagon R18,
-2018,3181,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,3,328d xDrive Sports Wagon R18 mixed,
-2018,3181,BMW,BMX,BMW,1,330e,176,1,330e Sedan R17,
-2018,3181,BMW,BMX,BMW,1,330e,176,2,330e Sedan R18,
-2018,3181,BMW,BMX,BMW,1,330e,176,3,330e Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,330i,196,1,330i Sedan R17,
-2018,3181,BMW,BMX,BMW,1,330i,196,2,330i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,330i,196,3,330i Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,330i xDrive,197,1,330i xDrive Sedan R17,
-2018,3181,BMW,BMX,BMW,1,330i xDrive,197,2,330i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,330i xDrive,197,3,330i xDrive Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,1,330i xDrive Gran Turismo R18,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,2,330i xDrive Gran Turismo R18 mixed,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,3,330i xDrive Gran Turismo R19,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,4,330i xDrive Gran Turismo R19 mixed,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,1,330i xDrive Sports Wagon R17,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,2,330i xDrive Sports Wagon R18,
-2018,3181,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,3,330i xDrive Sports Wagon R18 mixed,
-2018,3181,BMW,BMX,BMW,1,340i,172,1,340i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,340i,172,2,340i Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,340i,172,3,340i Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,340i xDrive,173,1,340i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,340i xDrive,173,2,340i xDrive Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,340i xDrive,173,3,340i xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,1,340i xDrive Gran Turismo R18,
-2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,2,340i xDrive Gran Turismo R18 mixed,
-2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,3,340i xDrive Gran Turismo R19,
-2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,4,340i xDrive Gran Turismo R19 mixed,
-2018,3181,BMW,BMX,BMW,1,430i Convertible,204,1,430i Convertible R18,
-2018,3181,BMW,BMX,BMW,1,430i Convertible,204,2,430i Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,430i Convertible,204,3,430i Convertible R19,
-2018,3181,BMW,BMX,BMW,1,430i Convertible,204,4,430i Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,430i Coupe,200,1,430i Coupe R18,
-2018,3181,BMW,BMX,BMW,1,430i Coupe,200,2,430i Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,430i Coupe,200,3,430i Coupe R19,
-2018,3181,BMW,BMX,BMW,1,430i Coupe,200,4,430i Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,1,430i Gran Coupe R18,
-2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,2,430i Gran Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,3,430i Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,4,430i Gran Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,1,430i xDrive Convertible R18,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,2,430i xDrive Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,3,430i xDrive Convertible R19,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,4,430i xDrive Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,1,430i xDrive Coupe R18,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,2,430i xDrive Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,3,430i xDrive Coupe R19,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,4,430i xDrive Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,1,430i xDrive Gran Coupe R18,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,2,430i xDrive Gran Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,3,430i xDrive Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,4,430i xDrive Gran Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,440i Convertible,213,1,440i Convertible R18,
-2018,3181,BMW,BMX,BMW,1,440i Convertible,213,2,440i Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,440i Convertible,213,3,440i Convertible R19,
-2018,3181,BMW,BMX,BMW,1,440i Convertible,213,4,440i Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,440i Coupe,214,1,440i Coupe R18,
-2018,3181,BMW,BMX,BMW,1,440i Coupe,214,2,440i Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,440i Coupe,214,3,440i Coupe R19,
-2018,3181,BMW,BMX,BMW,1,440i Coupe,214,4,440i Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,1,440i Gran Coupe R18,
-2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,2,440i Gran Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,3,440i Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,4,440i Gran Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,1,440i xDrive Convertible R18,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,2,440i xDrive Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,3,440i xDrive Convertible R19,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,4,440i xDrive Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,1,440i xDrive Coupe R18,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,2,440i xDrive Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,3,440i xDrive Coupe R19,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,4,440i xDrive Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,1,440i xDrive Gran Coupe R18,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,2,440i xDrive Gran Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,3,440i xDrive Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,4,440i xDrive Gran Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,530e,227,1,530e Sedan R18,
-2018,3181,BMW,BMX,BMW,1,530e,227,2,530e Sedan R19,
-2018,3181,BMW,BMX,BMW,1,530e,227,3,530e Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,530e xDrive,228,1,530e xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,530e xDrive,228,2,530e xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,530e xDrive,228,3,530e xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,530i,206,1,530i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,530i,206,2,530i Sedan R19,
-2018,3181,BMW,BMX,BMW,1,530i,206,3,530i Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,530i xDrive,207,1,530i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,530i xDrive,207,2,530i xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,530i xDrive,207,3,530i xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,540d xDrive,223,1,540d xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,540d xDrive,223,2,540d xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,540d xDrive,223,3,540d xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,540d xDrive,223,4,540d xDrive Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,540i,220,1,540i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,540i,220,2,540i Sedan R19,
-2018,3181,BMW,BMX,BMW,1,540i,220,3,540i Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,540i,220,4,540i Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,540i xDrive,221,1,540i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,540i xDrive,221,2,540i xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,540i xDrive,221,3,540i xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,540i xDrive,221,4,540i xDrive Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,640i Convertible,105,1,640i Convertible R18,
-2018,3181,BMW,BMX,BMW,1,640i Convertible,105,2,640i Convertible R19,
-2018,3181,BMW,BMX,BMW,1,640i Convertible,105,3,640i Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,640i Convertible,105,4,640i Convertible R20 mixed,
-2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,1,640i Gran Coupe R18,
-2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,2,640i Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,3,640i Gran Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,4,640i Gran Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,1,640i xDrive Convertible R18,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,2,640i xDrive Convertible R19,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,3,640i xDrive Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,4,640i xDrive Convertible R20 mixed,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,1,640i xDrive Gran Coupe R18,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,2,640i xDrive Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,3,640i xDrive Gran Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,1,640i xDrive Gran Turismo R19,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,2,640i xDrive Gran Turismo R19 mixed,
-2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,3,640i xDrive Gran Turismo R20 mixed,
-2018,3181,BMW,BMX,BMW,1,650i Convertible,104,1,650i Convertible R19,
-2018,3181,BMW,BMX,BMW,1,650i Convertible,104,2,650i Convertible R20 mixed,
-2018,3181,BMW,BMX,BMW,1,650i Gran Coupe,113,1,650i Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,650i Gran Coupe,113,2,650i Gran Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,650i xDrive Convertible,110,1,650i xDrive Convertible R19,
-2018,3181,BMW,BMX,BMW,1,650i xDrive Convertible,110,2,650i xDrive Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,650i xDrive Convertible,110,3,650i xDrive Convertible R20 mixed,
-2018,3181,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,1,650i xDrive Gran Coupe R19,
-2018,3181,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,2,650i xDrive Gran Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,3,650i xDrive Gran Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,740e xDrive,226,1,740e xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,740e xDrive,226,2,740e xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,740e xDrive,226,3,740e xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,740i,54,1,740i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,740i,54,2,740i Sedan R19,
-2018,3181,BMW,BMX,BMW,1,740i,54,3,740i Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,740i,54,4,740i Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,740i xDrive,58,1,740i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,740i xDrive,58,2,740i xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,740i xDrive,58,3,740i xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,740i xDrive,58,4,740i xDrive Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,750i,80,1,750i Sedan R19,
-2018,3181,BMW,BMX,BMW,1,750i,80,2,750i Sedan R18,
-2018,3181,BMW,BMX,BMW,1,750i,80,3,750i Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,750i,80,4,750i Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,750i xDrive,86,1,750i xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,750i xDrive,86,2,750i xDrive Sedan R18,
-2018,3181,BMW,BMX,BMW,1,750i xDrive,86,3,750i xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,750i xDrive,86,4,750i xDrive Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,1,ALPINA B6 xDrive Gran Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,2,ALPINA B6 xDrive Gran Coupe R20 mixed AST,
-2018,3181,BMW,BMX,BMW,1,Alpina B7 xDrive,212,1,ALPINA B7 xDrive R20 mixed,
-2018,3181,BMW,BMX,BMW,1,Alpina B7 xDrive,212,2,ALPINA B7 xDrive R21 mixed,
-2018,3181,BMW,BMX,BMW,1,I3 (94Ah),143,1,i3 R19 mixed,
-2018,3181,BMW,BMX,BMW,1,I3 (94Ah),143,2,i3 R20 mixed,
-2018,3181,BMW,BMX,BMW,1,I3 (94Ah) with Range Extender,224,1,i3 with Range Extender R19 mixed,
-2018,3181,BMW,BMX,BMW,1,I3 (94Ah) with Range Extender,224,2,i3 with Range Extender R20 mixed,
-2018,3181,BMW,BMX,BMW,1,I3s (94Ah),238,1,i3s R20 mixed,
-2018,3181,BMW,BMX,BMW,1,I3s (94Ah) with Range Extender,237,1,i3s with Range Extender R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M2,177,1,M2 Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M3,149,1,M3 Sedan R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M3,149,2,M3 Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M3,149,3,M3 Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M3 CS,240,1,M3 CS R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M4 Convertible,151,1,M4 Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M4 Convertible,151,2,M4 Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M4 Convertible,151,3,M4 Convertible R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M4 Coupe,150,1,M4 Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M4 Coupe,150,2,M4 Coupe R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M4 Coupe,150,3,M4 Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M5,235,1,M5 Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M5,235,2,M5 Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M6 Convertible,103,1,M6 Convertible R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M6 Convertible,103,2,M6 Convertible R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M6 Gran Coupe,107,1,M6 Gran Coupe R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M240i Convertible,209,1,M240i Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M240i Convertible,209,2,M240i Convertible R18,
-2018,3181,BMW,BMX,BMW,1,M240i Coupe,208,1,M240i Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M240i Coupe,208,2,M240i Coupe R18,
-2018,3181,BMW,BMX,BMW,1,M240i Coupe,208,3,M240i Coupe M-Performance R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M240i xDrive Convertible,211,1,M240i xDrive Convertible R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M240i xDrive Convertible,211,2,M240i xDrive Convertible R18,
-2018,3181,BMW,BMX,BMW,1,M240i xDrive Coupe,210,1,M240i xDrive Coupe R18 mixed,
-2018,3181,BMW,BMX,BMW,1,M240i xDrive Coupe,210,2,M240i xDrive Coupe R18,
-2018,3181,BMW,BMX,BMW,1,M550i xDrive,230,1,M550i xDrive Sedan R19 mixed,
-2018,3181,BMW,BMX,BMW,1,M550i xDrive,230,2,M550i xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,M550i xDrive,230,3,M550i xDrive Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M760i xDrive,222,1,M760i xDrive Sedan R20 mixed,
-2018,3181,BMW,BMX,BMW,1,M760i xDrive,222,2,M760i xDrive Sedan R19,
-2018,3181,BMW,BMX,BMW,1,X1 sDrive28i,175,1,X1 sDrive28i R18,
-2018,3181,BMW,BMX,BMW,1,X1 sDrive28i,175,2,X1 sDrive28i R19,
-2018,3181,BMW,BMX,BMW,1,X1 xDrive28i,174,1,X1 xDrive28i R18,
-2018,3181,BMW,BMX,BMW,1,X1 xDrive28i,174,2,X1 xDrive28i R19,
+2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V8,562,1,DB11 V8 Coupe,11
+2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V12,500,1,DB11 V12 Coupe,11
+2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Rapide S,283,1,Rapide S,12
+2018,2506,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,"Vanquish, S and Zagato",282,1,Vanquish & Vanquish Zagato,14
+2018,3148,BMW,BMX,BMW,1,X3 M40i,233,1,X3 M40i R19,44
+2018,3148,BMW,BMX,BMW,1,X3 M40i,233,2,X3 M40i R20 mixed,44
+2018,3148,BMW,BMX,BMW,1,X3 M40i,233,3,X3 M40i R21 mixed,44
+2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,1,X3 xDrive30i R18,44
+2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,2,X3 xDrive30i R19,44
+2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,3,X3 xDrive30i R20 mixed,44
+2018,3148,BMW,BMX,BMW,1,X3 xDrive30i,234,4,X3 xDrive30i R21 mixed,44
+2018,3148,BMW,BMX,BMW,1,X4 M40i,178,1,X4 M40i R19,412
+2018,3148,BMW,BMX,BMW,1,X4 M40i,178,2,X4 M40i R19 mixed,412
+2018,3148,BMW,BMX,BMW,1,X4 M40i,178,3,X4 M40i R20 mixed,412
+2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,1,X4 xDrive28i R18,412
+2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,2,X4 xDrive28i R19,412
+2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,3,X4 xDrive28i R19 mixed,412
+2018,3148,BMW,BMX,BMW,1,X4 xDrive28i,166,4,X4 xDrive28i R20 mixed,412
+2018,3148,BMW,BMX,BMW,1,X5 M,168,1,X5 M R20 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 M,168,2,X5 M R21 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,1,X5 sDrive35i R19,45
+2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,2,X5 sDrive35i R19,45
+2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,3,X5 sDrive35i R20 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,4,X5 sDrive35i R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,5,X5 sDrive35i R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 sDrive35i,145,6,X5 sDrive35i R20 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,1,X5 xDrive35d R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,2,X5 xDrive35d R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,3,X5 xDrive35d R20 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,4,X5 xDrive35d R21 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,5,X5 xDrive35d R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,6,X5 xDrive35d R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,7,X5 xDrive35d R20 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive 35d,147,8,X5 xDrive35d R21 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,1,X5 xDrive35i R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,2,X5 xDrive35i R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,3,X5 xDrive35i R20 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,4,X5 xDrive35i R21 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,5,X5 xDrive35i R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,6,X5 xDrive35i R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,7,X5 xDrive35i R20 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive35i,146,8,X5 xDrive35i R21 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive40e,170,1,X5 xDrive40e R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive40e,170,2,X5 xDrive40e R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive40e,170,3,X5 xDrive40e R20 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,1,X5 xDrive50i R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,2,X5 xDrive50i R19,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,3,X5 xDrive50i R20 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,4,X5 xDrive50i R21 mixed,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,5,X5 xDrive50i R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,6,X5 xDrive50i R19 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,7,X5 xDrive50i R20 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X5 xDrive50i,148,8,X5 xDrive50i R21 mixed 3rd row,45
+2018,3148,BMW,BMX,BMW,1,X6 M,96,1,X6 M R20 mixed,46
+2018,3148,BMW,BMX,BMW,1,X6 M,96,2,X6 M R21 mixed,46
+2018,3148,BMW,BMX,BMW,1,X6 sDrive35i,169,1,X6 sDrive35i R19,46
+2018,3148,BMW,BMX,BMW,1,X6 sDrive35i,169,2,X6 sDrive35i R20 mixed,46
+2018,3148,BMW,BMX,BMW,1,X6 xDrive35i,94,1,X6 xDrive35i R19,46
+2018,3148,BMW,BMX,BMW,1,X6 xDrive35i,94,2,X6 xDrive35i R20 mixed,46
+2018,3148,BMW,BMX,BMW,1,X6 xDrive35i,94,3,X6 xDrive35i R21 mixed,46
+2018,3148,BMW,BMX,BMW,1,X6 xDrive50i,95,1,X6 xDrive50i R19,46
+2018,3148,BMW,BMX,BMW,1,X6 xDrive50i,95,2,X6 xDrive50i R20 mixed,46
+2018,3148,BMW,BMX,BMW,1,X6 xDrive50i,95,3,X6 xDrive50i R21 mixed,46
+2018,3181,BMW,BMX,BMW,1,230i Convertible,194,1,230i Convertible R17,35
+2018,3181,BMW,BMX,BMW,1,230i Convertible,194,2,230i Convertible R18,35
+2018,3181,BMW,BMX,BMW,1,230i Convertible,194,3,230i Convertible R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,230i Coupe,192,1,230i Coupe R17,35
+2018,3181,BMW,BMX,BMW,1,230i Coupe,192,2,230i Coupe R18,35
+2018,3181,BMW,BMX,BMW,1,230i Coupe,192,3,230i Coupe R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,230i xDrive Convertible,195,1,230i xDrive Convertible R17,35
+2018,3181,BMW,BMX,BMW,1,230i xDrive Convertible,195,2,230i xDrive Convertible R18,35
+2018,3181,BMW,BMX,BMW,1,230i xDrive Convertible,195,3,230i xDrive Convertible R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,230i xDrive Coupe,193,1,230i xDrive Coupe R17,35
+2018,3181,BMW,BMX,BMW,1,230i xDrive Coupe,193,2,230i xDrive Coupe R18,35
+2018,3181,BMW,BMX,BMW,1,230i xDrive Coupe,193,3,230i xDrive Coupe R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,320i,29,1,320i Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,320i,29,2,320i Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,320i,29,3,320i Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,320i xDrive,117,1,320i xDrive Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,320i xDrive,117,2,320i xDrive Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,320i xDrive,117,3,320i xDrive Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,328d,138,1,328d Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,328d,138,2,328d Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,328d,138,3,328d Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,328d xDrive,139,1,328d xDrive Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,328d xDrive,139,2,328d xDrive Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,328d xDrive,139,3,328d xDrive Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,1,328d xDrive Sports Wagon R17,36
+2018,3181,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,2,328d xDrive Sports Wagon R18,36
+2018,3181,BMW,BMX,BMW,1,328d xDrive Sports Wagon,141,3,328d xDrive Sports Wagon R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,330e,176,1,330e Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,330e,176,2,330e Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,330e,176,3,330e Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,330i,196,1,330i Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,330i,196,2,330i Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,330i,196,3,330i Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive,197,1,330i xDrive Sedan R17,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive,197,2,330i xDrive Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive,197,3,330i xDrive Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,1,330i xDrive Gran Turismo R18,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,2,330i xDrive Gran Turismo R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,3,330i xDrive Gran Turismo R19,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,4,330i xDrive Gran Turismo R19 mixed,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,1,330i xDrive Sports Wagon R17,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,2,330i xDrive Sports Wagon R18,36
+2018,3181,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,3,330i xDrive Sports Wagon R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,340i,172,1,340i Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,340i,172,2,340i Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,340i,172,3,340i Sedan R19 mixed,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive,173,1,340i xDrive Sedan R18,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive,173,2,340i xDrive Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive,173,3,340i xDrive Sedan R19 mixed,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,1,340i xDrive Gran Turismo R18,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,2,340i xDrive Gran Turismo R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,3,340i xDrive Gran Turismo R19,36
+2018,3181,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,4,340i xDrive Gran Turismo R19 mixed,36
+2018,3181,BMW,BMX,BMW,1,430i Convertible,204,1,430i Convertible R18,37
+2018,3181,BMW,BMX,BMW,1,430i Convertible,204,2,430i Convertible R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i Convertible,204,3,430i Convertible R19,37
+2018,3181,BMW,BMX,BMW,1,430i Convertible,204,4,430i Convertible R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i Coupe,200,1,430i Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,430i Coupe,200,2,430i Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i Coupe,200,3,430i Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,430i Coupe,200,4,430i Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,1,430i Gran Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,2,430i Gran Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,3,430i Gran Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,430i Gran Coupe,202,4,430i Gran Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,1,430i xDrive Convertible R18,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,2,430i xDrive Convertible R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,3,430i xDrive Convertible R19,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Convertible,205,4,430i xDrive Convertible R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,1,430i xDrive Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,2,430i xDrive Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,3,430i xDrive Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Coupe,201,4,430i xDrive Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,1,430i xDrive Gran Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,2,430i xDrive Gran Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,3,430i xDrive Gran Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,4,430i xDrive Gran Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i Convertible,213,1,440i Convertible R18,37
+2018,3181,BMW,BMX,BMW,1,440i Convertible,213,2,440i Convertible R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i Convertible,213,3,440i Convertible R19,37
+2018,3181,BMW,BMX,BMW,1,440i Convertible,213,4,440i Convertible R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i Coupe,214,1,440i Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,440i Coupe,214,2,440i Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i Coupe,214,3,440i Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,440i Coupe,214,4,440i Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,1,440i Gran Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,2,440i Gran Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,3,440i Gran Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,440i Gran Coupe,215,4,440i Gran Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,1,440i xDrive Convertible R18,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,2,440i xDrive Convertible R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,3,440i xDrive Convertible R19,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Convertible,216,4,440i xDrive Convertible R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,1,440i xDrive Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,2,440i xDrive Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,3,440i xDrive Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Coupe,217,4,440i xDrive Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,1,440i xDrive Gran Coupe R18,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,2,440i xDrive Gran Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,3,440i xDrive Gran Coupe R19,37
+2018,3181,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,4,440i xDrive Gran Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,530e,227,1,530e Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,530e,227,2,530e Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,530e,227,3,530e Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,530e xDrive,228,1,530e xDrive Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,530e xDrive,228,2,530e xDrive Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,530e xDrive,228,3,530e xDrive Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,530i,206,1,530i Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,530i,206,2,530i Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,530i,206,3,530i Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,530i xDrive,207,1,530i xDrive Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,530i xDrive,207,2,530i xDrive Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,530i xDrive,207,3,530i xDrive Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,540d xDrive,223,1,540d xDrive Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,540d xDrive,223,2,540d xDrive Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,540d xDrive,223,3,540d xDrive Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,540d xDrive,223,4,540d xDrive Sedan R20 mixed,38
+2018,3181,BMW,BMX,BMW,1,540i,220,1,540i Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,540i,220,2,540i Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,540i,220,3,540i Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,540i,220,4,540i Sedan R20 mixed,38
+2018,3181,BMW,BMX,BMW,1,540i xDrive,221,1,540i xDrive Sedan R18,38
+2018,3181,BMW,BMX,BMW,1,540i xDrive,221,2,540i xDrive Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,540i xDrive,221,3,540i xDrive Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,540i xDrive,221,4,540i xDrive Sedan R20 mixed,38
+2018,3181,BMW,BMX,BMW,1,640i Convertible,105,1,640i Convertible R18,39
+2018,3181,BMW,BMX,BMW,1,640i Convertible,105,2,640i Convertible R19,39
+2018,3181,BMW,BMX,BMW,1,640i Convertible,105,3,640i Convertible R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i Convertible,105,4,640i Convertible R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,1,640i Gran Coupe R18,39
+2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,2,640i Gran Coupe R19,39
+2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,3,640i Gran Coupe R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i Gran Coupe,112,4,640i Gran Coupe R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,1,640i xDrive Convertible R18,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,2,640i xDrive Convertible R19,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,3,640i xDrive Convertible R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Convertible,135,4,640i xDrive Convertible R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,1,640i xDrive Gran Coupe R18,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,2,640i xDrive Gran Coupe R19,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,3,640i xDrive Gran Coupe R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,1,640i xDrive Gran Turismo R19,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,2,640i xDrive Gran Turismo R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,3,640i xDrive Gran Turismo R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,650i Convertible,104,1,650i Convertible R19,39
+2018,3181,BMW,BMX,BMW,1,650i Convertible,104,2,650i Convertible R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,650i Gran Coupe,113,1,650i Gran Coupe R19,39
+2018,3181,BMW,BMX,BMW,1,650i Gran Coupe,113,2,650i Gran Coupe R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,650i xDrive Convertible,110,1,650i xDrive Convertible R19,39
+2018,3181,BMW,BMX,BMW,1,650i xDrive Convertible,110,2,650i xDrive Convertible R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,650i xDrive Convertible,110,3,650i xDrive Convertible R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,1,650i xDrive Gran Coupe R19,39
+2018,3181,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,2,650i xDrive Gran Coupe R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,3,650i xDrive Gran Coupe R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,740e xDrive,226,1,740e xDrive Sedan R18,40
+2018,3181,BMW,BMX,BMW,1,740e xDrive,226,2,740e xDrive Sedan R19,40
+2018,3181,BMW,BMX,BMW,1,740e xDrive,226,3,740e xDrive Sedan R19 mixed,40
+2018,3181,BMW,BMX,BMW,1,740i,54,1,740i Sedan R18,40
+2018,3181,BMW,BMX,BMW,1,740i,54,2,740i Sedan R19,40
+2018,3181,BMW,BMX,BMW,1,740i,54,3,740i Sedan R19 mixed,40
+2018,3181,BMW,BMX,BMW,1,740i,54,4,740i Sedan R20 mixed,40
+2018,3181,BMW,BMX,BMW,1,740i xDrive,58,1,740i xDrive Sedan R18,40
+2018,3181,BMW,BMX,BMW,1,740i xDrive,58,2,740i xDrive Sedan R19,40
+2018,3181,BMW,BMX,BMW,1,740i xDrive,58,3,740i xDrive Sedan R19 mixed,40
+2018,3181,BMW,BMX,BMW,1,740i xDrive,58,4,740i xDrive Sedan R20 mixed,40
+2018,3181,BMW,BMX,BMW,1,750i,80,1,750i Sedan R19,40
+2018,3181,BMW,BMX,BMW,1,750i,80,2,750i Sedan R18,40
+2018,3181,BMW,BMX,BMW,1,750i,80,3,750i Sedan R19 mixed,40
+2018,3181,BMW,BMX,BMW,1,750i,80,4,750i Sedan R20 mixed,40
+2018,3181,BMW,BMX,BMW,1,750i xDrive,86,1,750i xDrive Sedan R19,40
+2018,3181,BMW,BMX,BMW,1,750i xDrive,86,2,750i xDrive Sedan R18,40
+2018,3181,BMW,BMX,BMW,1,750i xDrive,86,3,750i xDrive Sedan R19 mixed,40
+2018,3181,BMW,BMX,BMW,1,750i xDrive,86,4,750i xDrive Sedan R20 mixed,40
+2018,3181,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,1,ALPINA B6 xDrive Gran Coupe R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,2,ALPINA B6 xDrive Gran Coupe R20 mixed AST,39
+2018,3181,BMW,BMX,BMW,1,Alpina B7 xDrive,212,1,ALPINA B7 xDrive R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,Alpina B7 xDrive,212,2,ALPINA B7 xDrive R21 mixed,39
+2018,3181,BMW,BMX,BMW,1,I3 (94Ah),143,1,i3 R19 mixed,41
+2018,3181,BMW,BMX,BMW,1,I3 (94Ah),143,2,i3 R20 mixed,41
+2018,3181,BMW,BMX,BMW,1,I3 (94Ah) with Range Extender,224,1,i3 with Range Extender R19 mixed,41
+2018,3181,BMW,BMX,BMW,1,I3 (94Ah) with Range Extender,224,2,i3 with Range Extender R20 mixed,41
+2018,3181,BMW,BMX,BMW,1,I3s (94Ah),238,1,i3s R20 mixed,41
+2018,3181,BMW,BMX,BMW,1,I3s (94Ah) with Range Extender,237,1,i3s with Range Extender R20 mixed,41
+2018,3181,BMW,BMX,BMW,1,M2,177,1,M2 Coupe R19 mixed,35
+2018,3181,BMW,BMX,BMW,1,M3,149,1,M3 Sedan R18 mixed,36
+2018,3181,BMW,BMX,BMW,1,M3,149,2,M3 Sedan R19 mixed,36
+2018,3181,BMW,BMX,BMW,1,M3,149,3,M3 Sedan R20 mixed,36
+2018,3181,BMW,BMX,BMW,1,M3 CS,240,1,M3 CS R19 mixed,36
+2018,3181,BMW,BMX,BMW,1,M4 Convertible,151,1,M4 Convertible R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,M4 Convertible,151,2,M4 Convertible R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,M4 Convertible,151,3,M4 Convertible R20 mixed,37
+2018,3181,BMW,BMX,BMW,1,M4 Coupe,150,1,M4 Coupe R18 mixed,37
+2018,3181,BMW,BMX,BMW,1,M4 Coupe,150,2,M4 Coupe R19 mixed,37
+2018,3181,BMW,BMX,BMW,1,M4 Coupe,150,3,M4 Coupe R20 mixed,37
+2018,3181,BMW,BMX,BMW,1,M5,235,1,M5 Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,M5,235,2,M5 Sedan R20 mixed,38
+2018,3181,BMW,BMX,BMW,1,M6 Convertible,103,1,M6 Convertible R19 mixed,39
+2018,3181,BMW,BMX,BMW,1,M6 Convertible,103,2,M6 Convertible R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,M6 Gran Coupe,107,1,M6 Gran Coupe R20 mixed,39
+2018,3181,BMW,BMX,BMW,1,M240i Convertible,209,1,M240i Convertible R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,M240i Convertible,209,2,M240i Convertible R18,35
+2018,3181,BMW,BMX,BMW,1,M240i Coupe,208,1,M240i Coupe R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,M240i Coupe,208,2,M240i Coupe R18,35
+2018,3181,BMW,BMX,BMW,1,M240i Coupe,208,3,M240i Coupe M-Performance R19 mixed,35
+2018,3181,BMW,BMX,BMW,1,M240i xDrive Convertible,211,1,M240i xDrive Convertible R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,M240i xDrive Convertible,211,2,M240i xDrive Convertible R18,35
+2018,3181,BMW,BMX,BMW,1,M240i xDrive Coupe,210,1,M240i xDrive Coupe R18 mixed,35
+2018,3181,BMW,BMX,BMW,1,M240i xDrive Coupe,210,2,M240i xDrive Coupe R18,35
+2018,3181,BMW,BMX,BMW,1,M550i xDrive,230,1,M550i xDrive Sedan R19 mixed,38
+2018,3181,BMW,BMX,BMW,1,M550i xDrive,230,2,M550i xDrive Sedan R19,38
+2018,3181,BMW,BMX,BMW,1,M550i xDrive,230,3,M550i xDrive Sedan R20 mixed,38
+2018,3181,BMW,BMX,BMW,1,M760i xDrive,222,1,M760i xDrive Sedan R20 mixed,-9
+2018,3181,BMW,BMX,BMW,1,M760i xDrive,222,2,M760i xDrive Sedan R19,-9
+2018,3181,BMW,BMX,BMW,1,X1 sDrive28i,175,1,X1 sDrive28i R18,43
+2018,3181,BMW,BMX,BMW,1,X1 sDrive28i,175,2,X1 sDrive28i R19,43
+2018,3181,BMW,BMX,BMW,1,X1 xDrive28i,174,1,X1 xDrive28i R18,43
+2018,3181,BMW,BMX,BMW,1,X1 xDrive28i,174,2,X1 xDrive28i R19,43
 2018,3181,BMW,BMX,BMW,1,X2 sDrive28i,243,1,X2 sDrive28i R18,
 2018,3181,BMW,BMX,BMW,1,X2 sDrive28i,243,2,X2 sDrive28i R19,
 2018,3181,BMW,BMX,BMW,1,X2 sDrive28i,243,3,X2 sDrive28i R20,
@@ -8799,10 +8799,10 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3181,Rolls-Royce Motor Cars Limited,RRG,Rolls-Royce Motor Cars Limited,1,Wraith,7,2,Wraith R21 mixed,339
 2018,3181,Rolls-Royce Motor Cars Limited,RRG,Rolls-Royce Motor Cars Limited,1,Wraith,7,3,Wraith Black Badge R21 mixed,339
 2018,3183,BYD Motors Inc.,BYD,BYD,2,e6,6,1,MY2018 e6 footprint,
-2018,3096,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,1,Stelvio AWD,
-2018,3096,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,2,Stelvio AWD,
-2018,3096,FCA US LLC,CRX,Chrysler,1,Pacifica,180,1,Pacifica,
-2018,3096,FCA US LLC,CRX,Chrysler,1,Pacifica Hybrid,181,1,Pacifica Hybrid,
+2018,3096,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,1,Stelvio AWD,-9
+2018,3096,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,2,Stelvio AWD,-9
+2018,3096,FCA US LLC,CRX,Chrysler,1,Pacifica,180,1,Pacifica,467
+2018,3096,FCA US LLC,CRX,Chrysler,1,Pacifica Hybrid,181,1,Pacifica Hybrid,467
 2018,3096,FCA US LLC,CRX,Dodge,2,Durango AWD,295,1,Durango AWD,
 2018,3096,FCA US LLC,CRX,Dodge,2,Durango AWD,295,2,Durango AWD,
 2018,3096,FCA US LLC,CRX,Dodge,2,Durango RWD,290,1,Durango RWD,
@@ -8844,14 +8844,14 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3096,FCA US LLC,CRX,RAM,12,Promaster City,981,2,Promaster City (Cargo Van),
 2018,3096,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE,41,1,Levante,
 2018,3096,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,Levante S,
-2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,4C,600,1,4C,
-2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,1,Giulia,
-2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,2,Giulia,
-2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,3,Giulia,
-2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,1,Giulia AWD,
-2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,2,Giulia AWD,
-2018,3100,FCA US LLC,CRX,Chrysler,1,300,170,1,300,
-2018,3100,FCA US LLC,CRX,Chrysler,1,300 AWD,175,1,300 AWD,
+2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,4C,600,1,4C,413
+2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,1,Giulia,465
+2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,2,Giulia,465
+2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,3,Giulia,465
+2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,1,Giulia AWD,465
+2018,3100,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,2,Giulia AWD,465
+2018,3100,FCA US LLC,CRX,Chrysler,1,300,170,1,300,90
+2018,3100,FCA US LLC,CRX,Chrysler,1,300 AWD,175,1,300 AWD,92
 2018,3100,FCA US LLC,CRX,Dodge,2,Challenger,272,1,Challenger,
 2018,3100,FCA US LLC,CRX,Dodge,2,Challenger,272,2,Challenger,
 2018,3100,FCA US LLC,CRX,Dodge,2,Challenger,272,3,Challenger,
@@ -9163,42 +9163,42 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3219,Ford Motor Company,FMX,Lincoln,2,MKZ FWD,31,1,MKZ 2.0TDI S6M-F 4 DOOR SEDAN,
 2018,3219,Ford Motor Company,FMX,Lincoln,2,MKZ FWD,31,2,MKZ 3.0TDI S6M-F 4 DOOR SEDAN,
 2018,3219,Ford Motor Company,FMX,Lincoln,2,MKZ HYBRID FWD,38,1,MKZ HEV 20HEV CVMF 4 DOOR SEDAN,
-2018,2741,General Motors LLC,GMX,Buick,1,ENCLAVE,123,1,ENCLAVE,
-2018,2741,General Motors LLC,GMX,Buick,1,ENCLAVE AWD,124,1,ENCLAVE AWD,
-2018,2741,General Motors LLC,GMX,Buick,1,ENCORE AWD,118,1,ENCORE AWD,
-2018,2741,General Motors LLC,GMX,Buick,1,ENVISION AWD,121,1,ENVISION AWD,
-2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,1,ESCALADE 2WD,
-2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,2,ESCALADE 2WD,
-2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,1,ESCALADE 4WD,
-2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,2,ESCALADE 4WD,
-2018,2741,General Motors LLC,GMX,Cadillac,2,XT5,561,1,XT5,
-2018,2741,General Motors LLC,GMX,Cadillac,2,XT5 AWD,562,1,XT5 AWD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,1,C15 SILVERADO CREW CAB,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,2,C15 SILVERADO  - CREW CAB,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,3,C15 SILVERADO,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,4,C15 SILVERADO,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,5,C15 SILVERADO EXTENDED CAB,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD CAB CHASSIS,968,1,C15 SILVERADO CAB CHASSIS,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C1500 SUBURBAN 2WD,66,1,C1500 SUBURBAN,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,C1500 TAHOE 2WD,24,1,C1500 TAHOE,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,1,COLORADO CREW CAB 2WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,2,COLORADO CREW CAB 2WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,1,COLORADO CREW CAB 4WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,2,COLORADO CREW CAB 4WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO CAB CHASSIS 2WD,966,1,COLORADO CAB CHASSIS 2WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO ZR2 4WD,985,1,COLORADO ZR2 4WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,982,1,EQUINOX AWD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,1,K1500 SILVERADO CREW CAB,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,2,K15 SILVERADO - CREW CAB,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,3,K1500 SILVERADO,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,4,K1500 SILVERADO,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,5,K1500 SILVERADO - EXTENDED CAB,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD CAB CHASSIS,967,1,K1500 SILVERADO CAB CHASSIS,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K1500 SUBURBAN 4WD,82,1,K1500 SUBURBAN 4WD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,K1500 TAHOE 4WD,77,1,K1500 TAHOE,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,TRAVERSE,983,1,TRAVERSE,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,TRAVERSE AWD,984,1,TRAVERSE AWD,
-2018,2741,General Motors LLC,GMX,Chevrolet,3,TRAX AWD,949,1,TRAX AWD,
+2018,2741,General Motors LLC,GMX,Buick,1,ENCLAVE,123,1,ENCLAVE,49
+2018,2741,General Motors LLC,GMX,Buick,1,ENCLAVE AWD,124,1,ENCLAVE AWD,49
+2018,2741,General Motors LLC,GMX,Buick,1,ENCORE AWD,118,1,ENCORE AWD,50
+2018,2741,General Motors LLC,GMX,Buick,1,ENVISION AWD,121,1,ENVISION AWD,432
+2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,1,ESCALADE 2WD,60
+2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,2,ESCALADE 2WD,60
+2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,1,ESCALADE 4WD,60
+2018,2741,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,2,ESCALADE 4WD,60
+2018,2741,General Motors LLC,GMX,Cadillac,2,XT5,561,1,XT5,64
+2018,2741,General Motors LLC,GMX,Cadillac,2,XT5 AWD,562,1,XT5 AWD,64
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,1,C15 SILVERADO CREW CAB,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,2,C15 SILVERADO  - CREW CAB,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,3,C15 SILVERADO,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,4,C15 SILVERADO,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD,915,5,C15 SILVERADO EXTENDED CAB,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO 2WD CAB CHASSIS,968,1,C15 SILVERADO CAB CHASSIS,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C1500 SUBURBAN 2WD,66,1,C1500 SUBURBAN,83
+2018,2741,General Motors LLC,GMX,Chevrolet,3,C1500 TAHOE 2WD,24,1,C1500 TAHOE,84
+2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,1,COLORADO CREW CAB 2WD,71
+2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,2,COLORADO CREW CAB 2WD,71
+2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,1,COLORADO CREW CAB 4WD,71
+2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,2,COLORADO CREW CAB 4WD,71
+2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO CAB CHASSIS 2WD,966,1,COLORADO CAB CHASSIS 2WD,71
+2018,2741,General Motors LLC,GMX,Chevrolet,3,COLORADO ZR2 4WD,985,1,COLORADO ZR2 4WD,71
+2018,2741,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,982,1,EQUINOX AWD,74
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,1,K1500 SILVERADO CREW CAB,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,2,K15 SILVERADO - CREW CAB,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,3,K1500 SILVERADO,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,4,K1500 SILVERADO,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD,930,5,K1500 SILVERADO - EXTENDED CAB,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO 4WD CAB CHASSIS,967,1,K1500 SILVERADO CAB CHASSIS,79
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K1500 SUBURBAN 4WD,82,1,K1500 SUBURBAN 4WD,83
+2018,2741,General Motors LLC,GMX,Chevrolet,3,K1500 TAHOE 4WD,77,1,K1500 TAHOE,84
+2018,2741,General Motors LLC,GMX,Chevrolet,3,TRAVERSE,983,1,TRAVERSE,86
+2018,2741,General Motors LLC,GMX,Chevrolet,3,TRAVERSE AWD,984,1,TRAVERSE AWD,86
+2018,2741,General Motors LLC,GMX,Chevrolet,3,TRAX AWD,949,1,TRAX AWD,87
 2018,2741,General Motors LLC,GMX,GMC,4,ACADIA AWD,942,1,ACADIA AWD,138
 2018,2741,General Motors LLC,GMX,GMC,4,ACADIA FWD,941,1,ACADIA FWD,138
 2018,2741,General Motors LLC,GMX,GMC,4,C15 SIERRA 2WD,910,1,C15 SIERRA CREW CAB,
@@ -9222,50 +9222,50 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,2741,General Motors LLC,GMX,GMC,4,K1500 YUKON 4WD,65,1,K1500 YUKON 4WD,
 2018,2741,General Motors LLC,GMX,GMC,4,K1500 YUKON XL 4WD,63,1,K1500 YUKON XL,
 2018,2741,General Motors LLC,GMX,GMC,4,TERRAIN AWD,944,1,TERRAIN AWD,
-2018,2752,General Motors LLC,GMX,Buick,1,CASCADA,122,1,CASCADA,
-2018,2752,General Motors LLC,GMX,Buick,1,ENCORE,117,1,ENCORE,
-2018,2752,General Motors LLC,GMX,Buick,1,ENVISION FWD,120,1,ENVISION FWD,
-2018,2752,General Motors LLC,GMX,Buick,1,LACROSSE,25,1,LACROSSE,
-2018,2752,General Motors LLC,GMX,Buick,1,LACROSSE AWD,26,1,LACROSSE AWD,
-2018,2752,General Motors LLC,GMX,Buick,1,REGAL AWD,127,1,REGAL AWD,
-2018,2752,General Motors LLC,GMX,Buick,1,REGAL FWD,126,1,REGAL,
-2018,2752,General Motors LLC,GMX,Buick,1,REGAL TOURX  AWD,125,1,REGAL TOURX AWD,
+2018,2752,General Motors LLC,GMX,Buick,1,CASCADA,122,1,CASCADA,416
+2018,2752,General Motors LLC,GMX,Buick,1,ENCORE,117,1,ENCORE,50
+2018,2752,General Motors LLC,GMX,Buick,1,ENVISION FWD,120,1,ENVISION FWD,432
+2018,2752,General Motors LLC,GMX,Buick,1,LACROSSE,25,1,LACROSSE,51
+2018,2752,General Motors LLC,GMX,Buick,1,LACROSSE AWD,26,1,LACROSSE AWD,51
+2018,2752,General Motors LLC,GMX,Buick,1,REGAL AWD,127,1,REGAL AWD,53
+2018,2752,General Motors LLC,GMX,Buick,1,REGAL FWD,126,1,REGAL,53
+2018,2752,General Motors LLC,GMX,Buick,1,REGAL TOURX  AWD,125,1,REGAL TOURX AWD,53
 2018,2752,General Motors LLC,GMX,Cadillac,2,ATS,542,1,ATS,56
 2018,2752,General Motors LLC,GMX,Cadillac,2,ATS,542,2,ATS,56
 2018,2752,General Motors LLC,GMX,Cadillac,2,ATS AWD,545,1,ATS AWD,56
 2018,2752,General Motors LLC,GMX,Cadillac,2,ATS AWD,545,2,ATS AWD,56
 2018,2752,General Motors LLC,GMX,Cadillac,2,ATS-V,557,1,ATS-V,56
 2018,2752,General Motors LLC,GMX,Cadillac,2,ATS-V,557,2,ATS-V,56
-2018,2752,General Motors LLC,GMX,Cadillac,2,CT6,559,1,CT6,
-2018,2752,General Motors LLC,GMX,Cadillac,2,CT6 AWD,560,1,CT6 AWD,
-2018,2752,General Motors LLC,GMX,Cadillac,2,CT6 PLUG-IN,563,1,CT6 PLUG-IN,
-2018,2752,General Motors LLC,GMX,Cadillac,2,CTS,548,1,CTS SEDAN,
-2018,2752,General Motors LLC,GMX,Cadillac,2,CTS AWD,549,1,CTS SEDAN AWD,
-2018,2752,General Motors LLC,GMX,Cadillac,2,CTS-V,558,1,CTS-V,
-2018,2752,General Motors LLC,GMX,Cadillac,2,XTS,543,1,XTS,
-2018,2752,General Motors LLC,GMX,Cadillac,2,XTS AWD,544,1,XTS AWD,
-2018,2752,General Motors LLC,GMX,Cadillac,2,XTS HEARSE,546,1,XTS HEARSE,
-2018,2752,General Motors LLC,GMX,Cadillac,2,XTS LIMO,547,1,XTS LIMO,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,BOLT EV,975,1,BOLT EV,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CAMARO,970,1,CAMARO,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,1,CORVETTE CONVERTIBLE,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,2,CORVETTE HATCHBACK COUPE,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,3,CORVETTE CONVERTIBLE,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,4,CORVETTE HATCHBACK COUPE,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE,972,1,CRUZE,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE HATCHBACK,978,1,CRUZE HATCHBACK,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER,977,1,CRUZE PREMIER,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER HATCHBACK,979,1,CRUZE PREMIER HATCHBACK,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,EQUINOX FWD,981,1,EQUINOX FWD,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,IMPALA,952,1,IMPALA,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,MALIBU,973,1,MALIBU,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,SONIC,131,1,SONIC,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,1,SONIC RS,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,2,SONIC RS LT HATCHBACK,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,SPARK,971,1,SPARK,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,SPARK ACTIV,980,1,SPARK ACTIV,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,TRAX,948,1,TRAX,
-2018,2752,General Motors LLC,GMX,Chevrolet,3,VOLT,121,1,VOLT,
+2018,2752,General Motors LLC,GMX,Cadillac,2,CT6,559,1,CT6,417
+2018,2752,General Motors LLC,GMX,Cadillac,2,CT6 AWD,560,1,CT6 AWD,417
+2018,2752,General Motors LLC,GMX,Cadillac,2,CT6 PLUG-IN,563,1,CT6 PLUG-IN,417
+2018,2752,General Motors LLC,GMX,Cadillac,2,CTS,548,1,CTS SEDAN,57
+2018,2752,General Motors LLC,GMX,Cadillac,2,CTS AWD,549,1,CTS SEDAN AWD,57
+2018,2752,General Motors LLC,GMX,Cadillac,2,CTS-V,558,1,CTS-V,57
+2018,2752,General Motors LLC,GMX,Cadillac,2,XTS,543,1,XTS,64
+2018,2752,General Motors LLC,GMX,Cadillac,2,XTS AWD,544,1,XTS AWD,64
+2018,2752,General Motors LLC,GMX,Cadillac,2,XTS HEARSE,546,1,XTS HEARSE,64
+2018,2752,General Motors LLC,GMX,Cadillac,2,XTS LIMO,547,1,XTS LIMO,64
+2018,2752,General Motors LLC,GMX,Chevrolet,3,BOLT EV,975,1,BOLT EV,447
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CAMARO,970,1,CAMARO,67
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,1,CORVETTE CONVERTIBLE,72
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,2,CORVETTE HATCHBACK COUPE,72
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,3,CORVETTE CONVERTIBLE,72
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,4,CORVETTE HATCHBACK COUPE,72
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE,972,1,CRUZE,70
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE HATCHBACK,978,1,CRUZE HATCHBACK,70
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER,977,1,CRUZE PREMIER,70
+2018,2752,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER HATCHBACK,979,1,CRUZE PREMIER HATCHBACK,70
+2018,2752,General Motors LLC,GMX,Chevrolet,3,EQUINOX FWD,981,1,EQUINOX FWD,74
+2018,2752,General Motors LLC,GMX,Chevrolet,3,IMPALA,952,1,IMPALA,77
+2018,2752,General Motors LLC,GMX,Chevrolet,3,MALIBU,973,1,MALIBU,78
+2018,2752,General Motors LLC,GMX,Chevrolet,3,SONIC,131,1,SONIC,80
+2018,2752,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,1,SONIC RS,80
+2018,2752,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,2,SONIC RS LT HATCHBACK,80
+2018,2752,General Motors LLC,GMX,Chevrolet,3,SPARK,971,1,SPARK,81
+2018,2752,General Motors LLC,GMX,Chevrolet,3,SPARK ACTIV,980,1,SPARK ACTIV,81
+2018,2752,General Motors LLC,GMX,Chevrolet,3,TRAX,948,1,TRAX,87
+2018,2752,General Motors LLC,GMX,Chevrolet,3,VOLT,121,1,VOLT,89
 2018,2752,General Motors LLC,GMX,GMC,4,TERRAIN FWD,943,1,TERRAIN FWD,
 2018,2723,Hyundai Motor Company,HYX,HYUNDAI MOTOR COMPANY,1,Santa Fe AWD,83,1,Santa Fe AWD 3.3 AT,
 2018,2723,Hyundai Motor Company,HYX,HYUNDAI MOTOR COMPANY,1,Santa Fe FWD,82,1,Santa Fe FWD 3.3 AT,
@@ -10023,7 +10023,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3131,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q5,330,1,Q5   235/60 R18,24
 2018,3131,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q7,320,1,Q7 2.0L    255/60 R18,25
 2018,3131,"Volkswagen Group of America, Inc.",VGA,Audi,2,SQ5,335,1,SQ5  255/45 R20,24
-2018,3131,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Bentayga,33,1,Bentayga  275/50 R20,
+2018,3131,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Bentayga,33,1,Bentayga  275/50 R20,446
 2018,3131,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Atlas,180,1,Atlas,
 2018,3131,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Atlas 4Motion,185,1,Atlas 4Motion,
 2018,3131,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan,170,1,Tiguan  215/65 R17,400
@@ -10114,7 +10114,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Continental Supersports Convt,47,1,Continental Supersports Convertible 275/40 ZR20,32
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Flying Spur,40,1,Flying Spur    275/40 ZR19,32
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Mulsanne,15,1,Mulsanne 265/45 ZR20,33
-2018,3135,"Volkswagen Group of America, Inc.",VGA,Bugatti,5,Chiron,501,1,Chiron  F:285/30R20 R:355/25/R21,
+2018,3135,"Volkswagen Group of America, Inc.",VGA,Bugatti,5,Chiron,501,1,Chiron  F:285/30R20 R:355/25/R21,-9
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Aventador S Coupe,473,1,Aventador S Coupe  F:255/35 ZR19 R:335/30 ZR20,212
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Aventador S Roadster,474,1,Aventador S Roadster  F:255/35 ZR19 R:335/30 ZR20,212
 2018,3135,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Huracan,407,1,Huracan Coupe F:245/30 ZR20 R:305/30 ZR20,214
@@ -10179,15 +10179,15 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V60 Polestar AWD,61,1,V60 Polestar AWD. Footprint for 245 tire width. CO2 Standards calculated according to alternative phase-In. Ref. Â§86.1818-12(e)(3)(ii)(A),433
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 AWD,74,1,V90 AWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. Â§86.1818-12(e)(3)(ii)(A),444
 2018,3113,"Volvo Car USA,  LLC",VVX,"Volvo Cars of North America, LLC",1,V90 FWD,73,1,V90 FWD 255 width tire. CO2 Standards calculated according to alternative phase-In. Ref. Â§86.1818-12(e)(3)(ii)(A),444
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,1,MDX AWD 18inch,
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch (245/50R20),
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,3,MDX AWD 20inch (265/45R20),
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD A-spec,3,1,MDX AWD A-SPEC,
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,1,MDX FWD 18inch,
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,2,MDX FWD 20inch (245/50R20),
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,3,MDX FWD 20inch (265/45R20),
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD,101,1,RDX AWD,
-2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD A-SPEC,103,1,RDX AWD A-SPEC,
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,1,MDX AWD 18inch,2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,2,MDX AWD 20inch (245/50R20),2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD,1,3,MDX AWD 20inch (265/45R20),2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX AWD A-spec,3,1,MDX AWD A-SPEC,2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,1,MDX FWD 18inch,2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,2,MDX FWD 20inch (245/50R20),2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,MDX FWD,2,3,MDX FWD 20inch (265/45R20),2
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD,101,1,RDX AWD,3
+2019,2895,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX AWD A-SPEC,103,1,RDX AWD A-SPEC,3
 2019,2895,"American Honda Motor Co., Inc.",HNX,Honda,1,CR-V AWD,101,1,CR-V AWD 17inch,
 2019,2895,"American Honda Motor Co., Inc.",HNX,Honda,1,CR-V AWD,101,2,CR-V AWD 18inch,
 2019,2895,"American Honda Motor Co., Inc.",HNX,Honda,1,ODYSSEY FWD,201,1,ODYSSEY FWD 18inch,
@@ -10200,17 +10200,17 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,2895,"American Honda Motor Co., Inc.",HNX,Honda,1,PILOT FWD,302,2,PILOT FWD 20inch,
 2019,2895,"American Honda Motor Co., Inc.",HNX,Honda,1,RIDGELINE AWD,501,1,RIDGELINE AWD,
 2019,2895,"American Honda Motor Co., Inc.",HNX,Honda,1,RIDGELINE FWD,502,1,RIDGELINE FWD,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,1,ILX 17inch,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,2,ILX 18inch,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,NSX,20,1,NSX,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD,102,1,RDX FWD,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD A-SPEC,104,1,RDX FWD A-SPEC,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,RLX,120,1,RLX,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD,60,1,TLX AWD 18inch,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD A-SPEC,62,1,TLX AWD A-SPEC 19inch,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,1,TLX FWD 17inch,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,2,TLX FWD 18inch,
-2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD A-SPEC,63,1,TLX FWD A-SPEC 19inch,
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,1,ILX 17inch,1
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,ILX,110,2,ILX 18inch,1
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,NSX,20,1,NSX,-9
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD,102,1,RDX FWD,3
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,RDX FWD A-SPEC,104,1,RDX FWD A-SPEC,3
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,RLX,120,1,RLX,4
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD,60,1,TLX AWD 18inch,6
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX AWD A-SPEC,62,1,TLX AWD A-SPEC 19inch,6
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,1,TLX FWD 17inch,6
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD,61,2,TLX FWD 18inch,6
+2019,3124,"American Honda Motor Co., Inc.",HNX,Acura,2,TLX FWD A-SPEC,63,1,TLX FWD A-SPEC 19inch,6
 2019,3124,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,1,ACCORD SEDAN 17inch,
 2019,3124,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD,20,2,ACCORD SEDAN 19inch,
 2019,3124,"American Honda Motor Co., Inc.",HNX,Honda,1,ACCORD 2.0T SPORT/TOURING,21,1,ACCORD 20T SPTT 19inch,
@@ -10235,226 +10235,226 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3124,"American Honda Motor Co., Inc.",HNX,Honda,1,INSIGHT,50,1,INSIGHT,
 2019,3124,"American Honda Motor Co., Inc.",HNX,Honda,1,INSIGHT TOURING,51,1,INSIGHT TOURING,
 2019,3124,"American Honda Motor Co., Inc.",HNX,Honda,1,PASSPORT FWD,311,1,PASSPORT FWD,
-2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V8,562,1,DB11 V8 Coupe,
-2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V12,500,1,DB11 V12 Coupe,
-2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DBS,700,1,DBS V12 Coupe,
-2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Rapide S,283,1,Rapide AMR,
-2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Vanquish S,282,1,Vanquish & Vanquish Zagato,
-2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Vantage V8,600,1,Vantage V8 Hatchback,
-2019,2826,BMW,BMX,BMW,1,X3 M40i,233,1,X3 M40i R21 mixed,
-2019,2826,BMW,BMX,BMW,1,X3 M40i,233,2,X3 M40i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X3 M40i,233,3,X3 M40i R19,
-2019,2826,BMW,BMX,BMW,1,X3 xDrive30i,234,1,X3 xDrive30i R18,
-2019,2826,BMW,BMX,BMW,1,X3 xDrive30i,234,2,X3 xDrive30i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X3 xDrive30i,234,3,X3 xDrive30i R19,
-2019,2826,BMW,BMX,BMW,1,X4 M40i,239,1,X4 M40i R21 mixed,
-2019,2826,BMW,BMX,BMW,1,X4 M40i,239,2,X4 M40i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X4 M40i,239,3,X4 M40i R19,
-2019,2826,BMW,BMX,BMW,1,X4 xDrive30i,244,1,X4 xDrive30i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X4 xDrive30i,244,2,X4 xDrive30i R19,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,1,X5 xDrive40i R19,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,2,X5 xDrive40i R19 7-seater,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,3,X5 xDrive40i R22 mixed,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,4,X5 xDrive40i R21 mixed,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,5,X5 xDrive40i R21 mixed 7-seater,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,6,X5 xDrive40i R20,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,7,X5 xDrive40i R20 7-seater,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,1,X5 xDrive50i R19,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,2,X5 xDrive50i R22 mixed,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,3,X5 xDrive50i R21 mixed,
-2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,4,X5 xDrive50i R20,
-2019,2826,BMW,BMX,BMW,1,X6 M,96,1,X6 M R21 mixed,
-2019,2826,BMW,BMX,BMW,1,X6 M,96,2,X6 M R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X6 sDrive35i,169,1,X6 sDrive35i R19,
-2019,2826,BMW,BMX,BMW,1,X6 sDrive35i,169,2,X6 sDrive35i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X6 xDrive35i,94,1,X6 xDrive35i R19,
-2019,2826,BMW,BMX,BMW,1,X6 xDrive35i,94,2,X6 xDrive35i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X6 xDrive35i,94,3,X6 xDrive35i R21 mixed,
-2019,2826,BMW,BMX,BMW,1,X6 xDrive50i,95,1,X6 xDrive50i R19,
-2019,2826,BMW,BMX,BMW,1,X6 xDrive50i,95,2,X6 xDrive50i R20 mixed,
-2019,2826,BMW,BMX,BMW,1,X6 xDrive50i,95,3,X6 xDrive50i R21 mixed,
+2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V8,562,1,DB11 V8 Coupe,11
+2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DB11 V12,500,1,DB11 V12 Coupe,11
+2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,DBS,700,1,DBS V12 Coupe,11
+2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Rapide S,283,1,Rapide AMR,12
+2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Vanquish S,282,1,Vanquish & Vanquish Zagato,14
+2019,2865,Aston Martin Lagonda,ASX,Aston Martin Lagonda Ltd,1,Vantage V8,600,1,Vantage V8 Hatchback,13
+2019,2826,BMW,BMX,BMW,1,X3 M40i,233,1,X3 M40i R21 mixed,44
+2019,2826,BMW,BMX,BMW,1,X3 M40i,233,2,X3 M40i R20 mixed,44
+2019,2826,BMW,BMX,BMW,1,X3 M40i,233,3,X3 M40i R19,44
+2019,2826,BMW,BMX,BMW,1,X3 xDrive30i,234,1,X3 xDrive30i R18,44
+2019,2826,BMW,BMX,BMW,1,X3 xDrive30i,234,2,X3 xDrive30i R20 mixed,44
+2019,2826,BMW,BMX,BMW,1,X3 xDrive30i,234,3,X3 xDrive30i R19,44
+2019,2826,BMW,BMX,BMW,1,X4 M40i,239,1,X4 M40i R21 mixed,412
+2019,2826,BMW,BMX,BMW,1,X4 M40i,239,2,X4 M40i R20 mixed,412
+2019,2826,BMW,BMX,BMW,1,X4 M40i,239,3,X4 M40i R19,412
+2019,2826,BMW,BMX,BMW,1,X4 xDrive30i,244,1,X4 xDrive30i R20 mixed,412
+2019,2826,BMW,BMX,BMW,1,X4 xDrive30i,244,2,X4 xDrive30i R19,412
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,1,X5 xDrive40i R19,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,2,X5 xDrive40i R19 7-seater,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,3,X5 xDrive40i R22 mixed,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,4,X5 xDrive40i R21 mixed,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,5,X5 xDrive40i R21 mixed 7-seater,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,6,X5 xDrive40i R20,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive40i,250,7,X5 xDrive40i R20 7-seater,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,1,X5 xDrive50i R19,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,2,X5 xDrive50i R22 mixed,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,3,X5 xDrive50i R21 mixed,45
+2019,2826,BMW,BMX,BMW,1,X5 xDrive50i,247,4,X5 xDrive50i R20,45
+2019,2826,BMW,BMX,BMW,1,X6 M,96,1,X6 M R21 mixed,46
+2019,2826,BMW,BMX,BMW,1,X6 M,96,2,X6 M R20 mixed,46
+2019,2826,BMW,BMX,BMW,1,X6 sDrive35i,169,1,X6 sDrive35i R19,46
+2019,2826,BMW,BMX,BMW,1,X6 sDrive35i,169,2,X6 sDrive35i R20 mixed,46
+2019,2826,BMW,BMX,BMW,1,X6 xDrive35i,94,1,X6 xDrive35i R19,46
+2019,2826,BMW,BMX,BMW,1,X6 xDrive35i,94,2,X6 xDrive35i R20 mixed,46
+2019,2826,BMW,BMX,BMW,1,X6 xDrive35i,94,3,X6 xDrive35i R21 mixed,46
+2019,2826,BMW,BMX,BMW,1,X6 xDrive50i,95,1,X6 xDrive50i R19,46
+2019,2826,BMW,BMX,BMW,1,X6 xDrive50i,95,2,X6 xDrive50i R20 mixed,46
+2019,2826,BMW,BMX,BMW,1,X6 xDrive50i,95,3,X6 xDrive50i R21 mixed,46
 2019,2826,BMW,BMX,BMW,1,X7 xDrive40i,251,1,X7 xDrive40i R22 mixed,
 2019,2826,BMW,BMX,BMW,1,X7 xDrive40i,251,2,X7 xDrive40i R21,
 2019,2826,BMW,BMX,BMW,1,X7 xDrive50i,248,1,X7 xDrive50i R22 mixed,
 2019,2826,BMW,BMX,BMW,1,X7 xDrive50i,248,2,X7 xDrive50i R21,
-2019,3147,BMW,BMX,BMW,1,230i Convertible,194,1,230i Convertible R17,
-2019,3147,BMW,BMX,BMW,1,230i Convertible,194,2,230i Convertible R18,
-2019,3147,BMW,BMX,BMW,1,230i Convertible,194,3,230i Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,230i Coupe,192,1,230i Coupe R17,
-2019,3147,BMW,BMX,BMW,1,230i Coupe,192,2,230i Coupe R18,
-2019,3147,BMW,BMX,BMW,1,230i Coupe,192,3,230i Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,230i xDrive Convertible,195,1,230i xDrive Convertible R17,
-2019,3147,BMW,BMX,BMW,1,230i xDrive Convertible,195,2,230i xDrive Convertible R18,
-2019,3147,BMW,BMX,BMW,1,230i xDrive Convertible,195,3,230i xDrive Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,230i xDrive Coupe,193,1,230i xDrive Coupe R17,
-2019,3147,BMW,BMX,BMW,1,230i xDrive Coupe,193,2,230i xDrive Coupe R18,
-2019,3147,BMW,BMX,BMW,1,230i xDrive Coupe,193,3,230i xDrive Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,330i,260,1,330i R19,
-2019,3147,BMW,BMX,BMW,1,330i,260,2,330i R19 mixed,
-2019,3147,BMW,BMX,BMW,1,330i,260,3,330i R18,
-2019,3147,BMW,BMX,BMW,1,330i xDrive,261,1,330i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,330i xDrive,261,2,330i xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,330i xDrive,261,3,330i xDrive R18,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,1,330i xDrive Gran Turismo R19,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,2,330i xDrive Gran Turismo R19 mixed,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,3,330i xDrive Gran Turismo R18,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,4,330i xDrive Gran Turismo R18 mixed,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,1,330i xDrive Sports Wagon R18,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,2,330i xDrive Sports Wagon R18 mixed,
-2019,3147,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,3,330i xDrive Sports Wagon R17,
-2019,3147,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,1,340i xDrive Gran Turismo R19,
-2019,3147,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,2,340i xDrive Gran Turismo R19 mixed,
-2019,3147,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,3,340i xDrive Gran Turismo R18,
-2019,3147,BMW,BMX,BMW,1,430i Convertible,204,1,430i Convertible R19,
-2019,3147,BMW,BMX,BMW,1,430i Convertible,204,2,430i Convertible R19 mixed,
-2019,3147,BMW,BMX,BMW,1,430i Convertible,204,3,430i Convertible R18,
-2019,3147,BMW,BMX,BMW,1,430i Convertible,204,4,430i Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,430i Coupe,200,1,430i Coupe R19,
-2019,3147,BMW,BMX,BMW,1,430i Coupe,200,2,430i Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,430i Coupe,200,3,430i Coupe R18,
-2019,3147,BMW,BMX,BMW,1,430i Coupe,200,4,430i Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,1,430i Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,2,430i Gran Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,3,430i Gran Coupe R18,
-2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,4,430i Gran Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Convertible,205,1,430i xDrive Convertible R19,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Convertible,205,2,430i xDrive Convertible R19 mixed,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Convertible,205,3,430i xDrive Convertible R18,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,1,430i xDrive Coupe R19,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,2,430i xDrive Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,3,430i xDrive Coupe R18,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,4,430i xDrive Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,1,430i xDrive Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,2,430i xDrive Gran Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,3,430i xDrive Gran Coupe R18,
-2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,4,430i xDrive Gran Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,440i Convertible,213,1,440i Convertible R19,
-2019,3147,BMW,BMX,BMW,1,440i Convertible,213,2,440i Convertible R19 mixed,
-2019,3147,BMW,BMX,BMW,1,440i Convertible,213,3,440i Convertible R18,
-2019,3147,BMW,BMX,BMW,1,440i Convertible,213,4,440i Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,440i Coupe,214,1,440i Coupe R19,
-2019,3147,BMW,BMX,BMW,1,440i Coupe,214,2,440i Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,440i Coupe,214,3,440i Coupe R18,
-2019,3147,BMW,BMX,BMW,1,440i Coupe,214,4,440i Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,1,440i Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,2,440i Gran Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,3,440i Gran Coupe R18,
-2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,4,440i Gran Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,1,440i xDrive Convertible R19,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,2,440i xDrive Convertible R19 mixed,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,3,440i xDrive Convertible R18,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,4,440i xDrive Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,1,440i xDrive Coupe R19,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,2,440i xDrive Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,3,440i xDrive Coupe R18,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,4,440i xDrive Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,1,440i xDrive Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,2,440i xDrive Gran Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,3,440i xDrive Gran Coupe R18,
-2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,4,440i xDrive Gran Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,530e,227,1,530e R19,
-2019,3147,BMW,BMX,BMW,1,530e,227,2,530e R19 mixed,
-2019,3147,BMW,BMX,BMW,1,530e,227,3,530e R18,
-2019,3147,BMW,BMX,BMW,1,530e xDrive,228,1,530e xDrive R19,
-2019,3147,BMW,BMX,BMW,1,530e xDrive,228,2,530e xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,530e xDrive,228,3,530e xDrive R18,
-2019,3147,BMW,BMX,BMW,1,530i,206,1,530i R19,
-2019,3147,BMW,BMX,BMW,1,530i,206,2,530i R19 mixed,
-2019,3147,BMW,BMX,BMW,1,530i,206,3,530i R18,
-2019,3147,BMW,BMX,BMW,1,530i xDrive,207,1,530i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,530i xDrive,207,2,530i xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,530i xDrive,207,3,530i xDrive R18,
-2019,3147,BMW,BMX,BMW,1,540i,220,1,540i R20 mixed,
-2019,3147,BMW,BMX,BMW,1,540i,220,2,540i R19,
-2019,3147,BMW,BMX,BMW,1,540i,220,3,540i R19 mixed,
-2019,3147,BMW,BMX,BMW,1,540i,220,4,540i R18,
-2019,3147,BMW,BMX,BMW,1,540i xDrive,221,1,540i xDrive R20 mixed,
-2019,3147,BMW,BMX,BMW,1,540i xDrive,221,2,540i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,540i xDrive,221,3,540i xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,540i xDrive,221,4,540i xDrive R18,
-2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,1,640i Gran Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,2,640i Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,3,640i Gran Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,4,640i Gran Coupe R18,
-2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,1,640i xDrive Gran Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,2,640i xDrive Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,3,640i xDrive Gran Coupe R18,
-2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,1,640i xDrive Gran Turismo R20 mixed,
-2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,2,640i xDrive Gran Turismo R19,
-2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,3,640i xDrive Gran Turismo R19 mixed,
-2019,3147,BMW,BMX,BMW,1,650i Gran Coupe,113,1,650i Gran Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,650i Gran Coupe,113,2,650i Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,1,650i xDrive Gran Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,2,650i xDrive Gran Coupe R19,
-2019,3147,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,3,650i xDrive Gran Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,740e xDrive,226,1,740e xDrive R19,
-2019,3147,BMW,BMX,BMW,1,740e xDrive,226,2,740e xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,740e xDrive,226,3,740e xDrive R18,
-2019,3147,BMW,BMX,BMW,1,740i,54,1,740i R20 mixed,
-2019,3147,BMW,BMX,BMW,1,740i,54,2,740i R19,
-2019,3147,BMW,BMX,BMW,1,740i,54,3,740i R19 mixed,
-2019,3147,BMW,BMX,BMW,1,740i,54,4,740i R18,
-2019,3147,BMW,BMX,BMW,1,740i xDrive,58,1,740i xDrive R20 mixed,
-2019,3147,BMW,BMX,BMW,1,740i xDrive,58,2,740i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,740i xDrive,58,3,740i xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,740i xDrive,58,4,740i xDrive R18,
-2019,3147,BMW,BMX,BMW,1,750i,80,1,750i R20 mixed,
-2019,3147,BMW,BMX,BMW,1,750i,80,2,750i R19,
-2019,3147,BMW,BMX,BMW,1,750i,80,3,750i R19 mixed,
-2019,3147,BMW,BMX,BMW,1,750i,80,4,750i R18,
-2019,3147,BMW,BMX,BMW,1,750i xDrive,86,1,750i xDrive R20 mixed,
-2019,3147,BMW,BMX,BMW,1,750i xDrive,86,2,750i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,750i xDrive,86,3,750i xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,750i xDrive,86,4,750i xDrive R18,
-2019,3147,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,1,ALPINA B6 xDrive Gran Coupe R20 mixed AST,
-2019,3147,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,2,ALPINA B6 xDrive Gran Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,Alpina B7 xDrive,212,1,ALPINA B7 xDrive R21 mixed,
-2019,3147,BMW,BMX,BMW,1,Alpina B7 xDrive,212,2,ALPINA B7 xDrive R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I3,143,1,i3 R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I3,143,2,i3 R19 mixed,
-2019,3147,BMW,BMX,BMW,1,I3,143,3,i3 R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I3 with Range Extender,224,1,i3 with Range Extender R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I3 with Range Extender,224,2,i3 with Range Extender R19 mixed,
-2019,3147,BMW,BMX,BMW,1,I3s,238,1,i3s R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I3s with Range Extender,237,1,i3s with Range Extender R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I8 Coupe,241,1,i8 Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,I8 Roadster,242,1,i8 Roadster R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M2 Competition,246,1,M2 Competition R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Convertible,151,1,M4 Convertible R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Convertible,151,2,M4 Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Convertible Competition,257,1,M4 Convertible Competition R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Convertible Competition,257,2,M4 Convertible Competition R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Coupe,150,1,M4 Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Coupe,150,2,M4 Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Coupe Competition,256,1,M4 Coupe Competition R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 Coupe Competition,256,2,M4 Coupe Competition R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M4 CS,231,1,M4 CS R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M5,235,1,M5 R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M5,235,2,M5 R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M5 Competition,254,1,M5 Competition R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M6 Gran Coupe,107,1,M6 Gran Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M240i Convertible,209,1,M240i Convertible R18,
-2019,3147,BMW,BMX,BMW,1,M240i Convertible,209,2,M240i Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,M240i Coupe,208,1,M240i Coupe R18,
-2019,3147,BMW,BMX,BMW,1,M240i Coupe,208,2,M240i Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,M240i xDrive Convertible,211,1,M240i xDrive Convertible R18,
-2019,3147,BMW,BMX,BMW,1,M240i xDrive Convertible,211,2,M240i xDrive Convertible R18 mixed,
-2019,3147,BMW,BMX,BMW,1,M240i xDrive Coupe,210,1,M240i xDrive Coupe R18,
-2019,3147,BMW,BMX,BMW,1,M240i xDrive Coupe,210,2,M240i xDrive Coupe R18 mixed,
-2019,3147,BMW,BMX,BMW,1,M240i xDrive Coupe M Performance,253,1,M240i xDrive Coupe M Performance R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M550i xDrive,230,1,M550i xDrive R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M550i xDrive,230,2,M550i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,M550i xDrive,230,3,M550i xDrive R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M760i xDrive,222,1,M760i xDrive R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M760i xDrive,222,2,M760i xDrive R19,
-2019,3147,BMW,BMX,BMW,1,M850i xDrive Convertible,259,1,M850i xDrive Convertible R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M850i xDrive Convertible,259,2,M850i xDrive Convertible R19 mixed,
-2019,3147,BMW,BMX,BMW,1,M850i xDrive Coupe,249,1,M850i xDrive Coupe R20 mixed,
-2019,3147,BMW,BMX,BMW,1,M850i xDrive Coupe,249,2,M850i xDrive Coupe R19 mixed,
-2019,3147,BMW,BMX,BMW,1,X1 sDrive28i,175,1,X1 sDrive28i R19,
-2019,3147,BMW,BMX,BMW,1,X1 sDrive28i,175,2,X1 sDrive28i R18,
-2019,3147,BMW,BMX,BMW,1,X1 xDrive28i,174,1,X1 xDrive28i R19,
-2019,3147,BMW,BMX,BMW,1,X1 xDrive28i,174,2,X1 xDrive28i R18,
+2019,3147,BMW,BMX,BMW,1,230i Convertible,194,1,230i Convertible R17,35
+2019,3147,BMW,BMX,BMW,1,230i Convertible,194,2,230i Convertible R18,35
+2019,3147,BMW,BMX,BMW,1,230i Convertible,194,3,230i Convertible R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,230i Coupe,192,1,230i Coupe R17,35
+2019,3147,BMW,BMX,BMW,1,230i Coupe,192,2,230i Coupe R18,35
+2019,3147,BMW,BMX,BMW,1,230i Coupe,192,3,230i Coupe R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,230i xDrive Convertible,195,1,230i xDrive Convertible R17,35
+2019,3147,BMW,BMX,BMW,1,230i xDrive Convertible,195,2,230i xDrive Convertible R18,35
+2019,3147,BMW,BMX,BMW,1,230i xDrive Convertible,195,3,230i xDrive Convertible R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,230i xDrive Coupe,193,1,230i xDrive Coupe R17,35
+2019,3147,BMW,BMX,BMW,1,230i xDrive Coupe,193,2,230i xDrive Coupe R18,35
+2019,3147,BMW,BMX,BMW,1,230i xDrive Coupe,193,3,230i xDrive Coupe R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,330i,260,1,330i R19,36
+2019,3147,BMW,BMX,BMW,1,330i,260,2,330i R19 mixed,36
+2019,3147,BMW,BMX,BMW,1,330i,260,3,330i R18,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive,261,1,330i xDrive R19,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive,261,2,330i xDrive R19 mixed,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive,261,3,330i xDrive R18,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,1,330i xDrive Gran Turismo R19,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,2,330i xDrive Gran Turismo R19 mixed,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,3,330i xDrive Gran Turismo R18,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Gran Turismo,199,4,330i xDrive Gran Turismo R18 mixed,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,1,330i xDrive Sports Wagon R18,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,2,330i xDrive Sports Wagon R18 mixed,36
+2019,3147,BMW,BMX,BMW,1,330i xDrive Sports Wagon,198,3,330i xDrive Sports Wagon R17,36
+2019,3147,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,1,340i xDrive Gran Turismo R19,36
+2019,3147,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,2,340i xDrive Gran Turismo R19 mixed,36
+2019,3147,BMW,BMX,BMW,1,340i xDrive Gran Turismo,219,3,340i xDrive Gran Turismo R18,36
+2019,3147,BMW,BMX,BMW,1,430i Convertible,204,1,430i Convertible R19,37
+2019,3147,BMW,BMX,BMW,1,430i Convertible,204,2,430i Convertible R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i Convertible,204,3,430i Convertible R18,37
+2019,3147,BMW,BMX,BMW,1,430i Convertible,204,4,430i Convertible R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i Coupe,200,1,430i Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,430i Coupe,200,2,430i Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i Coupe,200,3,430i Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,430i Coupe,200,4,430i Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,1,430i Gran Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,2,430i Gran Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,3,430i Gran Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,430i Gran Coupe,202,4,430i Gran Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Convertible,205,1,430i xDrive Convertible R19,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Convertible,205,2,430i xDrive Convertible R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Convertible,205,3,430i xDrive Convertible R18,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,1,430i xDrive Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,2,430i xDrive Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,3,430i xDrive Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Coupe,201,4,430i xDrive Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,1,430i xDrive Gran Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,2,430i xDrive Gran Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,3,430i xDrive Gran Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,430i xDrive Gran Coupe,203,4,430i xDrive Gran Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i Convertible,213,1,440i Convertible R19,37
+2019,3147,BMW,BMX,BMW,1,440i Convertible,213,2,440i Convertible R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i Convertible,213,3,440i Convertible R18,37
+2019,3147,BMW,BMX,BMW,1,440i Convertible,213,4,440i Convertible R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i Coupe,214,1,440i Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,440i Coupe,214,2,440i Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i Coupe,214,3,440i Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,440i Coupe,214,4,440i Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,1,440i Gran Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,2,440i Gran Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,3,440i Gran Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,440i Gran Coupe,215,4,440i Gran Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,1,440i xDrive Convertible R19,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,2,440i xDrive Convertible R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,3,440i xDrive Convertible R18,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Convertible,216,4,440i xDrive Convertible R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,1,440i xDrive Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,2,440i xDrive Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,3,440i xDrive Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Coupe,217,4,440i xDrive Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,1,440i xDrive Gran Coupe R19,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,2,440i xDrive Gran Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,3,440i xDrive Gran Coupe R18,37
+2019,3147,BMW,BMX,BMW,1,440i xDrive Gran Coupe,218,4,440i xDrive Gran Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,530e,227,1,530e R19,38
+2019,3147,BMW,BMX,BMW,1,530e,227,2,530e R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,530e,227,3,530e R18,38
+2019,3147,BMW,BMX,BMW,1,530e xDrive,228,1,530e xDrive R19,38
+2019,3147,BMW,BMX,BMW,1,530e xDrive,228,2,530e xDrive R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,530e xDrive,228,3,530e xDrive R18,38
+2019,3147,BMW,BMX,BMW,1,530i,206,1,530i R19,38
+2019,3147,BMW,BMX,BMW,1,530i,206,2,530i R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,530i,206,3,530i R18,38
+2019,3147,BMW,BMX,BMW,1,530i xDrive,207,1,530i xDrive R19,38
+2019,3147,BMW,BMX,BMW,1,530i xDrive,207,2,530i xDrive R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,530i xDrive,207,3,530i xDrive R18,38
+2019,3147,BMW,BMX,BMW,1,540i,220,1,540i R20 mixed,38
+2019,3147,BMW,BMX,BMW,1,540i,220,2,540i R19,38
+2019,3147,BMW,BMX,BMW,1,540i,220,3,540i R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,540i,220,4,540i R18,38
+2019,3147,BMW,BMX,BMW,1,540i xDrive,221,1,540i xDrive R20 mixed,38
+2019,3147,BMW,BMX,BMW,1,540i xDrive,221,2,540i xDrive R19,38
+2019,3147,BMW,BMX,BMW,1,540i xDrive,221,3,540i xDrive R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,540i xDrive,221,4,540i xDrive R18,38
+2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,1,640i Gran Coupe R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,2,640i Gran Coupe R19,39
+2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,3,640i Gran Coupe R19 mixed,39
+2019,3147,BMW,BMX,BMW,1,640i Gran Coupe,112,4,640i Gran Coupe R18,39
+2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,1,640i xDrive Gran Coupe R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,2,640i xDrive Gran Coupe R19,39
+2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Coupe,134,3,640i xDrive Gran Coupe R18,39
+2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,1,640i xDrive Gran Turismo R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,2,640i xDrive Gran Turismo R19,39
+2019,3147,BMW,BMX,BMW,1,640i xDrive Gran Turismo,232,3,640i xDrive Gran Turismo R19 mixed,39
+2019,3147,BMW,BMX,BMW,1,650i Gran Coupe,113,1,650i Gran Coupe R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,650i Gran Coupe,113,2,650i Gran Coupe R19,39
+2019,3147,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,1,650i xDrive Gran Coupe R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,2,650i xDrive Gran Coupe R19,39
+2019,3147,BMW,BMX,BMW,1,650i xDrive Gran Coupe,114,3,650i xDrive Gran Coupe R19 mixed,39
+2019,3147,BMW,BMX,BMW,1,740e xDrive,226,1,740e xDrive R19,40
+2019,3147,BMW,BMX,BMW,1,740e xDrive,226,2,740e xDrive R19 mixed,40
+2019,3147,BMW,BMX,BMW,1,740e xDrive,226,3,740e xDrive R18,40
+2019,3147,BMW,BMX,BMW,1,740i,54,1,740i R20 mixed,40
+2019,3147,BMW,BMX,BMW,1,740i,54,2,740i R19,40
+2019,3147,BMW,BMX,BMW,1,740i,54,3,740i R19 mixed,40
+2019,3147,BMW,BMX,BMW,1,740i,54,4,740i R18,40
+2019,3147,BMW,BMX,BMW,1,740i xDrive,58,1,740i xDrive R20 mixed,40
+2019,3147,BMW,BMX,BMW,1,740i xDrive,58,2,740i xDrive R19,40
+2019,3147,BMW,BMX,BMW,1,740i xDrive,58,3,740i xDrive R19 mixed,40
+2019,3147,BMW,BMX,BMW,1,740i xDrive,58,4,740i xDrive R18,40
+2019,3147,BMW,BMX,BMW,1,750i,80,1,750i R20 mixed,40
+2019,3147,BMW,BMX,BMW,1,750i,80,2,750i R19,40
+2019,3147,BMW,BMX,BMW,1,750i,80,3,750i R19 mixed,40
+2019,3147,BMW,BMX,BMW,1,750i,80,4,750i R18,40
+2019,3147,BMW,BMX,BMW,1,750i xDrive,86,1,750i xDrive R20 mixed,40
+2019,3147,BMW,BMX,BMW,1,750i xDrive,86,2,750i xDrive R19,40
+2019,3147,BMW,BMX,BMW,1,750i xDrive,86,3,750i xDrive R19 mixed,40
+2019,3147,BMW,BMX,BMW,1,750i xDrive,86,4,750i xDrive R18,40
+2019,3147,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,1,ALPINA B6 xDrive Gran Coupe R20 mixed AST,39
+2019,3147,BMW,BMX,BMW,1,Alpina B6 xDrive Gran Coupe,163,2,ALPINA B6 xDrive Gran Coupe R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,Alpina B7 xDrive,212,1,ALPINA B7 xDrive R21 mixed,40
+2019,3147,BMW,BMX,BMW,1,Alpina B7 xDrive,212,2,ALPINA B7 xDrive R20 mixed,40
+2019,3147,BMW,BMX,BMW,1,I3,143,1,i3 R20 mixed,41
+2019,3147,BMW,BMX,BMW,1,I3,143,2,i3 R19 mixed,41
+2019,3147,BMW,BMX,BMW,1,I3,143,3,i3 R20 mixed,41
+2019,3147,BMW,BMX,BMW,1,I3 with Range Extender,224,1,i3 with Range Extender R20 mixed,41
+2019,3147,BMW,BMX,BMW,1,I3 with Range Extender,224,2,i3 with Range Extender R19 mixed,41
+2019,3147,BMW,BMX,BMW,1,I3s,238,1,i3s R20 mixed,41
+2019,3147,BMW,BMX,BMW,1,I3s with Range Extender,237,1,i3s with Range Extender R20 mixed,41
+2019,3147,BMW,BMX,BMW,1,I8 Coupe,241,1,i8 Coupe R20 mixed,42
+2019,3147,BMW,BMX,BMW,1,I8 Roadster,242,1,i8 Roadster R20 mixed,42
+2019,3147,BMW,BMX,BMW,1,M2 Competition,246,1,M2 Competition R19 mixed,35
+2019,3147,BMW,BMX,BMW,1,M4 Convertible,151,1,M4 Convertible R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Convertible,151,2,M4 Convertible R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Convertible Competition,257,1,M4 Convertible Competition R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Convertible Competition,257,2,M4 Convertible Competition R20 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Coupe,150,1,M4 Coupe R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Coupe,150,2,M4 Coupe R18 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Coupe Competition,256,1,M4 Coupe Competition R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 Coupe Competition,256,2,M4 Coupe Competition R20 mixed,37
+2019,3147,BMW,BMX,BMW,1,M4 CS,231,1,M4 CS R19 mixed,37
+2019,3147,BMW,BMX,BMW,1,M5,235,1,M5 R20 mixed,38
+2019,3147,BMW,BMX,BMW,1,M5,235,2,M5 R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,M5 Competition,254,1,M5 Competition R20 mixed,38
+2019,3147,BMW,BMX,BMW,1,M6 Gran Coupe,107,1,M6 Gran Coupe R20 mixed,39
+2019,3147,BMW,BMX,BMW,1,M240i Convertible,209,1,M240i Convertible R18,35
+2019,3147,BMW,BMX,BMW,1,M240i Convertible,209,2,M240i Convertible R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,M240i Coupe,208,1,M240i Coupe R18,35
+2019,3147,BMW,BMX,BMW,1,M240i Coupe,208,2,M240i Coupe R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,M240i xDrive Convertible,211,1,M240i xDrive Convertible R18,35
+2019,3147,BMW,BMX,BMW,1,M240i xDrive Convertible,211,2,M240i xDrive Convertible R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,M240i xDrive Coupe,210,1,M240i xDrive Coupe R18,35
+2019,3147,BMW,BMX,BMW,1,M240i xDrive Coupe,210,2,M240i xDrive Coupe R18 mixed,35
+2019,3147,BMW,BMX,BMW,1,M240i xDrive Coupe M Performance,253,1,M240i xDrive Coupe M Performance R19 mixed,35
+2019,3147,BMW,BMX,BMW,1,M550i xDrive,230,1,M550i xDrive R20 mixed,38
+2019,3147,BMW,BMX,BMW,1,M550i xDrive,230,2,M550i xDrive R19,38
+2019,3147,BMW,BMX,BMW,1,M550i xDrive,230,3,M550i xDrive R19 mixed,38
+2019,3147,BMW,BMX,BMW,1,M760i xDrive,222,1,M760i xDrive R20 mixed,-9
+2019,3147,BMW,BMX,BMW,1,M760i xDrive,222,2,M760i xDrive R19,-9
+2019,3147,BMW,BMX,BMW,1,M850i xDrive Convertible,259,1,M850i xDrive Convertible R20 mixed,-9
+2019,3147,BMW,BMX,BMW,1,M850i xDrive Convertible,259,2,M850i xDrive Convertible R19 mixed,-9
+2019,3147,BMW,BMX,BMW,1,M850i xDrive Coupe,249,1,M850i xDrive Coupe R20 mixed,-9
+2019,3147,BMW,BMX,BMW,1,M850i xDrive Coupe,249,2,M850i xDrive Coupe R19 mixed,-9
+2019,3147,BMW,BMX,BMW,1,X1 sDrive28i,175,1,X1 sDrive28i R19,43
+2019,3147,BMW,BMX,BMW,1,X1 sDrive28i,175,2,X1 sDrive28i R18,43
+2019,3147,BMW,BMX,BMW,1,X1 xDrive28i,174,1,X1 xDrive28i R19,43
+2019,3147,BMW,BMX,BMW,1,X1 xDrive28i,174,2,X1 xDrive28i R18,43
 2019,3147,BMW,BMX,BMW,1,X2 M35i,255,1,X2 M35i R20,
 2019,3147,BMW,BMX,BMW,1,X2 M35i,255,2,X2 M35i R19,
 2019,3147,BMW,BMX,BMW,1,X2 sDrive28i,243,1,X2 sDrive28i R20,
@@ -10463,12 +10463,12 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3147,BMW,BMX,BMW,1,X2 xDrive28i,236,1,X2 xDrive28i R20,
 2019,3147,BMW,BMX,BMW,1,X2 xDrive28i,236,2,X2 xDrive28i R19,
 2019,3147,BMW,BMX,BMW,1,X2 xDrive28i,236,3,X2 xDrive28i R18,
-2019,3147,BMW,BMX,BMW,1,X3 sDrive30i,245,1,X3 sDrive30i R18,
-2019,3147,BMW,BMX,BMW,1,X3 sDrive30i,245,2,X3 sDrive30i R20 mixed,
-2019,3147,BMW,BMX,BMW,1,X3 sDrive30i,245,3,X3 sDrive30i R19,
-2019,3147,BMW,BMX,BMW,1,Z4 sDrive30i,262,1,Z4 sDrive30i R18 mixed,
-2019,3147,BMW,BMX,BMW,1,Z4 sDrive30i,262,2,Z4 sDrive30i R19 mixed,
-2019,3147,BMW,BMX,BMW,1,Z4 sDrive30i,262,3,Z4 sDrive30i R18 mixed,
+2019,3147,BMW,BMX,BMW,1,X3 sDrive30i,245,1,X3 sDrive30i R18,44
+2019,3147,BMW,BMX,BMW,1,X3 sDrive30i,245,2,X3 sDrive30i R20 mixed,44
+2019,3147,BMW,BMX,BMW,1,X3 sDrive30i,245,3,X3 sDrive30i R19,44
+2019,3147,BMW,BMX,BMW,1,Z4 sDrive30i,262,1,Z4 sDrive30i R18 mixed,47
+2019,3147,BMW,BMX,BMW,1,Z4 sDrive30i,262,2,Z4 sDrive30i R19 mixed,47
+2019,3147,BMW,BMX,BMW,1,Z4 sDrive30i,262,3,Z4 sDrive30i R18 mixed,47
 2019,3147,BMW,BMX,Mini,2,COOPER CLUBMAN,179,1,COOPER CLUBMAN R16,
 2019,3147,BMW,BMX,Mini,2,COOPER CLUBMAN,179,2,COOPER CLUBMAN R18,
 2019,3147,BMW,BMX,Mini,2,COOPER CLUBMAN,179,3,COOPER CLUBMAN R17,
@@ -10533,10 +10533,10 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3147,Rolls-Royce Motor Cars Limited,RRG,Rolls-Royce Motor Cars Limited,1,Wraith,7,1,Wraith R20 mixed,339
 2019,3147,Rolls-Royce Motor Cars Limited,RRG,Rolls-Royce Motor Cars Limited,1,Wraith,7,2,Wraith R21 mixed,339
 2019,3147,Rolls-Royce Motor Cars Limited,RRG,Rolls-Royce Motor Cars Limited,1,Wraith Black Badge,12,1,Wraith Black Badge R21 mixed,339
-2019,3079,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,1,Stelvio AWD,
-2019,3079,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,2,Stelvio AWD,
-2019,3079,FCA US LLC,CRX,Chrysler,1,Pacifica,180,1,Pacifica,
-2019,3079,FCA US LLC,CRX,Chrysler,1,Pacifica Hybrid,181,1,Pacifica Hybrid,
+2019,3079,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,1,Stelvio AWD,-9
+2019,3079,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio AWD,665,2,Stelvio AWD,-9
+2019,3079,FCA US LLC,CRX,Chrysler,1,Pacifica,180,1,Pacifica,467
+2019,3079,FCA US LLC,CRX,Chrysler,1,Pacifica Hybrid,181,1,Pacifica Hybrid,467
 2019,3079,FCA US LLC,CRX,Dodge,2,Durango AWD,295,1,Durango AWD,
 2019,3079,FCA US LLC,CRX,Dodge,2,Durango AWD,295,2,Durango AWD,
 2019,3079,FCA US LLC,CRX,Dodge,2,Durango RWD,290,1,Durango RWD,
@@ -10588,15 +10588,15 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE GTS,45,1,Levante GTS,
 2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE S,40,1,Levante S,
 2019,3079,"Maserati North America, Inc.",MAX,MASERATI,1,LEVANTE Trofeo,46,1,Levante Trofeo,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,4C,600,1,4C,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,1,Giulia,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,2,Giulia,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,3,Giulia,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,1,Giulia AWD,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,2,Giulia AWD,
-2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio,660,1,Stelvio,
-2019,3094,FCA US LLC,CRX,Chrysler,1,300,170,1,300,
-2019,3094,FCA US LLC,CRX,Chrysler,1,300 AWD,175,1,300 AWD,
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,4C,600,1,4C,413
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,1,Giulia,465
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,2,Giulia,465
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia,650,3,Giulia,465
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,1,Giulia AWD,465
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Giulia AWD,655,2,Giulia AWD,465
+2019,3094,FCA US LLC,CRX,ALFA ROMEO,11,Stelvio,660,1,Stelvio,-9
+2019,3094,FCA US LLC,CRX,Chrysler,1,300,170,1,300,90
+2019,3094,FCA US LLC,CRX,Chrysler,1,300 AWD,175,1,300 AWD,92
 2019,3094,FCA US LLC,CRX,Dodge,2,Challenger,272,1,Challenger,
 2019,3094,FCA US LLC,CRX,Dodge,2,Challenger,272,2,Challenger,
 2019,3094,FCA US LLC,CRX,Dodge,2,Challenger,272,3,Challenger,
@@ -10866,45 +10866,45 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3234,"Roush Industries, Inc.",RII,"Roush Industries, Inc.",1,Roush Stage 3 Mustang,1,2,Mustang Convertible Auto Trans,
 2019,3234,"Roush Industries, Inc.",RII,"Roush Industries, Inc.",1,Roush Stage 3 Mustang,1,3,Mustang Coupe Manual Trans,
 2019,3234,"Roush Industries, Inc.",RII,"Roush Industries, Inc.",1,Roush Stage 3 Mustang,1,4,Mustang Coupe Auto Trans,
-2019,3002,General Motors LLC,GMX,Buick,1,ENCLAVE,123,1,ENCLAVE FWD,
-2019,3002,General Motors LLC,GMX,Buick,1,ENCLAVE AWD,124,1,ENCLAVE AWD,
-2019,3002,General Motors LLC,GMX,Buick,1,ENCORE AWD,118,1,ENCORE AWD,
-2019,3002,General Motors LLC,GMX,Buick,1,ENVISION AWD,121,1,ENVISION AWD,
-2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,1,ESCALADE 2WD,
-2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,2,ESCALADE 2WD,
-2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,1,ESCALADE 4WD,
-2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,2,ESCALADE 4WD,
+2019,3002,General Motors LLC,GMX,Buick,1,ENCLAVE,123,1,ENCLAVE FWD,49
+2019,3002,General Motors LLC,GMX,Buick,1,ENCLAVE AWD,124,1,ENCLAVE AWD,49
+2019,3002,General Motors LLC,GMX,Buick,1,ENCORE AWD,118,1,ENCORE AWD,50
+2019,3002,General Motors LLC,GMX,Buick,1,ENVISION AWD,121,1,ENVISION AWD,432
+2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,1,ESCALADE 2WD,60
+2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 2WD,516,2,ESCALADE 2WD,60
+2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,1,ESCALADE 4WD,60
+2019,3002,General Motors LLC,GMX,Cadillac,2,ESCALADE 4WD,511,2,ESCALADE 4WD,60
 2019,3002,General Motors LLC,GMX,Cadillac,2,XT4 AWD,565,1,XT4 AWD,
-2019,3002,General Motors LLC,GMX,Cadillac,2,XT5,561,1,XT5 FWD,
-2019,3002,General Motors LLC,GMX,Cadillac,2,XT5 AWD,562,1,XT5 AWD,
+2019,3002,General Motors LLC,GMX,Cadillac,2,XT5,561,1,XT5 FWD,64
+2019,3002,General Motors LLC,GMX,Cadillac,2,XT5 AWD,562,1,XT5 AWD,64
 2019,3002,General Motors LLC,GMX,Chevrolet,3,BLAZER AWD,989,1,BLAZER AWD,
 2019,3002,General Motors LLC,GMX,Chevrolet,3,BLAZER FWD,988,1,BLAZER FWD,
 2019,3002,General Motors LLC,GMX,Chevrolet,3,C10 SILVERADO 2WD,986,2,C10 SILVERADO 2WD,
 2019,3002,General Motors LLC,GMX,Chevrolet,3,C10 SILVERADO 2WD,986,3,C10 SILVERADO 2WD,
 2019,3002,General Motors LLC,GMX,Chevrolet,3,C10 SILVERADO 2WD,986,4,C10 SILVERADO 2WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO LD 2WD,915,4,C15 SILVERADO LD EXTENDED CAB,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,C1500 SUBURBAN 2WD,66,1,C1500 SUBURBAN,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,C1500 TAHOE 2WD,24,1,C1500 TAHOE,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,1,COLORADO CREW CAB 2WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,2,COLORADO EXT CAB 2WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,3,COLORADO CREW CAB 2WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,1,COLORADO CREW CAB 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,2,COLORADO EXT CAB 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,3,COLORADO CREW CAB 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO ZR2 4WD,985,1,COLORADO ZR2 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,982,1,EQUINOX AWD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD,987,2,K10 SILVERADO 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD,987,3,K10 SILVERADO 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD,987,4,K10 SILVERADO 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD CAB CHASSIS,991,1,K10 SILVERADO 4WD CAB CHASSIS,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD TRAILBOSS,992,2,K10 SILVERADO 4WD TRAILBOSS,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD TRAILBOSS,992,3,K10 SILVERADO 4WD TRAILBOSS,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO LD 4WD,930,4,K1500SILVERADO LD - EXTENDED CAB,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K1500 SUBURBAN 4WD,82,1,K1500 SUBURBAN 4WD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,K1500 TAHOE 4WD,77,1,K1500 TAHOE,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,TRAVERSE AWD,984,1,TRAVERSE AWD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,TRAVERSE FWD,983,1,TRAVERSE FWD,
-2019,3002,General Motors LLC,GMX,Chevrolet,3,TRAX AWD,949,1,TRAX AWD,
+2019,3002,General Motors LLC,GMX,Chevrolet,3,C15 SILVERADO LD 2WD,915,4,C15 SILVERADO LD EXTENDED CAB,79
+2019,3002,General Motors LLC,GMX,Chevrolet,3,C1500 SUBURBAN 2WD,66,1,C1500 SUBURBAN,83
+2019,3002,General Motors LLC,GMX,Chevrolet,3,C1500 TAHOE 2WD,24,1,C1500 TAHOE,84
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,1,COLORADO CREW CAB 2WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,2,COLORADO EXT CAB 2WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 2WD,964,3,COLORADO CREW CAB 2WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,1,COLORADO CREW CAB 4WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,2,COLORADO EXT CAB 4WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO 4WD,965,3,COLORADO CREW CAB 4WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,COLORADO ZR2 4WD,985,1,COLORADO ZR2 4WD,71
+2019,3002,General Motors LLC,GMX,Chevrolet,3,EQUINOX AWD,982,1,EQUINOX AWD,74
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD,987,2,K10 SILVERADO 4WD,77
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD,987,3,K10 SILVERADO 4WD,77
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD,987,4,K10 SILVERADO 4WD,77
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD CAB CHASSIS,991,1,K10 SILVERADO 4WD CAB CHASSIS,77
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD TRAILBOSS,992,2,K10 SILVERADO 4WD TRAILBOSS,77
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K10 SILVERADO 4WD TRAILBOSS,992,3,K10 SILVERADO 4WD TRAILBOSS,77
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K15 SILVERADO LD 4WD,930,4,K1500SILVERADO LD - EXTENDED CAB,79
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K1500 SUBURBAN 4WD,82,1,K1500 SUBURBAN 4WD,83
+2019,3002,General Motors LLC,GMX,Chevrolet,3,K1500 TAHOE 4WD,77,1,K1500 TAHOE,84
+2019,3002,General Motors LLC,GMX,Chevrolet,3,TRAVERSE AWD,984,1,TRAVERSE AWD,86
+2019,3002,General Motors LLC,GMX,Chevrolet,3,TRAVERSE FWD,983,1,TRAVERSE FWD,86
+2019,3002,General Motors LLC,GMX,Chevrolet,3,TRAX AWD,949,1,TRAX AWD,87
 2019,3002,General Motors LLC,GMX,GMC,4,ACADIA AWD,942,1,ACADIA AWD,138
 2019,3002,General Motors LLC,GMX,GMC,4,ACADIA FWD,941,1,ACADIA FWD,138
 2019,3002,General Motors LLC,GMX,GMC,4,C10 SIERRA 2WD,946,2,C10 SIERRA 2WD,
@@ -10928,47 +10928,47 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3002,General Motors LLC,GMX,GMC,4,K1500 YUKON 4WD,65,1,K1500 YUKON 4WD,
 2019,3002,General Motors LLC,GMX,GMC,4,K1500 YUKON XL 4WD,63,1,K1500 YUKON XL,
 2019,3002,General Motors LLC,GMX,GMC,4,TERRAIN AWD,944,1,TERRAIN AWD,
-2019,3041,General Motors LLC,GMX,Buick,1,CASCADA,122,1,CASCADA,
-2019,3041,General Motors LLC,GMX,Buick,1,ENCORE,117,1,ENCORE FWD,
-2019,3041,General Motors LLC,GMX,Buick,1,ENVISION FWD,120,1,ENVISION FWD,
-2019,3041,General Motors LLC,GMX,Buick,1,LACROSSE,25,1,LACROSSE,
-2019,3041,General Motors LLC,GMX,Buick,1,LACROSSE AWD,26,1,LACROSSE AWD,
-2019,3041,General Motors LLC,GMX,Buick,1,REGAL,126,1,REGAL,
-2019,3041,General Motors LLC,GMX,Buick,1,REGAL AWD,127,1,REGAL AWD,
-2019,3041,General Motors LLC,GMX,Buick,1,REGAL TOUR X AWD,125,1,REGAL TOUR X AWD,
+2019,3041,General Motors LLC,GMX,Buick,1,CASCADA,122,1,CASCADA,416
+2019,3041,General Motors LLC,GMX,Buick,1,ENCORE,117,1,ENCORE FWD,50
+2019,3041,General Motors LLC,GMX,Buick,1,ENVISION FWD,120,1,ENVISION FWD,432
+2019,3041,General Motors LLC,GMX,Buick,1,LACROSSE,25,1,LACROSSE,51
+2019,3041,General Motors LLC,GMX,Buick,1,LACROSSE AWD,26,1,LACROSSE AWD,51
+2019,3041,General Motors LLC,GMX,Buick,1,REGAL,126,1,REGAL,53
+2019,3041,General Motors LLC,GMX,Buick,1,REGAL AWD,127,1,REGAL AWD,53
+2019,3041,General Motors LLC,GMX,Buick,1,REGAL TOUR X AWD,125,1,REGAL TOUR X AWD,53
 2019,3041,General Motors LLC,GMX,Cadillac,2,ATS,542,1,ATS,56
 2019,3041,General Motors LLC,GMX,Cadillac,2,ATS AWD,545,1,ATS AWD,56
 2019,3041,General Motors LLC,GMX,Cadillac,2,ATS-V,557,1,ATS-V,56
-2019,3041,General Motors LLC,GMX,Cadillac,2,CT6,559,1,CT6,
-2019,3041,General Motors LLC,GMX,Cadillac,2,CT6 AWD,560,1,CT6 AWD,
-2019,3041,General Motors LLC,GMX,Cadillac,2,CTS,548,1,CTS SEDAN,
-2019,3041,General Motors LLC,GMX,Cadillac,2,CTS AWD,549,1,CTS SEDAN AWD,
-2019,3041,General Motors LLC,GMX,Cadillac,2,CTS-V,558,1,CTS-V,
+2019,3041,General Motors LLC,GMX,Cadillac,2,CT6,559,1,CT6,417
+2019,3041,General Motors LLC,GMX,Cadillac,2,CT6 AWD,560,1,CT6 AWD,417
+2019,3041,General Motors LLC,GMX,Cadillac,2,CTS,548,1,CTS SEDAN,57
+2019,3041,General Motors LLC,GMX,Cadillac,2,CTS AWD,549,1,CTS SEDAN AWD,57
+2019,3041,General Motors LLC,GMX,Cadillac,2,CTS-V,558,1,CTS-V,57
 2019,3041,General Motors LLC,GMX,Cadillac,2,XT4 FWD,564,1,XT4 FWD,
-2019,3041,General Motors LLC,GMX,Cadillac,2,XTS,543,1,XTS,
-2019,3041,General Motors LLC,GMX,Cadillac,2,XTS AWD,544,1,XTS AWD,
-2019,3041,General Motors LLC,GMX,Cadillac,2,XTS HEARSE,546,1,XTS HEARSE,
-2019,3041,General Motors LLC,GMX,Cadillac,2,XTS LIMO,547,1,XTS LIMO,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,BOLT EV,975,1,BOLT EV,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CAMARO,970,1,CAMARO,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,1,CORVETTE CONVERTIBLE,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,2,CORVETTE HATCHBACK COUPE,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,3,CORVETTE CONVERTIBLE,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,4,CORVETTE HATCHBACK COUPE,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE,972,1,CRUZE,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE HATCHBACK,978,1,CRUZE HATCHBACK,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER,977,1,CRUZE PREMIER,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER HATCHBACK,979,1,CRUZE PREMIER HATCHBACK,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,EQUINOX FWD,981,1,EQUINOX FWD,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,IMPALA,952,1,IMPALA,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,MALIBU,973,1,MALIBU,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,SONIC,131,1,SONIC,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,1,SONIC RS LT HATCHBACK,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,2,SONIC RS,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,SPARK,971,1,SPARK,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,SPARK ACTIV,980,1,SPARK ACTIV,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,TRAX,948,1,TRAX FWD,
-2019,3041,General Motors LLC,GMX,Chevrolet,3,VOLT,121,1,VOLT,
+2019,3041,General Motors LLC,GMX,Cadillac,2,XTS,543,1,XTS,64
+2019,3041,General Motors LLC,GMX,Cadillac,2,XTS AWD,544,1,XTS AWD,64
+2019,3041,General Motors LLC,GMX,Cadillac,2,XTS HEARSE,546,1,XTS HEARSE,64
+2019,3041,General Motors LLC,GMX,Cadillac,2,XTS LIMO,547,1,XTS LIMO,64
+2019,3041,General Motors LLC,GMX,Chevrolet,3,BOLT EV,975,1,BOLT EV,447
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CAMARO,970,1,CAMARO,67
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,1,CORVETTE CONVERTIBLE,72
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,2,CORVETTE HATCHBACK COUPE,72
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,3,CORVETTE CONVERTIBLE,72
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CORVETTE,155,4,CORVETTE HATCHBACK COUPE,72
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE,972,1,CRUZE,70
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE HATCHBACK,978,1,CRUZE HATCHBACK,70
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER,977,1,CRUZE PREMIER,70
+2019,3041,General Motors LLC,GMX,Chevrolet,3,CRUZE PREMIER HATCHBACK,979,1,CRUZE PREMIER HATCHBACK,70
+2019,3041,General Motors LLC,GMX,Chevrolet,3,EQUINOX FWD,981,1,EQUINOX FWD,74
+2019,3041,General Motors LLC,GMX,Chevrolet,3,IMPALA,952,1,IMPALA,77
+2019,3041,General Motors LLC,GMX,Chevrolet,3,MALIBU,973,1,MALIBU,78
+2019,3041,General Motors LLC,GMX,Chevrolet,3,SONIC,131,1,SONIC,80
+2019,3041,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,1,SONIC RS LT HATCHBACK,80
+2019,3041,General Motors LLC,GMX,Chevrolet,3,SONIC 5,132,2,SONIC RS,80
+2019,3041,General Motors LLC,GMX,Chevrolet,3,SPARK,971,1,SPARK,81
+2019,3041,General Motors LLC,GMX,Chevrolet,3,SPARK ACTIV,980,1,SPARK ACTIV,81
+2019,3041,General Motors LLC,GMX,Chevrolet,3,TRAX,948,1,TRAX FWD,87
+2019,3041,General Motors LLC,GMX,Chevrolet,3,VOLT,121,1,VOLT,89
 2019,3041,General Motors LLC,GMX,GMC,4,TERRAIN FWD,943,1,TERRAIN FWD,
 2019,3192,Hyundai Motor Company,HYX,HYUNDAI MOTOR COMPANY,1,Santa Fe XL AWD,87,1,Santa Fe XL AWD 3.3 AT,
 2019,3192,Hyundai Motor Company,HYX,HYUNDAI MOTOR COMPANY,1,Santa Fe XL FWD,86,1,Santa Fe XL FWD 3.3 AT,
@@ -11791,14 +11791,14 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3137,Porsche AG,PRX,Porsche,1,Cayenne Turbo,421,1,Cayenne Turbo,330
 2019,3137,Porsche AG,PRX,Porsche,1,Macan,301,1,Macan (Base),332
 2019,3137,Porsche AG,PRX,Porsche,1,Macan S,311,1,Macan S,332
-2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,e-tron,350,1,e-tron   255/50R20,
+2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,e-tron,350,1,e-tron   255/50R20,-9
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q3 quattro,62,1,Q3 quattro  2.0T  235/50 R18,23
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q5,330,1,Q5   235/60 R18,24
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q7,320,1,Q7 2.0L    255/60 R18,25
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q7,320,2,Q7 3.0L    255/55 R19,25
-2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q8,380,1,Q8 3.0L    275/50R20,
+2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,Q8,380,1,Q8 3.0L    275/50R20,21
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Audi,2,SQ5,335,1,SQ5  255/45 R20,24
-2019,3137,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Bentayga,33,1,Bentayga  275/50 R20,
+2019,3137,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Bentayga,33,1,Bentayga  275/50 R20,446
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Urus,410,1,Urus 4.0L  F 285/45 ZR21 R 315/40 ZR21,
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Atlas,180,1,Atlas,
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Atlas 4Motion,185,1,Atlas 4Motion,
@@ -11882,7 +11882,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Audi,2,TT RS,18,1,TT RS Coupe 235/35 R19,27
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Audi,2,TTS Coupe,39,1,TTS Coupe 245/35 R19,27
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Bentley,3,Mulsanne,15,1,Mulsanne 265/45 ZR20,33
-2019,3136,"Volkswagen Group of America, Inc.",VGA,Bugatti,5,Chiron,501,1,Chiron  F:285/30R20 R:355/25/R21,
+2019,3136,"Volkswagen Group of America, Inc.",VGA,Bugatti,5,Chiron,501,1,Chiron  F:285/30R20 R:355/25/R21,-9
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Aventador Coupe,475,1,Aventador Coupe  F:255/35 ZR19 R:335/30 ZR20,212
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Aventador Roadster,476,1,Aventador Roadster  F:255/35 ZR19 R:335/30 ZR20,212
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Huracan,407,1,Huracan Coupe F:245/30 ZR20 R:305/30 ZR20,214
