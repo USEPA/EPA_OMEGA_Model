@@ -4,7 +4,11 @@ import datetime
 pd.options.mode.chained_assignment = None  # default='warn'
 
 def weighted_average(grp):
-    return  grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp)).multiply(grp[weighting_field],axis=0).sum())
+    if grp[weighting_field]._get_numeric_data().sum() == 0: # if all the weighting factors are zero, take a simple average. Otherwise, it will calculate as 0/0.
+        return grp._get_numeric_data().multiply(1, axis=0).sum()/((~pd.isnull(grp)).multiply(1,axis=0).sum())
+    else: # take a weighted average
+        return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp)).multiply(grp[weighting_field],axis=0).sum())
+
     # if pd.notnull(grp[information_toget_source_column_name]).multiply(grp[weighting_field], axis=0).sum() == 0:
     #     grp_information_toget_source_column_avg = grp[information_toget_source_column_name]._get_numeric_data().mean()
     # else:

@@ -167,6 +167,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             matching_electrification[(vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'PHEV'
             matching_electrification[(vehghg_file['HYBRID_YN'] == 'N') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'EV'
             matching_electrification[(vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'N')] = 'HEV'
+            matching_electrification[vehghg_file['FUEL_USAGE'] == 'H'] = 'FCV'
             vehghg_file = pd.concat([vehghg_file, matching_cyl_layout, matching_cyl_num, \
                                           matching_eng_disp, matching_drvtrn_layout, matching_trns_category, \
                                           matching_trns_numgears, matching_boost_category, matching_mfr_category, \
