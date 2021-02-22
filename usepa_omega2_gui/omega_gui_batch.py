@@ -1184,6 +1184,7 @@ def status_bar():
 # Run the function 'status_bar' in 1 second intervals
 timer = multitimer.MultiTimer(interval=1, function=status_bar)
 
+
 def run_gui():
     global app
     global form

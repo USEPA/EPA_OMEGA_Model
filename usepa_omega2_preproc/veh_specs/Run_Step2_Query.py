@@ -4,7 +4,20 @@ import datetime
 pd.options.mode.chained_assignment = None  # default='warn'
 
 def weighted_average(grp):
-    return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp)).multiply(grp[weighting_field],axis=0).sum())
+    if grp[weighting_field]._get_numeric_data().sum() == 0: # if all the weighting factors are zero, take a simple average. Otherwise, it will calculate as 0/0.
+        return grp._get_numeric_data().multiply(1, axis=0).sum()/((~pd.isnull(grp)).multiply(1,axis=0).sum())
+    else: # take a weighted average
+        return grp._get_numeric_data().multiply(grp[weighting_field], axis=0).sum()/((~pd.isnull(grp)).multiply(grp[weighting_field],axis=0).sum())
+
+    # if pd.notnull(grp[information_toget_source_column_name]).multiply(grp[weighting_field], axis=0).sum() == 0:
+    #     grp_information_toget_source_column_avg = grp[information_toget_source_column_name]._get_numeric_data().mean()
+    # else:
+    #     grp_information_toget_source_column_avg = grp[information_toget_source_column_name]._get_numeric_data().multiply(grp[weighting_field], axis=0).mean() \
+    #                 / pd.notnull(grp[information_toget_source_column_name]).multiply(grp[weighting_field], axis=0).mean()
+    # if len(grp) > 1: grp.drop(grp.index[1:len(grp)], inplace=True)
+    # grp.loc[grp.index[0], information_toget_source_column_name] = grp_information_toget_source_column_avg
+    #
+    # return grp
 
 def mode(df, key_cols, value_col, count_col):
     return df.groupby(key_cols + [value_col]).size() \
@@ -290,6 +303,7 @@ for model_year in model_years:
             try: #Add in the columns to the master file from the source file
                 master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
                     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
+                    # how='left', on=list(['LineageID', 'BodyID']))
                     how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
             except KeyError: #Master file is missing at least one of the data columns from the source file
                 original_source_columns = list(pd.Series(list(matching_categories)+list(all_subarray['Column Name'].unique())).unique())
@@ -392,9 +406,10 @@ for model_year in model_years:
                             list(aggregating_columns)).mean().reset_index()
                     else:
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
-                            list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]] \
-                            .groupby(list(aggregating_columns)).apply(weighted_average)
-                        query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan)
+                         list(aggregating_columns) + [weighting_field] + [information_toget_source_column_name]].groupby(list(aggregating_columns)).apply(weighted_average)
+                        query_output_source = query_output_source.drop(weighting_field, axis=1).replace(0, np.nan) # drop weighting_field column
+                        # query_output_source.dropna(subset=list(aggregating_columns), inplace=True)
+                        # query_output_source = query_output_source.drop_duplicates(list(aggregating_columns)).reset_index() # don't drop np.nan and '' for many empty max. towing capacity
                     try:
                         query_output_source = query_output_source.drop(list(aggregating_columns), axis=1).reset_index()
                     except KeyError:
@@ -405,6 +420,8 @@ for model_year in model_years:
                     .rename(columns={information_toget_source_column_name: all_subarray['Output Column Name'][all_subarray_count]})
                 query_columns = pd.Series(query_output_source.columns)
                 query_output_source = query_output_source[list(query_columns[~query_columns.astype(str).str.contains(str(np.nan))])]
+                if information_toget_source_column_name == 'MAXIMUM TOWING CAPACITY' or information_toget_source_column_name == 'EPA_CAFE_MT_CALC_COMB_FE_4 ':
+                    print(information_toget_source_column_name)
                 try:
                     query_output
                 except NameError:  # First query output

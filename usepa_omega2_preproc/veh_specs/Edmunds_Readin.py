@@ -39,18 +39,41 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     Edmunds_data_cleaned = Edmunds_Data.merge(Edmunds_matched_bodyid[['Model', 'Trims', 'LineageID', 'BodyID']], how='left', on = ['Model', 'Trims']).reset_index(drop=True)
     # Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].astype(float)
     Edmunds_data_cleaned['BodyID'] = Edmunds_data_cleaned['BodyID'].replace(np.nan, 0).astype(int)
-    # Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].astype(float).astype(int)
     Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].replace(np.nan, 0).astype(int)
-    # Edmunds_data_cleaned['LENGTH'] = Edmunds_data_cleaned['LENGTH'].replace('no', '')
-    # Edmunds_data_cleaned['WIDTH'] = Edmunds_data_cleaned['WIDTH'].replace('no', '')
-    # Edmunds_data_cleaned['HEIGHT'] = Edmunds_data_cleaned['HEIGHT'].replace('no', '')
-    # Edmunds_data_cleaned['WHEELBASE'] = Edmunds_data_cleaned['WHEELBASE'].replace('no', '')
-    # Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].replace('no', '')
-    # Edmunds_data_cleaned['EPA INTERIOR VOLUME'] = Edmunds_data_cleaned['EPA INTERIOR VOLUME'].replace('no', '')
-    # Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'] = Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'].replace('no', '')
-    # Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].replace('no', '')
+    Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].replace(np.nan, 0)
+    in_unit_columns=[]; ft_unit_columns = []; ft3_unit_columns = []; lbs_unit_columns = []
+    degree_unit_columns=[]; gal_unit_columns = []; mpg_unit_columns = [];
+    ncolumns = len(Edmunds_data_cleaned.columns)
+    for i in range(ncolumns):
+        cell_str = str(Edmunds_data_cleaned.iloc[:, i].to_list())
+        if ' in.' in cell_str: in_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' ft.' in cell_str: ft_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' cu.ft.' in cell_str: ft3_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' lbs.' in cell_str: lbs_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' degrees' in cell_str: degree_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' gal.' in cell_str: gal_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' mpg' in cell_str: mpg_unit_columns.append(Edmunds_data_cleaned.columns[i])
 
-    Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.replace('(', '').str.replace('Most Popular', '').str.replace(')', '').str.replace('Discontinued', '').replace(np.nan, 0) # .astype(int)
+    for i in range(len(in_unit_columns)):
+        Edmunds_data_cleaned[in_unit_columns[i]] = Edmunds_data_cleaned[in_unit_columns[i]].replace(np.nan, '').str.replace(' in.', '').str.replace('no', '')
+    for i in range(len(ft_unit_columns)):
+        Edmunds_data_cleaned[ft_unit_columns[i]] = Edmunds_data_cleaned[ft_unit_columns[i]].replace(np.nan, '').str.replace(' ft.', '').str.replace('no', '')
+    for i in range(len(ft3_unit_columns)):
+        Edmunds_data_cleaned[ft3_unit_columns[i]] = Edmunds_data_cleaned[ft3_unit_columns[i]].replace(np.nan, '').str.replace(' cu.ft.', '').str.replace('no', '')
+    for i in range(len(lbs_unit_columns)):
+        Edmunds_data_cleaned[lbs_unit_columns[i]] = Edmunds_data_cleaned[lbs_unit_columns[i]].replace(np.nan, '').str.replace(' lbs.', '').str.replace('no', '')
+    for i in range(len(degree_unit_columns)):
+        Edmunds_data_cleaned[degree_unit_columns[i]] = Edmunds_data_cleaned[degree_unit_columns[i]].replace(np.nan, '').str.replace(' degrees', '').str.replace('no', '')
+    for i in range(len(gal_unit_columns)):
+        Edmunds_data_cleaned[gal_unit_columns[i]] = Edmunds_data_cleaned[gal_unit_columns[i]].replace(np.nan, '').str.replace(' gal.', '').str.replace('no', '')
+    for i in range(len(mpg_unit_columns)):
+        Edmunds_data_cleaned[mpg_unit_columns[i]] = Edmunds_data_cleaned[mpg_unit_columns[i]].replace(np.nan, '').str.replace(' mpg', '').str.replace('no', '')
+
+    Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Most Popular)')
+    Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Discontinued)')
+    Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'] = Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'].str.rstrip(' (Estimated)')
+
     Edmunds_data_cleaned['CYLINDERS'] = Edmunds_data_cleaned['CYLINDERS'].str.replace('Inline ','I').str.replace('Flat ', 'H').replace([np.nan, str(np.nan), 'FALSE', 'false', 'False', 'No', 'no'], 'ELE')
     matching_cyl_layout = pd.Series(Edmunds_data_cleaned['CYLINDERS'].astype(str).str[0], name = 'Cylinder Layout Category').replace('E','ELE').astype(str)
     matching_cyl_num = pd.Series(Edmunds_data_cleaned['CYLINDERS'].astype(str).str[1:], name='Number of Cylinders Category').replace(['LE', 'ALSE', str(np.nan)[1:]], 0)
@@ -80,8 +103,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     matching_boost_category[Edmunds_data_cleaned['Trims'].str.contains('Twincharger')] = 'TS'
     matching_boost_category[Edmunds_data_cleaned['Trims'].str.contains('S/C')] = 'SC'
     matching_boost_category[matching_cyl_layout == 'ELE'] = 'ELE'
-    matching_mfr_category = pd.Series(Edmunds_data_cleaned['Make'], name='Make Category').astype(str)\
-        .replace('ROLLS ROYCE', 'ROLLS-ROYCE')
+    matching_mfr_category = pd.Series(Edmunds_data_cleaned['Make'], name='Make Category').astype(str).replace('ROLLS ROYCE', 'ROLLS-ROYCE')
 
     matching_fuel_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Fuel Type Category').replace(0,'G')
     Edmunds_data_cleaned['FUEL TYPE'][matching_cyl_layout == 'ELE'] = 'Electric fuel'
@@ -138,5 +160,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
                                            matching_eng_disp, matching_drvtrn_layout, matching_trns_category, \
                                            matching_trns_numgears, matching_boost_category, matching_mfr_category, \
                                            matching_fuel_category, electrification_category, tire_codes],axis=1)
+    Edmunds_Final_Output.rename(columns={'WHEEL BASE':'WHEELBASE'})
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
+    print('output_path: ', output_path)
     Edmunds_Final_Output.to_csv(output_path+'\\'+'Edmunds Readin'+'_ '+'MY'+str(year)+' '+date_and_time+'.csv', index=False)

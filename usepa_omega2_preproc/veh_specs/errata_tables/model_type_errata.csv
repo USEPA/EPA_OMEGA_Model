@@ -1,0 +1,2 @@
+Correction Index,Correction Type,Column Name Change?,Column Name,MODEL_YEAR,CARLINE_NAME,MODEL_TYPE_INDEX,Old Value,New Value,Numeric (y/n),Source(s)
+1,Replace,n,OFF_BOARD_CHARGE_CAPABLE_YN,2019,Pacifica Hybrid,520,N,Y,n,

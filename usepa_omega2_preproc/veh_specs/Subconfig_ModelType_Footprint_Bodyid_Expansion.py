@@ -85,14 +85,14 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             if type(modeltype_exceptions_table) != str:
                 for error_check_count in range(0, len(modeltype_exceptions_table)):
                     if modeltype_exceptions_table['Numeric (y/n)'][error_check_count] == 'y':
-                        model_type_file.loc[(model_type_file['CARLINE_NAME'] == modeltype_exceptions_table['Model'][error_check_count]) & \
-                                         (model_type_file['MODEL_TYPE_INDEX'] == modeltype_exceptions_table['Model Type Index'][error_check_count]) & \
+                        model_type_file.loc[(model_type_file['CARLINE_NAME'] == modeltype_exceptions_table['CARLINE_NAME'][error_check_count]) & \
+                                         (model_type_file['MODEL_TYPE_INDEX'] == modeltype_exceptions_table['MODEL_TYPE_INDEX'][error_check_count]) & \
                                         (model_type_file[modeltype_exceptions_table['Column Name'][error_check_count]] == float(modeltype_exceptions_table['Old Value'][error_check_count])), \
                                          modeltype_exceptions_table['Column Name'][error_check_count]] = \
                             modeltype_exceptions_table['New Value'][error_check_count]
                     else:
-                        model_type_file.loc[(model_type_file['CARLINE_NAME'] == modeltype_exceptions_table['Model'][error_check_count]) & \
-                                         (model_type_file['MODEL_TYPE_INDEX'] == modeltype_exceptions_table['Model Type Index'][error_check_count]) & \
+                        model_type_file.loc[(model_type_file['CARLINE_NAME'] == modeltype_exceptions_table['CARLINE_NAME'][error_check_count]) & \
+                                         (model_type_file['MODEL_TYPE_INDEX'] == modeltype_exceptions_table['MODEL_TYPE_INDEX'][error_check_count]) & \
                                         (model_type_file[modeltype_exceptions_table['Column Name'][error_check_count]] == modeltype_exceptions_table['Old Value'][error_check_count]), \
                                          modeltype_exceptions_table['Column Name'][error_check_count]] = \
                             modeltype_exceptions_table['New Value'][error_check_count]
@@ -167,6 +167,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             matching_electrification[(vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'PHEV'
             matching_electrification[(vehghg_file['HYBRID_YN'] == 'N') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'EV'
             matching_electrification[(vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'N')] = 'HEV'
+            matching_electrification[vehghg_file['FUEL_USAGE'] == 'H'] = 'FCV'
             vehghg_file = pd.concat([vehghg_file, matching_cyl_layout, matching_cyl_num, \
                                           matching_eng_disp, matching_drvtrn_layout, matching_trns_category, \
                                           matching_trns_numgears, matching_boost_category, matching_mfr_category, \
@@ -255,9 +256,17 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             #     = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()].replace(np.nan,'none')
             # vehghg_file_flexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()]\
             #     = vehghg_file_flexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()].replace(np.nan,'none')
-            vehghg_file_output = pd.merge_ordered(vehghg_file_nonflexfuel, vehghg_file_flexfuel, \
-                how='outer', on=merging_columns+['Vehghg_ID']).sort_values('Vehghg_ID').reset_index(drop=True)
+
+            # output both flex fuel and non flex fuel
+            # vehghg_file_output = pd.merge_ordered(vehghg_file_nonflexfuel, vehghg_file_flexfuel, \
+            #    how='outer', on=merging_columns+['Vehghg_ID']).sort_values('Vehghg_ID').reset_index(drop=True)
+
+            # only output non flex fuel
+            vehghg_file_output = vehghg_file_nonflexfuel
+
             # vehghg_file_output = vehghg_file_output.replace('none', np.nan)
+
+
             del vehghg_file
             vehghg_file_output = vehghg_file_output.loc[:,~vehghg_file_output.columns.str.contains('^Unnamed')]
             vehghg_file_output['Distributed Footprint Volumes'][vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
