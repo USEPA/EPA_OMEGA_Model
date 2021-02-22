@@ -784,20 +784,20 @@ class Form(QObject):
 
         # Prepare command line options for OMEGA 2 batch process
         # batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        a = '--batch_file ' + '"' + input_batch_file + '"'
-        b = ' --bundle_path ' + '"' + output_batch_directory + '"'
+        batch_file_arg = '--batch_file "%s"' % input_batch_file
+        bundle_path_arg = ' --bundle_path "%s"' % output_batch_directory
 
         if multiprocessor_mode_selected:
             # Add command line options for multiprocessor mode
-            c = ' --dispy --local --dispy_exclusive --dispy_debug'
+            dispy_arg = ' --dispy --local --dispy_exclusive --dispy_debug'
         else:
             # No multiprocessor
-            c = ''
+            dispy_arg = ''
         # Add timestamp option so program can track comm_file
-        d = ' --timestamp ' + batch_time_stamp
+        timestamp_arg = ' --timestamp ' + batch_time_stamp
 
         # Combine command line options
-        x = a + b + c + d
+        command_line_args = batch_file_arg + bundle_path_arg + dispy_arg + timestamp_arg
 
         # Disable selected gui functions during model run
         self.enable_gui_run_functions(0)
@@ -815,10 +815,11 @@ class Form(QObject):
         # )
 
         print('sys.executable = %s' % sys.executable)
-        print('Popen(%s)' % ['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'), x])
+        print('Popen(%s)' % ['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
+                             command_line_args])
 
         omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
-                                         x], close_fds=True)
+                                         command_line_args], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # First find the log files
