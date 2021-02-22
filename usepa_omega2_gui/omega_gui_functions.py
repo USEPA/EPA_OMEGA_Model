@@ -182,7 +182,8 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name):
     Returns:
         N/A
     """
-    df = pandas.read_excel('usepa_omega2_gui/elements/plot_definition.xlsx', index_col=0, sheet_name='plot_definition')
+    # df = pandas.read_excel('usepa_omega2_gui/elements/plot_definition.xlsx',index_col=0, sheet_name='plot_definition')
+    df = pandas.read_csv('usepa_omega2_gui/elements/plot_definition.csv', index_col=0)
 
     if len(plot_selection) > 0:
         # print(plot_selection)
