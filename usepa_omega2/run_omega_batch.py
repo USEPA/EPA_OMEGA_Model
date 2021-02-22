@@ -657,7 +657,7 @@ if __name__ == '__main__':
                     for s_index in session_list:
                         batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
                         session_summary_filename = options.batch_path + '_' + batch.sessions[s_index].settings.output_folder + batch.sessions[s_index].settings.session_unique_name + '_summary_results.csv'
-                        batch_summary_filename = options.batch_path + 'summary_results.csv'
+                        batch_summary_filename = batch.name + '_summary_results.csv'
                         if os.access(session_summary_filename, os.F_OK):
                             if not os.access(batch_summary_filename, os.F_OK):
                                 # copy the summary verbatim to create batch summary
