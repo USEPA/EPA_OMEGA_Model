@@ -389,7 +389,9 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                     dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False, network=False):
 
     import sys
-    from usepa_omega2 import o2
+
+    # print('run_omega_batch sys.path = %s' % sys.path)
+    import o2
 
     options = OMEGABatchOptions()
     options.validate_batch = not no_validate
