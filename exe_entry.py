@@ -3,8 +3,11 @@
 # build usepa_omega2 package:
 pyinstaller exe_entry.py --name omega2 --paths usepa_omega2 --add-data usepa_omega2/test_inputs;usepa_omega2/test_inputs --noconfirm
 
-# build usepa_omega2_gui package:
+# WINDOWS build usepa_omega2_gui package:
 pyinstaller exe_entry.py --name omega2 --paths usepa_omega2;usepa_omega2_gui --add-data usepa_omega2;usepa_omega2 --add-data usepa_omega2_gui;usepa_omega2_gui --noconfirm --onefile
+
+# *NIX build usepa_omega2_gui package:
+pyinstaller exe_entry.py --name omega2 --paths usepa_omega2:usepa_omega2_gui --add-data usepa_omega2:usepa_omega2 --add-data usepa_omega2_gui:usepa_omega2_gui --noconfirm --onefile
 
 """
 
