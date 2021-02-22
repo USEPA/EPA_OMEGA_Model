@@ -8,18 +8,33 @@ post-process batch results
 import pandas as pd
 
 def run_postproc(batch_log, batch_summary_filename):
+    """
+    Post-process a batch run.  Create summary delta file (session results minus reference session)
+
+    Args:
+        batch_log: batch log writer object
+        batch_summary_filename: filename of batch summary results to post-process
+
+    Returns:
+        Creates a batch summary delta file
+
+    """
     batch_log.logwrite('\nPost-processing batch summary file %s...' % batch_summary_filename)
 
     # create summary delta file
     batch_delta_filename = batch_summary_filename.replace('results', 'deltas')
 
     summary_df = pd.read_csv(batch_summary_filename)
-    sessions = summary_df['session_name']
-    session_names = sessions.unique()
+    session_names = summary_df['session_name'].unique()
 
-    # clear string values
-    summary_df['session_name'] = 0
+    # define, cache and clear non-delta columns
+    non_delta_dict = dict()
+    non_delta_columns = ['session_name', 'calendar_year']
+    for ndc in non_delta_columns:
+        non_delta_dict[ndc] = summary_df[ndc]
+        summary_df[ndc] = 0
 
+    # create delta dataframe
     delta_df = summary_df.copy()
     num_rows = delta_df.shape[0]
 
@@ -31,8 +46,9 @@ def run_postproc(batch_log, batch_summary_filename):
             reference_index = int(i % num_analysis_years)
             delta_df.iloc[i] = summary_df.iloc[i] - summary_df.iloc[reference_index]
 
-        # restore string values
-        delta_df['session_name'] = sessions
+        # restore cached values for non-delta columns
+        for ndc in non_delta_columns:
+            delta_df[ndc] = non_delta_dict[ndc]
 
         delta_df.to_csv(batch_delta_filename, index=False)
     else:
