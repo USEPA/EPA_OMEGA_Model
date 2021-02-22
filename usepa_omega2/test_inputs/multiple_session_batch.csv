@@ -1,6 +1,6 @@
 Parameter,Type,Value,Value,Value,Value,Value
 Batch Settings,,,,,,
-Batch Name,String,single_session_batch,,,,
+Batch Name,String,multiple_session_batch,,,,
 Context Folder Name,String,,,,,
 Context Name,String,AEO2020,,,,
 Context Case,String,Reference case,,,,
