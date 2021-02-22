@@ -799,6 +799,16 @@ class Form(QObject):
         # Combine command line options
         command_line_args = batch_file_arg + bundle_path_arg + dispy_arg + timestamp_arg
 
+        command_line_dict = dict()
+        command_line_dict['batch_file'] = input_batch_file
+        command_line_dict['bundle_path'] = output_batch_directory
+        command_line_dict['timestamp'] = batch_time_stamp
+        if multiprocessor_mode_selected:
+            command_line_dict['dispy'] = True
+            command_line_dict['local'] = True
+            command_line_dict['dispy_exclusive'] = True
+            command_line_dict['dispy_debug'] = True
+
         # Disable selected gui functions during model run
         self.enable_gui_run_functions(0)
         # Indicate model start to status bar
@@ -818,8 +828,16 @@ class Form(QObject):
         print('Popen(%s)' % ['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
                              command_line_args])
 
-        omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
-                                         command_line_args], close_fds=True)
+        import usepa_omega2.omega_batch as omega_batch
+        # omega_batch.run_omega_batch(**command_line_dict)
+
+        import threading, time
+        t = threading.Thread(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
+        t.name = input_batch_file
+        t.start()
+
+        # omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
+        #                                  command_line_args], close_fds=True)
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # First find the log files
@@ -830,7 +848,8 @@ class Form(QObject):
 
         # self.load_plots_2()
         # Keep looking for communication from other processes through the log files
-        while omega_batch.poll() is None:
+        # while omega_batch.poll() is None:
+        while t.is_alive():
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
             # Keep the overhead low and only update the event file at 10 hz

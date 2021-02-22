@@ -68,7 +68,7 @@ if __name__ == "__main__":
                 cmd_str = '%s & %s %s' % (pythonpathstr, pythoncommand, os.path.join(source_folder, f))
                 cmd_opts = ''
 
-                if f == 'run_omega_batch.py':
+                if f == 'omega_batch.py':
                     cmd_opts = '--batch_file usepa_omega2\\test_inputs\\single_session_batch.xlsx --verbose'
 
                 cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
