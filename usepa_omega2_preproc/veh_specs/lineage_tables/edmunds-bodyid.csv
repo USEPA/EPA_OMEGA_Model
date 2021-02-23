@@ -15066,11 +15066,11 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Hyundai,Elantra Sedan ,Eco 4dr Sedan (1.4L 4cyl Turbo 7AM),56.5 in.,179.9 in.,106.3 in.,1142,163
 2017,Hyundai,Elantra Sedan ,SE 4dr Sedan (2.0L 4cyl 6M),56.5 in.,179.9 in.,106.3 in.,1142,163
 2017,Hyundai,Elantra Sedan ,Sport 4dr Sedan (1.6L 4cyl Turbo 6M),56.5 in.,179.9 in.,106.3 in.,1142,163
-2017,Hyundai,Iconiq Electric Hatchback,4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,"""+1"""
-2017,Hyundai,Iconiq Electric Hatchback,Limited 4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,"""+1"""
-2017,Hyundai,Iconiq Hybrid Hatchback,Blue 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),57.1 in.,176.0 in.,106.3 in.,1569,"""+1"""
-2017,Hyundai,Iconiq Hybrid Hatchback,Limited 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),57.1 in.,176.0 in.,106.3 in.,1569,"""+1"""
-2017,Hyundai,Iconiq Hybrid Hatchback,SEL 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),57.1 in.,176.0 in.,106.3 in.,1569,"""+1"""
+2017,Hyundai,Iconiq Electric Hatchback,4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,-9
+2017,Hyundai,Iconiq Electric Hatchback,Limited 4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,-9
+2017,Hyundai,Iconiq Hybrid Hatchback,Blue 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),57.1 in.,176.0 in.,106.3 in.,1569,-9
+2017,Hyundai,Iconiq Hybrid Hatchback,Limited 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),57.1 in.,176.0 in.,106.3 in.,1569,-9
+2017,Hyundai,Iconiq Hybrid Hatchback,SEL 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),57.1 in.,176.0 in.,106.3 in.,1569,-9
 2017,Hyundai,Santa Fe SUV,Limited Ultimate 4dr SUV (3.3L 6cyl 6A),66.9 in.,193.1 in.,110.2 in.,1571,167
 2017,Hyundai,Santa Fe SUV,Limited Ultimate 4dr SUV AWD (3.3L 6cyl 6A),66.9 in.,193.1 in.,110.2 in.,1571,167
 2017,Hyundai,Santa Fe SUV,SE 4dr SUV (3.3L 6cyl 6A),66.9 in.,193.1 in.,110.2 in.,1571,167
@@ -15562,8 +15562,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Maserati,Ghibli Sedan,4dr Sedan (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,1628,245
 2017,Maserati,Ghibli Sedan,S 4dr Sedan (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,1628,245
 2017,Maserati,Ghibli Sedan,S Q4 4dr Sedan AWD (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,1628,245
-2017,Maserati,Levante SUV,4dr SUV AWD (3.0L 6cyl Turbo 8A) A,FALSE,FALSE,FALSE,1629,"""+1"""
-2017,Maserati,Levante SUV,S 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.1 in.,197.0 in.,118.3 in.,1629,"""+1"""
+2017,Maserati,Levante SUV,4dr SUV AWD (3.0L 6cyl Turbo 8A) A,FALSE,FALSE,FALSE,1629,-9
+2017,Maserati,Levante SUV,S 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.1 in.,197.0 in.,118.3 in.,1629,-9
 2017,Maserati ,Quattroporte 2017,GTS GranLusso 4dr Sedan (3.8L 8cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
 2017,Maserati,Quattroporte Gts-Gransport,GTS GranSport 4dr Sedan (3.8L 8cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
 2017,Maserati,Quattroporte Sedan,GTS GranSport 4dr Sedan (3.8L 8cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
@@ -19203,13 +19203,13 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Subaru,WRX,Premium 4dr Sedan AWD (2.0L 4cyl Turbo 6M),58.1 in.,180.9 in.,104.3 in.,920,359
 2019,Tesla,MODEL-S,Long Range 4dr Sedan AWD (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,371
 2019,Tesla,MODEL-S,P100D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,371
-2017,Tesla,Model-S Sedan,60 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
-2017,Tesla,Model-S Sedan,75D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
-2017,Tesla,Model-S Sedan,90D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
-2017,Tesla,Model-S Sedan,100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
-2017,Tesla,Model-S Sedan,75 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
-2017,Tesla,Model-S Sedan,P100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
-2017,Tesla,Model-S Sedan,60D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,
+2017,Tesla,Model-S Sedan,60 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
+2017,Tesla,Model-S Sedan,75D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
+2017,Tesla,Model-S Sedan,90D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
+2017,Tesla,Model-S Sedan,100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
+2017,Tesla,Model-S Sedan,75 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
+2017,Tesla,Model-S Sedan,P100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
+2017,Tesla,Model-S Sedan,60D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
 2019,Tesla,MODEL-X,Long Range 4dr SUV AWD (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
 2019,Tesla,MODEL-X,75D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
 2019,Tesla,MODEL-X,4dr SUV AWD w/Prod. End 3/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
@@ -19217,10 +19217,10 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Tesla,MODEL-X,100D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
 2019,Tesla,MODEL-X,P100D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
 2019,Tesla,MODEL-X,Standard Range 4dr SUV AWD w/Prod. End 10/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2017,Tesla,Model-X SUV,75D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,
-2017,Tesla,Model-X SUV,90D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,
-2017,Tesla,Model-X SUV,P100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,
-2017,Tesla,Model-X SUV,100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,
+2017,Tesla,Model-X SUV,75D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
+2017,Tesla,Model-X SUV,90D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
+2017,Tesla,Model-X SUV,P100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
+2017,Tesla,Model-X SUV,100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
 2016,TOYOTA,TACOMA DOUBLE CAB,SR5 4dr Double Cab 5.0 ft. SB (3.5L 6cyl 6A),70.6 in.,212.3 in.,127.4 in.,1026,387
 2016,TOYOTA,TACOMA DOUBLE CAB,TRD Off Road 4dr Double Cab 4WD 5.0 ft. SB (3.5L 6cyl 6A),70.6 in.,212.3 in.,127.4 in.,1026,387
 2016,TOYOTA,TACOMA DOUBLE CAB,TRD Sport 4dr Double Cab 5.0 ft. SB (3.5L 6cyl 6A),70.6 in.,212.3 in.,127.4 in.,1026,387

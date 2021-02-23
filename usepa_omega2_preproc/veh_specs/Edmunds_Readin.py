@@ -17,14 +17,14 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
             exceptions_table['New Value'][error_check_count]
 
     body_id_table_readin = pd.read_csv(run_input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int}, low_memory=False)
-    body_id_table_readin = body_id_table_readin[body_id_table_readin['EndYear'] != 'xx'].reset_index(drop=True)
-    body_id_table_int = body_id_table_readin[(~pd.isnull(body_id_table_readin['EndYear'])) \
-                                             & (body_id_table_readin['StartYear'] <= year)].reset_index(drop=True)
+    body_id_table_readin = body_id_table_readin[body_id_table_readin['BodyID EndYear'] != 'xx'].reset_index(drop=True)
+    body_id_table_int = body_id_table_readin[(~pd.isnull(body_id_table_readin['BodyID EndYear'])) \
+                                             & (body_id_table_readin['BodyID StartYear'] <= year)].reset_index(drop=True)
     body_id_int_not_null_endyear = body_id_table_int[
-        ~body_id_table_int['EndYear'].astype(str).str.contains('null')].reset_index(drop=True)
-    body_id_int_not_null_endyear['EndYear'] = body_id_int_not_null_endyear['EndYear'].astype(float)
-    body_id_table = pd.concat([body_id_int_not_null_endyear[body_id_int_not_null_endyear['EndYear'] >= year], \
-                               body_id_table_int[body_id_table_int['EndYear'].astype(str).str.contains('null')]]).reset_index(drop=True)
+        ~body_id_table_int['BodyID EndYear'].astype(str).str.contains('null')].reset_index(drop=True)
+    body_id_int_not_null_endyear['BodyID EndYear'] = body_id_int_not_null_endyear['BodyID EndYear'].astype(float)
+    body_id_table = pd.concat([body_id_int_not_null_endyear[body_id_int_not_null_endyear['BodyID EndYear'] >= year], \
+                               body_id_table_int[body_id_table_int['BodyID EndYear'].astype(str).str.contains('null')]]).reset_index(drop=True)
     body_id_table['LineageID'] = body_id_table['LineageID'].astype(int)
     body_id_table['BodyID'] = body_id_table['BodyID'].astype(int)
 
