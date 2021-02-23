@@ -500,10 +500,18 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                     #     validate_folder(session.read_parameter(i))
                     # elif str(i).endswith(' File'):
                     #     validate_file(session.read_parameter(i))
-                    if options.verbose and (str(i).endswith(' File')):
-                        batch.batch_log.logwrite('validating %s=%s' % (i, batch_definition_path + session.read_parameter(i)))
                     if str(i).endswith(' File'):
-                        validate_file(batch_definition_path + session.read_parameter(i))
+                        source_file_path = session.read_parameter(i)
+                        if source_file_path.startswith('/') or source_file_path.startswith('\\') or (source_file_path[1] == ':'):
+                            # file_path is absolute path
+                            if options.verbose: batch.batch_log.logwrite(
+                                'validating %s=%s' % (i, source_file_path))
+                            validate_file(source_file_path)
+                        else:
+                            # file_path is relative path
+                            if options.verbose: batch.batch_log.logwrite(
+                                'validating %s=%s' % (i, batch_definition_path + source_file_path))
+                            validate_file(batch_definition_path + source_file_path)
 
                 batch.batch_log.logwrite('Validating Session %d Parameters...' % s)
                 session.init(validate_only=True)
@@ -562,13 +570,23 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                         #     batch.dataframe.loc[i][session.num] = \
                         #         session.name + os.sep + batch.dataframe.loc[i][session.num]
                         if str(i).endswith(' File'):
-                            if options.verbose:
-                                batch.batch_log.logwrite('relocating %s to %s' % (
-                                batch_definition_path + batch.dataframe.loc[i][session.num],
-                                options.session_path + session.read_parameter(i)))
-                            batch.dataframe.loc[i][session.num] = \
-                                session.name + os.sep + relocate_file(options.session_path,
-                                                                      batch_definition_path + session.read_parameter(i))
+                            source_file_path = batch.dataframe.loc[i][session.num]
+                            if source_file_path.startswith('/') or source_file_path.startswith('\\') or (source_file_path[1] == ':'):
+                                import file_eye_oh as fileio
+                                # file_path is absolute path
+                                if options.verbose:
+                                    batch.batch_log.logwrite('relocating %s to %s' % (
+                                    source_file_path, options.session_path + fileio.get_filenameext(source_file_path)))
+                                batch.dataframe.loc[i][session.num] = session.name + os.sep + relocate_file(
+                                    options.session_path, source_file_path)
+                            else:
+                                # file_path is relative path
+                                if options.verbose:
+                                    batch.batch_log.logwrite('relocating %s to %s' % (
+                                        batch_definition_path + batch.dataframe.loc[i][session.num],
+                                        options.session_path + source_file_path))
+                                batch.dataframe.loc[i][session.num] = session.name + os.sep + relocate_file(
+                                    options.session_path, batch_definition_path + source_file_path)
 
         import time
 
