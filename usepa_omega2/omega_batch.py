@@ -123,11 +123,13 @@ class OMEGABatchObject(OMEGABase):
             'Num Tech Options per ICE Vehicle': 'NITO',
             'Num Tech Options per BEV Vehicle': 'NBTO',
             'New Vehicle Price Sales Response Elasticity': 'NVPSRE',
+            'Consumer Pricing Multiplier Min': 'CPMMIN',
+            'Consumer Pricing Multiplier Max': 'CPMMAX',
             'Allow Backsliding': 'BS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
             'GHG Standard Type': 'GHG',
-            'Iterate Producer-Consumer':'IPC',
+            'Iterate Producer-Consumer': 'IPC',
         }
 
         fullfact_dimensions_vectors = self.parse_dataframe_params(verbose=verbose)
@@ -288,17 +290,17 @@ class OMEGASessionObject(OMEGABase):
             self.settings.producer_num_tech_options_per_bev_vehicle = int(
                 self.read_parameter('Num Tech Options per BEV Vehicle'))
 
-        # if not pd.isna(self.read_parameter('Iteration Num Tech Options per ICE Vehicle')):
-        #     self.settings.iteration_num_tech_options_per_ice_vehicle = int(
-        #         self.read_parameter('Iteration Num Tech Options per ICE Vehicle'))
-        #
-        # if not pd.isna(self.read_parameter('Iteration Num Tech Options per BEV Vehicle')):
-        #     self.settings.iteration_num_tech_options_per_bev_vehicle = int(
-        #         self.read_parameter('Iteration Num Tech Options per BEV Vehicle'))
-
         if not pd.isna(self.read_parameter('New Vehicle Price Sales Response Elasticity')):
             self.settings.new_vehicle_sales_response_elasticity = \
                 self.read_parameter('New Vehicle Price Sales Response Elasticity')
+
+        if not pd.isna(self.read_parameter('Consumer Pricing Multiplier Min')):
+            self.settings.consumer_pricing_multiplier_min = float(
+                self.read_parameter('Consumer Pricing Multiplier Min'))
+
+        if not pd.isna(self.read_parameter('Consumer Pricing Multiplier Max')):
+            self.settings.consumer_pricing_multiplier_max = float(
+                self.read_parameter('Consumer Pricing Multiplier Max'))
 
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)

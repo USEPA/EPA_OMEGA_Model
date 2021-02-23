@@ -142,6 +142,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
     winning_combos = None
     producer_compliance_possible = False
 
+    if (calendar_year == o2.options.analysis_initial_year) and (iteration_num == 0):
+        cache.clear()
+
     producer_iteration_log = \
         omega_log.IterationLog('%s%d_%d_producer_iteration_log.csv' % (o2.options.output_folder, calendar_year, iteration_num))
 

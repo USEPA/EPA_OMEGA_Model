@@ -36,7 +36,8 @@ Allow Backsliding,TRUE / FALSE,FALSE,FALSE,FALSE,FALSE,FALSE
 Cost Curve Frontier Affinity Factor,#,0.75,0.75,0.75,0.75,0.75
 Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE,TRUE,TRUE,TRUE
 New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5,-0.5,-0.5,-0.5
-,,,,,,
+Consumer Pricing Multiplier Min,#,0.95,0.95,0.95,0.95,0.95
+Consumer Pricing Multiplier Max,#,1.05,1.05,1.05,1.05,1.05
 ,,,,,,
 Postproc Settings,,,,,,
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv,cost_factors-criteria.csv,cost_factors-criteria.csv,cost_factors-criteria.csv
