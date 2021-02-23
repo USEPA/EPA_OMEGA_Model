@@ -813,7 +813,9 @@ class Form(QObject):
 
         import usepa_omega2.omega_batch as omega_batch
         import threading, time
-        t = threading.Thread(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
+        import multiprocessing
+        # t = threading.Thread(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
+        t = multiprocessing.Process(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
         t.name = input_batch_file
         t.start()
 
