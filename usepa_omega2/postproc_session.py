@@ -131,7 +131,7 @@ def plot_co2_gpmi(calendar_years):
               '%s\nAverage Vehicle Cert CO2 g/mi v Year' % o2.options.session_unique_name)
     ax1.set_ylim(0, 500)
     ax1.legend(average_co2_gpmi_data.keys())
-    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi' % o2.options.session_unique_name, format='png')
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi.png' % o2.options.session_unique_name)
     return average_co2_gpmi_data
 
 
@@ -181,7 +181,7 @@ def plot_vehicle_cost(calendar_years):
               '%s\nAverage Vehicle Cost v Year' % o2.options.session_unique_name)
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(average_cost_data.keys())
-    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost' % o2.options.session_unique_name, format='png')
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost.png' % o2.options.session_unique_name)
     return average_cost_data
 
 
@@ -198,7 +198,7 @@ def plot_market_shares(bev_hauling_share_frac, bev_non_hauling_share_frac, calen
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_unique_name)
     ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling', 'hauling', 'non_hauling'])
-    fig.savefig(o2.options.output_folder + '%s Market Shares' % o2.options.session_unique_name, format='png')
+    fig.savefig(o2.options.output_folder + '%s Market Shares.png' % o2.options.session_unique_name)
 
 
 def plot_total_sales(calendar_years):
@@ -218,7 +218,7 @@ def plot_total_sales(calendar_years):
     ax1.legend(['context sales', 'sales'])
     label_xyt(ax1, 'Year', 'Sales [millions]', '%s\nTotal Sales Versus Calendar Year\n Total Sales %.2f Million' % (
         o2.options.session_unique_name, total_sales.sum() / 1e6))
-    fig.savefig(o2.options.output_folder + '%s Total Sales v Year' % o2.options.session_unique_name, format='png')
+    fig.savefig(o2.options.output_folder + '%s Total Sales v Year.png' % o2.options.session_unique_name)
 
 
 def plot_manufacturer_compliance(calendar_years):
@@ -233,7 +233,7 @@ def plot_manufacturer_compliance(calendar_years):
     ax1.legend(['cert_target_co2_Mg', 'cert_co2_Mg'])
     label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
         o2.options.session_unique_name, total_cost_billions))
-    fig.savefig(o2.options.output_folder + '%s Compliance v Year' % o2.options.session_unique_name, format='png')
+    fig.savefig(o2.options.output_folder + '%s Compliance v Year.png' % o2.options.session_unique_name)
     return cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
 
 
@@ -254,8 +254,8 @@ def plot_iteration(iteration_log):
         plt.grid()
         plt.legend(['producer_share_frac_%s' % mc, 'consumer_share_frac_%s' % mc])
         plt.ylim([0, 1])
-        plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc), format='png')
+        plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
     fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'][iteration_log['pricing_iteration'] == -1])
     label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (
                 2.0 * iteration_log['iteration'][iteration_log['pricing_iteration'] == -1].mean()))
-    fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name), format='png')
+    fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
