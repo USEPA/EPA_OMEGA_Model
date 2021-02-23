@@ -9106,7 +9106,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,GMC,TERRAIN SUV,SL 4dr SUV (2.4L 4cyl 6A),66.3 in.,185.5 in.,112.5 in.,139,143
 2017,GMC,Terrain SUV,SL 4dr SUV (2.4L 4cyl 6A),66.3 in.,185.5 in.,112.5 in.,1544,143
 2019,Gmc,YUKON-XL,Denali 4dr SUV (6.2L 8cyl 10A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,Denali 4dr SUV (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,Denali 4dr SUV (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,143,144
 2016,GMC,YUKON SUV,Denali 4dr SUV (6.2L 8cyl 8A),74.4 in.,203.9 in.,116.0 in.,143,144
 2016,GMC,YUKON XL SUV,Denali 4dr SUV (6.2L 8cyl 8A),74.4 in.,224.4 in.,130.0 in.,141,145
 2017,GMC,Yukon SUV,Denali 4dr SUV (6.2L 8cyl 8A),74.4 in.,203.9 in.,116.0 in.,143,144
@@ -9114,7 +9114,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2015,GMC,YUKON,Denali 4dr SUV (6.2L 8cyl 8A) ),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON-XL,Denali 4dr SUV (6.2L 8cyl 8A) ),74.4 in.,224.3 in.,130.0 in.,141,145
 2019,Gmc,YUKON-XL,Denali 4dr SUV 4WD (6.2L 8cyl 10A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,Denali 4dr SUV 4WD (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,Denali 4dr SUV 4WD (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,143,144
 2016,GMC,YUKON SUV,Denali 4dr SUV 4WD (6.2L 8cyl 8A),74.4 in.,203.9 in.,116.0 in.,143,144
 2016,GMC,YUKON XL SUV,Denali 4dr SUV 4WD (6.2L 8cyl 8A),74.4 in.,224.4 in.,130.0 in.,141,145
 2019,Honda,ACCORD-HYBRID,4dr Sedan (2.0L 4cyl gas/electric hybrid CVT),57.1 in.,192.2 in.,111.4 in.,1898,146
@@ -12251,7 +12251,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,GMC,Yukon SUV,SLE 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2017,GMC,Yukon XL SUV,SLE 4dr SUV (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
 2019,Gmc,YUKON-XL,SLE 4dr SUV (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,SLE 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,SLE 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON,SLE 4dr SUV (5.3L 8cyl 6A) ),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON-XL,SLE 4dr SUV (5.3L 8cyl 6A) ),74.4 in.,224.3 in.,130.0 in.,141,145
 2019,Honda,ACCORD-HYBRID,EX-L 4dr Sedan (2.0L 4cyl gas/electric hybrid CVT),57.1 in.,192.2 in.,111.4 in.,1898,146
@@ -13328,12 +13328,12 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,PROMASTER CARGO VAN,"1500 Low Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",90.0 in.,213.1 in.,136.0 in.,171,335
 2016,RAM,PROMASTER CARGO VAN,"1500 Low Roof 3dr Van w/118"" Wheelbase (3.6L 6cyl 6A)",90.0 in.,195.0 in.,118.0 in.,170,335
 2016,RAM,3500 MEGA CAB,Lone Star 4dr Mega Cab SB (5.7L 8cyl 6A),78.3 in.,248.4 in.,160.0 in.,-9,-9
-2016,RAM,PROMASTER CARGO VAN,"2500 High Roof 3dr Van w/159"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,336
-2016,RAM,PROMASTER CARGO VAN,"2500 High Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,336
-2016,RAM,PROMASTER CARGO VAN,3500 High Roof 3dr Van w/Extended Length (3.6L 6cyl 6A),101.0 in.,250.0 in.,159.0 in.,174,336
-2016,RAM,PROMASTER CARGO VAN,3500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,172,336
-2017,Ram,Promaster-Cargo-Van Van,1500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,213.1 in.,136.0 in.,172,336
-2019,Ram,PROMASTER-CARGO-VAN,1500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,213.1 in.,136.0 in.,172,336
+2016,RAM,PROMASTER CARGO VAN,"2500 High Roof 3dr Van w/159"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,335
+2016,RAM,PROMASTER CARGO VAN,"2500 High Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,335
+2016,RAM,PROMASTER CARGO VAN,3500 High Roof 3dr Van w/Extended Length (3.6L 6cyl 6A),101.0 in.,250.0 in.,159.0 in.,174,335
+2016,RAM,PROMASTER CARGO VAN,3500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,172,335
+2017,Ram,Promaster-Cargo-Van Van,1500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,213.1 in.,136.0 in.,172,335
+2019,Ram,PROMASTER-CARGO-VAN,1500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,213.1 in.,136.0 in.,172,335
 2016,RAM,PROMASTER CITY MINIVAN,Tradesman Cargo 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2016,RAM,PROMASTER CITY MINIVAN,Tradesman SLT Cargo 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2016,RAM,PROMASTER CITY MINIVAN,Wagon SLT 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
@@ -14917,7 +14917,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,GMC,Yukon SUV,SLE 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2017,GMC,Yukon XL SUV,SLE 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
 2019,Gmc,YUKON-XL,SLE 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,SLE 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,SLE 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON,SLE 4dr SUV 4WD (5.3L 8cyl 6A) ),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON-XL,SLE 4dr SUV 4WD (5.3L 8cyl 6A) ),74.4 in.,224.3 in.,130.0 in.,141,145
 2016,GMC,YUKON SUV,SLT 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
@@ -16159,19 +16159,19 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,1500 CREW CAB,SLT 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),77.0 in.,229.0 in.,140.5 in.,163,334
 2017,Ram,1500 Crew-Cab,SLT 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
 2016,RAM,1500 CREW CAB,SLT 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),77.5 in.,237.9 in.,149.5 in.,164,334
-2019,Ram,PROMASTER-CARGO-VAN,"1500 Low Roof 3dr Van w/118"" WB (3.6L 6cyl 6A)",91.0 in.,195.4 in.,118.0 in.,170,336
-2017,Ram,Promaster-Cargo-Van Van,"1500 Low Roof 3dr Van w/118"" Wheelbase (3.6L 6cyl 6A)",90.0 in.,195.0 in.,118.0 in.,170,336
-2019,Ram,PROMASTER-CARGO-VAN,"1500 Low Roof 3dr Van w/136"" WB (3.6L 6cyl 6A)",91.0 in.,213.1 in.,136.0 in.,171,336
-2017,Ram,Promaster-Cargo-Van Van,"1500 Low Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",90.0 in.,213.1 in.,136.0 in.,171,336
-2016,RAM,PROMASTER WINDOW VAN,2500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,172,336
-2017,Ram,Promaster-Window-Van Van,2500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,173,336
-2019,Ram,PROMASTER-WINDOW-VAN,2500 High Roof 3dr Van (3.6L 6cyl 6A),105.9 in.,236.2 in.,159.0 in.,173,336
+2019,Ram,PROMASTER-CARGO-VAN,"1500 Low Roof 3dr Van w/118"" WB (3.6L 6cyl 6A)",91.0 in.,195.4 in.,118.0 in.,170,335
+2017,Ram,Promaster-Cargo-Van Van,"1500 Low Roof 3dr Van w/118"" Wheelbase (3.6L 6cyl 6A)",90.0 in.,195.0 in.,118.0 in.,170,335
+2019,Ram,PROMASTER-CARGO-VAN,"1500 Low Roof 3dr Van w/136"" WB (3.6L 6cyl 6A)",91.0 in.,213.1 in.,136.0 in.,171,335
+2017,Ram,Promaster-Cargo-Van Van,"1500 Low Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",90.0 in.,213.1 in.,136.0 in.,171,335
+2016,RAM,PROMASTER WINDOW VAN,2500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,172,335
+2017,Ram,Promaster-Window-Van Van,2500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,173,335
+2019,Ram,PROMASTER-WINDOW-VAN,2500 High Roof 3dr Van (3.6L 6cyl 6A),105.9 in.,236.2 in.,159.0 in.,173,335
 2017,Ram,Promaster-City Minivan,Tradesman Cargo 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2017,Ram,Promaster-City Minivan,Wagon 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2017,Ram,Promaster-City Minivan,Wagon SLT 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2017,Ram,Promaster-City Minivan,Tradesman SLT Cargo 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
-2019,Ram,PROMASTER-CARGO-VAN,"2500 High Roof 3dr Van w/136"" WB (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,336
-2017,Ram,Promaster-Cargo-Van Van,"2500 High Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,336
+2019,Ram,PROMASTER-CARGO-VAN,"2500 High Roof 3dr Van w/136"" WB (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,335
+2017,Ram,Promaster-Cargo-Van Van,"2500 High Roof 3dr Van w/136"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,335
 2019,Rolls-royce,GHOST-SERIES-II,Black Badge 4dr Sedan (6.6L 12cyl Turbo 8A),61.0 in.,215.2 in.,129.7 in.,836,337
 2019,Rolls-royce,GHOST-SERIES-II,EWB 4dr Sedan (6.6L 12cyl Turbo 8A),61.0 in.,221.5 in.,136.4 in.,1190,337
 2017,Rolls-Royce,Ghost-Series-Ii Sedan,4dr Sedan (6.6L 12cyl Turbo 8A),61.0 in.,212.6 in.,129.7 in.,836,337
@@ -16534,10 +16534,10 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Volvo,S60,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,1075,405
 2019,Volvo,S60,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,1075,405
 2017,Volvo,S60 Sedan,T6 Polestar 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1075,405
-2017,Volvo,S90 Sedan,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,406
-2017,Volvo,S90 Sedan,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,406
-2017,Volvo,S90 Sedan,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,406
-2017,Volvo,S90 Sedan,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,406
+2017,Volvo,S90 Sedan,T5 Momentum 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,478
+2017,Volvo,S90 Sedan,T6 Inscription 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,478
+2017,Volvo,S90 Sedan,T6 Momentum 4dr Sedan AWD (2.0L 4cyl Twincharger 8A),56.8 in.,195.4 in.,115.8 in.,1125,478
+2017,Volvo,S90 Sedan,T5 Inscription 4dr Sedan (2.0L 4cyl Turbo 8A),56.8 in.,195.4 in.,115.8 in.,1125,478
 2017,Volvo,V60-Cross-Country Wagon,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.8 in.,182.6 in.,109.2 in.,1259,433
 2017,Volvo,V60-Cross-Country Wagon,T5 Platinum 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.8 in.,182.6 in.,109.2 in.,1259,433
 2017,Volvo,V60 Wagon,T5 Platinum 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
@@ -16546,7 +16546,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Volvo,V60 Wagon,T5 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
 2017,Volvo,V60 Wagon,T5 Dynamic 4dr Wagon (2.0L 4cyl Turbo 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
 2017,Volvo,V60 Wagon,T6 Polestar 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.4 in.,182.5 in.,109.3 in.,1077,433
-2017,Volvo,V90-Cross-Country Wagon,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,436
+2017,Volvo,V90-Cross-Country Wagon,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,444
 2017,Volvo,XC60 SUV,T5 Dynamic 4dr SUV (2.0L 4cyl Turbo 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
 2017,Volvo,XC60 SUV,T5 Inscription 4dr SUV (2.0L 4cyl Turbo 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
 2017,Volvo,XC60 SUV,T6 Dynamic 4dr SUV AWD (2.0L 4cyl Twincharger 8A),67.4 in.,182.8 in.,109.2 in.,1078,409
@@ -17750,7 +17750,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2015,GMC,TERRAIN,SLT-2 4dr SUV (2.4L 4cyl 6A) ),FALSE,185.3 in.,112.5 in.,139,143
 2015,GMC,TERRAIN,SLT-2 4dr SUV AWD (2.4L 4cyl 6A) ),FALSE,185.3 in.,112.5 in.,139,143
 2019,Gmc,YUKON-XL,SLT 4dr SUV (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,SLT 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,SLT 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON,SLT 4dr SUV (5.3L 8cyl 6A) ),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON-XL,SLT 4dr SUV (5.3L 8cyl 6A) ),74.4 in.,224.3 in.,130.0 in.,141,145
 2016,GMC,YUKON SUV,SLT 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
@@ -17758,13 +17758,13 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,GMC,Yukon SUV,SLT 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2017,GMC,Yukon XL SUV,SLT 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
 2019,Gmc,YUKON-XL,SLT 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,SLT 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,SLT 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON,SLT 4dr SUV 4WD (5.3L 8cyl 6A) ),74.4 in.,203.9 in.,116.0 in.,143,144
 2015,GMC,YUKON-XL,SLT 4dr SUV 4WD (5.3L 8cyl 6A) ),74.4 in.,224.3 in.,130.0 in.,141,145
 2019,Gmc,YUKON-XL,SLT Standard Edition 4dr SUV (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,SLT Standard Edition 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,SLT Standard Edition 4dr SUV (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2019,Gmc,YUKON-XL,SLT Standard Edition 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,224.4 in.,130.0 in.,141,145
-2019,Gmc,YUKON,SLT Standard Edition 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,145
+2019,Gmc,YUKON,SLT Standard Edition 4dr SUV 4WD (5.3L 8cyl 6A),74.4 in.,203.9 in.,116.0 in.,143,144
 2017,Honda,Accord Sedan,Sport Special Edition 4dr Sedan (2.4L 4cyl 6M),57.7 in.,192.5 in.,109.3 in.,423,146
 2017,Honda,Accord Sedan,Sport Special Edition 4dr Sedan (2.4L 4cyl CVT),57.7 in.,192.5 in.,109.3 in.,423,146
 2016,HONDA,ACCORD SEDAN,Sport w/Honda Sensing 4dr Sedan (2.4L 4cyl CVT),57.7 in.,192.5 in.,109.3 in.,423,146
@@ -19112,20 +19112,20 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Ram,3500,Big Horn 2dr Regular Cab LB (6.4L 8cyl 8A),77.8 in.,232.0 in.,140.2 in.,-9,-9
 2019,Ram,3500,Tradesman 2dr Regular Cab 4WD LB (6.4L 8cyl 8A),79.5 in.,232.0 in.,140.2 in.,-9,-9
 2019,Ram,3500,Lone Star 4dr Crew Cab LB (6.4L 8cyl 8A),78.4 in.,260.8 in.,169.0 in.,-9,-9
-2019,Ram,PROMASTER-CARGO-VAN,"2500 High Roof 3dr Van w/159"" WB (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,336
-2017,Ram,Promaster-Cargo-Van Van,"2500 High Roof 3dr Van w/159"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,336
-2019,Ram,PROMASTER-CARGO-VAN,2500 Low Roof 3dr Van (3.6L 6cyl 6A),91.0 in.,213.1 in.,136.0 in.,172,336
-2019,Ram,PROMASTER-CARGO-VAN,3500 High Roof 3dr Ext Van (3.6L 6cyl 6A),101.0 in.,250.5 in.,159.0 in.,173,336
-2016,RAM,PROMASTER WINDOW VAN,3500 High Roof 3dr Van (3.6L 6cyl 6A),,,159.0 in.,172,336
-2017,Ram,Promaster-Cargo-Van Van,3500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,173,336
-2017,Ram,Promaster-Window-Van Van,3500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,,159.0 in.,173,336
-2019,Ram,PROMASTER-WINDOW-VAN,3500 High Roof 3dr Van (3.6L 6cyl 6A),105.9 in.,250.6 in.,159.0 in.,172,336
-2019,Ram,PROMASTER-CARGO-VAN,"3500 High Roof 3dr Van w/136"" WB (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,336
-2019,Ram,PROMASTER-CARGO-VAN,"3500 High Roof 3dr Van w/159"" WB (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,336
-2019,Ram,PROMASTER-CITY,Tradesman Cargo 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,335
-2019,Ram,PROMASTER-CITY,Wagon 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,335
-2019,Ram,PROMASTER-CITY,Wagon SLT 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,335
-2019,Ram,PROMASTER-CITY,Tradesman SLT Cargo 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,335
+2019,Ram,PROMASTER-CARGO-VAN,"2500 High Roof 3dr Van w/159"" WB (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,335
+2017,Ram,Promaster-Cargo-Van Van,"2500 High Roof 3dr Van w/159"" Wheelbase (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,335
+2019,Ram,PROMASTER-CARGO-VAN,2500 Low Roof 3dr Van (3.6L 6cyl 6A),91.0 in.,213.1 in.,136.0 in.,172,335
+2019,Ram,PROMASTER-CARGO-VAN,3500 High Roof 3dr Ext Van (3.6L 6cyl 6A),101.0 in.,250.5 in.,159.0 in.,173,335
+2016,RAM,PROMASTER WINDOW VAN,3500 High Roof 3dr Van (3.6L 6cyl 6A),,,159.0 in.,172,335
+2017,Ram,Promaster-Cargo-Van Van,3500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,236.0 in.,159.0 in.,173,335
+2017,Ram,Promaster-Window-Van Van,3500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,,159.0 in.,173,335
+2019,Ram,PROMASTER-WINDOW-VAN,3500 High Roof 3dr Van (3.6L 6cyl 6A),105.9 in.,250.6 in.,159.0 in.,172,335
+2019,Ram,PROMASTER-CARGO-VAN,"3500 High Roof 3dr Van w/136"" WB (3.6L 6cyl 6A)",101.0 in.,213.1 in.,136.0 in.,172,335
+2019,Ram,PROMASTER-CARGO-VAN,"3500 High Roof 3dr Van w/159"" WB (3.6L 6cyl 6A)",101.0 in.,236.0 in.,159.0 in.,173,335
+2019,Ram,PROMASTER-CITY,Tradesman Cargo 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,336
+2019,Ram,PROMASTER-CITY,Wagon 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,336
+2019,Ram,PROMASTER-CITY,Wagon SLT 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,336
+2019,Ram,PROMASTER-CITY,Tradesman SLT Cargo 4dr Minivan (2.4L 4cyl 9A),74.2 in.,187.1 in.,122.4 in.,175,336
 2017,Ram,Promaster-Cargo-Van Van,3500 High Roof 3dr Van w/Extended Length (3.6L 6cyl 6A),101.0 in.,250.0 in.,159.0 in.,174,335
 2019,Ram,PROMASTER-CARGO-VAN,3500 Low Roof 3dr Van (3.6L 6cyl 6A),91.0 in.,213.1 in.,136.0 in.,172,335
 2019,Rolls-royce,PHANTOM,EWB 4dr Sedan (6.8L 12cyl Turbo 8A),65.2 in.,235.8 in.,148.5 in.,839,338
@@ -19518,13 +19518,13 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Volvo,V60,T5 Momentum 4dr Wagon (2.0L 4cyl Turbo 8A),56.6 in.,187.4 in.,113.1 in.,1077,433
 2019,Volvo,V60,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,1077,433
 2019,Volvo,V60,T6 Momentum 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),56.6 in.,187.4 in.,113.1 in.,1077,433
-2019,Volvo,V90-CROSS-COUNTRY,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.7 in.,194.4 in.,115.8 in.,1128,479
-2019,Volvo,V90-CROSS-COUNTRY,T6 Volvo Ocean Race 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,479
-2019,Volvo,V90-CROSS-COUNTRY,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,479
-2019,Volvo,V90,T5 R-Design 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,1128,479
-2019,Volvo,V90,T5 Inscription 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,1128,479
-2019,Volvo,V90,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,1128,479
-2019,Volvo,V90,T6 Inscription 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,1128,479
+2019,Volvo,V90-CROSS-COUNTRY,T5 4dr Wagon AWD (2.0L 4cyl Turbo 8A),60.7 in.,194.4 in.,115.8 in.,1128,444
+2019,Volvo,V90-CROSS-COUNTRY,T6 Volvo Ocean Race 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,444
+2019,Volvo,V90-CROSS-COUNTRY,T6 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),60.7 in.,194.4 in.,115.8 in.,1128,444
+2019,Volvo,V90,T5 R-Design 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,1128,444
+2019,Volvo,V90,T5 Inscription 4dr Wagon (2.0L 4cyl Turbo 8A),58.1 in.,194.3 in.,115.8 in.,1128,444
+2019,Volvo,V90,T6 R-Design 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,1128,444
+2019,Volvo,V90,T6 Inscription 4dr Wagon AWD (2.0L 4cyl Twincharger 8A),58.1 in.,194.3 in.,115.8 in.,1128,444
 2019,Volvo,XC40,T5 Momentum 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
 2019,Volvo,XC40,T5 Inscription 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
 2019,Volvo,XC40,T5 R-Design 4dr SUV AWD (2.0L 4cyl Turbo 8A),65.3 in.,174.2 in.,106.4 in.,-9,480
