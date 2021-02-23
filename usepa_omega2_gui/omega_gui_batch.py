@@ -1074,6 +1074,7 @@ class Form(QObject):
 
         self.window.list_graphs_2.clear()
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
+        plot_select_directory = input_file
         if not os.path.exists(input_file):
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
@@ -1095,6 +1096,7 @@ class Form(QObject):
             N/A
         """
         global plot_select_directory_name
+        global plot_select_directory
         self.window.list_graphs_1.clear()
         input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
         plot_data_df = pandas.read_csv(input_file)
@@ -1105,6 +1107,7 @@ class Form(QObject):
         plot_select_directory_path = output_batch_subdirectory
         plot_select_directory_name = os.path.basename(os.path.normpath(output_batch_subdirectory))
         input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
+        plot_select_directory = input_file
         if not os.path.exists(input_file):
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
@@ -1125,13 +1128,14 @@ class Form(QObject):
             N/A
         """
         global plot_select_directory_name
+        global plot_select_directory
         # See if valid selections have been made
         if self.window.list_graphs_1.currentItem() is not None and self.window.list_graphs_2.currentItem() is not None:
             # Get plot selections
             a = self.window.list_graphs_1.selectedIndexes()[0]
             b = self.window.list_graphs_2.selectedIndexes()[0]
             # Send plot selections to plot function
-            test_plot_2(a.data(), b.data(), plot_select_directory_name)
+            test_plot_2(a.data(), b.data(), plot_select_directory_name, plot_select_directory)
 
 
 def status_bar():
