@@ -778,26 +778,16 @@ class Form(QObject):
         # Play a model start sound
         # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
-        # This call works and runs a completely separate process
-        # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
-        # omega2.terminate()
-
-        # Prepare command line options for OMEGA 2 batch process
-        # batch_time_stamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        batch_file_arg = '--batch_file "%s"' % input_batch_file
-        bundle_path_arg = ' --bundle_path "%s"' % output_batch_directory
-
+        # Prepare options for OMEGA 2 batch process
+        command_line_dict = dict()
+        command_line_dict['batch_file'] = input_batch_file
+        command_line_dict['bundle_path'] = output_batch_directory
+        command_line_dict['timestamp'] = batch_time_stamp
         if multiprocessor_mode_selected:
-            # Add command line options for multiprocessor mode
-            dispy_arg = ' --dispy --local --dispy_exclusive --dispy_debug'
-        else:
-            # No multiprocessor
-            dispy_arg = ''
-        # Add timestamp option so program can track comm_file
-        timestamp_arg = ' --timestamp ' + batch_time_stamp
-
-        # Combine command line options
-        command_line_args = batch_file_arg + bundle_path_arg + dispy_arg + timestamp_arg
+            command_line_dict['dispy'] = True
+            command_line_dict['local'] = True
+            command_line_dict['dispy_exclusive'] = True
+            command_line_dict['dispy_debug'] = True
 
         # Disable selected gui functions during model run
         self.enable_gui_run_functions(0)
@@ -814,13 +804,6 @@ class Form(QObject):
         #     timeout=5
         # )
 
-        print('sys.executable = %s' % sys.executable)
-        print('Popen(%s)' % ['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
-                             command_line_args])
-
-        omega_batch = subprocess.Popen(['python', os.path.realpath(path + 'usepa_omega2_gui/run_omega_batch_gui.py'),
-                                         command_line_args], close_fds=True)
-
         # While the subprocess is running, output communication from the batch process to the event monitor
         # First find the log files
         log_file_array = []  # Clear log file array
@@ -828,9 +811,16 @@ class Form(QObject):
         log_ident_array = []  # Clear log identifier array
         file_timer = 0  # Counter for file search timer
 
+        import usepa_omega2.omega_batch as omega_batch
+        import threading, time
+        t = threading.Thread(target=omega_batch.run_omega_batch, kwargs=command_line_dict, daemon=False)
+        t.name = input_batch_file
+        t.start()
+
         # self.load_plots_2()
         # Keep looking for communication from other processes through the log files
-        while omega_batch.poll() is None:
+        # while omega_batch.poll() is None:
+        while t.is_alive():
             # This command allows the GUI to catch up and repaint itself
             app.processEvents()
             # Keep the overhead low and only update the event file at 10 hz
@@ -1078,14 +1068,12 @@ class Form(QObject):
         self.window.list_graphs_1.clear()
         input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
         plot_data_df = pandas.read_csv(input_file)
-        # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
         for index, row in plot_data_df.iterrows():
             # print(row['plot_name'])
             self.window.list_graphs_1.addItem(row['plot_name'])
 
         self.window.list_graphs_2.clear()
-        # input_file = 'usepa_omega2_gui/elements/summary_results.csv'
-        input_file = plot_select_directory_path + '/' + plot_select_directory_name + '_summary_results.csv'
+        input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         if not os.path.exists(input_file):
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
@@ -1110,25 +1098,20 @@ class Form(QObject):
         self.window.list_graphs_1.clear()
         input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
         plot_data_df = pandas.read_csv(input_file)
-        # df = pandas.read_csv('usepa_omega2_gui/elements/summary_results.csv')
         for index, row in plot_data_df.iterrows():
-            # print(row['plot_name'])
             self.window.list_graphs_1.addItem(row['plot_name'])
 
         self.window.list_graphs_2.clear()
         plot_select_directory_path = output_batch_subdirectory
         plot_select_directory_name = os.path.basename(os.path.normpath(output_batch_subdirectory))
-        input_file = plot_select_directory_path + '/' + plot_select_directory_name + '_summary_results.csv'
+        input_file = plot_select_directory_path + os.sep + plot_select_directory_name + '_summary_results.csv'
         if not os.path.exists(input_file):
             self.window.list_graphs_1.clear()
             self.window.list_graphs_2.clear()
             return()
-        # print(input_file)
-        # input_file = 'usepa_omega2_gui/elements/summary_results.csv'
         plot_data_df1 = pandas.read_csv(input_file)
         plot_data_df1.drop_duplicates(subset=['session_name'], inplace=True)
         for index, row in plot_data_df1.iterrows():
-            # print(row['plot_name'])
             self.window.list_graphs_2.addItem(row['session_name'])
 
     def open_plot_2(self):

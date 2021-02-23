@@ -389,7 +389,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     tech_share_combos_total['compliance_score'] = abs(1-tech_share_combos_total['compliance_ratio'])
     tech_share_combos_total['slope'] = 0
 
-    if o2.options.log_producer_iteration_years is 'all' or calendar_year in o2.options.log_producer_iteration_years:
+    if o2.options.log_producer_iteration_years == 'all' or calendar_year in o2.options.log_producer_iteration_years:
         producer_iteration_log.write(tech_share_combos_total)
 
     potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
@@ -411,7 +411,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         winning_combos = tech_share_combos_total.loc[[mini_df['total_combo_credits_co2_megagrams'].idxmax()]]
         compliance_possible = False
 
-    if o2.options.log_producer_iteration_years is 'all' or calendar_year in o2.options.log_producer_iteration_years:
+    if o2.options.log_producer_iteration_years == 'all' or calendar_year in o2.options.log_producer_iteration_years:
         winning_combos['winner'] = True
         producer_iteration_log.write(winning_combos)
 
