@@ -172,7 +172,7 @@ def status_output_color(g):
     return g
 
 
-def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name):
+def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name, plot_select_directory):
     """
     Reads a csv file and plots selected graph.
 
@@ -193,7 +193,8 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name):
         # a = (df.loc[plot_selection, 'y_data_1'])
         x_data = (df.loc[plot_selection, 'x_data'])  # Column from spreadsheet for x axis
         # y_data = (df.loc[plot_selection, 'y_data_1'])  # Column from spreadsheet for y axis
-        file_name = (df.loc[plot_selection, 'plot_source'])  # Column from spreadsheet for file name
+        # file_name = (df.loc[plot_selection, 'plot_source'])  # Column from spreadsheet for file name
+        file_name = plot_select_directory
         df1 = pandas.read_csv(file_name)  # Read source filename into dataframe
         df1 = df1.loc[df1['session_name'] == scenario_selection]  # Strip off all rows except selected scenario
         line_style = 'solid'  # Plot line style
