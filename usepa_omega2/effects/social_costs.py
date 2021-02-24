@@ -215,13 +215,12 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
     from context_fuel_prices import ContextFuelPrices
     from vehicles import VehicleFinal
 
+    # get vehicle annual data
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year, ['vehicle_ID', 'age', 'fuel_consumption', 'vmt'])
 
     # UPDATE cost effects data
     ed_list = list()
-    for vad in vads:
-        # get vehicle annual data
-        vehicle_ID, age, fuel_consumption, vmt = vad[0], vad[1], vad[2], vad[3]
+    for vehicle_ID, age, fuel_consumption, vmt in vads:
 
         # get vehicle final data
         reg_class_ID, in_use_fuel_ID = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['reg_class_ID', 'in_use_fuel_ID'])
