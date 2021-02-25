@@ -17,7 +17,11 @@ import os, sys
 # print('SYS Path = %s' % sys.path)
 
 from o2 import OMEGABase
+from usepa_omega2 import OMEGARuntimeOptions
 from file_eye_oh import validate_file, relocate_file
+
+bundle_input_folder_name = 'in'
+bundle_output_folder_name = OMEGARuntimeOptions().output_folder
 
 
 def validate_predefined_input(input_str, valid_inputs):
@@ -447,7 +451,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
             time.sleep(1)  # wait for files to close
 
             summary_filename = os.path.join(options.bundle_path_root, batch.name,
-                                            batch.sessions[s_index].name, 'output',
+                                            batch.sessions[s_index].name, bundle_output_folder_name,
                                             'o2log_%s_%s.txt' % (
                                                 batch.name, batch.sessions[s_index].name))
 
@@ -638,9 +642,10 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                     session = batch.sessions[s]
                     options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
                                                            session_name=session.name)
-
+                    validate_folder(options.bundle_path_root, batch_name=batch.name,
+                                    session_name=session.name + os.sep + bundle_input_folder_name)
                     # indicate source batch
-                    if ':' in options.batch_file:
+                    if is_absolute_path(options.batch_file):
                         # batch file path is absolute
                         batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % options.batch_file
                     else:
@@ -671,16 +676,16 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                     if options.verbose:
                                         batch.batch_log.logwrite('relocating %s to %s' % (
                                         source_file_path, options.session_path + fileio.get_filenameext(source_file_path)))
-                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + relocate_file(
-                                        options.session_path, source_file_path)
+                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
+                                        options.session_path + bundle_input_folder_name, source_file_path)
                                 else:
                                     # file_path is relative path
                                     if options.verbose:
                                         batch.batch_log.logwrite('relocating %s to %s' % (
                                             batch.batch_definition_path + batch.dataframe.loc[i][session.num],
                                             options.session_path + source_file_path))
-                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + relocate_file(
-                                        options.session_path, batch.batch_definition_path + source_file_path)
+                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
+                                        options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
                             else:
                                 # handle 'Context New Vehicle Prices File' when generating
                                 if session.num == 0:
