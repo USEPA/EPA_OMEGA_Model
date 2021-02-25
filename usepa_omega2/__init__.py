@@ -51,6 +51,7 @@ try:
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
             self.session_name = 'OMEGA2 Demo'
             self.session_unique_name = 'OMEGA2 Demo'
+            self.session_is_reference = True
             self.verbose = False
             self.output_folder = 'output' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
@@ -62,6 +63,8 @@ try:
             self.context_folder = ''
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
+            self.context_new_vehicle_prices_file = path + 'test_inputs/context_new_vehicle_prices.csv'
+            self.generate_context_new_vehicle_prices_file = False
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_file = path + 'test_inputs/fuel_upstream.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'

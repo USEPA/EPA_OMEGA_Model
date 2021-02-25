@@ -37,6 +37,66 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     bev_price_dollars = Column(Numeric)
 
     hauling_context_size_class_info = dict()
+    _new_vehicle_prices = dict()
+
+    @classmethod
+    def init_context_new_vehicle_prices(cls, filename):
+        """
+        Load context new vehicle prices from file or clear context_new_vehicle_prices and start from scratch
+
+        Returns: updates context_new_vehicle_prices dict/dataframe
+
+        """
+
+        cls._new_vehicle_prices.clear()
+
+        if not o2.options.generate_context_new_vehicle_prices_file:
+            df = pd.read_csv(filename, index_col=0, dtype=str)
+            # cls._new_vehicle_prices = df['new_vehicle_price_dollars'].to_dict()
+            # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
+            # converts the strings to floats... they have different values than what's in the file
+            # This is the workaround: let python do the conversion
+            for key, value in df['new_vehicle_price_dollars'].items():
+                cls._new_vehicle_prices[key] = float(value)
+
+    @classmethod
+    def save_context_new_vehicle_prices(cls, filename):
+        """
+        Save context_new_vehicle_prices to a .csv file
+
+        """
+        # pd.DataFrame.from_dict(cls._new_vehicle_prices, orient='index', columns=['new_vehicle_price_dollars']).to_csv(
+        #     filename, index=True)
+
+        # you shouldn't have to do this either... but somehow pandas (or maybe the OS) rounds the numbers when they get
+        # written out to the file... this is the workaround: write the file yourself!
+        with open(filename, 'w') as price_file:
+            price_file.write(',new_vehicle_price_dollars\n')
+            for k, v in ContextNewVehicleMarket._new_vehicle_prices.items():
+                price_file.write('%d, %.38f\n' % (k, v))
+
+    @classmethod
+    def new_vehicle_prices(cls, calendar_year):
+        """
+
+        Args:
+            calendar_year:
+
+        Returns: context new vehicle price for the given calendar year
+
+        """
+        return cls._new_vehicle_prices[calendar_year]
+
+    @classmethod
+    def set_new_vehicle_price(cls, calendar_year, price):
+        """
+        Set context new vehicle price for the given calendar year to the given price
+        Args:
+            calendar_year:
+            price:
+
+        """
+        cls._new_vehicle_prices[calendar_year] = price
 
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None):
@@ -59,23 +119,6 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
                                          filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
 
         return cache[cache_key]
-
-    # TODO: was going to use this to calculate P0 for the consumer sales response, but there's no ice/bev split and some of the bevs have a zero price, which is bogus, even in 2050...
-    # @staticmethod
-    # def new_vehicle_sales_weighted_price(calendar_year):
-    #     ice_price = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales * ContextNewVehicleMarket.ice_price_dollars)). \
-    #                       filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
-    #                       filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
-    #                       filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar()) / \
-    #                 ContextNewVehicleMarket.get_new_vehicle_sales(calendar_year)
-    #
-    #     bev_price = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales * ContextNewVehicleMarket.bev_price_dollars)).
-    #                       filter(ContextNewVehicleMarket.context_ID == o2.options.context_id). \
-    #                       filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id). \
-    #                       filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar()) / \
-    #                 ContextNewVehicleMarket.get_new_vehicle_sales(calendar_year)
-    #
-    #     return ice_price
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

@@ -60,16 +60,17 @@ def new_vehicle_sales_response(calendar_year, P):
     :param P: a single price or a list-like of prices
     :return: total new vehicle sales volume at each price
     """
+    from context_new_vehicle_market import ContextNewVehicleMarket
 
     if type(P) is list:
         import numpy as np
         P = np.array(P)
 
-    from context_new_vehicle_market import ContextNewVehicleMarket
+    if o2.options.session_is_reference and isinstance(P, float):
+        ContextNewVehicleMarket.set_new_vehicle_price(calendar_year, P)
 
-    # TODO: un-hardcode these values
     Q0 = ContextNewVehicleMarket.new_vehicle_sales(calendar_year)
-    P0 = 30937  # sales-weighted, from vehicles.csv
+    P0 = ContextNewVehicleMarket.new_vehicle_prices(calendar_year)
 
     E = o2.options.new_vehicle_sales_response_elasticity
 
