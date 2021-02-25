@@ -137,15 +137,15 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         producer_decision_and_response = get_demanded_shares(price_options_df, calendar_year)
 
+        ###############################################################################################################
         calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
-
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
         producer.calculate_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
                                                    total_sales=producer_decision_and_response['new_vehicle_sales'])
-
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
+        ###############################################################################################################
 
         producer_decision_and_response['sales_ratio'] = \
             producer_decision_and_response['new_vehicle_sales'] / unsubsidized_sales
@@ -168,6 +168,18 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         producer_decision_and_response = \
             producer_decision_and_response.loc[producer_decision_and_response['pricing_score'].idxmin()]
+
+        # ###############################################################################################################
+        # if o2.options.session_is_reference:
+        #     calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
+        #     # propagate total sales down to composite vehicles by market class share and reg class share,
+        #     # calculate new compliance status for each producer-technology / consumer response combination
+        #     producer.calculate_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+        #                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
+        #
+        #     # propagate vehicle sales up to market class sales
+        #     calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
+        # ###############################################################################################################
 
         producer_decision_and_response['price_cost_ratio_total'] = \
             producer_decision_and_response['average_price_total'] / producer_decision_and_response['average_cost_total']
@@ -497,6 +509,7 @@ def init_omega(o2_options):
 
         init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
+        ContextNewVehicleMarket.init_context_new_vehicle_prices(o2.options.context_new_vehicle_prices_file)
 
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
@@ -585,6 +598,10 @@ def run_omega(o2_options, standalone_run=False):
             summary_filename = o2.options.output_folder + o2.options.session_unique_name + '_summary_results.csv'
             session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
+
+            if o2.options.session_is_reference and o2.options.generate_context_new_vehicle_prices_file:
+                from context_new_vehicle_market import ContextNewVehicleMarket
+                ContextNewVehicleMarket.save_context_new_vehicle_prices(o2.options.context_new_vehicle_prices_file)
 
             omega_log.end_logfile("\nSession Complete")
 
