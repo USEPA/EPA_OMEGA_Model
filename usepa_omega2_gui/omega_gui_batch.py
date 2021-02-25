@@ -424,7 +424,7 @@ class Form(QObject):
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
         file_name = ""
         # file_type = "Image files (*.jpg *.gif);; All Files (*.*)"
-        file_type = "OMEGA 2 Batch Files (*.xlsx, *.csv)"
+        file_type = "OMEGA 2 Batch Files (*.xlsx *.csv)"
         # Add file dialog title
         file_dialog_title = "Select Input Batch File"
         # Call file dialog function
