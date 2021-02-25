@@ -42,8 +42,9 @@ def is_absolute_path(source_file_path):
     Returns: True if file path is absolute
 
     """
-
-    return source_file_path.startswith('/') or source_file_path.startswith('\\') or (source_file_path[1] == ':')
+    # return source_file_path.startswith('/') or source_file_path.startswith('\\') or (source_file_path[1] == ':')
+    import os
+    return os.path.isabs(source_file_path)
 
 
 class OMEGABatchObject(OMEGABase):
