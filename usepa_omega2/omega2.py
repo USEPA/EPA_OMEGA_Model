@@ -5,7 +5,6 @@ omega2.py
 OMEGA2 top level code
 
 """
-from usepa_omega2 import omega_log
 
 print('importing %s' % __file__)
 

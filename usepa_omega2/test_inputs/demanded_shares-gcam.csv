@@ -1,5 +1,6 @@
 input_template_name:,demanded_shares_gcam,input_template_version:,0.0002,,,
 market_class_id,calendar_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate
+hauling.BEV,2020,12000,5,5,0.142,0.1
 hauling.BEV,2021,12000,5,5,0.142,0.1
 hauling.BEV,2022,12000,5,5,0.168,0.1
 hauling.BEV,2023,12000,5,5,0.198,0.1
@@ -30,6 +31,7 @@ hauling.BEV,2047,12000,5,5,0.968,0.1
 hauling.BEV,2048,12000,5,5,0.973,0.1
 hauling.BEV,2049,12000,5,5,0.978,0.1
 hauling.BEV,2050,12000,5,5,0.982,0.1
+hauling.ICE,2020,12000,5,5,1,0.1
 hauling.ICE,2021,12000,5,5,1,0.1
 hauling.ICE,2022,12000,5,5,1,0.1
 hauling.ICE,2023,12000,5,5,1,0.1
@@ -60,6 +62,7 @@ hauling.ICE,2047,12000,5,5,1,0.1
 hauling.ICE,2048,12000,5,5,1,0.1
 hauling.ICE,2049,12000,5,5,1,0.1
 hauling.ICE,2050,12000,5,5,1,0.1
+non hauling.BEV,2020,12000,5,5,0.142,0.1
 non hauling.BEV,2021,12000,5,5,0.142,0.1
 non hauling.BEV,2022,12000,5,5,0.168,0.1
 non hauling.BEV,2023,12000,5,5,0.198,0.1
@@ -90,6 +93,7 @@ non hauling.BEV,2047,12000,5,5,0.968,0.1
 non hauling.BEV,2048,12000,5,5,0.973,0.1
 non hauling.BEV,2049,12000,5,5,0.978,0.1
 non hauling.BEV,2050,12000,5,5,0.982,0.1
+non hauling.ICE,2020,12000,5,5,1,0.1
 non hauling.ICE,2021,12000,5,5,1,0.1
 non hauling.ICE,2022,12000,5,5,1,0.1
 non hauling.ICE,2023,12000,5,5,1,0.1

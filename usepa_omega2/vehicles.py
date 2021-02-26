@@ -435,9 +435,9 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.cert_CO2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
                     veh.set_new_vehicle_mfr_cost_dollars()
-                    veh.set_cert_target_CO2_grams_per_mile()
-                    veh.set_cert_target_CO2_Mg()
-                    veh.set_cert_CO2_Mg()
+                    # veh.set_cert_target_CO2_grams_per_mile()
+                    # veh.set_cert_target_CO2_Mg()
+                    # veh.set_cert_CO2_Mg()
 
                     if veh.context_size_class not in context_size_class_dict:
                         context_size_class_dict[veh.context_size_class] = veh.initial_registered_count

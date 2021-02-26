@@ -425,6 +425,7 @@ class OMEGABatchOptions(OMEGABase):
 def run_bundled_sessions(batch, options, remote_batchfile, session_list):
     import pandas as pd
     from omega_log import OMEGALog
+    import time
 
     batch = OMEGABatchObject()
     batch.batch_definition_path = options.batch_path
