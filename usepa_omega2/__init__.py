@@ -53,7 +53,7 @@ try:
             self.session_unique_name = 'OMEGA2 Demo'
             self.session_is_reference = True
             self.verbose = False
-            self.output_folder = 'output' + os.sep
+            self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
