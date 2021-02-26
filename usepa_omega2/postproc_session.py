@@ -7,7 +7,7 @@ post-compliance-modeling output generation (charts, summary files, etc)
 """
 
 from usepa_omega2 import *
-import pandas as pd
+# import pandas as pd
 from omega_plot import *
 
 
@@ -26,7 +26,6 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     from manufacturer_annual_data import ManufacturerAnnualData
     from consumer.market_classes import MarketClass
     import pandas as pd
-    import numpy as np
 
     if o2.options.calc_effects:
         from effects.o2_effects import run_effects_calcs
@@ -35,26 +34,15 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     if not standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
-    # TODO: this stuff has no business being in the mad
-    bev_non_hauling_share_frac = np.array(sql_unpack_result(
-        o2.session.query(ManufacturerAnnualData.bev_non_hauling_share_frac).all()))
-    ice_non_hauling_share_frac = np.array(sql_unpack_result(
-        o2.session.query(ManufacturerAnnualData.ice_non_hauling_share_frac).all()))
-    bev_hauling_share_frac = np.array(
-        sql_unpack_result(o2.session.query(ManufacturerAnnualData.bev_hauling_share_frac).all()))
-    ice_hauling_share_frac = np.array(
-        sql_unpack_result(o2.session.query(ManufacturerAnnualData.ice_hauling_share_frac).all()))
-
     calendar_years = ManufacturerAnnualData.get_calendar_years()
 
     plot_iteration(iteration_log)
 
     cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = plot_manufacturer_compliance(calendar_years)
 
-    plot_total_sales(calendar_years)
+    total_sales = plot_total_sales(calendar_years)
 
-    plot_market_shares(bev_hauling_share_frac, bev_non_hauling_share_frac, calendar_years, ice_hauling_share_frac,
-                       ice_non_hauling_share_frac)
+    market_share_results = plot_market_shares(calendar_years, total_sales)
 
     average_cost_data = plot_vehicle_cost(calendar_years)
 
@@ -67,10 +55,8 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     session_results['cert_co2_Mg'] = cert_co2_Mg
     session_results['total_cost_billions'] = total_cost_billions
 
-    session_results['bev_non_hauling_share_frac'] = bev_non_hauling_share_frac
-    session_results['ice_non_hauling_share_frac'] = ice_non_hauling_share_frac
-    session_results['bev_hauling_share_frac'] = bev_hauling_share_frac
-    session_results['ice_hauling_share_frac'] = ice_hauling_share_frac
+    for k in market_share_results:
+        session_results[k] = market_share_results[k]
 
     for hc in hauling_classes:
         session_results['average_%s_cost' % hc] = average_cost_data[hc]
@@ -185,10 +171,70 @@ def plot_vehicle_cost(calendar_years):
     return average_cost_data
 
 
-def plot_market_shares(bev_hauling_share_frac, bev_non_hauling_share_frac, calendar_years, ice_hauling_share_frac,
-                       ice_non_hauling_share_frac):
-    hauling_share_frac = bev_hauling_share_frac + ice_hauling_share_frac
-    non_hauling_share_frac = bev_non_hauling_share_frac + ice_non_hauling_share_frac
+def plot_market_shares(calendar_years, total_sales):
+    from vehicle_annual_data import VehicleAnnualData
+    from vehicles import VehicleFinal
+
+    market_share_results = dict()
+
+    hauling_share_frac = []
+    for idx, cy in enumerate(calendar_years):
+        hauling_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                                   .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                                   .filter(VehicleFinal.hauling_class == 'hauling')
+                                   .filter(VehicleAnnualData.calendar_year == cy)
+                                   .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+    market_share_results['share_frac_hauling'] = hauling_share_frac
+
+    non_hauling_share_frac = []
+    for idx, cy in enumerate(calendar_years):
+        non_hauling_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                                   .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                                   .filter(VehicleFinal.hauling_class == 'non_hauling')
+                                   .filter(VehicleAnnualData.calendar_year == cy)
+                                   .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+    market_share_results['share_frac_non_hauling'] = non_hauling_share_frac
+
+    bev_non_hauling_share_frac = []
+    for idx, cy in enumerate(calendar_years):
+        bev_non_hauling_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                                                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                                                .filter(VehicleFinal.hauling_class == 'non_hauling')
+                                                .filter(VehicleFinal.fueling_class == 'BEV')
+                                                .filter(VehicleAnnualData.calendar_year == cy)
+                                                .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+    market_share_results['share_frac_bev_non_hauling'] = bev_non_hauling_share_frac
+
+    ice_non_hauling_share_frac = []
+    for idx, cy in enumerate(calendar_years):
+        ice_non_hauling_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                                                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                                                .filter(VehicleFinal.hauling_class == 'non_hauling')
+                                                .filter(VehicleFinal.fueling_class == 'ICE')
+                                                .filter(VehicleAnnualData.calendar_year == cy)
+                                                .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+    market_share_results['share_frac_ice_non_hauling'] = ice_non_hauling_share_frac
+
+    bev_hauling_share_frac = []
+    for idx, cy in enumerate(calendar_years):
+        bev_hauling_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                                                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                                                .filter(VehicleFinal.hauling_class == 'hauling')
+                                                .filter(VehicleFinal.fueling_class == 'BEV')
+                                                .filter(VehicleAnnualData.calendar_year == cy)
+                                                .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+    market_share_results['share_frac_bev_hauling'] = bev_hauling_share_frac
+
+    ice_hauling_share_frac = []
+    for idx, cy in enumerate(calendar_years):
+        ice_hauling_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                                                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                                                .filter(VehicleFinal.hauling_class == 'hauling')
+                                                .filter(VehicleFinal.fueling_class == 'ICE')
+                                                .filter(VehicleAnnualData.calendar_year == cy)
+                                                .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+    market_share_results['share_frac_ice_hauling'] = ice_hauling_share_frac
+
     fig, ax1 = fplothg(calendar_years, bev_non_hauling_share_frac, '.--')
     ax1.plot(calendar_years, ice_non_hauling_share_frac, '.-')
     ax1.plot(calendar_years, bev_hauling_share_frac, '.--')
@@ -199,6 +245,8 @@ def plot_market_shares(bev_hauling_share_frac, bev_non_hauling_share_frac, calen
     label_xyt(ax1, 'Year', 'Market Share Frac', '%s\nMarket Shares' % o2.options.session_unique_name)
     ax1.legend(['bev_non_hauling', 'ice_non_hauling', 'bev_hauling', 'ice_hauling', 'hauling', 'non_hauling'])
     fig.savefig(o2.options.output_folder + '%s Market Shares.png' % o2.options.session_unique_name)
+
+    return market_share_results
 
 
 def plot_total_sales(calendar_years):
@@ -219,6 +267,8 @@ def plot_total_sales(calendar_years):
     label_xyt(ax1, 'Year', 'Sales [millions]', '%s\nTotal Sales Versus Calendar Year\n Total Sales %.2f Million' % (
         o2.options.session_unique_name, total_sales.sum() / 1e6))
     fig.savefig(o2.options.output_folder + '%s Total Sales v Year.png' % o2.options.session_unique_name)
+
+    return total_sales
 
 
 def plot_manufacturer_compliance(calendar_years):

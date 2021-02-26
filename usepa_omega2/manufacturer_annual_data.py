@@ -7,7 +7,6 @@ manufacturer_annual_data.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -21,25 +20,14 @@ class ManufacturerAnnualData(SQABase):
     cert_target_co2_Mg = Column('cert_target_co2_megagrams', Numeric)
     manufacturer_vehicle_cost_dollars = Column('manufacturer_vehicle_cost_dollars', Numeric)
 
-    bev_non_hauling_share_frac = Column('bev_non_hauling_share_frac', Numeric)
-    ice_non_hauling_share_frac = Column('ice_non_hauling_share_frac', Numeric)
-    bev_hauling_share_frac = Column('bev_hauling_share_frac', Numeric)
-    ice_hauling_share_frac = Column('ice_hauling_share_frac', Numeric)
-
     @staticmethod
     def create_manufacturer_annual_data(calendar_year, manufacturer_ID, cert_target_co2_Mg,
-                                        cert_co2_Mg, manufacturer_vehicle_cost_dollars,
-                                        bev_non_hauling_share_frac, ice_non_hauling_share_frac,
-                                        bev_hauling_share_frac, ice_hauling_share_frac):
+                                        cert_co2_Mg, manufacturer_vehicle_cost_dollars):
         o2.session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
                                               calendar_year=calendar_year,
                                               cert_target_co2_Mg=cert_target_co2_Mg,
                                               cert_co2_Mg=cert_co2_Mg,
                                               manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
-                                              bev_non_hauling_share_frac=bev_non_hauling_share_frac,
-                                              ice_non_hauling_share_frac=ice_non_hauling_share_frac,
-                                              bev_hauling_share_frac=bev_hauling_share_frac,
-                                              ice_hauling_share_frac=ice_hauling_share_frac,
                                               ))
         o2.session.flush()
 

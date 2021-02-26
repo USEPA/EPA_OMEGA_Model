@@ -308,14 +308,6 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
                                         cert_target_co2_Mg=cert_target_co2_Mg,
                                         cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
-                                        bev_non_hauling_share_frac=winning_combo['producer_share_frac_non hauling.BEV'] *
-                                                                   winning_combo['producer_share_frac_non hauling'],
-                                        ice_non_hauling_share_frac=winning_combo['producer_share_frac_non hauling.ICE'] *
-                                                                   winning_combo['producer_share_frac_non hauling'],
-                                        bev_hauling_share_frac=winning_combo['producer_share_frac_hauling.BEV'] *
-                                                               winning_combo['producer_share_frac_hauling'],
-                                        ice_hauling_share_frac=winning_combo['producer_share_frac_hauling.ICE'] *
-                                                               winning_combo['producer_share_frac_hauling'],
                                         )
     o2.session.flush()
 

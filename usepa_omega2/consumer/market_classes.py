@@ -6,7 +6,6 @@ market_classes.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -15,7 +14,7 @@ def populate_market_classes(market_class_dict, market_class, obj):
 
     :param market_class_dict: dict of dicts of market classes
     :param market_class: dot separated market class name e.g. 'hauling.BEV',
-        possibly with reg class suffix e.g. 'non hauling.ICE.car' depending on the market_class_dict
+        possibly with reg class suffix e.g. 'non_hauling.ICE.car' depending on the market_class_dict
     :param obj: object to place in a set in the appropriate leaf
     :return: modifies market_class_dict
     """
@@ -119,9 +118,9 @@ class MarketClass(SQABase, OMEGABase):
         elif vehicle.hauling_class == 'hauling' and vehicle.electrification_class != 'EV':
             market_class_ID = 'hauling.ICE'
         elif vehicle.electrification_class == 'EV':
-            market_class_ID = 'non hauling.BEV'
+            market_class_ID = 'non_hauling.BEV'
         else:
-            market_class_ID = 'non hauling.ICE'
+            market_class_ID = 'non_hauling.ICE'
 
         return market_class_ID
 

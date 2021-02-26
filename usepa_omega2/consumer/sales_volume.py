@@ -38,7 +38,7 @@ def context_new_vehicle_sales(model_year):
     ICE_share = VehicleAnnualData.get_initial_fueling_class_registered_count('ICE') / total_sales_initial
     BEV_share = VehicleAnnualData.get_initial_fueling_class_registered_count('BEV') / total_sales_initial
 
-    # pulling in hauling sales, non hauling = total minus hauling
+    # pulling in hauling sales, non_hauling = total minus hauling
     hauling_sales = 0
     for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
         hauling_sales = hauling_sales + \
@@ -46,7 +46,7 @@ def context_new_vehicle_sales(model_year):
                         ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
 
     sales_dict['hauling'] = hauling_sales
-    sales_dict['non hauling'] = total_sales - hauling_sales
+    sales_dict['non_hauling'] = total_sales - hauling_sales
     sales_dict['ICE'] = total_sales * ICE_share
     sales_dict['BEV'] = total_sales * BEV_share
     sales_dict['total'] = total_sales
