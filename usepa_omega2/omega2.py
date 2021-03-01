@@ -405,6 +405,7 @@ def calculate_hauling_class_data(winning_combo):
         winning_combo['average_cost_%s' % hc] = 0
         winning_combo['average_price_%s' % hc] = 0
         winning_combo['sales_%s' % hc] = 0
+        winning_combo['producer_abs_market_share_frac_%s' % hc] = 0
 
         for mc in MarketClass.market_classes:
             if hc in mc.split('.'):
@@ -412,10 +413,10 @@ def calculate_hauling_class_data(winning_combo):
                 if 'average_price_%s' % mc in winning_combo:
                     winning_combo['average_price_%s' % hc] += winning_combo['average_price_%s' % mc] * winning_combo['sales_%s' % mc]
                 winning_combo['sales_%s' % hc] += winning_combo['sales_%s' % mc]
+                winning_combo['producer_abs_market_share_frac_%s' % hc] += winning_combo['producer_abs_market_share_frac_%s' % mc]
 
         winning_combo['average_cost_%s' % hc] = winning_combo['average_cost_%s' % hc] / winning_combo['sales_%s' % hc]
         winning_combo['average_price_%s' % hc] = winning_combo['average_price_%s' % hc] / winning_combo['sales_%s' % hc]
-
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
     converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= 1e-4
