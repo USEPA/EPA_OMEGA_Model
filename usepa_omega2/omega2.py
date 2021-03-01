@@ -407,7 +407,7 @@ def calculate_hauling_class_data(winning_combo):
         winning_combo['sales_%s' % hc] = 0
 
         for mc in MarketClass.market_classes:
-            if mc.startswith(hc):
+            if hc in mc.split('.'):
                 winning_combo['average_cost_%s' % hc] += winning_combo['average_cost_%s' % mc] * winning_combo['sales_%s' % mc]
                 if 'average_price_%s' % mc in winning_combo:
                     winning_combo['average_price_%s' % hc] += winning_combo['average_price_%s' % mc] * winning_combo['sales_%s' % mc]
