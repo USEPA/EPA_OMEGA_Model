@@ -46,7 +46,9 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     average_cost_data = plot_vehicle_cost(calendar_years)
 
-    average_co2_gpmi_data = plot_co2_gpmi(calendar_years)
+    average_cert_co2_gpmi_data = plot_cert_co2_gpmi(calendar_years)
+
+    average_target_co2_gpmi_data = plot_target_co2_gpmi(calendar_years)
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = calendar_years
@@ -60,18 +62,21 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     for hc in hauling_classes:
         session_results['average_%s_cost' % hc] = average_cost_data[hc]
-        session_results['average_%s_co2_gpmi' % hc] = average_co2_gpmi_data[hc]
+    session_results['average_%s_cert_co2_gpmi' % hc] = average_cert_co2_gpmi_data[hc]
+    session_results['average_%s_target_co2_gpmi' % hc] = average_target_co2_gpmi_data[hc]
     session_results['average_vehicle_cost'] = average_cost_data['total']
-    session_results['average_vehicle_co2_gpmi'] = average_co2_gpmi_data['total']
+    session_results['average_vehicle_cert_co2_gpmi'] = average_cert_co2_gpmi_data['total']
+    session_results['average_vehicle_target_co2_gpmi'] = average_target_co2_gpmi_data['total']
 
     for mc in MarketClass.market_classes:
-        session_results['average_co2_gpmi_%s' % mc] = average_co2_gpmi_data[mc]
+        session_results['average_cert_co2_gpmi_%s' % mc] = average_cert_co2_gpmi_data[mc]
+        session_results['average_target_co2_gpmi_%s' % mc] = average_target_co2_gpmi_data[mc]
         session_results['average_cost_%s' % mc] = average_cost_data[mc]
 
     return session_results
 
 
-def plot_co2_gpmi(calendar_years):
+def plot_cert_co2_gpmi(calendar_years):
     from vehicles import VehicleFinal
     from vehicle_annual_data import VehicleAnnualData
     from consumer.market_classes import MarketClass
@@ -118,6 +123,56 @@ def plot_co2_gpmi(calendar_years):
     ax1.set_ylim(0, 500)
     ax1.legend(average_co2_gpmi_data.keys())
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi.png' % o2.options.session_unique_name)
+    return average_co2_gpmi_data
+
+
+def plot_target_co2_gpmi(calendar_years):
+    from vehicles import VehicleFinal
+    from vehicle_annual_data import VehicleAnnualData
+    from consumer.market_classes import MarketClass
+
+    # g/mi chart
+    fig, ax1 = figure()
+    average_co2_gpmi_data = dict()
+    for hc in hauling_classes:
+        average_co2_gpmi_data[hc] = []
+        for cy in calendar_years:
+            average_co2_gpmi_data[hc].append(o2.session.query(
+                func.sum(VehicleFinal.cert_target_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleAnnualData.registered_count)).
+                                             filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.hauling_class == hc).
+                                             filter(VehicleAnnualData.age == 0).scalar())
+        ax1.plot(calendar_years, average_co2_gpmi_data[hc])
+    for mc in MarketClass.market_classes:
+        average_co2_gpmi_data[mc] = []
+        for cy in calendar_years:
+            average_co2_gpmi_data[mc].append(o2.session.query(
+                func.sum(VehicleFinal.cert_target_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleAnnualData.registered_count)).
+                                             filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.market_class_ID == mc).
+                                             filter(VehicleAnnualData.age == 0).scalar())
+        if 'ICE' in mc:
+            ax1.plot(calendar_years, average_co2_gpmi_data[mc], '.-')
+        else:
+            ax1.plot(calendar_years, average_co2_gpmi_data[mc], '.--')
+    average_co2_gpmi_data['total'] = []
+    for cy in calendar_years:
+        average_co2_gpmi_data['total'].append(o2.session.query(
+            func.sum(VehicleFinal.cert_target_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+            func.sum(VehicleAnnualData.registered_count)).
+                                              filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                              filter(VehicleFinal.model_year == cy).
+                                              filter(VehicleAnnualData.age == 0).scalar())
+    ax1.plot(calendar_years, average_co2_gpmi_data['total'])
+    label_xyt(ax1, 'Year', 'Average Vehicle Target CO2 [g/mi]',
+              '%s\nAverage Vehicle Target CO2 g/mi v Year' % o2.options.session_unique_name)
+    ax1.set_ylim(0, 500)
+    ax1.legend(average_co2_gpmi_data.keys())
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Target CO2 gpmi.png' % o2.options.session_unique_name)
     return average_co2_gpmi_data
 
 
