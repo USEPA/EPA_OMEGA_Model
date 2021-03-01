@@ -78,10 +78,10 @@ def get_demanded_shares(market_class_data, calendar_year):
             else:
                 if 'non_hauling' in market_class_id:  # .split('.'):
                     demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
-                    demanded_absolute_share = demanded_share * market_class_data['producer_share_frac_%s' % market_class_id]
+                    demanded_absolute_share = demanded_share * market_class_data['producer_share_frac_non_hauling']
                 else:
                     demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
-                    demanded_absolute_share = demanded_share * market_class_data['producer_share_frac_%s' % market_class_id]
+                    demanded_absolute_share = demanded_share * market_class_data['producer_share_frac_hauling']
 
                 market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                 market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
