@@ -71,12 +71,12 @@ def get_demanded_shares(market_class_data, calendar_year):
 
             if pass_num == 0:
                 ## ToDo: These market class conditions should be made more general, instead of using string searches.
-                if 'non_hauling' in market_class_id:  # .split('.'):
+                if 'non_hauling' in market_class_id.split('.'):
                     sales_share_denominator_all_nonhauling = sales_share_denominator_all_nonhauling + sales_share_numerator
                 else:
                     sales_share_denominator_all_hauling = sales_share_denominator_all_hauling + sales_share_numerator
             else:
-                if 'non_hauling' in market_class_id:  # .split('.'):
+                if 'non_hauling' in market_class_id.split('.'):
                     demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
                     demanded_absolute_share = demanded_share * market_class_data['producer_abs_market_share_frac_non_hauling']
                 else:
