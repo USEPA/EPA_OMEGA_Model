@@ -22,8 +22,8 @@ def calculate_generalized_cost(cost_factors):
 sweep_list = ['ICE', 'BEV']
 # sweep_list = ['hauling', 'non hauling']
 # sweep_list = ['ICE', 'BEV', 'hauling', 'non hauling']
-def create_tech_options_from_market_class_tree(calendar_year, market_class_dict, producer_bev_share, share_range,
-                                               consumer_bev_share, parent='', verbose=False):
+def create_compliance_options(calendar_year, market_class_dict, producer_bev_share, share_range,
+                              consumer_bev_share, parent='', verbose=False):
     """
 
     :param market_class_dict:
@@ -33,16 +33,17 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
     children = list(market_class_dict)
 
+    # create tech options from market class tree
     for k in market_class_dict:
         if verbose:
             print('processing ' + k)
         if type(market_class_dict[k]) is dict:
             # process subtree
             child_df_list.append(
-                create_tech_options_from_market_class_tree(calendar_year, market_class_dict[k],
-                                                           producer_bev_share, share_range,
-                                                           consumer_bev_share,
-                                                           parent=k))
+                create_compliance_options(calendar_year, market_class_dict[k],
+                                          producer_bev_share, share_range,
+                                          consumer_bev_share,
+                                          parent=k))
         else:
             # process leaf
             for new_veh in market_class_dict[k]:
@@ -98,6 +99,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
 
                 child_df_list.append(df)
 
+    # crate market share options (or inherit from consumer response)
     if parent:
         sales_share_column_names = ['producer_share_frac_' + parent + '.' + c for c in children]
     else:
@@ -124,6 +126,7 @@ def create_tech_options_from_market_class_tree(calendar_year, market_class_dict,
             else:
                 sales_share_df[cn] = [consumer_bev_share[cn.replace('producer', 'consumer')]]
 
+    # combine tech and market share options
     if verbose:
         print('combining ' + str(children))
     tech_combos_df = pd.DataFrame()
@@ -175,9 +178,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
         manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
-        tech_share_combos_total = create_tech_options_from_market_class_tree(calendar_year, market_class_tree,
-                                                                             winning_combos, share_range,
-                                                                             consumer_bev_share)
+        tech_share_combos_total = create_compliance_options(calendar_year, market_class_tree,
+                                                            winning_combos, share_range,
+                                                            consumer_bev_share)
 
         calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total)
 
