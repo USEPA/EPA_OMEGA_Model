@@ -10,7 +10,7 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
-params_dict = dict()
+cache = dict()
 
 
 class DemandedSharesGCAM(SQABase, OMEGABase):
@@ -40,15 +40,17 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
 
         """
         key = '%s_%s' % (calendar_year, market_class_id)
-        if not key in params_dict:
-            params_dict[key] = o2.session.query(DemandedSharesGCAM). \
+        if not key in cache:
+            cache[key] = o2.session.query(DemandedSharesGCAM). \
                 filter(DemandedSharesGCAM.calendar_year == calendar_year). \
                 filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
 
-        return params_dict[key]
+        return cache[key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
