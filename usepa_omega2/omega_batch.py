@@ -633,7 +633,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                     relocate_file(options.batch_path + source_folder, source_folder + os.sep + f)
 
             # write a copy of the original batch definition file to the bundle
-            relocate_file(options.bundle_path_root, options.batch_file)
+            relocate_file(options.batch_path, options.batch_file)
 
             # write a copy of the expanded, validated batch to the source batch_file directory:
             if '.csv' in options.batch_file:
