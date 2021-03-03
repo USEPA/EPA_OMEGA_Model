@@ -53,6 +53,7 @@ try:
             self.session_unique_name = 'OMEGA2 Demo'
             self.session_is_reference = True
             self.verbose = False
+            self.auto_close_figures = True
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
@@ -93,7 +94,7 @@ try:
 
             self.iterate_producer_consumer = True
             self.producer_consumer_max_iterations = 20
-            self.producer_consumer_iteration_tolerance = 5e-3
+            self.producer_consumer_iteration_tolerance = 1e-3
 
             self.consumer_pricing_num_options = 4
             self.consumer_pricing_multiplier_min = 0.95

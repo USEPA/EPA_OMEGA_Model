@@ -14,6 +14,85 @@ from usepa_omega2.consumer import stock
 import postproc_session
 
 
+def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decision_and_response, iteration_num,
+                              producer_pricing_iteration):
+    """
+
+    Args:
+        calendar_year:
+        convergence_error:
+        producer_decision_and_response:
+        iteration_num:
+        producer_pricing_iteration:
+
+    Returns:
+
+    """
+    from consumer.market_classes import MarketClass
+    import consumer
+
+    for mc in MarketClass.market_classes:
+        omega_log.logwrite(('%d producer/consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) +
+                           '= %.4f / %.4f (DELTA:%f, CE:%f)' % (
+                               producer_decision_and_response['producer_abs_share_frac_%s' % mc],
+                               producer_decision_and_response['consumer_abs_share_frac_%s' % mc],
+                               abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
+                                   producer_decision_and_response[
+                                       'consumer_abs_share_frac_%s' % mc]),
+                               abs(1 - producer_decision_and_response['producer_abs_share_frac_%s' % mc] /
+                                   producer_decision_and_response[
+                                       'consumer_abs_share_frac_%s' % mc])
+                           ), echo_console=True)
+    omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
+
+    for cat in consumer.market_categories:
+        omega_log.logwrite(
+            ('price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
+            producer_decision_and_response['average_price_%s' % cat],
+            producer_decision_and_response['average_cost_%s' % cat],
+            producer_decision_and_response['average_price_%s' % cat] /
+            producer_decision_and_response['average_cost_%s' % cat]
+            ), echo_console=True)
+
+    omega_log.logwrite(
+        'price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_price_total'],
+                                                             producer_decision_and_response['average_cost_total'],
+                                                             producer_decision_and_response['average_price_total'] /
+                                                             producer_decision_and_response['average_cost_total']
+                                                             ), echo_console=True)
+    omega_log.logwrite(
+        '%d_%d_%d  SCORE:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_pricing_iteration,
+                                                producer_decision_and_response['pricing_score'],
+                                                producer_decision_and_response['abs_share_delta_total'],
+                                                producer_decision_and_response['sales_ratio']), echo_console=True)
+
+
+def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, producer_pricing_iteration,
+                         compliant, convergence_error):
+    """
+
+    Args:
+        calendar_year:
+        converged:
+        iteration_log:
+        iteration_num:
+        producer_pricing_iteration:
+        compliant:
+        convergence_error:
+
+    Returns:
+
+    """
+    iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
+    iteration_log.loc[iteration_log.index[-1], 'pricing_iteration'] = producer_pricing_iteration
+    iteration_log.loc[iteration_log.index[-1], 'calendar_year'] = calendar_year
+    iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
+    iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
+    iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
+    if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
+        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
+
+
 def run_producer_consumer():
     """
     Create producer cost-minimizing technology and market share options, in consideration of market response from
@@ -54,30 +133,25 @@ def run_producer_consumer():
                     producer.run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_response,
                                                   iteration_num)
 
-                if producer_compliant or True:
-                    market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
-                                                                       winning_combo)
+                market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
+                                                                   winning_combo)
 
-                    best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
-                        iterate_producer_consumer_pricing(calendar_year, best_winning_combo_with_sales_response,
-                                                          candidate_mfr_composite_vehicles, iteration_log,
-                                                          iteration_num, market_class_vehicle_dict, winning_combo)
+                best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
+                    iterate_producer_consumer_pricing(calendar_year, best_winning_combo_with_sales_response,
+                                                      candidate_mfr_composite_vehicles, iteration_log,
+                                                      iteration_num, market_class_vehicle_dict, winning_combo)
 
-                    producer_consumer_iteration = -1  # flag end of pricing subiteration
+                producer_consumer_iteration = -1  # flag end of pricing subiteration
 
-                    converged, convergence_error = \
-                        detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
+                converged, convergence_error = \
+                    detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
-                    iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
-                    update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
-                                         producer_consumer_iteration, producer_compliant, convergence_error)
+                iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
+                update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+                                     producer_consumer_iteration, producer_compliant, convergence_error)
 
-                    prev_producer_decision_and_response = producer_decision_and_response
-                    prev_candidate_mfr_composite_vehicles = candidate_mfr_composite_vehicles
-                else:
-                    # roll back to prior iteration result, can't comply based on consumer response
-                    producer_decision_and_response = prev_producer_decision_and_response
-                    candidate_mfr_composite_vehicles = prev_candidate_mfr_composite_vehicles
+                prev_producer_decision_and_response = producer_decision_and_response
+                prev_candidate_mfr_composite_vehicles = candidate_mfr_composite_vehicles
 
                 # decide whether to iterate or not
                 iterate = o2.options.iterate_producer_consumer \
@@ -103,7 +177,20 @@ def run_producer_consumer():
 def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_response, candidate_mfr_composite_vehicles,
                                       iteration_log, iteration_num, market_class_vehicle_dict,
                                       producer_decision):
+    """
 
+    Args:
+        calendar_year:
+        best_producer_decision_and_response:
+        candidate_mfr_composite_vehicles:
+        iteration_log:
+        iteration_num:
+        market_class_vehicle_dict:
+        producer_decision:
+
+    Returns:
+
+    """
     from consumer.market_classes import MarketClass
     import producer
     import consumer
@@ -113,7 +200,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
     for mc in market_class_vehicle_dict:
         producer_decision['winning_combo_share_weighted_cost'] = producer_decision['winning_combo_share_weighted_cost'] + \
                                                                  producer_decision['average_cost_%s' % mc] * \
-                                                                 producer_decision['producer_abs_market_share_frac_%s' % mc]
+                                                                 producer_decision['producer_abs_share_frac_%s' % mc]
 
     producer_decision['total_sales'] = \
         consumer.sales_volume.new_vehicle_sales_response(calendar_year,
@@ -154,10 +241,12 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
             producer_decision_and_response['total_combo_target_co2_megagrams']
 
         # calculate distance to origin (minimal price and market share error):
-        score_sum_of_squares = producer_decision_and_response['share_weighted_share_delta']**2
-        for hc in hauling_classes:
-            score_sum_of_squares += abs(1 - producer_decision_and_response['average_price_%s' % hc] /
-                                        producer_decision_and_response['average_cost_%s' % hc])**2
+        score_sum_of_squares = producer_decision_and_response['abs_share_delta_total']**2
+        # add terms to maintain prices of non-responsive market categories during convergence:
+        for cat in consumer.non_responsive_market_categories:
+            score_sum_of_squares += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
+                                        producer_decision_and_response['average_cost_%s' % cat])**2
+
         producer_decision_and_response['pricing_score'] = score_sum_of_squares**0.5
 
         if o2.options.log_producer_decision_and_response_years == 'all' or \
@@ -168,6 +257,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
         producer_decision_and_response = \
             producer_decision_and_response.loc[producer_decision_and_response['pricing_score'].idxmin()]
 
+        # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
+        # any slight offset during the convergence process:
         # ###############################################################################################################
         # if o2.options.session_is_reference:
         #     calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
@@ -214,26 +305,35 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
 
 def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response):
+    """
+
+    Args:
+        calendar_year:
+        market_class_vehicle_dict:
+        producer_decision_and_response:
+
+    Returns:
+
+    """
     import consumer
 
-    producer_decision_and_response['share_weighted_share_delta'] = 0
+    producer_decision_and_response['abs_share_delta_total'] = 0
     producer_decision_and_response['average_price_total'] = 0
     producer_decision_and_response['average_cost_total'] = 0
+
     for mc in market_class_vehicle_dict:
-        producer_decision_and_response['share_weighted_share_delta'] += abs(
-            producer_decision_and_response['producer_share_frac_%s' % mc] -
-            producer_decision_and_response['consumer_share_frac_%s' % mc]) \
-                                                                        * producer_decision_and_response[
-                                                                            'consumer_abs_share_frac_%s' % mc]
+        producer_decision_and_response['abs_share_delta_total'] += abs(
+            producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
+            producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
 
-        producer_decision_and_response['average_price_total'] += producer_decision_and_response[
-                                                                     'average_price_%s' % mc] * \
-                                                                 producer_decision_and_response[
-                                                                     'consumer_abs_share_frac_%s' % mc]
+        producer_decision_and_response['average_price_total'] += \
+            producer_decision_and_response['average_price_%s' % mc] * \
+            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
-        producer_decision_and_response['average_cost_total'] += producer_decision_and_response['average_cost_%s' % mc] * \
-                                                                producer_decision_and_response[
-                                                                    'consumer_abs_share_frac_%s' % mc]
+        producer_decision_and_response['average_cost_total'] += \
+            producer_decision_and_response['average_cost_%s' % mc] * \
+            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+
     # calculate new total sales demand based on total share weighted price
     producer_decision_and_response['new_vehicle_sales'] = \
         consumer.sales_volume.new_vehicle_sales_response(calendar_year,
@@ -242,7 +342,18 @@ def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_de
 
 def calculate_price_options(continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
                             producer_decision_and_response):
+    """
 
+    Args:
+        continue_search:
+        multiplier_columns:
+        prev_multiplier_range:
+        price_options_df:
+        producer_decision_and_response:
+
+    Returns:
+
+    """
     import numpy as np
     from consumer.market_classes import MarketClass
 
@@ -275,7 +386,17 @@ def calculate_price_options(continue_search, multiplier_columns, prev_multiplier
 
 def tighten_multiplier_range(mcc, prev_multiplier_range, producer_decision_and_response,
                              search_collapsed):
+    """
 
+    Args:
+        mcc:
+        prev_multiplier_range:
+        producer_decision_and_response:
+        search_collapsed:
+
+    Returns:
+
+    """
     import numpy as np
 
     prev_multiplier_span_frac = prev_multiplier_range[mcc][-1] / prev_multiplier_range[mcc][0] - 1
@@ -304,59 +425,18 @@ def tighten_multiplier_range(mcc, prev_multiplier_range, producer_decision_and_r
     return multiplier_range, search_collapsed
 
 
-def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decision_and_response, iteration_num, producer_pricing_iteration):
-    from consumer.market_classes import MarketClass
-
-    for mc in MarketClass.market_classes:
-        omega_log.logwrite(('%d producer/consumer_share_frac_%s' % (calendar_year, mc)).ljust(50) +
-                           '= %.4f / %.4f (DELTA:%f, CE:%f)' % (
-                               producer_decision_and_response['producer_share_frac_%s' % mc],
-                               producer_decision_and_response['consumer_share_frac_%s' % mc],
-                               abs(producer_decision_and_response['producer_share_frac_%s' % mc] - producer_decision_and_response[
-                                   'consumer_share_frac_%s' % mc]),
-                               abs(1 - producer_decision_and_response['producer_share_frac_%s' % mc] / producer_decision_and_response[
-                                   'consumer_share_frac_%s' % mc])
-                           ), echo_console=True)
-    omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
-    for hc in hauling_classes:
-        omega_log.logwrite(
-            ('price / cost %s' % hc).ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_price_%s' % hc],
-                                                                     producer_decision_and_response['average_cost_%s' % hc],
-                                                                     producer_decision_and_response['average_price_%s' % hc] /
-                                                                     producer_decision_and_response['average_cost_%s' % hc]
-                                                                     ), echo_console=True)
-    omega_log.logwrite('price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_price_total'],
-                                                                            producer_decision_and_response['average_cost_total'],
-                                                                            producer_decision_and_response['average_price_total'] /
-                                                                            producer_decision_and_response['average_cost_total']
-                                                                            ), echo_console=True)
-    omega_log.logwrite(
-        '%d_%d_%d  SCORE:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_pricing_iteration,
-                                                           producer_decision_and_response['pricing_score'],
-                                                           producer_decision_and_response['share_weighted_share_delta'],
-                                                           producer_decision_and_response['sales_ratio']), echo_console=True)
-
-
-def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, producer_pricing_iteration,
-                         compliant, convergence_error):
-    iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
-    iteration_log.loc[iteration_log.index[-1], 'pricing_iteration'] = producer_pricing_iteration
-    iteration_log.loc[iteration_log.index[-1], 'calendar_year'] = calendar_year
-    iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
-    iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
-    iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
-    if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
-
-
 def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winning_combo):
     """
 
-    :param candidate_mfr_composite_vehicles: list of candidate composite vehicles that minimize producer compliance cost
-    :param winning_combo: pandas Series that corresponds with candidate_mfr_composite_vehicles, has market shares, costs,
+    Args:
+        calendar_year:
+        candidate_mfr_composite_vehicles: list of candidate composite vehicles that minimize producer compliance cost
+        winning_combo: pandas Series that corresponds with candidate_mfr_composite_vehicles, has market shares, costs,
             compliance data (Mg CO2)
-    :return: dictionary of candidate vehicles binned by market class and reg class, updates producer_decision with
+
+    Returns: dictionary of candidate vehicles binned by market class and reg class, updates producer_decision with
             sales-weighted average cost and CO2 g/mi by market class
+
     """
 
     from consumer.market_classes import MarketClass
@@ -391,43 +471,62 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
             winning_combo['average_cost_%s' % mc] = 0
             winning_combo['sales_%s' % mc] = 0
 
-        winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
+        # winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
 
-    calculate_hauling_class_data(winning_combo)
+    calculate_market_sector_data(winning_combo)
 
     return market_class_vehicle_dict
 
 
-def calculate_hauling_class_data(winning_combo):
+def calculate_market_sector_data(winning_combo):
+    """
+
+    Args:
+        winning_combo:
+
+    Returns:
+
+    """
+    import consumer
     from consumer.market_classes import MarketClass
 
-    for hc in hauling_classes:
-        winning_combo['average_cost_%s' % hc] = 0
-        winning_combo['average_price_%s' % hc] = 0
-        winning_combo['sales_%s' % hc] = 0
-        winning_combo['producer_abs_market_share_frac_%s' % hc] = 0
+    for mcat in consumer.market_categories:
+        winning_combo['average_cost_%s' % mcat] = 0
+        winning_combo['average_price_%s' % mcat] = 0
+        winning_combo['sales_%s' % mcat] = 0
+        winning_combo['producer_abs_share_frac_%s' % mcat] = 0
 
         for mc in MarketClass.market_classes:
-            if hc in mc.split('.'):
-                winning_combo['average_cost_%s' % hc] += winning_combo['average_cost_%s' % mc] * winning_combo['sales_%s' % mc]
+            if mcat in mc.split('.'):
+                winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * winning_combo['sales_%s' % mc]
                 if 'average_price_%s' % mc in winning_combo:
-                    winning_combo['average_price_%s' % hc] += winning_combo['average_price_%s' % mc] * winning_combo['sales_%s' % mc]
-                winning_combo['sales_%s' % hc] += winning_combo['sales_%s' % mc]
-                winning_combo['producer_abs_market_share_frac_%s' % hc] += winning_combo['producer_abs_market_share_frac_%s' % mc]
+                    winning_combo['average_price_%s' % mcat] += winning_combo['average_price_%s' % mc] * winning_combo['sales_%s' % mc]
+                winning_combo['sales_%s' % mcat] += winning_combo['sales_%s' % mc]
+                winning_combo['producer_abs_share_frac_%s' % mcat] += winning_combo['producer_abs_share_frac_%s' % mc]
 
-        winning_combo['average_cost_%s' % hc] = winning_combo['average_cost_%s' % hc] / winning_combo['sales_%s' % hc]
-        winning_combo['average_price_%s' % hc] = winning_combo['average_price_%s' % hc] / winning_combo['sales_%s' % hc]
+        winning_combo['average_cost_%s' % mcat] = winning_combo['average_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
+        winning_combo['average_price_%s' % mcat] = winning_combo['average_price_%s' % mcat] / winning_combo['sales_%s' % mcat]
 
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
+    """
+
+    Args:
+        producer_decision_and_response:
+        market_class_dict:
+
+    Returns:
+
+    """
+    # TODO: paramaterize the 1e-4?
     converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= 1e-4
     convergence_error = 0
     for mc in market_class_dict:
         # relative percentage convergence on largest market shares:
-        if producer_decision_and_response['producer_share_frac_%s' % mc] >= 0.5:
+        if producer_decision_and_response['producer_abs_share_frac_%s' % mc] >= 0.5:
             convergence_error = \
-                max(convergence_error, abs(1 - producer_decision_and_response['producer_share_frac_%s' % mc] / \
-                                        producer_decision_and_response['consumer_share_frac_%s' % mc]))
+                max(convergence_error, abs(1 - producer_decision_and_response['producer_abs_share_frac_%s' % mc] / \
+                                        producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
             converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
 
     return converged, convergence_error
@@ -435,6 +534,14 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
 
 # noinspection PyUnresolvedReferences
 def init_omega(o2_options):
+    """
+
+    Args:
+        o2_options:
+
+    Returns:
+
+    """
     from omega_log import OMEGALog
 
     # set up global variables:
@@ -567,6 +674,15 @@ def init_omega(o2_options):
 
 
 def run_omega(o2_options, standalone_run=False):
+    """
+
+    Args:
+        o2_options:
+        standalone_run:
+
+    Returns:
+
+    """
     import traceback
     import time
 

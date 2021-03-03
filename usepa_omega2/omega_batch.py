@@ -66,6 +66,7 @@ class OMEGABatchObject(OMEGABase):
         self.sessions = []
         self.dataframe = pd.DataFrame()
         self.batch_log = None
+        self.auto_close_figures = True
 
     def force_numeric_params(self):
         import pandas as pd
@@ -271,7 +272,7 @@ class OMEGASessionObject(OMEGABase):
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.parent.name + '_' + self.name
-
+        self.settings.auto_close_figures = self.parent.auto_close_figures
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
         self.settings.context_folder = self.parent.context_folder
@@ -413,6 +414,7 @@ class OMEGABatchOptions(OMEGABase):
         self.no_bundle = False
         self.verbose = False
         self.timestamp = None
+        self.auto_close_figures = True
         self.dispy = False
         self.dispy_ping = False
         self.dispy_debug = False
@@ -438,6 +440,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
                          errors='ignore')  # drop Type column, no error if it's not there
     batch.force_numeric_params()
     batch.get_batch_settings()
+    batch.auto_close_figures = options.auto_close_figures
     batch.add_sessions(verbose=False)
     # process sessions:
     for s_index in session_list:
@@ -481,8 +484,9 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
 
 
 def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + os.sep + 'bundle', batch_file='',
-                    session_num=None, no_bundle=False, verbose=False, timestamp=None, dispy=False, dispy_ping=False,
-                    dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False, network=False):
+                    session_num=None, no_bundle=False, verbose=False, timestamp=None, show_figures=False, dispy=False,
+                    dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
+                    network=False):
 
     import sys
 
@@ -498,6 +502,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     options.no_bundle = no_bundle  # or args.dispy # or (options.bundle_path_root is not None)
     options.verbose = verbose
     options.timestamp = timestamp
+    options.auto_close_figures = not show_figures
     options.dispy = dispy
     options.dispy_ping = dispy_ping
     options.dispy_debug = dispy_debug
@@ -772,6 +777,7 @@ if __name__ == '__main__':
         parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
         parser.add_argument('--timestamp', type=str,
                             help='Timestamp string, overrides creating timestamp from system clock', default=None)
+        parser.add_argument('--show_figures', action='store_true', help='Display figure windows (no auto-close)')
         parser.add_argument('--dispy', action='store_true', help='Run sessions on dispynode(s)')
         parser.add_argument('--dispy_ping', action='store_true', help='Ping dispynode(s)')
         parser.add_argument('--dispy_debug', action='store_true', help='Enable verbose dispy debug messages)')
@@ -787,9 +793,10 @@ if __name__ == '__main__':
 
         run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
                         batch_file=args.batch_file, session_num=args.session_num, no_bundle=args.no_bundle,
-                        verbose=args.verbose, timestamp=args.timestamp, dispy=args.dispy, dispy_ping=args.dispy_ping,
-                        dispy_debug=args.dispy_debug, dispy_exclusive=args.dispy_exclusive,
-                        dispy_scheduler=args.dispy_scheduler, local=args.local, network=args.network)
+                        verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
+                        dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
+                        dispy_exclusive=args.dispy_exclusive, dispy_scheduler=args.dispy_scheduler, local=args.local,
+                        network=args.network)
 
     except:
         import traceback

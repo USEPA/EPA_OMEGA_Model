@@ -13,27 +13,42 @@ from usepa_omega2 import *
 import numpy as np
 import consumer
 
+cache = dict()
+
 
 # placeholder for producer deemed generalized vehicle cost:
 def calculate_generalized_cost(cost_factors):
+    """
+
+    Args:
+        cost_factors:
+
+    Returns:
+
+    """
     pass
 
 
-sweep_list = ['ICE', 'BEV']
-# sweep_list = ['hauling', 'non hauling']
-# sweep_list = ['ICE', 'BEV', 'hauling', 'non hauling']
-def create_compliance_options(calendar_year, market_class_dict, producer_bev_share, share_range,
-                              consumer_bev_share, parent='', verbose=False):
+def create_compliance_options(calendar_year, market_class_dict, producer_bev_share, share_range, consumer_response,
+                              parent='', verbose=False):
     """
 
-    :param market_class_dict:
-    :return:
+    Args:
+        calendar_year:
+        market_class_dict:
+        producer_bev_share:
+        share_range:
+        consumer_response:
+        parent:
+        verbose:
+
+    Returns:
+
     """
     child_df_list = []
 
     children = list(market_class_dict)
 
-    # create tech options from market class tree
     for k in market_class_dict:
         if verbose:
             print('processing ' + k)
@@ -42,7 +57,7 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
             child_df_list.append(
                 create_compliance_options(calendar_year, market_class_dict[k],
                                           producer_bev_share, share_range,
-                                          consumer_bev_share,
+                                          consumer_response,
                                           parent=k))
         else:
             # process leaf
@@ -76,21 +91,11 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                         co2_gpmi_options = [max_co2_gpmi]
                     else:
                         co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
-                else: # first producer pass, generate normal range of options
+                else:  # first producer pass, generate normal range of options
                     if num_tech_options == 1:
                         co2_gpmi_options = [max_co2_gpmi]
                     else:
                         co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
-
-                # else:  # ICE vehicle and consumer_bev_share available
-                #     if o2.options.allow_backsliding:
-                #         max_co2_gpmi = consumer_bev_share['veh_%s_co2_gpmi' % new_veh.vehicle_ID] * 1.1
-                #     else:
-                #         max_co2_gpmi = min(new_veh.cert_CO2_grams_per_mile, consumer_bev_share['veh_%s_co2_gpmi' % new_veh.vehicle_ID] * 1.1)
-                #
-                #     min_co2_gpmi = max(new_veh.get_min_co2_gpmi(), consumer_bev_share['veh_%s_co2_gpmi' % new_veh.vehicle_ID] * 0.9)
-                #
-                #     co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
                 tech_cost_options = new_veh.get_cost(co2_gpmi_options)
 
@@ -99,49 +104,67 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
 
                 child_df_list.append(df)
 
-    # crate market share options (or inherit from consumer response)
-    if parent:
-        sales_share_column_names = ['producer_share_frac_' + parent + '.' + c for c in children]
-    else:
-        sales_share_column_names = ['producer_share_frac_' + c for c in children]
-
-    if all(s in sweep_list for s in children) and consumer_bev_share is None:
-        if share_range == 1.0:
-            sales_share_df = partition(sales_share_column_names,
-                                       increment=1 / (o2.options.producer_num_market_share_options - 1),
-                                       min_level=0.001)
+    if consumer_response is None:
+        # generate producer desired market shares for responsive market sectors
+        if parent:
+            share_column_names = ['producer_share_frac_' + parent + '.' + c for c in children]
         else:
-            # print('share = %f' % share_range)
-            # print(producer_bev_share[sales_share_column_names])
-            from omega_functions import generate_nearby_shares
-            sales_share_df = generate_nearby_shares(sales_share_column_names, producer_bev_share, share_range,
-                                                    o2.options.producer_num_market_share_options, min_level=0.001)
-    else:
-        sales_share_df = pd.DataFrame()
-        for c, cn in zip(children, sales_share_column_names):
-            if consumer_bev_share is None or cn.replace('producer', 'consumer') not in consumer_bev_share:
-                # maintain initial fleet market share (for now...)
+            share_column_names = ['producer_share_frac_' + c for c in children]
+
+        if all(s in consumer.responsive_market_categories for s in children):
+            if share_range == 1.0:
+                sales_share_df = partition(share_column_names,
+                                           increment=1 / (o2.options.producer_num_market_share_options - 1),
+                                           min_level=0.001)
+            else:
+                from omega_functions import generate_nearby_shares
+                sales_share_df = generate_nearby_shares(share_column_names, producer_bev_share, share_range,
+                                                        o2.options.producer_num_market_share_options, min_level=0.001)
+        else:
+            sales_share_df = pd.DataFrame()
+            for c, cn in zip(children, share_column_names):
                 sales_share_df[cn] = [consumer.sales_volume.context_new_vehicle_sales(calendar_year)[c] /
                                       consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']]
-            else:
-                sales_share_df[cn] = [consumer_bev_share[cn.replace('producer', 'consumer')]]
+    else:
+        # inherit absolute market shares from consumer response
+        if parent:
+            abs_share_column_names = ['producer_abs_share_frac_' + parent + '.' + c for c in children]
+        else:
+            abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
 
-    # combine tech and market share options
+        sales_share_df = pd.DataFrame()
+        share_total = 0
+        for cn in abs_share_column_names:
+            if cn.replace('producer', 'consumer') in consumer_response:
+                sales_share_df[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
+                share_total += sales_share_df[cn]
+
     if verbose:
         print('combining ' + str(children))
     tech_combos_df = pd.DataFrame()
     for df in child_df_list:
         tech_combos_df = cartesian_prod(tech_combos_df, df)
 
-    tech_share_combos_df = cartesian_prod(tech_combos_df, sales_share_df)
+    if not sales_share_df.empty:
+        tech_share_combos_df = cartesian_prod(tech_combos_df, sales_share_df)
+    else:
+        tech_share_combos_df = tech_combos_df
 
     return tech_share_combos_df
 
 
-cache = dict()
-
-
 def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, iteration_num):
+    """
+
+    Args:
+        manufacturer_ID:
+        calendar_year:
+        consumer_bev_share:
+        iteration_num:
+
+    Returns:
+
+    """
     winning_combos = None
     producer_compliance_possible = False
 
@@ -150,24 +173,6 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
     producer_iteration_log = \
         omega_log.IterationLog('%s%d_%d_producer_iteration_log.csv' % (o2.options.output_folder, calendar_year, iteration_num))
-
-    # final_share_accuracy = 0.001
-    # num_compliance_iterations = 12
-    #
-    # # linear share range:
-    # compliance_iteration_share_ranges = \
-    #     np.linspace(1.0,
-    #                 (final_share_accuracy * (o2.options.producer_num_market_share_options - 1) / 2),
-    #                 num_compliance_iterations)  # [1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
-    #
-    # # logarithmic share range:
-    # compliance_iteration_share_ranges = \
-    #     np.e**np.linspace(0,
-    #                       np.log((final_share_accuracy * (o2.options.producer_num_market_share_options - 1) / 2)),
-    #                       num_compliance_iterations)
-    #
-    # if 'producer' in o2.options.verbose_console:
-    #     print(compliance_iteration_share_ranges)
 
     iterate_producer = True
     producer_iteration = 0
@@ -214,7 +219,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
     if 'producer' in o2.options.verbose_console:
         from consumer.market_classes import MarketClass
         for mc in MarketClass.market_classes:
-            omega_log.logwrite(('%d producer_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' % (winning_combo['producer_share_frac_%s' % mc]), echo_console=True)
+            omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' % (winning_combo['producer_abs_share_frac_%s' % mc]), echo_console=True)
         omega_log.logwrite('', echo_console=True)
 
     import copy
@@ -233,6 +238,15 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
 
 def get_initial_vehicle_data(calendar_year, manufacturer_ID):
+    """
+
+    Args:
+        calendar_year:
+        manufacturer_ID:
+
+    Returns:
+
+    """
     from vehicles import VehicleFinal, Vehicle
     from consumer.market_classes import MarketClass, populate_market_classes
 
@@ -286,6 +300,17 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
 
 
 def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_vehicles, winning_combo):
+    """
+
+    Args:
+        calendar_year:
+        manufacturer_ID:
+        manufacturer_composite_vehicles:
+        winning_combo:
+
+    Returns:
+
+    """
     from manufacturer_annual_data import ManufacturerAnnualData
     from vehicles import VehicleFinal
 
@@ -315,18 +340,27 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     o2.session.flush()
 
 
-def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total, total_sales=None):
-    # on the first time through, from the producer module, total_sales = None => use context sales, market shares
-    # come from the producer desired market shares
-    # on the second time through, from the omega2 module, total_sales is determined by sales response, market shares
-    # come from the consumer demanded market shares...
+def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total,
+                                      total_sales=None):
+    """
+    on the first time through, from the producer module, total_sales = None => use context sales, market shares
+    come from the producer desired market shares
+    on the second time through, from the omega2 module, total_sales is determined by sales response, market shares
+    come from the consumer demanded market shares...
+
+    Args:
+        calendar_year:
+        manufacturer_composite_vehicles:
+        tech_share_combos_total:
+        total_sales:
+
+    Returns:
+
+    """
 
     if total_sales is None:
-        prefix = 'producer_share_frac_'
         total_sales = consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']
         tech_share_combos_total['context_sales'] = total_sales
-    else:
-        prefix = 'consumer_share_frac_'
 
     total_target_co2_Mg = 0
     total_cert_co2_Mg = 0
@@ -334,20 +368,28 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
     for new_veh in manufacturer_composite_vehicles:
         # assign sales to vehicle based on market share fractions and reg class share fractions
         market_class = new_veh.market_class_ID
-        if prefix == 'producer_share_frac_':
+
+        if ('consumer_abs_share_frac_%s' % market_class) in tech_share_combos_total:
+            vehicle_sales = total_sales * tech_share_combos_total['consumer_abs_share_frac_%s' % market_class]
+        elif ('producer_abs_share_frac_%s' % market_class) in tech_share_combos_total:
+            vehicle_sales = total_sales * tech_share_combos_total['producer_abs_share_frac_%s' % market_class]
+        else:
             substrs = market_class.split('.')
             chain = []
             for i in range(len(substrs)):
-                str = prefix
+                str = 'producer_share_frac_'
                 for j in range(i + 1):
                     str = str + substrs[j] + '.' * (j != i)
-                # str = str + ''
                 chain.append(str)
             vehicle_sales = total_sales
             for c in chain:
                 vehicle_sales = vehicle_sales * tech_share_combos_total[c]
-        else:
-            vehicle_sales = total_sales * tech_share_combos_total['consumer_abs_share_frac_%s' % market_class]
+
+            if ('producer_abs_share_frac_%s' % market_class) not in tech_share_combos_total:
+                tech_share_combos_total['producer_abs_share_frac_%s' % market_class] = vehicle_sales / total_sales
+            else:
+                tech_share_combos_total['producer_abs_share_frac_%s' % market_class] += vehicle_sales / total_sales
+
         vehicle_sales = vehicle_sales * new_veh.reg_class_market_share_frac
         tech_share_combos_total['veh_%s_sales' % new_veh.vehicle_ID] = vehicle_sales
 
@@ -377,6 +419,17 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
 
 
 def select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log):
+    """
+
+    Args:
+        tech_share_combos_total:
+        calendar_year:
+        producer_iteration:
+        producer_iteration_log:
+
+    Returns:
+
+    """
     # tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_combo_credits_co2_megagrams')
     mini_df = pd.DataFrame()
     mini_df['total_combo_credits_co2_megagrams'] = tech_share_combos_total['total_combo_credits_co2_megagrams']
