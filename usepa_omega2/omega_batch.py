@@ -11,6 +11,10 @@ example usage:
 print('importing %s' % __file__)
 
 import os, sys
+
+# make sure top-level project folder is on the path (i.e. folder that contains usepa_omega2)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # print('usepa_omega2 omega_batch.py path = %s' %  os.path.abspath(__file__))
 # print('SYS Path = %s' % sys.path)
 

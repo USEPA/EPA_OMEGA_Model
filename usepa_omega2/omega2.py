@@ -522,12 +522,17 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= 1e-4
     convergence_error = 0
     for mc in market_class_dict:
+        # # relative percentage convergence on largest market shares:
+        # if producer_decision_and_response['producer_abs_share_frac_%s' % mc] >= 0.5:
+        #     convergence_error = \
+        #         max(convergence_error, abs(1 - producer_decision_and_response['producer_abs_share_frac_%s' % mc] / \
+        #                                 producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
+        #     converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
         # relative percentage convergence on largest market shares:
-        if producer_decision_and_response['producer_abs_share_frac_%s' % mc] >= 0.5:
-            convergence_error = \
-                max(convergence_error, abs(1 - producer_decision_and_response['producer_abs_share_frac_%s' % mc] / \
-                                        producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-            converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
+        convergence_error = \
+            max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] - \
+                                    producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
+        converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
 
     return converged, convergence_error
 
