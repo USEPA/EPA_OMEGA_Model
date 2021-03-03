@@ -29,6 +29,7 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
 
     """
     from consumer.market_classes import MarketClass
+    import consumer
 
     for mc in MarketClass.market_classes:
         omega_log.logwrite(('%d producer/consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) +
@@ -43,14 +44,16 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
                                        'consumer_abs_share_frac_%s' % mc])
                            ), echo_console=True)
     omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
-    for hc in hauling_classes:
+
+    for cat in consumer.market_categories:
         omega_log.logwrite(
-            ('price / cost %s' % hc).ljust(50) + '$%d / $%d R:%f' % (
-            producer_decision_and_response['average_price_%s' % hc],
-            producer_decision_and_response['average_cost_%s' % hc],
-            producer_decision_and_response['average_price_%s' % hc] /
-            producer_decision_and_response['average_cost_%s' % hc]
+            ('price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
+            producer_decision_and_response['average_price_%s' % cat],
+            producer_decision_and_response['average_cost_%s' % cat],
+            producer_decision_and_response['average_price_%s' % cat] /
+            producer_decision_and_response['average_cost_%s' % cat]
             ), echo_console=True)
+
     omega_log.logwrite(
         'price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_price_total'],
                                                              producer_decision_and_response['average_cost_total'],
@@ -239,9 +242,11 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         # calculate distance to origin (minimal price and market share error):
         score_sum_of_squares = producer_decision_and_response['abs_share_delta_total']**2
-        for hc in hauling_classes:
-            score_sum_of_squares += abs(1 - producer_decision_and_response['average_price_%s' % hc] /
-                                        producer_decision_and_response['average_cost_%s' % hc])**2
+        # add terms to maintain prices of non-responsive market categories during convergence:
+        for cat in consumer.non_responsive_market_categories:
+            score_sum_of_squares += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
+                                        producer_decision_and_response['average_cost_%s' % cat])**2
+
         producer_decision_and_response['pricing_score'] = score_sum_of_squares**0.5
 
         if o2.options.log_producer_decision_and_response_years == 'all' or \
@@ -252,6 +257,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
         producer_decision_and_response = \
             producer_decision_and_response.loc[producer_decision_and_response['pricing_score'].idxmin()]
 
+        # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
+        # any slight offset during the convergence process:
         # ###############################################################################################################
         # if o2.options.session_is_reference:
         #     calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
