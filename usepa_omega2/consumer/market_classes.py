@@ -13,8 +13,8 @@ def populate_market_classes(market_class_dict, market_class, obj):
     """
 
     :param market_class_dict: dict of dicts of market classes
-    :param market_class: dot separated market class name e.g. 'BEV.hauling',
-        possibly with reg class suffix e.g. 'ICE.non_hauling.car' depending on the market_class_dict
+    :param market_class: dot separated market class name e.g. 'hauling.BEV',
+        possibly with reg class suffix e.g. 'non_hauling.ICE.car' depending on the market_class_dict
     :param obj: object to place in a set in the appropriate leaf
     :return: modifies market_class_dict
     """
@@ -37,7 +37,7 @@ def populate_market_classes(market_class_dict, market_class, obj):
 def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class=False):
     """
     Returns a nested dictionary of market classes from a dot-formatted list of market class names
-    :param market_class_list: list of dot-separted market class names e.g. ['BEV.hauling', 'ICE.hauling'] etc
+    :param market_class_list: list of dot-separted market class names e.g. ['hauling.BEV', 'hauling.ICE'] etc
     :param market_class_dict: recursive input and also the output data structure
     :param by_reg_class: if true then leaves are sets in reg class dicts, otherwise leaves are sets by market segment
     :return: market_class_dict of dicts
@@ -114,13 +114,13 @@ class MarketClass(SQABase, OMEGABase):
         """
 
         if vehicle.hauling_class == 'hauling' and vehicle.electrification_class == 'EV':
-            market_class_ID = 'BEV.hauling'
+            market_class_ID = 'hauling.BEV'
         elif vehicle.hauling_class == 'hauling' and vehicle.electrification_class != 'EV':
-            market_class_ID = 'ICE.hauling'
+            market_class_ID = 'hauling.ICE'
         elif vehicle.electrification_class == 'EV':
-            market_class_ID = 'BEV.non_hauling'
+            market_class_ID = 'non_hauling.BEV'
         else:
-            market_class_ID = 'ICE.non_hauling'
+            market_class_ID = 'non_hauling.ICE'
 
         return market_class_ID
 
@@ -190,19 +190,19 @@ if __name__ == '__main__':
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
             market_class_list = [
-                'ICE.hauling',
-                'BEV.hauling.bev300.base',
-                'BEV.hauling.bev300.sport',
-                'BEV.hauling.bev100',
-                'ICE.non_hauling',
-                'BEV.non_hauling',
+                'hauling.ICE',
+                'hauling.BEV.bev300.base',
+                'hauling.BEV.bev300.sport',
+                'hauling.BEV.bev100',
+                'non_hauling.ICE',
+                'non_hauling.BEV',
             ]
 
             market_class_list = [
-                'ICE.hauling',
-                'BEV.hauling',
-                'ICE.non_hauling',
-                'BEV.non_hauling',
+                'hauling.ICE',
+                'hauling.BEV',
+                'non_hauling.ICE',
+                'non_hauling.BEV',
             ]
 
             market_class_dict = parse_market_classes(market_class_list)
@@ -211,20 +211,20 @@ if __name__ == '__main__':
             market_class_dict_rc = parse_market_classes(market_class_list, by_reg_class=True)
             print_dict(market_class_dict_rc)
 
-            populate_market_classes(market_class_dict, 'ICE.hauling', 'F150')
-            populate_market_classes(market_class_dict, 'ICE.hauling', 'Silverado')
-            populate_market_classes(market_class_dict, 'BEV.hauling', 'Cybertruck')
-            populate_market_classes(market_class_dict, 'ICE.non_hauling', '240Z')
-            populate_market_classes(market_class_dict, 'BEV.non_hauling', 'Tesla3')
-            populate_market_classes(market_class_dict, 'BEV.non_hauling', 'TeslaS')
+            populate_market_classes(market_class_dict, 'hauling.ICE', 'F150')
+            populate_market_classes(market_class_dict, 'hauling.ICE', 'Silverado')
+            populate_market_classes(market_class_dict, 'hauling.BEV', 'Cybertruck')
+            populate_market_classes(market_class_dict, 'non_hauling.ICE', '240Z')
+            populate_market_classes(market_class_dict, 'non_hauling.BEV', 'Tesla3')
+            populate_market_classes(market_class_dict, 'non_hauling.BEV', 'TeslaS')
             print_dict(market_class_dict)
 
-            populate_market_classes(market_class_dict_rc, 'ICE.hauling.truck', 'F150')
-            populate_market_classes(market_class_dict_rc, 'ICE.hauling.truck', 'Silverado')
-            populate_market_classes(market_class_dict_rc, 'BEV.hauling.truck', 'Cybertruck')
-            populate_market_classes(market_class_dict_rc, 'ICE.non_hauling.car', '240Z')
-            populate_market_classes(market_class_dict_rc, 'ICE.non_hauling.car', 'Sentra')
-            populate_market_classes(market_class_dict_rc, 'BEV.non_hauling.car', 'Tesla3')
+            populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck', 'F150')
+            populate_market_classes(market_class_dict_rc, 'hauling.ICE.truck', 'Silverado')
+            populate_market_classes(market_class_dict_rc, 'hauling.BEV.truck', 'Cybertruck')
+            populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car', '240Z')
+            populate_market_classes(market_class_dict_rc, 'non_hauling.ICE.car', 'Sentra')
+            populate_market_classes(market_class_dict_rc, 'non_hauling.BEV.car', 'Tesla3')
             print_dict(market_class_dict_rc)
 
         else:
