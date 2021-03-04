@@ -6,6 +6,7 @@ Code Details
 
    alpha_package_costs
    code_doc_samples
+   exe_entry
    setup
    test_omega2
    usepa_omega2

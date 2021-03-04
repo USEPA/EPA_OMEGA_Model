@@ -77,14 +77,6 @@ usepa\_omega2.cost\_curves module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.demanded\_shares\_gcam module
--------------------------------------------
-
-.. automodule:: usepa_omega2.demanded_shares_gcam
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.drive\_cycle\_energy\_calcs module
 ------------------------------------------------
 
@@ -133,14 +125,6 @@ usepa\_omega2.manufacturers module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.market\_classes module
-------------------------------------
-
-.. automodule:: usepa_omega2.market_classes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.o2 module
 -----------------------
 
@@ -153,6 +137,14 @@ usepa\_omega2.omega2 module
 ---------------------------
 
 .. automodule:: usepa_omega2.omega2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.omega\_batch module
+---------------------------------
+
+.. automodule:: usepa_omega2.omega_batch
    :members:
    :undoc-members:
    :show-inheritance:
@@ -205,18 +197,26 @@ usepa\_omega2.omega\_types module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.producer module
------------------------------
+usepa\_omega2.postproc\_batch module
+------------------------------------
 
-.. automodule:: usepa_omega2.producer
+.. automodule:: usepa_omega2.postproc_batch
    :members:
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.run\_omega\_batch module
+usepa\_omega2.postproc\_session module
 --------------------------------------
 
-.. automodule:: usepa_omega2.run_omega_batch
+.. automodule:: usepa_omega2.postproc_session
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.producer module
+-----------------------------
+
+.. automodule:: usepa_omega2.producer
    :members:
    :undoc-members:
    :show-inheritance:
