@@ -143,8 +143,6 @@ def plot_co2_gpmi(calendar_years):
               '%s\nAverage Vehicle Cert CO2 g/mi  by Market Class v Year' % o2.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi by Market Class.png' % o2.options.session_unique_name)
-    if o2.options.auto_close_figures:
-        plt.close('all')
     return average_cost_data
 
 
@@ -226,8 +224,6 @@ def plot_vehicle_cost(calendar_years):
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost by Market Class.png' % o2.options.session_unique_name)
-    if o2.options.auto_close_figures:
-        plt.close('all')
     return average_cost_data
 
 
@@ -293,9 +289,6 @@ def plot_market_shares(calendar_years, total_sales):
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Market Class Shares.png' % o2.options.session_unique_name)
 
-    if o2.options.auto_close_figures:
-        plt.close('all')
-
     return market_share_results
 
 
@@ -325,8 +318,6 @@ def plot_total_sales(calendar_years):
     label_xyt(ax1, 'Year', 'Sales [millions]', '%s\nTotal Sales Versus Calendar Year\n Total Sales %.2f Million' % (
         o2.options.session_unique_name, total_sales.sum() / 1e6))
     fig.savefig(o2.options.output_folder + '%s Total Sales v Year.png' % o2.options.session_unique_name)
-    if o2.options.auto_close_figures:
-        plt.close('all')
 
     return total_sales
 
@@ -352,8 +343,7 @@ def plot_manufacturer_compliance(calendar_years):
     label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
         o2.options.session_unique_name, total_cost_billions))
     fig.savefig(o2.options.output_folder + '%s Compliance v Year.png' % o2.options.session_unique_name)
-    if o2.options.auto_close_figures:
-        plt.close('all')
+
     return cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
 
 
@@ -387,5 +377,3 @@ def plot_iteration(iteration_log):
     label_xyt(ax1, '', 'Iteration [#]', 'Iteration mean = %.2f' % (
                 2.0 * iteration_log['iteration'][iteration_log['pricing_iteration'] == -1].mean()))
     fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
-    if o2.options.auto_close_figures:
-        plt.close('all')

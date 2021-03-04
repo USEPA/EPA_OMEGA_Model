@@ -553,6 +553,10 @@ def init_omega(o2_options):
     # set up global variables:
     o2.options = o2_options
 
+    if o2.options.auto_close_figures:
+        import matplotlib
+        matplotlib.use('Agg')
+
     omega_log.init_logfile()
 
     init_omega_db()
