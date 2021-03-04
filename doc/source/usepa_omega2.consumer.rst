@@ -12,6 +12,22 @@ usepa\_omega2.consumer.annual\_vmt\_fixed\_by\_age module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.consumer.demanded\_shares\_gcam module
+----------------------------------------------------
+
+.. automodule:: usepa_omega2.consumer.demanded_shares_gcam
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.consumer.market\_classes module
+---------------------------------------------
+
+.. automodule:: usepa_omega2.consumer.market_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.consumer.reregistration\_fixed\_by\_age module
 ------------------------------------------------------------
 

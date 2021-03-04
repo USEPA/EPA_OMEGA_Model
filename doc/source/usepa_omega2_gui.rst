@@ -28,14 +28,6 @@ usepa\_omega2\_gui.omega\_gui\_stylesheets module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2\_gui.run\_omega\_batch\_gui module
-------------------------------------------------
-
-.. automodule:: usepa_omega2_gui.run_omega_batch_gui
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2\_gui.sound\_gui module
 ------------------------------------
 
