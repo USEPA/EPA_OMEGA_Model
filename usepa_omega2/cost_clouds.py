@@ -6,7 +6,6 @@ cost_clouds.py
 """
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 input_template_name = 'cost_clouds'
@@ -103,42 +102,38 @@ class CostCloud(SQABase, OMEGABase):
         return template_errors
 
     @staticmethod
-    def calculate_frontier(cloud, GHG_gpmi, GHG_cost):
+    def calculate_frontier(cloud, x_key, y_key):
         """
         Args:
-            cloud:
-            GHG_gpmi:
-            GHG_cost:
+            cloud (DataFrame): a set of points to find the frontier of
+            x_key (str): name of the column holding x-axis data
+            y_key (str): name of the column holding y-axis data
 
         Returns:
+            DataFrame containing the frontier points
 
         """
-        cloud = cloud.copy()
 
         frontier_pts = []
 
         # find frontier starting point, lowest GHGs, and add to frontier
-        frontier_pts.append(cloud.loc[cloud[GHG_gpmi].idxmin()])
+        idxmin = cloud[x_key].idxmin()
+        frontier_pts.append(cloud.loc[idxmin])
 
-        # keep lower cost points
-        cloud = cloud[cloud[GHG_cost] < frontier_pts[-1][GHG_cost]]
-
-        while len(cloud):
+        while pd.notna(idxmin):
             # calculate frontier factor (more negative is more better) = slope of each point relative
             # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-            cloud['frontier_factor'] = (cloud[GHG_cost] - frontier_pts[-1][GHG_cost]) \
-                                       / (cloud[GHG_gpmi] - frontier_pts[-1][GHG_gpmi]) \
+            cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) \
+                                       / (cloud[x_key] - frontier_pts[-1][x_key]) \
                                        ** o2.options.cost_curve_frontier_affinity_factor
 
-            # find next frontier point (lowest slope) and add to frontier list
-            frontier_pts.append(cloud.loc[cloud['frontier_factor'].idxmin()])
-
-            # keep lower cost points (smaller cloud)
-            cloud = cloud[cloud[GHG_cost] < frontier_pts[-1][GHG_cost]]
+            # find next frontier point (lowest slope), if there is one, and add to frontier list
+            idxmin = cloud['frontier_factor'].idxmin()
+            if pd.notna(idxmin):
+                frontier_pts.append(cloud.loc[idxmin])
 
         result_df_foo = pd.concat(frontier_pts, axis=1)
         result_df_foo = result_df_foo.transpose()
-        # result_df_foo = result_df_foo.drop('frontier_factor', axis=1)
 
         return result_df_foo
 
