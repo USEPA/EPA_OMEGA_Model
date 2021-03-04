@@ -241,7 +241,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
             producer_decision_and_response['total_combo_target_co2_megagrams']
 
         # calculate "distance to origin" (minimal price and market share errors):
-        pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**0.5
+        pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**2
         # add terms to maintain prices of non-responsive market categories during convergence:
         for cat in consumer.non_responsive_market_categories:
             pricing_convergence_score += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
