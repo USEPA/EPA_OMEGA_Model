@@ -487,6 +487,7 @@ def calculate_market_sector_data(winning_combo):
     Returns:
 
     """
+    import numpy as np
     import consumer
     from consumer.market_classes import MarketClass
 
@@ -498,10 +499,10 @@ def calculate_market_sector_data(winning_combo):
 
         for mc in MarketClass.market_classes:
             if mcat in mc.split('.'):
-                winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * winning_combo['sales_%s' % mc]
+                winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 if 'average_price_%s' % mc in winning_combo:
-                    winning_combo['average_price_%s' % mcat] += winning_combo['average_price_%s' % mc] * winning_combo['sales_%s' % mc]
-                winning_combo['sales_%s' % mcat] += winning_combo['sales_%s' % mc]
+                    winning_combo['average_price_%s' % mcat] += winning_combo['average_price_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
+                winning_combo['sales_%s' % mcat] += np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['producer_abs_share_frac_%s' % mcat] += winning_combo['producer_abs_share_frac_%s' % mc]
 
         winning_combo['average_cost_%s' % mcat] = winning_combo['average_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]

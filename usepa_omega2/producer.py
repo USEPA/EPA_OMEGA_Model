@@ -30,7 +30,7 @@ def calculate_generalized_cost(cost_factors):
 
 
 def create_compliance_options(calendar_year, market_class_dict, producer_bev_share, share_range, consumer_response,
-                              parent='', verbose=False):
+                              node_name='', verbose=False):
     """
 
     Args:
@@ -39,7 +39,7 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
         producer_bev_share:
         share_range:
         consumer_response:
-        parent:
+        node_name:
         verbose:
 
     Returns:
@@ -58,7 +58,7 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                 create_compliance_options(calendar_year, market_class_dict[k],
                                           producer_bev_share, share_range,
                                           consumer_response,
-                                          parent=k))
+                                          node_name=k))
         else:
             # process leaf
             for new_veh in market_class_dict[k]:
@@ -106,8 +106,8 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
 
     if consumer_response is None:
         # generate producer desired market shares for responsive market sectors
-        if parent:
-            share_column_names = ['producer_share_frac_' + parent + '.' + c for c in children]
+        if node_name:
+            share_column_names = ['producer_share_frac_' + node_name + '.' + c for c in children]
         else:
             share_column_names = ['producer_share_frac_' + c for c in children]
 
@@ -115,11 +115,11 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
             if share_range == 1.0:
                 sales_share_df = partition(share_column_names,
                                            increment=1 / (o2.options.producer_num_market_share_options - 1),
-                                           min_level=0.001)
+                                           min_level=0.0)
             else:
                 from omega_functions import generate_nearby_shares
                 sales_share_df = generate_nearby_shares(share_column_names, producer_bev_share, share_range,
-                                                        o2.options.producer_num_market_share_options, min_level=0.001)
+                                                        o2.options.producer_num_market_share_options, min_level=0.0)
         else:
             sales_share_df = pd.DataFrame()
             for c, cn in zip(children, share_column_names):
@@ -127,8 +127,8 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                                       consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']]
     else:
         # inherit absolute market shares from consumer response
-        if parent:
-            abs_share_column_names = ['producer_abs_share_frac_' + parent + '.' + c for c in children]
+        if node_name:
+            abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c for c in children]
         else:
             abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
 
