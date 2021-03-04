@@ -34,8 +34,8 @@ def get_demanded_shares(market_class_data, calendar_year):
     sales_share_denominator_all_hauling = 0
     sales_share_denominator_all_nonhauling = 0
 
-    for pass_num in [0, 1]:
-        for market_class_id in MarketClass.market_classes:
+    for market_class_id in MarketClass.market_classes:
+        for pass_num in [0, 1]:
             fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
             gcam_data_cy = DemandedSharesGCAM.get_gcam_params(calendar_year, market_class_id)
@@ -72,9 +72,9 @@ def get_demanded_shares(market_class_data, calendar_year):
             if pass_num == 0:
                 ## ToDo: These market class conditions should be made more general, instead of using string searches.
                 if 'non_hauling' in market_class_id.split('.'):
-                    sales_share_denominator_all_nonhauling = sales_share_denominator_all_nonhauling + sales_share_numerator
+                    sales_share_denominator_all_nonhauling += sales_share_numerator
                 else:
-                    sales_share_denominator_all_hauling = sales_share_denominator_all_hauling + sales_share_numerator
+                    sales_share_denominator_all_hauling += sales_share_numerator
             else:
                 if 'non_hauling' in market_class_id.split('.'):
                     demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
