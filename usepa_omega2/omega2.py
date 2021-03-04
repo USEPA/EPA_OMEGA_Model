@@ -62,7 +62,7 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
                                                              ), echo_console=True)
     omega_log.logwrite(
         '%d_%d_%d  SCORE:%f  SWSD:%f  SR:%f' % (calendar_year, iteration_num, producer_pricing_iteration,
-                                                producer_decision_and_response['pricing_score'],
+                                                producer_decision_and_response['pricing_convergence_score'],
                                                 producer_decision_and_response['abs_share_delta_total'],
                                                 producer_decision_and_response['sales_ratio']), echo_console=True)
 
@@ -240,14 +240,14 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
             producer_decision_and_response['total_combo_cert_co2_megagrams'] / \
             producer_decision_and_response['total_combo_target_co2_megagrams']
 
-        # calculate distance to origin (minimal price and market share error):
-        score_sum_of_squares = producer_decision_and_response['abs_share_delta_total']**2
+        # calculate "distance to origin" (minimal price and market share errors):
+        pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**0.5
         # add terms to maintain prices of non-responsive market categories during convergence:
         for cat in consumer.non_responsive_market_categories:
-            score_sum_of_squares += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
+            pricing_convergence_score += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
                                         producer_decision_and_response['average_cost_%s' % cat])**1
 
-        producer_decision_and_response['pricing_score'] = score_sum_of_squares**0.5
+        producer_decision_and_response['pricing_convergence_score'] = pricing_convergence_score**1
 
         if o2.options.log_producer_decision_and_response_years == 'all' or \
                 calendar_year in o2.options.log_producer_decision_and_response_years:
@@ -255,7 +255,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
                                 (o2.options.output_folder, calendar_year, iteration_num, producer_pricing_iteration))
 
         producer_decision_and_response = \
-            producer_decision_and_response.loc[producer_decision_and_response['pricing_score'].idxmin()]
+            producer_decision_and_response.loc[producer_decision_and_response['pricing_convergence_score'].idxmin()]
 
         # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
         # any slight offset during the convergence process:
@@ -276,7 +276,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         converged, convergence_error = detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
-        if (best_producer_decision_and_response is None) or (producer_decision_and_response['pricing_score'] < best_producer_decision_and_response['pricing_score']):
+        if (best_producer_decision_and_response is None) or (producer_decision_and_response['pricing_convergence_score'] < best_producer_decision_and_response['pricing_convergence_score']):
             best_producer_decision_and_response = producer_decision_and_response.copy()
 
         iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)

@@ -118,7 +118,7 @@ def plot_co2_gpmi(calendar_years):
         ax1.plot(calendar_years, average_cost_data[mcat], '.--')
     ax1.plot(calendar_years, average_cost_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
-    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]',
+    label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Cert CO2 g/mi by Market Category v Year' % o2.options.session_unique_name)
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi by Market Category.png' % o2.options.session_unique_name)
 
@@ -139,7 +139,7 @@ def plot_co2_gpmi(calendar_years):
         else:
             ax1.plot(calendar_years, average_cost_data[mc], '.--')
 
-    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]',
+    label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Cert CO2 g/mi  by Market Class v Year' % o2.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi by Market Class.png' % o2.options.session_unique_name)
@@ -200,7 +200,7 @@ def plot_vehicle_cost(calendar_years):
         ax1.plot(calendar_years, average_cost_data[mcat], '.--')
     ax1.plot(calendar_years, average_cost_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
-    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]',
+    label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost by Market Category v Year' % o2.options.session_unique_name)
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost by Market Category.png' % o2.options.session_unique_name)
 
@@ -221,7 +221,7 @@ def plot_vehicle_cost(calendar_years):
         else:
             ax1.plot(calendar_years, average_cost_data[mc], '.--')
 
-    label_xyt(ax1, 'Year', 'Average Vehicle Cost [$]',
+    label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost  by Market Class v Year' % o2.options.session_unique_name)
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(MarketClass.market_classes)
@@ -280,7 +280,7 @@ def plot_market_shares(calendar_years, total_sales):
     for mcat in consumer.market_categories:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mcat], '.--')
     ax1.set_ylim(-0.05, 1.05)
-    label_xyt(ax1, 'Year', 'Market Category Absolute Market Share Frac', '%s\nAbsolute Market Shares' % o2.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nMarket Category Absolute Market Shares' % o2.options.session_unique_name)
     ax1.legend(consumer.market_categories)
     fig.savefig(o2.options.output_folder + '%s Market Categories Shares.png' % o2.options.session_unique_name)
 
@@ -289,7 +289,7 @@ def plot_market_shares(calendar_years, total_sales):
     for mc in MarketClass.market_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mc], '.--')
     ax1.set_ylim(-0.05, 1.05)
-    label_xyt(ax1, 'Year', 'Market Class Absolute Market Share Frac', '%s\nAbsolute Market Shares' % o2.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nMarket Class Absolute Market Shares' % o2.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Market Class Shares.png' % o2.options.session_unique_name)
 
@@ -349,7 +349,7 @@ def plot_manufacturer_compliance(calendar_years):
     fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, '.-')
     ax1.plot(calendar_years, cert_co2_Mg, '.-')
     ax1.legend(['cert_target_co2_Mg', 'cert_co2_Mg'])
-    label_xyt(ax1, 'Year', 'CO2 Mg', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
+    label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
         o2.options.session_unique_name, total_cost_billions))
     fig.savefig(o2.options.output_folder + '%s Compliance v Year.png' % o2.options.session_unique_name)
     if o2.options.auto_close_figures:
@@ -384,7 +384,7 @@ def plot_iteration(iteration_log):
         plt.ylim([0, 1])
         plt.savefig('%s%s Iteration %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
     fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'][iteration_log['pricing_iteration'] == -1])
-    label_xyt(ax1, '', 'iteration', 'iteration mean = %.2f' % (
+    label_xyt(ax1, '', 'Iteration [#]', 'Iteration mean = %.2f' % (
                 2.0 * iteration_log['iteration'][iteration_log['pricing_iteration'] == -1].mean()))
     fig.savefig('%s%s Iteration Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
     if o2.options.auto_close_figures:
