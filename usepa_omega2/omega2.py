@@ -245,7 +245,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
         # add terms to maintain prices of non-responsive market categories during convergence:
         for cat in consumer.non_responsive_market_categories:
             score_sum_of_squares += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
-                                        producer_decision_and_response['average_cost_%s' % cat])**2
+                                        producer_decision_and_response['average_cost_%s' % cat])**1
 
         producer_decision_and_response['pricing_score'] = score_sum_of_squares**0.5
 
