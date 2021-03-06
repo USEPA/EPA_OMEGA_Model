@@ -34,60 +34,125 @@ def print_dict(dict_in, num_tabs=0):
         print()
 
 
-partition_dict = dict()
-def partition(columns, max_values=[1.0], increment=0.01, min_level=0.01, verbose=False):
-    """
+def linspace(min, max, num_values):
+    import numpy as np
+    ans = np.arange(min, max + (max-min) / (num_values-1), (max-min) / (num_values-1))
+    return ans[0:num_values]
 
-    :param columns: number of columns or list of column names
-    :param max_values: list of max values for groups of columns
-    :param increment: increment from 0 to max_values
-    :param min_level: minimum output value (max output value will be max_value - min_level)
-    :param verbose: if True then print result
-    :return: pandas Dataframe of result, rows of which add up to sum(max_values)
+
+partition_dict = dict()
+def partition(column_names, num_levels=5, min_constraints=None, max_constraints=None, verbose=False):
+    """
+    Generate a dataframe with columns from ``column_names``, whose rows sum to 1.0 across the columns, following the
+    given constraints
+
+    Args:
+        column_names: list of column names
+        num_levels: number of values in the column with the lowest span (min value minus max value)
+        min_constraints: a scalar value or dict of minimum value constraints with column names as keys
+        max_constraints: a scalar value or dict of maximum value constraints with column names as keys
+        verbose: if True then the resulting partition will be printed
+
+    Returns:
+        A dataframe of the resulting partition
+
+    Example:
+
+        ::
+
+        p = partition_x(['BEV','ICE','PHEV'], min_constraints={'BEV':0.1}, max_constraints={'BEV':0.2, 'PHEV':0.25}, num_levels=5, verbose=True)
+
+
     """
     import sys
     import pandas as pd
     import numpy as np
 
-    if type(columns) is list:
-        num_columns = len(columns)
-    else:
-        num_columns = columns
-        columns = [i for i in range(num_columns)]
+    cache_key = '%s_%s_%s_%s' % (column_names, num_levels, min_constraints, max_constraints)
 
-    partition_name = '%s_%s_%s_%s' % (columns, max_values, increment, min_level)
+    if cache_key not in partition_dict:
 
-    if not partition_name in partition_dict:
-        dfs = []
-        for mv in max_values:
-            members = []
-            for i in range(num_columns):
-                members.append(pd.DataFrame(np.arange(0, mv + increment, increment), columns=[columns[i]]))
+        if type(column_names) is list:
+            num_columns = len(column_names)
+        else:
+            num_columns = column_names
+            column_names = [i for i in range(num_columns)]
 
-            x = pd.DataFrame()
-            for m in members:
-                x = cartesian_prod(x, m)
-                x = x[mv - x.sum(axis=1, numeric_only=True) >= -sys.float_info.epsilon].copy()  # sum <= mv
+        min_level_dict = dict()
+        if min_constraints is None:
+            min_constraints=dict()
 
-            x = x[abs(x.sum(axis=1) - mv) <= sys.float_info.epsilon]
-            x[x == 0] = min_level
-            x[x == mv] = mv - min_level
-            dfs.append(x)
+        if type(min_constraints) is float or type(min_constraints) is int:
+            min_val = min_constraints
+            min_constraints = dict()
+            for c in column_names:
+                min_constraints[c] = min_val
 
-        ans = pd.DataFrame()
-        for df in dfs:
-            ans = cartesian_prod(ans, df)
+        max_level_dict = dict()
+        if max_constraints is None:
+            max_constraints=dict()
+
+        if type(max_constraints) is float or type(max_constraints) is int:
+            max_val = max_constraints
+            max_constraints = dict()
+            for c in column_names:
+                max_level_dict[c] = max_constraints
+
+        # initialize min and max level dicts with nominal values
+        for c in column_names:
+            if c in min_constraints:
+                min_level_dict[c] = min_constraints[c]
+            else:
+                min_level_dict[c] = 0
+            if c in max_constraints:
+                max_level_dict[c] = max_constraints[c]
+            else:
+                max_level_dict[c] = 1
+
+        # determine maximum allowed values
+        for c in column_names:
+            other_columns = set(column_names).difference({c})
+            max_level_dict[c] = min(max_level_dict[c], 1 - np.sum([min_level_dict[c] for c in other_columns]))
+
+        # determine minimum allowed values
+        for c in column_names:
+            other_columns = set(column_names).difference({c})
+            min_level_dict[c] = max(min_level_dict[c], 1 - np.sum([max_level_dict[c] for c in other_columns]))
+
+        # calculate span of values (max-min)
+        span_dict = dict()
+        for c in column_names:
+            span_dict[c] = max_level_dict[c] - min_level_dict[c]
+
+        # create list of column names sorted by span, smallest to biggest
+        column_names_sorted_by_span = sorted(span_dict, key=span_dict.__getitem__)
+
+        # generate a range of shares for the first n-1 columns
+        members = pd.DataFrame()
+        for c in column_names_sorted_by_span[:-1]:
+            members[c] = linspace(min_level_dict[c], max_level_dict[c], num_levels)
+
+        # generate cartesian product of first n-1 columns
+        x = pd.DataFrame()
+        for m in members:
+            x = cartesian_prod(x, pd.DataFrame(members[m]))
+
+        # calculate values for the last column, honoring it's upper and lower limits
+        last = column_names_sorted_by_span[-1]
+        x[last] = np.maximum(0, np.maximum(min_level_dict[last], np.minimum(max_level_dict[last], 1 - x.sum(axis=1, skipna=True))))
+
+        # remove rows that don't add up to 1 and get rid of join column ('_')
+        x = x.loc[abs(x.sum(axis=1, numeric_only=True) - 1) <= sys.float_info.epsilon]
+        if '_' in x:
+            x = x.drop('_', axis=1)
 
         if verbose:
             with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-                print(ans)
+                print(x)
 
-        ans = ans.loc[abs(ans.sum(axis=1, numeric_only=True) - sum(max_values)) <= sys.float_info.epsilon]
-        ans = ans.drop('_', axis=1)
+        partition_dict[cache_key] = x
 
-        partition_dict[partition_name] = ans
-
-    return partition_dict[partition_name]
+    return partition_dict[cache_key]
 
 
 def unique(vector):

@@ -113,13 +113,11 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
 
         if all(s in consumer.responsive_market_categories for s in children):
             if share_range == 1.0:
-                sales_share_df = partition(share_column_names,
-                                           increment=1 / (o2.options.producer_num_market_share_options - 1),
-                                           min_level=0.0)
+                sales_share_df = partition(share_column_names, num_levels=num_tech_options, min_constraints=0.001)
             else:
                 from omega_functions import generate_nearby_shares
                 sales_share_df = generate_nearby_shares(share_column_names, producer_bev_share, share_range,
-                                                        o2.options.producer_num_market_share_options, min_level=0.0)
+                                                        o2.options.producer_num_market_share_options, min_level=0.001)
         else:
             sales_share_df = pd.DataFrame()
             for c, cn in zip(children, share_column_names):

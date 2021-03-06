@@ -34,53 +34,55 @@ def get_demanded_shares(market_class_data, calendar_year):
     sales_share_denominator_all_hauling = 0
     sales_share_denominator_all_nonhauling = 0
 
-    for market_class_id in MarketClass.market_classes:
-        for pass_num in [0, 1]:
-            fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
+    sales_share_numerator = dict()
 
-            gcam_data_cy = DemandedSharesGCAM.get_gcam_params(calendar_year, market_class_id)
-
-            price_amortization_period = gcam_data_cy.price_amortization_period
-            discount_rate = gcam_data_cy.discount_rate
-            annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** price_amortization_period) - 1)
-
-            total_capital_costs = market_class_data['average_price_%s' % market_class_id]
-            average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
-
-            if market_class_id == 'non_hauling.BEV':
-                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
-                annual_o_m_costs = 1600
-            elif market_class_id == 'hauling.BEV':
-                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
-                annual_o_m_costs = 1600
-            elif market_class_id == 'non_hauling.ICE':
-                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
-                annual_o_m_costs = 2000
-            elif market_class_id == 'hauling.ICE':
-                fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
-                annual_o_m_costs = 2000
-
-            consumer_generalized_cost_dollars = total_capital_costs
-            annualized_capital_costs = annualization_factor * total_capital_costs
-            annual_VMT = float(gcam_data_cy.annual_VMT)
-
-            total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
-            total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
-            total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / 1.58
-            sales_share_numerator = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
-
+    for pass_num in [0, 1]:
+        for market_class_id in MarketClass.market_classes:
             if pass_num == 0:
+                fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
+
+                gcam_data_cy = DemandedSharesGCAM.get_gcam_params(calendar_year, market_class_id)
+
+                price_amortization_period = gcam_data_cy.price_amortization_period
+                discount_rate = gcam_data_cy.discount_rate
+                annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** price_amortization_period) - 1)
+
+                total_capital_costs = market_class_data['average_price_%s' % market_class_id]
+                average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
+
+                if market_class_id == 'non_hauling.BEV':
+                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
+                    annual_o_m_costs = 1600
+                elif market_class_id == 'hauling.BEV':
+                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
+                    annual_o_m_costs = 1600
+                elif market_class_id == 'non_hauling.ICE':
+                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
+                    annual_o_m_costs = 2000
+                elif market_class_id == 'hauling.ICE':
+                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
+                    annual_o_m_costs = 2000
+
+                # consumer_generalized_cost_dollars = total_capital_costs
+                annualized_capital_costs = annualization_factor * total_capital_costs
+                annual_VMT = float(gcam_data_cy.annual_VMT)
+
+                total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
+                total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
+                total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / 1.58
+                sales_share_numerator[market_class_id] = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
+
                 ## ToDo: These market class conditions should be made more general, instead of using string searches.
                 if 'non_hauling' in market_class_id.split('.'):
-                    sales_share_denominator_all_nonhauling += sales_share_numerator
+                    sales_share_denominator_all_nonhauling += sales_share_numerator[market_class_id]
                 else:
-                    sales_share_denominator_all_hauling += sales_share_numerator
+                    sales_share_denominator_all_hauling += sales_share_numerator[market_class_id]
             else:
                 if 'non_hauling' in market_class_id.split('.'):
-                    demanded_share = sales_share_numerator / sales_share_denominator_all_nonhauling
+                    demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator_all_nonhauling
                     demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_non_hauling']
                 else:
-                    demanded_share = sales_share_numerator / sales_share_denominator_all_hauling
+                    demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator_all_hauling
                     demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_hauling']
 
                 market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
