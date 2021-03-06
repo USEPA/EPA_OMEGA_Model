@@ -85,6 +85,7 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                 market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
+                market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
     return market_class_data.copy()
 
