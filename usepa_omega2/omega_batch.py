@@ -249,6 +249,7 @@ class OMEGASessionObject(OMEGABase):
         self.output_path = "." + os.sep
         self.enabled = False
         self.settings = OMEGARuntimeOptions()
+        self.result = []
 
     def read_parameter(self, index_str, default_value=None):
         try:
@@ -375,7 +376,8 @@ class OMEGASessionObject(OMEGABase):
         self.init(remote=remote)
 
         self.parent.batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
-        run_omega(self.settings)
+        result = run_omega(self.settings)
+        return result
 
 
 def validate_folder(batch_root, batch_name='', session_name=''):
@@ -452,36 +454,47 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
             batch.batch_log.logwrite("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
             batch.batch_log.logwrite('')
         else:
-            batch.sessions[s_index].run(remote=True)
+            batch.sessions[s_index].result = batch.sessions[s_index].run(remote=True)
 
-            time.sleep(1)  # wait for files to close
+            if not batch.sessions[s_index].result:
+                # normal run, no failures
+                time.sleep(1)  # wait for files to close
+                summary_filename = os.path.join(options.bundle_path_root, batch.name,
+                                                batch.sessions[s_index].name, bundle_output_folder_name,
+                                                'o2log_%s_%s.txt' % (
+                                                    batch.name, batch.sessions[s_index].name))
 
-            summary_filename = os.path.join(options.bundle_path_root, batch.name,
-                                            batch.sessions[s_index].name, bundle_output_folder_name,
-                                            'o2log_%s_%s.txt' % (
-                                                batch.name, batch.sessions[s_index].name))
+                # check session completion status and add status prefix to session folder
+                if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
+                    with open(summary_filename, "r") as f_read:
+                        last_line = f_read.readlines()[-1]
+                    batch_path = os.path.join(options.bundle_path_root, batch.name)
+                    if 'Session Complete' in last_line:
+                        completion_prefix = '_'
+                        batch.batch_log.logwrite('$$$ Session Completed, Session "%s" $$$' %
+                                                 batch.sessions[s_index].name)
+                    elif 'Session Fail' in last_line:
+                        completion_prefix = '#FAIL_'
+                        batch.batch_log.logwrite(
+                            '*** Session Failed, Session "%s" ***' % batch.sessions[s_index].name)
+                    else:
+                        completion_prefix = '#WEIRD_'
+                        batch.batch_log.logwrite('??? Weird Summary File for Session "%s" : last_line = "%s" ???' % (
+                            batch.sessions[s_index].name, last_line))
 
-            # check session completion status and add status prefix to session folder
-            if os.path.exists(summary_filename) and os.path.getsize(summary_filename) > 0:
-                with open(summary_filename, "r") as f_read:
-                    last_line = f_read.readlines()[-1]
-                batch_path = os.path.join(options.bundle_path_root, batch.name)
-                if 'Session Complete' in last_line:
-                    completion_prefix = '_'
-                    batch.batch_log.logwrite('$$$ Session Completed, Session "%s" $$$' %
-                                             batch.sessions[s_index].name)
-                elif 'Session Fail' in last_line:
-                    completion_prefix = '#FAIL_'
-                    batch.batch_log.logwrite(
-                        '!!! Session Failed, Session "%s" !!!' % batch.sessions[s_index].name)
-                else:
-                    completion_prefix = '#WEIRD_'
-                    batch.batch_log.logwrite('??? Weird Summary File for Session "%s" : last_line = "%s" ???' % (
-                        batch.sessions[s_index].name, last_line))
+                    os.rename(os.path.join(batch_path, batch.sessions[s_index].name),
+                              os.path.join(batch_path, completion_prefix + batch.sessions[s_index].name))
+            else:
+                # abnormal run, display fault
+                batch.batch_log.logwrite(
+                    '\n*** Session Failed, Session "%s" ***' % batch.sessions[s_index].name)
+                for idx, r in enumerate(batch.sessions[s_index].result):
+                    if idx == 0:
+                        # strip leading '\n'
+                        r = r[1:]
+                    batch.batch_log.logwrite(r)
 
-                os.rename(os.path.join(batch_path, batch.sessions[s_index].name),
-                          os.path.join(batch_path, completion_prefix + batch.sessions[s_index].name))
-    batch.batch_log.end_logfile("*** batch complete ***")
+    batch.batch_log.end_logfile("$$$ batch complete $$$")
     return batch
 
 
@@ -744,31 +757,34 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                     dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root,
                                                  options.batch_path + batch.name,
                                                  dispy_session_list)
-                    batch.batch_log.end_logfile("*** batch complete ***")
+                    batch.batch_log.end_logfile("*** dispy batch complete ***")
             else:  # run from here
                 batch = run_bundled_sessions(batch, options, remote_batchfile, session_list)
 
+            batch_summary_filename = ''
             # if not running a session inside a dispy batch (i.e. we are the top-level batch):
             if options.session_num is None:
                 # post-process sessions (collate summary files)
                 for s_index in session_list:
-                    batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
-                    session_summary_filename = options.batch_path + '_' + batch.sessions[
-                        s_index].settings.output_folder + batch.sessions[
-                                                   s_index].settings.session_unique_name + '_summary_results.csv'
-                    batch_summary_filename = batch.name + '_summary_results.csv'
-                    if os.access(session_summary_filename, os.F_OK):
-                        if not os.access(batch_summary_filename, os.F_OK):
-                            # copy the summary verbatim to create batch summary
-                            shutil.copyfile(session_summary_filename, batch_summary_filename)
-                        else:
-                            # add subsequent sessions to batch summary
-                            df = pd.read_csv(session_summary_filename)
-                            df.to_csv(batch_summary_filename, header=False, index=False, mode='a')
+                    if not batch.sessions[s_index].result:
+                        batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
+                        session_summary_filename = options.batch_path + '_' + batch.sessions[
+                            s_index].settings.output_folder + batch.sessions[
+                                                       s_index].settings.session_unique_name + '_summary_results.csv'
+                        batch_summary_filename = batch.name + '_summary_results.csv'
+                        if os.access(session_summary_filename, os.F_OK):
+                            if not os.access(batch_summary_filename, os.F_OK):
+                                # copy the summary verbatim to create batch summary
+                                shutil.copyfile(session_summary_filename, batch_summary_filename)
+                            else:
+                                # add subsequent sessions to batch summary
+                                df = pd.read_csv(session_summary_filename)
+                                df.to_csv(batch_summary_filename, header=False, index=False, mode='a')
 
-                # perform batch post-process
-                import postproc_batch
-                postproc_batch.run_postproc(batch.batch_log, batch_summary_filename)
+                # perform batch post-process, if possible
+                if os.access(batch_summary_filename, os.F_OK):
+                    import postproc_batch
+                    postproc_batch.run_postproc(batch.batch_log, batch_summary_filename)
 
 
 if __name__ == '__main__':

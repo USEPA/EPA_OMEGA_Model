@@ -745,6 +745,7 @@ def run_omega(o2_options, standalone_run=False):
             omega_log.logwrite("\n#INIT FAIL")
             omega_log.logwrite(init_fail)
             omega_log.end_logfile("\nSession Fail")
+            return init_fail
 
     except Exception as e:
         if init_fail:
