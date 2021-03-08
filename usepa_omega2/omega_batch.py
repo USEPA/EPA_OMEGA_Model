@@ -745,8 +745,9 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
             if options.dispy:  # run remote job on cluster, except for first job if generating context vehicle prices
                 dispy_session_list = session_list
                 if batch.generate_context_new_vehicle_prices_file:
+                    import copy
                     # run reference case to generate vehicle prices then dispy the rest
-                    batch = run_bundled_sessions(batch, options, remote_batchfile, [0])
+                    run_bundled_sessions(copy.copy(batch), options, remote_batchfile, [0])
                     dispy_session_list = dispy_session_list[1:]
 
                 if dispy_session_list:
@@ -765,16 +766,16 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
             # if not running a session inside a dispy batch (i.e. we are the top-level batch):
             if options.session_num is None:
                 # post-process sessions (collate summary files)
-                for s_index in session_list:
-                    if not batch.sessions[s_index].result:
+                for idx, s_index in enumerate(session_list):
+                    if not batch.sessions[s_index].result or options.dispy:
                         batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
                         session_summary_filename = options.batch_path + '_' + batch.sessions[
                             s_index].settings.output_folder + batch.sessions[
                                                        s_index].settings.session_unique_name + '_summary_results.csv'
                         batch_summary_filename = batch.name + '_summary_results.csv'
                         if os.access(session_summary_filename, os.F_OK):
-                            if not os.access(batch_summary_filename, os.F_OK):
-                                # copy the summary verbatim to create batch summary
+                            if idx == 0:
+                                # copy the first summary verbatim to create batch summary
                                 shutil.copyfile(session_summary_filename, batch_summary_filename)
                             else:
                                 # add subsequent sessions to batch summary
