@@ -17,6 +17,7 @@ class Fuel(SQABase, OMEGABase):
     fuel_ID = Column('fuel_id', String, primary_key=True)
     unit = Column(Enum(*fuel_units, validate_strings=True))
     energy_density_MJ_per_unit = Column('energy_density_megajoules_per_unit', Float)
+    co2_tailpipe_emissions_grams_per_unit = Column('co2_tailpipe_emissions_grams_per_unit', Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -24,8 +25,9 @@ class Fuel(SQABase, OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'fuels'
-        input_template_version = 0.0002
-        input_template_columns = {'fuel_id', 'unit', 'energy_density_megajoules_per_unit'}
+        input_template_version = 0.1
+        input_template_columns = {'fuel_id', 'unit', 'energy_density_megajoules_per_unit',
+                                  'co2_tailpipe_emissions_grams_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -44,6 +46,7 @@ class Fuel(SQABase, OMEGABase):
                         fuel_ID=df.loc[i, 'fuel_id'],
                         unit=df.loc[i, 'unit'],
                         energy_density_MJ_per_unit=df.loc[i, 'energy_density_megajoules_per_unit'],
+                        co2_tailpipe_emissions_grams_per_unit=df.loc[i, 'co2_tailpipe_emissions_grams_per_unit'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
