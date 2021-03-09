@@ -106,7 +106,7 @@ def run_producer_consumer():
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
-        omega_log.logwrite("Running: Manufacturer=" + str(manufacturer_ID), echo_console=True)
+        omega_log.logwrite("Running %s: Manufacturer=%s" % (o2.options.session_unique_name, manufacturer_ID), echo_console=True)
 
         iteration_log = pd.DataFrame()
 
@@ -126,7 +126,8 @@ def run_producer_consumer():
             iterate = True
 
             while iterate:
-                omega_log.logwrite("Running: Year=" + str(calendar_year) + "  Iteration=" + str(iteration_num),
+                omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
+                                   (o2.options.session_unique_name, calendar_year, iteration_num),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
@@ -707,7 +708,7 @@ def run_omega(o2_options, standalone_run=False):
     try:
         init_fail = init_omega(o2_options)
 
-        omega_log.logwrite("Running: OMEGA 2 Version " + str(code_version))
+        omega_log.logwrite("Running %s: OMEGA 2 Version %s" % (o2.options.session_unique_name, code_version))
 
         if not init_fail:
             if o2.options.run_profiler:
