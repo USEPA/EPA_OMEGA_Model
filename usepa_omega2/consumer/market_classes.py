@@ -85,6 +85,10 @@ class MarketClass(SQABase, OMEGABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))
+    producer_generalized_cost_fuel_years = Column(Float)
+    producer_generalized_cost_amortization_years = Column(Float)
+    producer_generalized_cost_discount_rate = Column(Float)
+    producer_generalized_cost_annual_vmt = Column(Float)
 
     market_classes = ()  # tuple of market classes
     _market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
@@ -134,8 +138,11 @@ class MarketClass(SQABase, OMEGABase):
         MarketClass._market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
         input_template_name = 'market_classes'
-        input_template_version = 0.0002
-        input_template_columns = {'market_class_id', 'hauling_class', 'fueling_class', 'ownership_class'}
+        input_template_version = 0.1
+        input_template_columns = {'market_class_id', 'hauling_class', 'fueling_class', 'ownership_class',
+                                  'producer_generalized_cost_fuel_years',
+                                  'producer_generalized_cost_amortization_years',
+                                  'producer_generalized_cost_discount_rate', 'producer_generalized_cost_annual_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -150,10 +157,14 @@ class MarketClass(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(MarketClass(
-                        market_class_ID = df.loc[i, 'market_class_id'],
+                        market_class_ID=df.loc[i, 'market_class_id'],
                         fueling_class=df.loc[i, 'fueling_class'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         ownership_class=df.loc[i, 'ownership_class'],
+                        producer_generalized_cost_fuel_years=df.loc[i, 'producer_generalized_cost_fuel_years'],
+                        producer_generalized_cost_amortization_years=df.loc[i, 'producer_generalized_cost_amortization_years'],
+                        producer_generalized_cost_discount_rate=df.loc[i, 'producer_generalized_cost_discount_rate'],
+                        producer_generalized_cost_annual_vmt=df.loc[i, 'producer_generalized_cost_annual_vmt'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
