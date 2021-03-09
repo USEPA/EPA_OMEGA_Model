@@ -3,6 +3,9 @@ placeholder, for now, but the dispy stuff should not really be in the omega_batc
 """
 from usepa_omega2 import omega_log
 
+from usepa_omega2 import OMEGARuntimeOptions
+bundle_output_folder_name = OMEGARuntimeOptions().output_folder
+
 print('importing %s' % __file__)
 
 
@@ -61,11 +64,11 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
 
     if status == dispy.DispyJob.Finished:
         if dispy_debug: sysprint('---- Job Finished %s: %s\n' % (job_id_str, job.result))
-        if job.result is False:
-            restart_job(job)
+        # if job.result is False:
+        #     restart_job(job)
 
     elif status == dispy.DispyJob.Terminated:
-        if dispy_debug: sysprint('---- Job Terminated %s \n' % str(job_id_str))
+        if dispy_debug: sysprint('---- Job Terminated %s job exeption = %s\n' % (str(job_id_str), str(job.exception)))
         # restart_job(job)
 
     elif status == dispy.DispyJob.Abandoned:
@@ -127,8 +130,8 @@ def status_cb(status, node, job):
         if dispy_debug: sysprint('++++ Node Closed %s *** \n' % node.ip_addr)
 
     elif status == dispy.DispyNode.AvailInfo:
-        if dispy_debug: sysprint('++++ Node Available %s *** \n' % node.ip_addr)
-
+        # if dispy_debug: sysprint('++++ Node Available %s *** \n' % node.ip_addr)
+        pass
     else:
         if node is not None:
             if dispy_debug: sysprint('++++ uncaught node status %s %s ***\n' % (node.ip_addr, status))
@@ -152,38 +155,32 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
     # run shell command
     subprocess.call(cmd, shell=True)
 
-    logfilename = os.path.join(network_batch_path_root, batch_name, session_name, 'output',
-                               'o2log_%s_%s.txt' % (batch_name, session_name))
+    no_result_foldername = os.path.join(network_batch_path_root, batch_name, session_name)
+    success_foldername = os.path.join(network_batch_path_root, batch_name, '_' + session_name)
+    fail_foldername = os.path.join(network_batch_path_root, batch_name, '#FAIL_' + session_name)
+    weird_foldername = os.path.join(network_batch_path_root, batch_name, '#WEIRD_' + session_name)
 
     time.sleep(1)  # wait for summary file to finish writing?
 
-    if os.path.exists(logfilename) and os.path.getsize(logfilename) > 0:
-        sysprint('@@@ checking logfile %s @@@' % logfilename)
+    if os.path.exists(success_foldername):
+        sysprint('::: dispy_run_session Completed, Session "%s" :::' % session_name)
+    elif os.path.exists(fail_foldername):
+        sysprint('?!? dispy_run_session Failed, Session "%s" ?!?' % session_name)
+    elif os.path.exists(weird_foldername):
+        logfilename = os.path.join(weird_foldername, bundle_output_folder_name,
+                                   'o2log_%s_%s.txt' % (batch_name, session_name))
         with open(logfilename, "r") as f_read:
             last_line = f_read.readlines()[-1]
-        batch_path = os.path.join(network_batch_path_root, batch_name)
-        if 'Session Complete' in last_line:
-            os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '_' + session_name))
-            sysprint('$$$ dispy_run_session Completed, Session "%s" $$$' % session_name)
-            return True
-        elif 'Session Fail' in last_line:
-            os.rename(os.path.join(batch_path, session_name), os.path.join(batch_path, '#FAIL_' + session_name))
-            sysprint('?!? dispy_run_session Failed, Session "%s" ?!?' % session_name)
-            return False
-        else:
-            sysprint('??? Weird Log File for Session "%s" : last_line = "%s" ???' % (session_name, last_line))
-            sysprint(f_read.readlines())
-            return False
-    else:
-        sysprint('??? No Summary File for Session "%s", path_exists=%d, non_zero=%d ???' % (
-            session_name, os.path.exists(logfilename), os.path.getsize(logfilename) > 0))
+        sysprint('??? Weird Log File for Session "%s" : last_line = "%s" ???' % (session_name, last_line))
+    elif os.path.exists(no_result_foldername):
         if retry_count < 3:
             sysprint('@@@ Trying Session "%s" again (attempt %d)... @@@' % (session_name, retry_count + 1))
             dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name,
                               retry_count=retry_count + 1)
         else:
             sysprint('!!! Abandoning Session "%s"... !!!' % session_name)
-        return False
+
+    return True
 
 
 dispy_debug = None
