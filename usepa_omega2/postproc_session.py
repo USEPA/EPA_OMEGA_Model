@@ -148,6 +148,7 @@ def plot_cert_co2_gpmi(calendar_years):
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cert CO2 gpmi by Market Class.png' % o2.options.session_unique_name)
     return average_cert_co2_data
 
+
 def plot_target_co2_gpmi(calendar_years):
     """
 
