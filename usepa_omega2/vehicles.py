@@ -101,7 +101,7 @@ class CompositeVehicle(OMEGABase):
         composite_frontier_df['market_share_frac'] = [0]
 
         for v in self.vehicle_list:
-            vehicle_frontier = v.create_frontier_df()
+            vehicle_frontier = v.cost_curve
             vehicle_frontier['veh_%d_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
 
             composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier, drop=False)
@@ -203,6 +203,7 @@ class Vehicle(OMEGABase):
         self.footprint_ft2 = None
         self._initial_registered_count = 0
         Vehicle.set_next_vehicle_ID()
+        self.cost_curve = None
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -257,6 +258,23 @@ class Vehicle(OMEGABase):
                                                                target_co2_gpmi=self.cert_CO2_grams_per_mile)
 
     def get_cost(self, target_co2_gpmi):
+        # get cost from cost curve for target_co2_gpmi(s)
+        cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
+                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'],
+                                                  fill_value='extrapolate')
+
+        return cost_dollars(target_co2_gpmi).tolist()
+
+    def get_max_co2_gpmi(self):
+        # get max co2_gpmi from self.cost_curve
+        return self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].max()
+
+    def get_min_co2_gpmi(self):
+        # get min co2_gpmi from self.cost_curve
+        return self.cost_curve['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID].min()
+
+
+    def _get_cost(self, target_co2_gpmi):
         from cost_curves import CostCurve
         # get cost from cost curve for target_co2_gpmi(s)
         cost_dollars = CostCurve.get_cost(cost_curve_class=self.cost_curve_class,
@@ -265,12 +283,12 @@ class Vehicle(OMEGABase):
 
         return cost_dollars
 
-    def get_max_co2_gpmi(self):
+    def _get_max_co2_gpmi(self):
         from cost_curves import CostCurve
         # get max co2_gpmi from self.cost_curve
         return CostCurve.get_max_co2_gpmi(self.cost_curve_class, self.model_year)
 
-    def get_min_co2_gpmi(self):
+    def _get_min_co2_gpmi(self):
         from cost_curves import CostCurve
         # get min co2_gpmi from self.cost_curve
         return CostCurve.get_min_co2_gpmi(self.cost_curve_class, self.model_year)
@@ -296,9 +314,12 @@ class Vehicle(OMEGABase):
         self.set_new_vehicle_mfr_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
         self.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
         self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
+        self.cost_curve = self.create_frontier_df()
 
     def create_frontier_df(self):
         from cost_curves import CostCurve
+        import producer
+
         df = pd.DataFrame()
 
         df['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID] = \
@@ -306,6 +327,8 @@ class Vehicle(OMEGABase):
 
         df['veh_%s_mfr_cost_dollars' % self.vehicle_ID] = \
             CostCurve.get_cost(self.cost_curve_class, self.model_year, df['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID])
+
+        df = producer.calculate_generalized_cost(self, df)
 
         return df
 

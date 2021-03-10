@@ -17,16 +17,19 @@ cache = dict()
 
 
 # placeholder for producer deemed generalized vehicle cost:
-def calculate_generalized_cost(cost_factors):
+def calculate_generalized_cost(vehicle, cost_curve):
     """
 
     Args:
-        cost_factors:
+        vehicle: an object of class Vehicle
+        cost_curve: the cost curve (frontier) of that vehicle
 
     Returns:
+        A cost curve modified by generalized cost factors
 
     """
-    pass
+
+    return cost_curve
 
 
 def create_compliance_options(calendar_year, market_class_dict, producer_bev_share, share_range, consumer_response,
