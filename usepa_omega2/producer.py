@@ -17,7 +17,7 @@ cache = dict()
 
 
 # placeholder for producer deemed generalized vehicle cost:
-def calculate_generalized_cost(vehicle, cost_curve):
+def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
     """
 
     Args:
@@ -28,6 +28,46 @@ def calculate_generalized_cost(vehicle, cost_curve):
         A cost curve modified by generalized cost factors
 
     """
+
+    from consumer.market_classes import MarketClass
+    from fuels import Fuel
+
+    producer_generalized_cost_fuel_years, \
+    producer_generalized_cost_annual_vmt, \
+    producer_generalized_cost_discount_rate, \
+    producer_generalized_cost_amortization_years = \
+        MarketClass.get_producer_generalized_cost_attributes(
+            vehicle.market_class_ID,
+            ['producer_generalized_cost_fuel_years',
+             'producer_generalized_cost_annual_vmt',
+             'producer_generalized_cost_discount_rate',
+             'producer_generalized_cost_amortization_years',
+             ])
+
+    # discount_rate = producer_generalized_cost_discount_rate
+    # annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** producer_generalized_cost_amortization_years) - 1)
+    vehicle_amortized_cost = cost_curve[cost_name] * (1 - producer_generalized_cost_discount_rate) ** (
+                producer_generalized_cost_amortization_years - 1)
+
+    grams_co2_per_unit = vehicle.fuel_tailpipe_co2_emissions_grams_per_unit()
+    liquid_generalized_fuel_cost = 0
+    electric_generalized_fuel_cost = 0
+
+    # TODO: calculate liquid and electric fuel costs separately and then add them...?
+    if grams_co2_per_unit > 0:
+        liquid_generalized_fuel_cost = \
+            (vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) / grams_co2_per_unit *
+             vehicle.cert_CO2_grams_per_mile *
+             producer_generalized_cost_annual_vmt *
+             producer_generalized_cost_fuel_years)
+
+    # else:
+    #     # TODO: need vehicle kwh/mi
+    #     electric_generalized_fuel_cost = 0
+
+    generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
+
+    cost_curve[cost_name.replace('mfr','mfr_generalized')] = generalized_fuel_cost + vehicle_amortized_cost
 
     return cost_curve
 
@@ -101,9 +141,11 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                         co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
                 tech_cost_options = new_veh.get_cost(co2_gpmi_options)
+                tech_generalized_cost_options = new_veh.get_generalized_cost(co2_gpmi_options)
 
                 df['veh_%s_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
                 df['veh_%s_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
+                df['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID] = tech_generalized_cost_options
 
                 child_df_list.append(df)
 
@@ -279,7 +321,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for mc in mctrc:
             for rc in reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
+                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year, verbose=False)
                     cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 
@@ -366,6 +408,7 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
     total_target_co2_Mg = 0
     total_cert_co2_Mg = 0
     total_cost_dollars = 0
+    total_generalized_cost_dollars = 0
     for new_veh in manufacturer_composite_vehicles:
         # assign sales to vehicle based on market share fractions and reg class share fractions
         market_class = new_veh.market_class_ID
@@ -398,6 +441,10 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
         vehicle_total_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%s_cost_dollars' % new_veh.vehicle_ID]
         tech_share_combos_total['veh_%s_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_cost_dollars
 
+        vehicle_total_generalized_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID]
+        tech_share_combos_total['veh_%s_generalized_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_generalized_cost_dollars
+
+
         # calculate cert and target Mg for the vehicle
         co2_gpmi = tech_share_combos_total['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
 
@@ -410,11 +457,13 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
         # update totals
         total_target_co2_Mg = total_target_co2_Mg + target_co2_Mg
         total_cert_co2_Mg = total_cert_co2_Mg + cert_co2_Mg
-        total_cost_dollars = total_cost_dollars + vehicle_total_cost_dollars
+        total_cost_dollars += vehicle_total_cost_dollars
+        total_generalized_cost_dollars += vehicle_total_generalized_cost_dollars
 
     tech_share_combos_total['total_combo_target_co2_megagrams'] = total_target_co2_Mg
     tech_share_combos_total['total_combo_cert_co2_megagrams'] = total_cert_co2_Mg
     tech_share_combos_total['total_combo_cost_dollars'] = total_cost_dollars
+    tech_share_combos_total['total_combo_generalized_cost_dollars'] = total_generalized_cost_dollars
     tech_share_combos_total['total_combo_credits_co2_megagrams'] = total_target_co2_Mg - total_cert_co2_Mg
     tech_share_combos_total['total_sales'] = total_sales
 
@@ -435,6 +484,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     mini_df = pd.DataFrame()
     mini_df['total_combo_credits_co2_megagrams'] = tech_share_combos_total['total_combo_credits_co2_megagrams']
     mini_df['total_combo_cost_dollars'] = tech_share_combos_total['total_combo_cost_dollars']
+    mini_df['total_combo_generalized_cost_dollars'] = tech_share_combos_total['total_combo_generalized_cost_dollars']
 
     tech_share_combos_total['producer_iteration'] = producer_iteration
     tech_share_combos_total['winner'] = False
@@ -445,15 +495,17 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         producer_iteration_log.write(tech_share_combos_total)
 
     potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
+    cost_name = 'total_combo_cost_dollars' # to use tech cost
+    # cost_name = 'total_combo_generalized_cost_dollars' # to use generalized tech cost
+
     if not potential_winners.empty:
-        winning_combos = tech_share_combos_total.loc[[potential_winners['total_combo_cost_dollars'].idxmin()]]
+        winning_combos = tech_share_combos_total.loc[[potential_winners[cost_name].idxmin()]]
         compliance_possible = True
 
         tech_share_combos_total = tech_share_combos_total[mini_df['total_combo_credits_co2_megagrams'] < 0].copy()
         if not tech_share_combos_total.empty:
             tech_share_combos_total['slope'] = \
-                (tech_share_combos_total['total_combo_cost_dollars'] - float(
-                    winning_combos['total_combo_cost_dollars'])) / \
+                (tech_share_combos_total[cost_name] - float(winning_combos[cost_name])) / \
                 (tech_share_combos_total['compliance_ratio'] - float(winning_combos['compliance_ratio']))
 
             other_winner_index = tech_share_combos_total['slope'].idxmin()

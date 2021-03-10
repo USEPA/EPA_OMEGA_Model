@@ -462,7 +462,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
 
             winning_combo['average_fuel_price_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
-                                                                   'retail_fuel_price')
+                                                                   'retail_fuel_price_dollars_per_unit')
 
             winning_combo['sales_%s' % mc] = 0
             for v in market_class_vehicles:

@@ -10,6 +10,7 @@ print('importing %s' % __file__)
 import o2  # import global variables
 from usepa_omega2 import *
 
+cache = dict()
 
 class Fuel(SQABase, OMEGABase):
     # --- database table properties ---
@@ -20,7 +21,31 @@ class Fuel(SQABase, OMEGABase):
     co2_tailpipe_emissions_grams_per_unit = Column('co2_tailpipe_emissions_grams_per_unit', Float)
 
     @staticmethod
+    def get_fuel_attributes(fuel_id, attribute_types):
+
+        cache_key = '%s_%s' % (fuel_id, attribute_types)
+
+        if cache_key not in cache:
+            if type(attribute_types) is not list:
+                attribute_types = [attribute_types]
+
+            attrs = Fuel.get_class_attributes(attribute_types)
+
+            result = o2.session.query(*attrs). \
+                filter(Fuel.fuel_ID == fuel_id).all()[0]
+
+            if len(attribute_types) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 

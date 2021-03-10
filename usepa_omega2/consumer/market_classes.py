@@ -129,6 +129,18 @@ class MarketClass(SQABase, OMEGABase):
         return market_class_ID
 
     @staticmethod
+    def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
+        if type(attribute_types) is not list:
+            attribute_types = [attribute_types]
+
+        attrs = MarketClass.get_class_attributes(attribute_types)
+
+        result = o2.session.query(*attrs). \
+            filter(MarketClass.market_class_ID == market_class_id).all()[0]
+
+        return result
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
