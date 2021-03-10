@@ -460,6 +460,10 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
 
+            winning_combo['average_generalized_cost_%s' % mc] = weighted_value(market_class_vehicles,
+                                                                   'initial_registered_count',
+                                                                   'new_vehicle_mfr_generalized_cost_dollars')
+
             winning_combo['average_fuel_price_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'retail_fuel_price_dollars_per_unit')
@@ -470,6 +474,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
         else:
             winning_combo['average_co2_gpmi_%s' % mc] = 0
             winning_combo['average_cost_%s' % mc] = 0
+            winning_combo['average_generalized_cost_%s' % mc] = 0
             winning_combo['sales_%s' % mc] = 0
 
         # winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
@@ -494,6 +499,7 @@ def calculate_market_sector_data(winning_combo):
 
     for mcat in consumer.market_categories:
         winning_combo['average_cost_%s' % mcat] = 0
+        winning_combo['average_generalized_cost_%s' % mcat] = 0
         winning_combo['average_price_%s' % mcat] = 0
         winning_combo['sales_%s' % mcat] = 0
         winning_combo['producer_abs_share_frac_%s' % mcat] = 0
@@ -501,12 +507,14 @@ def calculate_market_sector_data(winning_combo):
         for mc in MarketClass.market_classes:
             if mcat in mc.split('.'):
                 winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
+                winning_combo['average_generalized_cost_%s' % mcat] += winning_combo['average_generalized_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 if 'average_price_%s' % mc in winning_combo:
                     winning_combo['average_price_%s' % mcat] += winning_combo['average_price_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['sales_%s' % mcat] += np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['producer_abs_share_frac_%s' % mcat] += winning_combo['producer_abs_share_frac_%s' % mc]
 
         winning_combo['average_cost_%s' % mcat] = winning_combo['average_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
+        winning_combo['average_generalized_cost_%s' % mcat] = winning_combo['average_generalized_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
         winning_combo['average_price_%s' % mcat] = winning_combo['average_price_%s' % mcat] / winning_combo['sales_%s' % mcat]
 
 

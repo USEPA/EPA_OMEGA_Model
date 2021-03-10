@@ -78,6 +78,9 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
     return market_class_dict
 
 
+cache = dict()
+
+
 class MarketClass(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'market_classes'
@@ -130,18 +133,28 @@ class MarketClass(SQABase, OMEGABase):
 
     @staticmethod
     def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
-        if type(attribute_types) is not list:
-            attribute_types = [attribute_types]
+        cache_key = '%s_%s' % (market_class_id, attribute_types)
 
-        attrs = MarketClass.get_class_attributes(attribute_types)
+        if cache_key not in cache:
+            if type(attribute_types) is not list:
+                attribute_types = [attribute_types]
 
-        result = o2.session.query(*attrs). \
-            filter(MarketClass.market_class_ID == market_class_id).all()[0]
+            attrs = MarketClass.get_class_attributes(attribute_types)
 
-        return result
+            result = o2.session.query(*attrs). \
+                filter(MarketClass.market_class_ID == market_class_id).all()[0]
+
+            if len(attribute_types) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 

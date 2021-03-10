@@ -47,6 +47,8 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     average_cost_data = plot_vehicle_cost(calendar_years)
 
+    average_generalized_cost_data = plot_vehicle_generalized_cost(calendar_years)
+
     average_cert_co2_gpmi_data = plot_cert_co2_gpmi(calendar_years)
 
     average_target_co2_gpmi_data = plot_target_co2_gpmi(calendar_years)
@@ -63,6 +65,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     for cat in consumer.market_categories + MarketClass.market_classes + ['total']:
         session_results['average_%s_cost' % cat] = average_cost_data[cat]
+        session_results['average_%s_generalized_cost' % cat] = average_generalized_cost_data[cat]
         session_results['average_%s_cert_co2_gpmi' % cat] = average_cert_co2_gpmi_data[cat]
         session_results['average_%s_target_co2_gpmi' % cat] = average_target_co2_gpmi_data[cat]
 
@@ -308,6 +311,88 @@ def plot_vehicle_cost(calendar_years):
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Average Vehicle Cost by Market Class.png' % o2.options.session_unique_name)
     return average_cost_data
+
+
+def plot_vehicle_generalized_cost(calendar_years):
+    """
+
+    Args:
+        calendar_years:
+
+    Returns:
+
+    """
+    from vehicles import VehicleFinal
+    from vehicle_annual_data import VehicleAnnualData
+    from consumer.market_classes import MarketClass
+    import consumer
+
+    average_cost_data = dict()
+
+    # tally up total sales weighted cost
+    average_cost_data['total'] = []
+    for cy in calendar_years:
+        average_cost_data['total'].append(o2.session.query(
+            func.sum(VehicleFinal.new_vehicle_mfr_generalized_cost_dollars * VehicleAnnualData.registered_count) /
+            func.sum(VehicleAnnualData.registered_count)).
+                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                          filter(VehicleFinal.model_year == cy).
+                                          filter(VehicleAnnualData.age == 0).scalar())
+
+    # tally up market_category sales
+    for mcat in consumer.market_categories:
+        market_category_cost = []
+        for idx, cy in enumerate(calendar_years):
+            registered_count_and_market_ID_and_cost = o2.session.query(VehicleAnnualData.registered_count,
+                                                                       VehicleFinal.market_class_ID,
+                                                                       VehicleFinal.new_vehicle_mfr_generalized_cost_dollars) \
+                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).all()
+            sales_weighted_cost = 0
+            mcat_count = 0
+            for result in registered_count_and_market_ID_and_cost:
+                if mcat in result.market_class_ID.split('.'):
+                    mcat_count += float(result.registered_count)
+                    sales_weighted_cost += float(result.registered_count) * float(result.new_vehicle_mfr_generalized_cost_dollars)
+            market_category_cost.append(sales_weighted_cost / mcat_count)
+
+        average_cost_data[mcat] = market_category_cost
+
+    # cost/market category chart
+    fig, ax1 = figure()
+    for mcat in consumer.market_categories:
+        ax1.plot(calendar_years, average_cost_data[mcat], '.--')
+    ax1.plot(calendar_years, average_cost_data['total'], '.-')
+    ax1.legend(consumer.market_categories + ['total'])
+    label_xyt(ax1, 'Year', 'Cost [$]',
+              '%s\nAverage Vehicle Generalized Cost by Market Category v Year' % o2.options.session_unique_name)
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Generalized Cost by Market Category.png' % o2.options.session_unique_name)
+
+    # cost/market class chart
+    fig, ax1 = figure()
+    for mc in MarketClass.market_classes:
+        average_cost_data[mc] = []
+        for cy in calendar_years:
+            average_cost_data[mc].append(o2.session.query(
+                func.sum(VehicleFinal.new_vehicle_mfr_generalized_cost_dollars * VehicleAnnualData.registered_count) /
+                func.sum(VehicleAnnualData.registered_count)).
+                                         filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                         filter(VehicleFinal.model_year == cy).
+                                         filter(VehicleFinal.market_class_ID == mc).
+                                         filter(VehicleAnnualData.age == 0).scalar())
+        if 'ICE' in mc:
+            ax1.plot(calendar_years, average_cost_data[mc], '.-')
+        else:
+            ax1.plot(calendar_years, average_cost_data[mc], '.--')
+
+    label_xyt(ax1, 'Year', 'Cost [$]',
+              '%s\nAverage Vehicle Generalized_Cost  by Market Class v Year' % o2.options.session_unique_name)
+    # ax1.set_ylim(15e3, 80e3)
+    ax1.legend(MarketClass.market_classes)
+    fig.savefig(o2.options.output_folder + '%s Average Vehicle Generalized Cost by Market Class.png' % o2.options.session_unique_name)
+    return average_cost_data
+
 
 
 def plot_market_shares(calendar_years, total_sales):

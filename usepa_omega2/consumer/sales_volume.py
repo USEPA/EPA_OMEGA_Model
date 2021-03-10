@@ -23,7 +23,6 @@ def context_new_vehicle_sales(model_year):
 
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
-    from vehicles import VehicleFinal
     from context_new_vehicle_market import ContextNewVehicleMarket
 
     sales_dict = dict()
