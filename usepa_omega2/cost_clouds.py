@@ -20,7 +20,7 @@ class CostCloud(SQABase, OMEGABase):
     new_vehicle_mfr_cost_dollars = Column(Float)
     cert_CO2_grams_per_mile = Column(Float)
     mfr_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    kwh_per_mile_cycle = Column(Float)
+    cert_kwh_per_mile = Column(Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -30,9 +30,9 @@ class CostCloud(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.0004
+        input_template_version = 0.1
         input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
-                                  'new_vehicle_mfr_cost_dollars', 'kWh_per_mile_cycle'}
+                                  'new_vehicle_mfr_cost_dollars', 'cert_kWh_per_mile'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -53,7 +53,7 @@ class CostCloud(SQABase, OMEGABase):
                         model_year=df.loc[i, 'model_year'],
                         new_vehicle_mfr_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
                         cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
-                        kwh_per_mile_cycle=df.loc[i, 'kWh_per_mile_cycle'],
+                        cert_kwh_per_mile=df.loc[i, 'cert_kWh_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 original_echo = o2.engine.echo
