@@ -7,8 +7,7 @@ the manufacturers.py is primarily related to the schema and class methods...
 
 """
 
-import o2  # import global variables
-from omega_functions import cartesian_prod, partition
+
 from usepa_omega2 import *
 import numpy as np
 import consumer
@@ -30,7 +29,6 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
     """
 
     from consumer.market_classes import MarketClass
-    from fuels import Fuel
 
     producer_generalized_cost_fuel_years, \
     producer_generalized_cost_annual_vmt, \

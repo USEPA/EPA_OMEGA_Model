@@ -6,7 +6,6 @@ Consumer module stub (for now)
 
 """
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 
