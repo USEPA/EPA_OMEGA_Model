@@ -95,6 +95,7 @@ class CostCloud(SQABase, OMEGABase):
 
                     cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year,
                                                                    frontier_df['cert_co2_grams_per_mile'],
+                                                                   frontier_df['cert_kWh_per_mile'],
                                                                    frontier_df['new_vehicle_mfr_cost_dollars'])
 
             # plt.close()
