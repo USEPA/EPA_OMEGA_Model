@@ -76,7 +76,7 @@ class CostCloud(SQABase, OMEGABase):
                     if verbose:
                         print(model_year)
 
-                    cost_cloud = class_cloud[class_cloud['model_year'] == model_year]
+                    cost_cloud = class_cloud[class_cloud['model_year'] == model_year].copy()
                     frontier_df = CostCloud.calculate_frontier(cost_cloud, 'cert_co2_grams_per_mile',
                                                                'new_vehicle_mfr_cost_dollars')
 
