@@ -98,8 +98,6 @@ class CostCloud(SQABase, OMEGABase):
                                                                    frontier_df['cert_kWh_per_mile'],
                                                                    frontier_df['new_vehicle_mfr_cost_dollars'])
 
-            # plt.close()
-
         return template_errors
 
     @staticmethod
@@ -129,7 +127,20 @@ class CostCloud(SQABase, OMEGABase):
                                        ** o2.options.cost_curve_frontier_affinity_factor
 
             # find next frontier point (lowest slope), if there is one, and add to frontier list
-            idxmin = cloud['frontier_factor'].idxmin()
+            min = cloud['frontier_factor'].min()
+
+            if min > 0:
+                # frontier factor is different for up-slope
+                cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
+                                           (cloud[x_key] - frontier_pts[-1][x_key]) \
+                                           ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
+                min = cloud['frontier_factor'].min()
+
+            if len(cloud[cloud['frontier_factor'] == min]) > 1:
+                # if multiple points with the same slope, take the one with the highest index (highest x-value)
+                idxmin = cloud[cloud['frontier_factor'] == min].index.max()
+            else:
+                idxmin = cloud['frontier_factor'].idxmin()
             if pd.notna(idxmin):
                 frontier_pts.append(cloud.loc[idxmin])
 
