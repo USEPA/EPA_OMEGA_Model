@@ -140,8 +140,10 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
 
                 tech_cost_options = new_veh.get_cost(co2_gpmi_options)
                 tech_generalized_cost_options = new_veh.get_generalized_cost(co2_gpmi_options)
+                tech_kwh_options = new_veh.get_kwh_pmi(co2_gpmi_options)
 
                 df['veh_%s_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
+                df['veh_%s_kwh_pmi' % new_veh.vehicle_ID] = tech_kwh_options
                 df['veh_%s_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
                 df['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID] = tech_generalized_cost_options
 
@@ -269,6 +271,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_composite_vehicles:
         new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
+        new_veh.cert_kWh_per_mile = winning_combo['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%s_sales' % new_veh.vehicle_ID]
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
@@ -319,7 +322,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for mc in mctrc:
             for rc in reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year, verbose=False)
+                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
                     cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 

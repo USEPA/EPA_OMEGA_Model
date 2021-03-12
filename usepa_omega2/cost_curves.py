@@ -24,6 +24,7 @@ class CostCurve(SQABase, OMEGABase):
     model_year = Column(Numeric)
     cost_dollars = Column(Float)
     cert_CO2_grams_per_mile = Column(Float)
+    cert_kWh_per_mile = Column(Float)
     _min_cost_curve_year = None
     _max_cost_curve_year = None
 
@@ -34,8 +35,8 @@ class CostCurve(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.0002
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'cost_dollars'}
+        input_template_version = 0.1
+        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile', 'cost_dollars', 'cert_kWh_per_mile'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -55,6 +56,7 @@ class CostCurve(SQABase, OMEGABase):
                         model_year=df.loc[i, 'model_year'],
                         cost_dollars=df.loc[i, 'cost_dollars'],
                         cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
+                        cert_kWh_per_mile=df.loc[i, 'cert_kWh_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
@@ -65,19 +67,20 @@ class CostCurve(SQABase, OMEGABase):
         return template_errors
 
     @staticmethod
-    def init_database_from_lists(cost_curve_class, model_year, frontier_co2_gpmi, frontier_cost, verbose=False):
+    def init_database_from_lists(cost_curve_class, model_year, frontier_co2_gpmi, frontier_kwhpmi, frontier_cost, verbose=False):
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s frontier...' % cost_curve_class)
 
         obj_list = []
-        for cost, co2_gpmi in zip(frontier_cost, frontier_co2_gpmi):
+        for cost, co2_gpmi, kwhpmi in zip(frontier_cost, frontier_co2_gpmi, frontier_kwhpmi):
             obj_list.append(CostCurve(
                 cost_curve_class=cost_curve_class,
                 model_year=model_year,
                 cost_dollars=cost,
                 cert_CO2_grams_per_mile=co2_gpmi,
+                cert_kWh_per_mile=kwhpmi,
             ))
         o2.session.add_all(obj_list)
         o2.session.flush()
@@ -143,6 +146,18 @@ class CostCurve(SQABase, OMEGABase):
         cache_key = '%s_%s_co2_gpmi' % (cost_curve_class, model_year)
         if cache_key not in cache:
             cache[cache_key] = sql_unpack_result(o2.session.query(CostCurve.cert_CO2_grams_per_mile).
+                                                    filter(CostCurve.cost_curve_class == cost_curve_class).
+                                                    filter(CostCurve.model_year == model_year).all())
+        return cache[cache_key]
+
+    @staticmethod
+    def get_kWhpmi(cost_curve_class, model_year):
+        if o2.options.flat_context:
+            model_year = o2.options.flat_context_year
+
+        cache_key = '%s_%s_kWhpmi' % (cost_curve_class, model_year)
+        if cache_key not in cache:
+            cache[cache_key] = sql_unpack_result(o2.session.query(CostCurve.cert_kWh_per_mile).
                                                     filter(CostCurve.cost_curve_class == cost_curve_class).
                                                     filter(CostCurve.model_year == model_year).all())
         return cache[cache_key]

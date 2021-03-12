@@ -20,7 +20,7 @@ class CostCloud(SQABase, OMEGABase):
     new_vehicle_mfr_cost_dollars = Column(Float)
     cert_CO2_grams_per_mile = Column(Float)
     mfr_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    kwh_per_mile_cycle = Column(Float)
+    cert_kwh_per_mile = Column(Float)
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -30,9 +30,9 @@ class CostCloud(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.0004
+        input_template_version = 0.1
         input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
-                                  'new_vehicle_mfr_cost_dollars', 'kWh_per_mile_cycle'}
+                                  'new_vehicle_mfr_cost_dollars', 'cert_kWh_per_mile'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -53,7 +53,7 @@ class CostCloud(SQABase, OMEGABase):
                         model_year=df.loc[i, 'model_year'],
                         new_vehicle_mfr_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
                         cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
-                        kwh_per_mile_cycle=df.loc[i, 'kWh_per_mile_cycle'],
+                        cert_kwh_per_mile=df.loc[i, 'cert_kWh_per_mile'],
                     ))
                 o2.session.add_all(obj_list)
                 original_echo = o2.engine.echo
@@ -76,7 +76,7 @@ class CostCloud(SQABase, OMEGABase):
                     if verbose:
                         print(model_year)
 
-                    cost_cloud = class_cloud[class_cloud['model_year'] == model_year]
+                    cost_cloud = class_cloud[class_cloud['model_year'] == model_year].copy()
                     frontier_df = CostCloud.calculate_frontier(cost_cloud, 'cert_co2_grams_per_mile',
                                                                'new_vehicle_mfr_cost_dollars')
 
@@ -95,9 +95,8 @@ class CostCloud(SQABase, OMEGABase):
 
                     cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year,
                                                                    frontier_df['cert_co2_grams_per_mile'],
+                                                                   frontier_df['cert_kWh_per_mile'],
                                                                    frontier_df['new_vehicle_mfr_cost_dollars'])
-
-            # plt.close()
 
         return template_errors
 
@@ -128,7 +127,20 @@ class CostCloud(SQABase, OMEGABase):
                                        ** o2.options.cost_curve_frontier_affinity_factor
 
             # find next frontier point (lowest slope), if there is one, and add to frontier list
-            idxmin = cloud['frontier_factor'].idxmin()
+            min = cloud['frontier_factor'].min()
+
+            if min > 0:
+                # frontier factor is different for up-slope
+                cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
+                                           (cloud[x_key] - frontier_pts[-1][x_key]) \
+                                           ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
+                min = cloud['frontier_factor'].min()
+
+            if len(cloud[cloud['frontier_factor'] == min]) > 1:
+                # if multiple points with the same slope, take the one with the highest index (highest x-value)
+                idxmin = cloud[cloud['frontier_factor'] == min].index.max()
+            else:
+                idxmin = cloud['frontier_factor'].idxmin()
             if pd.notna(idxmin):
                 frontier_pts.append(cloud.loc[idxmin])
 
