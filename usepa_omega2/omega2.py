@@ -456,6 +456,10 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
                                                                        'initial_registered_count',
                                                                        'cert_CO2_grams_per_mile')
 
+            winning_combo['average_kwh_pmi_%s' % mc] = weighted_value(market_class_vehicles,
+                                                                       'initial_registered_count',
+                                                                       'cert_kWh_per_mile')
+
             winning_combo['average_cost_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
@@ -469,6 +473,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
                 winning_combo['sales_%s' % mc] += winning_combo['veh_%s_sales' % v.vehicle_ID]  # was v.initial_registered_count
         else:
             winning_combo['average_co2_gpmi_%s' % mc] = 0
+            winning_combo['average_kwh_pmi_%s' % mc] = 0
             winning_combo['average_cost_%s' % mc] = 0
             winning_combo['sales_%s' % mc] = 0
 

@@ -150,6 +150,18 @@ class CostCurve(SQABase, OMEGABase):
                                                     filter(CostCurve.model_year == model_year).all())
         return cache[cache_key]
 
+    @staticmethod
+    def get_kWhpmi(cost_curve_class, model_year):
+        if o2.options.flat_context:
+            model_year = o2.options.flat_context_year
+
+        cache_key = '%s_%s_kWhpmi' % (cost_curve_class, model_year)
+        if cache_key not in cache:
+            cache[cache_key] = sql_unpack_result(o2.session.query(CostCurve.cert_kWh_per_mile).
+                                                    filter(CostCurve.cost_curve_class == cost_curve_class).
+                                                    filter(CostCurve.model_year == model_year).all())
+        return cache[cache_key]
+
 
 if __name__ == '__main__':
     try:
