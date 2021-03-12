@@ -48,6 +48,7 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
                 producer_generalized_cost_amortization_years - 1)
 
     grams_co2_per_unit = vehicle.fuel_tailpipe_co2_emissions_grams_per_unit()
+    kwh_per_mi = vehicle.cert_kWh_per_mile
     liquid_generalized_fuel_cost = 0
     electric_generalized_fuel_cost = 0
 
@@ -59,13 +60,14 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
              producer_generalized_cost_annual_vmt *
              producer_generalized_cost_fuel_years)
 
-    # else:
-    #     # TODO: need vehicle kwh/mi
-    #     electric_generalized_fuel_cost = 0
+    if kwh_per_mi > 0:
+        electric_generalized_fuel_cost = (kwh_per_mi *
+                                         vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
+                                         producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
 
     generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
-    cost_curve[cost_name.replace('mfr','mfr_generalized')] = generalized_fuel_cost + vehicle_amortized_cost
+    cost_curve[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_amortized_cost
 
     return cost_curve
 
@@ -496,8 +498,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         producer_iteration_log.write(tech_share_combos_total)
 
     potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
-    cost_name = 'total_combo_cost_dollars' # to use tech cost
-    # cost_name = 'total_combo_generalized_cost_dollars' # to use generalized tech cost
+    cost_name = 'total_combo_generalized_cost_dollars' # to use generalized tech cost
 
     if not potential_winners.empty:
         winning_combos = tech_share_combos_total.loc[[potential_winners[cost_name].idxmin()]]
