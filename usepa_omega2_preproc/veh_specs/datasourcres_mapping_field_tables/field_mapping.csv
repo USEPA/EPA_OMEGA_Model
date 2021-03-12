@@ -69,7 +69,7 @@ Compliance Category Description,COMPLIANCE_CATEGORY_DESC,,,,,,,,,,,,,,,,,,,,,,,C
 Compression Ratio,Compression Ratio,,Comp. Ratio,,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Cooled EGR (y/n),COOLED_EGR_YN,,,,,,,,,,,,,,,,,,,,,,,COOLED_EGR_YN,,1,,,,,,,,,
 Curb Weight,Curb Weight,lbf,Curb Weight (lbs.),lbf,2,CURB WEIGHT,lbf,1,,,,,,,,,,,,,,,,,,,,,,,,,,,
-Cylinder Deactivation (y/n),CYL_DEACT,,,,,CYLINDER DEACTIVATION,,1,,,,,,,,,,,,,,,,CYL_DEACT,,1,,,,,,,,,
+Cylinder Deactivation (y/n),CYL_DEACT,,,,,CYLINDER DEACTIVATION,,2,,,,,,,,,,,,,,,,CYL_DEACT,,1,,,,,,,,,
 Cylinder Deactivation Description,CYL_DEACT_DESC,,,,,,,,,,,,,,,,,,,,,,,CYL_DEACT_DESC,,1,,,,,,,,,
 Cylinder Layout Category,Cylinder Layout Category,,,,,,,,,,,,,,,,,,,,,,,Cylinder Layout Category,,1,,,,,,,,,
 Departure Angle,DEPARTURE_ANGLE,deg,,,,,,,,,,,,,,,,,,,,,,DEPARTURE_ANGLE,deg,1,,,,,,,,,
