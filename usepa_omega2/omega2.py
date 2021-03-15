@@ -582,7 +582,6 @@ def init_omega(o2_options):
     from fuels import Fuel
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
-    from context_fuel_upstream import ContextFuelUpstream
     from consumer.market_classes import MarketClass
     from cost_curves import CostCurve, input_template_name as cost_curve_template_name
     from cost_clouds import CostCloud
@@ -635,9 +634,6 @@ def init_omega(o2_options):
 
         init_fail = init_fail + ContextFuelPrices.init_database_from_file(
             o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
-
-        init_fail = init_fail + ContextFuelUpstream.init_database_from_file(o2.options.fuel_upstream_file,
-                                                                            verbose=o2.options.verbose)
 
         init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
