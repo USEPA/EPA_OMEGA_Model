@@ -79,6 +79,7 @@ try:
             self.consumer_calculate_generalized_cost = None
             self.ghg_standards_file = path + 'test_inputs/ghg_standards-footprint.csv'
             self.ghg_standards_fuels_file = path + 'test_inputs/ghg_standards-fuels.csv'
+            self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
             self.required_zev_share_file = path + 'test_inputs/required_zev_share.csv'
             self.reregistration_fixed_by_age_file = path + 'test_inputs/reregistration_fixed_by_age.csv'
             self.annual_vmt_fixed_by_age_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'

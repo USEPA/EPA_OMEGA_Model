@@ -136,3 +136,4 @@ composer.lock
 
 /comm_file.txt
 /usepa_omega2_preproc/output_context_aeo/
+/venv*/
