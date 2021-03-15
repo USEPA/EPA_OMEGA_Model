@@ -29,7 +29,6 @@ Stock VMT File,String,annual_vmt_fixed_by_age.csv
 Verbose Output,TRUE / FALSE,FALSE
 Slice Tech Combo Tables,TRUE / FALSE,TRUE
 ,,
-,,
 Runtime Settings,,
 Num Market Share Options,#,5
 Num Tech Options per ICE Vehicle,#,5

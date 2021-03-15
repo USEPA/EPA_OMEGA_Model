@@ -40,7 +40,6 @@ New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5
 Consumer Pricing Multiplier Min,#,0.95,0.95
 Consumer Pricing Multiplier Max,#,1.05,1.05
 ,,,
-,,,
 Postproc Settings,,,
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
 Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv

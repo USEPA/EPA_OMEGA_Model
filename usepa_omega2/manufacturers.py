@@ -7,9 +7,9 @@ manufacturers.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
+initial_credit_bank = dict()
 
 class Manufacturer(SQABase, OMEGABase):
     # --- database table properties ---
@@ -20,6 +20,7 @@ class Manufacturer(SQABase, OMEGABase):
     # --- static properties ---
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        from GHG_credits import GHG_credit_bank
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -39,11 +40,17 @@ class Manufacturer(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
+                    manufacturer_ID = df.loc[i, 'manufacturer_id']
                     obj_list.append(Manufacturer(
-                        manufacturer_ID=df.loc[i, 'manufacturer_id'],
+                        manufacturer_ID=manufacturer_ID,
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
+
+                template_errors = GHG_credit_bank.validate_ghg_credits_template(o2.options.ghg_credits_file, verbose)
+
+                if not template_errors:
+                    initial_credit_bank[manufacturer_ID] = GHG_credit_bank(o2.options.ghg_credits_file, manufacturer_ID)
 
         return template_errors
 

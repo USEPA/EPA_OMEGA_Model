@@ -11,12 +11,37 @@ input_template_name = 'ghg_credit_history'
 credit_max_life_years = 5
 debit_max_life_years = 3
 
+input_template_version = 0.1
+input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
+
 
 class GHG_credit_bank(OMEGABase):
 
-    def __init__(self):
-        self.credit_bank = pd.DataFrame()
+    def __init__(self, filename, manufacturer_name, verbose=False):
+        # call init after validating ghg_credits template
+        if verbose:
+            omega_log.logwrite('\nInitializing credit bank from %s...' % filename)
+
+        # read in the data portion of the input file
+        self.credit_bank = pd.read_csv(filename, skiprows=1)
+
+        self.credit_bank[self.credit_bank['manufacturer'] == manufacturer_name]
+        self.credit_bank = self.credit_bank.rename({'balance_Mg':'beginning_balance_Mg'}, axis='columns')
+        self.credit_bank['ending_balance_Mg'] = self.credit_bank['beginning_balance_Mg']
+        self.credit_bank['age'] = self.credit_bank['calendar_year'] - self.credit_bank['model_year']
+
         self.transaction_log = pd.DataFrame()
+
+    @staticmethod
+    def validate_ghg_credits_template(filename, verbose):
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
+
+        if not template_errors:
+            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
+                                                        verbose=verbose)
+
+        return template_errors
 
     @staticmethod
     def create_credit():
@@ -124,33 +149,6 @@ class GHG_credit_bank(OMEGABase):
         self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
-
-    def init_from_file(self, filename, manufacturer_name, verbose=False):
-
-        if verbose:
-            omega_log.logwrite('\nInitializing credit bank from %s...' % filename)
-
-        input_template_version = 0.1
-        input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
-
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
-                                                         verbose=verbose)
-
-        if not template_errors:
-            # read in the data portion of the input file
-            df = pd.read_csv(filename, skiprows=1)
-
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
-
-            if not template_errors:
-                df[df['manufacturer'] == manufacturer_name]
-                df = df.rename({'balance_Mg':'beginning_balance_Mg'}, axis='columns')
-                df['ending_balance_Mg'] = df['beginning_balance_Mg']
-                df['age'] = df['calendar_year'] - df['model_year']
-
-                self.credit_bank = df
-
-        return template_errors
 
 
 if __name__ == '__main__':
