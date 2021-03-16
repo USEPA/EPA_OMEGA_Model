@@ -11,7 +11,9 @@ pyinstaller exe_entry.py --name omega2 --paths usepa_omega2:usepa_omega2_gui --a
 
 """
 
-import usepa_omega2
+print('Running exe_entry.py... whether you like it or not!')
+
+# import usepa_omega2
 import usepa_omega2_gui.omega_gui_batch
 
 # usepa_omega2.run_omega(usepa_omega2.OMEGARuntimeOptions(), standalone_run=True)
