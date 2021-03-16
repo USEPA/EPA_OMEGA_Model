@@ -7,7 +7,6 @@ fuels.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 cache = dict()
@@ -41,6 +40,14 @@ class Fuel(SQABase, OMEGABase):
 
         return cache[cache_key]
 
+
+    @staticmethod
+    def validate_fuel_ID(fuel_id):
+        result = o2.session.query(Fuel.fuel_ID).filter(Fuel.fuel_ID == fuel_id).all()
+        if result:
+            return True
+        else:
+            return False
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

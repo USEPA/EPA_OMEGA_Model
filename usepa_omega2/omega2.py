@@ -580,6 +580,7 @@ def init_omega(o2_options):
 
     # import database modules to populate ORM context
     from fuels import Fuel
+    from policy_fuel_upstream import PolicyFuelUpstream
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
     from consumer.market_classes import MarketClass
@@ -631,6 +632,9 @@ def init_omega(o2_options):
 
     try:
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+
+        init_fail = init_fail + PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file,
+                                                                  verbose=o2.options.verbose)
 
         init_fail = init_fail + ContextFuelPrices.init_database_from_file(
             o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
