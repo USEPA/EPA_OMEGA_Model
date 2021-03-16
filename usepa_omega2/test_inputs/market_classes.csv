@@ -1,6 +1,6 @@
 input_template_name:,market_classes,input_template_version:,0.1,,,,
 market_class_id,hauling_class,fueling_class,ownership_class,producer_generalized_cost_fuel_years,producer_generalized_cost_amortization_years,producer_generalized_cost_discount_rate,producer_generalized_cost_annual_vmt
-non_hauling.BEV,non_hauling,BEV,private,5,1,0.07,10000
-hauling.BEV,hauling,BEV,private,5,1,0.07,10000
-non_hauling.ICE,non_hauling,ICE,private,5,1,0.07,15000
-hauling.ICE,hauling,ICE,private,5,1,0.07,20000
+non_hauling.BEV,non_hauling,BEV,private,5,5,0.07,15000
+hauling.BEV,hauling,BEV,private,5,5,0.07,15000
+non_hauling.ICE,non_hauling,ICE,private,5,5,0.07,15000
+hauling.ICE,hauling,ICE,private,5,5,0.07,15000
