@@ -17,6 +17,7 @@ Vehicles File,String,vehicles.csv,vehicles.csv
 Demanded Shares File,String,demanded_shares-gcam.csv,demanded_shares-gcam.csv
 Fuels File,String,fuels.csv,fuels.csv
 Policy Fuel Upstream File,String,fuel_upstream.csv,fuel_upstream.csv
+Policy Fuel Upstream Methods File,String,fuel_upstream_methods.csv,fuel_upstream_methods.csv
 Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
 Cost File,String,cost_curves.csv,cost_curves.csv
