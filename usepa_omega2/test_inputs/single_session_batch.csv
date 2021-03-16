@@ -16,8 +16,8 @@ Market Classes File,String,market_classes.csv
 Vehicles File,String,vehicles.csv
 Demanded Shares File,String,demanded_shares-gcam.csv
 Fuels File,String,fuels.csv
+Policy Fuel Upstream File,String,fuel_upstream.csv
 Context Fuel Prices File,String,context_fuel_prices.csv
-Context Fuel Upstream File,String,fuel_upstream.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv
 Cost File,String,cost_curves.csv
 GHG Standards File,String,ghg_standards-footprint.csv
