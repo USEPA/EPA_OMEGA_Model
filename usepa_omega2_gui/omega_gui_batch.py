@@ -757,24 +757,6 @@ class Form(QObject):
         output_batch_subdirectory = output_batch_directory + os.sep + batch_time_stamp + '_' + \
             batch_definition_df.loc['Batch Name', 'Value']
 
-        # Create path to session log file
-        # output_session_subdirectory = output_batch_subdirectory + os.sep + "ReferencePolicy" + os.sep + "output"
-        # print('*****', output_session_subdirectory)
-
-        # Delete contents of comm_file.txt used to communicate with other processes
-        # and place the first line 'Start Model Run'
-        # path = output_batch_subdirectory
-        # os.mkdir(path)
-        # file1 = open(output_batch_subdirectory + "/" + log_file_batch, "a")  # append mode
-        # file1.write("Today \n")
-        # file1.close()
-        # file = open(output_batch_subdirectory + "/" + log_file_batch, "r+")
-        # file.truncate(0)
-        # file.close()
-        # file1 = open(output_batch_subdirectory + "/" + log_file_batch, "a")  # append mode
-        # file1.write("Start Model Run \n")
-        # file1.close()
-
         # Play a model start sound
         # sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
