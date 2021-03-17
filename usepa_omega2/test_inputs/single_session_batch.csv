@@ -18,6 +18,8 @@ Demanded Shares File,String,demanded_shares-gcam.csv
 Fuels File,String,fuels.csv
 Policy Fuel Upstream File,String,fuel_upstream.csv
 Policy Fuel Upstream Methods File,String,fuel_upstream_methods.csv
+Drive Cycles File,String,drive_cycles.csv
+Drive Cycle Weights File,String,drive_cycle_weights.csv
 Context Fuel Prices File,String,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv
 Cost File,String,cost_curves.csv

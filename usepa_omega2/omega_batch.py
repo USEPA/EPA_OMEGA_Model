@@ -299,6 +299,8 @@ class OMEGASessionObject(OMEGABase):
         self.settings.fuels_file = self.read_parameter('Fuels File')
         self.settings.fuel_upstream_file = self.read_parameter('Policy Fuel Upstream File')
         self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
+        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
+        self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
         self.settings.fuel_scenarios_file = self.read_parameter('Fuel Scenarios File')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
