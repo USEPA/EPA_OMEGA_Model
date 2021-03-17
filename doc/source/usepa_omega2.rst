@@ -13,6 +13,14 @@ Subpackages
 Submodules
 ----------
 
+usepa\_omega2.GHG\_credits module
+---------------------------------
+
+.. automodule:: usepa_omega2.GHG_credits
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.GHG\_standards\_flat module
 -----------------------------------------
 
@@ -41,14 +49,6 @@ usepa\_omega2.context\_fuel\_prices module
 ------------------------------------------
 
 .. automodule:: usepa_omega2.context_fuel_prices
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.context\_fuel\_upstream module
---------------------------------------------
-
-.. automodule:: usepa_omega2.context_fuel_upstream
    :members:
    :undoc-members:
    :show-inheritance:
@@ -193,6 +193,14 @@ usepa\_omega2.omega\_types module
 ---------------------------------
 
 .. automodule:: usepa_omega2.omega_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.policy\_fuel\_upstream module
+-------------------------------------------
+
+.. automodule:: usepa_omega2.policy_fuel_upstream
    :members:
    :undoc-members:
    :show-inheritance:
