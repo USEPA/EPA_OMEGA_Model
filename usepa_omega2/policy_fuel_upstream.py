@@ -75,6 +75,7 @@ if __name__ == '__main__':
                                                                   verbose=o2.options.verbose)
 
         if not init_fail:
+            fileio.validate_folder(o2.options.database_dump_folder)
             PolicyFuelUpstream.values.to_csv(
                 o2.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 
