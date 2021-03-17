@@ -10,6 +10,9 @@ from usepa_omega2 import *
 
 input_template_name = 'cost_clouds'
 
+ICE_prefix = 'ice_'
+BEV_prefix = 'bev_'
+
 class CostCloud(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_clouds'
@@ -77,21 +80,16 @@ class CostCloud(SQABase, OMEGABase):
                         print(model_year)
 
                     cost_cloud = class_cloud[class_cloud['model_year'] == model_year].copy()
-                    frontier_df = CostCloud.calculate_frontier(cost_cloud, 'cert_co2_grams_per_mile',
+                    if BEV_prefix in cost_curve_class:
+                        value_column = 'cert_kWh_per_mile'
+                    else: # elif ICE_prefix in cost_curve_class:
+                        value_column = 'cert_co2_grams_per_mile'
+
+                    frontier_df = CostCloud.calculate_frontier(cost_cloud, value_column,
                                                                'new_vehicle_mfr_cost_dollars')
 
                     if verbose and (model_year == cloud_model_years.min()):
-                        import matplotlib.pyplot as plt
-                        plt.figure()
-                        plt.plot(cost_cloud['cert_co2_grams_per_mile'], cost_cloud['new_vehicle_mfr_cost_dollars'],
-                                 '.')
-                        plt.title('Cost versus CO2 %s' % cost_curve_class)
-                        plt.xlabel('Combined GHG CO2 [g/mi]')
-                        plt.ylabel('Combined GHG Cost [$]')
-                        plt.plot(frontier_df['cert_co2_grams_per_mile'], frontier_df['new_vehicle_mfr_cost_dollars'],
-                                 'r-')
-                        plt.grid()
-                        plt.savefig(o2.options.output_folder + 'Cost versus CO2 %s' % cost_curve_class)
+                        CostCloud.plot_frontier(cost_cloud, cost_curve_class, frontier_df, value_column)
 
                     cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year,
                                                                    frontier_df['cert_co2_grams_per_mile'],
@@ -99,6 +97,20 @@ class CostCloud(SQABase, OMEGABase):
                                                                    frontier_df['new_vehicle_mfr_cost_dollars'])
 
         return template_errors
+
+    @staticmethod
+    def plot_frontier(cost_cloud, cost_curve_class, frontier_df, value_column):
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(cost_cloud[value_column], cost_cloud['new_vehicle_mfr_cost_dollars'],
+                     '.')
+            plt.title('Cost versus %s %s' % (value_column, cost_curve_class))
+            plt.xlabel('%s' % value_column)
+            plt.ylabel('Combined GHG Cost [$]')
+            plt.plot(frontier_df[value_column], frontier_df['new_vehicle_mfr_cost_dollars'],
+                     'r-')
+            plt.grid()
+            plt.savefig(o2.options.output_folder + 'Cost versus %s %s' % (value_column, cost_curve_class))
 
     @staticmethod
     def calculate_frontier(cloud, x_key, y_key):
