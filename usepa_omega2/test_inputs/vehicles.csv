@@ -1,14 +1,14 @@
 input_template_name:,vehicles,input_template_version:,0.3,,,,,,,,,,,,,,
 vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_co2_grams_per_mile,cert_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs
-BEV Hauling dummy,USA Motors,2019,truck,Standard Pick-up Trucks 4WD,Large Pickup,EV,hauling,bev_300_Truck,{'US electricity':1.0},{'MTE US electricity':1.0},1,0,0.38,67.80602909,,19.44439635,5414.610054
+BEV Hauling dummy,USA Motors,2019,truck,Standard Pick-up Trucks 4WD,Large Pickup,EV,hauling,bev_300_Truck,{'US electricity':1.0},{'MTE US electricity':1.0},1,0,0.252,60,,19.44439635,5414.610054
 ICE-PHEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,REEV,non_hauling,ice_LPW_LRL,{'pump gasoline':1.0},{'MTE Gasoline':1.0},3632,25.35457048,0,44.24881608,59.23898678,12.26767621,3638.973018
-BEV Compact car,USA Motors,2019,car,Compact Cars,Compact,EV,non_hauling,bev_300_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},5552,0,0.31,43.2,,12.1,3750
-BEV Minicompact car,USA Motors,2019,car,Minicompact Cars,Minicompact,EV,non_hauling,bev_300_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},434,0,0.27,34.8,,11,3250
-BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,non_hauling,bev_300_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994
-BEV Midsize car,USA Motors,2019,car,Midsize Cars,Midsize,EV,non_hauling,bev_300_MPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},16557,0,0.34,44.85234644,,12.26315758,3983.775744
-BEV Two Seater car,USA Motors,2019,car,Two Seaters,Two Seater,EV,non_hauling,bev_300_HPW,{'US electricity':1.0},{'MTE US electricity':1.0},394,0,0.27,29.18274112,,10.97614213,2635.152284
-BEV Small Crossover car,USA Motors,2019,car,Small Station Wagons,Small Crossover,EV,non_hauling,bev_300_MPW_HRL,{'US electricity':1.0},{'MTE US electricity':1.0},21361,0,0.34,42.3,,11.60299611,3877.808857
-BEV Large Utility truck,USA Motors,2019,truck,Standard SUV 4WD,Large Utility,EV,non_hauling,bev_300_MPW_HRL,{'US electricity':1.0},{'MTE US electricity':1.0},10416,0,0.36,51.8,,13.4,6000
+BEV Compact car,USA Motors,2019,car,Compact Cars,Compact,EV,non_hauling,bev_300_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},5552,0,0.152,48,,12.1,3750
+BEV Minicompact car,USA Motors,2019,car,Minicompact Cars,Minicompact,EV,non_hauling,bev_300_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},434,0,0.152,48,,11,3250
+BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,non_hauling,bev_300_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},1557,0,0.152,48,,11.50635838,3283.236994
+BEV Midsize car,USA Motors,2019,car,Midsize Cars,Midsize,EV,non_hauling,bev_300_MPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},16557,0,0.167,50,,12.26315758,3983.775744
+BEV Two Seater car,USA Motors,2019,car,Two Seaters,Two Seater,EV,non_hauling,bev_300_HPW,{'US electricity':1.0},{'MTE US electricity':1.0},394,0,0.192,55,,10.97614213,2635.152284
+BEV Small Crossover car,USA Motors,2019,car,Small Station Wagons,Small Crossover,EV,non_hauling,bev_300_MPW_HRL,{'US electricity':1.0},{'MTE US electricity':1.0},21361,0,0.231,58,,11.60299611,3877.808857
+BEV Large Utility truck,USA Motors,2019,truck,Standard SUV 4WD,Large Utility,EV,non_hauling,bev_300_MPW_HRL,{'US electricity':1.0},{'MTE US electricity':1.0},10416,0,0.231,58,,13.4,6000
 ICE-PHEV Midsize car,USA Motors,2019,car,Midsize Cars,Midsize,REEV,non_hauling,ice_MPW_LRL,{'pump gasoline':1.0},{'MTE Gasoline':1.0},29689,61.62847519,0,46.5459901,115.1784499,10.75632726,4026.263936
 ICE-HEV Large Van truck,USA Motors,2019,truck,"Special Purpose Vehicle, minivan 2WD",Large Van,HEV,non_hauling,ice_MPW_HRL,{'pump gasoline':1.0},{'MTE Gasoline':1.0},3484,83.8,0,58,220,15.82855913,5250
 ICE-PHEV Compact car,USA Motors,2019,car,Compact Cars,Compact,REEV,non_hauling,ice_LPW_LRL,{'pump gasoline':1.0},{'MTE Gasoline':1.0},14029,91.03664552,0,48.97793143,148.938342,11.85666833,4291.218191

@@ -89,7 +89,7 @@ class CostCurve(SQABase, OMEGABase):
         CostCurve._max_cost_curve_year = o2.session.query(func.max(CostCurve.model_year)).scalar()
 
     @staticmethod
-    def get_cost(cost_curve_class, model_year, target_co2_gpmi):
+    def get_cost(cost_curve_class, model_year, target_co2_gpmi, co2_points=None):
         if o2.options.flat_context:
             model_year = o2.options.flat_context_year
 
@@ -107,10 +107,15 @@ class CostCurve(SQABase, OMEGABase):
 
         cache_key = '%s_%s_cost_dollars_interp1d' % (cost_curve_class, model_year)
         if cache_key not in cache:
-            result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_CO2_grams_per_mile).filter(
+            result = o2.session.query(CostCurve.cost_dollars, CostCurve.cert_CO2_grams_per_mile, CostCurve.cert_kWh_per_mile).filter(
                 CostCurve.model_year == model_year).filter(CostCurve.cost_curve_class == cost_curve_class)
 
-            cache[cache_key] = scipy.interpolate.interp1d([r[1] for r in result], [r[0] for r in result], fill_value='extrapolate')
+            if co2_points is not None:
+                cache[cache_key] = scipy.interpolate.interp1d(co2_points,
+                                                              [r.cost_dollars for r in result],
+                                                              fill_value='extrapolate')
+            else:
+                cache[cache_key] = scipy.interpolate.interp1d([r.cert_CO2_grams_per_mile for r in result], [r.cost_dollars for r in result], fill_value='extrapolate')
 
         return cache[cache_key](target_co2_gpmi)
 
