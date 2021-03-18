@@ -388,6 +388,7 @@ class Vehicle(OMEGABase):
         cost_curve[kwh_name] = CostCurve.get_kWhpmi(self.cost_curve_class, self.model_year)
         if cost_curve[co2_name].max() == 0:
             cost_curve[co2_name] = cost_curve[kwh_name] * 534 / (1-0.065) - self.cert_target_CO2_grams_per_mile * 2478 / 8887
+            CostCurve.set_co2_gpmi(self.cost_curve_class, self.model_year, cost_curve[co2_name])
         cost_curve[cost_name] = CostCurve.get_cost(self.cost_curve_class, self.model_year, cost_curve[co2_name], co2_points=cost_curve[co2_name])
 
         cost_curve = o2.options.producer_calculate_generalized_cost(self, cost_curve, co2_name, cost_name)

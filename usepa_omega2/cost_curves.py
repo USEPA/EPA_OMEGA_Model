@@ -119,29 +119,29 @@ class CostCurve(SQABase, OMEGABase):
 
         return cache[cache_key](target_co2_gpmi)
 
-    @staticmethod
-    def get_min_co2_gpmi(cost_curve_class, model_year):
-        if o2.options.flat_context:
-            model_year = o2.options.flat_context_year
-
-        cache_key = '%s_%s_min' % (cost_curve_class, model_year)
-        if cache_key not in cache:
-            cache[cache_key] = o2.session.query(func.min(CostCurve.cert_CO2_grams_per_mile)). \
-                filter(CostCurve.cost_curve_class == cost_curve_class). \
-                filter(CostCurve.model_year == model_year).scalar()
-        return cache[cache_key]
-
-    @staticmethod
-    def get_max_co2_gpmi(cost_curve_class, model_year):
-        if o2.options.flat_context:
-            model_year = o2.options.flat_context_year
-
-        cache_key = '%s_%s_max' % (cost_curve_class, model_year)
-        if cache_key not in cache:
-            cache[cache_key] = o2.session.query(func.max(CostCurve.cert_CO2_grams_per_mile)). \
-                filter(CostCurve.cost_curve_class == cost_curve_class). \
-                filter(CostCurve.model_year == model_year).scalar()
-        return cache[cache_key]
+    # @staticmethod
+    # def get_min_co2_gpmi(cost_curve_class, model_year):
+    #     if o2.options.flat_context:
+    #         model_year = o2.options.flat_context_year
+    #
+    #     cache_key = '%s_%s_min' % (cost_curve_class, model_year)
+    #     if cache_key not in cache:
+    #         cache[cache_key] = o2.session.query(func.min(CostCurve.cert_CO2_grams_per_mile)). \
+    #             filter(CostCurve.cost_curve_class == cost_curve_class). \
+    #             filter(CostCurve.model_year == model_year).scalar()
+    #     return cache[cache_key]
+    #
+    # @staticmethod
+    # def get_max_co2_gpmi(cost_curve_class, model_year):
+    #     if o2.options.flat_context:
+    #         model_year = o2.options.flat_context_year
+    #
+    #     cache_key = '%s_%s_max' % (cost_curve_class, model_year)
+    #     if cache_key not in cache:
+    #         cache[cache_key] = o2.session.query(func.max(CostCurve.cert_CO2_grams_per_mile)). \
+    #             filter(CostCurve.cost_curve_class == cost_curve_class). \
+    #             filter(CostCurve.model_year == model_year).scalar()
+    #     return cache[cache_key]
 
     @staticmethod
     def get_co2_gpmi(cost_curve_class, model_year):
@@ -154,6 +154,15 @@ class CostCurve(SQABase, OMEGABase):
                                                     filter(CostCurve.cost_curve_class == cost_curve_class).
                                                     filter(CostCurve.model_year == model_year).all())
         return cache[cache_key]
+
+    @staticmethod
+    def set_co2_gpmi(cost_curve_class, model_year, co2_gpmi):
+        cache_key = '%s_%s_co2_gpmi' % (cost_curve_class, model_year)
+        cache[cache_key] = co2_gpmi
+        # cache_key = '%s_%s_min' % (cost_curve_class, model_year)
+        # cache[cache_key] = co2_gpmi.min()
+        # cache_key = '%s_%s_max' % (cost_curve_class, model_year)
+        # cache[cache_key] = co2_gpmi.max()
 
     @staticmethod
     def get_kWhpmi(cost_curve_class, model_year):
