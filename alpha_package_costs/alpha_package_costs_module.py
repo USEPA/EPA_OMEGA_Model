@@ -147,10 +147,8 @@ class CalcCosts:
         ic_slope = techcosts_weight.at[work_class, 'IC_slope']
         self.df.loc[self.df['weight_reduction'] == 0, f'weight_cost_{year}'] = (self.df['Test Weight lbs'] - 300) * base_weight_cost
         self.df.loc[self.df['weight_reduction'] != 0, f'weight_cost_{year}'] = ((self.df['Test Weight lbs'] - 300) / (1 - self.df['weight_reduction'] / 100)) * base_weight_cost \
-                                                                               + ((dmc_ln_coeff * np.log(self.df['weight_reduction'] / 100) + dmc_constant)
-                                                                                  * ((self.df['Test Weight lbs'] - 300) / (1- self.df['weight_reduction'] / 100)) * (self.df['weight_reduction'] / 100)) \
-                                                                               + (ic_slope * (self.df['weight_reduction'] / 100)) * ((self.df['Test Weight lbs'] - 300) / (1 - self.df['weight_reduction'] / 100)) \
-                                                                               * (self.df['weight_reduction'] / 100)
+                                                                               + ((dmc_ln_coeff * np.log(self.df['weight_reduction'] / 100) + dmc_constant) * ((self.df['Test Weight lbs'] - 300) / (1- self.df['weight_reduction'] / 100)) * (self.df['weight_reduction'] / 100)) \
+                                                                               + (ic_slope * (self.df['weight_reduction'] / 100)) * ((self.df['Test Weight lbs'] - 300) / (1 - self.df['weight_reduction'] / 100)) * (self.df['weight_reduction'] / 100)
         return self.df
 
     def powertrain_cost(self, start_year):
