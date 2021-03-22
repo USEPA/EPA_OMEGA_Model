@@ -13,6 +13,9 @@ input_template_name = 'cost_clouds'
 ICE_prefix = 'ice_'
 BEV_prefix = 'bev_'
 
+cache = dict()
+
+
 class CostCloud(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_clouds'
@@ -26,9 +29,10 @@ class CostCloud(SQABase, OMEGABase):
     cert_kwh_per_mile = Column(Float)
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
-        import matplotlib.pyplot as plt
+    def init_cost_clouds_from_file(filename, verbose=False):
         import cost_curves
+
+        cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -181,7 +185,7 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=True)
+        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=True)
 
         if not init_fail:
             dump_omega_db_to_csv(o2.options.database_dump_folder)
