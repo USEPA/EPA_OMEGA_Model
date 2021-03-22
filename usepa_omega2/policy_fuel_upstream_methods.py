@@ -10,6 +10,34 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 
+def upstream_zero(vehicle, cost_curve, co2_name, kwh_name):
+    pass
+
+
+def upstream_xev_ice_delta(vehicle, cost_curve, co2_name, kwh_name):
+    from policy_fuel_upstream import PolicyFuelUpstream
+    from fuels import Fuel
+
+    upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
+    upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
+    upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
+    gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
+
+    cost_curve[co2_name] += cost_curve[kwh_name] * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
+                            vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / gco2_per_gal
+
+
+def upstream_actual(vehicle, cost_curve, co2_name, kwh_name):
+    from policy_fuel_upstream import PolicyFuelUpstream
+    upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
+    upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
+    upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
+    gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
+
+    cost_curve[co2_name] += cost_curve[kwh_name] * upstream_gco2_per_kWh / (1 - upstream_inefficiency) + \
+                            cost_curve[co2_name] * upstream_gco2_per_gal / gco2_per_gal
+
+
 class PolicyFuelUpstreamMethods(OMEGABase):
     methods = pd.DataFrame()
 

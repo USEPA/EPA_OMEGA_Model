@@ -10,6 +10,7 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 co2_units = 'co2e_grams_per_unit'
+electric_loss_units = 'upstream_inefficiency'
 
 class PolicyFuelUpstream(OMEGABase):
     values = pd.DataFrame()
@@ -17,6 +18,11 @@ class PolicyFuelUpstream(OMEGABase):
     @staticmethod
     def get_upstream_co2e_grams_per_unit(calendar_year, fuel_ID):
         return PolicyFuelUpstream.values['%s:%s' % (fuel_ID, co2_units)].loc[
+                  PolicyFuelUpstream.values['calendar_year'] == calendar_year].item()
+
+    @staticmethod
+    def get_upstream_inefficiency(calendar_year, fuel_ID):
+        return PolicyFuelUpstream.values['%s:%s' % (fuel_ID, electric_loss_units)].loc[
                   PolicyFuelUpstream.values['calendar_year'] == calendar_year].item()
 
     @staticmethod

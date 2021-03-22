@@ -499,8 +499,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         producer_iteration_log.write(tech_share_combos_total)
 
     potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
-    cost_name = 'total_combo_generalized_cost_dollars' # to use generalized tech cost
-    cost_name = 'total_combo_cost_dollars'  # to use tech cost
+    cost_name = 'total_combo_generalized_cost_dollars'  # to use generalized tech cost
+    # cost_name = 'total_combo_cost_dollars'  # to use tech cost
 
     if not potential_winners.empty:
         winning_combos = tech_share_combos_total.loc[[potential_winners[cost_name].idxmin()]]

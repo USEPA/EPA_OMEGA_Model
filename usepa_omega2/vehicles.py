@@ -366,7 +366,7 @@ class Vehicle(OMEGABase):
         self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile
         self.cert_kWh_per_mile = vehicle.cert_kWh_per_mile
         if self.cert_CO2_grams_per_mile == 0:
-            self.cert_CO2_grams_per_mile = self.cert_kWh_per_mile * 534 / (1-0.065) - self.cert_target_CO2_grams_per_mile * 2478 / 8887
+            self.cert_CO2_grams_per_mile = self.cert_kWh_per_mile * 534 / (1-0.065) - 0*self.cert_target_CO2_grams_per_mile * 2478 / 8887
         self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
         self.set_new_vehicle_mfr_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
         self.set_new_vehicle_mfr_generalized_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
@@ -383,11 +383,13 @@ class Vehicle(OMEGABase):
         kwh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
 
+        # TODO: update dynamic costs
         # TODO: convert kwh to gco2/mi for BEVs (and what for PHEVS...?? -- upstream calcs
+        # TODO: calculate frontier from updated cloud
         cost_curve[co2_name] = CostCurve.get_co2_gpmi(self.cost_curve_class, self.model_year)
         cost_curve[kwh_name] = CostCurve.get_kWhpmi(self.cost_curve_class, self.model_year)
         if cost_curve[co2_name].max() == 0:
-            cost_curve[co2_name] = cost_curve[kwh_name] * 534 / (1-0.065) - self.cert_target_CO2_grams_per_mile * 2478 / 8887
+            cost_curve[co2_name] = cost_curve[kwh_name] * 534 / (1-0.065) - 0*self.cert_target_CO2_grams_per_mile * 2478 / 8887
             CostCurve.set_co2_gpmi(self.cost_curve_class, self.model_year, cost_curve[co2_name])
         cost_curve[cost_name] = CostCurve.get_cost(self.cost_curve_class, self.model_year, cost_curve[co2_name], co2_points=cost_curve[co2_name])
 

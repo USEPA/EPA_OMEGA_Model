@@ -23,7 +23,7 @@ Drive Cycle Weights File,String,drive_cycle_weights.csv
 Context Fuel Prices File,String,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv
 Cost File,String,cost_curves.csv
-GHG Standards File,String,ghg_standards-flat.csv
+GHG Standards File,String,ghg_standards-footprint.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv
 GHG Credits File,String,ghg_credits.csv
 ZEV Requirement File,String,required_zev_share.csv
@@ -36,7 +36,7 @@ Runtime Settings,,
 Num Market Share Options,#,5
 Num Tech Options per ICE Vehicle,#,5
 Num Tech Options per BEV Vehicle,#,1
-Allow Backsliding,TRUE / FALSE,FALSE
+Allow Backsliding,TRUE / FALSE,TRUE
 Cost Curve Frontier Affinity Factor,#,0.75
 Iterate Producer-Consumer,TRUE / FALSE,TRUE
 New Vehicle Price Sales Response Elasticity,#,-0.5
