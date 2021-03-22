@@ -48,7 +48,7 @@ class PolicyFuelUpstream(OMEGABase):
 
                 PolicyFuelUpstream.values['calendar_year'] = df['calendar_year']
 
-                fuel_columns = [c for c in df.columns if co2_units in c]
+                fuel_columns = [c for c in df.columns if (co2_units in c) or (electric_loss_units in c)]
 
                 for fc in fuel_columns:
                     fuel = fc.split(':')[0]

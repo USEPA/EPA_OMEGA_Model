@@ -360,14 +360,19 @@ class Vehicle(OMEGABase):
         if model_year:
             self.model_year = model_year
 
+        from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
+
         self.set_cert_target_CO2_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
         # TODO: cert co2 needs to be calculated each year, especially if cycle weightings change over time
         self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile
         self.cert_kWh_per_mile = vehicle.cert_kWh_per_mile
-        if self.cert_CO2_grams_per_mile == 0:
-            self.cert_CO2_grams_per_mile = self.cert_kWh_per_mile * 534 / (1-0.065) - 0*self.cert_target_CO2_grams_per_mile * 2478 / 8887
+
+        add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
+        self.cert_CO2_grams_per_mile = add_upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
+
         self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
+
         self.set_new_vehicle_mfr_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
         self.set_new_vehicle_mfr_generalized_cost_dollars()  # varies by model_year and cert_CO2_grams_per_mile
         self.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
@@ -375,7 +380,7 @@ class Vehicle(OMEGABase):
 
     def create_frontier_df(self):
         from cost_curves import CostCurve
-        import producer
+        from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
 
         cost_curve = pd.DataFrame()
 
@@ -388,10 +393,11 @@ class Vehicle(OMEGABase):
         # TODO: calculate frontier from updated cloud
         cost_curve[co2_name] = CostCurve.get_co2_gpmi(self.cost_curve_class, self.model_year)
         cost_curve[kwh_name] = CostCurve.get_kWhpmi(self.cost_curve_class, self.model_year)
-        if cost_curve[co2_name].max() == 0:
-            cost_curve[co2_name] = cost_curve[kwh_name] * 534 / (1-0.065) - 0*self.cert_target_CO2_grams_per_mile * 2478 / 8887
-            CostCurve.set_co2_gpmi(self.cost_curve_class, self.model_year, cost_curve[co2_name])
-        cost_curve[cost_name] = CostCurve.get_cost(self.cost_curve_class, self.model_year, cost_curve[co2_name], co2_points=cost_curve[co2_name])
+
+        add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
+        cost_curve[co2_name] = add_upstream(self, cost_curve[co2_name], cost_curve[kwh_name])
+        cost_curve[cost_name] = CostCurve.get_cost(self.cost_curve_class, self.model_year, cost_curve[co2_name],
+                                                   co2_points=cost_curve[co2_name])
 
         cost_curve = o2.options.producer_calculate_generalized_cost(self, cost_curve, co2_name, cost_name)
 

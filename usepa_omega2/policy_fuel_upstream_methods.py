@@ -11,31 +11,42 @@ from usepa_omega2 import *
 
 
 def upstream_zero(vehicle, cost_curve, co2_name, kwh_name):
-    pass
+    return cost_curve
 
 
-def upstream_xev_ice_delta(vehicle, cost_curve, co2_name, kwh_name):
+def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kWh_per_mile):
     from policy_fuel_upstream import PolicyFuelUpstream
     from fuels import Fuel
 
     upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
     upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
     upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-    gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
+    fuel_gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
-    cost_curve[co2_name] += cost_curve[kwh_name] * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
-                            vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / gco2_per_gal
+    co2_grams_per_mile += kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
+                          vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
+
+    return co2_grams_per_mile
 
 
-def upstream_actual(vehicle, cost_curve, co2_name, kwh_name):
+def upstream_actual(vehicle, co2_grams_per_mile, kWh_per_mile):
     from policy_fuel_upstream import PolicyFuelUpstream
+    from fuels import Fuel
+
     upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
     upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
     upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-    gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
+    fuel_gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
-    cost_curve[co2_name] += cost_curve[kwh_name] * upstream_gco2_per_kWh / (1 - upstream_inefficiency) + \
-                            cost_curve[co2_name] * upstream_gco2_per_gal / gco2_per_gal
+    # TODO: need "utility factor" or percentage of electric and gas miles to weight these terms
+    co2_grams_per_mile += kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) + \
+                          co2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
+
+    return co2_grams_per_mile
+
+
+upstream_method_dict = {'upstream_zero': upstream_zero, 'upstream_xev_ice_delta': upstream_xev_ice_delta,
+                        'upstream_actual': upstream_actual}
 
 
 class PolicyFuelUpstreamMethods(OMEGABase):
@@ -43,8 +54,10 @@ class PolicyFuelUpstreamMethods(OMEGABase):
 
     @staticmethod
     def get_upstream_method(calendar_year):
-        return PolicyFuelUpstreamMethods.methods['upstream_calculation_method'].loc[
-                  PolicyFuelUpstreamMethods.methods['calendar_year'] == calendar_year].item()
+        method = PolicyFuelUpstreamMethods.methods['upstream_calculation_method'].loc[
+                PolicyFuelUpstreamMethods.methods['calendar_year'] == calendar_year].item()
+        return upstream_method_dict[method]
+
 
     @staticmethod
     def init_from_file(filename, verbose=False):
