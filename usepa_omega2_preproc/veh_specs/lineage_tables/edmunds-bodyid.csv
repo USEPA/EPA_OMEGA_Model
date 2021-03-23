@@ -12825,8 +12825,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,MAZDA,6 SEDAN,i Touring 4dr Sedan (2.5L 4cyl 6M),57.1 in.,191.5 in.,111.4 in.,611,255
 2016,MCLAREN,675LT COUPE COUPE,2dr Coupe (3.8L 8cyl Turbo 7AM),,179.0 in.,,1111,259
 2016,MCLAREN,675LT SPIDER CONVERTIBLE,2dr Convertible (3.8L 8cyl Turbo 7AM),,179.0 in.,,1197,259
-2019,Mercedes-benz,A-CLASS,A 220 4MATIC 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.9 in.,179.1 in.,107.4 in.,-9,-9
-2019,Mercedes-benz,A-CLASS,A 220 4dr Sedan (2.0L 4cyl Turbo 7AM),56.9 in.,179.1 in.,107.4 in.,-9,-9
+2019,Mercedes-benz,A-CLASS,A 220 4MATIC 4dr Sedan AWD (2.0L 4cyl Turbo 7AM),56.9 in.,179.1 in.,107.4 in.,2129,487
+2019,Mercedes-benz,A-CLASS,A 220 4dr Sedan (2.0L 4cyl Turbo 7AM),56.9 in.,179.1 in.,107.4 in.,2129,487
 2016,MERCEDES-BENZ,AMG GT COUPE,S 2dr Coupe (4.0L 8cyl Turbo 7AM),50.7 in.,179.0 in.,103.5 in.,1084,435
 2019,Mercedes-benz,AMG-GT,C 2dr Coupe (4.0L 8cyl Turbo 7AM),50.7 in.,179.0 in.,103.5 in.,1084,435
 2019,Mercedes-benz,AMG-GT,2dr Convertible (4.0L 8cyl Turbo 7AM),49.6 in.,179.0 in.,103.5 in.,1084,435
@@ -13338,7 +13338,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,PROMASTER CITY MINIVAN,Tradesman SLT Cargo 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2016,RAM,PROMASTER CITY MINIVAN,Wagon SLT 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
 2016,RAM,PROMASTER CITY MINIVAN,Wagon 4dr Minivan (2.4L 4cyl 9A),74.0 in.,187.5 in.,122.4 in.,175,336
-2019,Rolls-royce,CULLINAN,4dr SUV AWD (6.8L 12cyl Turbo 8A),72.0 in.,210.0 in.,130.0 in.,-9,-9
+2019,Rolls-royce,CULLINAN,4dr SUV AWD (6.8L 12cyl Turbo 8A),72.0 in.,210.0 in.,130.0 in.,2134,492
 2019,Rolls-royce,DAWN,2dr Convertible (6.6L 12cyl Turbo 8A),59.1 in.,208.1 in.,122.5 in.,835,412
 2019,Rolls-royce,DAWN,Black Badge 2dr Convertible (6.6L 12cyl Turbo 8A),59.1 in.,208.1 in.,122.5 in.,721,338
 2016,ROLLS ROYCE,DAWN CONVERTIBLE,2dr Convertible (6.6L 12cyl Turbo 8A),59.1 in.,208.1 in.,122.5 in.,835,412
@@ -13502,9 +13502,9 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Toyota,Camry-Hybrid Sedan,LE 4dr Sedan (2.5L 4cyl gas/electric hybrid CVT),57.9 in.,190.9 in.,109.3 in.,1013,376
 2017,Toyota,Camry-Hybrid Sedan,SE 4dr Sedan (2.5L 4cyl gas/electric hybrid CVT),57.9 in.,190.9 in.,109.3 in.,1013,376
 2017,Toyota,Camry-Hybrid Sedan,XLE 4dr Sedan (2.5L 4cyl gas/electric hybrid CVT),57.9 in.,190.9 in.,109.3 in.,1013,376
-2019,Toyota,C-HR,LE 4dr SUV (2.0L 4cyl CVT),61.6 in.,171.2 in.,103.9 in.,-9,-9
-2019,Toyota,C-HR,Limited 4dr SUV (2.0L 4cyl CVT),61.6 in.,171.2 in.,103.9 in.,-9,-9
-2019,Toyota,C-HR,XLE 4dr SUV (2.0L 4cyl CVT),61.6 in.,171.2 in.,103.9 in.,-9,-9
+2019,Toyota,C-HR,LE 4dr SUV (2.0L 4cyl CVT),61.6 in.,171.2 in.,103.9 in.,2133,491
+2019,Toyota,C-HR,Limited 4dr SUV (2.0L 4cyl CVT),61.6 in.,171.2 in.,103.9 in.,2133,491
+2019,Toyota,C-HR,XLE 4dr SUV (2.0L 4cyl CVT),61.6 in.,171.2 in.,103.9 in.,2133,491
 2019,Toyota,COROLLA,L 4dr Sedan (1.8L 4cyl CVT),57.3 in.,183.1 in.,106.3 in.,184,378
 2019,Toyota,COROLLA,LE 4dr Sedan (1.8L 4cyl CVT),57.3 in.,183.1 in.,106.3 in.,184,378
 2019,Toyota,COROLLA,LE Eco 4dr Sedan (1.8L 4cyl CVT),57.3 in.,183.1 in.,106.3 in.,184,378
@@ -13603,36 +13603,36 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,TOYOTA,PRIUS C HATCHBACK,One 4dr Hatchback (1.5L 4cyl gas/electric hybrid CVT),57.3 in.,157.3 in.,100.4 in.,1033,383
 2016,TOYOTA,PRIUS C HATCHBACK,Three 4dr Hatchback (1.5L 4cyl gas/electric hybrid CVT),57.3 in.,157.3 in.,100.4 in.,1033,383
 2016,TOYOTA,PRIUS C HATCHBACK,Two 4dr Hatchback (1.5L 4cyl gas/electric hybrid CVT),57.3 in.,157.3 in.,100.4 in.,1033,383
-2019,Volkswagen,ARTEON,"SEL Premium R-Line 4MOTION 4dr Hatchback AWD w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,SEL Premium 4MOTION 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,SE 4MOTION 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SE R-Line 4MOTION 4dr Hatchback AWD w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,SEL 4MOTION 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SEL R-Line 4dr Hatchback w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SE R-Line 4dr Hatchback w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SEL R-Line 4dr Hatchback w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,SE 4dr Hatchback (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SE R-Line 4MOTION 4dr Hatchback AWD w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SE R-Line 4dr Hatchback w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SEL R-Line 4MOTION 4dr Hatchback AWD w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,SEL 4dr Hatchback (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SEL Premium R-Line 4MOTION 4dr Hatchback AWD w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ARTEON,"SEL R-Line 4MOTION 4dr Hatchback AWD w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SE w/Technology R-Line 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SE w/Technology 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SEL R-Line 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SEL 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SE 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SE w/Technology 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SEL R-Line 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SEL 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SE w/Technology R-Line 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,SE 4dr SUV (2.0L 4cyl Turbo 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,S 4dr SUV (2.0L 4cyl Turbo 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,SE w/Technology 4dr SUV (2.0L 4cyl Turbo 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SE 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 S 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
-2019,Volkswagen,ATLAS,V6 SEL Premium 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,-9,-9
+2019,Volkswagen,ARTEON,"SEL Premium R-Line 4MOTION 4dr Hatchback AWD w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,SEL Premium 4MOTION 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,SE 4MOTION 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SE R-Line 4MOTION 4dr Hatchback AWD w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,SEL 4MOTION 4dr Hatchback AWD (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SEL R-Line 4dr Hatchback w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SE R-Line 4dr Hatchback w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SEL R-Line 4dr Hatchback w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,SE 4dr Hatchback (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SE R-Line 4MOTION 4dr Hatchback AWD w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SE R-Line 4dr Hatchback w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SEL R-Line 4MOTION 4dr Hatchback AWD w/20"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,SEL 4dr Hatchback (2.0L 4cyl Turbo 8A),56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SEL Premium R-Line 4MOTION 4dr Hatchback AWD w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ARTEON,"SEL R-Line 4MOTION 4dr Hatchback AWD w/19"" Wheels (2.0L 4cyl Turbo 8A)",56.5 in.,191.4 in.,111.9 in.,2130,488
+2019,Volkswagen,ATLAS,V6 SE w/Technology R-Line 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SE w/Technology 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SEL R-Line 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SEL 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SE 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SE w/Technology 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SEL R-Line 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SEL 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SE w/Technology R-Line 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,SE 4dr SUV (2.0L 4cyl Turbo 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,S 4dr SUV (2.0L 4cyl Turbo 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,SE w/Technology 4dr SUV (2.0L 4cyl Turbo 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SE 4dr SUV (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 S 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
+2019,Volkswagen,ATLAS,V6 SEL Premium 4MOTION 4dr SUV AWD (3.6L 6cyl 8A),70.0 in.,198.3 in.,117.3 in.,1162,445
 2019,Volkswagen,BEETLE,2.0T Final Edition SE 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,772,391
 2019,Volkswagen,BEETLE,2.0T Final Edition SEL 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,772,391
 2019,Volkswagen,BEETLE,2.0T S 2dr Hatchback (2.0L 4cyl Turbo 6A),58.6 in.,168.8 in.,100.1 in.,772,391
@@ -15055,8 +15055,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Hyundai,Accent Sedan,Value Edition 4dr Sedan (1.6L 4cyl 6A),57.1 in.,172.0 in.,101.2 in.,445,161
 2017,Hyundai,Azera Sedan,4dr Sedan (3.3L 6cyl 6A),57.9 in.,193.7 in.,112.0 in.,449,162
 2017,Hyundai,Azera Sedan,Limited 4dr Sedan (3.3L 6cyl 6A),57.9 in.,193.7 in.,112.0 in.,449,162
-2017,Hyundai,Elantra GT Hatchback,4dr Hatchback (2.0L 4cyl 6A),57.9 in.,169.3 in.,104.3 in.,1907,163
-2017,Hyundai,Elantra GT Hatchback,4dr Hatchback (2.0L 4cyl 6M),57.9 in.,169.3 in.,104.3 in.,1907,163
+2017,Hyundai,Elantra GT Hatchback,4dr Hatchback (2.0L 4cyl 6A),57.9 in.,169.3 in.,104.3 in.,897,163
+2017,Hyundai,Elantra GT Hatchback,4dr Hatchback (2.0L 4cyl 6M),57.9 in.,169.3 in.,104.3 in.,897,163
 2017,Hyundai,Elantra Sedan ,SE 4dr Sedan (2.0L 4cyl 6A),56.5 in.,179.9 in.,106.3 in.,1142,163
 2017,Hyundai,Elantra Sedan ,Sport 4dr Sedan (1.6L 4cyl Turbo 7AM),56.5 in.,179.9 in.,106.3 in.,1142,163
 2017,Hyundai,Elantra Sedan ,Value Edition 4dr Sedan (2.0L 4cyl 6A),56.5 in.,179.9 in.,106.3 in.,1142,163
@@ -15562,8 +15562,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Maserati,Ghibli Sedan,4dr Sedan (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,1628,245
 2017,Maserati,Ghibli Sedan,S 4dr Sedan (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,1628,245
 2017,Maserati,Ghibli Sedan,S Q4 4dr Sedan AWD (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,1628,245
-2017,Maserati,Levante SUV,4dr SUV AWD (3.0L 6cyl Turbo 8A) A,FALSE,FALSE,FALSE,1629,-9
-2017,Maserati,Levante SUV,S 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.1 in.,197.0 in.,118.3 in.,1629,-9
+2017,Maserati,Levante SUV,4dr SUV AWD (3.0L 6cyl Turbo 8A) A,FALSE,FALSE,FALSE,1629,469
+2017,Maserati,Levante SUV,S 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.1 in.,197.0 in.,118.3 in.,1629,469
 2017,Maserati ,Quattroporte 2017,GTS GranLusso 4dr Sedan (3.8L 8cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
 2017,Maserati,Quattroporte Gts-Gransport,GTS GranSport 4dr Sedan (3.8L 8cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
 2017,Maserati,Quattroporte Sedan,GTS GranSport 4dr Sedan (3.8L 8cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
@@ -16234,17 +16234,17 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Subaru,WRX Sedan,STI 4dr Sedan AWD (2.5L 4cyl Turbo 6M),58.1 in.,180.9 in.,104.3 in.,920,359
 2017,Subaru,WRX Sedan,STI Limited w/Low Profile Trunk Spoiler 4dr Sedan AWD (2.5L 4cyl Turbo 6M),58.1 in.,180.9 in.,104.3 in.,920,359
 2017,Subaru,WRX Sedan,STI Limited w/Wing 4dr Sedan AWD (2.5L 4cyl Turbo 6M),58.1 in.,180.9 in.,104.3 in.,920,359
-2019,Tesla,MODEL-3,Long Range 4dr Sedan w/Prod. End 6/19 (electric DD),56.8 in.,184.8 in.,113.2 in.,-9,-9
-2019,Tesla,MODEL-3,Long Range 4dr Sedan AWD (electric DD),56.8 in.,184.8 in.,113.2 in.,-9,-9
-2019,Tesla,MODEL-3,Standard Range Plus 4dr Sedan (electric DD),56.8 in.,184.8 in.,113.2 in.,-9,-9
-2019,Tesla,MODEL-3,Standard Range 4dr Sedan w/Prod. End 6/19 (electric DD),56.8 in.,184.8 in.,113.2 in.,-9,-9
-2019,Tesla,MODEL-3,Performance 4dr Sedan AWD (electric DD),56.8 in.,184.8 in.,113.2 in.,-9,-9
-2019,Tesla,MODEL-3,Mid Range 4dr Sedan w/Prod. End 3/19 (electric DD),56.8 in.,184.8 in.,113.2 in.,-9,-9
-2019,Tesla,MODEL-S,Standard Range 4dr Sedan AWD w/Prod. End 10/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,-9
-2019,Tesla,MODEL-S,4dr Sedan AWD w/Prod. End 3/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,-9
-2019,Tesla,MODEL-S,100D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,-9
-2019,Tesla,MODEL-S,75D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,-9
-2019,Tesla,MODEL-S,Performance 4dr Sedan AWD (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,-9
+2019,Tesla,MODEL-3,Long Range 4dr Sedan w/Prod. End 6/19 (electric DD),56.8 in.,184.8 in.,113.2 in.,2149,499
+2019,Tesla,MODEL-3,Long Range 4dr Sedan AWD (electric DD),56.8 in.,184.8 in.,113.2 in.,2149,499
+2019,Tesla,MODEL-3,Standard Range Plus 4dr Sedan (electric DD),56.8 in.,184.8 in.,113.2 in.,2149,499
+2019,Tesla,MODEL-3,Standard Range 4dr Sedan w/Prod. End 6/19 (electric DD),56.8 in.,184.8 in.,113.2 in.,2149,499
+2019,Tesla,MODEL-3,Performance 4dr Sedan AWD (electric DD),56.8 in.,184.8 in.,113.2 in.,2149,499
+2019,Tesla,MODEL-3,Mid Range 4dr Sedan w/Prod. End 3/19 (electric DD),56.8 in.,184.8 in.,113.2 in.,2149,499
+2019,Tesla,MODEL-S,Standard Range 4dr Sedan AWD w/Prod. End 10/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
+2019,Tesla,MODEL-S,4dr Sedan AWD w/Prod. End 3/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
+2019,Tesla,MODEL-S,100D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
+2019,Tesla,MODEL-S,75D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
+2019,Tesla,MODEL-S,Performance 4dr Sedan AWD (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
 2016,TOYOTA,PRIUS C HATCHBACK,Persona Series Special Edition 4dr Hatchback (1.5L 4cyl gas/electric hybrid CVT),57.3 in.,157.3 in.,100.4 in.,1033,383
 2016,TOYOTA,PRIUS HATCHBACK,Four 4dr Hatchback (1.8L 4cyl gas/electric hybrid CVT),58.1 in.,178.7 in.,106.3 in.,1034,383
 2016,TOYOTA,PRIUS HATCHBACK,Four Touring 4dr Hatchback (1.8L 4cyl gas/electric hybrid CVT),58.1 in.,178.7 in.,106.3 in.,1034,383
@@ -16620,14 +16620,14 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Alfa-romeo,GIULIA,Sport 4dr Sedan AWD (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
 2019,Alfa-romeo,GIULIA,Sport 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
 2019,Alfa-romeo,GIULIA,Ti Sport Carbon 4dr Sedan (2.0L 4cyl Turbo 8A),56.5 in.,182.5 in.,111.0 in.,1345,465
-2019,Alfa-romeo,STELVIO,Ti Lusso 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,Ti Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,Ti 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,Quadrifoglio 4dr SUV AWD (2.9L 6cyl Turbo 8A),66.3 in.,185.1 in.,111.0 in.,-9,-9
-2019,Alfa-romeo,STELVIO,Sport 4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,-9,-9
+2019,Alfa-romeo,STELVIO,Ti Lusso 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,Ti Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,Sport 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,Ti 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,Quadrifoglio 4dr SUV AWD (2.9L 6cyl Turbo 8A),66.3 in.,185.1 in.,111.0 in.,2154,502
+2019,Alfa-romeo,STELVIO,Sport 4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,184.6 in.,111.0 in.,2154,502
 2019,Aston-martin,DB11,V8 2dr Coupe (4.0L 8cyl Turbo 8A),50.4 in.,186.6 in.,110.4 in.,1347,11
 2019,Aston-martin,DB11,V8 Volante 2dr Convertible (4.0L 8cyl Turbo 8A),51.2 in.,187.0 in.,,1347,11
 2019,Aston-martin,DB11,AMR 2dr Coupe (5.2L 12cyl Turbo 8A),50.8 in.,187.0 in.,110.4 in.,1347,11
@@ -16677,8 +16677,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Audi,A7,3.0 TFSI Premium quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 7AM),56.0 in.,195.6 in.,115.2 in.,1130,20
 2019,Audi,A8,L 4.0 TFSI quattro 4dr Sedan AWD (4.0L 8cyl Turbo gas/electric hybrid 8A),58.5 in.,208.7 in.,123.1 in.,1316,21
 2019,Audi,A8,L 3.0 TFSI quattro 4dr Sedan AWD (3.0L 6cyl Turbo gas/electric hybrid 8A),58.5 in.,208.7 in.,123.1 in.,1316,21
-2019,Audi,E-TRON,Premium Plus quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,1042,-9
-2019,Audi,E-TRON,Prestige quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,1042,-9
+2019,Audi,E-TRON,Premium Plus quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,2160,508
+2019,Audi,E-TRON,Prestige quattro 4dr SUV AWD (electric DD),65.5 in.,193.0 in.,115.1 in.,2160,508
 2019,Audi,Q3,Premium Plus quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
 2019,Audi,Q3,S line Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
 2019,Audi,Q3,Premium quattro 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,176.6 in.,105.5 in.,312,23
@@ -16770,8 +16770,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Bmw,7-SERIES,750i xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
 2019,Bmw,7-SERIES,M760i xDrive 4dr Sedan AWD (6.6L 12cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
 2019,Bmw,7-SERIES,740i 4dr Sedan (3.0L 6cyl Turbo 8A),58.2 in.,206.6 in.,126.4 in.,831,40
-2019,Bmw,8-SERIES,M850i xDrive 2dr Convertible AWD (4.4L 8cyl Turbo 8A),53.0 in.,191.2 in.,111.1 in.,-9,-9
-2019,Bmw,8-SERIES,M850i xDrive 2dr Coupe AWD (4.4L 8cyl Turbo 8A),53.0 in.,191.2 in.,111.1 in.,-9,-9
+2019,Bmw,8-SERIES,M850i xDrive 2dr Convertible AWD (4.4L 8cyl Turbo 8A),53.0 in.,191.2 in.,111.1 in.,2142,497
+2019,Bmw,8-SERIES,M850i xDrive 2dr Coupe AWD (4.4L 8cyl Turbo 8A),53.0 in.,191.2 in.,111.1 in.,2142,497
 2019,Bmw,ALPINA-B6-GRAN-COUPE,xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),55.0 in.,197.1 in.,116.9 in.,829,39
 2019,Bmw,ALPINA-B7,xDrive 4dr Sedan AWD (4.4L 8cyl Turbo 8A),58.7 in.,206.7 in.,126.4 in.,831,40
 2019,Bmw,I3,4dr Hatchback (electric DD),62.9 in.,158.3 in.,101.2 in.,356,41
@@ -16789,9 +16789,9 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Bmw,M6-GRAN-COUPE,4dr Sedan (4.4L 8cyl Turbo 7AM),54.9 in.,197.5 in.,116.7 in.,1317,39
 2019,Bmw,X1,xDrive28i 4dr SUV AWD (2.0L 4cyl Turbo 8A),62.9 in.,175.4 in.,105.1 in.,832,43
 2019,Bmw,X1,sDrive28i 4dr SUV (2.0L 4cyl Turbo 8A),62.9 in.,175.4 in.,105.1 in.,832,43
-2019,Bmw,X2,M35i 4dr SUV AWD (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,-9,-9
-2019,Bmw,X2,xDrive28i 4dr SUV AWD (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,-9,-9
-2019,Bmw,X2,sDrive28i 4dr SUV (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,-9,-9
+2019,Bmw,X2,M35i 4dr SUV AWD (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,2157,505
+2019,Bmw,X2,xDrive28i 4dr SUV AWD (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,2157,505
+2019,Bmw,X2,sDrive28i 4dr SUV (2.0L 4cyl Turbo 8A),60.1 in.,172.2 in.,105.1 in.,2157,505
 2019,Bmw,X3,xDrive30i 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.0 in.,185.9 in.,112.8 in.,360,44
 2019,Bmw,X3,M40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.0 in.,186.1 in.,112.8 in.,360,44
 2019,Bmw,X3,sDrive30i 4dr SUV (2.0L 4cyl Turbo 8A),66.0 in.,185.9 in.,112.8 in.,360,44
@@ -16803,8 +16803,8 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Bmw,X6,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,363,46
 2019,Bmw,X6,sDrive35i 4dr SUV (3.0L 6cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,363,46
 2019,Bmw,X6,xDrive35i 4dr SUV AWD (3.0L 6cyl Turbo 8A),67.0 in.,193.8 in.,115.5 in.,363,46
-2019,Bmw,X7,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),71.1 in.,203.3 in.,122.2 in.,-9,-9
-2019,Bmw,X7,xDrive40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),71.1 in.,203.3 in.,122.2 in.,-9,-9
+2019,Bmw,X7,xDrive50i 4dr SUV AWD (4.4L 8cyl Turbo 8A),71.1 in.,203.3 in.,122.2 in.,2158,506
+2019,Bmw,X7,xDrive40i 4dr SUV AWD (3.0L 6cyl Turbo 8A),71.1 in.,203.3 in.,122.2 in.,2158,506
 2019,Bmw,Z4,sDrive30i 2dr Convertible (2.0L 4cyl Turbo 8A),51.4 in.,170.7 in.,97.2 in.,-9,47
 2019,Buick,CASCADA,2dr Convertible (1.6L 4cyl Turbo 6A),56.8 in.,184.9 in.,106.1 in.,856,416
 2019,Buick,CASCADA,Sport Touring 2dr Convertible (1.6L 4cyl Turbo 6A),56.8 in.,184.9 in.,106.1 in.,856,416
@@ -16893,12 +16893,12 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Cadillac,ESCALADE,4dr SUV (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,389,60
 2019,Cadillac,ESCALADE,Luxury 4dr SUV (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,389,60
 2019,Cadillac,ESCALADE,Platinum 4dr SUV 4WD (6.2L 8cyl 10A),74.4 in.,203.9 in.,116.0 in.,389,60
-2019,Cadillac,XT4,Luxury 4dr SUV AWD (2.0L 4cyl Turbo 9A),,181.1 in.,109.4 in.,-9,-9
-2019,Cadillac,XT4,Sport 4dr SUV (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,-9,-9
-2019,Cadillac,XT4,Luxury 4dr SUV (2.0L 4cyl Turbo 9A),,181.1 in.,109.4 in.,-9,-9
-2019,Cadillac,XT4,Premium Luxury 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,-9,-9
-2019,Cadillac,XT4,Premium Luxury 4dr SUV (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,-9,-9
-2019,Cadillac,XT4,Sport 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,-9,-9
+2019,Cadillac,XT4,Luxury 4dr SUV AWD (2.0L 4cyl Turbo 9A),,181.1 in.,109.4 in.,1649,507
+2019,Cadillac,XT4,Sport 4dr SUV (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,1649,507
+2019,Cadillac,XT4,Luxury 4dr SUV (2.0L 4cyl Turbo 9A),,181.1 in.,109.4 in.,1649,507
+2019,Cadillac,XT4,Premium Luxury 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,1649,507
+2019,Cadillac,XT4,Premium Luxury 4dr SUV (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,1649,507
+2019,Cadillac,XT4,Sport 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.1 in.,181.1 in.,109.4 in.,1649,507
 2019,Cadillac,XT5,4dr SUV AWD (3.6L 6cyl 8A),66.0 in.,189.5 in.,112.5 in.,1136,61
 2019,Cadillac,XT5,4dr SUV (3.6L 6cyl 8A),66.0 in.,189.5 in.,112.5 in.,1136,61
 2019,Cadillac,XT5,Platinum 4dr SUV AWD (3.6L 6cyl 8A),66.0 in.,189.5 in.,112.5 in.,1136,61
@@ -16914,16 +16914,16 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Cadillac,XTS,Platinum V-Sport 4dr Sedan AWD (3.6L 6cyl Turbo 6A),59.4 in.,200.9 in.,111.7 in.,394,64
 2019,Cadillac,XTS,Platinum 4dr Sedan (3.6L 6cyl 6A),59.4 in.,200.9 in.,111.7 in.,394,64
 2019,Cadillac,XTS,Luxury 4dr Sedan (3.6L 6cyl 6A),59.4 in.,200.9 in.,111.7 in.,394,64
-2019,Chevrolet,BLAZER,RS 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,LT Cloth 4dr SUV (2.5L 4cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,Premier 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,LT V6 Cloth 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,L 4dr SUV (2.5L 4cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,LT V6 Leather 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,Premier 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,LT V6 Leather 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,RS 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
-2019,Chevrolet,BLAZER,LT V6 Cloth 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,-9,-9
+2019,Chevrolet,BLAZER,RS 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,LT Cloth 4dr SUV (2.5L 4cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,Premier 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,LT V6 Cloth 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,L 4dr SUV (2.5L 4cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,LT V6 Leather 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,Premier 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,LT V6 Leather 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,RS 4dr SUV AWD (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
+2019,Chevrolet,BLAZER,LT V6 Cloth 4dr SUV (3.6L 6cyl 9A),67.0 in.,191.4 in.,112.7 in.,2132,490
 2019,Chevrolet,BOLT-EV,Premier 4dr Hatchback (electric DD),62.8 in.,164.0 in.,102.4 in.,1164,447
 2019,Chevrolet,BOLT-EV,LT 4dr Hatchback (electric DD),62.8 in.,164.0 in.,102.4 in.,1164,447
 2019,Chevrolet,CAMARO,2LT 2dr Coupe (2.0L 4cyl Turbo 6M),53.1 in.,188.3 in.,110.7 in.,866,67
@@ -17276,13 +17276,13 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Fiat,500X,Blue Sky Edition 4dr SUV AWD (1.3L 4cyl Turbo 9A),63.7 in.,167.2 in.,101.2 in.,845,414
 2019,Fiat,500X,Urbana Edition 4dr SUV AWD (1.3L 4cyl Turbo 9A),63.7 in.,168.2 in.,101.2 in.,845,414
 2019,Fiat,500X,Trekking Plus 4dr SUV AWD (1.3L 4cyl Turbo 9A),63.7 in.,167.2 in.,101.2 in.,1258,414
-2019,Ford,ECOSPORT,S 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,-9,-9
-2019,Ford,ECOSPORT,Titanium 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,-9,-9
-2019,Ford,ECOSPORT,S 4dr SUV (1.0L 3cyl Turbo 6A),64.8 in.,161.3 in.,99.2 in.,-9,-9
-2019,Ford,ECOSPORT,SES 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,-9,-9
-2019,Ford,ECOSPORT,SE 4dr SUV (1.0L 3cyl Turbo 6A),64.8 in.,161.3 in.,99.2 in.,-9,-9
-2019,Ford,ECOSPORT,SE 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,-9,-9
-2019,Ford,ECOSPORT,Titanium 4dr SUV (1.0L 3cyl Turbo 6A),64.8 in.,161.3 in.,99.2 in.,-9,-9
+2019,Ford,ECOSPORT,S 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,2136,494
+2019,Ford,ECOSPORT,Titanium 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,2136,494
+2019,Ford,ECOSPORT,S 4dr SUV (1.0L 3cyl Turbo 6A),64.8 in.,161.3 in.,99.2 in.,2136,494
+2019,Ford,ECOSPORT,SES 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,2136,494
+2019,Ford,ECOSPORT,SE 4dr SUV (1.0L 3cyl Turbo 6A),64.8 in.,161.3 in.,99.2 in.,2136,494
+2019,Ford,ECOSPORT,SE 4dr SUV AWD (2.0L 4cyl 6A),65.1 in.,161.3 in.,99.2 in.,2136,494
+2019,Ford,ECOSPORT,Titanium 4dr SUV (1.0L 3cyl Turbo 6A),64.8 in.,161.3 in.,99.2 in.,2136,494
 2019,Ford,EDGE,ST 4dr SUV AWD (2.7L 6cyl Turbo 8A),68.3 in.,188.8 in.,112.2 in.,846,123
 2019,Ford,EDGE,SEL 4dr SUV (2.0L 4cyl Turbo 8A),68.3 in.,188.8 in.,112.2 in.,846,123
 2019,Ford,EDGE,SE 4dr SUV (2.0L 4cyl Turbo 8A),68.3 in.,188.8 in.,112.2 in.,846,123
@@ -17505,18 +17505,18 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Ford,MUSTANG,GT 2dr Coupe (5.0L 8cyl 6M),54.3 in.,188.5 in.,107.1 in.,43,133
 2019,Ford,MUSTANG,EcoBoost Premium 2dr Coupe (2.3L 4cyl Turbo 6M),54.3 in.,188.5 in.,107.1 in.,43,133
 2019,Ford,MUSTANG,BULLITT 2dr Coupe (5.0L 8cyl 6M),54.3 in.,188.5 in.,107.1 in.,43,133
-2019,Ford,RANGER,Lariat 4dr SuperCab 4WD SB (2.3L 4cyl Turbo 10A),71.5 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,Lariat 4dr Crew Cab 4WD SB (2.3L 4cyl Turbo 10A),71.8 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,Lariat 4dr Crew Cab SB (2.3L 4cyl Turbo 10A),71.2 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XL 4dr SuperCab 4WD SB (2.3L 4cyl Turbo 10A),71.5 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XL 4dr SuperCab SB (2.3L 4cyl Turbo 10A),70.9 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XLT 4dr Crew Cab 4WD SB (2.3L 4cyl Turbo 10A),71.8 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XL 4dr Crew Cab 4WD SB (2.3L 4cyl Turbo 10A),71.8 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XLT 4dr SuperCab SB (2.3L 4cyl Turbo 10A),70.9 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XL 4dr Crew Cab SB (2.3L 4cyl Turbo 10A),71.2 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XLT 4dr Crew Cab SB (2.3L 4cyl Turbo 10A),71.2 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,XLT 4dr SuperCab 4WD SB (2.3L 4cyl Turbo 10A),71.5 in.,210.8 in.,126.8 in.,-9,-9
-2019,Ford,RANGER,Lariat 4dr SuperCab SB (2.3L 4cyl Turbo 10A),70.9 in.,210.8 in.,126.8 in.,-9,-9
+2019,Ford,RANGER,Lariat 4dr SuperCab 4WD SB (2.3L 4cyl Turbo 10A),71.5 in.,210.8 in.,126.8 in.,2152,134
+2019,Ford,RANGER,Lariat 4dr Crew Cab 4WD SB (2.3L 4cyl Turbo 10A),71.8 in.,210.8 in.,126.8 in.,2153,134
+2019,Ford,RANGER,Lariat 4dr Crew Cab SB (2.3L 4cyl Turbo 10A),71.2 in.,210.8 in.,126.8 in.,2153,134
+2019,Ford,RANGER,XL 4dr SuperCab 4WD SB (2.3L 4cyl Turbo 10A),71.5 in.,210.8 in.,126.8 in.,2152,134
+2019,Ford,RANGER,XL 4dr SuperCab SB (2.3L 4cyl Turbo 10A),70.9 in.,210.8 in.,126.8 in.,2152,134
+2019,Ford,RANGER,XLT 4dr Crew Cab 4WD SB (2.3L 4cyl Turbo 10A),71.8 in.,210.8 in.,126.8 in.,2153,134
+2019,Ford,RANGER,XL 4dr Crew Cab 4WD SB (2.3L 4cyl Turbo 10A),71.8 in.,210.8 in.,126.8 in.,2153,134
+2019,Ford,RANGER,XLT 4dr SuperCab SB (2.3L 4cyl Turbo 10A),70.9 in.,210.8 in.,126.8 in.,2152,134
+2019,Ford,RANGER,XL 4dr Crew Cab SB (2.3L 4cyl Turbo 10A),71.2 in.,210.8 in.,126.8 in.,2153,134
+2019,Ford,RANGER,XLT 4dr Crew Cab SB (2.3L 4cyl Turbo 10A),71.2 in.,210.8 in.,126.8 in.,2153,134
+2019,Ford,RANGER,XLT 4dr SuperCab 4WD SB (2.3L 4cyl Turbo 10A),71.5 in.,210.8 in.,126.8 in.,2152,134
+2019,Ford,RANGER,Lariat 4dr SuperCab SB (2.3L 4cyl Turbo 10A),70.9 in.,210.8 in.,126.8 in.,2152,134
 2019,Ford,SHELBY-GT350,2dr Coupe (5.2L 8cyl 6M),54.2 in.,189.6 in.,107.1 in.,848,133
 2019,Ford,SHELBY-GT350,R 2dr Coupe (5.2L 8cyl 6M),53.6 in.,189.6 in.,107.1 in.,848,133
 2019,Ford,TAURUS,SE 4dr Sedan (3.5L 6cyl 6A),60.7 in.,202.9 in.,112.9 in.,849,135
@@ -17593,25 +17593,25 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Ford,TRANSIT-VAN,"150 Medium Roof 3dr Van w/130"" WB, Sliding Passenger Side Door (3.7L 6cyl 6A)",100.8 in.,217.8 in.,129.9 in.,-9,136
 2019,Ford,TRANSIT-VAN,"150 Low Roof 3dr Van w/148"" WB, 60/40 Passenger Side Door (3.7L 6cyl 6A)",83.2 in.,237.6 in.,147.6 in.,-9,136
 2019,Ford,TRANSIT-VAN,250 High Roof 4dr Ext Van w/Dual Sliding Doors (3.7L 6cyl 6A),109.4 in.,263.9 in.,147.6 in.,-9,136
-2019,Genesis,G70,3.3T Dynamic 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,3.3T Advanced 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,3.3T Design 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,2.0T Advanced 4dr Sedan (2.0L 4cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,3.3T Advanced 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,3.3T Dynamic 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,3.3T Design 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,2.0T Sport M/T 4dr Sedan (2.0L 4cyl Turbo 6M),55.1 in.,184.4 in.,111.6 in.,-9,165
-2019,Genesis,G70,2.0T Advanced 4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,-9,165
+2019,Genesis,G70,3.3T Dynamic 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,3.3T Advanced 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,3.3T Design 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,2.0T Advanced 4dr Sedan (2.0L 4cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,3.3T Advanced 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,3.3T Dynamic 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,3.3T Design 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,2.0T Sport M/T 4dr Sedan (2.0L 4cyl Turbo 6M),55.1 in.,184.4 in.,111.6 in.,2138,495
+2019,Genesis,G70,2.0T Advanced 4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.1 in.,184.4 in.,111.6 in.,2138,495
 2019,Genesis,G80,3.3T Sport 4dr Sedan AWD (3.3L 6cyl Turbo 8A),58.3 in.,196.5 in.,118.5 in.,1143,166
 2019,Genesis,G80,5.0 Ultimate 4dr Sedan (5.0L 8cyl 8A),58.3 in.,196.5 in.,118.5 in.,1143,166
 2019,Genesis,G80,3.3T Sport 4dr Sedan (3.3L 6cyl Turbo 8A),58.3 in.,196.5 in.,118.5 in.,1143,166
 2019,Genesis,G80,5.0 Ultimate 4dr Sedan AWD (5.0L 8cyl 8A),58.3 in.,196.5 in.,118.5 in.,1143,166
 2019,Genesis,G80,3.8 4dr Sedan (3.8L 6cyl 8A),58.3 in.,196.5 in.,118.5 in.,1143,166
 2019,Genesis,G80,3.8 4dr Sedan AWD (3.8L 6cyl 8A),58.3 in.,196.5 in.,118.5 in.,1143,166
-2019,Genesis,G90,Ultimate 4dr Sedan AWD (5.0L 8cyl 8A),58.9 in.,204.9 in.,124.4 in.,1143,166
-2019,Genesis,G90,Ultimate 4dr Sedan (5.0L 8cyl 8A),58.9 in.,204.9 in.,124.4 in.,1143,166
-2019,Genesis,G90,Premium 4dr Sedan (3.3L 6cyl Turbo 8A),58.9 in.,204.9 in.,124.4 in.,1143,166
-2019,Genesis,G90,Premium 4dr Sedan AWD (3.3L 6cyl Turbo 8A),58.9 in.,204.9 in.,124.4 in.,1143,166
+2019,Genesis,G90,Ultimate 4dr Sedan AWD (5.0L 8cyl 8A),58.9 in.,204.9 in.,124.4 in.,1534,165
+2019,Genesis,G90,Ultimate 4dr Sedan (5.0L 8cyl 8A),58.9 in.,204.9 in.,124.4 in.,1534,165
+2019,Genesis,G90,Premium 4dr Sedan (3.3L 6cyl Turbo 8A),58.9 in.,204.9 in.,124.4 in.,1534,165
+2019,Genesis,G90,Premium 4dr Sedan AWD (3.3L 6cyl Turbo 8A),58.9 in.,204.9 in.,124.4 in.,1534,165
 2019,Gmc,ACADIA,SLT-1 4dr SUV AWD (3.6L 6cyl 6A),68.7 in.,193.6 in.,112.5 in.,1535,138
 2019,Gmc,ACADIA,Denali 4dr SUV AWD (3.6L 6cyl 6A),68.7 in.,193.6 in.,112.5 in.,1535,138
 2019,Gmc,ACADIA,SLE-1 4dr SUV AWD (2.5L 4cyl 6A),66.0 in.,193.6 in.,112.5 in.,1535,138
@@ -17799,10 +17799,10 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Honda,CIVIC,Touring 4dr Sedan (1.5L 4cyl Turbo CVT),55.7 in.,182.3 in.,106.3 in.,893,147
 2017,Honda,Civic Hatchback,Type R 4dr Hatchback (2.0L 4cyl Turbo 6M),56.5 in.,179.4 in.,106.3 in.,1551,147
 2019,Honda,CIVIC,Type R 4dr Hatchback (2.0L 4cyl Turbo 6M),56.5 in.,179.4 in.,106.3 in.,1551,147
-2019,Honda,CLARITY,Fuel Cell 4dr Sedan (electric (fuel cell) DD),58.2 in.,192.7 in.,108.3 in.,-9,-9
-2019,Honda,CLARITY,Touring Plug-In Hybrid 4dr Sedan (1.5L 4cyl gas/electric hybrid CVT),58.2 in.,192.7 in.,108.3 in.,-9,-9
-2019,Honda,CLARITY,Electric 4dr Sedan (electric DD),58.2 in.,192.7 in.,108.3 in.,-9,-9
-2019,Honda,CLARITY,Plug-In Hybrid 4dr Sedan (1.5L 4cyl gas/electric hybrid CVT),58.2 in.,192.7 in.,108.3 in.,-9,-9
+2019,Honda,CLARITY,Fuel Cell 4dr Sedan (electric (fuel cell) DD),58.2 in.,192.7 in.,108.3 in.,1165,152
+2019,Honda,CLARITY,Touring Plug-In Hybrid 4dr Sedan (1.5L 4cyl gas/electric hybrid CVT),58.2 in.,192.7 in.,108.3 in.,1165,152
+2019,Honda,CLARITY,Electric 4dr Sedan (electric DD),58.2 in.,192.7 in.,108.3 in.,1165,152
+2019,Honda,CLARITY,Plug-In Hybrid 4dr Sedan (1.5L 4cyl gas/electric hybrid CVT),58.2 in.,192.7 in.,108.3 in.,1165,152
 2019,Honda,CR-V,LX 4dr SUV AWD (2.4L 4cyl CVT),66.5 in.,180.6 in.,104.7 in.,1140,149
 2019,Honda,CR-V,EX 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,180.6 in.,104.7 in.,1140,149
 2019,Honda,CR-V,EX 4dr SUV (1.5L 4cyl Turbo CVT),66.1 in.,180.6 in.,104.7 in.,1140,149
@@ -17839,13 +17839,13 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Honda,ODYSSEY,LX 4dr Minivan (3.5L 6cyl 9A),68.3 in.,203.2 in.,118.1 in.,1563,155
 2019,Honda,ODYSSEY,Touring 4dr Minivan (3.5L 6cyl 10A),68.3 in.,203.2 in.,118.1 in.,1563,155
 2019,Honda,ODYSSEY,EX 4dr Minivan (3.5L 6cyl 9A),68.3 in.,203.2 in.,118.1 in.,1563,155
-2019,Honda,PASSPORT,EX-L 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,-9,-9
-2019,Honda,PASSPORT,Touring 4dr SUV (3.5L 6cyl 9A),71.6 in.,190.5 in.,111.0 in.,-9,-9
-2019,Honda,PASSPORT,EX-L 4dr SUV (3.5L 6cyl 9A),71.6 in.,190.5 in.,111.0 in.,-9,-9
-2019,Honda,PASSPORT,Elite 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,-9,-9
-2019,Honda,PASSPORT,Touring 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,-9,-9
-2019,Honda,PASSPORT,Sport 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,-9,-9
-2019,Honda,PASSPORT,Sport 4dr SUV (3.5L 6cyl 9A),71.6 in.,190.5 in.,111.0 in.,-9,-9
+2019,Honda,PASSPORT,EX-L 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,1618,483
+2019,Honda,PASSPORT,Touring 4dr SUV (3.5L 6cyl 9A),71.6 in.,190.5 in.,111.0 in.,1618,483
+2019,Honda,PASSPORT,EX-L 4dr SUV (3.5L 6cyl 9A),71.6 in.,190.5 in.,111.0 in.,1618,483
+2019,Honda,PASSPORT,Elite 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,1618,483
+2019,Honda,PASSPORT,Touring 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,1618,483
+2019,Honda,PASSPORT,Sport 4dr SUV AWD (3.5L 6cyl 9A),72.2 in.,190.5 in.,111.0 in.,1618,483
+2019,Honda,PASSPORT,Sport 4dr SUV (3.5L 6cyl 9A),71.6 in.,190.5 in.,111.0 in.,1618,483
 2019,Honda,PILOT,EX-L 4dr SUV AWD w/Navigation and Rear Entertainment System (3.5L 6cyl 6A),70.6 in.,196.5 in.,111.0 in.,895,156
 2019,Honda,PILOT,Elite 4dr SUV AWD (3.5L 6cyl 9A),70.6 in.,196.5 in.,111.0 in.,895,156
 2019,Honda,PILOT,EX-L 4dr SUV w/Navigation and Rear Entertainment System (3.5L 6cyl 6A),70.6 in.,196.5 in.,111.0 in.,895,156
@@ -17872,43 +17872,43 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Hyundai,ACCENT,Limited 4dr Sedan (1.6L 4cyl 6A),57.1 in.,172.6 in.,101.6 in.,445,161
 2019,Hyundai,ACCENT,SE 4dr Sedan (1.6L 4cyl 6M),57.1 in.,172.6 in.,101.6 in.,445,161
 2019,Hyundai,ACCENT,SEL 4dr Sedan (1.6L 4cyl 6A),57.1 in.,172.6 in.,101.6 in.,445,161
-2019,Hyundai,ELANTRA-GT,4dr Hatchback (2.0L 4cyl 6A),57.7 in.,170.9 in.,104.3 in.,1142,163
-2019,Hyundai,ELANTRA-GT,N Line 4dr Hatchback (1.6L 4cyl Turbo 7AM),57.7 in.,170.9 in.,104.3 in.,1142,163
-2019,Hyundai,ELANTRA-GT,N Line 4dr Hatchback (1.6L 4cyl Turbo 6M),57.7 in.,170.9 in.,104.3 in.,1142,163
-2019,Hyundai,ELANTRA,SE SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,SE 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Value Edition SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,SEL SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Value Edition 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Sport 4dr Sedan (1.6L 4cyl Turbo 6M),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Sport 4dr Sedan (1.6L 4cyl Turbo 7AM),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Limited SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,SE 4dr Sedan (2.0L 4cyl 6M),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Limited 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,SEL 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,ELANTRA,Eco 4dr Sedan (1.4L 4cyl Turbo 7AM),56.5 in.,181.9 in.,106.3 in.,1142,163
-2019,Hyundai,IONIQ-ELECTRIC,Limited 4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,-9
-2019,Hyundai,IONIQ-ELECTRIC,4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,-9
-2019,Hyundai,IONIQ-HYBRID,Limited 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,-9
-2019,Hyundai,IONIQ-HYBRID,Blue 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,-9
-2019,Hyundai,IONIQ-HYBRID,SEL 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,-9,-9
-2019,Hyundai,IONIQ-PLUG-IN-HYBRID,Limited 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,-9,-9
-2019,Hyundai,IONIQ-PLUG-IN-HYBRID,4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,-9,-9
-2019,Hyundai,KONA-ELECTRIC,SEL 4dr SUV (electric DD),61.2 in.,164.6 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA-ELECTRIC,Ultimate 4dr SUV (electric DD),61.2 in.,164.6 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA-ELECTRIC,Limited 4dr SUV (electric DD),61.2 in.,164.6 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,SE 4dr SUV AWD (2.0L 4cyl 6A),61.0 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,Iron Man 4dr SUV (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,SEL 4dr SUV AWD (2.0L 4cyl 6A),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,Limited 4dr SUV (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,Ultimate 4dr SUV AWD (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,Ultimate 4dr SUV (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,Limited 4dr SUV AWD (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,SE 4dr SUV (2.0L 4cyl 6A),61.0 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,SEL 4dr SUV (2.0L 4cyl 6A),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,KONA,Iron Man 4dr SUV AWD (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,-9,-9
-2019,Hyundai,NEXO,Limited 4dr SUV (electric (fuel cell) DD),64.6 in.,183.9 in.,109.8 in.,-9,-9
-2019,Hyundai,NEXO,Blue 4dr SUV (electric (fuel cell) DD),64.2 in.,183.9 in.,109.8 in.,-9,-9
+2019,Hyundai,ELANTRA-GT,4dr Hatchback (2.0L 4cyl 6A),57.7 in.,170.9 in.,104.3 in.,1907,163
+2019,Hyundai,ELANTRA-GT,N Line 4dr Hatchback (1.6L 4cyl Turbo 7AM),57.7 in.,170.9 in.,104.3 in.,1907,163
+2019,Hyundai,ELANTRA-GT,N Line 4dr Hatchback (1.6L 4cyl Turbo 6M),57.7 in.,170.9 in.,104.3 in.,1907,163
+2019,Hyundai,ELANTRA,SE SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,SE 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Value Edition SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,SEL SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Value Edition 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Sport 4dr Sedan (1.6L 4cyl Turbo 6M),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Sport 4dr Sedan (1.6L 4cyl Turbo 7AM),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Limited SULEV 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,SE 4dr Sedan (2.0L 4cyl 6M),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Limited 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,SEL 4dr Sedan (2.0L 4cyl 6A),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,ELANTRA,Eco 4dr Sedan (1.4L 4cyl Turbo 7AM),56.5 in.,181.9 in.,106.3 in.,2139,163
+2019,Hyundai,IONIQ-ELECTRIC,Limited 4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,468
+2019,Hyundai,IONIQ-ELECTRIC,4dr Hatchback (electric 1DD),57.1 in.,176.0 in.,106.3 in.,1570,468
+2019,Hyundai,IONIQ-HYBRID,Limited 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,468
+2019,Hyundai,IONIQ-HYBRID,Blue 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,468
+2019,Hyundai,IONIQ-HYBRID,SEL 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,468
+2019,Hyundai,IONIQ-PLUG-IN-HYBRID,Limited 4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,468
+2019,Hyundai,IONIQ-PLUG-IN-HYBRID,4dr Hatchback (1.6L 4cyl gas/electric hybrid 6AM),56.9 in.,176.0 in.,106.3 in.,1569,468
+2019,Hyundai,KONA-ELECTRIC,SEL 4dr SUV (electric DD),61.2 in.,164.6 in.,102.4 in.,2141,496
+2019,Hyundai,KONA-ELECTRIC,Ultimate 4dr SUV (electric DD),61.2 in.,164.6 in.,102.4 in.,2141,496
+2019,Hyundai,KONA-ELECTRIC,Limited 4dr SUV (electric DD),61.2 in.,164.6 in.,102.4 in.,2141,496
+2019,Hyundai,KONA,SE 4dr SUV AWD (2.0L 4cyl 6A),61.0 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,Iron Man 4dr SUV (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,SEL 4dr SUV AWD (2.0L 4cyl 6A),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,Limited 4dr SUV (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,Ultimate 4dr SUV AWD (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,Ultimate 4dr SUV (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,Limited 4dr SUV AWD (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,SE 4dr SUV (2.0L 4cyl 6A),61.0 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,SEL 4dr SUV (2.0L 4cyl 6A),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,KONA,Iron Man 4dr SUV AWD (1.6L 4cyl Turbo 7AM),61.6 in.,164.0 in.,102.4 in.,2140,496
+2019,Hyundai,NEXO,Limited 4dr SUV (electric (fuel cell) DD),64.6 in.,183.9 in.,109.8 in.,2151,501
+2019,Hyundai,NEXO,Blue 4dr SUV (electric (fuel cell) DD),64.2 in.,183.9 in.,109.8 in.,2151,501
 2019,Hyundai,SANTA-FE-XL,Limited Ultimate 4dr SUV AWD (3.3L 6cyl 6A),66.9 in.,193.1 in.,110.2 in.,1571,167
 2019,Hyundai,SANTA-FE-XL,SE 4dr SUV (3.3L 6cyl 6A),66.9 in.,193.1 in.,110.2 in.,1571,167
 2019,Hyundai,SANTA-FE-XL,Limited Ultimate 4dr SUV (3.3L 6cyl 6A),66.9 in.,193.1 in.,110.2 in.,1571,167
@@ -18008,12 +18008,12 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Infiniti,QX80 SUV,Limited 4dr SUV 4WD (5.6L 8cyl 7A),75.8 in.,208.9 in.,121.1 in.,972,175
 2017,Infiniti,QX80 SUV,Signature 4dr SUV (5.6L 8cyl 7A),75.8 in.,208.9 in.,121.1 in.,972,175
 2017,Infiniti,QX80 SUV,Signature 4dr SUV 4WD (5.6L 8cyl 7A),75.8 in.,208.9 in.,121.1 in.,972,175
-2019,Jaguar,E-PACE,P300 R-Dynamic SE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
-2019,Jaguar,E-PACE,P300 R-Dynamic HSE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
-2019,Jaguar,E-PACE,P250 S 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
-2019,Jaguar,E-PACE,P250 SE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
-2019,Jaguar,E-PACE,P300 R-Dynamic S 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
-2019,Jaguar,E-PACE,P250 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,-9,-9
+2019,Jaguar,E-PACE,P300 R-Dynamic SE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,2126,484
+2019,Jaguar,E-PACE,P300 R-Dynamic HSE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,2126,484
+2019,Jaguar,E-PACE,P250 S 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,2126,484
+2019,Jaguar,E-PACE,P250 SE 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,2126,484
+2019,Jaguar,E-PACE,P300 R-Dynamic S 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,2126,484
+2019,Jaguar,E-PACE,P250 4dr SUV AWD (2.0L 4cyl Turbo 9A),64.9 in.,173.0 in.,105.6 in.,2126,484
 2019,Jaguar,F-PACE,20d Premium 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
 2019,Jaguar,F-PACE,20d R-Sport 4dr SUV AWD (2.0L 4cyl Turbodiesel 8A),65.0 in.,186.3 in.,113.1 in.,1166,449
 2019,Jaguar,F-PACE,SVR 4dr SUV AWD (5.0L 8cyl S/C 8A),65.7 in.,186.5 in.,113.1 in.,1166,449
@@ -18047,10 +18047,10 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Jaguar,F-TYPE,380 HP 2dr Convertible (3.0L 6cyl S/C 8A),51.5 in.,176.0 in.,103.2 in.,-9,185
 2019,Jaguar,F-TYPE,R-Dynamic 2dr Convertible (3.0L 6cyl S/C 8A),51.5 in.,176.0 in.,103.2 in.,-9,185
 2019,Jaguar,F-TYPE,340 HP 2dr Coupe (3.0L 6cyl S/C 6M),51.6 in.,176.0 in.,103.2 in.,-9,185
-2019,Jaguar,I-PACE,First Edition 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,-9,-9
-2019,Jaguar,I-PACE,HSE 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,-9,-9
-2019,Jaguar,I-PACE,S 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,-9,-9
-2019,Jaguar,I-PACE,SE 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,-9,-9
+2019,Jaguar,I-PACE,First Edition 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,2127,485
+2019,Jaguar,I-PACE,HSE 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,2127,485
+2019,Jaguar,I-PACE,S 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,2127,485
+2019,Jaguar,I-PACE,SE 4dr Hatchback AWD (electric DD),61.3 in.,184.3 in.,117.7 in.,2127,485
 2019,Jaguar,XE,S 4dr Sedan (3.0L 6cyl S/C 8A),55.8 in.,183.9 in.,111.6 in.,1173,456
 2019,Jaguar,XE,25t R-Sport 4dr Sedan AWD (2.0L 4cyl Turbo 8A),56.1 in.,183.9 in.,111.6 in.,1173,456
 2019,Jaguar,XE,30t R-Sport 4dr Sedan (2.0L 4cyl Turbo 8A),55.8 in.,183.9 in.,111.6 in.,1173,456
@@ -18243,18 +18243,18 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Kia,SPORTAGE,LX 4dr SUV AWD (2.4L 4cyl 6A),64.8 in.,176.4 in.,105.1 in.,904,211
 2019,Kia,SPORTAGE,EX 4dr SUV (2.4L 4cyl 6A),64.8 in.,176.4 in.,105.1 in.,904,211
 2019,Kia,SPORTAGE,SX 4dr SUV AWD (2.0L 4cyl Turbo 6A),65.2 in.,176.4 in.,105.1 in.,904,211
-2019,Kia,STINGER,4dr Sedan (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,Premium 4dr Sedan (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GT1 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GTS 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GT2 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GT2 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GT1 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GTS 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GT 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,Premium 4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
-2019,Kia,STINGER,GT 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,-9,-9
+2019,Kia,STINGER,4dr Sedan (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,Premium 4dr Sedan (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GT1 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GTS 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GT2 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GT2 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GT1 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GTS 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GT 4dr Sedan AWD (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,Premium 4dr Sedan AWD (2.0L 4cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
+2019,Kia,STINGER,GT 4dr Sedan (3.3L 6cyl Turbo 8A),55.1 in.,190.2 in.,114.4 in.,2155,503
 2019,Lamborghini,AVENTADOR,S Roadster 2dr Convertible AWD (6.5L 12cyl 7AM),44.7 in.,188.9 in.,106.3 in.,536,212
 2019,Lamborghini,AVENTADOR,S 2dr Coupe AWD (6.5L 12cyl 7AM),44.7 in.,188.9 in.,106.3 in.,535,212
 2019,Lamborghini,HURACAN,Performante 2dr Coupe AWD (5.2L 10cyl 7AM),,175.6 in.,103.1 in.,817,214
@@ -18375,12 +18375,12 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Lexus,RX-450H,4dr SUV AWD (3.5L 6cyl gas/electric hybrid CVT),67.7 in.,192.5 in.,109.8 in.,1005,232
 2019,Lexus,RX-450HL,4dr SUV AWD (3.5L 6cyl gas/electric hybrid CVT),67.7 in.,196.9 in.,109.8 in.,1005,232
 2019,Lexus,RX-450HL,Luxury 4dr SUV AWD (3.5L 6cyl gas/electric hybrid CVT),67.7 in.,196.9 in.,109.8 in.,1005,232
-2019,Lexus,UX-200,Luxury 4dr SUV (2.0L 4cyl CVT),60.6 in.,177.0 in.,103.9 in.,-9,-9
-2019,Lexus,UX-200,4dr SUV (2.0L 4cyl CVT),60.6 in.,177.0 in.,103.9 in.,-9,-9
-2019,Lexus,UX-200,F SPORT 4dr SUV (2.0L 4cyl CVT),60.6 in.,177.0 in.,103.9 in.,-9,-9
-2019,Lexus,UX-250H,Luxury 4dr SUV AWD (2.0L 4cyl gas/electric hybrid CVT),60.6 in.,177.0 in.,103.9 in.,-9,-9
-2019,Lexus,UX-250H,F SPORT 4dr SUV AWD (2.0L 4cyl gas/electric hybrid CVT),60.6 in.,177.0 in.,103.9 in.,-9,-9
-2019,Lexus,UX-250H,4dr SUV AWD (2.0L 4cyl gas/electric hybrid CVT),60.6 in.,177.0 in.,103.9 in.,-9,-9
+2019,Lexus,UX-200,Luxury 4dr SUV (2.0L 4cyl CVT),60.6 in.,177.0 in.,103.9 in.,2156,504
+2019,Lexus,UX-200,4dr SUV (2.0L 4cyl CVT),60.6 in.,177.0 in.,103.9 in.,2156,504
+2019,Lexus,UX-200,F SPORT 4dr SUV (2.0L 4cyl CVT),60.6 in.,177.0 in.,103.9 in.,2156,504
+2019,Lexus,UX-250H,Luxury 4dr SUV AWD (2.0L 4cyl gas/electric hybrid CVT),60.6 in.,177.0 in.,103.9 in.,2156,504
+2019,Lexus,UX-250H,F SPORT 4dr SUV AWD (2.0L 4cyl gas/electric hybrid CVT),60.6 in.,177.0 in.,103.9 in.,2156,504
+2019,Lexus,UX-250H,4dr SUV AWD (2.0L 4cyl gas/electric hybrid CVT),60.6 in.,177.0 in.,103.9 in.,2156,504
 2019,Lincoln,CONTINENTAL,Black Label 4dr Sedan AWD (2.7L 6cyl Turbo 6A),58.5 in.,201.4 in.,117.9 in.,1183,236
 2019,Lincoln,CONTINENTAL,Select 4dr Sedan (3.7L 6cyl 6A),58.5 in.,201.4 in.,117.9 in.,1183,236
 2019,Lincoln,CONTINENTAL,4dr Sedan (3.7L 6cyl 6A),58.5 in.,201.4 in.,117.9 in.,1183,236
@@ -18408,14 +18408,14 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Lincoln,MKZ,Reserve I 4dr Sedan (2.0L 4cyl Turbo 6A),58.1 in.,193.9 in.,112.2 in.,580,239
 2019,Lincoln,MKZ,Hybrid 4dr Sedan (2.0L 4cyl gas/electric hybrid CVT),58.1 in.,193.9 in.,112.2 in.,580,239
 2019,Lincoln,MKZ,Reserve II 4dr Sedan (2.0L 4cyl Turbo 6A),58.1 in.,193.9 in.,112.2 in.,580,239
-2019,Lincoln,NAUTILUS,Reserve 4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,Black Label 4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,Select 4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,Select 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,Reserve 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
-2019,Lincoln,NAUTILUS,Black Label 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,-9,-9
+2019,Lincoln,NAUTILUS,Reserve 4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,Black Label 4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,Select 4dr SUV (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,Select 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,Reserve 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
+2019,Lincoln,NAUTILUS,Black Label 4dr SUV AWD (2.0L 4cyl Turbo 8A),66.2 in.,190.0 in.,112.2 in.,2150,500
 2019,Lincoln,NAVIGATOR,Select 4dr SUV 4WD (3.5L 6cyl Turbo 10A),76.3 in.,210.0 in.,122.5 in.,854,240
 2019,Lincoln,NAVIGATOR,Reserve 4dr SUV 4WD (3.5L 6cyl Turbo 10A),76.3 in.,210.0 in.,122.5 in.,854,240
 2019,Lincoln,NAVIGATOR,4dr SUV 4WD (3.5L 6cyl Turbo 10A),76.3 in.,210.0 in.,122.5 in.,854,240
@@ -18437,14 +18437,14 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Maserati,GHIBLI,GranSport 4dr Sedan (3.0L 6cyl Turbo 8A),57.5 in.,195.7 in.,118.0 in.,588,245
 2019,Maserati,GRANTURISMO-CONVERTIBLE,MC 2dr Convertible (4.7L 8cyl 6A),53.3 in.,193.7 in.,115.8 in.,590,246
 2019,Maserati,GRANTURISMO-CONVERTIBLE,Sport 2dr Convertible (4.7L 8cyl 6A),53.3 in.,193.3 in.,115.8 in.,590,246
-2019,Maserati,LEVANTE,S GranLusso 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,S GranSport 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,GTS 4dr SUV AWD (3.8L 8cyl Turbo 8A),66.9 in.,197.6 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,Trofeo 4dr SUV AWD (3.8L 8cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,GranSport 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,GranLusso 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
-2019,Maserati,LEVANTE,S 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,-9
+2019,Maserati,LEVANTE,S GranLusso 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,S GranSport 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,GTS 4dr SUV AWD (3.8L 8cyl Turbo 8A),66.9 in.,197.6 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,Trofeo 4dr SUV AWD (3.8L 8cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,GranSport 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,GranLusso 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
+2019,Maserati,LEVANTE,S 4dr SUV AWD (3.0L 6cyl Turbo 8A),66.7 in.,197.0 in.,118.3 in.,1629,469
 2019,Maserati,QUATTROPORTE,S Q4 GranLusso 4dr Sedan AWD (3.0L 6cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
 2019,Maserati,QUATTROPORTE,S 4dr Sedan (3.0L 6cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
 2019,Maserati,QUATTROPORTE,S GranSport 4dr Sedan (3.0L 6cyl Turbo 8A),58.3 in.,207.2 in.,124.8 in.,592,247
@@ -18509,16 +18509,16 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Mazda,MX-5-MIATA,Grand Touring 2dr Convertible (2.0L 4cyl 6M),48.8 in.,154.1 in.,90.9 in.,912,256
 2019,Mazda,MX-5-MIATA,Club 2dr Convertible (2.0L 4cyl 6A),48.8 in.,154.1 in.,90.9 in.,912,256
 2019,Mclaren,570GT,2dr Coupe (3.8L 8cyl Turbo 7AM),47.3 in.,178.3 in.,105.1 in.,1639,437
-2019,Mclaren,570S-SPIDER,2dr Convertible (3.8L 8cyl Turbo 7AM),47.3 in.,178.3 in.,105.0 in.,1102,437
+2019,Mclaren,570S-SPIDER,2dr Convertible (3.8L 8cyl Turbo 7AM),47.3 in.,178.3 in.,105.0 in.,2146,437
 2019,Mclaren,570S,2dr Coupe (3.8L 8cyl Turbo 7AM),47.3 in.,178.3 in.,105.1 in.,1102,437
-2019,Mclaren,600LT,2dr Coupe (3.8L 8cyl Turbo 7AM),47.0 in.,181.3 in.,105.1 in.,-9,259
-2019,Mclaren,720S-SPIDER,Performance 2dr Convertible (4.0L 8cyl Turbo 7AM),47.0 in.,178.9 in.,105.0 in.,-9,-9
-2019,Mclaren,720S-SPIDER,2dr Convertible (4.0L 8cyl Turbo 7AM),47.0 in.,178.9 in.,105.0 in.,-9,-9
-2019,Mclaren,720S-SPIDER,Luxury 2dr Convertible (4.0L 8cyl Turbo 7AM),47.0 in.,178.9 in.,105.0 in.,-9,-9
-2019,Mclaren,720S,Luxury 2dr Coupe (4.0L 8cyl Turbo 7AM),47.1 in.,178.9 in.,105.1 in.,-9,-9
-2019,Mclaren,720S,Performance 2dr Coupe (4.0L 8cyl Turbo 7AM),47.1 in.,178.9 in.,105.1 in.,-9,-9
-2019,Mclaren,720S,2dr Coupe (4.0L 8cyl Turbo 7AM),47.1 in.,178.9 in.,105.1 in.,-9,-9
-2019,Mclaren,SENNA,2dr Coupe (4.0L 8cyl Turbo 7AM),48.4 in.,186.8 in.,105.0 in.,-9,-9
+2019,Mclaren,600LT,2dr Coupe (3.8L 8cyl Turbo 7AM),47.0 in.,181.3 in.,105.1 in.,2147,437
+2019,Mclaren,720S-SPIDER,Performance 2dr Convertible (4.0L 8cyl Turbo 7AM),47.0 in.,178.9 in.,105.0 in.,2144,259
+2019,Mclaren,720S-SPIDER,2dr Convertible (4.0L 8cyl Turbo 7AM),47.0 in.,178.9 in.,105.0 in.,2144,259
+2019,Mclaren,720S-SPIDER,Luxury 2dr Convertible (4.0L 8cyl Turbo 7AM),47.0 in.,178.9 in.,105.0 in.,2144,259
+2019,Mclaren,720S,Luxury 2dr Coupe (4.0L 8cyl Turbo 7AM),47.1 in.,178.9 in.,105.1 in.,2143,259
+2019,Mclaren,720S,Performance 2dr Coupe (4.0L 8cyl Turbo 7AM),47.1 in.,178.9 in.,105.1 in.,2143,259
+2019,Mclaren,720S,2dr Coupe (4.0L 8cyl Turbo 7AM),47.1 in.,178.9 in.,105.1 in.,2143,259
+2019,Mclaren,SENNA,2dr Coupe (4.0L 8cyl Turbo 7AM),48.4 in.,186.8 in.,105.0 in.,2145,259
 2016,MERCEDES-BENZ,GLA CLASS SUV,GLA 250 4dr SUV (2.0L 4cyl Turbo 7AM),60.0 in.,173.9 in.,106.3 in.,640,270
 2019,Mercedes-benz,GLA-CLASS,AMG GLA 45 4dr SUV AWD (2.0L 4cyl Turbo 7AM),58.0 in.,175.4 in.,106.3 in.,1330,270
 2019,Mercedes-benz,GLA-CLASS,GLA 250 4dr SUV (2.0L 4cyl Turbo 7AM),60.0 in.,173.9 in.,106.3 in.,640,270
@@ -18679,13 +18679,13 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Mini,HARDTOP-2-DOOR,Cooper S 2dr Hatchback (2.0L 4cyl Turbo 6M),55.7 in.,151.9 in.,98.2 in.,665,286
 2019,Mini,HARDTOP-4-DOOR,Cooper 4dr Hatchback (1.5L 3cyl Turbo 6M),56.1 in.,157.4 in.,101.1 in.,665,286
 2019,Mini,HARDTOP-4-DOOR,Cooper S 4dr Hatchback (2.0L 4cyl Turbo 6M),56.1 in.,158.0 in.,101.1 in.,665,286
-2019,Mitsubishi,ECLIPSE-CROSS,SEL Touring 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,-9,-9
-2019,Mitsubishi,ECLIPSE-CROSS,SE 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,-9,-9
-2019,Mitsubishi,ECLIPSE-CROSS,SP 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,-9,-9
-2019,Mitsubishi,ECLIPSE-CROSS,LE 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,-9,-9
-2019,Mitsubishi,ECLIPSE-CROSS,ES 4dr SUV (1.5L 4cyl Turbo CVT),66.3 in.,173.4 in.,105.1 in.,-9,-9
-2019,Mitsubishi,ECLIPSE-CROSS,SEL 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,-9,-9
-2019,Mitsubishi,ECLIPSE-CROSS,ES 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,-9,-9
+2019,Mitsubishi,ECLIPSE-CROSS,SEL Touring 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,2135,493
+2019,Mitsubishi,ECLIPSE-CROSS,SE 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,2135,493
+2019,Mitsubishi,ECLIPSE-CROSS,SP 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,2135,493
+2019,Mitsubishi,ECLIPSE-CROSS,LE 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,2135,493
+2019,Mitsubishi,ECLIPSE-CROSS,ES 4dr SUV (1.5L 4cyl Turbo CVT),66.3 in.,173.4 in.,105.1 in.,2135,493
+2019,Mitsubishi,ECLIPSE-CROSS,SEL 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,2135,493
+2019,Mitsubishi,ECLIPSE-CROSS,ES 4dr SUV AWD (1.5L 4cyl Turbo CVT),66.5 in.,173.4 in.,105.1 in.,2135,493
 2019,Mitsubishi,MIRAGE-G4,ES 4dr Sedan (1.2L 3cyl 5M),59.2 in.,169.5 in.,100.4 in.,680,295
 2019,Mitsubishi,MIRAGE-G4,ES 4dr Sedan (1.2L 3cyl CVT),59.2 in.,169.5 in.,100.4 in.,680,295
 2019,Mitsubishi,MIRAGE-G4,SE 4dr Sedan (1.2L 3cyl CVT),59.2 in.,169.5 in.,100.4 in.,680,295
@@ -18772,9 +18772,9 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Nissan,GT-R,Pure 2dr Coupe AWD (3.8L 6cyl Turbo 6AM),53.9 in.,185.4 in.,109.4 in.,1986,304
 2019,Nissan,GT-R,Premium 2dr Coupe AWD (3.8L 6cyl Turbo 6AM),53.9 in.,185.4 in.,109.4 in.,1985,304
 2019,Nissan,GT-R,NISMO 2dr Coupe AWD (3.8L 6cyl Turbo 6AM),53.9 in.,184.6 in.,109.4 in.,1986,304
-2019,Nissan,KICKS,S 4dr Hatchback (1.6L 4cyl CVT),62.4 in.,169.1 in.,103.1 in.,-9,-9
-2019,Nissan,KICKS,SV 4dr Hatchback (1.6L 4cyl CVT),62.4 in.,169.1 in.,103.1 in.,-9,-9
-2019,Nissan,KICKS,SR 4dr Hatchback (1.6L 4cyl CVT),62.4 in.,169.1 in.,103.1 in.,-9,-9
+2019,Nissan,KICKS,S 4dr Hatchback (1.6L 4cyl CVT),62.4 in.,169.1 in.,103.1 in.,2161,305
+2019,Nissan,KICKS,SV 4dr Hatchback (1.6L 4cyl CVT),62.4 in.,169.1 in.,103.1 in.,2161,305
+2019,Nissan,KICKS,SR 4dr Hatchback (1.6L 4cyl CVT),62.4 in.,169.1 in.,103.1 in.,2161,305
 2019,Nissan,LEAF,SV PLUS 4dr Hatchback (electric DD),61.4 in.,176.4 in.,106.3 in.,231,306
 2019,Nissan,LEAF,SL 4dr Hatchback (electric DD),61.4 in.,176.4 in.,106.3 in.,231,306
 2019,Nissan,LEAF,S PLUS 4dr Hatchback (electric DD),61.4 in.,176.4 in.,106.3 in.,231,306
@@ -19143,17 +19143,17 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Smart,EQ-FORTWO,passion 2dr Convertible (electric DD),61.1 in.,106.1 in.,73.7 in.,945,353
 2019,Smart,EQ-FORTWO,prime 2dr Convertible (electric DD),61.1 in.,106.1 in.,73.7 in.,945,353
 2019,Smart,EQ-FORTWO,prime 2dr Hatchback (electric DD),61.2 in.,106.1 in.,73.7 in.,946,353
-2019,Subaru,ASCENT,Limited 4dr SUV AWD w/7-Passenger Technology Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Premium 4dr SUV AWD w/8-Passenger Sporty Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,4dr SUV AWD w/8-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Premium 4dr SUV AWD w/7-Passenger Convenience Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Premium 4dr SUV AWD w/8-Passenger Convenience Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Premium 4dr SUV AWD w/8-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Limited 4dr SUV AWD w/8-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Limited 4dr SUV AWD w/7-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Touring 4dr SUV AWD w/7-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Limited 4dr SUV AWD w/8-Passenger Technology Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
-2019,Subaru,ASCENT,Premium 4dr SUV AWD w/7-Passenger Sporty Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,-9,-9
+2019,Subaru,ASCENT,Limited 4dr SUV AWD w/7-Passenger Technology Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Premium 4dr SUV AWD w/8-Passenger Sporty Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,4dr SUV AWD w/8-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Premium 4dr SUV AWD w/7-Passenger Convenience Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Premium 4dr SUV AWD w/8-Passenger Convenience Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Premium 4dr SUV AWD w/8-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Limited 4dr SUV AWD w/8-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Limited 4dr SUV AWD w/7-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Touring 4dr SUV AWD w/7-Passenger (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Limited 4dr SUV AWD w/8-Passenger Technology Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
+2019,Subaru,ASCENT,Premium 4dr SUV AWD w/7-Passenger Sporty Pkg (2.4L 4cyl Turbo CVT),71.6 in.,196.8 in.,113.8 in.,2131,489
 2019,Subaru,BRZ,Series.Gray 2dr Coupe (2.0L 4cyl 6M),52.0 in.,166.7 in.,101.2 in.,1158,357
 2019,Subaru,BRZ,Premium 2dr Coupe (2.0L 4cyl 6M),52.0 in.,166.7 in.,101.2 in.,1158,357
 2019,Subaru,BRZ,Limited 2dr Coupe (2.0L 4cyl 6M),52.0 in.,166.7 in.,101.2 in.,1158,357
@@ -19201,26 +19201,26 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Subaru,WRX,4dr Sedan AWD (2.0L 4cyl Turbo 6M),58.1 in.,180.9 in.,104.3 in.,920,359
 2019,Subaru,WRX,Premium 4dr Sedan AWD (2.0L 4cyl Turbo CVT),58.1 in.,180.9 in.,104.3 in.,920,359
 2019,Subaru,WRX,Premium 4dr Sedan AWD (2.0L 4cyl Turbo 6M),58.1 in.,180.9 in.,104.3 in.,920,359
-2019,Tesla,MODEL-S,Long Range 4dr Sedan AWD (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,371
-2019,Tesla,MODEL-S,P100D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,1159,371
-2017,Tesla,Model-S Sedan,60 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2017,Tesla,Model-S Sedan,75D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2017,Tesla,Model-S Sedan,90D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2017,Tesla,Model-S Sedan,100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2017,Tesla,Model-S Sedan,75 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2017,Tesla,Model-S Sedan,P100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2017,Tesla,Model-S Sedan,60D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,1159,-9
-2019,Tesla,MODEL-X,Long Range 4dr SUV AWD (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2019,Tesla,MODEL-X,75D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2019,Tesla,MODEL-X,4dr SUV AWD w/Prod. End 3/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2019,Tesla,MODEL-X,Performance 4dr SUV AWD (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2019,Tesla,MODEL-X,100D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2019,Tesla,MODEL-X,P100D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2019,Tesla,MODEL-X,Standard Range 4dr SUV AWD w/Prod. End 10/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,-9
-2017,Tesla,Model-X SUV,75D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
-2017,Tesla,Model-X SUV,90D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
-2017,Tesla,Model-X SUV,P100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
-2017,Tesla,Model-X SUV,100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,-9
+2019,Tesla,MODEL-S,Long Range 4dr Sedan AWD (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
+2019,Tesla,MODEL-S,P100D 4dr Sedan AWD w/Prod. End 1/19 (electric DD),56.9 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,60 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,75D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,90D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,75 4dr Sedan (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,P100D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2017,Tesla,Model-S Sedan,60D 4dr Sedan AWD (electric DD),56.5 in.,196.0 in.,116.5 in.,767,371
+2019,Tesla,MODEL-X,Long Range 4dr SUV AWD (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2019,Tesla,MODEL-X,75D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2019,Tesla,MODEL-X,4dr SUV AWD w/Prod. End 3/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2019,Tesla,MODEL-X,Performance 4dr SUV AWD (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2019,Tesla,MODEL-X,100D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2019,Tesla,MODEL-X,P100D 4dr SUV AWD w/Prod. End 1/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2019,Tesla,MODEL-X,Standard Range 4dr SUV AWD w/Prod. End 10/19 (electric DD),66.0 in.,198.3 in.,116.7 in.,768,372
+2017,Tesla,Model-X SUV,75D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,372
+2017,Tesla,Model-X SUV,90D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,372
+2017,Tesla,Model-X SUV,P100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,372
+2017,Tesla,Model-X SUV,100D 4dr SUV AWD (electric DD),,198.3 in.,116.7 in.,768,372
 2016,TOYOTA,TACOMA DOUBLE CAB,SR5 4dr Double Cab 5.0 ft. SB (3.5L 6cyl 6A),70.6 in.,212.3 in.,127.4 in.,1026,387
 2016,TOYOTA,TACOMA DOUBLE CAB,TRD Off Road 4dr Double Cab 4WD 5.0 ft. SB (3.5L 6cyl 6A),70.6 in.,212.3 in.,127.4 in.,1026,387
 2016,TOYOTA,TACOMA DOUBLE CAB,TRD Sport 4dr Double Cab 5.0 ft. SB (3.5L 6cyl 6A),70.6 in.,212.3 in.,127.4 in.,1026,387
