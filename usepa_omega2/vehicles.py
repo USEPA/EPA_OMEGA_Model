@@ -256,6 +256,7 @@ class Vehicle(OMEGABase):
         self.footprint_ft2 = None
         self._initial_registered_count = 0
         Vehicle.set_next_vehicle_ID()
+        self.cost_cloud = None
         self.cost_curve = None
 
     @staticmethod
@@ -361,6 +362,7 @@ class Vehicle(OMEGABase):
             self.model_year = model_year
 
         from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
+        from cost_clouds import CostCloud
 
         self.set_cert_target_CO2_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
@@ -370,6 +372,7 @@ class Vehicle(OMEGABase):
 
         add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
         self.cert_CO2_grams_per_mile = add_upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
+        self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
 
         self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
 
@@ -379,26 +382,33 @@ class Vehicle(OMEGABase):
         self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
 
     def create_frontier_df(self):
-        from cost_curves import CostCurve
+        from cost_clouds import CostCloud
         from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
-
-        cost_curve = pd.DataFrame()
 
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
         kwh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
 
-        # TODO: update dynamic costs
-        # TODO: convert kwh to gco2/mi for BEVs (and what for PHEVS...?? -- upstream calcs
-        # TODO: calculate frontier from updated cloud
-        cost_curve[co2_name] = CostCurve.get_co2_gpmi(self.cost_curve_class, self.model_year)
-        cost_curve[kwh_name] = CostCurve.get_kWhpmi(self.cost_curve_class, self.model_year)
+        # rename generic columns to vehicle-specific columns
+        self.cost_cloud = self.cost_cloud.rename(
+            columns={'cert_co2_grams_per_mile': co2_name, 'cert_kWh_per_mile': kwh_name,
+                     'new_vehicle_mfr_cost_dollars': cost_name})
 
+        self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
+
+        # TODO: update dynamic costs, if any
+
+        # add upstream calcs
         add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
-        cost_curve[co2_name] = add_upstream(self, cost_curve[co2_name], cost_curve[kwh_name])
-        cost_curve[cost_name] = CostCurve.get_cost(self.cost_curve_class, self.model_year, cost_curve[co2_name],
-                                                   co2_points=cost_curve[co2_name])
+        self.cost_cloud[co2_name] = add_upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kwh_name])
 
+        # calculate frontier from updated cloud
+        cost_curve = CostCloud.calculate_frontier(self.cost_cloud, co2_name, cost_name)
+
+        # drop frontier factor
+        cost_curve = cost_curve.drop(columns=['frontier_factor'])
+
+        # calculate producer generalized cost
         cost_curve = o2.options.producer_calculate_generalized_cost(self, cost_curve, co2_name, cost_name)
 
         return cost_curve

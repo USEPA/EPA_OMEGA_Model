@@ -20,7 +20,7 @@ Policy Fuel Upstream File,String,fuel_upstream.csv,fuel_upstream.csv
 Policy Fuel Upstream Methods File,String,fuel_upstream_methods.csv,fuel_upstream_methods.csv
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
-Cost File,String,cost_curves.csv,cost_curves.csv
+Cost File,String,cost_clouds.csv,cost_clouds.csv
 GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-flat.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv,ghg_standards-fuels.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
