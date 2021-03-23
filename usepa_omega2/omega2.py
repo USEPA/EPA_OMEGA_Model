@@ -581,10 +581,10 @@ def init_omega(o2_options):
     # import database modules to populate ORM context
     from fuels import Fuel
     from policy_fuel_upstream import PolicyFuelUpstream
+    from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
     from consumer.market_classes import MarketClass
-    from cost_curves import CostCurve, input_template_name as cost_curve_template_name
     from cost_clouds import CostCloud
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from manufacturers import Manufacturer
@@ -635,7 +635,8 @@ def init_omega(o2_options):
 
         init_fail = init_fail + PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file,
                                                                   verbose=o2.options.verbose)
-
+        init_fail = init_fail + PolicyFuelUpstreamMethods.init_from_file(o2.options.fuel_upstream_methods_file,
+                                                                  verbose=o2.options.verbose)
         init_fail = init_fail + ContextFuelPrices.init_database_from_file(
             o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
 
@@ -646,10 +647,11 @@ def init_omega(o2_options):
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
 
-        if get_template_name(o2.options.cost_file) == cost_curve_template_name:
-            init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-        else:
-            init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        # if get_template_name(o2.options.cost_file) == cost_curve_template_name:
+        #     init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        # else:
+
+        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
         init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
                                                                                 verbose=o2.options.verbose)
@@ -689,8 +691,9 @@ def init_omega(o2_options):
         # initial year = initial fleet model year (latest year of data)
         o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
         # final year = last year of cost curve data
-        o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
+        # o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
         # o2.options.analysis_final_year = 2022
+        o2.options.analysis_final_year = CostCloud.get_max_year()
 
         stock.update_stock(o2.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
     finally:

@@ -7,7 +7,6 @@ GHG_standards_footprint.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 input_template_name = 'ghg_standards-footprint'

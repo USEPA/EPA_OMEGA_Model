@@ -10,22 +10,16 @@ from usepa_omega2 import *
 
 input_template_name = 'cost_clouds'
 
-class CostCloud(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'cost_clouds'
-    index = Column('index', Integer, primary_key=True)
+cache = dict()
 
-    cost_curve_class = Column(String)
-    model_year = Column(Numeric)
-    new_vehicle_mfr_cost_dollars = Column(Float)
-    cert_CO2_grams_per_mile = Column(Float)
-    mfr_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    cert_kwh_per_mile = Column(Float)
+
+class CostCloud(OMEGABase):
+
+    max_year = 0
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
-        import matplotlib.pyplot as plt
-        import cost_curves
+    def init_cost_clouds_from_file(filename, verbose=False):
+        cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -45,60 +39,33 @@ class CostCloud(SQABase, OMEGABase):
                                                         verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load cloud data into database
-                for i in df.index:
-                    obj_list.append(CostCloud(
-                        cost_curve_class=df.loc[i, 'cost_curve_class'],
-                        model_year=df.loc[i, 'model_year'],
-                        new_vehicle_mfr_cost_dollars=df.loc[i, 'new_vehicle_mfr_cost_dollars'],
-                        cert_CO2_grams_per_mile=df.loc[i, 'cert_co2_grams_per_mile'],
-                        cert_kwh_per_mile=df.loc[i, 'cert_kWh_per_mile'],
-                    ))
-                o2.session.add_all(obj_list)
-                original_echo = o2.engine.echo
-                o2.engine.echo = False  # cloud has a lot of points... turn off echo
-                if verbose:
-                    print('\nAdding cost cloud to database...')
-                o2.session.flush()
-                o2.engine.echo = original_echo
-
-            # convert cost clouds into curves and set up cost_curves table...
-            cost_curve_classes = df['cost_curve_class'].unique()
-            # for each cost curve class
-            for cost_curve_class in cost_curve_classes:
-                if verbose:
-                    print(cost_curve_class)
-                class_cloud = df[df['cost_curve_class'] == cost_curve_class]
-                cloud_model_years = class_cloud['model_year'].unique()
-                # for each model year
-                for model_year in cloud_model_years:
-                    if verbose:
-                        print(model_year)
-
-                    cost_cloud = class_cloud[class_cloud['model_year'] == model_year].copy()
-                    frontier_df = CostCloud.calculate_frontier(cost_cloud, 'cert_co2_grams_per_mile',
-                                                               'new_vehicle_mfr_cost_dollars')
-
-                    if verbose and (model_year == cloud_model_years.min()):
-                        import matplotlib.pyplot as plt
-                        plt.figure()
-                        plt.plot(cost_cloud['cert_co2_grams_per_mile'], cost_cloud['new_vehicle_mfr_cost_dollars'],
-                                 '.')
-                        plt.title('Cost versus CO2 %s' % cost_curve_class)
-                        plt.xlabel('Combined GHG CO2 [g/mi]')
-                        plt.ylabel('Combined GHG Cost [$]')
-                        plt.plot(frontier_df['cert_co2_grams_per_mile'], frontier_df['new_vehicle_mfr_cost_dollars'],
-                                 'r-')
-                        plt.grid()
-                        plt.savefig(o2.options.output_folder + 'Cost versus CO2 %s' % cost_curve_class)
-
-                    cost_curves.CostCurve.init_database_from_lists(cost_curve_class, model_year,
-                                                                   frontier_df['cert_co2_grams_per_mile'],
-                                                                   frontier_df['cert_kWh_per_mile'],
-                                                                   frontier_df['new_vehicle_mfr_cost_dollars'])
+                # convert cost clouds into curves and set up cost_curves table...
+                cost_curve_classes = df['cost_curve_class'].unique()
+                # for each cost curve class
+                for cost_curve_class in cost_curve_classes:
+                    class_cloud = df[df['cost_curve_class'] == cost_curve_class]
+                    cloud_model_years = class_cloud['model_year'].unique()
+                    # for each model year
+                    cache[cost_curve_class] = dict()
+                    for model_year in cloud_model_years:
+                        cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
+                        CostCloud.max_year = max(CostCloud.max_year, model_year)
 
         return template_errors
+
+    @staticmethod
+    def plot_frontier(cost_cloud, cost_curve_class, frontier_df, value_column):
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(cost_cloud[value_column], cost_cloud['new_vehicle_mfr_cost_dollars'],
+                     '.')
+            plt.title('Cost versus %s %s' % (value_column, cost_curve_class))
+            plt.xlabel('%s' % value_column)
+            plt.ylabel('Combined GHG Cost [$]')
+            plt.plot(frontier_df[value_column], frontier_df['new_vehicle_mfr_cost_dollars'],
+                     'r-')
+            plt.grid()
+            plt.savefig(o2.options.output_folder + 'Cost versus %s %s' % (value_column, cost_curve_class))
 
     @staticmethod
     def calculate_frontier(cloud, x_key, y_key):
@@ -149,8 +116,16 @@ class CostCloud(SQABase, OMEGABase):
 
         return result_df_foo
 
-    def calculate_generalized_cost(self, cost_curve_class):
-        print(cost_curve_class)
+    @staticmethod
+    def get_cloud(model_year, cost_curve_class):
+        return cache[cost_curve_class][model_year]
+
+    @staticmethod
+    def get_max_year():
+        return CostCloud.max_year
+
+    # def calculate_generalized_cost(self, cost_curve_class):
+    #     print(cost_curve_class)
 
 
 if __name__ == '__main__':
@@ -164,15 +139,11 @@ if __name__ == '__main__':
         omega_log.init_logfile()
         o2.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
 
-        import cost_curves
-
-        SQABase.metadata.create_all(o2.engine)
-
         init_fail = []
-        init_fail = init_fail + CostCloud.init_database_from_file(o2.options.cost_file, verbose=True)
+        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=True)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

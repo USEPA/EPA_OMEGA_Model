@@ -31,21 +31,14 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
     from consumer.market_classes import MarketClass
 
     producer_generalized_cost_fuel_years, \
-    producer_generalized_cost_annual_vmt, \
-    producer_generalized_cost_discount_rate, \
-    producer_generalized_cost_amortization_years = \
+    producer_generalized_cost_annual_vmt = \
         MarketClass.get_producer_generalized_cost_attributes(
             vehicle.market_class_ID,
             ['producer_generalized_cost_fuel_years',
              'producer_generalized_cost_annual_vmt',
-             'producer_generalized_cost_discount_rate',
-             'producer_generalized_cost_amortization_years',
              ])
 
-    # discount_rate = producer_generalized_cost_discount_rate
-    # annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** producer_generalized_cost_amortization_years) - 1)
-    vehicle_amortized_cost = cost_curve[cost_name] * (1 - producer_generalized_cost_discount_rate) ** (
-                producer_generalized_cost_amortization_years - 1)
+    vehicle_cost = cost_curve[cost_name]
 
     grams_co2_per_unit = vehicle.fuel_tailpipe_co2_emissions_grams_per_unit()
     kwh_per_mi = vehicle.cert_kWh_per_mile
@@ -67,7 +60,7 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
 
     generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
-    cost_curve[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_amortized_cost
+    cost_curve[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost
 
     return cost_curve
 
@@ -303,18 +296,21 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
 
         Vehicle.reset_vehicle_IDs()
 
-        manufacturer_composite_vehicles = []
+        manufacturer_vehicles = []
         # update each vehicle and calculate compliance target for each vehicle
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
             new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
-            manufacturer_composite_vehicles.append(new_veh)
+            # TODO: update cert g/mi curve values based on policy upstream and whatever the heck else?? or is it done before here...? when processing the original clouds??
+            manufacturer_vehicles.append(new_veh)
 
         # aggregate by market class / reg class
         mctrc = dict()
         for mc in MarketClass.market_classes:
-            mctrc[mc] = {'car': [], 'truck': [], 'sales': 0}
-        for new_veh in manufacturer_composite_vehicles:
+            mctrc[mc] = {'sales': 0}
+            for rc in reg_classes:
+                mctrc[mc][rc] = []
+        for new_veh in manufacturer_vehicles:
             mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
             mctrc[new_veh.market_class_ID]['sales'] = mctrc[new_veh.market_class_ID]['sales'] + new_veh.initial_registered_count
 
@@ -498,7 +494,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         producer_iteration_log.write(tech_share_combos_total)
 
     potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
-    cost_name = 'total_combo_generalized_cost_dollars' # to use generalized tech cost
+    cost_name = 'total_combo_generalized_cost_dollars'
 
     if not potential_winners.empty:
         winning_combos = tech_share_combos_total.loc[[potential_winners[cost_name].idxmin()]]

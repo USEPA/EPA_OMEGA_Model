@@ -10,6 +10,7 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 co2_units = 'co2e_grams_per_unit'
+electric_loss_units = 'upstream_inefficiency'
 
 class PolicyFuelUpstream(OMEGABase):
     values = pd.DataFrame()
@@ -17,6 +18,11 @@ class PolicyFuelUpstream(OMEGABase):
     @staticmethod
     def get_upstream_co2e_grams_per_unit(calendar_year, fuel_ID):
         return PolicyFuelUpstream.values['%s:%s' % (fuel_ID, co2_units)].loc[
+                  PolicyFuelUpstream.values['calendar_year'] == calendar_year].item()
+
+    @staticmethod
+    def get_upstream_inefficiency(calendar_year, fuel_ID):
+        return PolicyFuelUpstream.values['%s:%s' % (fuel_ID, electric_loss_units)].loc[
                   PolicyFuelUpstream.values['calendar_year'] == calendar_year].item()
 
     @staticmethod
@@ -42,7 +48,7 @@ class PolicyFuelUpstream(OMEGABase):
 
                 PolicyFuelUpstream.values['calendar_year'] = df['calendar_year']
 
-                fuel_columns = [c for c in df.columns if co2_units in c]
+                fuel_columns = [c for c in df.columns if (co2_units in c) or (electric_loss_units in c)]
 
                 for fc in fuel_columns:
                     fuel = fc.split(':')[0]
@@ -75,6 +81,7 @@ if __name__ == '__main__':
                                                                   verbose=o2.options.verbose)
 
         if not init_fail:
+            fileio.validate_folder(o2.options.database_dump_folder)
             PolicyFuelUpstream.values.to_csv(
                 o2.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 

@@ -17,9 +17,12 @@ Vehicles File,String,vehicles.csv
 Demanded Shares File,String,demanded_shares-gcam.csv
 Fuels File,String,fuels.csv
 Policy Fuel Upstream File,String,fuel_upstream.csv
+Policy Fuel Upstream Methods File,String,fuel_upstream_methods.csv
+Drive Cycles File,String,drive_cycles.csv
+Drive Cycle Weights File,String,drive_cycle_weights.csv
 Context Fuel Prices File,String,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv
-Cost File,String,cost_curves.csv
+Cost File,String,cost_clouds.csv
 GHG Standards File,String,ghg_standards-footprint.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv
 GHG Credits File,String,ghg_credits.csv
@@ -33,7 +36,7 @@ Runtime Settings,,
 Num Market Share Options,#,5
 Num Tech Options per ICE Vehicle,#,5
 Num Tech Options per BEV Vehicle,#,1
-Allow Backsliding,TRUE / FALSE,FALSE
+Allow Backsliding,TRUE / FALSE,TRUE
 Cost Curve Frontier Affinity Factor,#,0.75
 Iterate Producer-Consumer,TRUE / FALSE,TRUE
 New Vehicle Price Sales Response Elasticity,#,-0.5

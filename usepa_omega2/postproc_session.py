@@ -117,7 +117,7 @@ def plot_cert_co2_gpmi(calendar_years):
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
                     sales_weighted_cost += float(result.registered_count) * float(result.cert_CO2_grams_per_mile)
-            market_category_cost.append(sales_weighted_cost / mcat_count)
+            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cert_co2_data[mcat] = market_category_cost
 
@@ -197,7 +197,7 @@ def plot_cert_kwh_pmi(calendar_years):
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
                     sales_weighted_cost += float(result.registered_count) * float(result.cert_kWh_per_mile)
-            market_category_cost.append(sales_weighted_cost / mcat_count)
+            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cert_kwh_data[mcat] = market_category_cost
 
@@ -277,7 +277,7 @@ def plot_target_co2_gpmi(calendar_years):
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
                     sales_weighted_cost += float(result.registered_count) * float(result.cert_target_CO2_grams_per_mile)
-            market_category_cost.append(sales_weighted_cost / mcat_count)
+            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cert_co2_data[mcat] = market_category_cost
 
@@ -357,7 +357,7 @@ def plot_vehicle_cost(calendar_years):
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
                     sales_weighted_cost += float(result.registered_count) * float(result.new_vehicle_mfr_cost_dollars)
-            market_category_cost.append(sales_weighted_cost / mcat_count)
+            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cost_data[mcat] = market_category_cost
 
@@ -438,7 +438,7 @@ def plot_vehicle_generalized_cost(calendar_years):
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
                     sales_weighted_cost += float(result.registered_count) * float(result.new_vehicle_mfr_generalized_cost_dollars)
-            market_category_cost.append(sales_weighted_cost / mcat_count)
+            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cost_data[mcat] = market_category_cost
 
