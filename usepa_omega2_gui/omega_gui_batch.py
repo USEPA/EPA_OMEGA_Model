@@ -825,29 +825,25 @@ class Form(QObject):
                 directory = output_batch_subdirectory + "/"  # Define output directory to search
                 for root, dirs, files in os.walk(directory):  # Search includes subdirectories
                     for file in files:  # Begin search
-                        if file.endswith('.txt'):  # Process if .txt file is found
+                        # Add if .txt file is found and it does not already exist in the log file array
+                        if file.endswith('.txt') and not any(file in x for x in log_file_array):
                             fullpath = os.path.join(root, file)  # Generate complete path of file
-                            # log_file_array.append(fullpath)
-                            # log_counter_array.append(0)
-                            try:
-                                log_file_array.index(fullpath)  # See if found .txt file already in log file
-                            except ValueError:
-                                log_file_array.append(fullpath)  # Append filename to log file array
-                                log_counter_array.append(0)  # Add another log counter for new file
-                                f = open(fullpath)  # Get identifier for status output
-                                lines = f.readlines()  # Read file
-                                f.close()  # Close file
-                                j = lines[0]  # Get first line
-                                # h = j.find('session')  # Look for 'session'
-                                if j.find('session') > -1:  # See if 'session' found
-                                    l = j.find('session') + 8
-                                    i = j.find(' ', l)  # Find the end of the next word after 'session'
-                                    k = j[l:i]  # Save the next word
-                                elif j.find('batch') > -1:  # See if 'batch' found:
-                                    k = 'Batch'  # Save the word for output
-                                else:
-                                    k = ""  # Not recognized
-                                log_ident_array.append(k)
+                            log_file_array.append(fullpath)  # Append filename to log file array
+                            log_counter_array.append(0)  # Add another log counter for new file
+                            f = open(fullpath)  # Get identifier for status output
+                            lines = f.readlines()  # Read file
+                            f.close()  # Close file
+                            j = lines[0]  # Get first line
+                            # h = j.find('session')  # Look for 'session'
+                            if j.find('session') > -1:  # See if 'session' found
+                                l = j.find('session') + 8
+                                i = j.find(' ', l)  # Find the end of the next word after 'session'
+                                k = j[l:i]  # Save the next word
+                            elif j.find('batch') > -1:  # See if 'batch' found:
+                                k = 'Batch'  # Save the word for output
+                            else:
+                                k = ""  # Not recognized
+                            log_ident_array.append(k)
 
             # Get number of lines in the log files if they exist
             for log_loop in range(0, len(log_file_array)):
