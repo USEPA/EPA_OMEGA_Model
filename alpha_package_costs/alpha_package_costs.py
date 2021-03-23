@@ -181,23 +181,15 @@ def add_elements_for_package_key(input_df):
     for index, row in df.iterrows():
         if row['Vehicle Type'] == 'Truck': df.loc[index, 'Structure Class'] = 'ladder'
         else: pass
-    #
-    #
-    # if df['Vehicle Type'][0] == 'Truck': df.insert(0, 'Structure Class', 'ladder')
-    # else: df.insert(0, 'Structure Class', 'unibody')
 
     df.insert(df.columns.get_loc('Key'), 'Price Class', 1)
     return df
 
 
-def calc_battery_kwh(settings, input_df):
-    usable_soc = settings.bev_metrics_dict['usable_soc']['value']
-    charging_loss = settings.bev_metrics_dict['charging_loss']['value']
-    gap = settings.bev_metrics_dict['gap']['value']
-    onroad_range = settings.onroad_bev_range_miles
+def calc_battery_kwh_gross(settings, input_df):
     battery_kwh_list = list()
     for kwh_per_100_miles in input_df['Combined Consumption Rate']:
-        battery_kwh_list.append(onroad_range / usable_soc * (kwh_per_100_miles / 100 * (1 - charging_loss)) / (1 - gap))
+        battery_kwh_list.append(settings.onroad_bev_range_miles / settings.bev_usable_soc * (kwh_per_100_miles / 100) / (1 - settings.bev_gap))
     return battery_kwh_list
 
 
@@ -218,53 +210,6 @@ def calc_glider_weight(battery_weight_list, curb_weight_series):
     return glider_weight_list
 
 
-# def bev_key(bev_metrics_dict, pev_curves_dict, fuel_id):
-#     # fuel_id = 'bev'
-#     price_class_id = 1
-#     metrics_dict = dict()
-#     usable_soc = bev_metrics_dict['usable_soc_percent']['value']
-#     charging_loss = bev_metrics_dict['charging_loss_percent']['value']
-#     gap = bev_metrics_dict['gap_percent']['value']
-#     metrics = ['onroad_range', 'onroad_Wh/mi'] #, 'usable_soc', 'charging_loss', 'gap']
-#     for metric in metrics:
-#         metrics_dict[metric] = [item for item in range(int(bev_metrics_dict[metric]['low']), int(bev_metrics_dict[metric]['high']), int(bev_metrics_dict[metric]['increment']))]
-#
-#     unibody_etws = range(int(bev_metrics_dict['unibody_ETW_lbs']['low']), int(bev_metrics_dict['unibody_ETW_lbs']['high']), int(bev_metrics_dict['unibody_ETW_lbs']['increment']))
-#     ladder_etws = range(int(bev_metrics_dict['ladder_ETW_lbs']['low']), int(bev_metrics_dict['ladder_ETW_lbs']['high']), int(bev_metrics_dict['ladder_ETW_lbs']['increment']))
-#     etws_dict = {'unibody': [item for item in unibody_etws],
-#                  'ladder': [item for item in ladder_etws],
-#                  }
-#
-#     pev_keys = list()
-#     unique_key = 0
-#     for structure_class, etws in etws_dict.items():
-#         for etw, onroad_range, onroad_wh_per_mile in product(etws, metrics_dict['onroad_range'], metrics_dict['onroad_Wh/mi']):
-#             unique_key += 1
-#             engine_key, trans_key, accessory_key, aero_key, nonaero_key, weight_rdxn = 0, 0, 0, 20, 20, 20
-#             motor_power = 150 # for now
-#             onroad_kwh_per_mile = onroad_wh_per_mile / 1000
-#             battery_kwh = onroad_range * onroad_kwh_per_mile / usable_soc
-#             battery_weight = lbs_per_kg * battery_kwh / (pev_curves_dict['x_cubed_factor']['kWh_per_kg_curve'] * battery_kwh ** 3
-#                                                          + pev_curves_dict['x_squared_factor']['kWh_per_kg_curve'] * battery_kwh ** 2
-#                                                          + pev_curves_dict['x_factor']['kWh_per_kg_curve'] * battery_kwh
-#                                                          + pev_curves_dict['constant']['kWh_per_kg_curve'])
-#             pev_key = (onroad_range, onroad_kwh_per_mile, usable_soc, charging_loss, gap, battery_kwh, motor_power)
-#             weight_key = (etw - 300, etw - 300 - battery_weight, battery_weight, weight_rdxn)
-#             if structure_class == 'ladder':
-#                 alpha_key = 'Truck'
-#                 this_key = (unique_key, fuel_id, structure_class, price_class_id, alpha_key,
-#                             engine_key, pev_key,
-#                             trans_key, accessory_key, aero_key, nonaero_key, weight_key)
-#                 pev_keys.append(this_key)
-#             else:
-#                 for alpha_key in ['LPW_LRL', 'LPW_HRL', 'MPW_LRL', 'MPW_HRL', 'HPW']:
-#                     this_key = (unique_key, fuel_id, structure_class, price_class_id, alpha_key,
-#                                 engine_key, pev_key,
-#                                 trans_key, accessory_key, aero_key, nonaero_key, weight_key)
-#                     pev_keys.append(this_key)
-#     return pev_keys
-
-
 def package_key(settings, input_df, fuel_id):
     """
 
@@ -282,13 +227,12 @@ def package_key(settings, input_df, fuel_id):
     else: engine_keys = pd.Series([0] * len(df))
     if fuel_id == 'ice': pev_keys = pd.Series([0] * len(df))
     else:
-        battery_kwh_list = calc_battery_kwh(settings, df)
+        battery_kwh_gross_list = calc_battery_kwh_gross(settings, df)
         pev_keys = pd.Series(zip(pd.Series([settings.onroad_bev_range_miles] * len(df)),
                                  df['Combined Consumption Rate'] / 100,
                                  pd.Series([settings.bev_usable_soc] * len(df)),
-                                 pd.Series([settings.bev_charging_loss] * len(df)),
                                  pd.Series([settings.bev_gap] * len(df)),
-                                 battery_kwh_list,
+                                 battery_kwh_gross_list,
                                  pd.Series([settings.bev_motor_power] * len(df))))
     if fuel_id != 'bev': trans_keys = pd.Series(df['Transmission'])
     else: trans_keys = pd.Series([0] * len(df))
@@ -308,7 +252,7 @@ def package_key(settings, input_df, fuel_id):
         battery_weight_list = pd.Series([0] * len(df))
         weight_keys = pd.Series(zip(curb_weights_series, curb_weights_series, battery_weight_list, df['Weight Reduction %']))
     if fuel_id == 'bev':
-        battery_weight_list = calc_battery_weight(settings, battery_kwh_list)
+        battery_weight_list = calc_battery_weight(settings, battery_kwh_gross_list)
         glider_weight_list = calc_glider_weight(battery_weight_list, curb_weights_series)
         weight_keys = pd.Series(zip(curb_weights_series, glider_weight_list, battery_weight_list, pd.Series([settings.bev_weight_reduction] * len(df))))
     else:
@@ -438,11 +382,11 @@ class PackageCost:
         Cost of batteries and motors.
         :return:
         """
-        pev_range, pev_energy_rate, pev_soc, pev_charging_loss, pev_gap, battery_kwh, motor_power = self.pev_key
-        battery_cost = battery_kwh * (pev_curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh ** 3 \
-                                      + pev_curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh ** 2 \
-                                      + pev_curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh \
-                                      + pev_curves_dict['constant']['dollars_per_kWh_curve'])
+        pev_range, pev_energy_rate, pev_soc, pev_gap, battery_kwh_gross, motor_power = self.pev_key
+        battery_cost = battery_kwh_gross * (pev_curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
+                                            + pev_curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
+                                            + pev_curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
+                                            + pev_curves_dict['constant']['dollars_per_kWh_curve'])
         motor_cost = motor_power * (pev_curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
                                     + pev_curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
                                     + pev_curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
@@ -544,9 +488,8 @@ def pev_package_results(settings, key, alpha_file_dict):
     print(key)
     pkg_obj = PackageCost(key)
     unique_key, fuel_id, structure_class, price_class_id, alpha_key, engine_key, pev_key, trans_key, accessory_key, aero_key, nonaero_key, weight_key = key
-    onroad_range, oncycle_kwh_per_mile, usable_soc, charging_loss, gap, battery_kwh, motor_power = pev_key
+    onroad_range, oncycle_kwh_per_mile, usable_soc, gap, battery_kwh_gross, motor_power = pev_key
     fuel_key, alpha_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_key'])
-    # oncycle_kwh_per_mile = battery_kwh * usable_soc * (1 - gap) / (onroad_range * (1 - charging_loss))
     ftp1_kwh, ftp2_kwh, ftp3_kwh, hwy_kwh, combined_kwh = alpha_file_dict[key]['EPA_FTP_1_kWhr/100mi'] / 100,\
                                                           alpha_file_dict[key]['EPA_FTP_2_kWhr/100mi'] / 100,\
                                                           alpha_file_dict[key]['EPA_FTP_3_kWhr/100mi'] / 100,\
@@ -574,39 +517,6 @@ def pev_package_results(settings, key, alpha_file_dict):
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
     
     return package_cost_df
-
-
-# def pev_package_results_from_alpha(settings, key):
-#     print(key)
-#     pkg_obj = PackageCost(key)
-#     unique_key, fuel_id, structure_class, price_class_id, alpha_key, engine_key, pev_key, trans_key, accessory_key, aero_key, nonaero_key, weight_key = key
-#     onroad_range, oncycle_kwh_per_mile, usable_soc, charging_loss, gap, battery_kwh, motor_power = pev_key
-#     fuel_key, alpha_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_key'])
-#     onroad_kwh_per_mile = battery_kwh / usable_soc / (1 - gap)
-#     ftp1_kwh, ftp2_kwh, ftp3_kwh, hwy_kwh, combined_kwh = 0, 0, 0, 0, oncycle_kwh_per_mile
-#
-#     ac_cost = pkg_obj.calc_ac_cost(settings.ac_cost_dict)
-#     battery_cost, motor_cost, pev_cost = pkg_obj.calc_bev_cost(settings.pev_curves_dict)
-#     powertrain_cost = pev_cost + ac_cost
-#     powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_motor': motor_cost, 'pev_powertrain': powertrain_cost}, index=[key])
-#     aero_cost = pkg_obj.calc_aero_cost(settings.aero_cost_dict)
-#     nonaero_cost = pkg_obj.calc_nonaero_cost(settings.nonaero_cost_dict)
-#     roadload_cost = aero_cost + nonaero_cost
-#     roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[key])
-#
-#     weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_dict, settings.price_class_dict)
-#     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[key])
-#
-#     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-#     package_cost_df.insert(0, 'cert_kWh_per_mile', combined_kwh)
-#     package_cost_df.insert(0, 'hwfet_kWh_per_mile', hwy_kwh)
-#     package_cost_df.insert(0, 'ftp_3_kWh_per_mile', ftp3_kwh)
-#     package_cost_df.insert(0, 'ftp_2_kWh_per_mile', ftp2_kwh)
-#     package_cost_df.insert(0, 'ftp_1_kWh_per_mile', ftp1_kwh)
-#     package_cost_df.insert(0, 'cert_co2_grams_per_mile', 0)
-#     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
-#
-#     return package_cost_df
 
 
 class SetInputs:
