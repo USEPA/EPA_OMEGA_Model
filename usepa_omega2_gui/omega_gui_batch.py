@@ -792,6 +792,7 @@ class Form(QObject):
         log_counter_array = []  # Clear counter array
         log_ident_array = []  # Clear log identifier array
         file_timer = 0  # Counter for file search timer
+        file_timer1 = 0  # Counter for item output timer
 
         import usepa_omega2.omega_batch as omega_batch
         import threading, time
@@ -820,7 +821,7 @@ class Form(QObject):
 
             # Look for new log files
             file_timer = file_timer + 1
-            if file_timer > 20:  # Look for new files every 2 seconds
+            if file_timer > 20:  # Look for new files every 2 seconds to reduce overhead
                 file_timer = 0
                 directory = output_batch_subdirectory + "/"  # Define output directory to search
                 for root, dirs, files in os.walk(directory):  # Search includes subdirectories
@@ -846,36 +847,39 @@ class Form(QObject):
                             log_ident_array.append(k)
 
             # Get number of lines in the log files if they exist
-            for log_loop in range(0, len(log_file_array)):
-                if os.path.isfile(log_file_array[log_loop]):
-                    log_lines = sum(1 for line in open(log_file_array[log_loop]))
-                    log_status = 1
-                else:
-                    log_lines = 0
-                    log_status = 0
+            file_timer1 = file_timer1 + 1
+            if file_timer1 > 10:  # Check every 1 second to reduce overhead
+                file_timer1 = 0
+                for log_loop in range(0, len(log_file_array)):
+                    if os.path.isfile(log_file_array[log_loop]):
+                        log_lines = sum(1 for line in open(log_file_array[log_loop]))
+                        log_status = 1
+                    else:
+                        log_lines = 0
+                        log_status = 0
 
-                # Read and output all new lines from log files
-                while log_counter_array[log_loop] < log_lines and log_status == 1:
-                    f = open(log_file_array[log_loop])
-                    lines = f.readlines()
-                    f.close()
+                    # Read and output all new lines from log files
+                    while log_counter_array[log_loop] < log_lines and log_status == 1:
+                        f = open(log_file_array[log_loop])
+                        lines = f.readlines()
+                        f.close()
 
-                    # j = lines[0]  # Get first line
-                    # h = j.find('session')
-                    # l = h + 8
-                    # i = j.find(' ', 21)
-                    # k = j[l:i]
-                    # print('&&&', j, h, i, k)
+                        # j = lines[0]  # Get first line
+                        # h = j.find('session')
+                        # l = h + 8
+                        # i = j.find(' ', 21)
+                        # k = j[l:i]
+                        # print('&&&', j, h, i, k)
 
-                    g = lines[log_counter_array[log_loop]]
-                    g = g.rstrip("\n")
-                    g = '[' + log_ident_array[log_loop] + '] ' + g
-                    # Select output color
-                    color = status_output_color(g)
-                    # Output to event monitor
-                    self.event_monitor(g, color, 'dt')
-                    # Increment total number of read lines in log file counter
-                    log_counter_array[log_loop] = log_counter_array[log_loop] + 1
+                        g = lines[log_counter_array[log_loop]]
+                        g = g.rstrip("\n")
+                        g = '[' + log_ident_array[log_loop] + '] ' + g
+                        # Select output color
+                        color = status_output_color(g)
+                        # Output to event monitor
+                        self.event_monitor(g, color, 'dt')
+                        # Increment total number of read lines in log file counter
+                        log_counter_array[log_loop] = log_counter_array[log_loop] + 1
 
         # Play a model end sound
         # sound2 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_stop], close_fds=True)
