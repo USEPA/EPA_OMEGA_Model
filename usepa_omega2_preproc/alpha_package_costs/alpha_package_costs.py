@@ -685,4 +685,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import os, traceback
+
+    try:
+        main()
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)
