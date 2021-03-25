@@ -647,10 +647,6 @@ def init_omega(o2_options):
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
 
-        # if get_template_name(o2.options.cost_file) == cost_curve_template_name:
-        #     init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-        # else:
-
         init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
         init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
