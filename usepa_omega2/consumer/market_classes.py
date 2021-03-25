@@ -25,7 +25,7 @@ def populate_market_classes(market_class_dict, market_class, obj):
         # end of the string
         if market_class_dict:
             # if dict not empty, add new entry
-            market_class_dict[prefix].add(obj)
+            market_class_dict[prefix].append(obj)
     else:
         if prefix in market_class_dict:
             # update existing dictionary
@@ -55,18 +55,18 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
                 if by_reg_class:
                     market_class_dict[prefix] = dict()
                     for rc in reg_classes:
-                        market_class_dict[prefix][rc] = set()
+                        market_class_dict[prefix][rc] = []
                 else:
-                    market_class_dict[prefix] = set()
+                    market_class_dict[prefix] = []
             else:
                 # create new dictionary
                 if by_reg_class:
                     rc_dict = {prefix: dict()}
                     for rc in reg_classes:
-                        rc_dict[prefix][rc] = set()
+                        rc_dict[prefix][rc] = []
                     return rc_dict
                 else:
-                    return {prefix: set()}
+                    return {prefix: []}
         else:
             if prefix in market_class_dict:
                 # update existing dictionary

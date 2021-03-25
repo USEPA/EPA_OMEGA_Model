@@ -86,39 +86,41 @@ class CostCloud(OMEGABase):
         idxmin = cloud[x_key].idxmin()
         frontier_pts.append(cloud.loc[idxmin])
 
-        while pd.notna(idxmin):
-            # calculate frontier factor (more negative is more better) = slope of each point relative
-            # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-            cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) \
-                                       / (cloud[x_key] - frontier_pts[-1][x_key]) \
-                                       ** o2.options.cost_curve_frontier_affinity_factor
+        if cloud[x_key].min() != cloud[x_key].max():
+            while pd.notna(idxmin):
+                # calculate frontier factor (more negative is more better) = slope of each point relative
+                # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
+                cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) \
+                                           / (cloud[x_key] - frontier_pts[-1][x_key]) \
+                                           ** o2.options.cost_curve_frontier_affinity_factor
 
-            # find next frontier point (lowest slope), if there is one, and add to frontier list
-            min = cloud['frontier_factor'].min()
-
-            if min > 0:
-                # frontier factor is different for up-slope
-                cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
-                                           (cloud[x_key] - frontier_pts[-1][x_key]) \
-                                           ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
+                # find next frontier point (lowest slope), if there is one, and add to frontier list
                 min = cloud['frontier_factor'].min()
 
-            if len(cloud[cloud['frontier_factor'] == min]) > 1:
-                # if multiple points with the same slope, take the one with the highest index (highest x-value)
-                idxmin = cloud[cloud['frontier_factor'] == min].index.max()
-            else:
-                idxmin = cloud['frontier_factor'].idxmin()
-            if pd.notna(idxmin):
-                frontier_pts.append(cloud.loc[idxmin])
+                if min > 0:
+                    # frontier factor is different for up-slope
+                    cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
+                                               (cloud[x_key] - frontier_pts[-1][x_key]) \
+                                               ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
+                    min = cloud['frontier_factor'].min()
 
-        result_df_foo = pd.concat(frontier_pts, axis=1)
-        result_df_foo = result_df_foo.transpose()
+                if len(cloud[cloud['frontier_factor'] == min]) > 1:
+                    # if multiple points with the same slope, take the one with the highest index (highest x-value)
+                    idxmin = cloud[cloud['frontier_factor'] == min].index.max()
+                else:
+                    idxmin = cloud['frontier_factor'].idxmin()
+                if pd.notna(idxmin):
+                    frontier_pts.append(cloud.loc[idxmin])
 
-        return result_df_foo
+        frontier_df = pd.concat(frontier_pts, axis=1)
+        frontier_df = frontier_df.transpose()
+        frontier_df['frontier_factor'] = 0
+
+        return frontier_df.copy()
 
     @staticmethod
     def get_cloud(model_year, cost_curve_class):
-        return cache[cost_curve_class][model_year]
+        return cache[cost_curve_class][model_year].copy()
 
     @staticmethod
     def get_max_year():

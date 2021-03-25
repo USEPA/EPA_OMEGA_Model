@@ -10,8 +10,8 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 
-def upstream_zero(vehicle, cost_curve, co2_name, kwh_name):
-    return cost_curve
+def upstream_zero(vehicle, co2_grams_per_mile, kWh_per_mile):
+    return co2_grams_per_mile
 
 
 def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kWh_per_mile):

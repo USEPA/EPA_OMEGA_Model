@@ -15,7 +15,6 @@ import consumer
 cache = dict()
 
 
-# placeholder for producer deemed generalized vehicle cost:
 def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
     """
 
@@ -364,6 +363,9 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
         cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_ID]
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
+            if 'producer' in o2.options.verbose_console:
+                v.cost_curve.to_csv(o2.options.output_folder + '%s_%s_cost_curve.csv' % (v.model_year, v.vehicle_ID))
+                v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_ID))
             new_veh = VehicleFinal()
             new_veh.inherit_vehicle(v)
             manufacturer_new_vehicles.append(new_veh)
