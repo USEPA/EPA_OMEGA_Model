@@ -309,6 +309,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards Fuels File')
         self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
         self.settings.required_zev_share_file = self.read_parameter('ZEV Requirement File')
+        self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
         self.settings.reregistration_fixed_by_age_file = self.read_parameter('Stock Deregistration File')
         self.settings.annual_vmt_fixed_by_age_file = self.read_parameter('Stock VMT File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)

@@ -603,6 +603,8 @@ def init_omega(o2_options):
     from effects.cost_effects_scc import CostEffectsSCC
     from effects.cost_effects_criteria import CostEffectsCriteria
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
+    from required_zev_share import RequiredZevShare
+    from production_constraints import ProductionConstraints
 
     from GHG_standards_flat import input_template_name as flat_template_name
     from GHG_standards_footprint import input_template_name as footprint_template_name
@@ -683,6 +685,12 @@ def init_omega(o2_options):
                                                                                 verbose=o2.options.verbose)
         init_fail = init_fail + EmissionFactorsVehicles.init_database_from_file(o2.options.emission_factors_vehicles_file,
                                                                                 verbose=o2.options.verbose)
+
+        init_fail = init_fail + RequiredZevShare.init_from_file(o2.options.required_zev_share_file,
+                                                                verbose=o2.options.verbose)
+
+        init_fail = init_fail + ProductionConstraints.init_from_file(o2.options.production_constraints_file,
+                                                                verbose=o2.options.verbose)
 
         # initial year = initial fleet model year (latest year of data)
         o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1

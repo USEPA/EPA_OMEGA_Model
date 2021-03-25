@@ -1,6 +1,6 @@
 """
-required_zev_share.py
-=====================
+production_constraints.py
+=========================
 
 
 """
@@ -10,21 +10,27 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 min_share_units = 'minimum_share'
+max_share_units = 'maximum_share'
 
-class RequiredZevShare(OMEGABase):
+class ProductionConstraints(OMEGABase):
     values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
-        return RequiredZevShare.values['%s:%s' % (market_class_id, min_share_units)].loc[
-            RequiredZevShare.values['calendar_year'] == calendar_year].item()
+        return ProductionConstraints.values['%s:%s' % (market_class_id, min_share_units)].loc[
+            ProductionConstraints.values['calendar_year'] == calendar_year].item()
+
+    @staticmethod
+    def get_maximum_share(calendar_year, market_class_id):
+        return ProductionConstraints.values['%s:%s' % (market_class_id, max_share_units)].loc[
+            ProductionConstraints.values['calendar_year'] == calendar_year].item()
 
     @staticmethod
     def init_from_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'required_zev_share'
+        input_template_name = 'production_constraints'
         input_template_version = 0.1
         input_template_columns = {'calendar_year'}
 
@@ -40,14 +46,14 @@ class RequiredZevShare(OMEGABase):
             if not template_errors:
                 from consumer.market_classes import MarketClass
 
-                RequiredZevShare.values['calendar_year'] = df['calendar_year']
+                ProductionConstraints.values['calendar_year'] = df['calendar_year']
 
-                share_columns = [c for c in df.columns if (min_share_units in c)]
+                share_columns = [c for c in df.columns if (min_share_units in c) or (max_share_units in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in MarketClass.market_classes:
-                        RequiredZevShare.values[sc] = df[sc]
+                        ProductionConstraints.values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -72,16 +78,18 @@ if __name__ == '__main__':
         init_fail = []
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
-        init_fail = init_fail + RequiredZevShare.init_from_file(o2.options.required_zev_share_file,
-                                                                verbose=o2.options.verbose)
+        init_fail = init_fail + ProductionConstraints.init_from_file(o2.options.production_constraints_file,
+                                                                     verbose=o2.options.verbose)
 
         if not init_fail:
             fileio.validate_folder(o2.options.database_dump_folder)
-            RequiredZevShare.values.to_csv(
-                o2.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
+            ProductionConstraints.values.to_csv(
+                o2.options.database_dump_folder + os.sep + 'production_constraints.csv', index=False)
 
-            print(RequiredZevShare.get_minimum_share(2020, 'hauling.BEV'))
-            print(RequiredZevShare.get_minimum_share(2020, 'non_hauling.BEV'))
+            print(ProductionConstraints.get_minimum_share(2020, 'hauling.BEV'))
+            print(ProductionConstraints.get_minimum_share(2020, 'non_hauling.BEV'))
+            print(ProductionConstraints.get_maximum_share(2020, 'hauling.ICE'))
+            print(ProductionConstraints.get_maximum_share(2020, 'non_hauling.ICE'))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

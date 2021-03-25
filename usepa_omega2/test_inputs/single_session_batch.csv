@@ -27,6 +27,7 @@ GHG Standards File,String,ghg_standards-footprint.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv
 GHG Credits File,String,ghg_credits.csv
 ZEV Requirement File,String,required_zev_share.csv
+Production Constraints File,String,production_constraints.csv
 Stock Deregistration File,String,reregistration_fixed_by_age.csv
 Stock VMT File,String,annual_vmt_fixed_by_age.csv
 Verbose Output,TRUE / FALSE,FALSE
