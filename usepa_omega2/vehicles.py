@@ -637,7 +637,6 @@ if __name__ == '__main__':
 
         from GHG_standards_fuels import GHGStandardFuels
 
-        from cost_curves import CostCurve, input_template_name as cost_curve_template_name
         from cost_clouds import CostCloud
 
         SQABase.metadata.create_all(o2.engine)
