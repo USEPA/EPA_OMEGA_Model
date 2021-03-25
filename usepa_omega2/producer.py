@@ -230,6 +230,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
                                            tech_share_combos_total['total_combo_target_co2_megagrams']
 
+        # if calendar_year == 2020:
+        #     tech_share_combos_total.to_csv(o2.options.output_folder + '%s_tech_share_combos_total.csv' % calendar_year)
+
         winning_combos, compliance_possible = \
             select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log)
 
@@ -361,11 +364,13 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     for cv in manufacturer_composite_vehicles:
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_ID]
+        if 'producer' in o2.options.verbose_console:
+            cv.cost_curve.to_csv(o2.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_ID))
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
-            if 'producer' in o2.options.verbose_console:
-                v.cost_curve.to_csv(o2.options.output_folder + '%s_%s_cost_curve.csv' % (v.model_year, v.vehicle_ID))
-                v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_ID))
+            # if 'producer' in o2.options.verbose_console:
+            #     v.cost_curve.to_csv(o2.options.output_folder + '%s_%s_cost_curve.csv' % (v.model_year, v.vehicle_ID))
+            #     v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_ID))
             new_veh = VehicleFinal()
             new_veh.inherit_vehicle(v)
             manufacturer_new_vehicles.append(new_veh)

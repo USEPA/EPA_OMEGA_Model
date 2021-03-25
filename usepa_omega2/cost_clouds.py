@@ -54,21 +54,21 @@ class CostCloud(OMEGABase):
         return template_errors
 
     @staticmethod
-    def plot_frontier(cost_cloud, cost_curve_class, frontier_df, value_column):
+    def plot_frontier(cost_cloud, cost_curve_class, frontier_df, x_key, y_key):
             import matplotlib.pyplot as plt
             plt.figure()
-            plt.plot(cost_cloud[value_column], cost_cloud['new_vehicle_mfr_cost_dollars'],
+            plt.plot(cost_cloud[x_key], cost_cloud[y_key],
                      '.')
-            plt.title('Cost versus %s %s' % (value_column, cost_curve_class))
-            plt.xlabel('%s' % value_column)
-            plt.ylabel('Combined GHG Cost [$]')
-            plt.plot(frontier_df[value_column], frontier_df['new_vehicle_mfr_cost_dollars'],
+            plt.title('Cost versus %s %s' % (x_key, cost_curve_class))
+            plt.xlabel('%s' % x_key)
+            plt.ylabel('%s' % y_key)
+            plt.plot(frontier_df[x_key], frontier_df[y_key],
                      'r-')
             plt.grid()
-            plt.savefig(o2.options.output_folder + 'Cost versus %s %s' % (value_column, cost_curve_class))
+            plt.savefig(o2.options.output_folder + '%s versus %s %s' % (y_key, x_key, cost_curve_class))
 
     @staticmethod
-    def calculate_frontier(cloud, x_key, y_key):
+    def calculate_frontier(cloud, x_key, y_key, allow_upslope=False):
         """
         Args:
             cloud (DataFrame): a set of points to find the frontier of
@@ -85,9 +85,10 @@ class CostCloud(OMEGABase):
         # find frontier starting point, lowest GHGs, and add to frontier
         idxmin = cloud[x_key].idxmin()
         frontier_pts.append(cloud.loc[idxmin])
+        min_frontier_factor = 0
 
         if cloud[x_key].min() != cloud[x_key].max():
-            while pd.notna(idxmin):
+            while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope):
                 # calculate frontier factor (more negative is more better) = slope of each point relative
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
                 cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) \
@@ -95,21 +96,21 @@ class CostCloud(OMEGABase):
                                            ** o2.options.cost_curve_frontier_affinity_factor
 
                 # find next frontier point (lowest slope), if there is one, and add to frontier list
-                min = cloud['frontier_factor'].min()
+                min_frontier_factor = cloud['frontier_factor'].min()
 
-                if min > 0:
+                if min_frontier_factor > 0:
                     # frontier factor is different for up-slope
                     cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
                                                (cloud[x_key] - frontier_pts[-1][x_key]) \
                                                ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
-                    min = cloud['frontier_factor'].min()
+                    min_frontier_factor = cloud['frontier_factor'].min()
 
-                if len(cloud[cloud['frontier_factor'] == min]) > 1:
+                if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
                     # if multiple points with the same slope, take the one with the highest index (highest x-value)
-                    idxmin = cloud[cloud['frontier_factor'] == min].index.max()
+                    idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor].index.max()
                 else:
                     idxmin = cloud['frontier_factor'].idxmin()
-                if pd.notna(idxmin):
+                if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                     frontier_pts.append(cloud.loc[idxmin])
 
         frontier_df = pd.concat(frontier_pts, axis=1)

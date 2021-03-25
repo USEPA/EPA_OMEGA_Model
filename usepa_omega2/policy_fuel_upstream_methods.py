@@ -18,13 +18,14 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kWh_per_mile):
     from policy_fuel_upstream import PolicyFuelUpstream
     from fuels import Fuel
 
-    upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
-    upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
-    upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-    fuel_gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
+    if vehicle.fueling_class == 'BEV':
+        upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
+        upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
+        upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
+        fuel_gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
-    co2_grams_per_mile += kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
-                          vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
+        co2_grams_per_mile += kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
+                              vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
 
     return co2_grams_per_mile
 

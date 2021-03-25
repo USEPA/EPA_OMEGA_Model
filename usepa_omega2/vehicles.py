@@ -417,14 +417,16 @@ class Vehicle(OMEGABase):
         add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
         self.cost_cloud[co2_name] = add_upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kwh_name])
 
+        # calculate producer generalized cost
+        self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, self.cost_cloud, co2_name, cost_name)
+
         # calculate frontier from updated cloud
-        cost_curve = CostCloud.calculate_frontier(self.cost_cloud, co2_name, cost_name)
+        cost_curve = CostCloud.calculate_frontier(self.cost_cloud, co2_name, cost_name, allow_upslope=False)
+
+        # CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, co2_name, cost_name)
 
         # drop frontier factor
         cost_curve = cost_curve.drop(columns=['frontier_factor'])
-
-        # calculate producer generalized cost
-        cost_curve = o2.options.producer_calculate_generalized_cost(self, cost_curve, co2_name, cost_name)
 
         return cost_curve
 
