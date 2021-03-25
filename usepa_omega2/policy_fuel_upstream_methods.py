@@ -65,7 +65,7 @@ class PolicyFuelUpstreamMethods(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'policy_upstream_method'
+        input_template_name = 'policy_fuel_upstream_methods'
         input_template_version = 0.1
         input_template_columns = {'calendar_year', 'upstream_calculation_method'}
 
