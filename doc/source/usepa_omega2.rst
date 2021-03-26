@@ -69,18 +69,26 @@ usepa\_omega2.cost\_clouds module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.cost\_curves module
----------------------------------
-
-.. automodule:: usepa_omega2.cost_curves
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.drive\_cycle\_energy\_calcs module
 ------------------------------------------------
 
 .. automodule:: usepa_omega2.drive_cycle_energy_calcs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.drive\_cycle\_weights module
+------------------------------------------
+
+.. automodule:: usepa_omega2.drive_cycle_weights
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.drive\_cycles module
+----------------------------------
+
+.. automodule:: usepa_omega2.drive_cycles
    :members:
    :undoc-members:
    :show-inheritance:
@@ -205,6 +213,14 @@ usepa\_omega2.policy\_fuel\_upstream module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.policy\_fuel\_upstream\_methods module
+----------------------------------------------------
+
+.. automodule:: usepa_omega2.policy_fuel_upstream_methods
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.postproc\_batch module
 ------------------------------------
 
@@ -225,6 +241,22 @@ usepa\_omega2.producer module
 -----------------------------
 
 .. automodule:: usepa_omega2.producer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.production\_constraints module
+--------------------------------------------
+
+.. automodule:: usepa_omega2.production_constraints
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.required\_zev\_share module
+-----------------------------------------
+
+.. automodule:: usepa_omega2.required_zev_share
    :members:
    :undoc-members:
    :show-inheritance:

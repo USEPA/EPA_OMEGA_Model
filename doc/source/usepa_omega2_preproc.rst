@@ -1,6 +1,14 @@
 usepa\_omega2\_preproc package
 ==============================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   usepa_omega2_preproc.alpha_package_costs
+
 Submodules
 ----------
 
