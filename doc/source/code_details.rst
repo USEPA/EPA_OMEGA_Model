@@ -4,7 +4,6 @@ Code Details
 .. toctree::
    :maxdepth: 4
 
-   alpha_package_costs
    code_doc_samples
    exe_entry
    setup
