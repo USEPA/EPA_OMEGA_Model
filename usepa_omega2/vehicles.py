@@ -112,6 +112,7 @@ class CompositeVehicle(OMEGABase):
 
         composite_frontier_df = pd.DataFrame()
         composite_frontier_df['cert_co2_grams_per_mile'] = [0]
+        # composite_frontier_df['tailpipe_co2_grams_per_mile'] = [0]
         composite_frontier_df['cert_kWh_per_mile'] = [0]
         composite_frontier_df['new_vehicle_mfr_cost_dollars'] = [0]
         composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'] = [0]
@@ -131,6 +132,11 @@ class CompositeVehicle(OMEGABase):
                 (composite_frontier_df['cert_co2_grams_per_mile'] * prior_market_share_frac +
                  composite_frontier_df['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID] * veh_market_share_frac) / \
                 (prior_market_share_frac + veh_market_share_frac)
+
+            # composite_frontier_df['tailpipe_co2_grams_per_mile'] = \
+            #     (composite_frontier_df['tailpipe_co2_grams_per_mile'] * prior_market_share_frac +
+            #      composite_frontier_df['veh_%s_tailpipe_co2_grams_per_mile' % v.vehicle_ID] * veh_market_share_frac) / \
+            #     (prior_market_share_frac + veh_market_share_frac)
 
             # calculate weighted kWh/mi
             composite_frontier_df['cert_kWh_per_mile'] = \
@@ -409,7 +415,7 @@ class Vehicle(OMEGABase):
         from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
 
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
-        tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
+        # tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
         kwh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
 
@@ -419,7 +425,7 @@ class Vehicle(OMEGABase):
                      'new_vehicle_mfr_cost_dollars': cost_name})
 
         # capture initial "cert" co2 as tailpipe, for now: TODO: weight drive cycles to calculate tailpipe
-        self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
+        # self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
 
         self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
 
