@@ -12,18 +12,27 @@ from usepa_omega2 import *
 min_share_units = 'minimum_share'
 max_share_units = 'maximum_share'
 
+
 class ProductionConstraints(OMEGABase):
     values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
-        return ProductionConstraints.values['%s:%s' % (market_class_id, min_share_units)].loc[
-            ProductionConstraints.values['calendar_year'] == calendar_year].item()
+        min_key = '%s:%s' % (market_class_id, min_share_units)
+        if min_key in ProductionConstraints.values:
+            return ProductionConstraints.values[min_key].loc[
+                ProductionConstraints.values['calendar_year'] == calendar_year].item()
+        else:
+            return 0
 
     @staticmethod
     def get_maximum_share(calendar_year, market_class_id):
-        return ProductionConstraints.values['%s:%s' % (market_class_id, max_share_units)].loc[
-            ProductionConstraints.values['calendar_year'] == calendar_year].item()
+        max_key = '%s:%s' % (market_class_id, max_share_units)
+        if max_key in ProductionConstraints.values:
+            return ProductionConstraints.values[max_key].loc[
+                ProductionConstraints.values['calendar_year'] == calendar_year].item()
+        else:
+            return 1
 
     @staticmethod
     def init_from_file(filename, verbose=False):

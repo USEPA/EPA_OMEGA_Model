@@ -7,7 +7,6 @@ post-compliance-modeling output generation (charts, summary files, etc)
 """
 
 from usepa_omega2 import *
-# import pandas as pd
 from omega_plot import *
 
 

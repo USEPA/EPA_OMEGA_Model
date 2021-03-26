@@ -130,7 +130,10 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
         # generate a range of shares for the first n-1 columns
         members = pd.DataFrame()
         for c in column_names_sorted_by_span[:-1]:
-            members[c] = linspace(min_level_dict[c], max_level_dict[c], num_levels)
+            if max_level_dict[c] > min_level_dict[c]:
+                members[c] = linspace(min_level_dict[c], max_level_dict[c], num_levels)
+            else:
+                members[c] = [min_level_dict[c]]
 
         # generate cartesian product of first n-1 columns
         x = pd.DataFrame()
@@ -272,6 +275,46 @@ def generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_leve
             max_val = np.minimum(1.0, val + half_range_frac)
             shares = np.append(np.append(shares, np.minimum(1-min_level, np.maximum(min_level,
                             np.linspace(min_val, max_val, num_steps)))), val) # create new share spread and include previous value
+        dfs.append(pd.DataFrame({k: unique(shares)}))
+
+    dfx = pd.DataFrame()
+    for df in dfs:
+        dfx = cartesian_prod(dfx, df)
+
+    dfx = dfx[dfx.sum(axis=1) <= 1]
+    dfx[columns[-1]] = 1 - dfx.sum(axis=1)
+
+    if verbose:
+        print(dfx)
+
+    return dfx
+
+
+def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_steps, min_constraints, max_constraints,
+                                       verbose=False):
+    """
+    Generate a partition of share values in the neighborhood of an initial set of share values
+    :param columns: list-like, list of values that represent shares in combo
+    :param combos: dict-like, typically a Series or Dataframe that contains the initial set of share values
+    :param half_range_frac: search "radius" [0..1], half the search range
+    :param num_steps: number of values to divide the search range into
+    :param min_level: specifies minimum share value (max will be 1-min_value), e.g. 0.001
+    :param verbose: if True then partition dataframe is printed to the console
+    :return: partition dataframe, with columns as specified, values near the initial values from combo
+    """
+    import numpy as np
+    import pandas as pd
+
+    dfs = []
+
+    for i in range(0, len(columns) - 1):
+        shares = np.array([])
+        for idx, combo in combos.iterrows():
+            k = columns[i]
+            val = combo[k]
+            min_val = np.maximum(min_constraints[k], val - half_range_frac)
+            max_val = np.minimum(max_constraints[k], val + half_range_frac)
+            shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)), val) # create new share spread and include previous value
         dfs.append(pd.DataFrame({k: unique(shares)}))
 
     dfx = pd.DataFrame()

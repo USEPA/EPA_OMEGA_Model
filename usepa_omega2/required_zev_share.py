@@ -16,8 +16,12 @@ class RequiredZevShare(OMEGABase):
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
-        return RequiredZevShare.values['%s:%s' % (market_class_id, min_share_units)].loc[
-            RequiredZevShare.values['calendar_year'] == calendar_year].item()
+        min_key = '%s:%s' % (market_class_id, min_share_units)
+        if min_key in RequiredZevShare.values:
+            return RequiredZevShare.values['%s:%s' % (market_class_id, min_share_units)].loc[
+                RequiredZevShare.values['calendar_year'] == calendar_year].item()
+        else:
+            return 0
 
     @staticmethod
     def init_from_file(filename, verbose=False):

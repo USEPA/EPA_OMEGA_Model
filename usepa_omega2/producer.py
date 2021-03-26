@@ -145,18 +145,35 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
 
     if consumer_response is None:
         # generate producer desired market shares for responsive market sectors
+        producer_prefix = 'producer_share_frac_'
         if node_name:
-            share_column_names = ['producer_share_frac_' + node_name + '.' + c for c in children]
+            share_column_names = [producer_prefix + node_name + '.' + c for c in children]
         else:
-            share_column_names = ['producer_share_frac_' + c for c in children]
+            share_column_names = [producer_prefix + c for c in children]
 
         if all(s in consumer.responsive_market_categories for s in children):
+            from production_constraints import ProductionConstraints
+            from required_zev_share import RequiredZevShare
+
+            min_constraints = dict()
+            max_constraints = dict()
+            for c in share_column_names:
+                production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+                production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
+                required_zev_share = RequiredZevShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+
+                max_constraints[c] = production_max
+                min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+
             if share_range == 1.0:
-                sales_share_df = partition(share_column_names, num_levels=num_tech_options, min_constraints=0.001)
+                sales_share_df = partition(share_column_names, num_levels=num_tech_options,
+                                           min_constraints=min_constraints, max_constraints=max_constraints)
             else:
-                from omega_functions import generate_nearby_shares
-                sales_share_df = generate_nearby_shares(share_column_names, producer_bev_share, share_range,
-                                                        o2.options.producer_num_market_share_options, min_level=0.001)
+                from omega_functions import generate_constrained_nearby_shares
+                sales_share_df = generate_constrained_nearby_shares(share_column_names, producer_bev_share, share_range,
+                                                        o2.options.producer_num_market_share_options,
+                                                                    min_constraints=min_constraints,
+                                                                    max_constraints=max_constraints)
         else:
             sales_share_df = pd.DataFrame()
             for c, cn in zip(children, share_column_names):
@@ -229,6 +246,8 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         tech_share_combos_total['share_range'] = share_range
         tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
                                            tech_share_combos_total['total_combo_target_co2_megagrams']
+        # save initial compliance ratio, it gets overwrriten during the consumer iteration
+        tech_share_combos_total['compliance_ratio_producer'] = tech_share_combos_total['compliance_ratio']
 
         # if calendar_year == 2020:
         #     tech_share_combos_total.to_csv(o2.options.output_folder + '%s_tech_share_combos_total.csv' % calendar_year)
