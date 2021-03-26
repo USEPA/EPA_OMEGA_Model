@@ -39,7 +39,7 @@ Num Tech Options per ICE Vehicle,#,5,5
 Num Tech Options per BEV Vehicle,#,1,1
 Allow Backsliding,TRUE / FALSE,FALSE,"TRUE, FALSE"
 Cost Curve Frontier Affinity Factor,#,0.75,0.75
-Iterate Producer-Consumer,TRUE / FALSE,FALSE,TRUE
+Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
 New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5
 Consumer Pricing Multiplier Min,#,0.95,0.95
 Consumer Pricing Multiplier Max,#,1.05,1.05

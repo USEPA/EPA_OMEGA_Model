@@ -166,9 +166,11 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                 min_constraints[c] = min(production_max, max(required_zev_share, production_min))
 
             if share_range == 1.0:
+                # span the whole space of shares
                 sales_share_df = partition(share_column_names, num_levels=num_tech_options,
                                            min_constraints=min_constraints, max_constraints=max_constraints)
             else:
+                # narrow search span to a range of shares around the winners
                 from omega_functions import generate_constrained_nearby_shares
                 sales_share_df = generate_constrained_nearby_shares(share_column_names, producer_bev_share, share_range,
                                                         o2.options.producer_num_market_share_options,

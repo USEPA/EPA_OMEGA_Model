@@ -80,11 +80,13 @@ class CompositeVehicle(OMEGABase):
             if len(self.cost_curve) > 1:
                 vehicle_co2_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
                                                                 self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID],
-                                                                fill_value='extrapolate')
+                                                                fill_value=(self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID].min(),
+                                                                            self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID].max()), bounds_error=False)
 
                 vehicle_kWh_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
                                                                 self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID],
-                                                                fill_value='extrapolate')
+                                                                fill_value=(self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID].min(),
+                                                                            self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID].max()), bounds_error=False)
                 v.cert_CO2_grams_per_mile = vehicle_co2_curve(self.cert_CO2_grams_per_mile)
                 v.cert_kWh_per_mile = vehicle_kWh_curve(self.cert_CO2_grams_per_mile)
             else:
@@ -179,27 +181,32 @@ class CompositeVehicle(OMEGABase):
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
                                                       self.cost_curve['new_vehicle_mfr_cost_dollars'],
-                                                      fill_value='extrapolate')
+                                                      fill_value=(self.cost_curve['new_vehicle_mfr_cost_dollars'].min(),
+                                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'].max()), bounds_error=False)
             return cost_dollars(target_co2_gpmi).tolist()
         else:
             return self.cost_curve['new_vehicle_mfr_cost_dollars']
 
     def get_kwh_pmi(self, target_co2_gpmi):
+        import numpy as np
         # get kwh/mi from cost curve for target_co2_gpmi(s)
         if len(self.cost_curve) > 1:
             kWh_pmi = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
                                                       self.cost_curve['cert_kWh_per_mile'],
-                                                      fill_value='extrapolate')
+                                                      fill_value=(self.cost_curve['cert_kWh_per_mile'].min(),
+                                                                  self.cost_curve['cert_kWh_per_mile'].max()), bounds_error=False)
             return kWh_pmi(target_co2_gpmi).tolist()
         else:
             return self.cost_curve['cert_kWh_per_mile']
 
     def get_generalized_cost(self, target_co2_gpmi):
+        import numpy as np
         # get cost from cost curve for target_co2_gpmi(s)
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
                                                       self.cost_curve['new_vehicle_mfr_generalized_cost_dollars'],
-                                                      fill_value='extrapolate')
+                                                      fill_value=(self.cost_curve['new_vehicle_mfr_generalized_cost_dollars'].min(),
+                                                                  self.cost_curve['new_vehicle_mfr_generalized_cost_dollars'].max()), bounds_error=False)
             return cost_dollars(target_co2_gpmi).tolist()
         else:
             return self.cost_curve['new_vehicle_mfr_generalized_cost_dollars']
@@ -337,7 +344,8 @@ class Vehicle(OMEGABase):
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID],
                                                       self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID],
-                                                      fill_value='extrapolate')
+                                                      fill_value=(self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].min(),
+                                                                  self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].max()), bounds_error=False)
             return cost_dollars(target_co2_gpmi).tolist()
         else:
             return self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].item()
@@ -347,8 +355,8 @@ class Vehicle(OMEGABase):
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID],
                                                   self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID],
-                                                  fill_value='extrapolate')
-
+                                                  fill_value=(self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID].min(),
+                                                              self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID].max()), bounds_error=False)
             return cost_dollars(target_co2_gpmi).tolist()
         else:
             return self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID].item()
@@ -401,6 +409,7 @@ class Vehicle(OMEGABase):
         from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
 
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
+        tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
         kwh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
 
@@ -408,6 +417,9 @@ class Vehicle(OMEGABase):
         self.cost_cloud = self.cost_cloud.rename(
             columns={'cert_co2_grams_per_mile': co2_name, 'cert_kWh_per_mile': kwh_name,
                      'new_vehicle_mfr_cost_dollars': cost_name})
+
+        # capture initial "cert" co2 as tailpipe, for now: TODO: weight drive cycles to calculate tailpipe
+        self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
 
         self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
 
