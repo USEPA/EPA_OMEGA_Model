@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="iconSize">
      <size>
@@ -562,7 +562,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Opens an existing OMEGA 2 Configuration File</string>
+       <string>Plots the selected parameters</string>
       </property>
       <property name="text">
        <string>Plot</string>
@@ -617,7 +617,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Opens an existing OMEGA 2 Configuration File</string>
+       <string>Selects previous model run for plotting</string>
       </property>
       <property name="text">
        <string>Select Previous Run</string>
@@ -641,7 +641,7 @@ EPA Science Advisory Board - 2020</string>
        </font>
       </property>
       <property name="toolTip">
-       <string>Opens an existing OMEGA 2 Configuration File</string>
+       <string>Selects current model run for plotting</string>
       </property>
       <property name="text">
        <string>Select Current Run</string>
@@ -788,7 +788,7 @@ EPA Science Advisory Board - 2020</string>
      <x>0</x>
      <y>0</y>
      <width>1115</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu1">
