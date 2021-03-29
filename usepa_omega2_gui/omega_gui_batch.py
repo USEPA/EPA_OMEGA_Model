@@ -1119,6 +1119,8 @@ class Form(QObject):
             a = self.window.list_graphs_1.selectedIndexes()[0]
             b = self.window.list_graphs_2.selectedIndexes()[0]
             # Send plot selections to plot function
+            c = "Plotting Data: [" + b.data() + "] [" + a.data() + "] From: " + plot_select_directory_name
+            self.event_monitor(c, "black", 'dt')
             test_plot_2(a.data(), b.data(), plot_select_directory_name, plot_select_directory)
 
 
