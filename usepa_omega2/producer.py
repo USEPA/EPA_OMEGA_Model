@@ -247,7 +247,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
         tech_share_combos_total['share_range'] = share_range
         tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
-                                           tech_share_combos_total['total_combo_target_co2_megagrams']
+                                           np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'])
         # save initial compliance ratio, it gets overwrriten during the consumer iteration
         tech_share_combos_total['compliance_ratio_producer'] = tech_share_combos_total['compliance_ratio']
 
@@ -536,7 +536,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
 
             other_winner_index = tech_share_combos_total['slope'].idxmin()
 
-            winning_combos = winning_combos.append(tech_share_combos_total.loc[other_winner_index])
+            if not pd.isna(other_winner_index):
+                winning_combos = winning_combos.append(tech_share_combos_total.loc[other_winner_index])
     else:
         winning_combos = tech_share_combos_total.loc[[mini_df['total_combo_credits_co2_megagrams'].idxmax()]]
         compliance_possible = False
