@@ -480,10 +480,10 @@ def ice_package_results(settings, key, alpha_file_dict):
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
     # package_cost_df.insert(0, 'cert_kWh_per_mile', 0)
     package_cost_df.insert(0, 'cert_co2_grams_per_mile', combined_co2)
-    package_cost_df.insert(0, 'hwfet_co2_grams_per_mile', hwy_co2)
-    package_cost_df.insert(0, 'ftp_3_co2_grams_per_mile', ftp3_co2)
-    package_cost_df.insert(0, 'ftp_2_co2_grams_per_mile', ftp2_co2)
-    package_cost_df.insert(0, 'ftp_1_co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'hwfet:co2_grams_per_mile', hwy_co2)
+    package_cost_df.insert(0, 'ftp_3:co2_grams_per_mile', ftp3_co2)
+    package_cost_df.insert(0, 'ftp_2:co2_grams_per_mile', ftp2_co2)
+    package_cost_df.insert(0, 'ftp_1:co2_grams_per_mile', ftp1_co2)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
 
     return package_cost_df
@@ -514,10 +514,10 @@ def pev_package_results(settings, key, alpha_file_dict):
     
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
     package_cost_df.insert(0, 'cert_kWh_per_mile', combined_kwh)
-    package_cost_df.insert(0, 'hwfet_kWh_per_mile', hwy_kwh)
-    package_cost_df.insert(0, 'ftp_3_kWh_per_mile', ftp3_kwh)
-    package_cost_df.insert(0, 'ftp_2_kWh_per_mile', ftp2_kwh)
-    package_cost_df.insert(0, 'ftp_1_kWh_per_mile', ftp1_kwh)
+    package_cost_df.insert(0, 'hwfet:kWh_per_mile', hwy_kwh)
+    package_cost_df.insert(0, 'ftp_3:kWh_per_mile', ftp3_kwh)
+    package_cost_df.insert(0, 'ftp_2:kWh_per_mile', ftp2_kwh)
+    package_cost_df.insert(0, 'ftp_1:kWh_per_mile', ftp1_kwh)
     # package_cost_df.insert(0, 'cert_co2_grams_per_mile', 0)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
     
