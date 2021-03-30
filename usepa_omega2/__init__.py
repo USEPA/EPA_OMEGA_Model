@@ -89,7 +89,7 @@ try:
             self.annual_vmt_fixed_by_age_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
             self.slice_tech_combo_cloud_tables = False
 
-            self.allow_backsliding = False
+            self.allow_backsliding = True
 
             self.producer_max_iterations = 15
             self.producer_num_market_share_options = 5
