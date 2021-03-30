@@ -127,7 +127,7 @@ def sum_vehicle_parts(df, years, new_arg, *args):
 
 def reshape_df_for_cloud_file(settings, df_source):
     df_return = pd.DataFrame()
-    id_variables = ['cost_curve_class']
+    id_variables = ['cost_curve_class', 'key']
     if settings.run_bev:
         for arg in df_source.columns:
             if arg.__contains__('kWh_per_mile'):
@@ -365,7 +365,7 @@ class EngineCost:
 class PackageCost:
     def __init__(self, key):
         self.key = key
-        self.unique_key, self.fuel_key, self.structure_key, self.price_key, self.alpha_key, self.engine_key, self.pev_key, \
+        self.key_key, self.unique_key, self.fuel_key, self.structure_key, self.price_key, self.alpha_key, self.engine_key, self.pev_key, \
         self.trans_key, self.accessory_key, self.aero_key, self.nonaero_key, self.weight_key = self.key
 
     def get_object_attributes(self, attribute_list):
@@ -457,7 +457,7 @@ class PackageCost:
 def ice_package_results(settings, key, alpha_file_dict):
     print(key)
     pkg_obj = PackageCost(key)
-    fuel_key, alpha_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_key'])
+    key_key, fuel_key, alpha_key = pkg_obj.get_object_attributes(['key_key', 'fuel_key', 'alpha_key'])
     ftp1_co2, ftp2_co2, ftp3_co2, hwy_co2, combined_co2 = alpha_file_dict[key]['EPA_FTP_1 gCO2/mi'], \
                                                           alpha_file_dict[key]['EPA_FTP_2 gCO2/mi'], \
                                                           alpha_file_dict[key]['EPA_FTP_3 gCO2/mi'], \
@@ -486,6 +486,7 @@ def ice_package_results(settings, key, alpha_file_dict):
     package_cost_df.insert(0, 'ftp_2:co2_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'ftp_1:co2_grams_per_mile', ftp1_co2)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
+    package_cost_df.insert(0, 'key', key_key)
 
     return package_cost_df
 
@@ -493,7 +494,7 @@ def ice_package_results(settings, key, alpha_file_dict):
 def pev_package_results(settings, key, alpha_file_dict):
     print(key)
     pkg_obj = PackageCost(key)
-    unique_key, fuel_id, structure_class, price_class_id, alpha_key, engine_key, pev_key, trans_key, accessory_key, aero_key, nonaero_key, weight_key = key
+    key_key, unique_key, fuel_id, structure_class, price_class_id, alpha_key, engine_key, pev_key, trans_key, accessory_key, aero_key, nonaero_key, weight_key = key
     onroad_range, oncycle_kwh_per_mile, usable_soc, gap, battery_kwh_gross, motor_power = pev_key
     fuel_key, alpha_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_key'])
     ftp1_kwh, ftp2_kwh, ftp3_kwh, hwy_kwh, combined_kwh = alpha_file_dict[key]['EPA_FTP_1_kWhr/100mi'] / 100,\
@@ -521,7 +522,8 @@ def pev_package_results(settings, key, alpha_file_dict):
     package_cost_df.insert(0, 'ftp_1:kWh_per_mile', ftp1_kwh)
     # package_cost_df.insert(0, 'cert_co2_grams_per_mile', 0)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
-    
+    package_cost_df.insert(0, 'key', key_key)
+
     return package_cost_df
 
 
