@@ -10,6 +10,14 @@ Example 55/45 Weighting:
 
     FTP1*0.1139900542252765 + FTP2*0.28491423279287026  + FTP3*0.15110309513583164 + HWFET*0.45 = 55/45 FTP/HWFET
 
+Example 45/55 Weighting:
+
+::
+
+    FTP1*0.45*0.43*3.591/7.4504 + FTP2*0.45*3.8595/7.4504 + FTP3*0.45*0.57*3.591/7.4504 + HWFET*0.55
+
+    FTP1*0.09326458982068077 + FTP2*0.23311164501234835  + FTP3*0.12362980511113499 + HWFET*0.55 = 55/45 FTP/HWFET
+
 
 """
 
@@ -46,6 +54,14 @@ class DriveCycleWeights(OMEGABase):
                 weighted_result += df[key] * DriveCycleWeights.get_drive_cycle_weight(calendar_year, dc)
 
         return weighted_result
+
+    @staticmethod
+    def calc_weighted_drive_cycle_co2_grams_per_mile(calendar_year, df):
+        return DriveCycleWeights.calc_weighted_drive_cycle(calendar_year, df, 'co2_grams_per_mile')
+
+    @staticmethod
+    def calc_weighted_drive_cycle_kWh_per_mile(calendar_year, df):
+        return DriveCycleWeights.calc_weighted_drive_cycle(calendar_year, df, 'kWh_per_mile')
 
     @staticmethod
     def init_from_file(filename, verbose=False):

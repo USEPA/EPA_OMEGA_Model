@@ -427,10 +427,10 @@ class Vehicle(OMEGABase):
                      'new_vehicle_mfr_cost_dollars': cost_name})
 
         self.cost_cloud[co2_name] = \
-            DriveCycleWeights.calc_weighted_drive_cycle(self.model_year, self.cost_cloud, 'co2_grams_per_mile')
+            DriveCycleWeights.calc_weighted_drive_cycle_co2_grams_per_mile(self.model_year, self.cost_cloud)
 
         self.cost_cloud[kwh_name] = \
-            DriveCycleWeights.calc_weighted_drive_cycle(self.model_year, self.cost_cloud, 'kWh_per_mile')
+            DriveCycleWeights.calc_weighted_drive_cycle_kWh_per_mile(self.model_year, self.cost_cloud)
 
         # capture pre-upstream values as "tailpipe", for now...
         self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
