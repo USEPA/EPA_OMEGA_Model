@@ -265,6 +265,7 @@ class Vehicle(OMEGABase):
         self.context_size_class = None
         self.context_size_class_share_frac = None
         self.electrification_class = None
+        self.upstream_CO2_grams_per_mile = None
         self.cert_CO2_grams_per_mile = None
         self.cert_kWh_per_mile = None
         self.cert_target_CO2_grams_per_mile = None
@@ -399,8 +400,9 @@ class Vehicle(OMEGABase):
         self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile
         self.cert_kWh_per_mile = vehicle.cert_kWh_per_mile
 
-        add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
-        self.cert_CO2_grams_per_mile = add_upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
+        upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
+        self.upstream_CO2_grams_per_mile = upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
+        self.cert_CO2_grams_per_mile += self.upstream_CO2_grams_per_mile
         self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
 
         self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
