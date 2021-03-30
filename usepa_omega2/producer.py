@@ -324,7 +324,6 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
             new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
-            # TODO: update cert g/mi curve values based on policy upstream and whatever the heck else?? or is it done before here...? when processing the original clouds??
             manufacturer_vehicles.append(new_veh)
 
         # aggregate by market class / reg class

@@ -396,7 +396,6 @@ class Vehicle(OMEGABase):
 
         self.set_cert_target_CO2_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
-        # TODO: cert co2 needs to be calculated each year, especially if cycle weightings change over time
         self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile
         self.cert_kWh_per_mile = vehicle.cert_kWh_per_mile
 

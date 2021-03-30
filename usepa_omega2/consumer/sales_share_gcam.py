@@ -29,7 +29,6 @@ def get_demanded_shares(market_class_data, calendar_year):
 
     # TODO: these need to come from the policy
     carbon_intensity_gasoline = 8887  # g per CO2 per gallon
-    carbon_intensity_electricity = 534  # g per kWh generated
 
     sales_share_denominator_all_hauling = 0
     sales_share_denominator_all_nonhauling = 0
@@ -49,14 +48,13 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 total_capital_costs = market_class_data['average_price_%s' % market_class_id]
                 average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
-                # TODO: use kwh for bevs...?
-                # average_kwh_pmi = market_class_data['average_kwh_pmi_%s' % market_class_id]
+                average_kwh_pmi = market_class_data['average_kwh_pmi_%s' % market_class_id]
 
                 if market_class_id == 'non_hauling.BEV':
-                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
+                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi
                     annual_o_m_costs = 1600
                 elif market_class_id == 'hauling.BEV':
-                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_electricity
+                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi
                     annual_o_m_costs = 1600
                 elif market_class_id == 'non_hauling.ICE':
                     fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
