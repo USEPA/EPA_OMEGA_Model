@@ -2,6 +2,14 @@
 drive_cycle_weights.py
 ======================
 
+Example 55/45 Weighting:
+
+::
+
+    FTP1*0.55*0.43*3.591/7.4504 + FTP2*0.55*3.8595/7.4504 + FTP3*0.55*0.57*3.591/7.4504 + HWFET*0.45
+
+    FTP1*0.1139900542252765 + FTP2*0.28491423279287026  + FTP3*0.15110309513583164 + HWFET*0.45 = 55/45 FTP/HWFET
+
 
 """
 
@@ -10,13 +18,34 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 
+weighted_values = ['co2_grams_per_mile', 'kWh_per_mile']
+
+
 class DriveCycleWeights(OMEGABase):
+
     weights = pd.DataFrame()
 
     @staticmethod
     def get_drive_cycle_weight(calendar_year, drive_cycle_id):
-        return DriveCycleWeights.weights['%s:weight' % (drive_cycle_id)].loc[
+        key = '%s:weight' % (drive_cycle_id)
+        if key in DriveCycleWeights.weights:
+            return DriveCycleWeights.weights[key].loc[
                   DriveCycleWeights.weights['calendar_year'] == calendar_year].item()
+        else:
+            return 0
+
+    @staticmethod
+    def calc_weighted_drive_cycle(calendar_year, df, weighted_value):
+        from drive_cycles import DriveCycles
+
+        weighted_result = 0
+
+        for dc in DriveCycles.get_drive_cycles():
+            key = '%s:%s' % (dc, weighted_value)
+            if key in df:
+                weighted_result += df[key] * DriveCycleWeights.get_drive_cycle_weight(calendar_year, dc)
+
+        return weighted_result
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -37,6 +66,8 @@ class DriveCycleWeights(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
+                from drive_cycles import DriveCycles
+
                 DriveCycleWeights.weights['calendar_year'] = df['calendar_year']
 
                 weight_columns = [c for c in df.columns if 'weight' in c]
@@ -77,8 +108,22 @@ if __name__ == '__main__':
             DriveCycleWeights.weights.to_csv(
                 o2.options.database_dump_folder + os.sep + 'drive_cycle_weights.csv', index=False)
 
-            print(DriveCycleWeights.get_drive_cycle_weight(2020, 'CS_EPA_FTP'))
-            print(DriveCycleWeights.get_drive_cycle_weight(2050, 'CS_EPA_FTP'))
+            print(DriveCycleWeights.get_drive_cycle_weight(2020, 'ftp_1'))
+            print(DriveCycleWeights.get_drive_cycle_weight(2050, 'hwfet'))
+
+            sample_cloud = {
+                            'ftp_1:co2_grams_per_mile': 277.853416,
+                            'ftp_2:co2_grams_per_mile': 272.779239,
+                            'ftp_3:co2_grams_per_mile': 242.292152,
+                            'hwfet:co2_grams_per_mile': 182.916104,
+                            'ftp_1:kWh_per_mile': 0.26559971,
+                            'ftp_2:kWh_per_mile': 0.2332757,
+                            'ftp_3:kWh_per_mile': 0.25938633,
+                            'hwfet:kWh_per_mile': 0.22907605,
+            }
+            print(DriveCycleWeights.calc_weighted_drive_cycle(2020, sample_cloud, 'co2_grams_per_mile'))
+            print(DriveCycleWeights.calc_weighted_drive_cycle(2020, sample_cloud, 'kWh_per_mile'))
+
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

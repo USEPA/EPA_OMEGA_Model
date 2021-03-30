@@ -18,7 +18,12 @@ class DriveCycles(OMEGABase):
         return drive_cycle_id in DriveCycles.data['drive_cycle_id'].values
 
     @staticmethod
+    def get_drive_cycles():
+        return DriveCycles.data['drive_cycle_id'].to_list()
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -66,8 +71,10 @@ if __name__ == '__main__':
             DriveCycles.data.to_csv(
                 o2.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
-            print(DriveCycles.validate_drive_cycle_ID('CS_EPA_FTP'))
-            print(DriveCycles.validate_drive_cycle_ID('CS_EPA_FPT'))
+            print(DriveCycles.validate_drive_cycle_ID('ftp_1'))
+            print(DriveCycles.validate_drive_cycle_ID('hwfet'))
+
+            print(DriveCycles.get_drive_cycles())
 
         else:
             print(init_fail)

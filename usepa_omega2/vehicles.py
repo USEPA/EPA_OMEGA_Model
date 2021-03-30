@@ -413,10 +413,12 @@ class Vehicle(OMEGABase):
     def create_frontier_df(self):
         from cost_clouds import CostCloud
         from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
+        from drive_cycle_weights import DriveCycleWeights
 
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
-        # tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
+        tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
         kwh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
+        tailpipe_kWh_name = 'veh_%s_tailpipe_kWh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
 
         # rename generic columns to vehicle-specific columns
@@ -424,16 +426,26 @@ class Vehicle(OMEGABase):
             columns={'cert_co2_grams_per_mile': co2_name, 'cert_kWh_per_mile': kwh_name,
                      'new_vehicle_mfr_cost_dollars': cost_name})
 
-        # capture initial "cert" co2 as tailpipe, for now: TODO: weight drive cycles to calculate tailpipe
-        # self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
+        self.cost_cloud[co2_name] = \
+            DriveCycleWeights.calc_weighted_drive_cycle(self.model_year, self.cost_cloud, 'co2_grams_per_mile')
 
+        self.cost_cloud[kwh_name] = \
+            DriveCycleWeights.calc_weighted_drive_cycle(self.model_year, self.cost_cloud, 'kWh_per_mile')
+
+        # capture pre-upstream values as "tailpipe", for now...
+        self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
+        self.cost_cloud[tailpipe_kWh_name] = self.cost_cloud[kwh_name]
+
+        # drop extraneous columns
         self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
 
         # TODO: update dynamic costs, if any
 
         # add upstream calcs
-        add_upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
-        self.cost_cloud[co2_name] = add_upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kwh_name])
+        upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
+        self.cost_cloud['upstream_co2_grams_per_mile'] = \
+            upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kwh_name])
+        self.cost_cloud[co2_name] += self.cost_cloud['upstream_co2_grams_per_mile']
 
         # calculate producer generalized cost
         self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, self.cost_cloud, co2_name, cost_name)

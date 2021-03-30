@@ -11,7 +11,7 @@ from usepa_omega2 import *
 
 
 def upstream_zero(vehicle, co2_grams_per_mile, kWh_per_mile):
-    return co2_grams_per_mile
+    return 0
 
 
 def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kWh_per_mile):
@@ -24,10 +24,12 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kWh_per_mile):
         upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
         fuel_gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
-        co2_grams_per_mile += kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
+        upstream = kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) - \
                               vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
+    else:
+        upstream = 0
 
-    return co2_grams_per_mile
+    return upstream
 
 
 def upstream_actual(vehicle, co2_grams_per_mile, kWh_per_mile):
@@ -40,10 +42,10 @@ def upstream_actual(vehicle, co2_grams_per_mile, kWh_per_mile):
     fuel_gco2_per_gal = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
     # TODO: need "utility factor" or percentage of electric and gas miles to weight these terms
-    co2_grams_per_mile += kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) + \
+    upstream = kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) + \
                           co2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
 
-    return co2_grams_per_mile
+    return upstream
 
 
 upstream_method_dict = {'upstream_zero': upstream_zero, 'upstream_xev_ice_delta': upstream_xev_ice_delta,

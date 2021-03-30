@@ -1,8 +1,7 @@
 input_template_name:,drive_cycles,input_template_version:,0.1
 drive_cycle_id,description,,
-CS_EPA_FTP,Charge-sustaining EPA FTP (city) cycle,,
-CD_EPA_FTP,Charge-depleting (electric-only) EPA FTP cycle,,
-CS_EPA_HWFET,Charge-sustaining EPA HWFET (highway) cycle,,
-CD_EPA_HWFET,Charge-depleting (electric-only) EPA HWFET cycle,,
-CS_EPA_US06,Charge-sustaining EPA US06 cycle,,
-CD_EPA_US06,Charge-depleting (electric-only) EPA US06 cycle,,
+ftp_1,EPA FTP (city) cycle phase 1,,
+ftp_2,EPA FTP (city) cycle phase 2,,
+ftp_3,EPA FTP (city) cycle phase 3,,
+hwfet,EPA HWFET cycle,,
+us06,EPA US06 cycle,,
