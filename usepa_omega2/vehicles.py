@@ -493,6 +493,7 @@ class VehicleFinal(SQABase, Vehicle):
     cert_fuel_ID = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
+    upstream_CO2_grams_per_mile = Column('upstream_co2_grams_per_mile', Float)
     cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
     cert_kWh_per_mile = Column('cert_kwh_grams_per_mile', Float)
     _initial_registered_count = Column('_initial_registered_count', Float)
