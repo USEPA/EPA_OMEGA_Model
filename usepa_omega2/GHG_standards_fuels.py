@@ -11,6 +11,8 @@ import o2  # import global variables
 from usepa_omega2 import *
 
 
+cache = dict()
+
 class GHGStandardFuels(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'ghg_standards_fuels'
@@ -20,7 +22,30 @@ class GHGStandardFuels(SQABase, OMEGABase):
     cert_CO2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)
 
     @staticmethod
+    def get_fuel_attributes(fuel_id, attribute_types):
+
+        cache_key = '%s_%s' % (fuel_id, attribute_types)
+
+        if cache_key not in cache:
+            if type(attribute_types) is not list:
+                attribute_types = [attribute_types]
+
+            attrs = GHGStandardFuels.get_class_attributes(attribute_types)
+
+            result = o2.session.query(*attrs). \
+                filter(GHGStandardFuels.fuel_ID == fuel_id).all()[0]
+
+            if len(attribute_types) == 1:
+                cache[cache_key] = result[0]
+            else:
+                cache[cache_key] = result
+
+        return cache[cache_key]
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 

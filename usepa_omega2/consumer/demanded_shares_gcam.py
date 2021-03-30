@@ -26,6 +26,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
     share_weight = Column(Float)
     demanded_share = Column(Numeric)
     consumer_generalized_cost_dollars = Column(Float)
+    o_m_costs = Column(Float)
 
     @staticmethod
     def get_gcam_params(calendar_year, market_class_id):
@@ -54,10 +55,11 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'demanded_shares_gcam'
-        input_template_version = 0.0002
+        input_template_version = 0.1
         input_template_columns = {'market_class_id', 'calendar_year', 'annual_vmt', 'payback_years',
-                                  'price_amortization_period',
-                                  'share_weight', 'discount_rate'}
+                                  'price_amortization_period', 'share_weight', 'discount_rate',
+                                  'o_m_costs',
+                                  }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -80,6 +82,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
                         price_amortization_period=df.loc[i, 'price_amortization_period'],
                         discount_rate=df.loc[i, 'discount_rate'],
                         share_weight=df.loc[i, 'share_weight'],
+                        o_m_costs=df.loc[i, 'o_m_costs'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()

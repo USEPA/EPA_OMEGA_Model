@@ -20,6 +20,7 @@ def get_demanded_shares(market_class_data, calendar_year):
     """
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from consumer.market_classes import MarketClass
+    from fuels import Fuel
 
     if o2.options.flat_context:
         calendar_year = o2.options.flat_context_year
@@ -27,8 +28,7 @@ def get_demanded_shares(market_class_data, calendar_year):
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
     logit_exponent_mu = -8
 
-    # TODO: these need to come from the policy
-    carbon_intensity_gasoline = 8887  # g per CO2 per gallon
+    carbon_intensity_gasoline = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
     sales_share_denominator_all_hauling = 0
     sales_share_denominator_all_nonhauling = 0
@@ -52,16 +52,16 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 if market_class_id == 'non_hauling.BEV':
                     fuel_cost_per_VMT = fuel_cost * average_kwh_pmi
-                    annual_o_m_costs = 1600
+                    annual_o_m_costs = gcam_data_cy.o_m_costs
                 elif market_class_id == 'hauling.BEV':
                     fuel_cost_per_VMT = fuel_cost * average_kwh_pmi
-                    annual_o_m_costs = 1600
+                    annual_o_m_costs = gcam_data_cy.o_m_costs
                 elif market_class_id == 'non_hauling.ICE':
                     fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
-                    annual_o_m_costs = 2000
+                    annual_o_m_costs = gcam_data_cy.o_m_costs
                 elif market_class_id == 'hauling.ICE':
                     fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
-                    annual_o_m_costs = 2000
+                    annual_o_m_costs = gcam_data_cy.o_m_costs
 
                 # consumer_generalized_cost_dollars = total_capital_costs
                 annualized_capital_costs = annualization_factor * total_capital_costs
