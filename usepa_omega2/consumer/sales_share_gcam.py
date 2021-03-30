@@ -26,7 +26,6 @@ def get_demanded_shares(market_class_data, calendar_year):
         calendar_year = o2.options.flat_context_year
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
-    logit_exponent_mu = -8
 
     carbon_intensity_gasoline = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
@@ -41,6 +40,8 @@ def get_demanded_shares(market_class_data, calendar_year):
                 fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
                 gcam_data_cy = DemandedSharesGCAM.get_gcam_params(calendar_year, market_class_id)
+
+                logit_exponent_mu = gcam_data_cy.logit_exponent_mu
 
                 price_amortization_period = gcam_data_cy.price_amortization_period
                 discount_rate = gcam_data_cy.discount_rate
@@ -69,10 +70,9 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
                 total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
-                total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / 1.58
+                total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy.average_occupancy
                 sales_share_numerator[market_class_id] = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
 
-                ## ToDo: These market class conditions should be made more general, instead of using string searches.
                 if 'non_hauling' in market_class_id.split('.'):
                     sales_share_denominator_all_nonhauling += sales_share_numerator[market_class_id]
                 else:
