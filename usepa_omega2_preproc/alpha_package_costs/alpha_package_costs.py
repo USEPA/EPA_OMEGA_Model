@@ -221,6 +221,7 @@ def package_key(settings, input_df, fuel_id):
     :return: A Series of package keys and the passed DataFrame converted to a dictionary.
     """
     df = input_df.copy().fillna(0)
+    key_keys = pd.Series(df['Key'])
     unique_keys = pd.Series(df['Unique Key'])
     fuel_keys = pd.Series([fuel_id] * len(df))
     structure_keys = pd.Series(df['Structure Class'])
@@ -262,7 +263,7 @@ def package_key(settings, input_df, fuel_id):
         weight_keys = pd.Series(zip(curb_weights_series, glider_weight_list, battery_weight_list, pd.Series([settings.bev_weight_reduction] * len(df))))
     else:
         pass
-    keys = pd.Series(zip(unique_keys, fuel_keys, structure_keys, price_keys, alpha_keys,
+    keys = pd.Series(zip(key_keys, unique_keys, fuel_keys, structure_keys, price_keys, alpha_keys,
                          engine_keys, pev_keys,
                          trans_keys, accessory_keys, aero_keys, nonaero_keys, weight_keys))
     df.insert(0, 'package_key', keys)
