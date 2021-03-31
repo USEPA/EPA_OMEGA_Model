@@ -52,6 +52,9 @@ class DriveCycleWeights(OMEGABase):
             key = '%s:%s' % (dc, weighted_value)
             if key in df:
                 weighted_result += df[key] * DriveCycleWeights.get_drive_cycle_weight(calendar_year, dc)
+            elif DriveCycleWeights.get_drive_cycle_weight(calendar_year, dc) > 0:
+                # cycle has weighted value, but not present in df, that's an error
+                raise Exception('*** Missing drive cycle "%s" in input to calc_weighted_drive_cycle() ***' % dc)
 
         return weighted_result
 
