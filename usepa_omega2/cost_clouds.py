@@ -12,6 +12,8 @@ input_template_name = 'cost_clouds'
 
 cache = dict()
 
+cloud_non_numeric_columns = ['key']
+
 
 class CostCloud(OMEGABase):
 
@@ -81,6 +83,9 @@ class CostCloud(OMEGABase):
         """
 
         frontier_pts = []
+
+        # drop non-numeric columns so dtypes don't become "object"
+        cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
         # find frontier starting point, lowest GHGs, and add to frontier
         idxmin = cloud[x_key].idxmin()
