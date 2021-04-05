@@ -66,6 +66,30 @@ class GHG_credit_bank(OMEGABase):
         new_credit_transaction = pd.DataFrame(new_credit_transaction, columns=new_credit_transaction.keys(), index=[0])
         return new_credit_transaction
 
+    def get_expiring_credits(self, calendar_year):
+        this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
+
+        # apply lifetime rules
+        ghg_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
+        if not ghg_credits.empty:
+            for _, credit in ghg_credits.iterrows():
+                if credit['age'] == credit_max_life_years:
+                    return credit['ending_balance_Mg']
+        else:
+            return 0
+
+    def get_expiring_debits(self, calendar_year):
+        this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
+
+        # apply lifetime rules
+        ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
+        if not ghg_debits.empty:
+            for _, debit in ghg_debits.iterrows():
+                if debit['age'] == debit_max_life_years:
+                    return debit['ending_balance_Mg']
+        else:
+            return 0
+
     def update_credit_age(self, calendar_year):
         # grab last years
         last_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year - 1].copy()
@@ -76,12 +100,12 @@ class GHG_credit_bank(OMEGABase):
         last_years_credits['beginning_balance_Mg'] = last_years_credits['ending_balance_Mg']
 
         # apply lifetime rules
-        credits = last_years_credits[last_years_credits['ending_balance_Mg'] >= 0]
-        if not credits.empty:
-            for idx, credit in credits.iterrows():
+        ghg_credits = last_years_credits[last_years_credits['ending_balance_Mg'] >= 0]
+        if not ghg_credits.empty:
+            for idx, credit in ghg_credits.iterrows():
                 # log the death of non-zero value credits
                 if ((credit['age'] > 0) and (credit['ending_balance_Mg'] == 0)) or \
-                    credit['age'] > credit_max_life_years:
+                        credit['age'] > credit_max_life_years:
                     if credit['ending_balance_Mg'] > 0:
                         t = GHG_credit_bank.create_credit_transaction(credit)
                         t['credit_value_Mg'] = credit['ending_balance_Mg']
@@ -89,9 +113,9 @@ class GHG_credit_bank(OMEGABase):
                         self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
                     last_years_credits = last_years_credits.drop(idx)
 
-        debits = last_years_credits[last_years_credits['beginning_balance_Mg'] < 0]
-        if not debits.empty:
-            for idx, debit in debits.iterrows():
+        ggh_debits = last_years_credits[last_years_credits['beginning_balance_Mg'] < 0]
+        if not ggh_debits.empty:
+            for idx, debit in ggh_debits.iterrows():
                 if (debit['age'] > 0) and (debit['ending_balance_Mg'] == 0):
                     # silently drop zero-value debits after age 0
                     last_years_credits = last_years_credits.drop(idx)
@@ -101,7 +125,6 @@ class GHG_credit_bank(OMEGABase):
                     t['credit_value_Mg'] = debit['ending_balance_Mg']
                     t['credit_destination'] = 'PAST_DUE'
                     self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
-
 
         self.credit_bank = pd.DataFrame.append(self.credit_bank, last_years_credits)
 
@@ -156,26 +179,23 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(fileio.get_filenameext(__file__))
 
-        credit_bank = GHG_credit_bank()
-        init_fail = credit_bank.init_from_file('test_inputs/ghg_debits.csv', 'USA Motors')
-        if not init_fail:
-            credit_bank.update_credit_age(2020)
-            credit_bank.handle_credit(2020, 'USA Motors', 0.55)
-            credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
-            credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
+        credit_bank = GHG_credit_bank('test_inputs/ghg_debits.csv', 'USA Motors')
+        credit_bank.update_credit_age(2020)
+        credit_bank.handle_credit(2020, 'USA Motors', 0.55)
+        credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
+        credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
-            credit_bank = GHG_credit_bank()
-            credit_bank.init_from_file('test_inputs/ghg_credits.csv', 'USA Motors')
-            import random
-            for year in range(2020,2030):
-                print(year)
-                credit_bank.update_credit_age(year)
-                credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
-            credit_bank.credit_bank.to_csv('../out/__dump/credit_bank.csv', index=False)
-            credit_bank.transaction_log.to_csv('../out/__dump/credit_bank_transactions.csv', index=False)
-        else:
-            for l in init_fail:
-                print(l)
+        credit_bank = GHG_credit_bank('test_inputs/ghg_credits.csv', 'USA Motors')
+        import random
+        for year in range(2020,2030):
+            print(year)
+            credit_bank.update_credit_age(year)
+            credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
+        credit_bank.credit_bank.to_csv('../out/__dump/credit_bank.csv', index=False)
+        credit_bank.transaction_log.to_csv('../out/__dump/credit_bank_transactions.csv', index=False)
+        # else:
+        #     for l in init_fail:
+        #         print(l)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
