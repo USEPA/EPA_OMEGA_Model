@@ -127,7 +127,7 @@ def sum_vehicle_parts(df, years, new_arg, *args):
 
 def reshape_df_for_cloud_file(settings, df_source):
     df_return = pd.DataFrame()
-    id_variables = ['cost_curve_class', 'key']
+    id_variables = ['cost_curve_class', 'alpha_key']
     if settings.run_bev:
         for arg in df_source.columns:
             if arg.__contains__('kWh_per_mile'):
@@ -141,10 +141,6 @@ def reshape_df_for_cloud_file(settings, df_source):
         source_args.append(f'new_vehicle_mfr_cost_dollars_{year}')
     for year in settings.years:
         temp = pd.melt(df_source[source_args], id_vars=id_variables, value_vars=f'new_vehicle_mfr_cost_dollars_{year}', value_name='new_vehicle_mfr_cost_dollars')
-        # temp = pd.melt(df_source[['cost_curve_class', 'cert_co2_grams_per_mile', 'cert_kWh_per_mile', f'new_vehicle_mfr_cost_dollars_{year}']],
-        #                id_vars=['cost_curve_class', 'cert_co2_grams_per_mile', 'cert_kWh_per_mile'],
-        #                value_vars=f'new_vehicle_mfr_cost_dollars_{year}',
-        #                value_name='new_vehicle_mfr_cost_dollars')
         temp.insert(1, 'model_year', year)
         temp.drop(columns='variable', inplace=True)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
@@ -221,12 +217,12 @@ def package_key(settings, input_df, fuel_id):
     :return: A Series of package keys and the passed DataFrame converted to a dictionary.
     """
     df = input_df.copy().fillna(0)
-    key_keys = pd.Series(df['Key'])
-    unique_keys = pd.Series(df['Unique Key'])
+    alpha_keys = pd.Series(df['Key'])
+    # unique_keys = pd.Series(df['Unique Key'])
     fuel_keys = pd.Series([fuel_id] * len(df))
     structure_keys = pd.Series(df['Structure Class'])
     price_keys = pd.Series(df['Price Class'])
-    alpha_keys = pd.Series(df['Vehicle Type'])
+    alpha_class_keys = pd.Series(df['Vehicle Type'])
     if fuel_id != 'bev':
         engine_keys = pd.Series(zip(df['Engine'], df['Engine Displacement L'], df['Engine Cylinders'].astype(int), df['DEAC D Cyl.'].astype(int), df['Start Stop']))
     else: engine_keys = pd.Series([0] * len(df))
@@ -263,11 +259,14 @@ def package_key(settings, input_df, fuel_id):
         weight_keys = pd.Series(zip(curb_weights_series, glider_weight_list, battery_weight_list, pd.Series([settings.bev_weight_reduction] * len(df))))
     else:
         pass
-    keys = pd.Series(zip(key_keys, unique_keys, fuel_keys, structure_keys, price_keys, alpha_keys,
-                         engine_keys, pev_keys,
-                         trans_keys, accessory_keys, aero_keys, nonaero_keys, weight_keys))
-    df.insert(0, 'package_key', keys)
-    df.set_index('package_key', inplace=True)
+    cost_keys = pd.Series(zip(fuel_keys, structure_keys, price_keys, alpha_class_keys,
+                              engine_keys, pev_keys,
+                              trans_keys, accessory_keys, aero_keys, nonaero_keys, weight_keys))
+    keys = pd.Series(zip(alpha_keys, cost_keys))
+    df.insert(0, 'cost_key', cost_keys)
+    df.insert(0, 'alpha_key', alpha_keys)
+    df.insert(0, 'key', keys)
+    df.set_index('key', inplace=True)
     df_dict = df.to_dict('index')
     return keys, df_dict
 
@@ -364,9 +363,9 @@ class EngineCost:
 
 class PackageCost:
     def __init__(self, key):
-        self.key = key
-        self.key_key, self.unique_key, self.fuel_key, self.structure_key, self.price_key, self.alpha_key, self.engine_key, self.pev_key, \
-        self.trans_key, self.accessory_key, self.aero_key, self.nonaero_key, self.weight_key = self.key
+        self.alpha_key, self.cost_key = key
+        self.fuel_key, self.structure_key, self.price_key, self.alpha_class_key, self.engine_key, self.pev_key, \
+        self.trans_key, self.accessory_key, self.aero_key, self.nonaero_key, self.weight_key = self.cost_key
 
     def get_object_attributes(self, attribute_list):
         """
@@ -439,7 +438,6 @@ class PackageCost:
         if weight_cost_cache_key in weight_cost_cache.keys():
             cost = weight_cost_cache[weight_cost_cache_key]
         else:
-            # base_wt = glider_weight / (1 - weight_rdxn)
             weight_removed = glider_weight / (1 - weight_rdxn) - glider_weight
             base_wt = curb_wt + weight_removed
             base_weight_cost_per_lb = weight_cost_dict[self.structure_key]['item_cost'] * price_class_dict[self.price_key]['scaler']
@@ -448,16 +446,17 @@ class PackageCost:
             ic_slope = weight_cost_dict[self.structure_key]['IC_slope']
             cost = base_wt * base_weight_cost_per_lb
             if weight_rdxn != 0:
-                # cost += ((dmc_ln_coeff * np.log(weight_rdxn) + dmc_constant) + (ic_slope * weight_rdxn)) * base_wt * weight_rdxn
                 cost += ((dmc_ln_coeff * np.log(weight_rdxn) + dmc_constant) + (ic_slope * weight_rdxn)) * weight_removed
             weight_cost_cache[weight_cost_cache_key] = cost
         return cost
 
 
 def ice_package_results(settings, key, alpha_file_dict):
-    print(key)
     pkg_obj = PackageCost(key)
-    key_key, fuel_key, alpha_key = pkg_obj.get_object_attributes(['key_key', 'fuel_key', 'alpha_key'])
+    alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
+    print(cost_key)
+
+    fuel_key, alpha_class_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key'])
     ftp1_co2, ftp2_co2, ftp3_co2, hwy_co2, combined_co2 = alpha_file_dict[key]['EPA_FTP_1 gCO2/mi'], \
                                                           alpha_file_dict[key]['EPA_FTP_2 gCO2/mi'], \
                                                           alpha_file_dict[key]['EPA_FTP_3 gCO2/mi'], \
@@ -468,35 +467,34 @@ def ice_package_results(settings, key, alpha_file_dict):
     accessories_cost = pkg_obj.calc_accessory_cost(settings.accessories_cost_dict)
     ac_cost = pkg_obj.calc_ac_cost(settings.ac_cost_dict)
     powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost
-    powertrain_cost_df = pd.DataFrame(powertrain_cost, columns=['ice_powertrain'], index=[key])
+    powertrain_cost_df = pd.DataFrame(powertrain_cost, columns=['ice_powertrain'], index=[alpha_key])
 
     aero_cost = pkg_obj.calc_aero_cost(settings.aero_cost_dict)
     nonaero_cost = pkg_obj.calc_nonaero_cost(settings.nonaero_cost_dict)
     roadload_cost = aero_cost + nonaero_cost
-    roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[key])
+    roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[alpha_key])
 
     weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_dict, settings.price_class_dict)
-    body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[key])
+    body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    # package_cost_df.insert(0, 'cert_kWh_per_mile', 0)
     package_cost_df.insert(0, 'cert_co2_grams_per_mile', combined_co2)
     package_cost_df.insert(0, 'hwfet:co2_grams_per_mile', hwy_co2)
     package_cost_df.insert(0, 'ftp_3:co2_grams_per_mile', ftp3_co2)
     package_cost_df.insert(0, 'ftp_2:co2_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'ftp_1:co2_grams_per_mile', ftp1_co2)
-    package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
-    package_cost_df.insert(0, 'key', key_key)
+    package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
+    package_cost_df.insert(0, 'cost_key', str(cost_key))
 
     return package_cost_df
 
 
 def pev_package_results(settings, key, alpha_file_dict):
-    print(key)
     pkg_obj = PackageCost(key)
-    key_key, unique_key, fuel_id, structure_class, price_class_id, alpha_key, engine_key, pev_key, trans_key, accessory_key, aero_key, nonaero_key, weight_key = key
+    alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
+    print(cost_key)
+    fuel_key, alpha_class_key, pev_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'pev_key'])
     onroad_range, oncycle_kwh_per_mile, usable_soc, gap, battery_kwh_gross, motor_power = pev_key
-    fuel_key, alpha_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_key'])
     ftp1_kwh, ftp2_kwh, ftp3_kwh, hwy_kwh, combined_kwh = alpha_file_dict[key]['EPA_FTP_1_kWhr/100mi'] / 100,\
                                                           alpha_file_dict[key]['EPA_FTP_2_kWhr/100mi'] / 100,\
                                                           alpha_file_dict[key]['EPA_FTP_3_kWhr/100mi'] / 100,\
@@ -505,14 +503,14 @@ def pev_package_results(settings, key, alpha_file_dict):
     ac_cost = pkg_obj.calc_ac_cost(settings.ac_cost_dict)
     battery_cost, motor_cost, pev_cost = pkg_obj.calc_bev_cost(settings.pev_curves_dict)
     powertrain_cost = pev_cost + ac_cost
-    powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_motor': motor_cost, 'pev_powertrain': powertrain_cost}, index=[key])
+    powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_motor': motor_cost, 'pev_powertrain': powertrain_cost}, index=[alpha_key])
     aero_cost = pkg_obj.calc_aero_cost(settings.aero_cost_dict)
     nonaero_cost = pkg_obj.calc_nonaero_cost(settings.nonaero_cost_dict)
     roadload_cost = aero_cost + nonaero_cost
-    roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[key])
+    roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[alpha_key])
 
     weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_dict, settings.price_class_dict)
-    body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[key])
+    body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
     
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
     package_cost_df.insert(0, 'cert_kWh_per_mile', combined_kwh)
@@ -520,9 +518,8 @@ def pev_package_results(settings, key, alpha_file_dict):
     package_cost_df.insert(0, 'ftp_3:kWh_per_mile', ftp3_kwh)
     package_cost_df.insert(0, 'ftp_2:kWh_per_mile', ftp2_kwh)
     package_cost_df.insert(0, 'ftp_1:kWh_per_mile', ftp1_kwh)
-    # package_cost_df.insert(0, 'cert_co2_grams_per_mile', 0)
-    package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_key}')
-    package_cost_df.insert(0, 'key', key_key)
+    package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
+    package_cost_df.insert(0, 'cost_key', str(cost_key))
 
     return package_cost_df
 
@@ -603,11 +600,10 @@ def main():
             
             if folder.name.__contains__('BEV') and settings.run_bev:
                 fuel_id = 'bev'
-                # package_keys = bev_key(settings.bev_metrics_dict, settings.pev_curves_dict, fuel_id)
                 alpha_file_df = add_elements_for_package_key(alpha_file_df)
-                package_keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
-                for pkg_key in package_keys:
-                    package_result = pev_package_results(settings, pkg_key, alpha_file_dict)
+                keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
+                for key in keys:
+                    package_result = pev_package_results(settings, key, alpha_file_dict)
                     bev_packages_df = pd.concat([bev_packages_df, package_result], axis=0, ignore_index=False)
                 
             elif folder.name.__contains__('PHEV') and settings.run_phev:
@@ -616,9 +612,9 @@ def main():
             elif settings.run_ice:
                 fuel_id = 'ice'
                 alpha_file_df = add_elements_for_package_key(alpha_file_df)
-                package_keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
-                for pkg_key in package_keys:
-                    package_result = ice_package_results(settings, pkg_key, alpha_file_dict)
+                keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
+                for key in keys:
+                    package_result = ice_package_results(settings, key, alpha_file_dict)
                     ice_packages_df = pd.concat([ice_packages_df, package_result], axis=0, ignore_index=False)
 
     # calculate YoY bev costs with learning
@@ -629,7 +625,7 @@ def main():
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'roadload', settings.years, settings.learning_rate_roadload)
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'body', settings.years, settings.learning_rate_weight)
         bev_packages_df.reset_index(drop=False, inplace=True)
-        bev_packages_df.rename(columns={'index': 'package'}, inplace=True)
+        bev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         bev_packages_df = sum_vehicle_parts(bev_packages_df, settings.years,
                                             'new_vehicle_mfr_cost_dollars',
                                             'pev_powertrain', 'roadload', 'body')
@@ -640,7 +636,7 @@ def main():
         ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'roadload', settings.years, settings.learning_rate_roadload)
         ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'body', settings.years, settings.learning_rate_weight)
         ice_packages_df.reset_index(drop=False, inplace=True)
-        ice_packages_df.rename(columns={'index': 'package'}, inplace=True)
+        ice_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         ice_packages_df = sum_vehicle_parts(ice_packages_df, settings.years,
                                             'new_vehicle_mfr_cost_dollars',
                                             'ice_powertrain', 'roadload', 'body')
