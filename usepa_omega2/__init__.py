@@ -6,7 +6,7 @@ __init.py__
 """
 
 # OMEGA2 code version number
-code_version = "0.4.0"
+code_version = "0.5.0"
 print('loading usepa_omega2 version %s' % code_version)
 
 import os, sys
@@ -69,6 +69,7 @@ try:
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_file = path + 'test_inputs/policy_fuel_upstream.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
+            self.price_modifications_file = path + 'test_inputs/price_modifications.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'

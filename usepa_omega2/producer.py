@@ -209,7 +209,7 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
     return tech_share_combos_df
 
 
-def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, iteration_num):
+def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, iteration_num, credits_offset_Mg):
     """
 
     Args:
@@ -247,7 +247,8 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
         tech_share_combos_total['share_range'] = share_range
         tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
-                                           np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'])
+                                           np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'] +
+                                                      credits_offset_Mg)
         # save initial compliance ratio, it gets overwrriten during the consumer iteration
         tech_share_combos_total['compliance_ratio_producer'] = tech_share_combos_total['compliance_ratio']
 
@@ -255,7 +256,8 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         #     tech_share_combos_total.to_csv(o2.options.output_folder + '%s_tech_share_combos_total.csv' % calendar_year)
 
         winning_combos, compliance_possible = \
-            select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log)
+            select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log,
+                                  credits_offset_Mg)
 
         producer_compliance_possible = producer_compliance_possible or compliance_possible
 
@@ -494,7 +496,8 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
     tech_share_combos_total['total_sales'] = total_sales
 
 
-def select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log):
+def select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log,
+                          credits_offset_Mg):
     """
 
     Args:
@@ -508,7 +511,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     """
     # tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_combo_credits_co2_megagrams')
     mini_df = pd.DataFrame()
-    mini_df['total_combo_credits_co2_megagrams'] = tech_share_combos_total['total_combo_credits_co2_megagrams']
+    mini_df['total_combo_credits_co2_megagrams'] = tech_share_combos_total['total_combo_credits_co2_megagrams'] + \
+                                                   credits_offset_Mg
     mini_df['total_combo_cost_dollars'] = tech_share_combos_total['total_combo_cost_dollars']
     mini_df['total_combo_generalized_cost_dollars'] = tech_share_combos_total['total_combo_generalized_cost_dollars']
 
@@ -520,7 +524,7 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     if o2.options.log_producer_iteration_years == 'all' or calendar_year in o2.options.log_producer_iteration_years:
         producer_iteration_log.write(tech_share_combos_total)
 
-    potential_winners = mini_df[mini_df['total_combo_credits_co2_megagrams'] >= 0]
+    potential_winners = mini_df[(mini_df['total_combo_credits_co2_megagrams']) >= 0]
     cost_name = 'total_combo_generalized_cost_dollars'
 
     if not potential_winners.empty:
@@ -544,6 +548,9 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     if o2.options.log_producer_iteration_years == 'all' or calendar_year in o2.options.log_producer_iteration_years:
         winning_combos['winner'] = True
         producer_iteration_log.write(winning_combos)
+
+    winning_combos['total_combo_credits_co2_megagrams'] = winning_combos['total_combo_credits_co2_megagrams'] - \
+                                                          credits_offset_Mg
 
     return winning_combos.copy(), compliance_possible
 
