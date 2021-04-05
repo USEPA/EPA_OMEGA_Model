@@ -604,7 +604,7 @@ def init_omega(o2_options):
     from effects.cost_effects_criteria import CostEffectsCriteria
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
     from required_zev_share import RequiredZevShare
-    from policy_price_modifications import PolicyPriceModification
+    from price_modifications import PriceModifications
     from production_constraints import ProductionConstraints
     from drive_cycles import DriveCycles
     from drive_cycle_weights import DriveCycleWeights
@@ -692,8 +692,8 @@ def init_omega(o2_options):
         init_fail = init_fail + RequiredZevShare.init_from_file(o2.options.required_zev_share_file,
                                                                 verbose=o2.options.verbose)
 
-        init_fail = init_fail + PolicyPriceModification.init_from_file(o2.options.price_modifications_file,
-                                                                       verbose=o2.options.verbose)
+        init_fail = init_fail + PriceModifications.init_from_file(o2.options.price_modifications_file,
+                                                                  verbose=o2.options.verbose)
 
         init_fail = init_fail + ProductionConstraints.init_from_file(o2.options.production_constraints_file,
                                                                 verbose=o2.options.verbose)

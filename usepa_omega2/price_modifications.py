@@ -11,15 +11,15 @@ from usepa_omega2 import *
 
 price_modification = 'price_modification_dollars'
 
-class PolicyPriceModification(OMEGABase):
+class PriceModifications(OMEGABase):
     values = pd.DataFrame()
 
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
         mod_key = '%s:%s' % (market_class_id, price_modification)
-        if mod_key in PolicyPriceModification.values:
-            return PolicyPriceModification.values['%s:%s' % (market_class_id, price_modification)].loc[
-                PolicyPriceModification.values['calendar_year'] == calendar_year].item()
+        if mod_key in PriceModifications.values:
+            return PriceModifications.values['%s:%s' % (market_class_id, price_modification)].loc[
+                PriceModifications.values['calendar_year'] == calendar_year].item()
         else:
             return 0
 
@@ -44,14 +44,14 @@ class PolicyPriceModification(OMEGABase):
             if not template_errors:
                 from consumer.market_classes import MarketClass
 
-                PolicyPriceModification.values['calendar_year'] = df['calendar_year']
+                PriceModifications.values['calendar_year'] = df['calendar_year']
 
                 share_columns = [c for c in df.columns if (price_modification in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in MarketClass.market_classes:
-                        PolicyPriceModification.values[sc] = df[sc]
+                        PriceModifications.values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -76,18 +76,18 @@ if __name__ == '__main__':
         init_fail = []
         init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
-        init_fail = init_fail + PolicyPriceModification.init_from_file(o2.options.price_modifications_file,
-                                                                       verbose=o2.options.verbose)
+        init_fail = init_fail + PriceModifications.init_from_file(o2.options.price_modifications_file,
+                                                                  verbose=o2.options.verbose)
 
         if not init_fail:
             fileio.validate_folder(o2.options.database_dump_folder)
-            PolicyPriceModification.values.to_csv(
+            PriceModifications.values.to_csv(
                 o2.options.database_dump_folder + os.sep + 'policy_price_modifications.csv', index=False)
 
-            print(PolicyPriceModification.get_price_modification(2020, 'hauling.BEV'))
-            print(PolicyPriceModification.get_price_modification(2020, 'non_hauling.BEV'))
-            print(PolicyPriceModification.get_price_modification(2020, 'hauling.ICE'))
-            print(PolicyPriceModification.get_price_modification(2020, 'non_hauling.ICE'))
+            print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))
+            print(PriceModifications.get_price_modification(2020, 'non_hauling.BEV'))
+            print(PriceModifications.get_price_modification(2020, 'hauling.ICE'))
+            print(PriceModifications.get_price_modification(2020, 'non_hauling.ICE'))
 
         else:
             print(init_fail)
