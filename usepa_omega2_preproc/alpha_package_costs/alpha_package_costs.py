@@ -439,7 +439,8 @@ class PackageCost:
             cost = weight_cost_cache[weight_cost_cache_key]
         else:
             weight_removed = glider_weight / (1 - weight_rdxn) - glider_weight
-            base_wt = curb_wt + weight_removed
+            # base_wt = curb_wt + weight_removed
+            base_wt = glider_weight + weight_removed
             base_weight_cost_per_lb = weight_cost_dict[self.structure_key]['item_cost'] * price_class_dict[self.price_key]['scaler']
             dmc_ln_coeff = weight_cost_dict[self.structure_key]['DMC_ln_coefficient']
             dmc_constant = weight_cost_dict[self.structure_key]['DMC_constant']
@@ -572,9 +573,9 @@ class SetInputs:
     ice_glider_share = 0.85
 
     # for now, set a BEV range and motor power here
-    onroad_bev_range_miles = 350
+    onroad_bev_range_miles = 300
     bev_motor_power = 150
-    bev_weight_reduction = 20
+    bev_weight_reduction = 0
     bev_usable_soc = bev_metrics_dict['usable_soc']['value']
     bev_charging_loss = bev_metrics_dict['charging_loss']['value']
     bev_gap = bev_metrics_dict['gap']['value']
