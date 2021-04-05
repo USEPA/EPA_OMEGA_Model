@@ -66,7 +66,8 @@ class GHG_credit_bank(OMEGABase):
         new_credit_transaction = pd.DataFrame(new_credit_transaction, columns=new_credit_transaction.keys(), index=[0])
         return new_credit_transaction
 
-    def get_expiring_credits(self, calendar_year):
+    def get_expiring_credits_Mg(self, calendar_year):
+        expiring_credits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
         # apply lifetime rules
@@ -74,11 +75,12 @@ class GHG_credit_bank(OMEGABase):
         if not ghg_credits.empty:
             for _, credit in ghg_credits.iterrows():
                 if credit['age'] == credit_max_life_years:
-                    return credit['ending_balance_Mg']
-        else:
-            return 0
+                    expiring_credits_Mg = credit['ending_balance_Mg']
 
-    def get_expiring_debits(self, calendar_year):
+        return expiring_credits_Mg
+
+    def get_expiring_debits_Mg(self, calendar_year):
+        expiring_debits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
         # apply lifetime rules
@@ -86,9 +88,9 @@ class GHG_credit_bank(OMEGABase):
         if not ghg_debits.empty:
             for _, debit in ghg_debits.iterrows():
                 if debit['age'] == debit_max_life_years:
-                    return debit['ending_balance_Mg']
-        else:
-            return 0
+                    expiring_debits_Mg = debit['ending_balance_Mg']
+                    
+        return expiring_debits_Mg
 
     def update_credit_age(self, calendar_year):
         # grab last years

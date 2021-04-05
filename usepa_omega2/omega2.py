@@ -103,6 +103,7 @@ def run_producer_consumer():
 
     from manufacturers import Manufacturer
     import producer
+    from GHG_credits import GHG_credit_bank
 
     for manufacturer in o2.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
@@ -115,7 +116,14 @@ def run_producer_consumer():
         else:
             analysis_end_year = o2.options.analysis_initial_year + o2.options.num_analysis_years
 
+        credit_bank = GHG_credit_bank(o2.options.ghg_credits_file, manufacturer_ID)
+
         for calendar_year in range(o2.options.analysis_initial_year, analysis_end_year):
+
+            credit_bank.update_credit_age(calendar_year)
+            expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
+            expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
+            credits_offset_Mg = 0  # expiring_credits_Mg + expiring_debits_Mg
 
             producer_decision_and_response = None
             prev_producer_decision_and_response = None
@@ -132,7 +140,7 @@ def run_producer_consumer():
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
                     producer.run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_response,
-                                                  iteration_num)
+                                                  iteration_num, credits_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                    winning_combo)
@@ -140,7 +148,8 @@ def run_producer_consumer():
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
                     iterate_producer_consumer_pricing(calendar_year, best_winning_combo_with_sales_response,
                                                       candidate_mfr_composite_vehicles, iteration_log,
-                                                      iteration_num, market_class_vehicle_dict, winning_combo)
+                                                      iteration_num, market_class_vehicle_dict, winning_combo,
+                                                      credits_offset_Mg)
 
                 producer_consumer_iteration = -1  # flag end of pricing subiteration
 
@@ -165,6 +174,9 @@ def run_producer_consumer():
                         omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION', echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
+            credit_bank.handle_credit(calendar_year, manufacturer_ID,
+                                      producer_decision_and_response['total_combo_credits_co2_megagrams'])
+
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          producer_decision_and_response)
 
@@ -172,12 +184,15 @@ def run_producer_consumer():
 
         iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
+        credit_bank.credit_bank.to_csv(o2.options.output_folder + 'credit_bank.csv', index=False)
+        credit_bank.transaction_log.to_csv(o2.options.output_folder + 'credit_bank_transactions.csv', index=False)
+
     return iteration_log
 
 
 def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_response, candidate_mfr_composite_vehicles,
                                       iteration_log, iteration_num, market_class_vehicle_dict,
-                                      producer_decision):
+                                      producer_decision, credit_offset_Mg):
     """
 
     Args:
@@ -239,7 +254,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         producer_decision_and_response['compliance_ratio'] = \
             producer_decision_and_response['total_combo_cert_co2_megagrams'] / \
-            producer_decision_and_response['total_combo_target_co2_megagrams']
+            (producer_decision_and_response['total_combo_target_co2_megagrams'] + credit_offset_Mg)
 
         # calculate "distance to origin" (minimal price and market share errors):
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**2
@@ -624,6 +639,8 @@ def init_omega(o2_options):
 
     from GHG_standards_fuels import GHGStandardFuels
 
+    from GHG_credits import GHG_credit_bank
+
     # instantiate database tables
     SQABase.metadata.create_all(o2.engine)
 
@@ -659,6 +676,10 @@ def init_omega(o2_options):
 
         init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
                                                                          verbose=o2.options.verbose)
+
+        init_fail = init_fail + GHG_credit_bank.validate_ghg_credits_template(o2.options.ghg_credits_file,
+                                                                              verbose=o2.options.verbose)
+
         init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
             o2.options.demanded_shares_file, verbose=o2.options.verbose)
 
