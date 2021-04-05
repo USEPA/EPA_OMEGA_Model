@@ -4,7 +4,8 @@ from datetime import datetime
 import shutil
 import matplotlib.pyplot as plt
 from pathlib import Path
-from itertools import product
+
+from usepa_omega2_preproc.context_aeo import SetInputs as context_aeo_inputs
 
 
 weight_cost_cache = dict()
@@ -543,8 +544,9 @@ class SetInputs:
     run_phev = False
 
     # get the price deflators
-    gdp_deflators = pd.read_csv(path_preproc / 'bea_tables/implicit_price_deflators.csv', skiprows=1, index_col=0)
-    dollar_basis = dollar_basis_year(gdp_deflators)
+    dollar_basis = int(context_aeo_inputs.aeo_version) - 1
+    gdp_deflators = pd.read_csv(path_preproc / f'bea_tables/implicit_price_deflators_{dollar_basis}.csv', index_col=0)
+    # dollar_basis = dollar_basis_year(gdp_deflators)
     gdp_deflators = gdp_deflators.to_dict('index')
 
     # read tech costs input file, convert dollar values to dollar basis, and create dictionaries
