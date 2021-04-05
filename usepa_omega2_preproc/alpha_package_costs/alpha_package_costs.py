@@ -382,20 +382,22 @@ class PackageCost:
     def engine_cost(self, engine_cost_dict, startstop_cost_dict, boost_multiplier):
         return EngineCost(self.engine_key, self.weight_key).calc_engine_cost(engine_cost_dict, startstop_cost_dict, boost_multiplier)
 
-    def calc_bev_cost(self, pev_curves_dict):
+    def calc_bev_cost(self, settings):
         """
         Cost of batteries and motors.
         :return:
         """
         pev_range, pev_energy_rate, pev_soc, pev_gap, battery_kwh_gross, motor_power = self.pev_key
-        battery_cost = battery_kwh_gross * (pev_curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
-                                            + pev_curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
-                                            + pev_curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
-                                            + pev_curves_dict['constant']['dollars_per_kWh_curve'])
-        motor_cost = motor_power * (pev_curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
-                                    + pev_curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
-                                    + pev_curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
-                                    + pev_curves_dict['constant']['dollars_per_kW_curve'])
+        battery_cost = battery_kwh_gross * (settings.pev_curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
+                                            + settings.pev_curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
+                                            + settings.pev_curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
+                                            + settings.pev_curves_dict['constant']['dollars_per_kWh_curve'])
+        motor_cost = motor_power * (settings.pev_curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
+                                    + settings.pev_curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
+                                    + settings.pev_curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
+                                    + settings.pev_curves_dict['constant']['dollars_per_kW_curve'])
+        battery_cost = battery_cost * settings.bev_powertrain_markup
+        motor_cost = motor_cost * settings.bev_powertrain_markup
         cost = battery_cost + motor_cost
         return battery_cost, motor_cost, cost
 
@@ -502,7 +504,7 @@ def pev_package_results(settings, key, alpha_file_dict):
                                                           alpha_file_dict[key]['EPA_HWFET_kWhr/100mi'] / 100,\
                                                           oncycle_kwh_per_mile
     ac_cost = pkg_obj.calc_ac_cost(settings.ac_cost_dict)
-    battery_cost, motor_cost, pev_cost = pkg_obj.calc_bev_cost(settings.pev_curves_dict)
+    battery_cost, motor_cost, pev_cost = pkg_obj.calc_bev_cost(settings)
     powertrain_cost = pev_cost + ac_cost
     powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_motor': motor_cost, 'pev_powertrain': powertrain_cost}, index=[alpha_key])
     aero_cost = pkg_obj.calc_aero_cost(settings.aero_cost_dict)
@@ -579,6 +581,7 @@ class SetInputs:
     bev_usable_soc = bev_metrics_dict['usable_soc']['value']
     bev_charging_loss = bev_metrics_dict['charging_loss']['value']
     bev_gap = bev_metrics_dict['gap']['value']
+    bev_powertrain_markup = bev_metrics_dict['bev_powertrain_markup']['value']
 
     # set constants
     lbs_per_kg = 2.2
