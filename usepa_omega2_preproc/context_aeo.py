@@ -184,7 +184,7 @@ class GetContext:
 
 
 class SetInputs:
-    aeo_version = '2020'
+    aeo_version = '2021'
     path_cwd = Path.cwd()
     path_aeo_inputs = path_cwd / f'usepa_omega2_preproc/aeo_tables/AEO{aeo_version}'
     path_bea_inputs = path_cwd / f'usepa_omega2_preproc/bea_tables/BEA{aeo_version}'
