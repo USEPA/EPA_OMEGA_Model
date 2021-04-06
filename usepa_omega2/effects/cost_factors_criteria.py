@@ -68,12 +68,18 @@ class CostFactorsCriteria(SQABase, OMEGABase):
         input_template_name = 'context_cost_factors-criteria'
         input_template_version = 0.2
         cost_factors_input_template_columns = {'calendar_year', 'dollar_basis',
-                                  'pm25_low-mortality_3.0_USD_per_uston', 'pm25_high-mortality_3.0_USD_per_uston',
-                                  'nox_low-mortality_3.0_USD_per_uston', 'nox_high-mortality_3.0_USD_per_uston',
-                                  'sox_low-mortality_3.0_USD_per_uston', 'sox_high-mortality_3.0_USD_per_uston',
-                                  'pm25_low-mortality_7.0_USD_per_uston', 'pm25_high-mortality_7.0_USD_per_uston',
-                                  'nox_low-mortality_7.0_USD_per_uston', 'nox_high-mortality_7.0_USD_per_uston',
-                                  'sox_low-mortality_7.0_USD_per_uston', 'sox_high-mortality_7.0_USD_per_uston'}
+                                               'pm25_low-mortality_3.0_USD_per_uston',
+                                               'pm25_high-mortality_3.0_USD_per_uston',
+                                               'nox_low-mortality_3.0_USD_per_uston',
+                                               'nox_high-mortality_3.0_USD_per_uston',
+                                               'sox_low-mortality_3.0_USD_per_uston',
+                                               'sox_high-mortality_3.0_USD_per_uston',
+                                               'pm25_low-mortality_7.0_USD_per_uston',
+                                               'pm25_high-mortality_7.0_USD_per_uston',
+                                               'nox_low-mortality_7.0_USD_per_uston',
+                                               'nox_high-mortality_7.0_USD_per_uston',
+                                               'sox_low-mortality_7.0_USD_per_uston',
+                                               'sox_high-mortality_7.0_USD_per_uston'}
 
         template_errors = validate_template_version_info(criteria_cost_factors_file, input_template_name,
                                                          input_template_version, verbose=verbose)
@@ -99,13 +105,19 @@ class CostFactorsCriteria(SQABase, OMEGABase):
                                                         deflators.columns, verbose=verbose)
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, deflators,
-                                         'pm25_low-mortality_3.0_USD_per_uston', 'pm25_high-mortality_3.0_USD_per_uston',
-                                         'nox_low-mortality_3.0_USD_per_uston', 'nox_high-mortality_3.0_USD_per_uston',
-                                         'sox_low-mortality_3.0_USD_per_uston', 'sox_high-mortality_3.0_USD_per_uston',
-                                         'pm25_low-mortality_7.0_USD_per_uston', 'pm25_high-mortality_7.0_USD_per_uston',
-                                         'nox_low-mortality_7.0_USD_per_uston', 'nox_high-mortality_7.0_USD_per_uston',
-                                         'sox_low-mortality_7.0_USD_per_uston', 'sox_high-mortality_7.0_USD_per_uston',
-                                         )
+                                             'pm25_low-mortality_3.0_USD_per_uston',
+                                             'pm25_high-mortality_3.0_USD_per_uston',
+                                             'nox_low-mortality_3.0_USD_per_uston',
+                                             'nox_high-mortality_3.0_USD_per_uston',
+                                             'sox_low-mortality_3.0_USD_per_uston',
+                                             'sox_high-mortality_3.0_USD_per_uston',
+                                             'pm25_low-mortality_7.0_USD_per_uston',
+                                             'pm25_high-mortality_7.0_USD_per_uston',
+                                             'nox_low-mortality_7.0_USD_per_uston',
+                                             'nox_high-mortality_7.0_USD_per_uston',
+                                             'sox_low-mortality_7.0_USD_per_uston',
+                                             'sox_high-mortality_7.0_USD_per_uston',
+                                             )
 
                 obj_list = []
                 # load data into database
