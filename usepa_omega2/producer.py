@@ -28,6 +28,7 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
     """
 
     from consumer.market_classes import MarketClass
+    from price_modifications import PriceModifications
 
     producer_generalized_cost_fuel_years, \
     producer_generalized_cost_annual_vmt = \
@@ -38,6 +39,8 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
              ])
 
     vehicle_cost = cost_curve[cost_name]
+
+    price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_ID)
 
     grams_co2_per_unit = vehicle.fuel_tailpipe_co2_emissions_grams_per_unit()
     kwh_per_mi = vehicle.cert_kWh_per_mile
@@ -59,7 +62,7 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
 
     generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
-    cost_curve[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost
+    cost_curve[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + price_modification
 
     return cost_curve
 

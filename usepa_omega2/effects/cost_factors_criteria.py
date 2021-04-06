@@ -59,43 +59,66 @@ class CostFactorsCriteria(SQABase, OMEGABase):
         return cache[cache_key]
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_database_from_file(criteria_cost_factors_file, cpi_deflators_file, verbose=False):
         cache.clear()
 
         if verbose:
-            omega_log.logwrite(f'\nInitializing database from {filename}...')
+            omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} and {cpi_deflators_file}...')
 
         input_template_name = 'context_cost_factors-criteria'
         input_template_version = 0.2
-        input_template_columns = {'calendar_year', 'dollar_basis',
-                                  'pm25_low-mortality_3.0_USD_per_uston', 'pm25_high-mortality_3.0_USD_per_uston',
-                                  'nox_low-mortality_3.0_USD_per_uston', 'nox_high-mortality_3.0_USD_per_uston',
-                                  'sox_low-mortality_3.0_USD_per_uston', 'sox_high-mortality_3.0_USD_per_uston',
-                                  'pm25_low-mortality_7.0_USD_per_uston', 'pm25_high-mortality_7.0_USD_per_uston',
-                                  'nox_low-mortality_7.0_USD_per_uston', 'nox_high-mortality_7.0_USD_per_uston',
-                                  'sox_low-mortality_7.0_USD_per_uston', 'sox_high-mortality_7.0_USD_per_uston'}
+        cost_factors_input_template_columns = {'calendar_year', 'dollar_basis',
+                                               'pm25_low-mortality_3.0_USD_per_uston',
+                                               'pm25_high-mortality_3.0_USD_per_uston',
+                                               'nox_low-mortality_3.0_USD_per_uston',
+                                               'nox_high-mortality_3.0_USD_per_uston',
+                                               'sox_low-mortality_3.0_USD_per_uston',
+                                               'sox_high-mortality_3.0_USD_per_uston',
+                                               'pm25_low-mortality_7.0_USD_per_uston',
+                                               'pm25_high-mortality_7.0_USD_per_uston',
+                                               'nox_low-mortality_7.0_USD_per_uston',
+                                               'nox_high-mortality_7.0_USD_per_uston',
+                                               'sox_low-mortality_7.0_USD_per_uston',
+                                               'sox_high-mortality_7.0_USD_per_uston'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
-                                                         verbose=verbose)
+        template_errors = validate_template_version_info(criteria_cost_factors_file, input_template_name,
+                                                         input_template_version, verbose=verbose)
+
+        input_template_name = 'context_cpi_price_deflators'
+        input_template_version = 0.1
+        deflators_input_template_columns = {'price_deflator', 'adjustment_factor'}
+
+        template_errors += validate_template_version_info(cpi_deflators_file, input_template_name,
+                                                          input_template_version, verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
-            df = pd.read_csv(filename, skiprows=1)
+            df = pd.read_csv(criteria_cost_factors_file, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_columns(criteria_cost_factors_file, cost_factors_input_template_columns,
+                                                        df.columns, verbose=verbose)
 
-            deflators = pd.read_csv(o2.options.cpi_deflators_file, skiprows=1, index_col=0)
-            df = gen_fxns.adjust_dollars(df, deflators, 
-                                         'pm25_low-mortality_3.0_USD_per_uston', 'pm25_high-mortality_3.0_USD_per_uston',
-                                         'nox_low-mortality_3.0_USD_per_uston', 'nox_high-mortality_3.0_USD_per_uston',
-                                         'sox_low-mortality_3.0_USD_per_uston', 'sox_high-mortality_3.0_USD_per_uston',
-                                         'pm25_low-mortality_7.0_USD_per_uston', 'pm25_high-mortality_7.0_USD_per_uston',
-                                         'nox_low-mortality_7.0_USD_per_uston', 'nox_high-mortality_7.0_USD_per_uston',
-                                         'sox_low-mortality_7.0_USD_per_uston', 'sox_high-mortality_7.0_USD_per_uston',
-                                         )
+            deflators = pd.read_csv(cpi_deflators_file, skiprows=1, index_col=0)
 
+            template_errors += validate_template_columns(cpi_deflators_file, deflators_input_template_columns,
+                                                        deflators.columns, verbose=verbose)
             if not template_errors:
+                df = gen_fxns.adjust_dollars(df, deflators,
+                                             'pm25_low-mortality_3.0_USD_per_uston',
+                                             'pm25_high-mortality_3.0_USD_per_uston',
+                                             'nox_low-mortality_3.0_USD_per_uston',
+                                             'nox_high-mortality_3.0_USD_per_uston',
+                                             'sox_low-mortality_3.0_USD_per_uston',
+                                             'sox_high-mortality_3.0_USD_per_uston',
+                                             'pm25_low-mortality_7.0_USD_per_uston',
+                                             'pm25_high-mortality_7.0_USD_per_uston',
+                                             'nox_low-mortality_7.0_USD_per_uston',
+                                             'nox_high-mortality_7.0_USD_per_uston',
+                                             'sox_low-mortality_7.0_USD_per_uston',
+                                             'sox_high-mortality_7.0_USD_per_uston',
+                                             )
+
                 obj_list = []
                 # load data into database
                 for i in df.index:

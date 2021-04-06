@@ -20,7 +20,6 @@ def get_demanded_shares(market_class_data, calendar_year):
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from consumer.market_classes import MarketClass
     from fuels import Fuel
-    from price_modifications import PriceModifications
 
     if o2.options.flat_context:
         calendar_year = o2.options.flat_context_year
@@ -47,8 +46,7 @@ def get_demanded_shares(market_class_data, calendar_year):
                 discount_rate = gcam_data_cy.discount_rate
                 annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** price_amortization_period) - 1)
 
-                total_capital_costs = market_class_data['average_price_%s' % market_class_id] + \
-                                      PriceModifications.get_price_modification(calendar_year, market_class_id)
+                total_capital_costs = market_class_data['average_modified_cross_subsidized_price_%s' % market_class_id]
                 average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
                 average_kwh_pmi = market_class_data['average_kwh_pmi_%s' % market_class_id]
 

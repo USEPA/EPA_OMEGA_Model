@@ -87,8 +87,8 @@ class GHG_credit_bank(OMEGABase):
         ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
         if not ghg_debits.empty:
             for _, debit in ghg_debits.iterrows():
-                if debit['age'] == debit_max_life_years:
-                    expiring_debits_Mg = debit['ending_balance_Mg']
+                if debit['age'] >= debit_max_life_years:
+                    expiring_debits_Mg += debit['ending_balance_Mg']
                     
         return expiring_debits_Mg
 
