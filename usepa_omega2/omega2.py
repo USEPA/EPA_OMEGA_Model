@@ -123,7 +123,7 @@ def run_producer_consumer():
             credit_bank.update_credit_age(calendar_year)
             expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
             expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
-            credits_offset_Mg = 0  # expiring_credits_Mg + expiring_debits_Mg
+            credits_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
             producer_decision_and_response = None
             prev_producer_decision_and_response = None
@@ -182,10 +182,14 @@ def run_producer_consumer():
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
+        iteration_log.to_csv(
+            o2.options.output_folder + o2.options.session_unique_name + '_producer_consumer_iteration_log.csv',
+            index=False)
 
-        credit_bank.credit_bank.to_csv(o2.options.output_folder + 'credit_bank.csv', index=False)
-        credit_bank.transaction_log.to_csv(o2.options.output_folder + 'credit_bank_transactions.csv', index=False)
+        credit_bank.credit_bank.to_csv(o2.options.output_folder + o2.options.session_unique_name + '_credit_bank.csv',
+                                       index=False)
+        credit_bank.transaction_log.to_csv(
+            o2.options.output_folder + o2.options.session_unique_name + '_credit_bank_transactions.csv', index=False)
 
     return iteration_log
 
@@ -653,76 +657,82 @@ def init_omega(o2_options):
     o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
 
     try:
-        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file,
-                                                                  verbose=o2.options.verbose)
-        init_fail = init_fail + PolicyFuelUpstreamMethods.init_from_file(o2.options.fuel_upstream_methods_file,
-                                                                  verbose=o2.options.verbose)
-        init_fail = init_fail + ContextFuelPrices.init_database_from_file(
-            o2.options.context_fuel_prices_file, verbose=o2.options.verbose)
+        init_fail += PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file, verbose=o2.options.verbose)
+        
+        init_fail += PolicyFuelUpstreamMethods.init_from_file(o2.options.fuel_upstream_methods_file, 
+                                                              verbose=o2.options.verbose)
+        
+        init_fail += ContextFuelPrices.init_database_from_file(o2.options.context_fuel_prices_file, 
+                                                               verbose=o2.options.verbose)
 
-        init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
-            o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
+        init_fail += ContextNewVehicleMarket.init_database_from_file(o2.options.context_new_vehicle_market_file, 
+                                                                     verbose=o2.options.verbose)
+        
         ContextNewVehicleMarket.init_context_new_vehicle_prices(o2.options.context_new_vehicle_prices_file)
 
-        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                    verbose=o2.options.verbose)
+        init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
-                                                                                verbose=o2.options.verbose)
-
-        init_fail = init_fail + GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file,
-                                                                         verbose=o2.options.verbose)
-
-        init_fail = init_fail + GHG_credit_bank.validate_ghg_credits_template(o2.options.ghg_credits_file,
-                                                                              verbose=o2.options.verbose)
-
-        init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(
-            o2.options.demanded_shares_file, verbose=o2.options.verbose)
-
-        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
+        init_fail += o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file, 
                                                                      verbose=o2.options.verbose)
-        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + ReregistrationFixedByAge.init_database_from_file(
-            o2.options.reregistration_fixed_by_age_file, verbose=o2.options.verbose)
+        init_fail += GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file, 
+                                                              verbose=o2.options.verbose)
+
+        init_fail += GHG_credit_bank.validate_ghg_credits_template(o2.options.ghg_credits_file, 
+                                                                   verbose=o2.options.verbose)
+
+        init_fail += DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file, 
+                                                                verbose=o2.options.verbose)
+
+        init_fail += Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
+        
+        init_fail += VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+
+        init_fail += ReregistrationFixedByAge.init_database_from_file(o2.options.reregistration_fixed_by_age_file, 
+                                                                      verbose=o2.options.verbose)
+        
         o2.options.stock_scrappage = ReregistrationFixedByAge
 
-        init_fail = init_fail + AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
-                                                                            verbose=o2.options.verbose)
+        init_fail += AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file, 
+                                                                 verbose=o2.options.verbose)
+        
         o2.options.stock_vmt = AnnualVMTFixedByAge
 
-        init_fail = init_fail + CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
-                                                                            verbose=o2.options.verbose)
-        init_fail = init_fail + CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
-                                                                       verbose=o2.options.verbose)
-        init_fail = init_fail + CostFactorsEnergySecurity.init_database_from_file(o2.options.energysecurity_cost_factors_file,
-                                                                                  verbose=o2.options.verbose)
-        init_fail = init_fail + CostFactorsCongestionNoise.init_database_from_file(o2.options.congestion_noise_cost_factors_file,
-                                                                                   verbose=o2.options.verbose)
-        init_fail = init_fail + EmissionFactorsPowersector.init_database_from_file(o2.options.emission_factors_powersector_file,
-                                                                                   verbose=o2.options.verbose)
-        init_fail = init_fail + EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,
-                                                                                verbose=o2.options.verbose)
-        init_fail = init_fail + EmissionFactorsVehicles.init_database_from_file(o2.options.emission_factors_vehicles_file,
-                                                                                verbose=o2.options.verbose)
-
-        init_fail = init_fail + RequiredZevShare.init_from_file(o2.options.required_zev_share_file,
-                                                                verbose=o2.options.verbose)
-
-        init_fail = init_fail + PriceModifications.init_from_file(o2.options.price_modifications_file,
-                                                                  verbose=o2.options.verbose)
-
-        init_fail = init_fail + ProductionConstraints.init_from_file(o2.options.production_constraints_file,
-                                                                verbose=o2.options.verbose)
-
-        init_fail = init_fail + DriveCycles.init_from_file(o2.options.drive_cycles_file, verbose=o2.options.verbose)
-
-        init_fail = init_fail + DriveCycleWeights.init_from_file(o2.options.drive_cycle_weights_file,
+        init_fail += CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
                                                                  verbose=o2.options.verbose)
+
+        init_fail += CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
+                                                            verbose=o2.options.verbose)
+
+        init_fail += CostFactorsEnergySecurity.init_database_from_file(o2.options.energysecurity_cost_factors_file,
+                                                                       verbose=o2.options.verbose)
+
+        init_fail += CostFactorsCongestionNoise.init_database_from_file(o2.options.congestion_noise_cost_factors_file,
+                                                                        verbose=o2.options.verbose)
+
+        init_fail += EmissionFactorsPowersector.init_database_from_file(o2.options.emission_factors_powersector_file,
+                                                                        verbose=o2.options.verbose)
+
+        init_fail += EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,
+                                                                     verbose=o2.options.verbose)
+
+        init_fail += EmissionFactorsVehicles.init_database_from_file(o2.options.emission_factors_vehicles_file,
+                                                                     verbose=o2.options.verbose)
+
+        init_fail += RequiredZevShare.init_from_file(o2.options.required_zev_share_file, verbose=o2.options.verbose)
+
+        init_fail += PriceModifications.init_from_file(o2.options.price_modifications_file, verbose=o2.options.verbose)
+
+        init_fail += ProductionConstraints.init_from_file(o2.options.production_constraints_file,
+                                                          verbose=o2.options.verbose)
+
+        init_fail += DriveCycles.init_from_file(o2.options.drive_cycles_file, verbose=o2.options.verbose)
+
+        init_fail += DriveCycleWeights.init_from_file(o2.options.drive_cycle_weights_file, verbose=o2.options.verbose)
 
         # initial year = initial fleet model year (latest year of data)
         o2.options.analysis_initial_year = int(o2.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
