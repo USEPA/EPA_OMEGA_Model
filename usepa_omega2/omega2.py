@@ -47,17 +47,17 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
 
     for cat in consumer.market_categories:
         omega_log.logwrite(
-            ('price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
-            producer_decision_and_response['average_price_%s' % cat],
+            ('cross subsidized price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
+            producer_decision_and_response['average_cross_subsidized_price_%s' % cat],
             producer_decision_and_response['average_cost_%s' % cat],
-            producer_decision_and_response['average_price_%s' % cat] /
+            producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
             producer_decision_and_response['average_cost_%s' % cat]
             ), echo_console=True)
 
     omega_log.logwrite(
-        'price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_price_total'],
+        'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_cross_subsidized_price_total'],
                                                              producer_decision_and_response['average_cost_total'],
-                                                             producer_decision_and_response['average_price_total'] /
+                                                             producer_decision_and_response['average_cross_subsidized_price_total'] /
                                                              producer_decision_and_response['average_cost_total']
                                                              ), echo_console=True)
     omega_log.logwrite(
@@ -232,7 +232,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
     while continue_search:
         price_options_df = producer_decision.to_frame().transpose()
 
-        continue_search, price_options_df = calculate_price_options(continue_search, multiplier_columns,
+        continue_search, price_options_df = calculate_price_options(calendar_year, continue_search, multiplier_columns,
                                                                     prev_multiplier_range, price_options_df,
                                                                     producer_decision_and_response)
 
@@ -259,7 +259,7 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**2
         # add terms to maintain prices of non-responsive market categories during convergence:
         for cat in consumer.non_responsive_market_categories:
-            pricing_convergence_score += abs(1 - producer_decision_and_response['average_price_%s' % cat] /
+            pricing_convergence_score += abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
                                         producer_decision_and_response['average_cost_%s' % cat])**1
 
         producer_decision_and_response['pricing_convergence_score'] = pricing_convergence_score**1
@@ -287,7 +287,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
         # ###############################################################################################################
 
         producer_decision_and_response['price_cost_ratio_total'] = \
-            producer_decision_and_response['average_price_total'] / producer_decision_and_response['average_cost_total']
+            (producer_decision_and_response['average_cross_subsidized_price_total'] /
+             producer_decision_and_response['average_cost_total'])
 
         converged, convergence_error = detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
@@ -333,7 +334,8 @@ def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_de
     import consumer
 
     producer_decision_and_response['abs_share_delta_total'] = 0
-    producer_decision_and_response['average_price_total'] = 0
+    producer_decision_and_response['average_cross_subsidized_price_total'] = 0
+    producer_decision_and_response['average_modified_cross_subsidized_price_total'] = 0
     producer_decision_and_response['average_cost_total'] = 0
 
     for mc in market_class_vehicle_dict:
@@ -341,8 +343,12 @@ def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_de
             producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
             producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
 
-        producer_decision_and_response['average_price_total'] += \
-            producer_decision_and_response['average_price_%s' % mc] * \
+        producer_decision_and_response['average_cross_subsidized_price_total'] += \
+            producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
+            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+
+        producer_decision_and_response['average_modified_cross_subsidized_price_total'] += \
+            producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] * \
             producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
         producer_decision_and_response['average_cost_total'] += \
@@ -352,10 +358,11 @@ def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_de
     # calculate new total sales demand based on total share weighted price
     producer_decision_and_response['new_vehicle_sales'] = \
         consumer.sales_volume.new_vehicle_sales_response(calendar_year,
-                                                         producer_decision_and_response['average_price_total'])
+                                                         producer_decision_and_response[
+                                                             'average_modified_cross_subsidized_price_total'])
 
 
-def calculate_price_options(continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
+def calculate_price_options(calendar_year, continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
                             producer_decision_and_response):
     """
 
@@ -371,6 +378,7 @@ def calculate_price_options(continue_search, multiplier_columns, prev_multiplier
     """
     import numpy as np
     from consumer.market_classes import MarketClass
+    from price_modifications import PriceModifications
 
     if producer_decision_and_response.empty:
         # first time through, span full range
@@ -388,7 +396,12 @@ def calculate_price_options(continue_search, multiplier_columns, prev_multiplier
                                                                           search_collapsed)
 
         price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
-        price_options_df['average_price_%s' % mc] = price_options_df['average_cost_%s' % mc] * price_options_df[mcc]
+
+        price_options_df['average_cross_subsidized_price_%s' % mc] = price_options_df['average_cost_%s' % mc] * price_options_df[mcc]
+
+        price_modification = PriceModifications.get_price_modification(calendar_year, mc)
+        price_options_df['average_modified_cross_subsidized_price_%s' % mc] = price_options_df['average_cross_subsidized_price_%s' % mc] + price_modification
+
         prev_multiplier_range[mcc] = multiplier_range
 
     if not producer_decision_and_response.empty and search_collapsed:
@@ -519,7 +532,7 @@ def calculate_market_sector_data(winning_combo):
     for mcat in consumer.market_categories:
         winning_combo['average_cost_%s' % mcat] = 0
         winning_combo['average_generalized_cost_%s' % mcat] = 0
-        winning_combo['average_price_%s' % mcat] = 0
+        winning_combo['average_cross_subsidized_price_%s' % mcat] = 0
         winning_combo['sales_%s' % mcat] = 0
         winning_combo['producer_abs_share_frac_%s' % mcat] = 0
 
@@ -527,14 +540,14 @@ def calculate_market_sector_data(winning_combo):
             if mcat in mc.split('.'):
                 winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['average_generalized_cost_%s' % mcat] += winning_combo['average_generalized_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
-                if 'average_price_%s' % mc in winning_combo:
-                    winning_combo['average_price_%s' % mcat] += winning_combo['average_price_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
+                if 'average_cross_subsidized_price_%s' % mc in winning_combo:
+                    winning_combo['average_cross_subsidized_price_%s' % mcat] += winning_combo['average_cross_subsidized_price_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['sales_%s' % mcat] += np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['producer_abs_share_frac_%s' % mcat] += winning_combo['producer_abs_share_frac_%s' % mc]
 
         winning_combo['average_cost_%s' % mcat] = winning_combo['average_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
         winning_combo['average_generalized_cost_%s' % mcat] = winning_combo['average_generalized_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
-        winning_combo['average_price_%s' % mcat] = winning_combo['average_price_%s' % mcat] / winning_combo['sales_%s' % mcat]
+        winning_combo['average_cross_subsidized_price_%s' % mcat] = winning_combo['average_cross_subsidized_price_%s' % mcat] / winning_combo['sales_%s' % mcat]
 
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
@@ -551,13 +564,6 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= 1e-4
     convergence_error = 0
     for mc in market_class_dict:
-        # # relative percentage convergence on largest market shares:
-        # if producer_decision_and_response['producer_abs_share_frac_%s' % mc] >= 0.5:
-        #     convergence_error = \
-        #         max(convergence_error, abs(1 - producer_decision_and_response['producer_abs_share_frac_%s' % mc] / \
-        #                                 producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-        #     converged = converged and (convergence_error <= o2.options.producer_consumer_iteration_tolerance)
-        # relative percentage convergence on largest market shares:
         convergence_error = \
             max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] - \
                                     producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
@@ -698,6 +704,7 @@ def init_omega(o2_options):
         o2.options.stock_vmt = AnnualVMTFixedByAge
 
         init_fail += CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
+                                                                 o2.options.cpi_deflators_file,
                                                                  verbose=o2.options.verbose)
 
         init_fail += CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
