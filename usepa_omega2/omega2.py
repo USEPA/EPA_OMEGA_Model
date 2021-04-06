@@ -126,8 +126,6 @@ def run_producer_consumer():
             credits_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
             producer_decision_and_response = None
-            prev_producer_decision_and_response = None
-            prev_candidate_mfr_composite_vehicles = None
             best_winning_combo_with_sales_response = None
 
             iteration_num = 0
@@ -159,9 +157,6 @@ def run_producer_consumer():
                 iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
                 update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
                                      producer_consumer_iteration, producer_compliant, convergence_error)
-
-                prev_producer_decision_and_response = producer_decision_and_response
-                prev_candidate_mfr_composite_vehicles = candidate_mfr_composite_vehicles
 
                 # decide whether to iterate or not
                 iterate = o2.options.iterate_producer_consumer \
