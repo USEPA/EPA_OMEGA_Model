@@ -9,32 +9,6 @@ from pathlib import Path
 from datetime import datetime
 import shutil
 
-path_cwd = Path.cwd()
-path_aeo_inputs = path_cwd / 'usepa_omega2_preproc/aeo_tables'
-path_bea_inputs = path_cwd / 'usepa_omega2_preproc/bea_tables'
-path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
-path_outputs.mkdir(exist_ok=True)
-path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
-
-vehicles_context_template = 'context_new_vehicle_market.csv'
-fuels_context_template = 'context_fuel_prices.csv'
-price_deflators_template = 'implicit_price_deflators.csv'
-cpiu_deflators_template = 'cpi_price_deflators.csv'
-
-aeo_cases = ['Reference case', 'High oil price', 'Low oil price']
-gasoline_upstream = 2478 # 77 FR 63181
-electricity_upstream = 534 # 77 FR 63182
-
-# name the aeo table(s) being used
-aeo_class_attributes_table_file = 'Table_42._Summary_of_New_Light-Duty_Vehicle_Size_Class_Attributes.csv'
-aeo_sales_table_file = 'Table_38._Light-Duty_Vehicle_Sales_by_Technology_Type.csv'
-aeo_petroleum_fuel_prices_table_file = 'Table_58._Components_of_Selected_Petroleum_Product_Prices.csv'
-aeo_electricity_fuel_prices_table_file = 'Table_8._Electricity_Supply_Disposition_Prices_and_Emissions.csv'
-aeo_vehicle_prices_table_file = 'Table_52._New_Light-Duty_Vehicle_Prices.csv'
-
-# and the bea table(s) being used
-deflators_table_file = 'Table_1.1.9_ImplicitPriceDeflators.csv'
-cpiu_table_file = 'SeriesReport.csv'
 
 
 def read_table(path, table_name, skiprows=4):
@@ -100,17 +74,17 @@ def new_metric(df, id_column, new_metric, new_metric_entry, *id_words):
     return df
 
 
-def save_template(df, path_to_template, path_to_save, template_name):
+def save_template(settings, df, path_to_save, template_name):
     """
 
     :param df: The DataFrame containing data to save to the template.
-    :param path_to_template: Path to the input template.
+    :param settings: The SetInputs class.
     :param path_to_save: Path to the save folder.
     :param template_name: Name of template.
     :return: Confirmation message that the template has been saved and to where.
 
     """
-    shutil.copy2(path_to_template / f'{template_name}', path_to_save / f'{template_name}')
+    shutil.copy2(settings.path_input_templates / f'{template_name}', path_to_save / f'{template_name}')
 
     # open the input template into which results will be placed.
     template_info = pd.read_csv(path_to_save / f'{template_name}', 'b', nrows=0)
@@ -122,46 +96,6 @@ def save_template(df, path_to_template, path_to_save, template_name):
     with open(path_to_save / f'{template_name}', 'a', newline='') as template_file:
         df.to_csv(template_file, index=False)
     return print(f'\n{template_name} saved to {path_to_save}')
-
-
-class GetContext:
-    def __init__(self, table):
-        """
-
-        :param table: A DataFrame of the table being worked on.
-        """
-        self.table = table
-
-    def aeo_year(self):
-        """
-
-        :return: The year of the report, e.g., 'AEO2020'.
-        """
-        a_loc = self.table.at[0, 'api key'].find('A')
-        return self.table.at[0, 'api key'][a_loc: a_loc + 7]
-
-    def aeo_dollars(self):
-        """
-
-        :return: The dollar basis of the AEO report.
-        """
-        usd_loc = self.table.at[0, 'units'].find(' $')
-        return int(self.table.at[0, 'units'][0: usd_loc])
-
-    def select_table_rows(self, col_id, arg, replace=None):
-        """
-
-        :param arg: The identifying string used to determine what rows to be included in the returned DataFrame.
-        :param replace: Any string elements that are to be removed from the entries containing 'metric'.
-        :return: A DataFrame of those AEO table rows containing 'metric' within the 'full name' column.
-        """
-        df_rows = pd.DataFrame()
-        df_rows = pd.concat([df_rows, self.table.loc[self.table[col_id].str.contains(arg), :]],
-                            ignore_index=True)
-        if replace:
-            df_rows.replace({col_id: replace}, {col_id: ''}, regex=True, inplace=True)
-        df_rows = df_rows.iloc[:, :-1]
-        return df_rows
 
 
 def error_gen(actual, rounded):
@@ -209,21 +143,98 @@ def round_floats_to_100(percents, decimals):
     return rounded
 
 
+class GetContext:
+    def __init__(self, table):
+        """
+
+        :param table: A DataFrame of the table being worked on.
+        """
+        self.table = table
+
+    def aeo_year(self):
+        """
+
+        :return: The year of the report, e.g., 'AEO2020'.
+        """
+        a_loc = self.table.at[0, 'api key'].find('A')
+        return self.table.at[0, 'api key'][a_loc: a_loc + 7]
+
+    def aeo_dollars(self):
+        """
+
+        :return: The dollar basis of the AEO report.
+        """
+        usd_loc = self.table.at[0, 'units'].find(' $')
+        return int(self.table.at[0, 'units'][0: usd_loc])
+
+    def select_table_rows(self, col_id, arg, replace=None):
+        """
+
+        :param arg: The identifying string used to determine what rows to be included in the returned DataFrame.
+        :param replace: Any string elements that are to be removed from the entries containing 'metric'.
+        :return: A DataFrame of those AEO table rows containing 'metric' within the 'full name' column.
+        """
+        df_rows = pd.DataFrame()
+        df_rows = pd.concat([df_rows, self.table.loc[self.table[col_id].str.contains(arg), :]],
+                            ignore_index=True)
+        if replace:
+            df_rows.replace({col_id: replace}, {col_id: ''}, regex=True, inplace=True)
+        df_rows = df_rows.iloc[:, :-1]
+        return df_rows
+
+
+class SetInputs:
+    aeo_version = '2020'
+    path_cwd = Path.cwd()
+    path_aeo_inputs = path_cwd / f'usepa_omega2_preproc/aeo_tables/AEO{aeo_version}'
+    path_bea_inputs = path_cwd / f'usepa_omega2_preproc/bea_tables/BEA{aeo_version}'
+    path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
+    path_outputs.mkdir(exist_ok=True)
+    path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
+
+    vehicles_context_template = 'context_new_vehicle_market.csv'
+    fuels_context_template = 'context_fuel_prices.csv'
+    price_deflators_template = 'implicit_price_deflators.csv'
+    cpiu_deflators_template = 'cpi_price_deflators.csv'
+
+    aeo_cases = ['Reference case', 'High oil price', 'Low oil price']
+    gasoline_upstream = 2478  # 77 FR 63181
+    electricity_upstream = 534  # 77 FR 63182
+
+    # name the aeo table(s) being used
+    aeo_class_attributes_table_file = 'Table_42._Summary_of_New_Light-Duty_Vehicle_Size_Class_Attributes.csv'
+    aeo_sales_table_file = 'Table_38._Light-Duty_Vehicle_Sales_by_Technology_Type.csv'
+    if aeo_version == '2020':
+        aeo_petroleum_fuel_prices_table_file = 'Table_58._Components_of_Selected_Petroleum_Product_Prices.csv'
+    elif aeo_version == '2021':
+        aeo_petroleum_fuel_prices_table_file = 'Table_57._Components_of_Selected_Petroleum_Product_Prices.csv'
+    else:
+        print('Error finding AEO fuel prices table.')
+    aeo_electricity_fuel_prices_table_file = 'Table_8._Electricity_Supply_Disposition_Prices_and_Emissions.csv'
+    aeo_vehicle_prices_table_file = 'Table_52._New_Light-Duty_Vehicle_Prices.csv'
+
+    # and the bea table(s) being used
+    deflators_table_file = 'Table_1.1.9_ImplicitPriceDeflators.csv'
+    cpiu_table_file = 'SeriesReport.csv'
+
+
 def main():
+
+    settings = SetInputs()
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
     # read files as DataFrames
-    aeo_class_attributes_table = read_table(path_aeo_inputs, aeo_class_attributes_table_file)
-    aeo_sales_table = read_table(path_aeo_inputs, aeo_sales_table_file)
-    aeo_petroleum_fuel_prices_table = read_table(path_aeo_inputs, aeo_petroleum_fuel_prices_table_file)
-    aeo_electricity_fuel_prices_table = read_table(path_aeo_inputs, aeo_electricity_fuel_prices_table_file)
-    aeo_vehicle_prices_table = read_table(path_aeo_inputs, aeo_vehicle_prices_table_file)
-    deflators_table = read_table(path_bea_inputs, deflators_table_file)
-    cpi_table = pd.read_csv(path_bea_inputs / cpiu_table_file, skiprows=11, usecols=[0, 1])
+    aeo_class_attributes_table = read_table(settings.path_aeo_inputs, settings.aeo_class_attributes_table_file)
+    aeo_sales_table = read_table(settings.path_aeo_inputs, settings.aeo_sales_table_file)
+    aeo_petroleum_fuel_prices_table = read_table(settings.path_aeo_inputs, settings.aeo_petroleum_fuel_prices_table_file)
+    aeo_electricity_fuel_prices_table = read_table(settings.path_aeo_inputs, settings.aeo_electricity_fuel_prices_table_file)
+    aeo_vehicle_prices_table = read_table(settings.path_aeo_inputs, settings.aeo_vehicle_prices_table_file)
+    deflators_table = read_table(settings.path_bea_inputs, settings.deflators_table_file)
+    cpi_table = pd.read_csv(settings.path_bea_inputs / settings.cpiu_table_file, skiprows=11, usecols=[0, 1])
 
     # first work on class attributes by looping thru the aeo cases
     fleet_context_df = pd.DataFrame()
-    for aeo_case in aeo_cases:
+    for aeo_case in settings.aeo_cases:
         print(f'Working on market context vehicle attributes for the AEO {aeo_case}')
         attribute = dict()
         attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case)
@@ -352,7 +363,7 @@ def main():
 
     # work on fuel prices
     fuel_context_df = pd.DataFrame()
-    for aeo_case in aeo_cases:
+    for aeo_case in settings.aeo_cases:
         print(f'Working on context gasoline prices for the AEO {aeo_case}')
         case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case)
         aeo_table_obj = GetContext(case_df)
@@ -425,18 +436,19 @@ def main():
     basis_factor_df = pd.DataFrame(cpi_table.loc[cpi_table['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)
     basis_factor = basis_factor_df.at[0, 'price_deflator']
     cpi_table.insert(len(cpi_table.columns),
-               'adjustment_factor',
-               basis_factor / cpi_table['price_deflator'])
+                     'adjustment_factor',
+                     basis_factor / cpi_table['price_deflator'])
 
     # print to output files
-    print(f'Saving output files to {path_outputs}')
-    path_of_run_folder = path_outputs / f'{start_time_readable}_run'
+    path_of_run_folder = settings.path_outputs / f'{start_time_readable}_run'
     path_of_run_folder.mkdir(exist_ok=False)
+    print(f'Saving output files to {path_of_run_folder}')
 
-    save_template(fleet_context_df, path_input_templates, path_of_run_folder, vehicles_context_template)
-    save_template(fuel_context_df, path_input_templates, path_of_run_folder, fuels_context_template)
-    save_template(deflators, path_input_templates, path_of_run_folder, price_deflators_template)
-    save_template(cpi_table, path_input_templates, path_of_run_folder, cpiu_deflators_template)
+    fleet_context_df.to_csv(path_of_run_folder / settings.vehicles_context_template, index=False)
+    fuel_context_df.to_csv(path_of_run_folder / settings.fuels_context_template, index=False)
+    deflators.to_csv(path_of_run_folder / settings.price_deflators_template, index=False)
+    deflators.to_csv(settings.path_cwd / f'usepa_omega2_preproc/bea_tables/implicit_price_deflators_{usd_basis}.csv', index=False)
+    cpi_table.to_csv(path_of_run_folder / settings.cpiu_deflators_template, index=False)
 
 
 if __name__ == '__main__':
