@@ -56,7 +56,7 @@ def cost_vs_plot(df, path, name_id, *years):
         for bev_plot, bev_legends in zip(bev_plot, bev_legends):
             x, y = bev_plot
             ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=bev_legends)
-            ax.set(xlim=(0, 0.5), ylim=(10000, 100000))
+            ax.set(xlim=(0, 0.5), ylim=(10000, 60000))
             plt.legend(loc=4)
             plt.title(f'bev_{year}')
             plt.savefig(path / f'bev_{year}_{name_id}.png')
@@ -437,7 +437,7 @@ class PackageCost:
         """
         curb_wt, glider_weight, battery_weight, weight_rdxn = self.weight_key
         weight_rdxn = weight_rdxn / 100
-        weight_cost_cache_key = (self.weight_key, self.price_key, self.structure_key)
+        weight_cost_cache_key = (self.weight_key, self.price_key, self.structure_key, self.fuel_key)
         if weight_cost_cache_key in weight_cost_cache.keys():
             cost = weight_cost_cache[weight_cost_cache_key]
         else:
@@ -478,7 +478,7 @@ def ice_package_results(settings, key, alpha_file_dict):
     roadload_cost = aero_cost + nonaero_cost
     roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[alpha_key])
 
-    weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_dict, settings.price_class_dict)
+    weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_ice_dict, settings.price_class_dict)
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
@@ -487,6 +487,7 @@ def ice_package_results(settings, key, alpha_file_dict):
     package_cost_df.insert(0, 'ftp_3:co2_grams_per_mile', ftp3_co2)
     package_cost_df.insert(0, 'ftp_2:co2_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'ftp_1:co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
 
@@ -513,7 +514,7 @@ def pev_package_results(settings, key, alpha_file_dict):
     roadload_cost = aero_cost + nonaero_cost
     roadload_cost_df = pd.DataFrame(roadload_cost, columns=['roadload'], index=[alpha_key])
 
-    weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_dict, settings.price_class_dict)
+    weight_cost = pkg_obj.calc_weight_cost(settings.weight_cost_pev_dict, settings.price_class_dict)
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
     
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
@@ -522,6 +523,8 @@ def pev_package_results(settings, key, alpha_file_dict):
     package_cost_df.insert(0, 'ftp_3:kWh_per_mile', ftp3_kwh)
     package_cost_df.insert(0, 'ftp_2:kWh_per_mile', ftp2_kwh)
     package_cost_df.insert(0, 'ftp_1:kWh_per_mile', ftp1_kwh)
+    package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
+    package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
 
@@ -542,6 +545,7 @@ class SetInputs:
     run_ice = True
     run_bev = True
     run_phev = False
+    generate_cost_cloud_file = True
 
     # get the price deflators
     dollar_basis = int(context_aeo_inputs.aeo_version) - 1
@@ -556,7 +560,8 @@ class SetInputs:
     trans_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'trans', 'item_cost', 'dmc', 'dmc_increment').to_dict('index')
     accessories_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'accessories', 'item_cost', 'dmc').to_dict('index')
     startstop_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'start-stop', 'item_cost', 'dmc').to_dict('index')
-    weight_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'weight', 'item_cost', 'dmc_per_pound').to_dict('index')
+    weight_cost_ice_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'weight_ice', 'item_cost', 'dmc_per_pound').to_dict('index')
+    weight_cost_pev_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'weight_pev', 'item_cost', 'dmc_per_pound').to_dict('index')
     aero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'aero', 'item_cost', 'dmc').to_dict('index')
     nonaero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'nonaero', 'item_cost', 'dmc').to_dict('index')
     ac_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'ac', 'item_cost', 'dmc').to_dict('index')
@@ -661,10 +666,12 @@ def main():
         cost_cloud = reshape_df_for_cloud_file(settings, bev_packages_df)
 
     cost_cloud.fillna(0, inplace=True)
-    cost_cloud.to_csv(settings.path_of_run_folder / 'cost_clouds.csv', index=False)
 
     cost_vs_plot(cost_cloud, settings.path_of_run_folder, settings.start_time_readable, 2020, 2030, 2040)
     # cost_vs_plot_combined(cost_cloud, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
+
+    if settings.generate_cost_cloud_file:
+        cost_cloud.to_csv(settings.path_of_run_folder / 'cost_clouds.csv', index=False)
 
     # save additional outputs
     modified_costs = pd.ExcelWriter(settings.path_of_run_folder.joinpath(f'techcosts_in_{settings.dollar_basis}_dollars.xlsx'))
@@ -674,7 +681,8 @@ def main():
     pd.DataFrame(settings.accessories_cost_dict).transpose().to_excel(modified_costs, sheet_name='accessories', index=True)
     pd.DataFrame(settings.aero_cost_dict).transpose().to_excel(modified_costs, sheet_name='aero', index=False)
     pd.DataFrame(settings.nonaero_cost_dict).transpose().to_excel(modified_costs, sheet_name='nonaero', index=False)
-    pd.DataFrame(settings.weight_cost_dict).transpose().to_excel(modified_costs, sheet_name='weight', index=True)
+    pd.DataFrame(settings.weight_cost_ice_dict).transpose().to_excel(modified_costs, sheet_name='weight_ice', index=True)
+    pd.DataFrame(settings.weight_cost_pev_dict).transpose().to_excel(modified_costs, sheet_name='weight_pev', index=True)
     pd.DataFrame(settings.ac_cost_dict).transpose().to_excel(modified_costs, sheet_name='ac', index=True)
     modified_costs.save()
 
