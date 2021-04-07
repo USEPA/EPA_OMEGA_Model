@@ -40,7 +40,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = plot_manufacturer_compliance(calendar_years)
 
-    total_sales = plot_total_sales(calendar_years)
+    context_sales, total_sales = plot_total_sales(calendar_years)
 
     market_share_results = plot_market_shares(calendar_years, total_sales)
 
@@ -56,6 +56,8 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = calendar_years
+    session_results['sales_total'] = total_sales
+    session_results['sales_context'] = context_sales
     session_results['session_name'] = o2.options.session_name
     session_results['cert_target_co2_Mg'] = cert_target_co2_Mg
     session_results['cert_co2_Mg'] = cert_co2_Mg
@@ -128,7 +130,7 @@ def plot_cert_co2_gpmi(calendar_years):
     ax1.legend(consumer.market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Cert CO2 g/mi by Market Category v Year' % o2.options.session_unique_name)
-    fig.savefig(o2.options.output_folder + '%s V Cert gpmi Mkt Cat.png' % o2.options.session_unique_name)
+    fig.savefig(o2.options.output_folder + '%s V Cert CO2 gpmi Mkt Cat.png' % o2.options.session_unique_name)
 
     # cost/market class chart
     fig, ax1 = figure()
@@ -150,7 +152,7 @@ def plot_cert_co2_gpmi(calendar_years):
     label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Cert CO2 g/mi  by Market Class v Year' % o2.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
-    fig.savefig(o2.options.output_folder + '%s V Cert gpmi Mkt Cls.png' % o2.options.session_unique_name)
+    fig.savefig(o2.options.output_folder + '%s V Cert CO2 gpmi Mkt Cls.png' % o2.options.session_unique_name)
     return average_cert_co2_data
 
 
@@ -569,7 +571,7 @@ def plot_total_sales(calendar_years):
         o2.options.session_unique_name, total_sales.sum() / 1e6))
     fig.savefig(o2.options.output_folder + '%s Sales v Year.png' % o2.options.session_unique_name)
 
-    return total_sales
+    return context_sales, total_sales
 
 
 def plot_manufacturer_compliance(calendar_years):
