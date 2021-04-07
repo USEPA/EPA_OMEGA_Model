@@ -545,7 +545,7 @@ class SetInputs:
     run_ice = True
     run_bev = True
     run_phev = False
-    generate_cost_cloud_file = False
+    generate_cost_cloud_file = True
 
     # get the price deflators
     dollar_basis = int(context_aeo_inputs.aeo_version) - 1
