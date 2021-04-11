@@ -623,8 +623,36 @@ def plot_iteration(iteration_log):
         plt.title('%s iteration' % mc)
         plt.grid()
         plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
-        plt.ylim([0, 1])
+        # plt.ylim([0, 1])
         plt.savefig('%s%s Iter %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
+
+    plt.figure()
+    for mc in MarketClass.get_market_class_dict():
+        plt.plot(iteration_log['calendar_year'][
+                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)],
+                 iteration_log['consumer_generalized_cost_dollars_%s' % mc][
+                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)], '.-')
+    plt.legend(['consumer_generalized_cost_dollars_%s' % mc for mc in MarketClass.get_market_class_dict()])
+    plt.ylabel('Cost $ / mi')
+    plt.title('Consumer Generalized Cost')
+    # plt.ylim([0.0, 0.9])
+    plt.grid()
+    plt.savefig('%s%s ConsumerGC.png' % (o2.options.output_folder, o2.options.session_unique_name))
+
+    plt.figure()
+    for mc in MarketClass.get_market_class_dict():
+        plt.plot(iteration_log['calendar_year'][
+                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)],
+                 iteration_log['cost_multiplier_%s' % mc][
+                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)], '.-')
+    plt.legend(['cost_multiplier_%s' % mc for mc in MarketClass.get_market_class_dict()])
+    plt.ylabel('Cost Multiplier')
+    plt.title('Producer Cost Multipliers')
+    # plt.ylim([0.0, 0.9])
+    plt.grid()
+    plt.savefig('%s%s Producer Cost Multipliers.png' % (o2.options.output_folder, o2.options.session_unique_name))
+
+
     fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'][iteration_log['pricing_iteration'] == -1])
     label_xyt(ax1, '', 'Iteration [#]', 'Iteration mean = %.2f' % (
                 2.0 * iteration_log['iteration'][iteration_log['pricing_iteration'] == -1].mean()))

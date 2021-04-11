@@ -7,7 +7,7 @@ sales_gcam.py
 """
 
 from usepa_omega2 import *
-
+import matplotlib.pyplot as plt
 
 def get_demanded_shares(market_class_data, calendar_year):
     """
@@ -72,6 +72,12 @@ def get_demanded_shares(market_class_data, calendar_year):
                 total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy.average_occupancy
                 sales_share_numerator[market_class_id] = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
 
+                market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
+
+                # plt.figure()
+                # plt.plot(total_cost_w_fuel_per_PMT)
+                # plt.title('%s total_cost_w_fuel_per_PMT' % market_class_id)
+
                 if 'non_hauling' in market_class_id.split('.'):
                     sales_share_denominator_all_nonhauling += sales_share_numerator[market_class_id]
                 else:
@@ -86,7 +92,6 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                 market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
-                market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
     return market_class_data.copy()
 

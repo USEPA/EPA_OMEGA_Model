@@ -135,8 +135,8 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                     else:
                         co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
 
-                tech_cost_options = new_veh.get_cost(co2_gpmi_options)
-                tech_generalized_cost_options = new_veh.get_generalized_cost(co2_gpmi_options)
+                tech_cost_options = new_veh.get_cost_from_cost_curve(co2_gpmi_options)
+                tech_generalized_cost_options = new_veh.get_generalized_cost_from_cost_curve(co2_gpmi_options)
                 tech_kwh_options = new_veh.get_kwh_pmi(co2_gpmi_options)
 
                 df['veh_%s_co2_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
@@ -249,11 +249,15 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total)
 
         tech_share_combos_total['share_range'] = share_range
-        tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
-                                           np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'] +
-                                                      credits_offset_Mg)
-        # save initial compliance ratio, it gets overwrriten during the consumer iteration
-        tech_share_combos_total['compliance_ratio_producer'] = tech_share_combos_total['compliance_ratio']
+        # tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
+        #                                    np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'] +
+        #                                               credits_offset_Mg)
+
+        tech_share_combos_total['compliance_ratio'] = (tech_share_combos_total['total_combo_cert_co2_megagrams'] - credits_offset_Mg)/ \
+                                           tech_share_combos_total['total_combo_target_co2_megagrams']
+
+
+        tech_share_combos_total['total_combo_credits_offset_Mg'] = credits_offset_Mg
 
         # if calendar_year == 2020:
         #     tech_share_combos_total.to_csv(o2.options.output_folder + '%s_tech_share_combos_total.csv' % calendar_year)
@@ -261,6 +265,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         winning_combos, compliance_possible = \
             select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log,
                                   credits_offset_Mg)
+
+        # save initial compliance ratio, it gets overwrriten during the consumer iteration
+        # winning_combos['compliance_ratio_producer'] = winning_combos['compliance_ratio']
 
         producer_compliance_possible = producer_compliance_possible or compliance_possible
 
@@ -274,13 +281,25 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
 
         producer_iteration += 1
 
-        iterate_producer = abs(1 - best_combo['compliance_ratio']) > o2.options.producer_iteration_tolerance
+        # iterate_producer = abs(1 - best_combo['compliance_ratio']) > o2.options.producer_iteration_tolerance and (len(winning_combos) > 1)
+        iterate_producer = abs(1 - best_combo['compliance_ratio']) > o2.options.producer_iteration_tolerance # and (len(winning_combos) > 1)
 
     if 'producer' in o2.options.verbose_console:
         omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_combo['compliance_ratio']),
                            echo_console=True)
 
+        omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' % (-best_combo['total_combo_credits_offset_Mg'], best_combo['total_combo_credits_co2_megagrams']),
+                           echo_console=True)
+
+        omega_log.logwrite('Target Compliance Ratio %3.3f, Actual Compliance Ratio %3.3f' %
+                           ((best_combo['total_combo_cert_co2_megagrams']-best_combo['total_combo_credits_offset_Mg'])/best_combo['total_combo_target_co2_megagrams'],
+                            best_combo['compliance_ratio']),
+                           echo_console=True)
+
     winning_combo = pd.to_numeric(best_combo)
+
+    winning_combo = winning_combo.rename({'compliance_ratio': 'compliance_ratio_producer'})
+    winning_combo['producer_iteration'] = producer_iteration - 1    # log the final iteration, as opposed to the winning iteration
 
     if 'producer' in o2.options.verbose_console:
         from consumer.market_classes import MarketClass
@@ -499,6 +518,48 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
     tech_share_combos_total['total_sales'] = total_sales
 
 
+def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
+    import matplotlib.pyplot as plt
+    plt.figure()
+    plt.plot(tech_share_combos_total['total_combo_cert_co2_megagrams'],
+             tech_share_combos_total['total_combo_cost_dollars'], '.')
+    plt.plot(tech_share_combos_total['total_combo_target_co2_megagrams'],
+             tech_share_combos_total['total_combo_cost_dollars'], 'r.')
+    plt.xlabel('CO2 WITHOUT Offset [Mg]')
+    plt.ylabel('Cost [$]')
+    plt.title('%s' % calendar_year)
+    plt.grid()
+
+    plt.figure()
+    plt.plot(tech_share_combos_total['total_combo_cert_co2_megagrams'] - tech_share_combos_total['total_combo_credits_offset_Mg'],
+             tech_share_combos_total['total_combo_cost_dollars'], '.')
+    plt.plot(tech_share_combos_total['total_combo_target_co2_megagrams'],
+             tech_share_combos_total['total_combo_cost_dollars'], 'r.')
+    plt.xlabel('CO2 WITH Offset [Mg]')
+    plt.ylabel('Cost [$]')
+    plt.title('%s' % calendar_year)
+    plt.grid()
+
+    plt.figure()
+    plt.plot(tech_share_combos_total['compliance_ratio'],
+             tech_share_combos_total['total_combo_cost_dollars'], '.')
+    plt.plot([1, 1], plt.ylim(), 'r')
+    plt.xlabel('Compliance Ratio WITH Offset')
+    plt.ylabel('Cost [$]')
+    plt.title('%s' % calendar_year)
+    plt.grid()
+
+    plt.figure()
+    plt.plot(tech_share_combos_total['compliance_ratio'],
+             tech_share_combos_total['total_combo_credits_co2_megagrams'] +
+             tech_share_combos_total['total_combo_credits_offset_Mg'], '.')
+    plt.plot([1, 1], plt.ylim(), 'r')
+    plt.xlabel('Compliance Ratio WITH Offset')
+    plt.ylabel('Credits WITH Offset [Mg]')
+    plt.title('%s' % calendar_year)
+    plt.grid()
+
+
 def select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log,
                           credits_offset_Mg):
     """
@@ -514,8 +575,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     """
     # tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_combo_credits_co2_megagrams')
     mini_df = pd.DataFrame()
-    mini_df['total_combo_credits_co2_megagrams'] = tech_share_combos_total['total_combo_credits_co2_megagrams'] + \
-                                                   credits_offset_Mg
+    mini_df['total_combo_credits_with_offset_co2_megagrams'] = \
+        tech_share_combos_total['total_combo_credits_co2_megagrams'] + credits_offset_Mg
     mini_df['total_combo_cost_dollars'] = tech_share_combos_total['total_combo_cost_dollars']
     mini_df['total_combo_generalized_cost_dollars'] = tech_share_combos_total['total_combo_generalized_cost_dollars']
 
@@ -524,17 +585,22 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     tech_share_combos_total['compliance_score'] = abs(1-tech_share_combos_total['compliance_ratio'])
     tech_share_combos_total['slope'] = 0
 
-    if o2.options.log_producer_iteration_years == 'all' or calendar_year in o2.options.log_producer_iteration_years:
+    # if producer_iteration == 0:
+    #     plot_tech_share_combos_total(calendar_year, tech_share_combos_total)
+
+    if (o2.options.log_producer_iteration_years == 'all') or (calendar_year in o2.options.log_producer_iteration_years):
         producer_iteration_log.write(tech_share_combos_total)
 
-    potential_winners = mini_df[(mini_df['total_combo_credits_co2_megagrams']) >= 0]
+    potential_winners = mini_df[(mini_df['total_combo_credits_with_offset_co2_megagrams']) >= 0]
     cost_name = 'total_combo_generalized_cost_dollars'
 
     if not potential_winners.empty:
+        # grab best compliant option, if there is one
         winning_combos = tech_share_combos_total.loc[[potential_winners[cost_name].idxmin()]]
         compliance_possible = True
 
-        tech_share_combos_total = tech_share_combos_total[mini_df['total_combo_credits_co2_megagrams'] < 0].copy()
+        # grab best non-compliant option, if there is one
+        tech_share_combos_total = tech_share_combos_total[mini_df['total_combo_credits_with_offset_co2_megagrams'] < 0].copy()
         if not tech_share_combos_total.empty:
             tech_share_combos_total['slope'] = \
                 (tech_share_combos_total[cost_name] - float(winning_combos[cost_name])) / \
@@ -545,15 +611,16 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
             if not pd.isna(other_winner_index):
                 winning_combos = winning_combos.append(tech_share_combos_total.loc[other_winner_index])
     else:
-        winning_combos = tech_share_combos_total.loc[[mini_df['total_combo_credits_co2_megagrams'].idxmax()]]
+        # grab best non-compliant option, if there is no compliant option
+        winning_combos = tech_share_combos_total.loc[[mini_df['total_combo_credits_with_offset_co2_megagrams'].idxmax()]]
         compliance_possible = False
 
-    if o2.options.log_producer_iteration_years == 'all' or calendar_year in o2.options.log_producer_iteration_years:
+    if (o2.options.log_producer_iteration_years == 'all') or (calendar_year in o2.options.log_producer_iteration_years) \
+            or ('producer' in o2.options.verbose_console):
         winning_combos['winner'] = True
         producer_iteration_log.write(winning_combos)
 
-    winning_combos['total_combo_credits_co2_megagrams'] = winning_combos['total_combo_credits_co2_megagrams'] - \
-                                                          credits_offset_Mg
+    # winning_combos['total_combo_credits_co2_megagrams'] = winning_combos['total_combo_credits_with_offset_co2_megagrams']
 
     return winning_combos.copy(), compliance_possible
 

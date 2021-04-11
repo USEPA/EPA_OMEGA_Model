@@ -43,6 +43,14 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
                                    producer_decision_and_response[
                                        'consumer_abs_share_frac_%s' % mc])
                            ), echo_console=True)
+        omega_log.logwrite(
+            ('cross subsidized price / cost %s' % mc).ljust(50) + '$%d / $%d R:%f' % (
+            producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
+            producer_decision_and_response['average_cost_%s' % mc],
+            producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
+            producer_decision_and_response['average_cost_%s' % mc]
+            ), echo_console=True)
+
     omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
 
     for cat in consumer.market_categories:
@@ -124,6 +132,11 @@ def run_producer_consumer():
             expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
             expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
             credits_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
+
+            credits_offset_Mg = 0
+            # current_credits, current_debits = credit_bank.get_credit_info(calendar_year)
+            # for c in current_credits + current_debits:
+            #     credits_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
 
             producer_decision_and_response = None
             best_winning_combo_with_sales_response = None
@@ -252,8 +265,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
             producer_decision_and_response['new_vehicle_sales'] / unsubsidized_sales
 
         producer_decision_and_response['compliance_ratio'] = \
-            producer_decision_and_response['total_combo_cert_co2_megagrams'] / \
-            (producer_decision_and_response['total_combo_target_co2_megagrams'] + credit_offset_Mg)
+            (producer_decision_and_response['total_combo_cert_co2_megagrams'] - credit_offset_Mg) / \
+            producer_decision_and_response['total_combo_target_co2_megagrams']
 
         # calculate "distance to origin" (minimal price and market share errors):
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**2
@@ -314,8 +327,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         omega_log.logwrite('', echo_console=True)
 
-    if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
+    # if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
+    #     iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 

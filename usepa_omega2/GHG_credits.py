@@ -15,6 +15,12 @@ input_template_version = 0.1
 input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
 
 
+class GHG_credit_info(OMEGABase):
+    def __init__(self, remaining_balance_Mg, remaining_years):
+        self.remaining_balance_Mg = remaining_balance_Mg
+        self.remaining_years = remaining_years
+
+
 class GHG_credit_bank(OMEGABase):
 
     def __init__(self, filename, manufacturer_name, verbose=False):
@@ -26,7 +32,7 @@ class GHG_credit_bank(OMEGABase):
         self.credit_bank = pd.read_csv(filename, skiprows=1)
 
         self.credit_bank[self.credit_bank['manufacturer'] == manufacturer_name]
-        self.credit_bank = self.credit_bank.rename({'balance_Mg':'beginning_balance_Mg'}, axis='columns')
+        self.credit_bank = self.credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
         self.credit_bank['ending_balance_Mg'] = self.credit_bank['beginning_balance_Mg']
         self.credit_bank['age'] = self.credit_bank['calendar_year'] - self.credit_bank['model_year']
 
@@ -66,6 +72,30 @@ class GHG_credit_bank(OMEGABase):
         new_credit_transaction = pd.DataFrame(new_credit_transaction, columns=new_credit_transaction.keys(), index=[0])
         return new_credit_transaction
 
+    def get_credit_info(self, calendar_year):
+        current_credits = []
+        this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
+
+        # apply lifetime rules
+        ghg_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
+        if not ghg_credits.empty:
+            for _, credit in ghg_credits.iterrows():
+                if credit['age'] <= credit_max_life_years:
+                    current_credits.append(
+                        GHG_credit_info(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1))
+
+        current_debits = []
+
+        # apply lifetime rules
+        ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
+        if not ghg_debits.empty:
+            for _, debit in ghg_debits.iterrows():
+                if debit['age'] <= debit_max_life_years:
+                    current_debits.append(
+                        GHG_credit_info(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1))
+
+        return current_credits, current_debits
+
     def get_expiring_credits_Mg(self, calendar_year):
         expiring_credits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
@@ -89,7 +119,7 @@ class GHG_credit_bank(OMEGABase):
             for _, debit in ghg_debits.iterrows():
                 if debit['age'] >= debit_max_life_years:
                     expiring_debits_Mg += debit['ending_balance_Mg']
-                    
+
         return expiring_debits_Mg
 
     def update_credit_age(self, calendar_year):
@@ -189,7 +219,8 @@ if __name__ == '__main__':
 
         credit_bank = GHG_credit_bank('test_inputs/ghg_credits.csv', 'USA Motors')
         import random
-        for year in range(2020,2030):
+
+        for year in range(2020, 2030):
             print(year)
             credit_bank.update_credit_age(year)
             credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
