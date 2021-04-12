@@ -551,6 +551,15 @@ def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
 
     plt.figure()
     plt.plot(tech_share_combos_total['compliance_ratio'],
+             tech_share_combos_total['total_combo_generalized_cost_dollars'], '.')
+    plt.plot([1, 1], plt.ylim(), 'r')
+    plt.xlabel('Compliance Ratio WITH Offset')
+    plt.ylabel('Generalized Cost [$]')
+    plt.title('%s' % calendar_year)
+    plt.grid()
+
+    plt.figure()
+    plt.plot(tech_share_combos_total['compliance_ratio'],
              tech_share_combos_total['total_combo_credits_co2_megagrams'] +
              tech_share_combos_total['total_combo_credits_offset_Mg'], '.')
     plt.plot([1, 1], plt.ylim(), 'r')
@@ -610,6 +619,9 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
 
             if not pd.isna(other_winner_index):
                 winning_combos = winning_combos.append(tech_share_combos_total.loc[other_winner_index])
+
+                if winning_combos.iloc[-1]['total_combo_generalized_cost_dollars'] >= winning_combos.iloc[0]['total_combo_generalized_cost_dollars']:
+                    print('stop')
     else:
         # grab best non-compliant option, if there is no compliant option
         winning_combos = tech_share_combos_total.loc[[mini_df['total_combo_credits_with_offset_co2_megagrams'].idxmax()]]
@@ -619,8 +631,6 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
             or ('producer' in o2.options.verbose_console):
         winning_combos['winner'] = True
         producer_iteration_log.write(winning_combos)
-
-    # winning_combos['total_combo_credits_co2_megagrams'] = winning_combos['total_combo_credits_with_offset_co2_megagrams']
 
     return winning_combos.copy(), compliance_possible
 
