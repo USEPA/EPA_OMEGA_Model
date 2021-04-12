@@ -148,6 +148,12 @@ def reshape_df_for_cloud_file(settings, df_source):
     return df_return
 
 
+def drop_columns(df, arg):
+    cols_to_drop = [col for col in df.columns if arg in col]
+    df.drop(columns=cols_to_drop, inplace=True)
+    return df
+
+
 def clean_alpha_data(input_df, *args):
     """
 
@@ -655,8 +661,6 @@ def main():
     settings.path_outputs.mkdir(exist_ok=True)
     settings.path_of_run_folder = settings.path_outputs / f'{settings.start_time_readable}_O2-TechCosts'
     settings.path_of_run_folder.mkdir(exist_ok=False)
-    bev_packages_df.to_csv(settings.path_of_run_folder / 'detailed_costs_bev.csv', index=False)
-    ice_packages_df.to_csv(settings.path_of_run_folder / 'detailed_costs_ice.csv', index=False)
 
     if settings.run_ice and settings.run_bev:
         cost_cloud = reshape_df_for_cloud_file(settings, ice_packages_df)
@@ -670,7 +674,13 @@ def main():
     cost_vs_plot(cost_cloud, settings.path_of_run_folder, settings.start_time_readable, 2020, 2030, 2040)
     # cost_vs_plot_combined(cost_cloud, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
 
+    bev_packages_df = drop_columns(bev_packages_df, 'cert')
+    ice_packages_df = drop_columns(ice_packages_df, 'cert')
+    bev_packages_df.to_csv(settings.path_of_run_folder / 'detailed_costs_bev.csv', index=False)
+    ice_packages_df.to_csv(settings.path_of_run_folder / 'detailed_costs_ice.csv', index=False)
+
     if settings.generate_cost_cloud_file:
+        cost_cloud = drop_columns(cost_cloud, 'cert')
         cost_cloud.to_csv(settings.path_of_run_folder / 'cost_clouds.csv', index=False)
 
     # save additional outputs
