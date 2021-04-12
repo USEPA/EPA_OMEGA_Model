@@ -620,8 +620,6 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
             if not pd.isna(other_winner_index):
                 winning_combos = winning_combos.append(tech_share_combos_total.loc[other_winner_index])
 
-                if winning_combos.iloc[-1]['total_combo_generalized_cost_dollars'] >= winning_combos.iloc[0]['total_combo_generalized_cost_dollars']:
-                    print('stop')
     else:
         # grab best non-compliant option, if there is no compliant option
         winning_combos = tech_share_combos_total.loc[[mini_df['total_combo_credits_with_offset_co2_megagrams'].idxmax()]]
