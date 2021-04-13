@@ -254,7 +254,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         #                                               credits_offset_Mg)
 
         tech_share_combos_total['compliance_ratio'] = (tech_share_combos_total['total_combo_cert_co2_megagrams'] - credits_offset_Mg)/ \
-                                           tech_share_combos_total['total_combo_target_co2_megagrams']
+                                           np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'])
 
 
         tech_share_combos_total['total_combo_credits_offset_Mg'] = credits_offset_Mg
