@@ -48,6 +48,8 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     average_generalized_cost_data = plot_vehicle_generalized_cost(calendar_years)
 
+    megagrams_data = plot_vehicle_megagrams(calendar_years)
+
     average_cert_co2_gpmi_data = plot_cert_co2_gpmi(calendar_years)
 
     average_cert_kwh_pmi_data = plot_cert_kwh_pmi(calendar_years)
@@ -72,6 +74,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
         session_results['average_%s_cert_co2_gpmi' % cat] = average_cert_co2_gpmi_data[cat]
         session_results['average_%s_cert_kwh_pmi' % cat] = average_cert_kwh_pmi_data[cat]
         session_results['average_%s_target_co2_gpmi' % cat] = average_target_co2_gpmi_data[cat]
+        session_results['%s_co2_Mg' % cat] = megagrams_data[cat]
 
     return session_results
 
@@ -478,6 +481,82 @@ def plot_vehicle_generalized_cost(calendar_years):
     return average_cost_data
 
 
+def plot_vehicle_megagrams(calendar_years):
+    """
+
+    Args:
+        calendar_years:
+
+    Returns:
+
+    """
+    from vehicles import VehicleFinal
+    from vehicle_annual_data import VehicleAnnualData
+    from consumer.market_classes import MarketClass
+    import consumer
+
+    Mg_data = dict()
+
+    # tally up total Mg
+    Mg_data['total'] = []
+    for cy in calendar_years:
+        Mg_data['total'].append(
+            o2.session.query(func.sum(VehicleFinal.cert_CO2_Mg)).
+                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                          filter(VehicleFinal.model_year == cy).
+                                          filter(VehicleAnnualData.age == 0).scalar())
+
+    # tally up market_category Mg
+    for mcat in consumer.market_categories:
+        market_category_Mg = []
+        for idx, cy in enumerate(calendar_years):
+            market_ID_and_Mg = o2.session.query(VehicleFinal.market_class_ID,
+                                                VehicleFinal.cert_CO2_Mg) \
+                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).all()
+            sales_weighted_Mg = 0
+            for result in market_ID_and_Mg:
+                if mcat in result.market_class_ID.split('.'):
+                    sales_weighted_Mg += float(result.cert_CO2_Mg)
+            market_category_Mg.append(sales_weighted_Mg)
+
+        Mg_data[mcat] = market_category_Mg
+
+    # cost/market category chart
+    fig, ax1 = figure()
+    for mcat in consumer.market_categories:
+        ax1.plot(calendar_years, Mg_data[mcat], '.--')
+    ax1.plot(calendar_years, Mg_data['total'], '.-')
+    ax1.legend(consumer.market_categories + ['total'])
+    label_xyt(ax1, 'Year', 'CO2 [Mg]',
+              '%s\nVehicle CO2 Megagrams by Market Category v Year' % o2.options.session_unique_name)
+    fig.savefig(o2.options.output_folder + '%s V Mg Mkt Cat.png' % o2.options.session_unique_name)
+
+    # cost/market class chart
+    fig, ax1 = figure()
+    for mc in MarketClass.market_classes:
+        Mg_data[mc] = []
+        for cy in calendar_years:
+            Mg_data[mc].append(o2.session.query(
+                func.sum(VehicleFinal.cert_CO2_Mg)).
+                                         filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
+                                         filter(VehicleFinal.model_year == cy).
+                                         filter(VehicleFinal.market_class_ID == mc).
+                                         filter(VehicleAnnualData.age == 0).scalar())
+
+        if 'ICE' in mc:
+            ax1.plot(calendar_years, Mg_data[mc], '.-')
+        else:
+            ax1.plot(calendar_years, Mg_data[mc], '.--')
+    ax1.plot(calendar_years, Mg_data['total'], '.-')
+    label_xyt(ax1, 'Year', 'CO2 [Mg]',
+              '%s\nVehicle CO2 Megagrams  by Market Class v Year' % o2.options.session_unique_name)
+    ax1.legend(MarketClass.market_classes + ['total'])
+    fig.savefig(o2.options.output_folder + '%s V Mg Mkt Cls.png' % o2.options.session_unique_name)
+    return Mg_data
+
+
 
 def plot_market_shares(calendar_years, total_sales):
     """
@@ -610,50 +689,97 @@ def plot_iteration(iteration_log):
     """
     from consumer.market_classes import MarketClass
 
-    year_iter_labels = ['%d_%d_%d' % (cy - 2000, it, it_sub) for cy, it, it_sub in
-                        zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == -1],
-                            iteration_log['iteration'][iteration_log['pricing_iteration'] == -1],
-                            iteration_log['pricing_iteration'][iteration_log['pricing_iteration'] == -1])]
-    for mc in MarketClass.get_market_class_dict():
+    # year_iter_labels = ['%d_%d_%d' % (cy - 2000, it, it_sub) for cy, it, it_sub in
+    #                     zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == -1],
+    #                         iteration_log['iteration'][iteration_log['pricing_iteration'] == -1],
+    #                         iteration_log['pricing_iteration'][iteration_log['pricing_iteration'] == -1])]
+
+
+    for iteration in [0,-1]:
+        year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
+                            zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == iteration],
+                                iteration_log['iteration'][iteration_log['pricing_iteration'] == iteration])]
+
+        for mc in MarketClass.get_market_class_dict():
+            plt.figure()
+            plt.plot(year_iter_labels,
+                     iteration_log['producer_abs_share_frac_%s' % mc][iteration_log['pricing_iteration'] == iteration])
+            plt.xticks(rotation=90)
+            plt.plot(year_iter_labels,
+                     iteration_log['consumer_abs_share_frac_%s' % mc][iteration_log['pricing_iteration'] == iteration])
+            plt.title('%s iteration %d' % (mc, iteration))
+            plt.grid()
+            plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
+            # plt.ylim([0, 1])
+            plt.savefig('%s%s Iter %s %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc, iteration))
+
         plt.figure()
-        plt.plot(year_iter_labels,
-                 iteration_log['producer_abs_share_frac_%s' % mc][iteration_log['pricing_iteration'] == -1])
-        plt.plot(year_iter_labels,
-                 iteration_log['consumer_abs_share_frac_%s' % mc][iteration_log['pricing_iteration'] == -1])
-        plt.title('%s iteration' % mc)
+        if iteration == -1:
+            for mc in MarketClass.get_market_class_dict():
+                plt.plot(iteration_log['calendar_year'][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['converged'] == True)] - 2000,
+                         iteration_log['consumer_generalized_cost_dollars_%s' % mc][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['converged'] == True)], '.-')
+        else:
+            for mc in MarketClass.get_market_class_dict():
+                plt.plot(iteration_log['calendar_year'][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['iteration'] == 0)] - 2000,
+                         iteration_log['consumer_generalized_cost_dollars_%s' % mc][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['iteration'] == 0)], '.-')
+
+        plt.xticks(rotation=90)
+        plt.legend(['consumer_generalized_cost_dollars_%s' % mc for mc in MarketClass.get_market_class_dict()])
+        plt.ylabel('Cost $ / mi')
+        plt.title('Consumer Generalized Cost %d' % iteration)
+        # plt.ylim([0.0, 0.9])
         plt.grid()
-        plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
-        # plt.ylim([0, 1])
-        plt.savefig('%s%s Iter %s.png' % (o2.options.output_folder, o2.options.session_unique_name, mc))
+        plt.savefig('%s%s ConsumerGC %s.png' % (o2.options.output_folder, o2.options.session_unique_name, iteration))
 
-    plt.figure()
-    for mc in MarketClass.get_market_class_dict():
-        plt.plot(iteration_log['calendar_year'][
-                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)],
-                 iteration_log['consumer_generalized_cost_dollars_%s' % mc][
-                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)], '.-')
-    plt.legend(['consumer_generalized_cost_dollars_%s' % mc for mc in MarketClass.get_market_class_dict()])
-    plt.ylabel('Cost $ / mi')
-    plt.title('Consumer Generalized Cost')
-    # plt.ylim([0.0, 0.9])
-    plt.grid()
-    plt.savefig('%s%s ConsumerGC.png' % (o2.options.output_folder, o2.options.session_unique_name))
+        plt.figure()
+        if iteration == -1:
+            for mc in MarketClass.get_market_class_dict():
+                plt.plot(iteration_log['calendar_year'][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['converged'] == True)] - 2000,
+                         iteration_log['cost_multiplier_%s' % mc][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['converged'] == True)], '.-')
+        else:
+            for mc in MarketClass.get_market_class_dict():
+                plt.plot(iteration_log['calendar_year'][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['iteration'] == 0)] - 2000,
+                         iteration_log['cost_multiplier_%s' % mc][
+                             (iteration_log['pricing_iteration'] == iteration) & (iteration_log['iteration'] == 0)], '.-')
 
-    plt.figure()
-    for mc in MarketClass.get_market_class_dict():
-        plt.plot(iteration_log['calendar_year'][
-                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)],
-                 iteration_log['cost_multiplier_%s' % mc][
-                     (iteration_log['pricing_iteration'] == -1) & (iteration_log['converged'] == True)], '.-')
-    plt.legend(['cost_multiplier_%s' % mc for mc in MarketClass.get_market_class_dict()])
-    plt.ylabel('Cost Multiplier')
-    plt.title('Producer Cost Multipliers')
-    # plt.ylim([0.0, 0.9])
-    plt.grid()
-    plt.savefig('%s%s Producer Cost Multipliers.png' % (o2.options.output_folder, o2.options.session_unique_name))
+        plt.xticks(rotation=90)
+        plt.legend(['cost_multiplier_%s' % mc for mc in MarketClass.get_market_class_dict()])
+        plt.ylabel('Cost Multiplier')
+        plt.title('Producer Cost Multipliers %d' % iteration)
+        # plt.ylim([0.0, 0.9])
+        plt.grid()
+        plt.savefig('%s%s Producer Cost Multipliers %d.png' % (o2.options.output_folder, o2.options.session_unique_name, iteration))
 
 
     fig, ax1 = fplothg(year_iter_labels, iteration_log['iteration'][iteration_log['pricing_iteration'] == -1])
+    ax1.set_xticklabels(ax1.get_xticks(), rotation=90)
     label_xyt(ax1, '', 'Iteration [#]', 'Iteration mean = %.2f' % (
                 2.0 * iteration_log['iteration'][iteration_log['pricing_iteration'] == -1].mean()))
     fig.savefig('%s%s Iter Counts.png' % (o2.options.output_folder, o2.options.session_unique_name))
+
+    # plot producer initial share and g/mi decisions
+    pts = (iteration_log['iteration'] == 0) & (iteration_log['pricing_iteration'] == 0)
+    plt.figure()
+    for mc in MarketClass.get_market_class_dict():
+        plt.plot(iteration_log['calendar_year'][pts] - 2000, iteration_log['producer_abs_share_frac_%s' % mc][pts])
+    plt.xticks(rotation=90)
+    plt.title('Producer Initial Absolute Market Shares')
+    plt.grid()
+    plt.legend(['producer_abs_share_frac_%s' % mc for mc in MarketClass.get_market_class_dict()])
+    plt.savefig('%s%s Producer Initial Abs Shares.png' % (o2.options.output_folder, o2.options.session_unique_name))
+
+    plt.figure()
+    for mc in MarketClass.get_market_class_dict():
+        plt.plot(iteration_log['calendar_year'][pts] - 2000, iteration_log['average_co2_gpmi_%s' % mc][pts])
+    plt.xticks(rotation=90)
+    plt.title('Producer Initial CO2 g/mi')
+    plt.grid()
+    plt.legend(['average_co2_gpmi_%s' % mc for mc in MarketClass.get_market_class_dict()])
+    plt.savefig('%s%s Producer Initial CO2 gpmi.png' % (o2.options.output_folder, o2.options.session_unique_name))
