@@ -108,32 +108,32 @@ def create_compliance_options(calendar_year, market_class_dict, producer_bev_sha
                     num_tech_options = o2.options.producer_num_tech_options_per_bev_vehicle
 
                 # if consumer_bev_share is None or new_veh.fueling_class == 'BEV':
-                min_co2_gpmi = new_veh.get_min_co2_gpmi()
+                veh_min_co2_gpmi = new_veh.get_min_co2_gpmi()
 
                 if o2.options.allow_backsliding:
-                    max_co2_gpmi = new_veh.get_max_co2_gpmi()
+                    veh_max_co2_gpmi = new_veh.get_max_co2_gpmi()
                 else:
-                    max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
+                    veh_max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
 
                 if producer_bev_share is not None:  # and new_veh.fueling_class != 'BEV':
                     co2_gpmi_options = np.array([])
                     for idx, combo in producer_bev_share.iterrows():
                         veh_co2_gpmi = combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
-                        min_co2_gpmi = max(min_co2_gpmi, veh_co2_gpmi * (1 - share_range))
-                        max_co2_gpmi = min(max_co2_gpmi, veh_co2_gpmi * (1 + share_range))
+                        min_co2_gpmi = max(veh_min_co2_gpmi, veh_co2_gpmi * (1 - share_range))
+                        max_co2_gpmi = min(veh_max_co2_gpmi, veh_co2_gpmi * (1 + share_range))
                         co2_gpmi_options = \
                             np.append(np.append(co2_gpmi_options,
                                       np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)), veh_co2_gpmi)
 
                     if num_tech_options == 1:
-                        co2_gpmi_options = [max_co2_gpmi]
+                        co2_gpmi_options = [veh_max_co2_gpmi]
                     else:
                         co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
                 else:  # first producer pass, generate normal range of options
                     if num_tech_options == 1:
-                        co2_gpmi_options = [max_co2_gpmi]
+                        co2_gpmi_options = [veh_max_co2_gpmi]
                     else:
-                        co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)
+                        co2_gpmi_options = np.linspace(veh_min_co2_gpmi, veh_max_co2_gpmi, num=num_tech_options)
 
                 tech_cost_options = new_veh.get_cost_from_cost_curve(co2_gpmi_options)
                 tech_generalized_cost_options = new_veh.get_generalized_cost_from_cost_curve(co2_gpmi_options)
@@ -254,7 +254,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, consumer_bev_share, ite
         #                                               credits_offset_Mg)
 
         tech_share_combos_total['compliance_ratio'] = (tech_share_combos_total['total_combo_cert_co2_megagrams'] - credits_offset_Mg)/ \
-                                           tech_share_combos_total['total_combo_target_co2_megagrams']
+                                           np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'])
 
 
         tech_share_combos_total['total_combo_credits_offset_Mg'] = credits_offset_Mg

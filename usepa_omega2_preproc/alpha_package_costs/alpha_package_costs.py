@@ -148,6 +148,12 @@ def reshape_df_for_cloud_file(settings, df_source):
     return df_return
 
 
+def drop_columns(df, arg):
+    cols_to_drop = [col for col in df.columns if arg in col]
+    df.drop(columns=cols_to_drop, inplace=True)
+    return df
+
+
 def clean_alpha_data(input_df, *args):
     """
 
@@ -537,7 +543,7 @@ class SetInputs:
     path_here = path_preproc / 'alpha_package_costs'
     path_outputs = path_here / 'outputs'
     path_alpha_inputs = path_here / 'ALPHA'
-    # path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
+    path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
 
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -578,6 +584,7 @@ class SetInputs:
     learning_rate_roadload = cost_inputs['learning_rate_roadload']['value']
     learning_rate_bev = cost_inputs['learning_rate_bev']['value']
     boost_multiplier = cost_inputs['boost_multiplier']['value']
+    run_id = cost_inputs['run_ID']['value']
 
     ice_glider_share = 0.85
 
@@ -653,10 +660,8 @@ def main():
                                             'ice_powertrain', 'roadload', 'body')
 
     settings.path_outputs.mkdir(exist_ok=True)
-    settings.path_of_run_folder = settings.path_outputs / f'{settings.start_time_readable}_O2-TechCosts'
+    settings.path_of_run_folder = settings.path_outputs / f'{settings.run_id}_O2-TechCosts_{settings.start_time_readable}'
     settings.path_of_run_folder.mkdir(exist_ok=False)
-    bev_packages_df.to_csv(settings.path_of_run_folder / 'detailed_costs_bev.csv', index=False)
-    ice_packages_df.to_csv(settings.path_of_run_folder / 'detailed_costs_ice.csv', index=False)
 
     if settings.run_ice and settings.run_bev:
         cost_cloud = reshape_df_for_cloud_file(settings, ice_packages_df)
@@ -667,11 +672,30 @@ def main():
 
     cost_cloud.fillna(0, inplace=True)
 
-    cost_vs_plot(cost_cloud, settings.path_of_run_folder, settings.start_time_readable, 2020, 2030, 2040)
+    if settings.run_id != '': name_id = f'{settings.run_id}_{settings.start_time_readable}'
+    else: name_id = settings.start_time_readable
+    cost_vs_plot(cost_cloud, settings.path_of_run_folder, name_id, 2020, 2030, 2040)
     # cost_vs_plot_combined(cost_cloud, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
 
+    bev_packages_df = drop_columns(bev_packages_df, 'cert')
+    ice_packages_df = drop_columns(ice_packages_df, 'cert')
+    bev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_bev_{name_id}.csv', index=False)
+    ice_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_ice_{name_id}.csv', index=False)
+
     if settings.generate_cost_cloud_file:
-        cost_cloud.to_csv(settings.path_of_run_folder / 'cost_clouds.csv', index=False)
+        cost_cloud = drop_columns(cost_cloud, 'cert')
+        # open the 'cost_clouds.csv' input template into which results will be placed.
+        cost_clouds_template_info = pd.read_csv(settings.path_input_templates.joinpath('cost_clouds.csv'), 'b', nrows=0)
+        temp = ' '.join((item for item in cost_clouds_template_info))
+        temp2 = temp.split(',')
+        temp2 = temp2[:4]
+        temp2.append(f'{name_id}')
+        df = pd.DataFrame(columns=temp2)
+        df.to_csv(settings.path_of_run_folder.joinpath('cost_clouds.csv'), index=False)
+
+        with open(settings.path_of_run_folder.joinpath('cost_clouds.csv'), 'a', newline='') as cloud_file:
+            cost_cloud.to_csv(cloud_file, index=False)
+        # cost_cloud.to_csv(settings.path_of_run_folder / f'cost_clouds.csv', index=False)
 
     # save additional outputs
     modified_costs = pd.ExcelWriter(settings.path_of_run_folder.joinpath(f'techcosts_in_{settings.dollar_basis}_dollars.xlsx'))
