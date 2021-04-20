@@ -406,7 +406,10 @@ class Vehicle(OMEGABase):
             self.upstream_CO2_grams_per_mile = upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
             self.cert_CO2_grams_per_mile += self.upstream_CO2_grams_per_mile
 
-            self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
+            if o2.options.flat_context:
+                self.cost_cloud = CostCloud.get_cloud(o2.options.flat_context_year, self.cost_curve_class)
+            else:
+                self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
             self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
             self.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
             self.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
