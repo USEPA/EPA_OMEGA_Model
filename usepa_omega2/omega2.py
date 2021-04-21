@@ -97,8 +97,6 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
     iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
-    if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
-        iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
 
 def run_producer_consumer():
@@ -142,9 +140,9 @@ def run_producer_consumer():
             best_winning_combo_with_sales_response = None
 
             iteration_num = 0
-            iterate = True
+            iterate_producer_consumer = True
 
-            while iterate:
+            while iterate_producer_consumer:
                 omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
                                    (o2.options.session_unique_name, calendar_year, iteration_num),
                                    echo_console=True)
@@ -157,10 +155,10 @@ def run_producer_consumer():
                                                                    winning_combo)
 
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
-                    iterate_producer_consumer_pricing(calendar_year, best_winning_combo_with_sales_response,
-                                                      candidate_mfr_composite_vehicles, iteration_log,
-                                                      iteration_num, market_class_vehicle_dict, winning_combo,
-                                                      credits_offset_Mg)
+                    iterate_producer_cross_subsidy(calendar_year, best_winning_combo_with_sales_response,
+                                                   candidate_mfr_composite_vehicles, iteration_log,
+                                                   iteration_num, market_class_vehicle_dict, winning_combo,
+                                                   credits_offset_Mg)
 
                 producer_consumer_iteration = -1  # flag end of pricing subiteration
 
@@ -168,14 +166,16 @@ def run_producer_consumer():
                     detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
                 iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
+
                 update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
                                      producer_consumer_iteration, producer_compliant, convergence_error)
 
                 # decide whether to iterate or not
-                iterate = o2.options.iterate_producer_consumer \
+                iterate_producer_consumer = o2.options.iterate_producer_consumer \
                           and iteration_num < o2.options.producer_consumer_max_iterations \
                           and not converged
-                if iterate:
+
+                if iterate_producer_consumer:
                     iteration_num += 1
                 else:
                     if iteration_num >= o2.options.producer_consumer_max_iterations:
@@ -190,21 +190,24 @@ def run_producer_consumer():
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
-        iteration_log.to_csv(
-            o2.options.output_folder + o2.options.session_unique_name + '_producer_consumer_iteration_log.csv',
-            index=False)
+        if (o2.options.log_consumer_iteration_years == 'all') or \
+                (calendar_year in o2.options.log_consumer_iteration_years)\
+                or (calendar_year == analysis_end_year-1):
+            iteration_log.to_csv(o2.options.output_folder + o2.options.session_unique_name +
+                                 '_producer_consumer_iteration_log.csv', index=False)
 
         credit_bank.credit_bank.to_csv(o2.options.output_folder + o2.options.session_unique_name + '_credit_bank.csv',
                                        index=False)
+
         credit_bank.transaction_log.to_csv(
             o2.options.output_folder + o2.options.session_unique_name + '_credit_bank_transactions.csv', index=False)
 
     return iteration_log
 
 
-def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_response, candidate_mfr_composite_vehicles,
-                                      iteration_log, iteration_num, market_class_vehicle_dict,
-                                      producer_decision, credit_offset_Mg):
+def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_response, candidate_mfr_composite_vehicles,
+                                   iteration_log, iteration_num, market_class_vehicle_dict,
+                                   producer_decision, credit_offset_Mg):
     """
 
     Args:
@@ -319,6 +322,8 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
 
         producer_pricing_iteration += 1
 
+        continue_search = continue_search and not converged
+
     if 'consumer' in o2.options.verbose_console:
         for mc, cc in zip(MarketClass.market_classes, multiplier_columns):
             omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc], echo_console=True)
@@ -326,9 +331,6 @@ def iterate_producer_consumer_pricing(calendar_year, best_producer_decision_and_
             omega_log.logwrite('PRODUCER-CONSUMER CONVERGED CE:%f' % convergence_error, echo_console=True)
 
         omega_log.logwrite('', echo_console=True)
-
-    # if o2.options.log_consumer_iteration_years == 'all' or calendar_year in o2.options.log_consumer_iteration_years:
-    #     iteration_log.to_csv('%sproducer_consumer_iteration_log.csv' % o2.options.output_folder, index=False)
 
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 

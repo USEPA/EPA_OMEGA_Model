@@ -15,12 +15,11 @@ import consumer
 cache = dict()
 
 
-def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
+def calculate_generalized_cost(vehicle, co2_name, kWh_name, cost_name):
     """
 
     Args:
         vehicle: an object of class Vehicle
-        cost_curve: the cost curve (frontier) of that vehicle
 
     Returns:
         A cost curve modified by generalized cost factors
@@ -38,12 +37,14 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
              'producer_generalized_cost_annual_vmt',
              ])
 
-    vehicle_cost = cost_curve[cost_name]
+    cost_cloud = vehicle.cost_cloud
+    vehicle_cost = cost_cloud[cost_name]
+    vehicle_cert_CO2_grams_per_mile = cost_cloud[co2_name]
+    vehicle_cert_kWh_per_mile = cost_cloud[kWh_name]
 
     price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_ID)
 
     grams_co2_per_unit = vehicle.fuel_tailpipe_co2_emissions_grams_per_unit()
-    kwh_per_mi = vehicle.cert_kWh_per_mile
     liquid_generalized_fuel_cost = 0
     electric_generalized_fuel_cost = 0
 
@@ -51,20 +52,20 @@ def calculate_generalized_cost(vehicle, cost_curve, co2_name, cost_name):
     if grams_co2_per_unit > 0:
         liquid_generalized_fuel_cost = \
             (vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) / grams_co2_per_unit *
-             vehicle.cert_CO2_grams_per_mile *
+             vehicle_cert_CO2_grams_per_mile *
              producer_generalized_cost_annual_vmt *
              producer_generalized_cost_fuel_years)
 
-    if kwh_per_mi > 0:
-        electric_generalized_fuel_cost = (kwh_per_mi *
+    if any(vehicle_cert_kWh_per_mile > 0):
+        electric_generalized_fuel_cost = (vehicle_cert_kWh_per_mile *
                                          vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
                                          producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
 
     generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
-    cost_curve[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + price_modification
+    cost_cloud[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + price_modification
 
-    return cost_curve
+    return cost_cloud
 
 
 def create_compliance_options(calendar_year, market_class_dict, winning_combos, share_range, consumer_response,
@@ -102,12 +103,14 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
             for new_veh in market_class_dict[k]:
                 df = pd.DataFrame()
 
+                if share_range == 1.0:
+                    new_veh.tech_option_iteration_num = 0  # reset vehicle tech option progression
+
                 if new_veh.fueling_class == 'ICE':
                     num_tech_options = o2.options.producer_num_tech_options_per_ice_vehicle
                 else:
                     num_tech_options = o2.options.producer_num_tech_options_per_bev_vehicle
 
-                # if consumer_bev_share is None or new_veh.fueling_class == 'BEV':
                 veh_min_co2_gpmi = new_veh.get_min_co2_gpmi()
 
                 if o2.options.allow_backsliding:
@@ -115,31 +118,30 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
                 else:
                     veh_max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
 
-                if winning_combos is not None:  # and new_veh.fueling_class != 'BEV':
+                if winning_combos is not None:
                     co2_gpmi_options = np.array([])
                     for idx, combo in winning_combos.iterrows():
-                        if combo['veh_%s_sales' % new_veh.vehicle_ID] > 0:
-                            veh_co2_gpmi = combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
-                            min_co2_gpmi = max(veh_min_co2_gpmi, veh_co2_gpmi * (1 - share_range))
-                            max_co2_gpmi = min(veh_max_co2_gpmi, veh_co2_gpmi * (1 + share_range))
-                            # market_share = combo['veh_%s_sales' % new_veh.vehicle_ID] / combo['total_sales']
-                            # ms_num_tech_options = max(num_tech_options, round(market_share * 12.5))
-                            co2_gpmi_options = \
-                                np.append(np.append(co2_gpmi_options,
-                                          np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)), veh_co2_gpmi)
-                        else:
-                            co2_gpmi_options = np.linspace(veh_min_co2_gpmi, veh_max_co2_gpmi, num=num_tech_options)
+
+                        if (combo['veh_%s_sales' % new_veh.vehicle_ID] > 0) or (new_veh.tech_option_iteration_num > 0):
+                            new_veh.tech_option_iteration_num += 1
+
+                        tech_share_range = o2.options.producer_convergence_factor**new_veh.tech_option_iteration_num
+                        veh_co2_gpmi = combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
+                        min_co2_gpmi = max(veh_min_co2_gpmi, veh_co2_gpmi * (1 - tech_share_range))
+                        max_co2_gpmi = min(veh_max_co2_gpmi, veh_co2_gpmi * (1 + tech_share_range))
+                        co2_gpmi_options = \
+                            np.append(np.append(co2_gpmi_options,
+                                      np.linspace(min_co2_gpmi, max_co2_gpmi, num=num_tech_options)), veh_co2_gpmi)
 
                     if num_tech_options == 1:
                         co2_gpmi_options = [veh_max_co2_gpmi]
                     else:
                         co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
-                else:  # first producer pass, generate normal range of options
+                else:  # first producer pass, generate full range of options
                     if num_tech_options == 1:
                         co2_gpmi_options = [veh_max_co2_gpmi]
                     else:
                         co2_gpmi_options = np.linspace(veh_min_co2_gpmi, veh_max_co2_gpmi, num=num_tech_options)
-                        # co2_gpmi_options = np.linspace(min_co2_gpmi, max_co2_gpmi, num=10)
 
                 tech_cost_options = new_veh.get_cost_from_cost_curve(co2_gpmi_options)
                 tech_generalized_cost_options = new_veh.get_generalized_cost_from_cost_curve(co2_gpmi_options)
@@ -178,8 +180,6 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
                 # span the whole space of shares
                 sales_share_df = partition(share_column_names, num_levels=o2.options.producer_num_market_share_options,
                                            min_constraints=min_constraints, max_constraints=max_constraints)
-                # sales_share_df = partition(share_column_names, num_levels=10,
-                #                            min_constraints=min_constraints, max_constraints=max_constraints)
             else:
                 # narrow search span to a range of shares around the winners
                 from omega_functions import generate_constrained_nearby_shares
@@ -246,7 +246,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
     best_combo = None  # producer_decision_and_response
 
     while iterate_producer and producer_iteration < o2.options.producer_max_iterations:
-        share_range = 0.33**producer_iteration
+        share_range = o2.options.producer_convergence_factor**producer_iteration
 
         manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
@@ -257,9 +257,6 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
         calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total)
 
         tech_share_combos_total['share_range'] = share_range
-        # tech_share_combos_total['compliance_ratio'] = tech_share_combos_total['total_combo_cert_co2_megagrams'] / \
-        #                                    np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'] +
-        #                                               credits_offset_Mg)
 
         tech_share_combos_total['compliance_ratio'] = (tech_share_combos_total['total_combo_cert_co2_megagrams'] - credits_offset_Mg)/ \
                                            np.maximum(1, tech_share_combos_total['total_combo_target_co2_megagrams'])
@@ -267,20 +264,11 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
 
         tech_share_combos_total['total_combo_credits_offset_Mg'] = credits_offset_Mg
 
-        # if calendar_year == 2020:
-        #     tech_share_combos_total.to_csv(o2.options.output_folder + '%s_tech_share_combos_total.csv' % calendar_year)
-
         winning_combos, compliance_possible = \
             select_winning_combos(tech_share_combos_total, calendar_year, producer_iteration, producer_iteration_log,
                                   credits_offset_Mg)
 
-        # save initial compliance ratio, it gets overwrriten during the consumer iteration
-        # winning_combos['compliance_ratio_producer'] = winning_combos['compliance_ratio']
-
         producer_compliance_possible = producer_compliance_possible or compliance_possible
-
-        # if calendar_year==2044:
-        #     print('wtf?')
 
         if (best_combo is None) or (winning_combos['compliance_score'].min() < best_combo['compliance_score'].min()):
             best_combo = winning_combos.loc[winning_combos['compliance_score'].idxmin()]
@@ -377,6 +365,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
             for rc in reg_classes:
                 if mctrc[mc][rc]:
                     cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
+                    cv.vehicle_ID = mc + '.' + rc
                     cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 
@@ -418,7 +407,8 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     for cv in manufacturer_composite_vehicles:
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_ID]
-        if 'producer' in o2.options.verbose_console:
+        if ((o2.options.log_producer_iteration_years == 'all') or
+            (calendar_year in o2.options.log_producer_iteration_years)) and 'producer' in o2.options.verbose_console:
             cv.cost_curve.to_csv(o2.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_ID))
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
@@ -615,9 +605,6 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
     # if calendar_year >= 2044:
     #     plot_tech_share_combos_total(calendar_year, tech_share_combos_total)
 
-    if (o2.options.log_producer_iteration_years == 'all') or (calendar_year in o2.options.log_producer_iteration_years):
-        producer_iteration_log.write(tech_share_combos_total)
-
     compliant_tech_share_options = mini_df[(mini_df['total_combo_credits_with_offset_co2_megagrams']) >= 0].copy()
     non_compliant_tech_share_options = mini_df[(mini_df['total_combo_credits_with_offset_co2_megagrams']) < 0].copy()
 
@@ -668,10 +655,15 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         # lowest cost:
         # winning_combos = tech_share_combos_total.loc[[[cost_name].idxmin()]]
 
-    if (o2.options.log_producer_iteration_years == 'all') or (calendar_year in o2.options.log_producer_iteration_years) \
-            or ('producer' in o2.options.verbose_console):
-        winning_combos['winner'] = True
-        producer_iteration_log.write(winning_combos)
+    if (o2.options.log_producer_iteration_years == 'all') or (calendar_year in o2.options.log_producer_iteration_years):
+        if 'producer' in o2.options.verbose_console:
+            tech_share_combos_total.loc[winning_combos.index, 'winner'] = True
+            if o2.options.slice_tech_combo_cloud_tables:
+                tech_share_combos_total = tech_share_combos_total[tech_share_combos_total['compliance_ratio'] <= 1.2]
+            producer_iteration_log.write(tech_share_combos_total)
+        else:
+            winning_combos['winner'] = True
+            producer_iteration_log.write(winning_combos)
 
     return winning_combos.copy(), compliance_possible
 

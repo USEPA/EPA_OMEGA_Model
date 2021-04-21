@@ -88,7 +88,7 @@ try:
             self.production_constraints_file = path + 'test_inputs/production_constraints.csv'
             self.reregistration_fixed_by_age_file = path + 'test_inputs/reregistration_fixed_by_age.csv'
             self.annual_vmt_fixed_by_age_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
-            self.slice_tech_combo_cloud_tables = False
+            self.slice_tech_combo_cloud_tables = True
 
             self.allow_backsliding = True
 
@@ -97,6 +97,7 @@ try:
             self.producer_num_tech_options_per_ice_vehicle = 5
             self.producer_num_tech_options_per_bev_vehicle = 1
             self.producer_iteration_tolerance = 1e-6
+            self.producer_convergence_factor = 0.33
 
             self.iterate_producer_consumer = True
             self.producer_consumer_max_iterations = 20
