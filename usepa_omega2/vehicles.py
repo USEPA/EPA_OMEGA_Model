@@ -7,7 +7,6 @@ vehicles.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 
@@ -55,6 +54,7 @@ class CompositeVehicle(OMEGABase):
             v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
 
         self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
+        self.tech_option_iteration_num = 0
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -166,7 +166,8 @@ class CompositeVehicle(OMEGABase):
 
             # calculate new sales-weighted frontier
             composite_frontier_df = CostCloud.calculate_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
-                                                                 'new_vehicle_mfr_generalized_cost_dollars')
+                                                                 'new_vehicle_mfr_generalized_cost_dollars',
+                                                                 allow_upslope=True)
 
             # if plot:
             #     ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
@@ -406,7 +407,10 @@ class Vehicle(OMEGABase):
             self.upstream_CO2_grams_per_mile = upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
             self.cert_CO2_grams_per_mile += self.upstream_CO2_grams_per_mile
 
-            self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
+            if o2.options.flat_context:
+                self.cost_cloud = CostCloud.get_cloud(o2.options.flat_context_year, self.cost_curve_class)
+            else:
+                self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
             self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
             self.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
             self.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
@@ -427,24 +431,24 @@ class Vehicle(OMEGABase):
 
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
         tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
-        kwh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
+        kWh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
         tailpipe_kWh_name = 'veh_%s_tailpipe_kWh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
 
         # rename generic columns to vehicle-specific columns
         self.cost_cloud = self.cost_cloud.rename(
-            columns={'cert_co2_grams_per_mile': co2_name, 'cert_kWh_per_mile': kwh_name,
+            columns={'cert_co2_grams_per_mile': co2_name, 'cert_kWh_per_mile': kWh_name,
                      'new_vehicle_mfr_cost_dollars': cost_name})
 
         self.cost_cloud[co2_name] = \
             DriveCycleWeights.calc_weighted_drive_cycle_co2_grams_per_mile(self.model_year, self.cost_cloud)
 
-        self.cost_cloud[kwh_name] = \
+        self.cost_cloud[kWh_name] = \
             DriveCycleWeights.calc_weighted_drive_cycle_kWh_per_mile(self.model_year, self.cost_cloud)
 
         # capture pre-upstream values as "tailpipe", for now...
         self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
-        self.cost_cloud[tailpipe_kWh_name] = self.cost_cloud[kwh_name]
+        self.cost_cloud[tailpipe_kWh_name] = self.cost_cloud[kWh_name]
 
         # drop extraneous columns
         self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
@@ -454,14 +458,14 @@ class Vehicle(OMEGABase):
         # add upstream calcs
         upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
         self.cost_cloud['upstream_co2_grams_per_mile'] = \
-            upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kwh_name])
+            upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kWh_name])
         self.cost_cloud[co2_name] += self.cost_cloud['upstream_co2_grams_per_mile']
 
         # calculate producer generalized cost
-        self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, self.cost_cloud, co2_name, cost_name)
+        self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, co2_name, kWh_name, cost_name)
 
         # calculate frontier from updated cloud
-        cost_curve = CostCloud.calculate_frontier(self.cost_cloud, co2_name, cost_name, allow_upslope=False)
+        cost_curve = CostCloud.calculate_frontier(self.cost_cloud, co2_name, cost_name, allow_upslope=True)
 
         # CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, co2_name, cost_name)
 
