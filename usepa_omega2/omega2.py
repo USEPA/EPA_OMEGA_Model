@@ -170,7 +170,7 @@ def run_producer_consumer():
                 update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
                                      producer_consumer_iteration, producer_compliant, convergence_error)
 
-                # decide whether to iterate or not
+                # decide whether to continue iterating or not
                 iterate_producer_consumer = o2.options.iterate_producer_consumer \
                           and iteration_num < o2.options.producer_consumer_max_iterations \
                           and not converged
