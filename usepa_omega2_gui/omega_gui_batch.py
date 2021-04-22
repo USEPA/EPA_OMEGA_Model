@@ -860,7 +860,11 @@ class Form(QObject):
 
                     # Read and output all new lines from log files
                     while log_counter_array[log_loop] < log_lines and log_status == 1:
-                        f = open(log_file_array[log_loop])
+                        try:
+                            f = open(log_file_array[log_loop])
+                        except Exception as e:
+                            print("%%%%% File Missing: ", e)
+                            break
                         lines = f.readlines()
                         f.close()
 
