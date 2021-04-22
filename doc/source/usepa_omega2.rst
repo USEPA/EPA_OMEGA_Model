@@ -237,6 +237,14 @@ usepa\_omega2.postproc\_session module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.price\_modifications module
+-----------------------------------------
+
+.. automodule:: usepa_omega2.price_modifications
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.producer module
 -----------------------------
 
