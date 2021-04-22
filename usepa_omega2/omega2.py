@@ -202,7 +202,7 @@ def run_producer_consumer():
         credit_bank.transaction_log.to_csv(
             o2.options.output_folder + o2.options.session_unique_name + '_credit_bank_transactions.csv', index=False)
 
-    return iteration_log
+    return iteration_log, credit_bank
 
 
 def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_response, candidate_mfr_composite_vehicles,
@@ -794,12 +794,13 @@ def run_omega(o2_options, standalone_run=False):
                 # run with profiler
                 import cProfile
                 import re
-                cProfile.run('iteration_log = run_producer_consumer()', filename='omega2_profile.dmp')
-                session_summary_results = postproc_session.run_postproc(globals()['iteration_log'], standalone_run)  # return values of cProfile.run() show up in the globals namespace
+                cProfile.run('iteration_log, credit_history = run_producer_consumer()', filename='omega2_profile.dmp')
+                session_summary_results = postproc_session.run_postproc(globals()['iteration_log', 'credit_history'],
+                                                                        standalone_run)  # return values of cProfile.run() show up in the globals namespace
             else:
                 # run without profiler
-                iteration_log = run_producer_consumer()
-                session_summary_results = postproc_session.run_postproc(iteration_log, standalone_run)
+                iteration_log, credit_history = run_producer_consumer()
+                session_summary_results = postproc_session.run_postproc(iteration_log, credit_history, standalone_run)
 
             # write output files
             summary_filename = o2.options.output_folder + o2.options.session_unique_name + '_summary_results.csv'

@@ -8,9 +8,9 @@ post-compliance-modeling output generation (charts, summary files, etc)
 
 from usepa_omega2 import *
 from omega_plot import *
+from GHG_credits import GHG_credit_bank
 
-
-def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
+def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, standalone_run: bool):
     """
     Generate charts and output files for a single simulation
 
@@ -38,7 +38,8 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     plot_iteration(iteration_log)
 
-    calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = plot_manufacturer_compliance(calendar_years)
+    calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = \
+        plot_manufacturer_compliance(calendar_years, credit_history)
 
     context_sales, total_sales = plot_total_sales(calendar_years)
 
@@ -654,7 +655,7 @@ def plot_total_sales(calendar_years):
     return context_sales, total_sales
 
 
-def plot_manufacturer_compliance(calendar_years):
+def plot_manufacturer_compliance(calendar_years, credit_history):
     """
 
     Args:
@@ -676,7 +677,35 @@ def plot_manufacturer_compliance(calendar_years):
     ax1.legend(['cert_target_co2_Mg', 'calendar_year_cert_co2_Mg', 'model_year_cert_co2_Mg'])
     label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         o2.options.session_unique_name, total_cost_billions))
+
+    cert_target_co2_Mg_dict = dict(zip(calendar_years, cert_target_co2_Mg))
+    calendar_year_cert_co2_Mg_dict = dict(zip(calendar_years, calendar_year_cert_co2_Mg))
+    model_year_cert_co2_Mg_dict = dict(zip(calendar_years, model_year_cert_co2_Mg))
+
+    for _, t in credit_history.transaction_log.iterrows():
+        print(t)
+        if t.credit_destination != "EXPIRATION" and t.model_year in calendar_year_cert_co2_Mg_dict:
+            ax1.annotate("",xy=(t.credit_destination, cert_target_co2_Mg_dict[t.credit_destination]), xycoords='data',
+                     xytext=(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year]), textcoords='data',
+                     arrowprops=dict(arrowstyle='-|>', color='green', shrinkA=2, shrinkB=2,
+                                     patchA=None, patchB=None, connectionstyle="arc3,rad=1"))
+        elif t.credit_destination != "EXPIRATION":
+            ax1.plot(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]], '.', color='orange')
+            ax1.annotate("",xy=(t.credit_destination, model_year_cert_co2_Mg_dict[t.credit_destination]), xycoords='data',
+                     xytext=(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]]), textcoords='data',
+                     arrowprops=dict(arrowstyle='-|>', color='green', shrinkA=2, shrinkB=2,
+                                     patchA=None, patchB=None, connectionstyle="arc3,rad=1"))
+            ax1.set_xlim(calendar_years[0]-5, ax1.get_xlim()[1])
+        elif t.credit_destination == "EXPIRATION" and t.model_year in calendar_year_cert_co2_Mg_dict:
+            print('expiration %s %s' % (t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year]))
+            ax1.annotate("",xy=(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year]), xycoords='data',
+                     xytext=(t.model_year, ax1.get_ylim()[0]), textcoords='data',
+                     arrowprops=dict(arrowstyle='<-', color='red', shrinkA=5, shrinkB=5,
+                                     patchA=None, patchB=None, connectionstyle="arc3,rad=0.01"))
+
     fig.savefig(o2.options.output_folder + '%s Cert Mg v Year.png' % o2.options.session_unique_name)
+
+
 
     return calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
 
