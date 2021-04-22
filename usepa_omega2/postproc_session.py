@@ -38,7 +38,7 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
 
     plot_iteration(iteration_log)
 
-    cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = plot_manufacturer_compliance(calendar_years)
+    calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = plot_manufacturer_compliance(calendar_years)
 
     context_sales, total_sales = plot_total_sales(calendar_years)
 
@@ -62,7 +62,8 @@ def run_postproc(iteration_log: pd.DataFrame, standalone_run: bool):
     session_results['sales_context'] = context_sales
     session_results['session_name'] = o2.options.session_name
     session_results['cert_target_co2_Mg'] = cert_target_co2_Mg
-    session_results['cert_co2_Mg'] = cert_co2_Mg
+    session_results['calendar_year_cert_co2_Mg'] = calendar_year_cert_co2_Mg
+    session_results['model_year_cert_co2_Mg'] = model_year_cert_co2_Mg
     session_results['total_cost_billions'] = total_cost_billions
 
     for k in market_share_results:
@@ -665,17 +666,19 @@ def plot_manufacturer_compliance(calendar_years):
     from manufacturer_annual_data import ManufacturerAnnualData
 
     cert_target_co2_Mg = ManufacturerAnnualData.get_cert_target_co2_Mg()
-    cert_co2_Mg = ManufacturerAnnualData.get_cert_co2_Mg()
+    calendar_year_cert_co2_Mg = ManufacturerAnnualData.get_calendar_year_cert_co2_Mg()
+    model_year_cert_co2_Mg = ManufacturerAnnualData.get_model_year_cert_co2_Mg()
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions()
     # compliance chart
-    fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, '.-')
-    ax1.plot(calendar_years, cert_co2_Mg, '.-')
-    ax1.legend(['cert_target_co2_Mg', 'cert_co2_Mg'])
-    label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCompliance Versus Calendar Year\n Total Cost $%.2f Billion' % (
+    fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, 'o-')
+    ax1.plot(calendar_years, calendar_year_cert_co2_Mg, 'r.-')
+    ax1.plot(calendar_years, model_year_cert_co2_Mg, '-')
+    ax1.legend(['cert_target_co2_Mg', 'calendar_year_cert_co2_Mg', 'model_year_cert_co2_Mg'])
+    label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         o2.options.session_unique_name, total_cost_billions))
     fig.savefig(o2.options.output_folder + '%s Cert Mg v Year.png' % o2.options.session_unique_name)
 
-    return cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
+    return calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
 
 
 def plot_iteration(iteration_log):

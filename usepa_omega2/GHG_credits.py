@@ -195,15 +195,18 @@ class GHG_credit_bank(OMEGABase):
         self.credit_bank[self.credit_bank['calendar_year'] == calendar_year] = this_years_credits  # update bank
 
     def pay_debit(self, credit, debit, this_years_credits):
-        transaction_amount = min(abs(debit['ending_balance_Mg']), credit['ending_balance_Mg'])
+        from manufacturer_annual_data import ManufacturerAnnualData
+        transaction_amount_Mg = min(abs(debit['ending_balance_Mg']), credit['ending_balance_Mg'])
         t = GHG_credit_bank.create_credit_transaction(credit)
-        t['credit_value_Mg'] = transaction_amount
+        t['credit_value_Mg'] = transaction_amount_Mg
         t['credit_destination'] = debit['model_year']
-        credit['ending_balance_Mg'] -= transaction_amount
-        debit['ending_balance_Mg'] += transaction_amount
+        credit['ending_balance_Mg'] -= transaction_amount_Mg
+        debit['ending_balance_Mg'] += transaction_amount_Mg
         self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
+        ManufacturerAnnualData.update_model_year_cert_co2_Mg(debit['model_year'], debit['manufacturer'], -transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2_Mg(credit['model_year'], credit['manufacturer'], +transaction_amount_Mg)
 
 
 if __name__ == '__main__':

@@ -182,11 +182,11 @@ def run_producer_consumer():
                         omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION', echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
-            credit_bank.handle_credit(calendar_year, manufacturer_ID,
-                                      producer_decision_and_response['total_combo_credits_co2_megagrams'])
-
             producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                          producer_decision_and_response)
+
+            credit_bank.handle_credit(calendar_year, manufacturer_ID,
+                                      producer_decision_and_response['total_combo_credits_co2_megagrams'])
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 

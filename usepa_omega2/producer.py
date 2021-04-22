@@ -427,7 +427,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
         create_manufacturer_annual_data(calendar_year=calendar_year,
                                         manufacturer_ID=manufacturer_ID,
                                         cert_target_co2_Mg=cert_target_co2_Mg,
-                                        cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
+                                        calendar_year_cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
                                         )
     o2.session.flush()
@@ -586,24 +586,17 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
 
     cost_name = 'total_combo_generalized_cost_dollars'
 
-    # tech_share_combos_total['compliance_score'] = abs(1-tech_share_combos_total['compliance_ratio']) / tech_share_combos_total['total_combo_generalized_cost_dollars']
-
     mini_df = pd.DataFrame()
     mini_df['total_combo_credits_with_offset_co2_megagrams'] = \
         tech_share_combos_total['total_combo_credits_co2_megagrams'] + credits_offset_Mg
     mini_df['total_combo_cost_dollars'] = tech_share_combos_total['total_combo_cost_dollars']
     mini_df['total_combo_generalized_cost_dollars'] = tech_share_combos_total['total_combo_generalized_cost_dollars']
     mini_df['compliance_ratio'] = tech_share_combos_total['compliance_ratio']
-    # mini_df['compliance_score'] = tech_share_combos_total['compliance_score']
 
     tech_share_combos_total['producer_iteration'] = producer_iteration
     tech_share_combos_total['winner'] = False
     tech_share_combos_total['compliance_score'] = abs(1-tech_share_combos_total['compliance_ratio'])  # / tech_share_combos_total['total_combo_generalized_cost_dollars']
     tech_share_combos_total['slope'] = 0
-
-    # if producer_iteration == 0:
-    # if calendar_year >= 2044:
-    #     plot_tech_share_combos_total(calendar_year, tech_share_combos_total)
 
     compliant_tech_share_options = mini_df[(mini_df['total_combo_credits_with_offset_co2_megagrams']) >= 0].copy()
     non_compliant_tech_share_options = mini_df[(mini_df['total_combo_credits_with_offset_co2_megagrams']) < 0].copy()
@@ -633,12 +626,6 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
             best_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
         else:
             best_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
-
-        # # if calendar_year==2044:
-        # #     print('2044')
-        #
-        # best_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options['compliance_score'].idxmin()]]
-        # best_non_compliant_tech_share_option = tech_share_combos_total.loc[[non_compliant_tech_share_options['compliance_score'].idxmin()]]
 
         winning_combos = pd.DataFrame.append(best_compliant_tech_share_option, best_non_compliant_tech_share_option)
 
