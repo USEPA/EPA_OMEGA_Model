@@ -664,6 +664,18 @@ def plot_manufacturer_compliance(calendar_years, credit_history):
     Returns:
 
     """
+    def draw_transfer_arrow(src_x, src_y, dest_x, dest_y):
+        ax1.annotate('', xy=(dest_x, dest_y), xycoords='data',
+                     xytext=(src_x, src_y), textcoords='data',
+                     arrowprops=dict(arrowstyle='-|>', color='green', shrinkA=2, shrinkB=2,
+                                     patchA=None, patchB=None, connectionstyle="arc3,rad=1"))
+
+    def draw_expiration_arrow(src_x, src_y):
+        ax1.annotate('', xy=(src_x, src_y), xycoords='data',
+                     xytext=(src_x, ax1.get_ylim()[0]), textcoords='data',
+                     arrowprops=dict(arrowstyle='<-', color='red', shrinkA=5, shrinkB=5,
+                                     patchA=None, patchB=None, connectionstyle="arc3,rad=0"))
+
     from manufacturer_annual_data import ManufacturerAnnualData
 
     cert_target_co2_Mg = ManufacturerAnnualData.get_cert_target_co2_Mg()
@@ -683,29 +695,25 @@ def plot_manufacturer_compliance(calendar_years, credit_history):
     model_year_cert_co2_Mg_dict = dict(zip(calendar_years, model_year_cert_co2_Mg))
 
     for _, t in credit_history.transaction_log.iterrows():
-        print(t)
-        if t.credit_destination != "EXPIRATION" and t.model_year in calendar_year_cert_co2_Mg_dict:
-            ax1.annotate("",xy=(t.credit_destination, cert_target_co2_Mg_dict[t.credit_destination]), xycoords='data',
-                     xytext=(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year]), textcoords='data',
-                     arrowprops=dict(arrowstyle='-|>', color='green', shrinkA=2, shrinkB=2,
-                                     patchA=None, patchB=None, connectionstyle="arc3,rad=1"))
-        elif t.credit_destination != "EXPIRATION":
-            ax1.plot(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]], '.', color='orange')
-            ax1.annotate("",xy=(t.credit_destination, model_year_cert_co2_Mg_dict[t.credit_destination]), xycoords='data',
-                     xytext=(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]]), textcoords='data',
-                     arrowprops=dict(arrowstyle='-|>', color='green', shrinkA=2, shrinkB=2,
-                                     patchA=None, patchB=None, connectionstyle="arc3,rad=1"))
+        if type(t.credit_destination) is not str and t.model_year in calendar_year_cert_co2_Mg_dict:
+            draw_transfer_arrow(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year],
+                                t.credit_destination, cert_target_co2_Mg_dict[t.credit_destination])
+        elif type(t.credit_destination) is not str and t.model_year not in calendar_year_cert_co2_Mg_dict:
+            ax1.plot(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]], 'o', color='orange')
+            draw_transfer_arrow(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]],
+                                t.credit_destination, model_year_cert_co2_Mg_dict[t.credit_destination])
             ax1.set_xlim(calendar_years[0]-5, ax1.get_xlim()[1])
-        elif t.credit_destination == "EXPIRATION" and t.model_year in calendar_year_cert_co2_Mg_dict:
-            print('expiration %s %s' % (t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year]))
-            ax1.annotate("",xy=(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year]), xycoords='data',
-                     xytext=(t.model_year, ax1.get_ylim()[0]), textcoords='data',
-                     arrowprops=dict(arrowstyle='<-', color='red', shrinkA=5, shrinkB=5,
-                                     patchA=None, patchB=None, connectionstyle="arc3,rad=0.01"))
+        elif t.credit_destination == 'EXPIRATION' and t.model_year in calendar_year_cert_co2_Mg_dict:
+            draw_expiration_arrow(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year])
+        elif t.credit_destination == 'EXPIRATION' and t.model_year not in calendar_year_cert_co2_Mg_dict:
+            ax1.plot(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]], 'o', color='orange')
+            draw_expiration_arrow(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]])
+        else:  # "PAST_DUE"
+            ax1.plot(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year], 'x', color='red')
+            plt.scatter(t.model_year, calendar_year_cert_co2_Mg_dict[calendar_years[0]], s=80, facecolors='none',
+                        edgecolors='r')
 
     fig.savefig(o2.options.output_folder + '%s Cert Mg v Year.png' % o2.options.session_unique_name)
-
-
 
     return calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
 
