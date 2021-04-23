@@ -789,9 +789,9 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 df.to_csv(batch_summary_filename, header=False, index=False, mode='a')
 
                 # perform batch post-process, if possible
-                if os.access(batch_summary_filename, os.F_OK):
-                    import postproc_batch
-                    postproc_batch.run_postproc(batch.batch_log, batch_summary_filename)
+                # if os.access(batch_summary_filename, os.F_OK):
+                #     import postproc_batch
+                #     postproc_batch.run_postproc(batch.batch_log, batch_summary_filename)
 
 
 if __name__ == '__main__':
