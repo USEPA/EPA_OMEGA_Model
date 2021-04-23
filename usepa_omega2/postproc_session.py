@@ -730,7 +730,7 @@ def plot_iteration(iteration_log):
     """
     from consumer.market_classes import MarketClass
 
-    for iteration in [0,-1]:
+    for iteration in [0, -1]:
         year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
                             zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == iteration],
                                 iteration_log['iteration'][iteration_log['pricing_iteration'] == iteration])]
