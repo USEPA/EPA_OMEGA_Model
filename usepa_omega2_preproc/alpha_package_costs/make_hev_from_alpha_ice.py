@@ -79,8 +79,8 @@ def main():
         hev_packages_df = pd.concat([hev_packages_df, df], axis=0, ignore_index=True)
 
     hev_packages_df = add_battery(settings, hev_packages_df)
-    hev_pakcages_df = add_motor(settings, hev_packages_df)
-    hev_pakcages_df = adjust_co2(settings, hev_pakcages_df)
+    hev_packages_df = add_motor(settings, hev_packages_df)
+    hev_packages_df = adjust_co2(settings, hev_packages_df)
     hev_packages_df = pd.concat([sub_header, hev_packages_df], axis=0, ignore_index=True)
     hev_packages_df.to_csv(hev_folder_path / 'HEV.csv', index=False)
     print(f'HEV packages file is saved to {hev_folder_path}')

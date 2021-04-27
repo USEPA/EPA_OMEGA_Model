@@ -612,9 +612,9 @@ class SetInputs:
 
     # set what to run (i.e., what outputs to generate)
     run_ice = True
-    run_bev = False
+    run_bev = True
     run_phev = False
-    run_hev = False
+    run_hev = True
     generate_cost_cloud_file = True
 
     # get the price deflators
