@@ -193,11 +193,6 @@ def clean_alpha_data(input_df, *args):
         df.drop(columns=[arg, 1], inplace=True)
         df.rename(columns={0: arg}, inplace=True)
         df[arg] = pd.to_numeric(df[arg])
-        # if df[arg].dtype == 'str':
-        #     df = df.join(df[arg].str.split('.', expand=True))
-        #     df.drop(columns=[arg, 1], inplace=True)
-        #     df.rename(columns={0: arg}, inplace=True)
-        #     df[arg] = pd.to_numeric(df[arg])
     return df
 
 
@@ -552,25 +547,6 @@ class PackageCost:
         motor_cost = motor_cost * markup
         cost = battery_cost + motor_cost
         return battery_cost, motor_cost, cost 
-    
-    # def calc_bev_cost(self, settings):
-    #     """
-    #     Cost of batteries and motors.
-    #     :return:
-    #     """
-    #     pev_range, pev_energy_rate, pev_soc, pev_gap, battery_kwh_gross, motor_power = self.pev_key
-    #     battery_cost = battery_kwh_gross * (settings.bev_curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
-    #                                         + settings.bev_curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
-    #                                         + settings.bev_curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
-    #                                         + settings.bev_curves_dict['constant']['dollars_per_kWh_curve'])
-    #     motor_cost = motor_power * (settings.bev_curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
-    #                                 + settings.bev_curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
-    #                                 + settings.bev_curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
-    #                                 + settings.bev_curves_dict['constant']['dollars_per_kW_curve'])
-    #     battery_cost = battery_cost * settings.bev_powertrain_markup
-    #     motor_cost = motor_cost * settings.bev_powertrain_markup
-    #     cost = battery_cost + motor_cost
-    #     return battery_cost, motor_cost, cost
 
     def calc_phev_cost(self):
         """
@@ -612,7 +588,6 @@ class PackageCost:
             cost = weight_cost_cache[weight_cost_cache_key]
         else:
             weight_removed = glider_weight / (1 - weight_rdxn) - glider_weight
-            # base_wt = curb_wt + weight_removed
             base_wt = glider_weight + weight_removed
             base_weight_cost_per_lb = weight_cost_dict[self.structure_key]['item_cost'] * price_class_dict[self.price_key]['scaler']
             dmc_ln_coeff = weight_cost_dict[self.structure_key]['DMC_ln_coefficient']
@@ -637,9 +612,9 @@ class SetInputs:
 
     # set what to run (i.e., what outputs to generate)
     run_ice = True
-    run_bev = True
+    run_bev = False
     run_phev = False
-    run_hev = True
+    run_hev = False
     generate_cost_cloud_file = True
 
     # get the price deflators
@@ -739,40 +714,6 @@ def main():
                 package_result = ice_package_results(settings, key, alpha_file_dict)
                 ice_packages_df = pd.concat([ice_packages_df, package_result], axis=0, ignore_index=False)
 
-    # for idx, folder in enumerate(alpha_folders):
-    #     alpha_files[idx] = [file for file in alpha_folders[idx].iterdir() if file.name.__contains__('.csv')]
-    #
-    #     for alpha_file in alpha_files[idx]:
-    #         alpha_file_df = pd.read_csv(alpha_file, skiprows=range(1, 2))
-    #         alpha_file_df = clean_alpha_data(alpha_file_df, 'Aero Improvement %', 'Crr Improvement %', 'Weight Reduction %')
-    #
-    #         if folder.name.__contains__('BEV') and settings.run_bev:
-    #             fuel_id = 'bev'
-    #             alpha_file_df = add_elements_for_package_key(alpha_file_df)
-    #             keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
-    #             for key in keys:
-    #                 package_result = pev_package_results(settings, key, alpha_file_dict)
-    #                 bev_packages_df = pd.concat([bev_packages_df, package_result], axis=0, ignore_index=False)
-    #
-    #         elif folder.name.__contains__('PHEV') and settings.run_phev:
-    #             fuel_id = 'phev'
-    #
-    #         elif folder.name.__contains__('HEV') and ~folder.name.__contains__('PHEV') and settings.run_hev:
-    #             fuel_id = 'hev'
-    #             alpha_file_df = add_elements_for_package_key(alpha_file_df)
-    #             keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
-    #             for key in keys:
-    #                 package_result = ice_package_results(settings, key, alpha_file_dict)
-    #                 hev_packages_df = pd.concat([hev_packages_df, package_result], axis=0, ignore_index=False)
-    #
-    #         elif settings.run_ice:
-    #             fuel_id = 'ice'
-    #             alpha_file_df = add_elements_for_package_key(alpha_file_df)
-    #             keys, alpha_file_dict = package_key(settings, alpha_file_df, fuel_id)
-    #             for key in keys:
-    #                 package_result = ice_package_results(settings, key, alpha_file_dict)
-    #                 ice_packages_df = pd.concat([ice_packages_df, package_result], axis=0, ignore_index=False)
-
     # calculate YoY bev costs with learning
     if settings.run_bev:
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_battery', settings.years, settings.learning_rate_bev)
@@ -823,18 +764,6 @@ def main():
         cost_cloud_ice = reshape_df_for_cloud_file(settings, ice_packages_df)
 
     cost_cloud = pd.concat([cost_cloud_bev, cost_cloud_phev, cost_cloud_hev, cost_cloud_ice], axis=0, ignore_index=True)
-
-    # if settings.run_ice and settings.run_bev and settings.run_hev:
-    #     cost_cloud = reshape_df_for_cloud_file(settings, ice_packages_df)
-    #     cost_cloud = pd.concat([cost_cloud,
-    #                             reshape_df_for_cloud_file(settings, bev_packages_df),
-    #                             reshape_df_for_cloud_file(settings, hev_packages_df)], axis=0, ignore_index=True)
-    #
-    # if settings.run_bev and not settings.run_ice:
-    #     cost_cloud = reshape_df_for_cloud_file(settings, bev_packages_df)
-    #
-    # if settings.run_hev and not settings.run_ice:
-    #     cost_cloud = reshape_df_for_cloud_file(settings, hev_packages_df)
 
     cost_cloud.fillna(0, inplace=True)
 
