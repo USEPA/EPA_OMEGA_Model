@@ -8,7 +8,7 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'cost_clouds'
+input_template_name = 'simulated_vehicles'
 
 cache = dict()
 
@@ -26,9 +26,9 @@ class CostCloud(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.1
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
-                                  'new_vehicle_mfr_cost_dollars', 'cert_kWh_per_mile'}
+        input_template_version = 0.2
+        input_template_columns = {'cost_curve_class', 'model_year', 'simulated_vehicle_id',
+                                  'new_vehicle_mfr_cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -88,7 +88,8 @@ class CostCloud(OMEGABase):
         cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
         # find frontier starting point, lowest GHGs, and add to frontier
-        idxmin = cloud[x_key].idxmin()
+        idxmin = pd.to_numeric(cloud[x_key]).idxmin()
+        # idxmin = cloud[x_key].idxmin()
         frontier_pts.append(cloud.loc[idxmin])
         min_frontier_factor = 0
 
@@ -114,7 +115,8 @@ class CostCloud(OMEGABase):
                     # if multiple points with the same slope, take the one with the highest index (highest x-value)
                     idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor].index.max()
                 else:
-                    idxmin = cloud['frontier_factor'].idxmin()
+                    idxmin = pd.to_numeric(cloud['frontier_factor']).idxmin()
+                    # idxmin = cloud['frontier_factor'].idxmin()
                 if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                     frontier_pts.append(cloud.loc[idxmin])
 
@@ -145,7 +147,7 @@ if __name__ == '__main__':
         o2.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        o2.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
+        o2.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/simulated_vehicles.csv'
 
         init_fail = []
         init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=True)

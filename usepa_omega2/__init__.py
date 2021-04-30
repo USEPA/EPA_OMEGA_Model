@@ -73,7 +73,7 @@ try:
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
-            self.cost_file = path + 'test_inputs/cost_clouds.csv'
+            self.cost_file = path + 'test_inputs/simulated_vehicles.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = None

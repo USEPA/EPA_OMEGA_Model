@@ -606,7 +606,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         compliance_possible = True
 
         # grab lowest-cost compliant option
-        lowest_cost_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options[cost_name].idxmin()]]
+        lowest_cost_compliant_tech_share_option = tech_share_combos_total.loc[[pd.to_numeric(compliant_tech_share_options[cost_name]).idxmin()]]
+        # lowest_cost_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options[cost_name].idxmin()]]
 
         # grab best non-compliant option
         non_compliant_tech_share_options['weighted_slope'] = \
@@ -614,7 +615,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
             ((non_compliant_tech_share_options[cost_name] - float(lowest_cost_compliant_tech_share_option[cost_name])) /
             (non_compliant_tech_share_options['compliance_ratio'] - float(lowest_cost_compliant_tech_share_option['compliance_ratio'])))
 
-        best_non_compliant_tech_share_option = tech_share_combos_total.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+        best_non_compliant_tech_share_option = tech_share_combos_total.loc[[pd.to_numeric(non_compliant_tech_share_options['weighted_slope']).idxmin()]]
+        # best_non_compliant_tech_share_option = tech_share_combos_total.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
 
         if float(best_non_compliant_tech_share_option[cost_name]) > float(lowest_cost_compliant_tech_share_option[cost_name]):
             # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
@@ -623,7 +625,8 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
                 ((compliant_tech_share_options[cost_name] - float(best_non_compliant_tech_share_option[cost_name])) /
                 (compliant_tech_share_options['compliance_ratio'] - float(best_non_compliant_tech_share_option['compliance_ratio'])))
 
-            best_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
+            best_compliant_tech_share_option = tech_share_combos_total.loc[[pd.to_numeric(compliant_tech_share_options['weighted_slope']).idxmax()]]
+            # best_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
         else:
             best_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
