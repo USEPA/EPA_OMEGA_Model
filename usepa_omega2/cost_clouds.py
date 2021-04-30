@@ -12,7 +12,7 @@ input_template_name = 'simulated_vehicles'
 
 cache = dict()
 
-cloud_non_numeric_columns = ['key']
+cloud_non_numeric_columns = ['simulated_vehicle_id']
 
 
 class CostCloud(OMEGABase):
@@ -88,8 +88,7 @@ class CostCloud(OMEGABase):
         cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
         # find frontier starting point, lowest GHGs, and add to frontier
-        idxmin = pd.to_numeric(cloud[x_key]).idxmin()
-        # idxmin = cloud[x_key].idxmin()
+        idxmin = cloud[x_key].idxmin()
         frontier_pts.append(cloud.loc[idxmin])
         min_frontier_factor = 0
 
@@ -115,8 +114,7 @@ class CostCloud(OMEGABase):
                     # if multiple points with the same slope, take the one with the highest index (highest x-value)
                     idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor].index.max()
                 else:
-                    idxmin = pd.to_numeric(cloud['frontier_factor']).idxmin()
-                    # idxmin = cloud['frontier_factor'].idxmin()
+                    idxmin = cloud['frontier_factor'].idxmin()
                 if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                     frontier_pts.append(cloud.loc[idxmin])
 
