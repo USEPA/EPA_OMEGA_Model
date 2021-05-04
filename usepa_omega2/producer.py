@@ -48,7 +48,6 @@ def calculate_generalized_cost(vehicle, co2_name, kWh_name, cost_name):
     liquid_generalized_fuel_cost = 0
     electric_generalized_fuel_cost = 0
 
-    # TODO: calculate liquid and electric fuel costs separately and then add them...?
     if grams_co2_per_unit > 0:
         liquid_generalized_fuel_cost = \
             (vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) / grams_co2_per_unit *

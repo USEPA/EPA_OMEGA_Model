@@ -10,6 +10,10 @@ code_version = "0.6.0"
 print('loading usepa_omega2 version %s' % code_version)
 
 import os, sys
+
+if 'darwin' in sys.platform:
+    os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for pyqtgraph on MacOS
+
 # print('usepa_omega2 __init__.py path = %s' % os.path.abspath(__file__))
 # print('SYS Path = %s' % sys.path)
 
