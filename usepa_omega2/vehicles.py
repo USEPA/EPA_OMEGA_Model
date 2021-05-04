@@ -191,8 +191,10 @@ class CompositeVehicle(OMEGABase):
             #     ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
             #              composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '.')
 
-            composite_frontier_df = composite_frontier_df.drop(
-                [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x')], axis=1)
+            drop_columns = [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x')] + \
+                           ['_', 'frontier_factor']
+
+            composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
 
             # calculate new sales-weighted frontier
             composite_frontier_df = CostCloud.calculate_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
