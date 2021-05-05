@@ -27,8 +27,7 @@ class CostCloud(OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_version = 0.1
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
-                                  'new_vehicle_mfr_cost_dollars', 'cert_kWh_per_mile'}
+        input_template_columns = {'cost_curve_class', 'model_year', 'new_vehicle_mfr_cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)

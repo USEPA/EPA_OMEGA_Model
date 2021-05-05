@@ -20,7 +20,7 @@ def get_vehicle_info(vehicle_id):
     from vehicles import VehicleFinal
 
     # add kwh_per_mile_cycle here when available in VehicleFinal
-    attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_CO2_grams_per_mile']
+    attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_co2_grams_per_mile']
 
     if vehicle_id not in vehicles_dict:
         vehicles_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)
@@ -55,19 +55,19 @@ def get_powersector_ef(calendar_year):
     from effects.emission_factors_powersector import EmissionFactorsPowersector
 
     emission_factors = [
-        'voc_grams_per_kWh',
-        'co_grams_per_kWh',
-        'nox_grams_per_kWh',
-        'pm25_grams_per_kWh',
-        'sox_grams_per_kWh',
-        'benzene_grams_per_kWh',
-        'butadiene13_grams_per_kWh',
-        'formaldehyde_grams_per_kWh',
-        'acetaldehyde_grams_per_kWh',
-        'acrolein_grams_per_kWh',
-        'co2_grams_per_kWh',
-        'ch4_grams_per_kWh',
-        'n2o_grams_per_kWh',
+        'voc_grams_per_kwh',
+        'co_grams_per_kwh',
+        'nox_grams_per_kwh',
+        'pm25_grams_per_kwh',
+        'sox_grams_per_kwh',
+        'benzene_grams_per_kwh',
+        'butadiene13_grams_per_kwh',
+        'formaldehyde_grams_per_kwh',
+        'acetaldehyde_grams_per_kwh',
+        'acrolein_grams_per_kwh',
+        'co2_grams_per_kwh',
+        'ch4_grams_per_kwh',
+        'n2o_grams_per_kwh',
     ]
 
     return EmissionFactorsPowersector.get_emission_factors(calendar_year, emission_factors)
@@ -109,7 +109,7 @@ def calc_inventory(calendar_year):
 
     # UPDATE vehicle annual data related to effects
     for vad in vads:
-        model_year, reg_class_ID, in_use_fuel_ID, cert_CO2_grams_per_mile = get_vehicle_info(vad.vehicle_ID)  # add kwh_per_mile_cycle here
+        model_year, reg_class_ID, in_use_fuel_ID, cert_co2_grams_per_mile = get_vehicle_info(vad.vehicle_ID)  # add kwh_per_mile_cycle here
 
         # co2 and fuel consumption
         if in_use_fuel_ID == 'US electricity':
@@ -117,7 +117,7 @@ def calc_inventory(calendar_year):
             vad.onroad_fuel_consumption_rate = kwh_per_mile_cycle / gap_bev  # TODO placeholder for now
             vad.fuel_consumption = vad.vmt * vad.onroad_fuel_consumption_rate
         else:
-            vad.onroad_co2_grams_per_mile = cert_CO2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
+            vad.onroad_co2_grams_per_mile = cert_co2_grams_per_mile / gap_ice  # TODO how are we doing this - simply gap? what about AC, off-cycle, etc.?
             vad.onroad_fuel_consumption_rate = vad.onroad_co2_grams_per_mile / co2_indolene  # TODO is this how we're doing this?
             vad.fuel_consumption = vad.vmt * vad.onroad_fuel_consumption_rate
 

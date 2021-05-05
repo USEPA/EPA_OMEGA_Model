@@ -19,7 +19,7 @@ class GHGStandardFuels(SQABase, OMEGABase):
     index = Column('index', Integer, primary_key=True)
     fuel_ID = Column('fuel_id', String)
     calendar_year = Column(Numeric)
-    cert_CO2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)
+    cert_co2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)
 
     @staticmethod
     def get_fuel_attributes(fuel_id, attribute_types):
@@ -71,7 +71,7 @@ class GHGStandardFuels(SQABase, OMEGABase):
                     obj_list.append(GHGStandardFuels(
                         fuel_ID=df.loc[i, 'fuel_id'],
                         calendar_year=df.loc[i, 'calendar_year'],
-                        cert_CO2_grams_per_unit=df.loc[i, 'cert_co2_grams_per_unit'],
+                        cert_co2_grams_per_unit=df.loc[i, 'cert_co2_grams_per_unit'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()

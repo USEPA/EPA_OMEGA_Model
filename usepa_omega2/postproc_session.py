@@ -102,7 +102,7 @@ def plot_cert_co2_gpmi(calendar_years):
     average_cert_co2_data['total'] = []
     for cy in calendar_years:
         average_cert_co2_data['total'].append(o2.session.query(
-            func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.cert_co2_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
                                           filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                           filter(VehicleFinal.model_year == cy).
@@ -114,7 +114,7 @@ def plot_cert_co2_gpmi(calendar_years):
         for idx, cy in enumerate(calendar_years):
             registered_count_and_market_ID_and_co2 = o2.session.query(VehicleAnnualData.registered_count,
                                                                        VehicleFinal.market_class_ID,
-                                                                       VehicleFinal.cert_CO2_grams_per_mile) \
+                                                                       VehicleFinal.cert_co2_grams_per_mile) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -123,7 +123,7 @@ def plot_cert_co2_gpmi(calendar_years):
             for result in registered_count_and_market_ID_and_co2:
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_CO2_grams_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(result.cert_co2_grams_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cert_co2_data[mcat] = market_category_cost
@@ -144,7 +144,7 @@ def plot_cert_co2_gpmi(calendar_years):
         average_cert_co2_data[mc] = []
         for cy in calendar_years:
             average_cert_co2_data[mc].append(o2.session.query(
-                func.sum(VehicleFinal.cert_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_co2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                          filter(VehicleFinal.model_year == cy).
@@ -182,7 +182,7 @@ def plot_cert_kwh_pmi(calendar_years):
     average_cert_kwh_data['total'] = []
     for cy in calendar_years:
         average_cert_kwh_data['total'].append(o2.session.query(
-            func.sum(VehicleFinal.cert_kWh_per_mile * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.cert_kwh_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
                                           filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                           filter(VehicleFinal.model_year == cy).
@@ -194,7 +194,7 @@ def plot_cert_kwh_pmi(calendar_years):
         for idx, cy in enumerate(calendar_years):
             registered_count_and_market_ID_and_kwh = o2.session.query(VehicleAnnualData.registered_count,
                                                                        VehicleFinal.market_class_ID,
-                                                                       VehicleFinal.cert_kWh_per_mile) \
+                                                                       VehicleFinal.cert_kwh_per_mile) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -203,7 +203,7 @@ def plot_cert_kwh_pmi(calendar_years):
             for result in registered_count_and_market_ID_and_kwh:
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_kWh_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(result.cert_kwh_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cert_kwh_data[mcat] = market_category_cost
@@ -224,7 +224,7 @@ def plot_cert_kwh_pmi(calendar_years):
         average_cert_kwh_data[mc] = []
         for cy in calendar_years:
             average_cert_kwh_data[mc].append(o2.session.query(
-                func.sum(VehicleFinal.cert_kWh_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_kwh_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                          filter(VehicleFinal.model_year == cy).
@@ -262,7 +262,7 @@ def plot_target_co2_gpmi(calendar_years):
     average_cert_co2_data['total'] = []
     for cy in calendar_years:
         average_cert_co2_data['total'].append(o2.session.query(
-            func.sum(VehicleFinal.cert_target_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.cert_target_co2_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
                                           filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                           filter(VehicleFinal.model_year == cy).
@@ -274,7 +274,7 @@ def plot_target_co2_gpmi(calendar_years):
         for idx, cy in enumerate(calendar_years):
             registered_count_and_market_ID_and_co2 = o2.session.query(VehicleAnnualData.registered_count,
                                                                        VehicleFinal.market_class_ID,
-                                                                       VehicleFinal.cert_target_CO2_grams_per_mile) \
+                                                                       VehicleFinal.cert_target_co2_grams_per_mile) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -283,7 +283,7 @@ def plot_target_co2_gpmi(calendar_years):
             for result in registered_count_and_market_ID_and_co2:
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_target_CO2_grams_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(result.cert_target_co2_grams_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
         average_cert_co2_data[mcat] = market_category_cost
@@ -304,7 +304,7 @@ def plot_target_co2_gpmi(calendar_years):
         average_cert_co2_data[mc] = []
         for cy in calendar_years:
             average_cert_co2_data[mc].append(o2.session.query(
-                func.sum(VehicleFinal.cert_target_CO2_grams_per_mile * VehicleAnnualData.registered_count) /
+                func.sum(VehicleFinal.cert_target_co2_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                          filter(VehicleFinal.model_year == cy).
@@ -504,7 +504,7 @@ def plot_vehicle_megagrams(calendar_years):
     Mg_data['total'] = []
     for cy in calendar_years:
         Mg_data['total'].append(
-            o2.session.query(func.sum(VehicleFinal.cert_CO2_Mg)).
+            o2.session.query(func.sum(VehicleFinal.cert_co2_Mg)).
                                           filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                           filter(VehicleFinal.model_year == cy).
                                           filter(VehicleAnnualData.age == 0).scalar())
@@ -514,14 +514,14 @@ def plot_vehicle_megagrams(calendar_years):
         market_category_Mg = []
         for idx, cy in enumerate(calendar_years):
             market_ID_and_Mg = o2.session.query(VehicleFinal.market_class_ID,
-                                                VehicleFinal.cert_CO2_Mg) \
+                                                VehicleFinal.cert_co2_Mg) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
             sales_weighted_Mg = 0
             for result in market_ID_and_Mg:
                 if mcat in result.market_class_ID.split('.'):
-                    sales_weighted_Mg += float(result.cert_CO2_Mg)
+                    sales_weighted_Mg += float(result.cert_co2_Mg)
             market_category_Mg.append(sales_weighted_Mg)
 
         Mg_data[mcat] = market_category_Mg
@@ -542,7 +542,7 @@ def plot_vehicle_megagrams(calendar_years):
         Mg_data[mc] = []
         for cy in calendar_years:
             Mg_data[mc].append(o2.session.query(
-                func.sum(VehicleFinal.cert_CO2_Mg)).
+                func.sum(VehicleFinal.cert_co2_Mg)).
                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                          filter(VehicleFinal.model_year == cy).
                                          filter(VehicleFinal.market_class_ID == mc).

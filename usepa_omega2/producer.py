@@ -15,11 +15,14 @@ import consumer
 cache = dict()
 
 
-def calculate_generalized_cost(vehicle, co2_name, kWh_name, cost_name):
+def calculate_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     """
 
     Args:
-        vehicle: an object of class Vehicle
+        vehicle:
+        co2_name:
+        kwh_name:
+        cost_name:
 
     Returns:
         A cost curve modified by generalized cost factors
@@ -39,8 +42,8 @@ def calculate_generalized_cost(vehicle, co2_name, kWh_name, cost_name):
 
     cost_cloud = vehicle.cost_cloud
     vehicle_cost = cost_cloud[cost_name]
-    vehicle_cert_CO2_grams_per_mile = cost_cloud[co2_name]
-    vehicle_cert_kWh_per_mile = cost_cloud[kWh_name]
+    vehicle_co2_grams_per_mile = cost_cloud[co2_name]
+    vehicle_cert_kwh_per_mile = cost_cloud[kwh_name]
 
     price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_ID)
 
@@ -51,12 +54,12 @@ def calculate_generalized_cost(vehicle, co2_name, kWh_name, cost_name):
     if grams_co2_per_unit > 0:
         liquid_generalized_fuel_cost = \
             (vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) / grams_co2_per_unit *
-             vehicle_cert_CO2_grams_per_mile *
+             vehicle_co2_grams_per_mile *
              producer_generalized_cost_annual_vmt *
              producer_generalized_cost_fuel_years)
 
-    if any(vehicle_cert_kWh_per_mile > 0):
-        electric_generalized_fuel_cost = (vehicle_cert_kWh_per_mile *
+    if any(vehicle_cert_kwh_per_mile > 0):
+        electric_generalized_fuel_cost = (vehicle_cert_kwh_per_mile *
                                          vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
                                          producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
 
@@ -83,6 +86,7 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
     Returns:
 
     """
+
     child_df_list = []
 
     children = list(market_class_dict)
@@ -115,7 +119,7 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
                 if o2.options.allow_backsliding:
                     veh_max_co2_gpmi = new_veh.get_max_co2_gpmi()
                 else:
-                    veh_max_co2_gpmi = new_veh.cert_CO2_grams_per_mile
+                    veh_max_co2_gpmi = new_veh.cert_co2_grams_per_mile
 
                 if winning_combos is not None:
                     co2_gpmi_options = np.array([])
@@ -309,13 +313,13 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
 
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_composite_vehicles:
-        new_veh.cert_CO2_grams_per_mile = winning_combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
-        new_veh.cert_kWh_per_mile = winning_combo['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
+        new_veh.cert_co2_grams_per_mile = winning_combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
+        new_veh.cert_kwh_per_mile = winning_combo['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%s_sales' % new_veh.vehicle_ID]
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
-        new_veh.set_cert_target_CO2_Mg()
-        new_veh.set_cert_CO2_Mg()
+        new_veh.set_cert_target_co2_Mg()
+        new_veh.set_cert_co2_Mg()
 
     return manufacturer_composite_vehicles, winning_combo, market_class_tree, producer_compliance_possible
 
@@ -420,7 +424,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
 
     o2.session.add_all(manufacturer_new_vehicles)
 
-    cert_target_co2_Mg = VehicleFinal.calc_cert_target_CO2_Mg(calendar_year, manufacturer_ID)
+    cert_target_co2_Mg = VehicleFinal.calc_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(calendar_year=calendar_year,
