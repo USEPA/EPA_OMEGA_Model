@@ -572,6 +572,7 @@ def plot_market_shares(calendar_years, total_sales):
 
     """
     from consumer.market_classes import MarketClass
+    from context_new_vehicle_market import ContextNewVehicleMarket
     from vehicle_annual_data import VehicleAnnualData
     from vehicles import VehicleFinal
     import consumer
@@ -605,6 +606,18 @@ def plot_market_shares(calendar_years, total_sales):
                 .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % mc] = market_category_abs_share_frac
 
+    # tally up context size class sales
+    for csc in ContextNewVehicleMarket.context_size_classes:
+        market_category_abs_share_frac = []
+        for idx, cy in enumerate(calendar_years):
+            market_category_abs_share_frac.append(float(o2.session.query(func.sum(VehicleAnnualData.registered_count))
+                .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID)
+                .filter(VehicleFinal.context_size_class == csc)
+                .filter(VehicleAnnualData.calendar_year == cy)
+                .filter(VehicleAnnualData.age == 0).scalar()) / total_sales[idx])
+        market_share_results['abs_share_frac_%s' % csc] = market_category_abs_share_frac
+
+
     # plot market category results
     fig, ax1 = figure()
     for mcat in consumer.market_categories:
@@ -622,6 +635,15 @@ def plot_market_shares(calendar_years, total_sales):
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nMarket Class Absolute Market Shares' % o2.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s Mkt Cls Shares.png' % o2.options.session_unique_name)
+
+    # plot context size class results
+    fig, ax1 = figure()
+    for csc in ContextNewVehicleMarket.context_size_classes:
+        ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % csc], '.--')
+    ax1.set_ylim(-0.05, 1.05)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nContext Size Class Absolute Market Shares' % o2.options.session_unique_name)
+    ax1.legend(ContextNewVehicleMarket.context_size_classes.keys(), ncol=2, loc='upper center')
+    fig.savefig(o2.options.output_folder + '%s CSC Shares.png' % o2.options.session_unique_name)
 
     return market_share_results
 

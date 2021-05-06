@@ -2,7 +2,7 @@ Parameter,Type,Value
 Batch Settings,,
 Batch Name,String,single_session_batch
 Context Folder Name,String,
-Context Name,String,AEO2020
+Context Name,String,AEO2021
 Context Case,String,Reference case
 Context New Vehicle Prices File,GENERATE {X.Y} / String,GENERATE context_new_vehicle_prices.csv
 ,,

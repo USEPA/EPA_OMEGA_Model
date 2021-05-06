@@ -334,8 +334,9 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     Returns:
 
     """
-    from vehicles import VehicleFinal, Vehicle
+    from vehicles import VehicleFinal, Vehicle, CompositeVehicle
     from consumer.market_classes import MarketClass, populate_market_classes
+    from context_new_vehicle_market import ContextNewVehicleMarket
 
     cache_key = calendar_year
     if cache_key not in cache:
@@ -351,7 +352,21 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
             new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
 
-        # aggregate by market class / reg class
+        # group by context size class
+        csc_dict = dict()
+        for new_veh in manufacturer_vehicles:
+            if new_veh.context_size_class not in csc_dict:
+                csc_dict[new_veh.context_size_class] = []
+            csc_dict[new_veh.context_size_class].append(new_veh)
+
+        # create a composite vehicle for each size class, assign sales and decompose to update manufacturer_vehicles
+        for csc in csc_dict:
+            cv = CompositeVehicle(csc_dict[csc], calendar_year, calc_composite_cost_curve=False)
+            cv.initial_registered_count = ContextNewVehicleMarket.new_vehicle_sales(calendar_year,
+                                                                                    context_size_class=csc)
+            cv.decompose()
+
+        # group by market class / reg class
         mctrc = dict()
         for mc in MarketClass.market_classes:
             mctrc[mc] = {'sales': 0}
@@ -359,9 +374,8 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
                 mctrc[mc][rc] = []
         for new_veh in manufacturer_vehicles:
             mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
-            mctrc[new_veh.market_class_ID]['sales'] = mctrc[new_veh.market_class_ID]['sales'] + new_veh.initial_registered_count
+            mctrc[new_veh.market_class_ID]['sales'] += new_veh.initial_registered_count
 
-        from vehicles import CompositeVehicle
         CompositeVehicle.reset_vehicle_IDs()
         manufacturer_composite_vehicles = []
         for mc in mctrc:
@@ -369,7 +383,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
                 if mctrc[mc][rc]:
                     cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
                     cv.vehicle_ID = mc + '.' + rc
-                    cv.reg_class_market_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
+                    cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 
         # get empty market class tree
@@ -467,9 +481,9 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
         market_class = new_veh.market_class_ID
 
         if ('consumer_abs_share_frac_%s' % market_class) in tech_share_combos_total:
-            vehicle_sales = total_sales * tech_share_combos_total['consumer_abs_share_frac_%s' % market_class]
+            market_class_sales = total_sales * tech_share_combos_total['consumer_abs_share_frac_%s' % market_class]
         elif ('producer_abs_share_frac_%s' % market_class) in tech_share_combos_total:
-            vehicle_sales = total_sales * tech_share_combos_total['producer_abs_share_frac_%s' % market_class]
+            market_class_sales = total_sales * tech_share_combos_total['producer_abs_share_frac_%s' % market_class]
         else:
             substrs = market_class.split('.')
             chain = []
@@ -478,23 +492,23 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
                 for j in range(i + 1):
                     str = str + substrs[j] + '.' * (j != i)
                 chain.append(str)
-            vehicle_sales = total_sales
+            market_class_sales = total_sales
             for c in chain:
-                vehicle_sales = vehicle_sales * tech_share_combos_total[c]
+                market_class_sales = market_class_sales * tech_share_combos_total[c]
 
             if ('producer_abs_share_frac_%s' % market_class) not in tech_share_combos_total:
-                tech_share_combos_total['producer_abs_share_frac_%s' % market_class] = vehicle_sales / total_sales
+                tech_share_combos_total['producer_abs_share_frac_%s' % market_class] = market_class_sales / total_sales
             else:
-                tech_share_combos_total['producer_abs_share_frac_%s' % market_class] += vehicle_sales / total_sales
+                tech_share_combos_total['producer_abs_share_frac_%s' % market_class] += market_class_sales / total_sales
 
-        vehicle_sales = vehicle_sales * new_veh.reg_class_market_share_frac
-        tech_share_combos_total['veh_%s_sales' % new_veh.vehicle_ID] = vehicle_sales
+        market_class_sales = market_class_sales * new_veh.composite_vehicle_share_frac
+        tech_share_combos_total['veh_%s_sales' % new_veh.vehicle_ID] = market_class_sales
 
         # calculate vehicle total cost
-        vehicle_total_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%s_cost_dollars' % new_veh.vehicle_ID]
+        vehicle_total_cost_dollars = market_class_sales * tech_share_combos_total['veh_%s_cost_dollars' % new_veh.vehicle_ID]
         tech_share_combos_total['veh_%s_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_cost_dollars
 
-        vehicle_total_generalized_cost_dollars = vehicle_sales * tech_share_combos_total['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID]
+        vehicle_total_generalized_cost_dollars = market_class_sales * tech_share_combos_total['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID]
         tech_share_combos_total['veh_%s_generalized_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_generalized_cost_dollars
 
 
@@ -502,9 +516,9 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
         co2_gpmi = tech_share_combos_total['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
 
         cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(new_veh, co2_gpmi_variants=co2_gpmi,
-                                                                    sales_variants=vehicle_sales)
+                                                                    sales_variants=market_class_sales)
         target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(new_veh,
-                                                                        sales_variants=vehicle_sales)
+                                                                        sales_variants=market_class_sales)
         tech_share_combos_total['veh_%s_cert_co2_megagrams' % new_veh.vehicle_ID] = cert_co2_Mg
         tech_share_combos_total['veh_%s_target_co2_megagrams' % new_veh.vehicle_ID] = target_co2_Mg
         # update totals

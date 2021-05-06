@@ -13,7 +13,7 @@ from usepa_omega2 import *
 class CompositeVehicle(OMEGABase):
     next_vehicle_ID = -1
 
-    def __init__(self, vehicle_list, calendar_year, verbose=False):
+    def __init__(self, vehicle_list, calendar_year, verbose=False, calc_composite_cost_curve=True):
         """
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
@@ -49,9 +49,11 @@ class CompositeVehicle(OMEGABase):
             self.initial_registered_count = self.initial_registered_count + v.initial_registered_count
 
         for v in self.vehicle_list:
-            v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
+            v.composite_vehicle_share_frac = v.initial_registered_count / self.initial_registered_count
 
-        self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
+        if calc_composite_cost_curve:
+            self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
+
         self.tech_option_iteration_num = 0
 
     @staticmethod
@@ -77,18 +79,19 @@ class CompositeVehicle(OMEGABase):
                              'cert_tailpipe_co2_grams_per_mile', 'cert_kwh_per_mile']
 
         for v in self.vehicle_list:
-            for ccv in cost_curve_values:
-                if len(self.cost_curve) > 1:
-                    ccv_interp1d = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
-                                                          self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)],
-                                                          fill_value=(self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].min(),
-                                                                      self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].max()),
-                                                          bounds_error=False)
-                    v.__setattr__(ccv, ccv_interp1d(self.cert_co2_grams_per_mile))
-                else:
-                    v.__setattr__(ccv, self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)])
+            if 'cost_curve' in self.__dict__:
+                for ccv in cost_curve_values:
+                    if len(self.cost_curve) > 1:
+                        ccv_interp1d = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
+                                                              self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)],
+                                                              fill_value=(self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].min(),
+                                                                          self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].max()),
+                                                              bounds_error=False)
+                        v.__setattr__(ccv, ccv_interp1d(self.cert_co2_grams_per_mile))
+                    else:
+                        v.__setattr__(ccv, self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)])
 
-            v.initial_registered_count = self.initial_registered_count * v.reg_class_market_share_frac
+            v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
             v.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
             v.set_cert_target_co2_Mg()  # varies by model year and initial_registered_count
@@ -116,7 +119,7 @@ class CompositeVehicle(OMEGABase):
 
         for v in self.vehicle_list:
             vehicle_frontier = v.cost_curve
-            vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
+            vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.composite_vehicle_share_frac
 
             composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier, drop=False)
 
@@ -578,10 +581,9 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.initial_registered_count = df.loc[i, 'sales']
 
                     if veh.context_size_class not in context_size_class_dict:
-                        context_size_class_dict[veh.context_size_class] = veh.initial_registered_count
-                    else:
-                        context_size_class_dict[veh.context_size_class] = \
-                            context_size_class_dict[veh.context_size_class] + veh.initial_registered_count
+                        context_size_class_dict[veh.context_size_class] = 0
+
+                    context_size_class_dict[veh.context_size_class] += veh.initial_registered_count
 
                     vehicles_list.append(veh)
 
@@ -593,6 +595,9 @@ class VehicleFinal(SQABase, Vehicle):
                             ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class]['total'] = \
                                 ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
                                     'total'] + veh.initial_registered_count
+
+                    if veh.context_size_class not in ContextNewVehicleMarket.context_size_classes:
+                        ContextNewVehicleMarket.context_size_classes[veh.context_size_class] = []
 
                     if verbose:
                         print(veh)
