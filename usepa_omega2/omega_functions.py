@@ -189,7 +189,7 @@ def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
             weight = 1
         else:
             weight = o.__getattribute__(weight_attribute)
-        total = total + weight
+        total += weight
         if callable(o.__getattribute__(attribute)):
             weighted_sum = weighted_sum + o.__getattribute__(attribute)(attribute_args) * weight
         else:

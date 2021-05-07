@@ -294,7 +294,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
                            echo_console=True)
 
         omega_log.logwrite('Target Compliance Ratio %3.3f, Actual Compliance Ratio %3.3f' %
-                           ((best_combo['total_combo_cert_co2_megagrams']-best_combo['total_combo_credits_offset_Mg'])/best_combo['total_combo_target_co2_megagrams'],
+                           ((best_combo['total_combo_cert_co2_megagrams']-best_combo['total_combo_credits_offset_Mg'])/max(1, best_combo['total_combo_target_co2_megagrams']),
                             best_combo['compliance_ratio']),
                            echo_console=True)
 
