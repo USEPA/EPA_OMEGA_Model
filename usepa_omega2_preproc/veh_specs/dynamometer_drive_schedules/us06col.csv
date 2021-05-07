@@ -1,5 +1,5 @@
 US06.TXT,US06 Supplemental FTP Driving Schedule
-"Test Time, secs Target Speed, mph",
+seconds,mph
 0,0
 1,0
 2,0

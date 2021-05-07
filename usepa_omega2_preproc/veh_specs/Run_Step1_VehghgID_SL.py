@@ -5,9 +5,7 @@ import numpy as np
 import datetime
 from pathlib import Path
 import matplotlib.pyplot as plt
-
 home = str(Path.home())
-dynamometer_drive_schedules_path = home + '/PycharmProjects/EPA_OMEGA_Model/usepa_omega2_preproc/veh_specs/dynamometer_drive_schedules/'
 
 main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
             +'\\'+'techspecconsolidator\VehGHG Runs'
@@ -33,28 +31,33 @@ for run_count in range (0,len(run_controller)):
     bodyid_filename = str(run_controller['BodyID Filename'][run_count])
     manual_filter_filename = str(run_controller['Manual Filter Filename, No Extensions'][run_count])
     expanded_footprint_filename = str(run_controller['Expanded Footprint Filename'][run_count])
-    subconfig_filename = str(run_controller['Subconfig Filename'][run_count])
+    subconfig_filename = str(run_controller['Subconfig Filename'][run_count]) # subconfig_sales
     vehghg_filename = str(run_controller['VehghgID Filename'][run_count])
     model_type_filename = str(run_controller['Model Type Filename'][run_count])
     model_type_exceptions_table_filename = str(run_controller['Model Type File Exceptions Table filename'][run_count])
     footprint_exceptions_table_filename = str(run_controller['Footprint File Exceptions Table filename'][run_count])
     roadload_coefficient_table_filename = str(run_controller['Roadload Coefficient Table Filename'][run_count])
-    drivecycle_filenames = str(run_controller['Drive Cycle Filenames'][run_count])
-    drivecycle_filenames = drivecycle_filenames.strip('{ }')
-    drivecycle_filenames = drivecycle_filenames.split(',')
-    for i in range (len(drivecycle_filenames)):
-        tmp_drivecycle_filename = drivecycle_filenames[i].strip(" '")
-        tmp_drivecycle = pd.read_csv(dynamometer_drive_schedules_path + tmp_drivecycle_filename, encoding="ISO-8859-1", skiprows=1)  # EVCIS Qlik Sense query results contain hyphens for nan
-        if 'ftp' in tmp_drivecycle_filename:
-            ftp_drivecycle_filename = tmp_drivecycle_filename
-            ftp_drivecycle = tmp_drivecycle
-        elif 'hwy' in tmp_drivecycle_filename:
-            hwfet_drivecycle_filename = tmp_drivecycle_filename
-            hwfet_drivecycle = tmp_drivecycle
-        elif 'us06' in tmp_drivecycle_filename:
-            us06_drivecycle = tmp_drivecycle
-        elif 'udds' in tmp_drivecycle_filename:
-            udds_drivecycle = tmp_drivecycle
+    drivecycle_filename = str(run_controller['Drive Cycle Filenames'][run_count])
+    drivecycle_filename = drivecycle_filename.strip('{ }')
+    drivecycle_filename = drivecycle_filename.split(',')
+    # drivecycle_filename = {'cycle':[], 'time_s': [], 'mph': []}
+    drivecycle_filenames = []
+    for i in range (len(drivecycle_filename)):
+        tmp_drivecycle_filename = drivecycle_filename[i].strip(" '")
+        drivecycle_filenames.append(tmp_drivecycle_filename)
+
+        # tmp_drivecycle = pd.read_csv(dynamometer_drive_schedules + tmp_drivecycle_filename, encoding="ISO-8859-1", skiprows=1)  # EVCIS Qlik Sense query results contain hyphens for nan
+        # if 'ftp' in tmp_drivecycle_filename:
+        #     ftp_drivecycle = tmp_drivecycle
+        #     drivecycles['cycle'].append(tmp_drivecycle_filename)
+        #     drivecycles['time_s'].append(ftp_drivecycle['seconds'])
+        #     drivecycles['mph'].append(ftp_drivecycle['mph'])
+        # elif 'hwy' in tmp_drivecycle_filename:
+        #     hwfet_drivecycle = tmp_drivecycle
+        # elif 'us06' in tmp_drivecycle_filename:
+        #     us06_drivecycle = tmp_drivecycle
+        # elif 'udds' in tmp_drivecycle_filename:
+        #     udds_drivecycle = tmp_drivecycle
 
     drivecycle_input_filenames = str(run_controller['Drive Cycle Input Names'][run_count])
     drivecycle_input_filenames = drivecycle_input_filenames.strip('{ }')
@@ -79,14 +82,14 @@ for run_count in range (0,len(run_controller)):
     else:
         modeltype_exceptions_table = 'N'
     if bool_run_new_vehghgid == 'y':
-        import Subconfig_ModelType_Footprint_Bodyid_Expansion
-        Subconfig_ModelType_Footprint_Bodyid_Expansion.Subconfig_ModelType_Footprint_Bodyid_Expansion\
+        import Subconfig_ModelType_Footprint_Bodyid_Expansion_SL
+        Subconfig_ModelType_Footprint_Bodyid_Expansion_SL.Subconfig_ModelType_Footprint_Bodyid_Expansion_SL\
             (input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
              bool_run_new_manual_filter, manual_filter_filename, \
              expanded_footprint_filename, subconfig_filename, model_type_filename, \
              vehghg_filename, output_path_vehghgid, \
              footprint_exceptions_table, modeltype_exceptions_table, model_year, roadload_coefficient_table_filename, \
-             ftp_drivecycle_filename, hwfet_drivecycle_filename)
+             drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames)
         # import Subconfig_Expansion
         # Subconfig_Expansion.Subconfig_Expansion(input_path, subconfig_filename, output_path_intermediate, \
         #                                         expanded_footprint_filename, output_path_vehghgid, vehghg_filename, 2016)
