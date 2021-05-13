@@ -553,11 +553,8 @@ class VehicleFinal(SQABase, Vehicle):
     def init_database_from_file(filename, verbose=False):
         from context_new_vehicle_market import ContextNewVehicleMarket
         from consumer.market_classes import MarketClass
-        from consumer import non_responsive_market_categories
 
         vehicle_shares_dict = {'total': 0}
-        # for nrmc in non_responsive_market_categories:
-        #     vehicle_shares_dict[nrmc] = 0
 
         vehicles_list = []
 
@@ -569,7 +566,10 @@ class VehicleFinal(SQABase, Vehicle):
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
                                   'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
                                   'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id',
-                                  'sales', 'cert_tailpipe_co2_grams_per_mile', 'cert_kwh_per_mile', 'footprint_ft2'}
+                                  'sales', 'cert_co2_grams_per_mile', 'cert_kwh_per_mile', 'footprint_ft2',
+                                  'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in',
+                                  'ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft', 'msrp_dollars',
+                                  'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -604,7 +604,7 @@ class VehicleFinal(SQABase, Vehicle):
 
                     veh.reg_class_ID = o2.options.GHG_standard.get_vehicle_reg_class(veh)
                     veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
-                    veh.cert_tailpipe_co2_grams_per_mile = df.loc[i, 'cert_tailpipe_co2_grams_per_mile']
+                    veh.cert_tailpipe_co2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.cert_co2_grams_per_mile = None
                     veh.cert_kwh_per_mile = df.loc[i, 'cert_kwh_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
@@ -640,7 +640,7 @@ class VehicleFinal(SQABase, Vehicle):
                     if v.fueling_class == 'ICE':
                         bizarro_v.fueling_class = 'BEV'
                         bizarro_v.name = 'BEV of ' + v.name
-                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_300_')
+                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
                         bizarro_v.in_use_fuel_ID = "{'US electricity':1.0}"
                         bizarro_v.cert_fuel_ID = "{'MTE US electricity':1.0}"
                         bizarro_v.market_class_ID = v.market_class_ID.replace('ICE', 'BEV')
@@ -649,7 +649,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         bizarro_v.fueling_class = 'ICE'
                         bizarro_v.name = 'ICE of ' + v.name
-                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('bev_300_', 'ice_')
+                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
                         bizarro_v.in_use_fuel_ID = "{'pump gasoline':1.0}"
                         bizarro_v.cert_fuel_ID = "{'MTE Gasoline':1.0}"
                         bizarro_v.market_class_ID = v.market_class_ID.replace('BEV', 'ICE')

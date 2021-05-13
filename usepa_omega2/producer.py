@@ -372,7 +372,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
                                     weight_by='market_share',
                                     distribute_to='initial_registered_count')
 
-            print('%s:%s' % (nrmc, nrmc_initial_registered_count))
+            # print('%s:%s' % (nrmc, nrmc_initial_registered_count))
 
         # calculate new vehicle market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
@@ -394,7 +394,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
                                     weight_by='market_share',
                                     distribute_to='initial_registered_count')
 
-            print('%s:%s' % (csc, csc_initial_registered_count))
+            # print('%s:%s' % (csc, csc_initial_registered_count))
 
         # calculate new vehicle market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
