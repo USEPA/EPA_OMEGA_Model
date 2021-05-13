@@ -13,7 +13,8 @@ from usepa_omega2 import *
 class CompositeVehicle(OMEGABase):
     next_vehicle_ID = -1
 
-    def __init__(self, vehicle_list, calendar_year, verbose=False, calc_composite_cost_curve=True):
+    def __init__(self, vehicle_list, calendar_year, verbose=False, calc_composite_cost_curve=True,
+                 weight_by='initial_registered_count'):
         """
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
@@ -27,7 +28,9 @@ class CompositeVehicle(OMEGABase):
         self.vehicle_ID = CompositeVehicle.next_vehicle_ID
         CompositeVehicle.set_next_vehicle_ID()
 
-        self.model_year = self.vehicle_list[0].model_year
+        self.weight_by = weight_by
+
+        self.model_year = self.vehicle_list[0].model_year # calendar_year?
         self.reg_class_ID = self.vehicle_list[0].reg_class_ID
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_ID = self.vehicle_list[0].market_class_ID
@@ -39,7 +42,7 @@ class CompositeVehicle(OMEGABase):
 
         # calc sales-weighted values
         for wv in weighted_values:
-            self.__setattr__(wv, weighted_value(self.vehicle_list, 'initial_registered_count', wv))
+            self.__setattr__(wv, weighted_value(self.vehicle_list, weight_by, wv))
 
         self.new_vehicle_mfr_cost_dollars = self.set_new_vehicle_mfr_cost_dollars()
         self.new_vehicle_mfr_generalized_cost_dollars = self.set_new_vehicle_mfr_generalized_cost_dollars()
@@ -48,8 +51,15 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             self.initial_registered_count = self.initial_registered_count + v.initial_registered_count
 
+        self.total_weight = 0
         for v in self.vehicle_list:
-            v.composite_vehicle_share_frac = v.initial_registered_count / self.initial_registered_count
+            self.total_weight += v.__getattribute__(self.weight_by)
+
+        for v in self.vehicle_list:
+            if self.total_weight != 0:
+                v.composite_vehicle_share_frac = v.__getattribute__(self.weight_by) / self.total_weight
+            else:
+                v.composite_vehicle_share_frac = 0
 
         if calc_composite_cost_curve:
             self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
@@ -70,7 +80,7 @@ class CompositeVehicle(OMEGABase):
         if calendar_year is None:
             calendar_year = self.model_year
 
-        return weighted_value(self.vehicle_list, 'initial_registered_count', 'retail_fuel_price_dollars_per_unit',
+        return weighted_value(self.vehicle_list, self.weight_by, 'retail_fuel_price_dollars_per_unit',
                               calendar_year)
 
     def decompose(self):
@@ -198,24 +208,24 @@ class CompositeVehicle(OMEGABase):
 
     def set_new_vehicle_mfr_cost_dollars(self):
         from omega_functions import weighted_value
-        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count',
+        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_cost_dollars')
         return self.new_vehicle_mfr_cost_dollars
 
     def set_new_vehicle_mfr_generalized_cost_dollars(self):
         from omega_functions import weighted_value
-        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count',
+        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_generalized_cost_dollars')
         return self.new_vehicle_mfr_cost_dollars
 
     def set_cert_target_co2_Mg(self):
         from omega_functions import weighted_value
-        self.cert_target_co2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_co2_Mg')
+        self.cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by, 'cert_target_co2_Mg')
         return self.cert_target_co2_Mg
 
     def set_cert_co2_Mg(self):
         from omega_functions import weighted_value
-        self.cert_co2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_co2_Mg')
+        self.cert_co2_Mg = weighted_value(self.vehicle_list, self.weight_by, 'cert_co2_Mg')
         return self.cert_co2_Mg
 
 
@@ -234,7 +244,8 @@ class Vehicle(OMEGABase):
         self.reg_class_market_share_frac = 1.0
         self.epa_size_class = None
         self.context_size_class = None
-        self.context_size_class_share_frac = None
+        self.market_share = None
+        self.non_responsive_market_group = None
         self.electrification_class = None
         self.upstream_co2_grams_per_mile = None
         self.cert_co2_grams_per_mile = None
@@ -245,7 +256,6 @@ class Vehicle(OMEGABase):
         self.cert_target_co2_Mg = None
         self.new_vehicle_mfr_cost_dollars = None
         self.new_vehicle_mfr_generalized_cost_dollars = None
-        self.manufacturer_deemed_new_vehicle_generalized_cost_dollars = None
         self.in_use_fuel_ID = None
         self.cert_fuel_ID = None
         self.market_class_ID = None
@@ -354,7 +364,7 @@ class Vehicle(OMEGABase):
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'cert_fuel_ID', 'market_class_ID',
-                              'footprint_ft2', 'epa_size_class', 'context_size_class', 'context_size_class_share_frac',
+                              'footprint_ft2', 'epa_size_class', 'context_size_class', 'market_share', 'non_responsive_market_group',
                               'electrification_class'}
 
         for p in inherit_properties:
@@ -467,15 +477,15 @@ class VehicleFinal(SQABase, Vehicle):
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
-    context_size_class_share_frac = Column(Float)
+    market_share = Column(Float)
+    non_responsive_market_group = Column(String)
     electrification_class = Column(String)  # TODO: validate with enum?
     cert_target_co2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
     cert_co2_Mg = Column('cert_co2_megagrams', Float)
     cert_target_co2_Mg = Column('cert_target_co2_megagrams', Float)
     new_vehicle_mfr_cost_dollars = Column(Float)
     new_vehicle_mfr_generalized_cost_dollars = Column(Float)
-    manufacturer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    in_use_fuel_ID = Column('showroom_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
+    in_use_fuel_ID = Column('in_use_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
     cert_fuel_ID = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
@@ -525,11 +535,30 @@ class VehicleFinal(SQABase, Vehicle):
             filter(VehicleFinal.model_year == model_year).scalar()
 
     @staticmethod
+    def clone_vehicle(vehicle):
+        inherit_properties = {'name', 'manufacturer_ID', 'hauling_class',
+                              'reg_class_ID', 'epa_size_class', 'context_size_class',
+                              'market_share', 'non_responsive_market_group', 'footprint_ft2'}
+
+        # model year and registered count are required to make a full-blown VehicleFinal object
+        veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
+
+        # get the rest of the attributes from the list
+        for p in inherit_properties:
+            veh.__setattr__(p, vehicle.__getattribute__(p))
+
+        return veh
+
+    @staticmethod
     def init_database_from_file(filename, verbose=False):
         from context_new_vehicle_market import ContextNewVehicleMarket
         from consumer.market_classes import MarketClass
+        from consumer import non_responsive_market_categories
 
-        context_size_class_dict = dict()
+        vehicle_shares_dict = {'total': 0}
+        # for nrmc in non_responsive_market_categories:
+        #     vehicle_shares_dict[nrmc] = 0
+
         vehicles_list = []
 
         if verbose:
@@ -574,16 +603,18 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.fueling_class = 'ICE'
 
                     veh.reg_class_ID = o2.options.GHG_standard.get_vehicle_reg_class(veh)
-                    veh.market_class_ID = MarketClass.get_vehicle_market_class(veh)
+                    veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_tailpipe_co2_grams_per_mile = df.loc[i, 'cert_tailpipe_co2_grams_per_mile']
                     veh.cert_co2_grams_per_mile = None
                     veh.cert_kwh_per_mile = df.loc[i, 'cert_kwh_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
 
-                    if veh.context_size_class not in context_size_class_dict:
-                        context_size_class_dict[veh.context_size_class] = 0
+                    vehicle_shares_dict['total'] += veh.initial_registered_count
 
-                    context_size_class_dict[veh.context_size_class] += veh.initial_registered_count
+                    if veh.context_size_class not in vehicle_shares_dict:
+                        vehicle_shares_dict[veh.context_size_class] = 0
+
+                    vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
 
                     vehicles_list.append(veh)
 
@@ -602,15 +633,33 @@ class VehicleFinal(SQABase, Vehicle):
                     if verbose:
                         print(veh)
 
-                # update context size class share
+                # update market group share
                 for v in vehicles_list:
-                    v.context_size_class_share_frac = v.initial_registered_count / context_size_class_dict[
-                        v.context_size_class]
+                    v.market_share = v.initial_registered_count / vehicle_shares_dict['total']
+                    bizarro_v = v.clone_vehicle(v)
+                    if v.fueling_class == 'ICE':
+                        bizarro_v.fueling_class = 'BEV'
+                        bizarro_v.name = 'BEV of ' + v.name
+                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_300_')
+                        bizarro_v.in_use_fuel_ID = "{'US electricity':1.0}"
+                        bizarro_v.cert_fuel_ID = "{'MTE US electricity':1.0}"
+                        bizarro_v.market_class_ID = v.market_class_ID.replace('ICE', 'BEV')
+                        bizarro_v.cert_tailpipe_co2_grams_per_mile = 0
+                        bizarro_v.cert_kwh_per_mile = 0
+                    else:
+                        bizarro_v.fueling_class = 'ICE'
+                        bizarro_v.name = 'ICE of ' + v.name
+                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('bev_300_', 'ice_')
+                        bizarro_v.in_use_fuel_ID = "{'pump gasoline':1.0}"
+                        bizarro_v.cert_fuel_ID = "{'MTE Gasoline':1.0}"
+                        bizarro_v.market_class_ID = v.market_class_ID.replace('BEV', 'ICE')
+                        bizarro_v.cert_tailpipe_co2_grams_per_mile = 0
+                        bizarro_v.cert_kwh_per_mile = 0
 
                 for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
                     ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
                         ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
-                        context_size_class_dict[hsc]
+                        vehicle_shares_dict[hsc]
 
         return template_errors
 

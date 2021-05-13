@@ -172,6 +172,26 @@ def unique(vector):
     return [vector[index] for index in sorted(indexes)]
 
 
+def distribute_by_attribute(obj_list, value, weight_by, distribute_to):
+    """
+
+    Args:
+        obj_list:
+        value:
+        weight_by:
+        distribute_to:
+
+    Returns:
+
+    """
+    attribute_total = 0
+    for o in obj_list:
+        attribute_total += o.__getattribute__(weight_by)
+
+    for o in obj_list:
+        o.__setattr__(distribute_to, value * o.__getattribute__(weight_by) / attribute_total)
+
+
 def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     """
 

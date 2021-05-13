@@ -24,9 +24,11 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, s
     """
 
     from manufacturer_annual_data import ManufacturerAnnualData
+    from vehicle_annual_data import VehicleAnnualData
     from consumer.market_classes import MarketClass
     import consumer
     import pandas as pd
+    import numpy as np
 
     if o2.options.calc_effects:
         from effects.o2_effects import run_effects_calcs
@@ -42,9 +44,17 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, s
     calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = \
         plot_manufacturer_compliance(calendar_years, credit_history)
 
-    context_sales, total_sales = plot_total_sales(calendar_years)
+    vehicle_calendar_years = np.unique(sql_unpack_result(o2.session.query(VehicleAnnualData.calendar_year).all()))
 
-    market_share_results = plot_market_shares(calendar_years, total_sales)
+    context_sales, total_sales = plot_total_sales(vehicle_calendar_years)
+
+    market_share_results = plot_market_shares(vehicle_calendar_years, total_sales)
+
+    # market share reults and total sales include base year data, but the rest of the data doesn't, so drop the
+    # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
+    total_sales = total_sales[1:]
+    for msr in market_share_results:
+        market_share_results[msr] = market_share_results[msr][1:]
 
     average_cost_data = plot_vehicle_cost(calendar_years)
 
@@ -686,8 +696,9 @@ def plot_total_sales(calendar_years):
                                  .filter(VehicleAnnualData.calendar_year == cy)
                                  .filter(VehicleAnnualData.age == 0).scalar()))
     total_sales = np.array(total_sales)
-    context_sales = np.array([consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years])
-    fig, ax1 = fplothg(calendar_years, context_sales / 1e6, '.-')
+
+    context_sales = np.array([consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
+    fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-')
     ax1.plot(calendar_years, total_sales / 1e6)
     ax1.legend(['context sales', 'sales'])
     label_xyt(ax1, 'Year', 'Sales [millions]', '%s\nTotal Sales Versus Calendar Year\n Total Sales %.2f Million' % (

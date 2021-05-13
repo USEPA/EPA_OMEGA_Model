@@ -342,6 +342,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     if cache_key not in cache:
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_ID)
+        # manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(2019, manufacturer_ID)
 
         Vehicle.reset_vehicle_IDs()
 
@@ -351,6 +352,31 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
             new_veh = Vehicle()
             new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
+            new_veh.initial_registered_count = new_veh.market_share
+
+        total_sales = consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']
+
+        # group by non responsive market group
+        from consumer import non_responsive_market_categories
+
+        nrmc_dict = dict()
+        for nrmc in non_responsive_market_categories:
+            nrmc_dict[nrmc] = []
+        for new_veh in manufacturer_vehicles:
+            nrmc_dict[new_veh.non_responsive_market_group].append(new_veh)
+
+        # distribute non responsive market class sales to manufacturer_vehicles by relative market share
+        for nrmc in non_responsive_market_categories:
+            nrmc_initial_registered_count = consumer.sales_volume.context_new_vehicle_sales(calendar_year)[nrmc]
+            distribute_by_attribute(nrmc_dict[nrmc], nrmc_initial_registered_count,
+                                    weight_by='market_share',
+                                    distribute_to='initial_registered_count')
+
+            print('%s:%s' % (nrmc, nrmc_initial_registered_count))
+
+        # calculate new vehicle market share based on vehicle size mix from context
+        for new_veh in manufacturer_vehicles:
+            new_veh.market_share = new_veh.initial_registered_count / total_sales
 
         # group by context size class
         csc_dict = dict()
@@ -359,12 +385,20 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
                 csc_dict[new_veh.context_size_class] = []
             csc_dict[new_veh.context_size_class].append(new_veh)
 
-        # create a composite vehicle for each size class, assign sales and decompose to update manufacturer_vehicles
+        # distribute context size class sales to manufacturer_vehicles by relative market share
         for csc in csc_dict:
-            cv = CompositeVehicle(csc_dict[csc], calendar_year, calc_composite_cost_curve=False)
-            cv.initial_registered_count = ContextNewVehicleMarket.new_vehicle_sales(calendar_year,
-                                                                                    context_size_class=csc)
-            cv.decompose()
+            csc_initial_registered_count = \
+                ContextNewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc)
+
+            distribute_by_attribute(csc_dict[csc], csc_initial_registered_count,
+                                    weight_by='market_share',
+                                    distribute_to='initial_registered_count')
+
+            print('%s:%s' % (csc, csc_initial_registered_count))
+
+        # calculate new vehicle market share based on vehicle size mix from context
+        for new_veh in manufacturer_vehicles:
+            new_veh.market_share = new_veh.initial_registered_count / total_sales
 
         # group by market class / reg class
         mctrc = dict()
@@ -381,7 +415,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for mc in mctrc:
             for rc in reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year)
+                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year, weight_by='market_share')
                     cv.vehicle_ID = mc + '.' + rc
                     cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
