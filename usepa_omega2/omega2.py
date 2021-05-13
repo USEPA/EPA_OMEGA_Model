@@ -503,7 +503,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
 
             winning_combo['average_kwh_pmi_%s' % mc] = weighted_value(market_class_vehicles,
                                                                        'initial_registered_count',
-                                                                       'cert_kwh_per_mile')
+                                                                       'cert_direct_kwh_per_mile')
 
             winning_combo['average_cost_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',

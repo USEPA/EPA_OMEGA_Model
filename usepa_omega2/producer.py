@@ -43,7 +43,7 @@ def calculate_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     cost_cloud = vehicle.cost_cloud
     vehicle_cost = cost_cloud[cost_name]
     vehicle_co2_grams_per_mile = cost_cloud[co2_name]
-    vehicle_cert_kwh_per_mile = cost_cloud[kwh_name]
+    vehicle_cert_direct_kwh_per_mile = cost_cloud[kwh_name]
 
     price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_ID)
 
@@ -58,8 +58,8 @@ def calculate_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
              producer_generalized_cost_annual_vmt *
              producer_generalized_cost_fuel_years)
 
-    if any(vehicle_cert_kwh_per_mile > 0):
-        electric_generalized_fuel_cost = (vehicle_cert_kwh_per_mile *
+    if any(vehicle_cert_direct_kwh_per_mile > 0):
+        electric_generalized_fuel_cost = (vehicle_cert_direct_kwh_per_mile *
                                          vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
                                          producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
 
@@ -314,7 +314,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_composite_vehicles:
         new_veh.cert_co2_grams_per_mile = winning_combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
-        new_veh.cert_kwh_per_mile = winning_combo['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
+        new_veh.cert_direct_kwh_per_mile = winning_combo['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%s_sales' % new_veh.vehicle_ID]
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()

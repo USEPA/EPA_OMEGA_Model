@@ -38,7 +38,7 @@ class CompositeVehicle(OMEGABase):
         self.cert_co2_Mg = self.set_cert_co2_Mg()
 
         weighted_values = ['cert_co2_grams_per_mile', 'upstream_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
-                           'cert_kwh_per_mile', 'footprint_ft2']
+                           'cert_direct_kwh_per_mile', 'footprint_ft2']
 
         # calc sales-weighted values
         for wv in weighted_values:
@@ -86,7 +86,7 @@ class CompositeVehicle(OMEGABase):
     def decompose(self):
 
         cost_curve_values = ['cert_co2_grams_per_mile', 'upstream_co2_grams_per_mile',
-                             'cert_direct_co2_grams_per_mile', 'cert_kwh_per_mile']
+                             'cert_direct_co2_grams_per_mile', 'cert_direct_kwh_per_mile']
 
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
@@ -121,7 +121,7 @@ class CompositeVehicle(OMEGABase):
 
         # calculated weighted values
         weighted_values = ['cert_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
-                           'upstream_co2_grams_per_mile', 'cert_kwh_per_mile', 'new_vehicle_mfr_cost_dollars',
+                           'upstream_co2_grams_per_mile', 'cert_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars',
                            'new_vehicle_mfr_generalized_cost_dollars']
 
         for wv in weighted_values:
@@ -179,12 +179,12 @@ class CompositeVehicle(OMEGABase):
         # get kwh/mi from cost curve for target_co2_gpmi(s)
         if len(self.cost_curve) > 1:
             kwh_pmi = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
-                                                      self.cost_curve['cert_kwh_per_mile'],
-                                                      fill_value=(self.cost_curve['cert_kwh_per_mile'].min(),
-                                                                  self.cost_curve['cert_kwh_per_mile'].max()), bounds_error=False)
+                                                      self.cost_curve['cert_direct_kwh_per_mile'],
+                                                      fill_value=(self.cost_curve['cert_direct_kwh_per_mile'].min(),
+                                                                  self.cost_curve['cert_direct_kwh_per_mile'].max()), bounds_error=False)
             return kwh_pmi(target_co2_gpmi).tolist()
         else:
-            return self.cost_curve['cert_kwh_per_mile']
+            return self.cost_curve['cert_direct_kwh_per_mile']
 
     def get_generalized_cost_from_cost_curve(self, target_co2_gpmi):
         import numpy as np
@@ -250,7 +250,7 @@ class Vehicle(OMEGABase):
         self.upstream_co2_grams_per_mile = None
         self.cert_co2_grams_per_mile = None
         self.cert_direct_co2_grams_per_mile = None
-        self.cert_kwh_per_mile = None
+        self.cert_direct_kwh_per_mile = None
         self.cert_target_co2_grams_per_mile = None
         self.cert_co2_Mg = None
         self.cert_target_co2_Mg = None
@@ -378,7 +378,7 @@ class Vehicle(OMEGABase):
 
         self.set_cert_target_co2_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
-        self.cert_kwh_per_mile = vehicle.cert_kwh_per_mile
+        self.cert_direct_kwh_per_mile = vehicle.cert_direct_kwh_per_mile
 
         if type(self) == Vehicle and type(vehicle) == VehicleFinal:
             # need to add upstream to "tailpipe" co2 g/mi and calculate this year's frontier
@@ -386,7 +386,7 @@ class Vehicle(OMEGABase):
 
             # calculate cert co2 g/mi
             upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
-            self.upstream_co2_grams_per_mile = upstream(self, self.cert_direct_co2_grams_per_mile, self.cert_kwh_per_mile)
+            self.upstream_co2_grams_per_mile = upstream(self, self.cert_direct_co2_grams_per_mile, self.cert_direct_kwh_per_mile)
             self.cert_co2_grams_per_mile = self.cert_direct_co2_grams_per_mile + self.upstream_co2_grams_per_mile
 
             if o2.options.flat_context:
@@ -415,14 +415,14 @@ class Vehicle(OMEGABase):
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
         tailpipe_co2_name = 'veh_%s_cert_direct_co2_grams_per_mile' % self.vehicle_ID
         upstream_co2_name = 'veh_%s_upstream_co2_grams_per_mile' % self.vehicle_ID
-        kwh_name = 'veh_%s_cert_kwh_per_mile' % self.vehicle_ID
+        kwh_name = 'veh_%s_cert_direct_kwh_per_mile' % self.vehicle_ID
         tailpipe_kwh_name = 'veh_%s_tailpipe_kwh_per_mile' % self.vehicle_ID
         cost_name = 'veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID
 
         # rename generic columns to vehicle-specific columns
         self.cost_cloud = self.cost_cloud.rename(
             columns={'cert_co2_grams_per_mile': co2_name, 'cert_direct_co2_grams_per_mile': tailpipe_co2_name,
-                     'upstream_co2_grams_per_mile': upstream_co2_name, 'cert_kwh_per_mile': kwh_name,
+                     'upstream_co2_grams_per_mile': upstream_co2_name, 'cert_direct_kwh_per_mile': kwh_name,
                      'new_vehicle_mfr_cost_dollars': cost_name})
 
         self.cost_cloud[tailpipe_co2_name] = \
@@ -492,7 +492,7 @@ class VehicleFinal(SQABase, Vehicle):
     upstream_co2_grams_per_mile = Column('upstream_co2_grams_per_mile', Float)
     cert_co2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
     cert_direct_co2_grams_per_mile = Column('cert_direct_co2_grams_per_mile', Float)
-    cert_kwh_per_mile = Column('cert_kwh_per_mile', Float)
+    cert_direct_kwh_per_mile = Column('cert_direct_kwh_per_mile', Float)
     _initial_registered_count = Column('_initial_registered_count', Float)
 
     @property
@@ -566,7 +566,7 @@ class VehicleFinal(SQABase, Vehicle):
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
                                   'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
                                   'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id',
-                                  'sales', 'cert_co2_grams_per_mile', 'cert_kwh_per_mile', 'footprint_ft2',
+                                  'sales', 'cert_co2_grams_per_mile', 'cert_direct_kwh_per_mile', 'footprint_ft2',
                                   'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in',
                                   'ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft', 'msrp_dollars',
                                   'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs'}
@@ -606,7 +606,7 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_co2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.cert_co2_grams_per_mile = None
-                    veh.cert_kwh_per_mile = df.loc[i, 'cert_kwh_per_mile']
+                    veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_kwh_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
 
                     vehicle_shares_dict['total'] += veh.initial_registered_count
@@ -645,7 +645,7 @@ class VehicleFinal(SQABase, Vehicle):
                         bizarro_v.cert_fuel_ID = "{'MTE US electricity':1.0}"
                         bizarro_v.market_class_ID = v.market_class_ID.replace('ICE', 'BEV')
                         bizarro_v.cert_direct_co2_grams_per_mile = 0
-                        bizarro_v.cert_kwh_per_mile = 0
+                        bizarro_v.cert_direct_kwh_per_mile = 0
                     else:
                         bizarro_v.fueling_class = 'ICE'
                         bizarro_v.name = 'ICE of ' + v.name
@@ -654,7 +654,7 @@ class VehicleFinal(SQABase, Vehicle):
                         bizarro_v.cert_fuel_ID = "{'MTE Gasoline':1.0}"
                         bizarro_v.market_class_ID = v.market_class_ID.replace('BEV', 'ICE')
                         bizarro_v.cert_direct_co2_grams_per_mile = 0
-                        bizarro_v.cert_kwh_per_mile = 0
+                        bizarro_v.cert_direct_kwh_per_mile = 0
 
                 for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
                     ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \

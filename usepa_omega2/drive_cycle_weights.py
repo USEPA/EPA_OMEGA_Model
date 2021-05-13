@@ -80,7 +80,7 @@ class DriveCycleWeights(OMEGABase):
 
     @staticmethod
     def calc_weighted_drive_cycle_kwh_per_mile(calendar_year, df):
-        return DriveCycleWeights.calculate_weighted_value(calendar_year, df, 'cert_kwh_per_mile', weighted=False)
+        return DriveCycleWeights.calculate_weighted_value(calendar_year, df, 'cert_direct_kwh_per_mile', weighted=False)
 
 
 if __name__ == '__main__':
@@ -107,14 +107,14 @@ if __name__ == '__main__':
         if not init_fail:
 
             sample_cloud = {
-                            'ftp_1:co2_grams_per_mile': 277.853416,
-                            'ftp_2:co2_grams_per_mile': 272.779239,
-                            'ftp_3:co2_grams_per_mile': 242.292152,
-                            'hwfet:co2_grams_per_mile': 182.916104,
-                            'ftp_1:kWh_per_mile': 0.26559971,
-                            'ftp_2:kWh_per_mile': 0.2332757,
-                            'ftp_3:kWh_per_mile': 0.25938633,
-                            'hwfet:kWh_per_mile': 0.22907605,
+                            'ftp_1:cert_direct_co2_grams_per_mile': 277.853416,
+                            'ftp_2:cert_direct_co2_grams_per_mile': 272.779239,
+                            'ftp_3:cert_direct_co2_grams_per_mile': 242.292152,
+                            'hwfet:cert_direct_co2_grams_per_mile': 182.916104,
+                            'ftp_1:cert_direct_kwh_per_mile': 0.26559971,
+                            'ftp_2:cert_direct_kwh_per_mile': 0.2332757,
+                            'ftp_3:cert_direct_kwh_per_mile': 0.25938633,
+                            'hwfet:cert_direct_kwh_per_mile': 0.22907605,
             }
             print(DriveCycleWeights.calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(2020, sample_cloud))
             print(DriveCycleWeights.calc_weighted_drive_cycle_kwh_per_mile(2020, sample_cloud))

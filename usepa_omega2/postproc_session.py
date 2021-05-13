@@ -64,7 +64,7 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, s
 
     average_cert_co2_gpmi_data = plot_cert_co2_gpmi(calendar_years)
 
-    average_cert_kwh_pmi_data = plot_cert_kwh_pmi(calendar_years)
+    average_cert_direct_kwh_pmi_data = plot_cert_direct_kwh_pmi(calendar_years)
 
     average_target_co2_gpmi_data = plot_target_co2_gpmi(calendar_years)
 
@@ -85,7 +85,7 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, s
         session_results['average_%s_cost' % cat] = average_cost_data[cat]
         session_results['average_%s_generalized_cost' % cat] = average_generalized_cost_data[cat]
         session_results['average_%s_cert_co2_gpmi' % cat] = average_cert_co2_gpmi_data[cat]
-        session_results['average_%s_cert_kwh_pmi' % cat] = average_cert_kwh_pmi_data[cat]
+        session_results['average_%s_cert_direct_kwh_pmi' % cat] = average_cert_direct_kwh_pmi_data[cat]
         session_results['average_%s_target_co2_gpmi' % cat] = average_target_co2_gpmi_data[cat]
         session_results['%s_co2_Mg' % cat] = megagrams_data[cat]
 
@@ -172,7 +172,7 @@ def plot_cert_co2_gpmi(calendar_years):
     return average_cert_co2_data
 
 
-def plot_cert_kwh_pmi(calendar_years):
+def plot_cert_direct_kwh_pmi(calendar_years):
     """
 
     Args:
@@ -186,13 +186,13 @@ def plot_cert_kwh_pmi(calendar_years):
     from consumer.market_classes import MarketClass
     import consumer
 
-    average_cert_kwh_data = dict()
+    average_cert_direct_kwh_data = dict()
 
     # tally up total sales weighted kWh
-    average_cert_kwh_data['total'] = []
+    average_cert_direct_kwh_data['total'] = []
     for cy in calendar_years:
-        average_cert_kwh_data['total'].append(o2.session.query(
-            func.sum(VehicleFinal.cert_kwh_per_mile * VehicleAnnualData.registered_count) /
+        average_cert_direct_kwh_data['total'].append(o2.session.query(
+            func.sum(VehicleFinal.cert_direct_kwh_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
                                           filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                           filter(VehicleFinal.model_year == cy).
@@ -204,7 +204,7 @@ def plot_cert_kwh_pmi(calendar_years):
         for idx, cy in enumerate(calendar_years):
             registered_count_and_market_ID_and_kwh = o2.session.query(VehicleAnnualData.registered_count,
                                                                        VehicleFinal.market_class_ID,
-                                                                       VehicleFinal.cert_kwh_per_mile) \
+                                                                       VehicleFinal.cert_direct_kwh_per_mile) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -213,16 +213,16 @@ def plot_cert_kwh_pmi(calendar_years):
             for result in registered_count_and_market_ID_and_kwh:
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_kwh_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(result.cert_direct_kwh_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
-        average_cert_kwh_data[mcat] = market_category_cost
+        average_cert_direct_kwh_data[mcat] = market_category_cost
 
     # cost/market category chart
     fig, ax1 = figure()
     for mcat in consumer.market_categories:
-        ax1.plot(calendar_years, average_cert_kwh_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cert_kwh_data['total'], '.-')
+        ax1.plot(calendar_years, average_cert_direct_kwh_data[mcat], '.--')
+    ax1.plot(calendar_years, average_cert_direct_kwh_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi by Market Category v Year' % o2.options.session_unique_name)
@@ -231,25 +231,25 @@ def plot_cert_kwh_pmi(calendar_years):
     # cost/market class chart
     fig, ax1 = figure()
     for mc in MarketClass.market_classes:
-        average_cert_kwh_data[mc] = []
+        average_cert_direct_kwh_data[mc] = []
         for cy in calendar_years:
-            average_cert_kwh_data[mc].append(o2.session.query(
-                func.sum(VehicleFinal.cert_kwh_per_mile * VehicleAnnualData.registered_count) /
+            average_cert_direct_kwh_data[mc].append(o2.session.query(
+                func.sum(VehicleFinal.cert_direct_kwh_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
                                          filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                          filter(VehicleFinal.model_year == cy).
                                          filter(VehicleFinal.market_class_ID == mc).
                                          filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cert_kwh_data[mc], '.-')
+            ax1.plot(calendar_years, average_cert_direct_kwh_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_cert_kwh_data[mc], '.--')
+            ax1.plot(calendar_years, average_cert_direct_kwh_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi  by Market Class v Year' % o2.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(o2.options.output_folder + '%s V Cert kWh pmi Mkt Cls.png' % o2.options.session_unique_name)
-    return average_cert_kwh_data
+    return average_cert_direct_kwh_data
 
 
 def plot_target_co2_gpmi(calendar_years):
