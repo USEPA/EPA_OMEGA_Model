@@ -8,11 +8,11 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'cost_clouds'
+input_template_name = 'simulated_vehicles'
 
 cache = dict()
 
-cloud_non_numeric_columns = ['key']
+cloud_non_numeric_columns = ['simulated_vehicle_id']
 
 
 class CostCloud(OMEGABase):
@@ -26,8 +26,9 @@ class CostCloud(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.1
-        input_template_columns = {'cost_curve_class', 'model_year', 'new_vehicle_mfr_cost_dollars'}
+        input_template_version = 0.2
+        input_template_columns = {'cost_curve_class', 'model_year', 'simulated_vehicle_id',
+                                  'new_vehicle_mfr_cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
