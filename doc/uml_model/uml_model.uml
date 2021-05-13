@@ -67,7 +67,7 @@
       </ownedAttribute>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_KH1QEKdDEeqRUoM6l8Mfgg" name="registered_count"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_Y0Q_wKd5EeqRUoM6l8Mfgg" name="VMT"/>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_ZHwHgKseEeq6oJG-GxIr5g" name="cert_tailpipe_co2_grams_per_mile" visibility="public"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_ZHwHgKseEeq6oJG-GxIr5g" name="cert_direct_co2_grams_per_mile" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_oQTbAKseEeq6oJG-GxIr5g" name="upstream_co2_grams_per_mile" visibility="public"/>
       <ownedAttribute xmi:type="uml:Property" xmi:id="_MqBV0LsUEeqR6PiF084V6A" name="index"/>
       <nestedClassifier xmi:type="uml:Class" xmi:id="_PYynwNZ0EeqxT4IWw4575Q" name="Class9"/>

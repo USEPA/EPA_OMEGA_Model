@@ -1,5 +1,5 @@
 input_template_name:,share_tree,input_template_version:,0.1,,,,,,,,,,
-calendar_year,share_id,weighted_combined->cert_tailpipe_co2_grams_per_mile,weighted_combined->cert_kwh_per_mile,cert_tailpipe_co2_grams_per_mile->cs_ftp,cert_tailpipe_co2_grams_per_mile->hwfet:co2_grams_per_mile,cs_ftp->ftp_1:co2_grams_per_mile,cs_ftp->ftp_2:co2_grams_per_mile,cs_ftp->ftp_3:co2_grams_per_mile,cert_kwh_per_mile->cd_ftp,cert_kwh_per_mile->hwfet:kWh_per_mile,cd_ftp->ftp_1:kWh_per_mile,cd_ftp->ftp_2:kWh_per_mile,cd_ftp->ftp_3:kWh_per_mile
+calendar_year,share_id,weighted_combined->cert_direct_co2_grams_per_mile,weighted_combined->cert_kwh_per_mile,cert_direct_co2_grams_per_mile->cs_ftp,cert_direct_co2_grams_per_mile->hwfet:co2_grams_per_mile,cs_ftp->ftp_1:co2_grams_per_mile,cs_ftp->ftp_2:co2_grams_per_mile,cs_ftp->ftp_3:co2_grams_per_mile,cert_kwh_per_mile->cd_ftp,cert_kwh_per_mile->hwfet:kWh_per_mile,cd_ftp->ftp_1:kWh_per_mile,cd_ftp->ftp_2:kWh_per_mile,cd_ftp->ftp_3:kWh_per_mile
 2020,cert,0.5,0.5,0.55,0.45,0.2072518623,0.5180189249,0.2747292128,0.55,0.45,0.2072518623,0.5180189249,0.2747292128
 2021,cert,0.5,0.5,0.55,0.45,0.2072518623,0.5180189249,0.2747292128,0.55,0.45,0.2072518623,0.5180189249,0.2747292128
 2022,cert,0.5,0.5,0.55,0.45,0.2072518623,0.5180189249,0.2747292128,0.55,0.45,0.2072518623,0.5180189249,0.2747292128

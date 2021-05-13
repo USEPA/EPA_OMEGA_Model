@@ -75,8 +75,8 @@ class DriveCycleWeights(OMEGABase):
                                                              weighted=weighted)
 
     @staticmethod
-    def calc_weighted_drive_cycle_cert_tailpipe_co2_grams_per_mile(calendar_year, df):
-        return DriveCycleWeights.calculate_weighted_value(calendar_year, df, 'cert_tailpipe_co2_grams_per_mile', weighted=False)
+    def calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(calendar_year, df):
+        return DriveCycleWeights.calculate_weighted_value(calendar_year, df, 'cert_direct_co2_grams_per_mile', weighted=False)
 
     @staticmethod
     def calc_weighted_drive_cycle_kwh_per_mile(calendar_year, df):
@@ -116,7 +116,7 @@ if __name__ == '__main__':
                             'ftp_3:kWh_per_mile': 0.25938633,
                             'hwfet:kWh_per_mile': 0.22907605,
             }
-            print(DriveCycleWeights.calc_weighted_drive_cycle_cert_tailpipe_co2_grams_per_mile(2020, sample_cloud))
+            print(DriveCycleWeights.calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(2020, sample_cloud))
             print(DriveCycleWeights.calc_weighted_drive_cycle_kwh_per_mile(2020, sample_cloud))
 
         else:
