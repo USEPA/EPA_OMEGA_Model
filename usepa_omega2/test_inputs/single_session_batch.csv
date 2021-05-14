@@ -2,7 +2,7 @@ Parameter,Type,Value
 Batch Settings,,
 Batch Name,String,single_session_batch
 Context Folder Name,String,
-Context Name,String,AEO2020
+Context Name,String,AEO2021
 Context Case,String,Reference case
 Context New Vehicle Prices File,GENERATE {X.Y} / String,GENERATE context_new_vehicle_prices.csv
 ,,
@@ -22,7 +22,7 @@ Drive Cycles File,String,drive_cycles.csv
 Drive Cycle Weights File,String,drive_cycle_weights.csv
 Context Fuel Prices File,String,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv
-Cost File,String,cost_clouds.csv
+Cost File,String,simulated_vehicles.csv
 GHG Standards File,String,ghg_standards-footprint.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv
 GHG Credits File,String,ghg_credits.csv

@@ -11,7 +11,7 @@ from usepa_omega2_preproc.context_aeo import SetInputs as context_aeo_inputs
 weight_cost_cache = dict()
 
 
-def cost_vs_plot(df, path, name_id, *years):
+def cost_vs_plot(settings, df, path, *years):
     ice_classes = [x for x in df['cost_curve_class'].unique() if 'ice' in x]
     bev_classes = [x for x in df['cost_curve_class'].unique() if 'bev' in x]
     hev_classes = [x for x in df['cost_curve_class'].unique() if 'hev' in x and 'phev' not in x]
@@ -31,7 +31,7 @@ def cost_vs_plot(df, path, name_id, *years):
             ice_plot.append(ice_data[cost_curve_class])
             ice_legends.append(cost_curve_class)
         for cost_curve_class in bev_classes:
-            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_kWh_per_mile'],
+            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_kwh_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             bev_plot.append(bev_data[cost_curve_class])
             bev_legends.append(cost_curve_class)
@@ -58,7 +58,7 @@ def cost_vs_plot(df, path, name_id, *years):
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
             plt.legend(loc=2)
             plt.title(f'ice_{year}')
-            plt.savefig(path / f'ice_{year}_{name_id}.png')
+            plt.savefig(path / f'ice_{year}_{settings.name_id}.png')
 
         # create bev plot
         fig = plt.figure()
@@ -70,7 +70,7 @@ def cost_vs_plot(df, path, name_id, *years):
             ax.set(xlim=(0, 0.5), ylim=(10000, 60000))
             plt.legend(loc=4)
             plt.title(f'bev_{year}')
-            plt.savefig(path / f'bev_{year}_{name_id}.png')
+            plt.savefig(path / f'bev_{year}_{settings.name_id}.png')
 
         # create hev plot
         fig = plt.figure()
@@ -82,10 +82,10 @@ def cost_vs_plot(df, path, name_id, *years):
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
             plt.legend(loc=2)
             plt.title(f'hev_{year}')
-            plt.savefig(path / f'hev_{year}_{name_id}.png')
+            plt.savefig(path / f'hev_{year}_{settings.name_id}.png')
 
 
-def cost_vs_plot_combined(df, path, name_id, *years): # can't do this with co2/mi and kWh/mi
+def cost_vs_plot_combined(settings, df, path, *years): # can't do this with co2/mi and kWh/mi
     classes = [x for x in df['cost_curve_class'].unique()]
     for year in years:
         class_data = dict()
@@ -110,7 +110,7 @@ def cost_vs_plot_combined(df, path, name_id, *years): # can't do this with co2/m
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
             plt.legend(loc=1)
             plt.title(f'{year}')
-            plt.savefig(path / f'{year}_{name_id}.png')
+            plt.savefig(path / f'{year}_{settings.name_id}.png')
 
 
 def create_df_and_convert_dollars(deflators, dollar_basis, file, sheet_name, *args, index_col=0):
@@ -149,9 +149,9 @@ def sum_vehicle_parts(df, years, new_arg, *args):
     return df
 
 
-def reshape_df_for_cloud_file(settings, df_source):
+def reshape_df_for_cloud_file(settings, df_source, *id_args):
     df_return = pd.DataFrame()
-    id_variables = ['cost_curve_class', 'alpha_key']
+    id_variables = [id_arg for id_arg in id_args]
     if settings.run_bev or settings.run_phev:
         for arg in df_source.columns:
             if arg.__contains__('kWh_per_mile'):
@@ -171,8 +171,12 @@ def reshape_df_for_cloud_file(settings, df_source):
     return df_return
 
 
-def drop_columns(df, arg):
-    cols_to_drop = [col for col in df.columns if arg in col]
+def drop_columns(df, *args):
+    cols_to_drop = list()
+    for arg in args:
+        if arg in df.columns:
+            cols_to_drop.append(arg)
+        else: pass
     df.drop(columns=cols_to_drop, inplace=True)
     return df
 
@@ -252,7 +256,6 @@ def package_key(settings, input_df, fuel_id):
     """
     df = input_df.copy().fillna(0)
     alpha_keys = pd.Series(df['Key'])
-    # unique_keys = pd.Series(df['Unique Key'])
     fuel_keys = pd.Series([fuel_id] * len(df))
     structure_keys = pd.Series(df['Structure Class'])
     price_keys = pd.Series(df['Price Class'])
@@ -320,7 +323,7 @@ def package_key(settings, input_df, fuel_id):
     return keys, df_dict
 
 
-def ice_package_results(settings, key, alpha_file_dict):
+def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     pkg_obj = PackageCost(key)
     alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
     print(cost_key)
@@ -351,19 +354,20 @@ def ice_package_results(settings, key, alpha_file_dict):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cert_co2_grams_per_mile', combined_co2)
-    package_cost_df.insert(0, 'hwfet:co2_grams_per_mile', hwy_co2)
-    package_cost_df.insert(0, 'ftp_3:co2_grams_per_mile', ftp3_co2)
-    package_cost_df.insert(0, 'ftp_2:co2_grams_per_mile', ftp2_co2)
-    package_cost_df.insert(0, 'ftp_1:co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'cert_direct_co2_grams_per_mile', combined_co2)
+    package_cost_df.insert(0, 'hwfet:cert_direct_co2_grams_per_mile', hwy_co2)
+    package_cost_df.insert(0, 'ftp_3:cert_direct_co2_grams_per_mile', ftp3_co2)
+    package_cost_df.insert(0, 'ftp_2:cert_direct_co2_grams_per_mile', ftp2_co2)
+    package_cost_df.insert(0, 'ftp_1:cert_direct_co2_grams_per_mile', ftp1_co2)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
-    package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
+    package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
+    package_cost_df.insert(0, 'alpha_filename', alpha_file_name)
 
     return package_cost_df
 
 
-def pev_package_results(settings, key, alpha_file_dict):
+def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     pkg_obj = PackageCost(key)
     alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
     print(cost_key)
@@ -387,15 +391,16 @@ def pev_package_results(settings, key, alpha_file_dict):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cert_kWh_per_mile', combined_kwh)
-    package_cost_df.insert(0, 'hwfet:kWh_per_mile', hwy_kwh)
-    package_cost_df.insert(0, 'ftp_3:kWh_per_mile', ftp3_kwh)
-    package_cost_df.insert(0, 'ftp_2:kWh_per_mile', ftp2_kwh)
-    package_cost_df.insert(0, 'ftp_1:kWh_per_mile', ftp1_kwh)
+    package_cost_df.insert(0, 'cert_direct_kwh_per_mile', combined_kwh)
+    package_cost_df.insert(0, 'hwfet:cert_direct_kwh_per_mile', hwy_kwh)
+    package_cost_df.insert(0, 'ftp_3:cert_direct_kwh_per_mile', ftp3_kwh)
+    package_cost_df.insert(0, 'ftp_2:cert_direct_kwh_per_mile', ftp2_kwh)
+    package_cost_df.insert(0, 'ftp_1:cert_direct_kwh_per_mile', ftp1_kwh)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
+    package_cost_df.insert(0, 'alpha_filename', alpha_file_name)
 
     return package_cost_df
 
@@ -407,6 +412,13 @@ def read_and_clean_file(settings, alpha_file, fuel_id):
     df = add_elements_for_package_key(df)
     keys, alpha_file_dict = package_key(settings, df, fuel_id)
     return keys, alpha_file_dict
+
+
+def create_cost_cloud_verbose(df, cols_to_use, cols_to_split, pattern=None, expand=True):
+    df_return = pd.DataFrame(df, columns=cols_to_use)
+    for col_to_split in cols_to_split:
+        df_return[col_to_split].str.split(pat=pattern, expand=expand)
+    return df_return
 
 
 class Engines:
@@ -535,10 +547,10 @@ class PackageCost:
             soc, gap, battery_kwh_gross, motor_power = self.hev_key
             curves_dict = settings.hev_curves_dict
             markup = settings.hev_metrics_dict['powertrain_markup_hev']['value']
-        battery_cost = battery_kwh_gross * (curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
-                                            + curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
-                                            + curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
-                                            + curves_dict['constant']['dollars_per_kWh_curve'])
+        battery_cost = battery_kwh_gross * (curves_dict['x_cubed_factor']['dollars_per_kwh_curve'] * battery_kwh_gross ** 3 \
+                                            + curves_dict['x_squared_factor']['dollars_per_kwh_curve'] * battery_kwh_gross ** 2 \
+                                            + curves_dict['x_factor']['dollars_per_kwh_curve'] * battery_kwh_gross \
+                                            + curves_dict['constant']['dollars_per_kwh_curve'])
         motor_cost = motor_power * (curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
                                     + curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
                                     + curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
@@ -615,7 +627,8 @@ class SetInputs:
     run_bev = True
     run_phev = False
     run_hev = True
-    generate_cost_cloud_file = True
+    generate_simulated_vehicles_file = True
+    generate_simulated_vehicles_verbose_file = True
 
     # get the price deflators
     dollar_basis = int(context_aeo_inputs.aeo_version) - 1
@@ -634,8 +647,8 @@ class SetInputs:
     aero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'aero', 'item_cost', 'dmc').to_dict('index')
     nonaero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'nonaero', 'item_cost', 'dmc').to_dict('index')
     ac_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'ac', 'item_cost', 'dmc').to_dict('index')
-    bev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'dollars_per_kWh_curve', 'dollars_per_kW_curve').to_dict('index')
-    hev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'dollars_per_kWh_curve', 'dollars_per_kW_curve').to_dict('index')
+    bev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'dollars_per_kwh_curve', 'dollars_per_kW_curve').to_dict('index')
+    hev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'dollars_per_kwh_curve', 'dollars_per_kW_curve').to_dict('index')
     # phev_curves_dict = 0
     pev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
     hev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
@@ -651,6 +664,9 @@ class SetInputs:
     learning_rate_bev = cost_inputs['learning_rate_bev']['value']
     boost_multiplier = cost_inputs['boost_multiplier']['value']
     run_id = cost_inputs['run_ID']['value']
+
+    if run_id != '': name_id = f'{run_id}_{start_time_readable}'
+    else: name_id = start_time_readable
 
     ice_glider_share = 0.85
 
@@ -671,47 +687,45 @@ def main():
 
     settings = SetInputs()
 
-    alpha_folders = [folder for folder in settings.path_alpha_inputs.iterdir()]
-    alpha_files = dict()
     ice_packages_df, bev_packages_df, hev_packages_df, phev_packages_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     if settings.run_bev:
         fuel_id = 'bev'
         alpha_folder = settings.path_alpha_inputs / 'BEV'
-        alpha_files = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
-        for idx, alpha_file in enumerate(alpha_files):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file, fuel_id)
+        alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
+        for idx, alpha_file_name in enumerate(alpha_file_names):
+            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
             for key in keys:
-                package_result = pev_package_results(settings, key, alpha_file_dict)
+                package_result = pev_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 bev_packages_df = pd.concat([bev_packages_df, package_result], axis=0, ignore_index=False)
 
     if settings.run_phev:
         fuel_id = 'phev'
         alpha_folder = settings.path_alpha_inputs / 'PHEV'
-        alpha_files = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
-        for idx, alpha_file in enumerate(alpha_files):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file, fuel_id)
+        alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
+        for idx, alpha_file_name in enumerate(alpha_file_names):
+            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
             for key in keys:
-                package_result = pev_package_results(settings, key, alpha_file_dict)
+                package_result = pev_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 phev_packages_df = pd.concat([phev_packages_df, package_result], axis=0, ignore_index=False)
 
     if settings.run_hev:
         fuel_id = 'hev'
         alpha_folder = settings.path_alpha_inputs / 'HEV'
-        alpha_files = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
-        for idx, alpha_file in enumerate(alpha_files):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file, fuel_id)
+        alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
+        for idx, alpha_file_name in enumerate(alpha_file_names):
+            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
             for key in keys:
-                package_result = ice_package_results(settings, key, alpha_file_dict)
+                package_result = ice_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 hev_packages_df = pd.concat([hev_packages_df, package_result], axis=0, ignore_index=False)
 
     if settings.run_ice:
         fuel_id = 'ice'
         alpha_folder = settings.path_alpha_inputs / 'ICE'
-        alpha_files = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
-        for idx, alpha_file in enumerate(alpha_files):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file, fuel_id)
+        alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
+        for idx, alpha_file_name in enumerate(alpha_file_names):
+            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
             for key in keys:
-                package_result = ice_package_results(settings, key, alpha_file_dict)
+                package_result = ice_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 ice_packages_df = pd.concat([ice_packages_df, package_result], axis=0, ignore_index=False)
 
     # calculate YoY bev costs with learning
@@ -723,6 +737,8 @@ def main():
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'body', settings.years, settings.learning_rate_weight)
         bev_packages_df.reset_index(drop=False, inplace=True)
         bev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
+        simulated_vehicle_id = [f'bev_{idx}' for idx in range(1, len(bev_packages_df) + 1)]
+        bev_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         bev_packages_df = sum_vehicle_parts(bev_packages_df, settings.years,
                                             'new_vehicle_mfr_cost_dollars',
                                             'pev_powertrain', 'roadload', 'body')
@@ -734,6 +750,8 @@ def main():
         hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'body', settings.years, settings.learning_rate_weight)
         hev_packages_df.reset_index(drop=False, inplace=True)
         hev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
+        simulated_vehicle_id = [f'hev_{idx}' for idx in range(1, len(hev_packages_df) + 1)]
+        hev_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         hev_packages_df = sum_vehicle_parts(hev_packages_df, settings.years,
                                             'new_vehicle_mfr_cost_dollars',
                                             'ice_powertrain', 'roadload', 'body')
@@ -745,54 +763,67 @@ def main():
         ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'body', settings.years, settings.learning_rate_weight)
         ice_packages_df.reset_index(drop=False, inplace=True)
         ice_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
+        simulated_vehicle_id = [f'ice_{idx}' for idx in range(1, len(ice_packages_df) + 1)]
+        ice_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         ice_packages_df = sum_vehicle_parts(ice_packages_df, settings.years,
                                             'new_vehicle_mfr_cost_dollars',
                                             'ice_powertrain', 'roadload', 'body')
 
     settings.path_outputs.mkdir(exist_ok=True)
-    settings.path_of_run_folder = settings.path_outputs / f'{settings.run_id}_O2-TechCosts_{settings.start_time_readable}'
+    settings.path_of_run_folder = settings.path_outputs / f'{settings.name_id}'
     settings.path_of_run_folder.mkdir(exist_ok=False)
 
-    cost_cloud, cost_cloud_bev, cost_cloud_phev, cost_cloud_hev, cost_cloud_ice = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    cost_cloud, cost_cloud_bev, cost_cloud_phev, cost_cloud_hev, cost_cloud_ice \
+        = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+    
     if settings.run_bev:
-        cost_cloud_bev = reshape_df_for_cloud_file(settings, bev_packages_df)
+        cost_cloud_bev = reshape_df_for_cloud_file(settings, bev_packages_df,
+                                                   'simulated_vehicle_id', 'cost_curve_class', 'alpha_key', 'alpha_filename')
     if settings.run_phev:
-        cost_cloud_phev = reshape_df_for_cloud_file(settings, phev_packages_df)
+        cost_cloud_phev = reshape_df_for_cloud_file(settings, phev_packages_df,
+                                                    'simulated_vehicle_id', 'cost_curve_class', 'alpha_key', 'alpha_filename')
     if settings.run_hev:
-        cost_cloud_hev = reshape_df_for_cloud_file(settings, hev_packages_df)
+        cost_cloud_hev = reshape_df_for_cloud_file(settings, hev_packages_df,
+                                                   'simulated_vehicle_id', 'cost_curve_class', 'alpha_key', 'alpha_filename')
     if settings.run_ice:
-        cost_cloud_ice = reshape_df_for_cloud_file(settings, ice_packages_df)
+        cost_cloud_ice = reshape_df_for_cloud_file(settings, ice_packages_df,
+                                                   'simulated_vehicle_id', 'cost_curve_class', 'alpha_key', 'alpha_filename')
 
     cost_cloud = pd.concat([cost_cloud_bev, cost_cloud_phev, cost_cloud_hev, cost_cloud_ice], axis=0, ignore_index=True)
 
+    cost_cloud_verbose = cost_cloud.copy()
     cost_cloud.fillna(0, inplace=True)
 
-    if settings.run_id != '': name_id = f'{settings.run_id}_{settings.start_time_readable}'
-    else: name_id = settings.start_time_readable
-    cost_vs_plot(cost_cloud, settings.path_of_run_folder, name_id, 2020, 2030, 2040)
-    # cost_vs_plot_combined(cost_cloud, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
+    cost_vs_plot(settings, cost_cloud, settings.path_of_run_folder, 2020, 2030, 2040)
+    # cost_vs_plot_combined(settings, cost_cloud, path_of_run_folder, start_time_readable, 2020, 2030, 2040)
 
-    bev_packages_df = drop_columns(bev_packages_df, 'cert')
-    ice_packages_df = drop_columns(ice_packages_df, 'cert')
-    hev_packages_df = drop_columns(hev_packages_df, 'cert')
-    bev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_bev_{name_id}.csv', index=False)
-    ice_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_ice_{name_id}.csv', index=False)
-    hev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_hev_{name_id}.csv', index=False)
+    # bev_packages_df = drop_columns(bev_packages_df, 'cert')
+    # ice_packages_df = drop_columns(ice_packages_df, 'cert')
+    # hev_packages_df = drop_columns(hev_packages_df, 'cert')
+    bev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_bev_{settings.name_id}.csv', index=False)
+    ice_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_ice_{settings.name_id}.csv', index=False)
+    hev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_hev_{settings.name_id}.csv', index=False)
 
-    if settings.generate_cost_cloud_file:
-        cost_cloud = drop_columns(cost_cloud, 'cert')
-        # open the 'cost_clouds.csv' input template into which results will be placed.
-        cost_clouds_template_info = pd.read_csv(settings.path_input_templates.joinpath('cost_clouds.csv'), 'b', nrows=0)
+    if settings.generate_simulated_vehicles_file:
+        cost_cloud = drop_columns(cost_cloud, 'cert_co2_grams_per_mile', 'cert_kWh_per_mile', 'alpha_key', 'alpha_filename')
+        # open the 'simulated_vehicles.csv' input template into which results will be placed.
+        cost_clouds_template_info = pd.read_csv(settings.path_input_templates.joinpath('simulated_vehicles.csv'), 'b', nrows=0)
         temp = ' '.join((item for item in cost_clouds_template_info))
         temp2 = temp.split(',')
         temp2 = temp2[:4]
-        temp2.append(f'{name_id}')
+        temp2.append(f'{settings.name_id}')
         df = pd.DataFrame(columns=temp2)
-        df.to_csv(settings.path_of_run_folder.joinpath('cost_clouds.csv'), index=False)
+        df.to_csv(settings.path_of_run_folder.joinpath('simulated_vehicles.csv'), index=False)
 
-        with open(settings.path_of_run_folder.joinpath('cost_clouds.csv'), 'a', newline='') as cloud_file:
+        with open(settings.path_of_run_folder.joinpath('simulated_vehicles.csv'), 'a', newline='') as cloud_file:
             cost_cloud.to_csv(cloud_file, index=False)
-        # cost_cloud.to_csv(settings.path_of_run_folder / f'cost_clouds.csv', index=False)
+
+    if settings.generate_simulated_vehicles_verbose_file:
+        df.to_csv(settings.path_of_run_folder.joinpath('simulated_vehicles_verbose.csv'), index=False)
+
+        with open(settings.path_of_run_folder.joinpath('simulated_vehicles_verbose.csv'), 'a', newline='') as cloud_file:
+            cost_cloud_verbose.to_csv(cloud_file, index=False)
+        # cost_cloud_verbose.to_csv(settings.path_of_run_folder / f'simulated_vehicles_verbose.csv', index=False)
 
     # save additional outputs
     modified_costs = pd.ExcelWriter(settings.path_of_run_folder.joinpath(f'techcosts_in_{settings.dollar_basis}_dollars.xlsx'))

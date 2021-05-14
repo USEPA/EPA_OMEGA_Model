@@ -21,7 +21,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
     index = Column(Integer, primary_key=True)
     model_year = Column(Numeric)
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
-    GHG_target_CO2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)
+    GHG_target_co2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)
     lifetime_VMT = Column('lifetime_vmt', Float)
 
     @staticmethod
@@ -41,7 +41,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
     def calculate_target_co2_gpmi(vehicle):
         cache_key = '%s_%s_target_co2_gpmi' % (vehicle.model_year, vehicle.reg_class_ID)
         if cache_key not in cache:
-            cache[cache_key] = o2.session.query(GHGStandardFlat.GHG_target_CO2_grams_per_mile). \
+            cache[cache_key] = o2.session.query(GHGStandardFlat.GHG_target_co2_grams_per_mile). \
                 filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
                 filter(GHGStandardFlat.model_year == vehicle.model_year).scalar()
         return cache[cache_key]
@@ -91,7 +91,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
                 co2_gpmi = co2_gpmi_variants
         else:
             sales = vehicle.initial_registered_count
-            co2_gpmi = vehicle.cert_CO2_grams_per_mile
+            co2_gpmi = vehicle.cert_co2_grams_per_mile
 
         return co2_gpmi * lifetime_VMT * sales / 1e6
 
@@ -121,7 +121,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
                     obj_list.append(GHGStandardFlat(
                         model_year=df.loc[i, 'model_year'],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
-                        GHG_target_CO2_grams_per_mile=df.loc[i, 'ghg_target_co2_grams_per_mile'],
+                        GHG_target_co2_grams_per_mile=df.loc[i, 'ghg_target_co2_grams_per_mile'],
                         lifetime_VMT=df.loc[i, 'lifetime_vmt'],
                     ))
                 o2.session.add_all(obj_list)

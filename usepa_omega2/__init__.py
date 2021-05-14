@@ -10,6 +10,10 @@ code_version = "0.6.0"
 print('loading usepa_omega2 version %s' % code_version)
 
 import os, sys
+
+if 'darwin' in sys.platform:
+    os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for pyqtgraph on MacOS
+
 # print('usepa_omega2 __init__.py path = %s' % os.path.abspath(__file__))
 # print('SYS Path = %s' % sys.path)
 
@@ -73,7 +77,7 @@ try:
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
-            self.cost_file = path + 'test_inputs/cost_clouds.csv'
+            self.cost_file = path + 'test_inputs/simulated_vehicles.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = None

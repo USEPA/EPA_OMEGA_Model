@@ -112,8 +112,10 @@ Multiprocessor
 Dispy and Pycos Versions
 ++++++++++++++++++++++++
 
-Some versions of dispy and pycos have proved to be incompatible with each other.  The following versions have been tested successfully together:
+Some versions of dispy and pycos have proved to be incompatible with each other.  The following versions have been tested together successfully:
 
 * dispy v4.12.2 and pycos v4.18.15
+* dispy v4.12.4 and pycos v4.11.0
+
 
 

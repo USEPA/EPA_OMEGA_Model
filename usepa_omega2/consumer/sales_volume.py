@@ -39,9 +39,8 @@ def context_new_vehicle_sales(model_year):
     # pulling in hauling sales, non_hauling = total minus hauling
     hauling_sales = 0
     for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
-        hauling_sales = hauling_sales + \
-                        ContextNewVehicleMarket.new_vehicle_sales(model_year, context_size_class=hsc) * \
-                        ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
+        hauling_sales += ContextNewVehicleMarket.new_vehicle_sales(model_year, context_size_class=hsc) * \
+                         ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
 
     sales_dict['hauling'] = hauling_sales
     sales_dict['non_hauling'] = total_sales - hauling_sales
@@ -96,7 +95,6 @@ if __name__ == '__main__':
         from manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
-        from cost_curves import CostCurve, input_template_name as cost_curve_template_name # needed for vehicle cost from CO2
         from cost_clouds import CostCloud  # needed for vehicle cost from CO2
         from context_new_vehicle_market import ContextNewVehicleMarket
 

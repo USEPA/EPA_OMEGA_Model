@@ -8,11 +8,11 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'cost_clouds'
+input_template_name = 'simulated_vehicles'
 
 cache = dict()
 
-cloud_non_numeric_columns = ['key']
+cloud_non_numeric_columns = ['simulated_vehicle_id']
 
 
 class CostCloud(OMEGABase):
@@ -26,9 +26,9 @@ class CostCloud(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.1
-        input_template_columns = {'cost_curve_class', 'model_year', 'cert_co2_grams_per_mile',
-                                  'new_vehicle_mfr_cost_dollars', 'cert_kWh_per_mile'}
+        input_template_version = 0.2
+        input_template_columns = {'cost_curve_class', 'model_year', 'simulated_vehicle_id',
+                                  'new_vehicle_mfr_cost_dollars'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -82,6 +82,8 @@ class CostCloud(OMEGABase):
 
         """
 
+        import numpy as np
+
         frontier_pts = []
 
         # drop non-numeric columns so dtypes don't become "object"
@@ -93,7 +95,7 @@ class CostCloud(OMEGABase):
         min_frontier_factor = 0
 
         if cloud[x_key].min() != cloud[x_key].max():
-            while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope):
+            while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) and not np.isinf(min_frontier_factor):
                 # calculate frontier factor (more negative is more better) = slope of each point relative
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
                 cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) \
@@ -110,11 +112,15 @@ class CostCloud(OMEGABase):
                                                ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
                     min_frontier_factor = cloud['frontier_factor'].min()
 
-                if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
-                    # if multiple points with the same slope, take the one with the highest index (highest x-value)
-                    idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor].index.max()
+                if not np.isinf(min_frontier_factor):
+                    if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
+                        # if multiple points with the same slope, take the one with the highest index (highest x-value)
+                        idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor].index.max()
+                    else:
+                        idxmin = cloud['frontier_factor'].idxmin()
                 else:
-                    idxmin = cloud['frontier_factor'].idxmin()
+                    idxmin = cloud['frontier_factor'].idxmax()
+
                 if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                     frontier_pts.append(cloud.loc[idxmin])
 

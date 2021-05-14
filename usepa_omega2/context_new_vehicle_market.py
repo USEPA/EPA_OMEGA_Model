@@ -7,7 +7,6 @@ vehicles.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 cache = dict()
@@ -37,6 +36,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     bev_price_dollars = Column(Numeric)
 
     hauling_context_size_class_info = dict()
+    context_size_classes = dict()
     _new_vehicle_prices = dict()
 
     @classmethod

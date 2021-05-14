@@ -13,7 +13,8 @@ from usepa_omega2 import *
 class CompositeVehicle(OMEGABase):
     next_vehicle_ID = -1
 
-    def __init__(self, vehicle_list, calendar_year, verbose=False):
+    def __init__(self, vehicle_list, calendar_year, verbose=False, calc_composite_cost_curve=True,
+                 weight_by='initial_registered_count'):
         """
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
@@ -27,21 +28,21 @@ class CompositeVehicle(OMEGABase):
         self.vehicle_ID = CompositeVehicle.next_vehicle_ID
         CompositeVehicle.set_next_vehicle_ID()
 
-        self.model_year = self.vehicle_list[0].model_year
+        self.weight_by = weight_by
+
+        self.model_year = self.vehicle_list[0].model_year # calendar_year?
         self.reg_class_ID = self.vehicle_list[0].reg_class_ID
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_ID = self.vehicle_list[0].market_class_ID
-        self.cert_target_CO2_Mg = self.set_cert_target_CO2_Mg()
-        self.cert_CO2_Mg = self.set_cert_CO2_Mg()
+        self.cert_target_co2_Mg = self.set_cert_target_co2_Mg()
+        self.cert_co2_Mg = self.set_cert_co2_Mg()
+
+        weighted_values = ['cert_co2_grams_per_mile', 'upstream_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
+                           'cert_direct_kwh_per_mile', 'footprint_ft2']
 
         # calc sales-weighted values
-        self.cert_CO2_grams_per_mile = weighted_value(self.vehicle_list, 'initial_registered_count',
-                                                      'cert_CO2_grams_per_mile')
-
-        self.cert_kWh_per_mile = weighted_value(self.vehicle_list, 'initial_registered_count',
-                                                      'cert_kWh_per_mile')
-
-        self.footprint_ft2 = weighted_value(self.vehicle_list, 'initial_registered_count', 'footprint_ft2')
+        for wv in weighted_values:
+            self.__setattr__(wv, weighted_value(self.vehicle_list, weight_by, wv))
 
         self.new_vehicle_mfr_cost_dollars = self.set_new_vehicle_mfr_cost_dollars()
         self.new_vehicle_mfr_generalized_cost_dollars = self.set_new_vehicle_mfr_generalized_cost_dollars()
@@ -50,10 +51,19 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             self.initial_registered_count = self.initial_registered_count + v.initial_registered_count
 
+        self.total_weight = 0
         for v in self.vehicle_list:
-            v.reg_class_market_share_frac = v.initial_registered_count / self.initial_registered_count
+            self.total_weight += v.__getattribute__(self.weight_by)
 
-        self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
+        for v in self.vehicle_list:
+            if self.total_weight != 0:
+                v.composite_vehicle_share_frac = v.__getattribute__(self.weight_by) / self.total_weight
+            else:
+                v.composite_vehicle_share_frac = 0
+
+        if calc_composite_cost_curve:
+            self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
+
         self.tech_option_iteration_num = 0
 
     @staticmethod
@@ -70,36 +80,32 @@ class CompositeVehicle(OMEGABase):
         if calendar_year is None:
             calendar_year = self.model_year
 
-        return weighted_value(self.vehicle_list, 'initial_registered_count', 'retail_fuel_price_dollars_per_unit', calendar_year)
+        return weighted_value(self.vehicle_list, self.weight_by, 'retail_fuel_price_dollars_per_unit',
+                              calendar_year)
 
     def decompose(self):
-        # for v in self.vehicle_list:
-        #     print('%s= %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+
+        cost_curve_values = ['cert_co2_grams_per_mile', 'upstream_co2_grams_per_mile',
+                             'cert_direct_co2_grams_per_mile', 'cert_direct_kwh_per_mile']
 
         for v in self.vehicle_list:
-            if len(self.cost_curve) > 1:
-                vehicle_co2_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
-                                                                self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID],
-                                                                fill_value=(self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID].min(),
-                                                                            self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID].max()), bounds_error=False)
+            if 'cost_curve' in self.__dict__:
+                for ccv in cost_curve_values:
+                    if len(self.cost_curve) > 1:
+                        ccv_interp1d = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
+                                                              self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)],
+                                                              fill_value=(self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].min(),
+                                                                          self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].max()),
+                                                              bounds_error=False)
+                        v.__setattr__(ccv, ccv_interp1d(self.cert_co2_grams_per_mile))
+                    else:
+                        v.__setattr__(ccv, self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)])
 
-                vehicle_kWh_curve = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
-                                                                self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID],
-                                                                fill_value=(self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID].min(),
-                                                                            self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID].max()), bounds_error=False)
-                v.cert_CO2_grams_per_mile = vehicle_co2_curve(self.cert_CO2_grams_per_mile)
-                v.cert_kWh_per_mile = vehicle_kWh_curve(self.cert_CO2_grams_per_mile)
-            else:
-                v.cert_CO2_grams_per_mile = self.cost_curve['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID].item()
-                v.cert_kWh_per_mile = self.cost_curve['veh_%s_cert_kWh_per_mile' % v.vehicle_ID].item()
-
-            v.initial_registered_count = self.initial_registered_count * v.reg_class_market_share_frac
-            v.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
-            v.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
-            v.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
-            v.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
-
-            # print('%s: %f' % (v.vehicle_ID, v.cert_CO2_grams_per_mile))
+            v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
+            v.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
+            v.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
+            v.set_cert_target_co2_Mg()  # varies by model year and initial_registered_count
+            v.set_cert_co2_Mg()  # varies by model year and initial_registered_count
 
     def calc_composite_cost_curve(self, plot=False):
         from cost_clouds import CostCloud
@@ -111,69 +117,43 @@ class CompositeVehicle(OMEGABase):
             label_xy(ax1, 'CO2 g/mi', '$')
 
         composite_frontier_df = pd.DataFrame()
-        composite_frontier_df['cert_co2_grams_per_mile'] = [0]
-        # composite_frontier_df['tailpipe_co2_grams_per_mile'] = [0]
-        composite_frontier_df['cert_kWh_per_mile'] = [0]
-        composite_frontier_df['new_vehicle_mfr_cost_dollars'] = [0]
-        composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'] = [0]
         composite_frontier_df['market_share_frac'] = [0]
+
+        # calculated weighted values
+        weighted_values = ['cert_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
+                           'upstream_co2_grams_per_mile', 'cert_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars',
+                           'new_vehicle_mfr_generalized_cost_dollars']
+
+        for wv in weighted_values:
+            composite_frontier_df[wv] = [0]
 
         for v in self.vehicle_list:
             vehicle_frontier = v.cost_curve
-            vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.reg_class_market_share_frac
+            vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.composite_vehicle_share_frac
 
             composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier, drop=False)
 
             prior_market_share_frac = composite_frontier_df['market_share_frac']
             veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_ID]
 
-            # calculate weighted co2 g/mi
-            composite_frontier_df['cert_co2_grams_per_mile'] = \
-                (composite_frontier_df['cert_co2_grams_per_mile'] * prior_market_share_frac +
-                 composite_frontier_df['veh_%s_cert_co2_grams_per_mile' % v.vehicle_ID] * veh_market_share_frac) / \
-                (prior_market_share_frac + veh_market_share_frac)
-
-            # composite_frontier_df['tailpipe_co2_grams_per_mile'] = \
-            #     (composite_frontier_df['tailpipe_co2_grams_per_mile'] * prior_market_share_frac +
-            #      composite_frontier_df['veh_%s_tailpipe_co2_grams_per_mile' % v.vehicle_ID] * veh_market_share_frac) / \
-            #     (prior_market_share_frac + veh_market_share_frac)
-
-            # calculate weighted kWh/mi
-            composite_frontier_df['cert_kWh_per_mile'] = \
-                (composite_frontier_df['cert_kWh_per_mile'] * prior_market_share_frac +
-                 composite_frontier_df['veh_%s_cert_kWh_per_mile' % v.vehicle_ID] * veh_market_share_frac) / \
-                (prior_market_share_frac + veh_market_share_frac)
-
-            # calculate weighted cost
-            composite_frontier_df['new_vehicle_mfr_cost_dollars'] = \
-                (composite_frontier_df['new_vehicle_mfr_cost_dollars'] * prior_market_share_frac +
-                 composite_frontier_df['veh_%s_mfr_cost_dollars' % v.vehicle_ID] * veh_market_share_frac) / \
-                (prior_market_share_frac + veh_market_share_frac)
-
-            composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'] = \
-                (composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'] * prior_market_share_frac +
-                 composite_frontier_df['veh_%s_mfr_generalized_cost_dollars' % v.vehicle_ID] * veh_market_share_frac) / \
-                (prior_market_share_frac + veh_market_share_frac)
+            for wv in weighted_values:
+                composite_frontier_df[wv] = \
+                    (composite_frontier_df[wv] * prior_market_share_frac +
+                     composite_frontier_df['veh_%s_%s' % (v.vehicle_ID, wv)] * veh_market_share_frac) / \
+                    (prior_market_share_frac + veh_market_share_frac)
 
             # update running total market share
             composite_frontier_df['market_share_frac'] = prior_market_share_frac + veh_market_share_frac
 
-            # if plot:
-            #     ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
-            #              composite_frontier_df['new_vehicle_mfr_cost_dollars'], '.')
-            #     ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
-            #              composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '.')
+            drop_columns = [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x')] + \
+                           ['_', 'frontier_factor']
+
+            composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
 
             # calculate new sales-weighted frontier
             composite_frontier_df = CostCloud.calculate_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
                                                                  'new_vehicle_mfr_generalized_cost_dollars',
                                                                  allow_upslope=True)
-
-            # if plot:
-            #     ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
-            #              composite_frontier_df['new_vehicle_mfr_cost_dollars'], '.-')
-            #     ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
-            #              composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '.--')
 
         if plot:
             ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
@@ -198,13 +178,13 @@ class CompositeVehicle(OMEGABase):
         import numpy as np
         # get kwh/mi from cost curve for target_co2_gpmi(s)
         if len(self.cost_curve) > 1:
-            kWh_pmi = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
-                                                      self.cost_curve['cert_kWh_per_mile'],
-                                                      fill_value=(self.cost_curve['cert_kWh_per_mile'].min(),
-                                                                  self.cost_curve['cert_kWh_per_mile'].max()), bounds_error=False)
-            return kWh_pmi(target_co2_gpmi).tolist()
+            kwh_pmi = scipy.interpolate.interp1d(self.cost_curve['cert_co2_grams_per_mile'],
+                                                      self.cost_curve['cert_direct_kwh_per_mile'],
+                                                      fill_value=(self.cost_curve['cert_direct_kwh_per_mile'].min(),
+                                                                  self.cost_curve['cert_direct_kwh_per_mile'].max()), bounds_error=False)
+            return kwh_pmi(target_co2_gpmi).tolist()
         else:
-            return self.cost_curve['cert_kWh_per_mile']
+            return self.cost_curve['cert_direct_kwh_per_mile']
 
     def get_generalized_cost_from_cost_curve(self, target_co2_gpmi):
         import numpy as np
@@ -228,25 +208,25 @@ class CompositeVehicle(OMEGABase):
 
     def set_new_vehicle_mfr_cost_dollars(self):
         from omega_functions import weighted_value
-        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count',
+        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_cost_dollars')
         return self.new_vehicle_mfr_cost_dollars
 
     def set_new_vehicle_mfr_generalized_cost_dollars(self):
         from omega_functions import weighted_value
-        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, 'initial_registered_count',
+        self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_generalized_cost_dollars')
         return self.new_vehicle_mfr_cost_dollars
 
-    def set_cert_target_CO2_Mg(self):
+    def set_cert_target_co2_Mg(self):
         from omega_functions import weighted_value
-        self.cert_target_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_target_CO2_Mg')
-        return self.cert_target_CO2_Mg
+        self.cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by, 'cert_target_co2_Mg')
+        return self.cert_target_co2_Mg
 
-    def set_cert_CO2_Mg(self):
+    def set_cert_co2_Mg(self):
         from omega_functions import weighted_value
-        self.cert_CO2_Mg = weighted_value(self.vehicle_list, 'initial_registered_count', 'cert_CO2_Mg')
-        return self.cert_CO2_Mg
+        self.cert_co2_Mg = weighted_value(self.vehicle_list, self.weight_by, 'cert_co2_Mg')
+        return self.cert_co2_Mg
 
 
 class Vehicle(OMEGABase):
@@ -264,17 +244,18 @@ class Vehicle(OMEGABase):
         self.reg_class_market_share_frac = 1.0
         self.epa_size_class = None
         self.context_size_class = None
-        self.context_size_class_share_frac = None
+        self.market_share = None
+        self.non_responsive_market_group = None
         self.electrification_class = None
-        self.upstream_CO2_grams_per_mile = None
-        self.cert_CO2_grams_per_mile = None
-        self.cert_kWh_per_mile = None
-        self.cert_target_CO2_grams_per_mile = None
-        self.cert_CO2_Mg = None
-        self.cert_target_CO2_Mg = None
+        self.upstream_co2_grams_per_mile = None
+        self.cert_co2_grams_per_mile = None
+        self.cert_direct_co2_grams_per_mile = None
+        self.cert_direct_kwh_per_mile = None
+        self.cert_target_co2_grams_per_mile = None
+        self.cert_co2_Mg = None
+        self.cert_target_co2_Mg = None
         self.new_vehicle_mfr_cost_dollars = None
         self.new_vehicle_mfr_generalized_cost_dollars = None
-        self.manufacturer_deemed_new_vehicle_generalized_cost_dollars = None
         self.in_use_fuel_ID = None
         self.cert_fuel_ID = None
         self.market_class_ID = None
@@ -335,55 +316,55 @@ class Vehicle(OMEGABase):
     def initial_registered_count(self, initial_registered_count):
         self._initial_registered_count = initial_registered_count
 
-    def set_cert_target_CO2_grams_per_mile(self):
-        self.cert_target_CO2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
+    def set_cert_target_co2_grams_per_mile(self):
+        self.cert_target_co2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
 
-    def set_cert_target_CO2_Mg(self):
-        self.cert_target_CO2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
+    def set_cert_target_co2_Mg(self):
+        self.cert_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
 
     def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
-        self.new_vehicle_mfr_cost_dollars = self.get_cost_from_cost_curve(self.cert_CO2_grams_per_mile)
+        self.new_vehicle_mfr_cost_dollars = self.get_cost_from_cost_curve(self.cert_co2_grams_per_mile)
 
     def set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve(self):
-        self.new_vehicle_mfr_generalized_cost_dollars = self.get_generalized_cost_from_cost_curve(self.cert_CO2_grams_per_mile)
+        self.new_vehicle_mfr_generalized_cost_dollars = self.get_generalized_cost_from_cost_curve(self.cert_co2_grams_per_mile)
 
     def get_cost_from_cost_curve(self, target_co2_gpmi):
         # get cost from cost curve for target_co2_gpmi(s)
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID],
-                                                      self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID],
-                                                      fill_value=(self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].min(),
-                                                                  self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].max()), bounds_error=False)
+                                                      self.cost_curve['veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID],
+                                                      fill_value=(self.cost_curve['veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID].min(),
+                                                                  self.cost_curve['veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID].max()), bounds_error=False)
             return cost_dollars(target_co2_gpmi).tolist()
         else:
-            return self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].item()
+            return self.cost_curve['veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID].item()
 
     def get_generalized_cost_from_cost_curve(self, target_co2_gpmi):
         # get cost from cost curve for target_co2_gpmi(s)
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID],
-                                                  self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID],
-                                                  fill_value=(self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID].min(),
-                                                              self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID].max()), bounds_error=False)
+                                                  self.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_ID],
+                                                  fill_value=(self.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_ID].min(),
+                                                              self.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_ID].max()), bounds_error=False)
             return cost_dollars(target_co2_gpmi).tolist()
         else:
-            return self.cost_curve['veh_%s_mfr_generalized_cost_dollars' % self.vehicle_ID].item()
+            return self.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_ID].item()
     #
     # def get_max_co2_gpmi(self):
     #     # get max co2_gpmi from self.cost_curve
-    #     return self.cost_curve['veh_%s_mfr_cost_dollars' % self.vehicle_ID].max()
+    #     return self.cost_curve['veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID].max()
     #
     # def get_min_co2_gpmi(self):
     #     # get min co2_gpmi from self.cost_curve
     #     return self.cost_curve['veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID].min()
 
-    def set_cert_CO2_Mg(self):
-        self.cert_CO2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
+    def set_cert_co2_Mg(self):
+        self.cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
         inherit_properties = {'name', 'manufacturer_ID', 'model_year', 'fueling_class', 'hauling_class',
                               'cost_curve_class', 'reg_class_ID', 'in_use_fuel_ID', 'cert_fuel_ID', 'market_class_ID',
-                              'footprint_ft2', 'epa_size_class', 'context_size_class', 'context_size_class_share_frac',
+                              'footprint_ft2', 'epa_size_class', 'context_size_class', 'market_share', 'non_responsive_market_group',
                               'electrification_class'}
 
         for p in inherit_properties:
@@ -395,34 +376,36 @@ class Vehicle(OMEGABase):
         from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
         from cost_clouds import CostCloud
 
-        self.set_cert_target_CO2_grams_per_mile()  # varies by model year
+        self.set_cert_target_co2_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
-        self.cert_kWh_per_mile = vehicle.cert_kWh_per_mile
+        self.cert_direct_kwh_per_mile = vehicle.cert_direct_kwh_per_mile
 
         if type(self) == Vehicle and type(vehicle) == VehicleFinal:
             # need to add upstream to "tailpipe" co2 g/mi and calculate this year's frontier
-            self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile  # this is really "tailpipe" g/mi
+            self.cert_direct_co2_grams_per_mile = vehicle.cert_direct_co2_grams_per_mile
 
+            # calculate cert co2 g/mi
             upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
-            self.upstream_CO2_grams_per_mile = upstream(self, self.cert_CO2_grams_per_mile, self.cert_kWh_per_mile)
-            self.cert_CO2_grams_per_mile += self.upstream_CO2_grams_per_mile
+            self.upstream_co2_grams_per_mile = upstream(self, self.cert_direct_co2_grams_per_mile, self.cert_direct_kwh_per_mile)
+            self.cert_co2_grams_per_mile = self.cert_direct_co2_grams_per_mile + self.upstream_co2_grams_per_mile
 
             if o2.options.flat_context:
                 self.cost_cloud = CostCloud.get_cloud(o2.options.flat_context_year, self.cost_curve_class)
             else:
                 self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
             self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
-            self.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
-            self.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_CO2_grams_per_mile
-            self.set_cert_target_CO2_Mg()  # varies by model year and initial_registered_count
-            self.set_cert_CO2_Mg()  # varies by model year and initial_registered_count
+            self.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
+            self.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
+            self.set_cert_target_co2_Mg()  # varies by model year and initial_registered_count
+            self.set_cert_co2_Mg()  # varies by model year and initial_registered_count
         else:  # type(self) == VehicleFinal and type(vehicle == Vehicle)
-            # cert_co2_grams_per_mile already has upstream in it, don't need to add it
-            self.cert_CO2_grams_per_mile = vehicle.cert_CO2_grams_per_mile #  - vehicle.upstream_CO2_grams_per_mile
+            self.cert_co2_grams_per_mile = vehicle.cert_co2_grams_per_mile
+            self.upstream_co2_grams_per_mile = vehicle.upstream_co2_grams_per_mile
+            self.cert_direct_co2_grams_per_mile = vehicle.cert_co2_grams_per_mile - vehicle.upstream_co2_grams_per_mile
             self.new_vehicle_mfr_cost_dollars = vehicle.new_vehicle_mfr_cost_dollars
             self.new_vehicle_mfr_generalized_cost_dollars = vehicle.new_vehicle_mfr_generalized_cost_dollars
-            self.cert_target_CO2_Mg = vehicle.cert_target_CO2_Mg
-            self.cert_CO2_Mg = vehicle.cert_CO2_Mg
+            self.cert_target_co2_Mg = vehicle.cert_target_co2_Mg
+            self.cert_co2_Mg = vehicle.cert_co2_Mg
 
     def create_frontier_df(self):
         from cost_clouds import CostCloud
@@ -430,25 +413,26 @@ class Vehicle(OMEGABase):
         from drive_cycle_weights import DriveCycleWeights
 
         co2_name = 'veh_%s_cert_co2_grams_per_mile' % self.vehicle_ID
-        tailpipe_co2_name = 'veh_%s_tailpipe_co2_grams_per_mile' % self.vehicle_ID
-        kWh_name = 'veh_%s_cert_kWh_per_mile' % self.vehicle_ID
-        tailpipe_kWh_name = 'veh_%s_tailpipe_kWh_per_mile' % self.vehicle_ID
-        cost_name = 'veh_%s_mfr_cost_dollars' % self.vehicle_ID
+        tailpipe_co2_name = 'veh_%s_cert_direct_co2_grams_per_mile' % self.vehicle_ID
+        upstream_co2_name = 'veh_%s_upstream_co2_grams_per_mile' % self.vehicle_ID
+        kwh_name = 'veh_%s_cert_direct_kwh_per_mile' % self.vehicle_ID
+        tailpipe_kwh_name = 'veh_%s_tailpipe_kwh_per_mile' % self.vehicle_ID
+        cost_name = 'veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID
 
         # rename generic columns to vehicle-specific columns
         self.cost_cloud = self.cost_cloud.rename(
-            columns={'cert_co2_grams_per_mile': co2_name, 'cert_kWh_per_mile': kWh_name,
+            columns={'cert_co2_grams_per_mile': co2_name, 'cert_direct_co2_grams_per_mile': tailpipe_co2_name,
+                     'upstream_co2_grams_per_mile': upstream_co2_name, 'cert_direct_kwh_per_mile': kwh_name,
                      'new_vehicle_mfr_cost_dollars': cost_name})
 
-        self.cost_cloud[co2_name] = \
-            DriveCycleWeights.calc_weighted_drive_cycle_co2_grams_per_mile(self.model_year, self.cost_cloud)
+        self.cost_cloud[tailpipe_co2_name] = \
+            DriveCycleWeights.calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(self.model_year, self.cost_cloud)
 
-        self.cost_cloud[kWh_name] = \
-            DriveCycleWeights.calc_weighted_drive_cycle_kWh_per_mile(self.model_year, self.cost_cloud)
+        self.cost_cloud[kwh_name] = \
+            DriveCycleWeights.calc_weighted_drive_cycle_kwh_per_mile(self.model_year, self.cost_cloud)
 
         # capture pre-upstream values as "tailpipe", for now...
-        self.cost_cloud[tailpipe_co2_name] = self.cost_cloud[co2_name]
-        self.cost_cloud[tailpipe_kWh_name] = self.cost_cloud[kWh_name]
+        self.cost_cloud[tailpipe_kwh_name] = self.cost_cloud[kwh_name]
 
         # drop extraneous columns
         self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
@@ -457,12 +441,12 @@ class Vehicle(OMEGABase):
 
         # add upstream calcs
         upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
-        self.cost_cloud['upstream_co2_grams_per_mile'] = \
-            upstream(self, self.cost_cloud[co2_name], self.cost_cloud[kWh_name])
-        self.cost_cloud[co2_name] += self.cost_cloud['upstream_co2_grams_per_mile']
+        self.cost_cloud[upstream_co2_name] = \
+            upstream(self, self.cost_cloud[tailpipe_co2_name], self.cost_cloud[kwh_name])
+        self.cost_cloud[co2_name] = self.cost_cloud[tailpipe_co2_name] + self.cost_cloud[upstream_co2_name]
 
         # calculate producer generalized cost
-        self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, co2_name, kWh_name, cost_name)
+        self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, tailpipe_co2_name, kwh_name, cost_name)
 
         # calculate frontier from updated cloud
         cost_curve = CostCloud.calculate_frontier(self.cost_cloud, co2_name, cost_name, allow_upslope=True)
@@ -493,21 +477,22 @@ class VehicleFinal(SQABase, Vehicle):
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
-    context_size_class_share_frac = Column(Float)
+    market_share = Column(Float)
+    non_responsive_market_group = Column(String)
     electrification_class = Column(String)  # TODO: validate with enum?
-    cert_target_CO2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
-    cert_CO2_Mg = Column('cert_co2_megagrams', Float)
-    cert_target_CO2_Mg = Column('cert_target_co2_megagrams', Float)
+    cert_target_co2_grams_per_mile = Column('cert_target_co2_grams_per_mile', Float)
+    cert_co2_Mg = Column('cert_co2_megagrams', Float)
+    cert_target_co2_Mg = Column('cert_target_co2_megagrams', Float)
     new_vehicle_mfr_cost_dollars = Column(Float)
     new_vehicle_mfr_generalized_cost_dollars = Column(Float)
-    manufacturer_deemed_new_vehicle_generalized_cost_dollars = Column(Float)
-    in_use_fuel_ID = Column('showroom_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
+    in_use_fuel_ID = Column('in_use_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
     cert_fuel_ID = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
-    upstream_CO2_grams_per_mile = Column('upstream_co2_grams_per_mile', Float)
-    cert_CO2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
-    cert_kWh_per_mile = Column('cert_kwh_per_mile', Float)
+    upstream_co2_grams_per_mile = Column('upstream_co2_grams_per_mile', Float)
+    cert_co2_grams_per_mile = Column('cert_co2_grams_per_mile', Float)
+    cert_direct_co2_grams_per_mile = Column('cert_direct_co2_grams_per_mile', Float)
+    cert_direct_kwh_per_mile = Column('cert_direct_kwh_per_mile', Float)
     _initial_registered_count = Column('_initial_registered_count', Float)
 
     @property
@@ -544,28 +529,47 @@ class VehicleFinal(SQABase, Vehicle):
         return o2.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
 
     @staticmethod
-    def calc_cert_target_CO2_Mg(model_year, manufacturer_id):
-        return o2.session.query(func.sum(VehicleFinal.cert_target_CO2_Mg)). \
+    def calc_cert_target_co2_Mg(model_year, manufacturer_id):
+        return o2.session.query(func.sum(VehicleFinal.cert_target_co2_Mg)). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
+
+    @staticmethod
+    def clone_vehicle(vehicle):
+        inherit_properties = {'name', 'manufacturer_ID', 'hauling_class',
+                              'reg_class_ID', 'epa_size_class', 'context_size_class',
+                              'market_share', 'non_responsive_market_group', 'footprint_ft2'}
+
+        # model year and registered count are required to make a full-blown VehicleFinal object
+        veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
+
+        # get the rest of the attributes from the list
+        for p in inherit_properties:
+            veh.__setattr__(p, vehicle.__getattribute__(p))
+
+        return veh
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         from context_new_vehicle_market import ContextNewVehicleMarket
         from consumer.market_classes import MarketClass
 
-        context_size_class_dict = dict()
+        vehicle_shares_dict = {'total': 0}
+
         vehicles_list = []
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.3
+        input_template_version = 0.4
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
                                   'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
                                   'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id',
-                                  'sales', 'cert_co2_grams_per_mile', 'cert_kwh_per_mile', 'footprint_ft2'}
+                                  'sales', 'cert_co2_grams_per_mile', 'cert_direct_kwh_per_mile', 'footprint_ft2',
+                                  'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in', 'width_in', 'height_in',
+                                  'ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft', 'msrp_dollars',
+                                  'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -599,21 +603,18 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.fueling_class = 'ICE'
 
                     veh.reg_class_ID = o2.options.GHG_standard.get_vehicle_reg_class(veh)
-                    veh.market_class_ID = MarketClass.get_vehicle_market_class(veh)
-                    veh.cert_CO2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
-                    veh.cert_kWh_per_mile = df.loc[i, 'cert_kwh_per_mile']
+                    veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
+                    veh.cert_direct_co2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
+                    veh.cert_co2_grams_per_mile = None
+                    veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_kwh_per_mile']
                     veh.initial_registered_count = df.loc[i, 'sales']
-                    # veh.set_new_vehicle_mfr_cost_dollars()
-                    # veh.set_new_vehicle_mfr_generalized_cost_dollars()
-                    # veh.set_cert_target_CO2_grams_per_mile()
-                    # veh.set_cert_target_CO2_Mg()
-                    # veh.set_cert_CO2_Mg()
 
-                    if veh.context_size_class not in context_size_class_dict:
-                        context_size_class_dict[veh.context_size_class] = veh.initial_registered_count
-                    else:
-                        context_size_class_dict[veh.context_size_class] = \
-                            context_size_class_dict[veh.context_size_class] + veh.initial_registered_count
+                    vehicle_shares_dict['total'] += veh.initial_registered_count
+
+                    if veh.context_size_class not in vehicle_shares_dict:
+                        vehicle_shares_dict[veh.context_size_class] = 0
+
+                    vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
 
                     vehicles_list.append(veh)
 
@@ -626,18 +627,39 @@ class VehicleFinal(SQABase, Vehicle):
                                 ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
                                     'total'] + veh.initial_registered_count
 
+                    if veh.context_size_class not in ContextNewVehicleMarket.context_size_classes:
+                        ContextNewVehicleMarket.context_size_classes[veh.context_size_class] = []
+
                     if verbose:
                         print(veh)
 
-                # update context size class share
+                # update market group share
                 for v in vehicles_list:
-                    v.context_size_class_share_frac = v.initial_registered_count / context_size_class_dict[
-                        v.context_size_class]
+                    v.market_share = v.initial_registered_count / vehicle_shares_dict['total']
+                    bizarro_v = v.clone_vehicle(v)
+                    if v.fueling_class == 'ICE':
+                        bizarro_v.fueling_class = 'BEV'
+                        bizarro_v.name = 'BEV of ' + v.name
+                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
+                        bizarro_v.in_use_fuel_ID = "{'US electricity':1.0}"
+                        bizarro_v.cert_fuel_ID = "{'MTE US electricity':1.0}"
+                        bizarro_v.market_class_ID = v.market_class_ID.replace('ICE', 'BEV')
+                        bizarro_v.cert_direct_co2_grams_per_mile = 0
+                        bizarro_v.cert_direct_kwh_per_mile = 0
+                    else:
+                        bizarro_v.fueling_class = 'ICE'
+                        bizarro_v.name = 'ICE of ' + v.name
+                        bizarro_v.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
+                        bizarro_v.in_use_fuel_ID = "{'pump gasoline':1.0}"
+                        bizarro_v.cert_fuel_ID = "{'MTE Gasoline':1.0}"
+                        bizarro_v.market_class_ID = v.market_class_ID.replace('BEV', 'ICE')
+                        bizarro_v.cert_direct_co2_grams_per_mile = 0
+                        bizarro_v.cert_direct_kwh_per_mile = 0
 
                 for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
                     ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
                         ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
-                        context_size_class_dict[hsc]
+                        vehicle_shares_dict[hsc]
 
         return template_errors
 
@@ -719,7 +741,7 @@ if __name__ == '__main__':
 
             weighted_mfr_cost_dollars = weighted_value(vehicles_list, 'initial_registered_count',
                                                        'new_vehicle_mfr_cost_dollars')
-            weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_CO2_grams_per_mile')
+            weighted_co2gpmi = weighted_value(vehicles_list, 'initial_registered_count', 'cert_co2_grams_per_mile')
             weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
 
             print(vehicles_list[0].retail_fuel_price_dollars_per_unit())

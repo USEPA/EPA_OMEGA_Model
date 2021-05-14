@@ -10,40 +10,40 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 
-def upstream_zero(vehicle, co2_grams_per_mile, kWh_per_mile):
+def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
     return 0
 
 
-def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kWh_per_mile):
+def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
     from policy_fuel_upstream import PolicyFuelUpstream
     from GHG_standards_fuels import GHGStandardFuels
     import numpy as np
 
     if vehicle.fueling_class == 'BEV':
-        upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
+        upstream_gco2_per_kwh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
         upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
         upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-        fuel_gco2_per_gal = GHGStandardFuels.get_fuel_attributes('MTE gasoline', 'cert_CO2_grams_per_unit')
+        fuel_gco2_per_gal = GHGStandardFuels.get_fuel_attributes('MTE gasoline', 'cert_co2_grams_per_unit')
 
-        upstream = np.maximum(0, kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) -
-                              vehicle.cert_target_CO2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
+        upstream = np.maximum(0, kwh_per_mile * upstream_gco2_per_kwh / (1 - upstream_inefficiency) -
+                              vehicle.cert_target_co2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
     else:
         upstream = 0
 
     return upstream
 
 
-def upstream_actual(vehicle, co2_grams_per_mile, kWh_per_mile):
+def upstream_actual(vehicle, co2_grams_per_mile, kwh_per_mile):
     from policy_fuel_upstream import PolicyFuelUpstream
     from GHG_standards_fuels import GHGStandardFuels
 
-    upstream_gco2_per_kWh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
+    upstream_gco2_per_kwh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
     upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
     upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-    fuel_gco2_per_gal = GHGStandardFuels.get_fuel_attributes('MTE gasoline', 'cert_CO2_grams_per_unit')
+    fuel_gco2_per_gal = GHGStandardFuels.get_fuel_attributes('MTE gasoline', 'cert_co2_grams_per_unit')
 
     # TODO: need "utility factor" or percentage of electric and gas miles to weight these terms
-    upstream = kWh_per_mile * upstream_gco2_per_kWh / (1 - upstream_inefficiency) + \
+    upstream = kwh_per_mile * upstream_gco2_per_kwh / (1 - upstream_inefficiency) + \
                           co2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
 
     return upstream

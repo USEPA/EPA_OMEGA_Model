@@ -120,14 +120,18 @@ class MarketClass(SQABase, OMEGABase):
 
         if vehicle.hauling_class == 'hauling' and vehicle.electrification_class == 'EV':
             market_class_ID = 'hauling.BEV'
+            non_responsive_market_group = 'hauling'
         elif vehicle.hauling_class == 'hauling' and vehicle.electrification_class != 'EV':
             market_class_ID = 'hauling.ICE'
+            non_responsive_market_group = 'hauling'
         elif vehicle.electrification_class == 'EV':
             market_class_ID = 'non_hauling.BEV'
+            non_responsive_market_group = 'non_hauling'
         else:
             market_class_ID = 'non_hauling.ICE'
+            non_responsive_market_group = 'non_hauling'
 
-        return market_class_ID
+        return market_class_ID, non_responsive_market_group
 
     @staticmethod
     def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
