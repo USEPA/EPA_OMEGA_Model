@@ -13261,10 +13261,10 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,1500 CREW CAB,Big Horn Fleet 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),77.5 in.,237.9 in.,149.5 in.,164,334
 2016,RAM,1500 QUAD CAB,Big Horn Fleet 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),77.7 in.,229.0 in.,140.5 in.,162,334
 2016,RAM,1500 QUAD CAB,Big Horn Fleet 4dr Quad Cab SB (3.6L 6cyl 8A),77.8 in.,229.0 in.,140.5 in.,162,334
-2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
-2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
-2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
-2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
+2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
+2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
+2019,Ram,1500,Big Horn/Lone Star 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2019,Ram,1500,Big Horn/Lone Star 4dr Quad Cab 4WD SB (3.6L 6cyl gas/electric hybrid 8A),77.7 in.,228.9 in.,140.5 in.,162,334
 2019,Ram,1500,Big Horn/Lone Star 4dr Quad Cab SB (3.6L 6cyl gas/electric hybrid 8A),77.6 in.,228.9 in.,140.5 in.,162,334
 2016,RAM,1500 REGULAR CAB,Express 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),75.2 in.,209.0 in.,120.5 in.,160,334
@@ -13288,20 +13288,20 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,1500 QUAD CAB,Express HFE 4dr Quad Cab SB (3.0L 6cyl Turbodiesel 8A),77.2 in.,229.0 in.,140.5 in.,162,334
 2016,RAM,1500 DIESEL,Express HFE 4dr Quad Cab SB (3.0L 6cyl Turbodiesel 8A),77.2 in.,229.0 in.,140.5 in.,162,334
 2016,RAM,1500 REGULAR CAB,HFE 2dr Regular Cab SB (3.6L 6cyl 8A),74.6 in.,209.0 in.,120.5 in.,160,334
-2019,Ram,1500-CLASSIC,Laramie 4dr Crew Cab 4WD 5.6 ft SB (3.0L 6cyl Turbodiesel 8A),77.5 in.,229.0 in.,140.5 in.,160,334
+2019,Ram,1500-CLASSIC,Laramie 4dr Crew Cab 4WD 5.6 ft SB (3.0L 6cyl Turbodiesel 8A),77.5 in.,229.0 in.,140.5 in.,163,334
 2016,RAM,1500 CREW CAB,Laramie 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),78.5 in.,229.0 in.,140.7 in.,163,334
 2017,Ram,1500 Crew-Cab,Laramie 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
-2019,Ram,1500,Laramie 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Laramie 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2019,Ram,1500-CLASSIC,Laramie 4dr Crew Cab 4WD 6.3 ft SB (3.0L 6cyl Turbodiesel 8A),77.4 in.,237.9 in.,149.5 in.,164,334
-2019,Ram,1500,Laramie 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Laramie 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Laramie 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),78.4 in.,237.9 in.,149.6 in.,164,334
 2017,Ram,1500 Crew-Cab,Laramie 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
 2019,Ram,1500-CLASSIC,Laramie 4dr Crew Cab 5.6 ft SB (3.0L 6cyl Turbodiesel 8A),77.0 in.,229.0 in.,140.5 in.,163,334
 2016,RAM,1500 CREW CAB,Laramie 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),77.6 in.,229.0 in.,140.5 in.,163,334
 2017,Ram,1500 Crew-Cab,Laramie 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
-2019,Ram,1500,Laramie 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Laramie 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2019,Ram,1500-CLASSIC,Laramie 4dr Crew Cab 6.3 ft SB (3.0L 6cyl Turbodiesel 8A),76.8 in.,237.9 in.,149.5 in.,164,334
-2019,Ram,1500,Laramie 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Laramie 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Laramie 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),77.5 in.,237.9 in.,149.5 in.,164,334
 2017,Ram,1500 Crew-Cab,Laramie 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
 2016,RAM,1500 QUAD CAB,Laramie 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),78.8 in.,229.0 in.,140.5 in.,162,334
@@ -13310,18 +13310,18 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,1500 QUAD CAB,Laramie 4dr Quad Cab SB (3.6L 6cyl 8A),77.8 in.,229.0 in.,140.5 in.,162,334
 2017,Ram,1500 Quad-Cab,Laramie 4dr Quad Cab SB (3.6L 6cyl 8A),,,,162,334
 2019,Ram,1500,Laramie 4dr Quad Cab SB (3.6L 6cyl gas/electric hybrid 8A),,228.9 in.,140.5 in.,162,334
-2019,Ram,1500,Limited 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Limited 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2016,RAM,1500 CREW CAB,Limited 4dr Crew Cab 4WD 5.6 ft SB (5.7L 8cyl 8A),78.5 in.,229.0 in.,140.7 in.,163,334
 2017,Ram,1500 Crew-Cab,Limited 4dr Crew Cab 4WD 5.6 ft SB (5.7L 8cyl 8A),,,,163,334
-2019,Ram,1500,Limited 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Limited 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Limited 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),78.4 in.,237.9 in.,149.6 in.,164,334
 2017,Ram,1500 Crew-Cab,Limited 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
-2019,Ram,1500,Limited 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Limited 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2016,RAM,1500 CREW CAB,Limited 4dr Crew Cab 5.6 ft SB (5.7L 8cyl 8A),77.5 in.,229.0 in.,149.5 in.,164,334
 2017,Ram,1500 Crew-Cab,Limited 4dr Crew Cab 5.6 ft SB (5.7L 8cyl 8A),,,,163,334
 2016,RAM,1500 CREW CAB,Limited 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),77.5 in.,237.9 in.,149.5 in.,164,334
 2017,Ram,1500 Crew-Cab,Limited 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
-2019,Ram,1500,Limited 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,241.8 in.,153.5 in.,160,334
+2019,Ram,1500,Limited 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 REGULAR CAB,Lone Star 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),75.0 in.,231.0 in.,140.5 in.,160,334
 2017,Ram,1500 Regular-Cab,Lone Star 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),,,,161,334
 2016,RAM,PROMASTER CARGO VAN,1500 High Roof 3dr Van (3.6L 6cyl 6A),101.0 in.,213.1 in.,136.0 in.,-9,335
@@ -16096,7 +16096,7 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2019,Ram,1500-CLASSIC,Lone Star 4dr Quad Cab 4WD SB (5.7L 8cyl 8A),77.7 in.,229.0 in.,140.5 in.,162,334
 2016,RAM,1500 QUAD CAB,Lone Star 4dr Quad Cab SB (3.6L 6cyl 8A),77.8 in.,229.0 in.,140.5 in.,162,334
 2017,Ram,1500 Quad-Cab,Lone Star 4dr Quad Cab SB (3.6L 6cyl 8A),,,,162,334
-2019,Ram,1500-CLASSIC,Lone Star 4dr Quad Cab SB (5.7L 8cyl 8A),77.2 in.,229.0 in.,140.5 in.,163,334
+2019,Ram,1500-CLASSIC,Lone Star 4dr Quad Cab SB (5.7L 8cyl 8A),77.2 in.,229.0 in.,140.5 in.,162,334
 2016,RAM,1500 REGULAR CAB,Lone Star Fleet 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),75.0 in.,231.0 in.,140.5 in.,163,334
 2016,RAM,1500 REGULAR CAB,Lone Star Fleet 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),75.2 in.,209.0 in.,120.5 in.,160,334
 2016,RAM,1500 REGULAR CAB,Lone Star Fleet 2dr Regular Cab LB (3.6L 6cyl 8A),74.4 in.,231.0 in.,140.5 in.,163,334
@@ -16113,16 +16113,16 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Ram,1500 Crew-Cab,Lone Star Silver 4dr Crew Cab 6.3 ft SB (3.0L 6cyl Turbodiesel 8A),,,,164,334
 2017,Ram,1500 Diesel,Lone Star Silver 4dr Crew Cab 6.3 ft SB (3.0L 6cyl Turbodiesel 8A),,,,164,334
 2017,Ram,1500 Crew-Cab,Lone Star Silver 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
-2019,Ram,1500,Longhorn 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Longhorn 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2016,RAM,1500 CREW CAB,Longhorn 4dr Crew Cab 4WD 5.6 ft SB (5.7L 8cyl 8A),78.5 in.,229.0 in.,140.7 in.,163,334
 2017,Ram,1500 Crew-Cab,Longhorn 4dr Crew Cab 4WD 5.6 ft SB (5.7L 8cyl 8A),,,,163,334
-2019,Ram,1500,Longhorn 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Longhorn 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Longhorn 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),78.4 in.,237.9 in.,149.6 in.,164,334
 2017,Ram,1500 Crew-Cab,Longhorn 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
-2019,Ram,1500,Longhorn 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Longhorn 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2016,RAM,1500 CREW CAB,Longhorn 4dr Crew Cab 5.6 ft SB (5.7L 8cyl 8A),77.6 in.,229.0 in.,140.5 in.,163,334
 2017,Ram,1500 Crew-Cab,Longhorn 4dr Crew Cab 5.6 ft SB (5.7L 8cyl 8A),,,,163,334
-2019,Ram,1500,Longhorn 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Longhorn 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Longhorn 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),77.5 in.,237.9 in.,149.5 in.,164,334
 2017,Ram,1500 Crew-Cab,Longhorn 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
 2017,Ram,1500 Regular-Cab,Night 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),,,,160,334
@@ -16139,11 +16139,11 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,1500 QUAD CAB,Outdoorsman 4dr Quad Cab SB (3.6L 6cyl 8A),FALSE,229.0 in.,140.5 in.,162,334
 2016,RAM,1500 CREW CAB,Rebel 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),78.5 in.,229.0 in.,140.7 in.,163,334
 2017,Ram,1500 Crew-Cab,Rebel 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
-2019,Ram,1500,Rebel 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
-2019,Ram,1500,Rebel 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
+2019,Ram,1500,Rebel 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
+2019,Ram,1500,Rebel 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
 2016,RAM,1500 CREW CAB,Rebel 4dr Crew Cab 5.6 ft SB (5.7L 8cyl 8A),FALSE,FALSE,149.5 in.,164,334
 2017,Ram,1500 Crew-Cab,Rebel 4dr Crew Cab 5.6 ft SB (5.7L 8cyl 8A),,,,163,334
-2019,Ram,1500,Rebel 4dr Quad Cab 4WD SB (3.6L 6cyl gas/electric hybrid 8A),77.7 in.,228.9 in.,140.5 in.,163,334
+2019,Ram,1500,Rebel 4dr Quad Cab 4WD SB (3.6L 6cyl gas/electric hybrid 8A),77.7 in.,228.9 in.,140.5 in.,162,334
 2016,RAM,1500 REGULAR CAB,SLT 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),75.0 in.,231.0 in.,140.5 in.,161,334
 2017,Ram,1500 Regular-Cab,SLT 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),,,,161,334
 2016,RAM,1500 REGULAR CAB,SLT 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),75.2 in.,209.0 in.,120.5 in.,160,334
@@ -18971,16 +18971,16 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2017,Ram,1500 Quad-Cab,SLT 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),,,,162,334
 2016,RAM,1500 QUAD CAB,SLT 4dr Quad Cab SB (3.6L 6cyl 8A),77.8 in.,229.0 in.,140.5 in.,162,334
 2017,Ram,1500 Quad-Cab,SLT 4dr Quad Cab SB (3.6L 6cyl 8A),,,,162,334
-2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),,,,160,334
-2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),,,,160,334
-2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab LB (3.6L 6cyl 8A),,,,160,334
-2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab SB (3.6L 6cyl 8A),,,,160,334
-2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
-2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
-2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
-2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
-2019,Ram,1500-CLASSIC,SLT Fleet 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),,,,160,334
-2019,Ram,1500-CLASSIC,SLT Fleet 4dr Quad Cab SB (3.6L 6cyl 8A),,,,160,334
+2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab 4WD LB (3.6L 6cyl 8A),74.4 in.,231.0 in.,140.5 in.,161,334
+2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),75.2 in.,209.0 in.,120.5 in.,160,334
+2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab LB (3.6L 6cyl 8A),74.4 in.,231.0 in.,140.5 in.,161,334
+2019,Ram,1500-CLASSIC,SLT Fleet 2dr Regular Cab SB (3.6L 6cyl 8A),75.2 in.,209.0 in.,120.5 in.,160,334
+2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),77.0 in.,229.0 in.,140.5 in.,163,334
+2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),77.4 in.,237.9 in.,149.5 in.,164,334
+2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),77.0 in.,229.0 in.,140.5 in.,163,334
+2019,Ram,1500-CLASSIC,SLT Fleet 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),77.4 in.,237.9 in.,149.5 in.,164,334
+2019,Ram,1500-CLASSIC,SLT Fleet 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),77.7 in.,229.0 in.,140.5 in.,162,334
+2019,Ram,1500-CLASSIC,SLT Fleet 4dr Quad Cab SB (3.6L 6cyl 8A),77.7 in.,229.0 in.,140.5 in.,162,334
 2017,Ram,1500 Regular-Cab,Sport 2dr Regular Cab 4WD SB (3.6L 6cyl 8A),,,,160,334
 2016,RAM,1500 REGULAR CAB,Sport 2dr Regular Cab 4WD SB (5.7L 8cyl 8A),75.2 in.,209.0 in.,120.5 in.,160,334
 2016,RAM,1500 REGULAR CAB,Sport 2dr Regular Cab SB (5.7L 8cyl 8A),74.6 in.,209.0 in.,120.5 in.,160,334
@@ -19012,23 +19012,23 @@ ModelYear,Make,Model,Trims,HEIGHT,LENGTH,WHEELBASE,BodyID,LineageID
 2016,RAM,1500 CREW CAB,Tradesman 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),77.5 in.,229.0 in.,140.5 in.,163,334
 2017,Ram,1500 Crew-Cab,Tradesman 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
 2019,Ram,1500-CLASSIC,Tradesman 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl 8A),77.5 in.,229.0 in.,140.5 in.,163,334
-2019,Ram,1500,Tradesman 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
-2019,Ram,1500,Tradesman 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Tradesman 4dr Crew Cab 4WD 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
+2019,Ram,1500,Tradesman 4dr Crew Cab 4WD 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Tradesman 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 6A),77.4 in.,237.9 in.,149.4 in.,164,334
 2017,Ram,1500 Crew-Cab,Tradesman 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
 2019,Ram,1500-CLASSIC,Tradesman 4dr Crew Cab 4WD 6.3 ft SB (5.7L 8cyl 8A),77.4 in.,237.9 in.,149.5 in.,164,334
 2016,RAM,1500 CREW CAB,Tradesman 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),77.0 in.,229.0 in.,140.5 in.,163,334
 2017,Ram,1500 Crew-Cab,Tradesman 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),,,,163,334
 2019,Ram,1500-CLASSIC,Tradesman 4dr Crew Cab 5.6 ft SB (3.6L 6cyl 8A),77.0 in.,229.0 in.,140.5 in.,163,334
-2019,Ram,1500,Tradesman 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,163,334
-2019,Ram,1500,Tradesman 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,164,334
+2019,Ram,1500,Tradesman 4dr Crew Cab 5.6 ft SB (3.6L 6cyl gas/electric hybrid 8A),,232.9 in.,144.6 in.,1716,334
+2019,Ram,1500,Tradesman 4dr Crew Cab 6.3 ft SB (3.6L 6cyl gas/electric hybrid 8A),,241.8 in.,153.5 in.,1717,334
 2016,RAM,1500 CREW CAB,Tradesman 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 6A),76.8 in.,237.9 in.,149.5 in.,164,334
 2017,Ram,1500 Crew-Cab,Tradesman 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),,,,164,334
 2019,Ram,1500-CLASSIC,Tradesman 4dr Crew Cab 6.3 ft SB (5.7L 8cyl 8A),76.8 in.,237.9 in.,149.5 in.,164,334
 2016,RAM,1500 QUAD CAB,Tradesman 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),77.7 in.,229.0 in.,140.5 in.,162,334
 2017,Ram,1500 Quad-Cab,Tradesman 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),,,,162,334
-2019,Ram,1500-CLASSIC,Tradesman 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),77.7 in.,229.0 in.,140.5 in.,160,334
-2019,Ram,1500,Tradesman 4dr Quad Cab 4WD SB (3.6L 6cyl gas/electric hybrid 8A),,228.9 in.,140.5 in.,160,334
+2019,Ram,1500-CLASSIC,Tradesman 4dr Quad Cab 4WD SB (3.6L 6cyl 8A),77.7 in.,229.0 in.,140.5 in.,162,334
+2019,Ram,1500,Tradesman 4dr Quad Cab 4WD SB (3.6L 6cyl gas/electric hybrid 8A),,228.9 in.,140.5 in.,162,334
 2016,RAM,1500 QUAD CAB,Tradesman 4dr Quad Cab SB (3.6L 6cyl 8A),77.2 in.,229.0 in.,140.5 in.,162,334
 2017,Ram,1500 Quad-Cab,Tradesman 4dr Quad Cab SB (3.6L 6cyl 8A),,,,162,334
 2019,Ram,1500-CLASSIC,Tradesman 4dr Quad Cab SB (3.6L 6cyl 8A),77.2 in.,229.0 in.,140.5 in.,162,334

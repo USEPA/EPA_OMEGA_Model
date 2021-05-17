@@ -10,7 +10,7 @@ from usepa_omega2_preproc.context_aeo import SetInputs as context_aeo_inputs
 
 weight_cost_cache = dict()
 
-
+# TODO add stop-start field to cost cloud file with value of 0 or 1
 def cost_vs_plot(settings, df, path, *years):
     ice_classes = [x for x in df['cost_curve_class'].unique() if 'ice' in x]
     bev_classes = [x for x in df['cost_curve_class'].unique() if 'bev' in x]
@@ -26,17 +26,17 @@ def cost_vs_plot(settings, df, path, *years):
         hev_plot = list()
         hev_legends = list()
         for cost_curve_class in ice_classes:
-            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_co2_grams_per_mile'],
+            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_direct_oncycle_co2_grams_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             ice_plot.append(ice_data[cost_curve_class])
             ice_legends.append(cost_curve_class)
         for cost_curve_class in bev_classes:
-            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_kwh_per_mile'],
+            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_direct_oncycle_kwh_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             bev_plot.append(bev_data[cost_curve_class])
             bev_legends.append(cost_curve_class)
         for cost_curve_class in hev_classes:
-            hev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_co2_grams_per_mile'],
+            hev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_direct_oncycle_co2_grams_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             hev_plot.append(hev_data[cost_curve_class])
             hev_legends.append(cost_curve_class)
@@ -154,7 +154,7 @@ def reshape_df_for_cloud_file(settings, df_source, *id_args):
     id_variables = [id_arg for id_arg in id_args]
     if settings.run_bev or settings.run_phev:
         for arg in df_source.columns:
-            if arg.__contains__('kWh_per_mile'):
+            if arg.__contains__('kwh_per_mile'):
                 id_variables.append(arg)
     if settings.run_ice or settings.run_hev or settings.run_phev:
         for arg in df_source.columns:
@@ -354,11 +354,11 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cert_direct_co2_grams_per_mile', combined_co2)
-    package_cost_df.insert(0, 'hwfet:cert_direct_co2_grams_per_mile', hwy_co2)
-    package_cost_df.insert(0, 'ftp_3:cert_direct_co2_grams_per_mile', ftp3_co2)
-    package_cost_df.insert(0, 'ftp_2:cert_direct_co2_grams_per_mile', ftp2_co2)
-    package_cost_df.insert(0, 'ftp_1:cert_direct_co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'cert_direct_oncycle_co2_grams_per_mile', combined_co2)
+    package_cost_df.insert(0, 'hwfet:cert_direct_oncycle_co2_grams_per_mile', hwy_co2)
+    package_cost_df.insert(0, 'ftp_3:cert_direct_oncycle_co2_grams_per_mile', ftp3_co2)
+    package_cost_df.insert(0, 'ftp_2:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2)
+    package_cost_df.insert(0, 'ftp_1:cert_direct_oncycle_co2_grams_per_mile', ftp1_co2)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
@@ -391,11 +391,11 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cert_direct_kwh_per_mile', combined_kwh)
-    package_cost_df.insert(0, 'hwfet:cert_direct_kwh_per_mile', hwy_kwh)
-    package_cost_df.insert(0, 'ftp_3:cert_direct_kwh_per_mile', ftp3_kwh)
-    package_cost_df.insert(0, 'ftp_2:cert_direct_kwh_per_mile', ftp2_kwh)
-    package_cost_df.insert(0, 'ftp_1:cert_direct_kwh_per_mile', ftp1_kwh)
+    package_cost_df.insert(0, 'cert_direct_oncycle_kwh_per_mile', combined_kwh)
+    package_cost_df.insert(0, 'hwfet:cert_direct_oncycle_kwh_per_mile', hwy_kwh)
+    package_cost_df.insert(0, 'ftp_3:cert_direct_oncycle_kwh_per_mile', ftp3_kwh)
+    package_cost_df.insert(0, 'ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
+    package_cost_df.insert(0, 'ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
@@ -547,10 +547,10 @@ class PackageCost:
             soc, gap, battery_kwh_gross, motor_power = self.hev_key
             curves_dict = settings.hev_curves_dict
             markup = settings.hev_metrics_dict['powertrain_markup_hev']['value']
-        battery_cost = battery_kwh_gross * (curves_dict['x_cubed_factor']['dollars_per_kwh_curve'] * battery_kwh_gross ** 3 \
-                                            + curves_dict['x_squared_factor']['dollars_per_kwh_curve'] * battery_kwh_gross ** 2 \
-                                            + curves_dict['x_factor']['dollars_per_kwh_curve'] * battery_kwh_gross \
-                                            + curves_dict['constant']['dollars_per_kwh_curve'])
+        battery_cost = battery_kwh_gross * (curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
+                                            + curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
+                                            + curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
+                                            + curves_dict['constant']['dollars_per_kWh_curve'])
         motor_cost = motor_power * (curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
                                     + curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
                                     + curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
@@ -647,8 +647,8 @@ class SetInputs:
     aero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'aero', 'item_cost', 'dmc').to_dict('index')
     nonaero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'nonaero', 'item_cost', 'dmc').to_dict('index')
     ac_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'ac', 'item_cost', 'dmc').to_dict('index')
-    bev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'dollars_per_kwh_curve', 'dollars_per_kW_curve').to_dict('index')
-    hev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'dollars_per_kwh_curve', 'dollars_per_kW_curve').to_dict('index')
+    bev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'dollars_per_kWh_curve', 'dollars_per_kW_curve').to_dict('index')
+    hev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'dollars_per_kWh_curve', 'dollars_per_kW_curve').to_dict('index')
     # phev_curves_dict = 0
     pev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
     hev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')

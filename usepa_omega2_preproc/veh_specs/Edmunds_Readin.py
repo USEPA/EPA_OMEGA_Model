@@ -86,7 +86,15 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     matching_drvtrn_layout[matching_drvtrn_layout.str.contains('Four')] = '4WD'
     matching_drvtrn_layout[matching_drvtrn_layout.str.contains('All')] = '4WD'
     matching_drvtrn_layout[matching_drvtrn_layout.str.contains('Rear')] = '2WD'
-    matching_trns_numgears = pd.Series(Edmunds_data_cleaned['TRANSMISSION'].str[0], name='Number of Transmission Gears Category').replace(['C', 'E', 'n'], 1).astype(int)
+
+    trns_numgears_list = []
+    for i in range (len(Edmunds_data_cleaned['TRANSMISSION'])):
+        tmp_trns_numgears = str(Edmunds_data_cleaned.loc[i, 'TRANSMISSION']).split('-')[0]
+        if tmp_trns_numgears[0] in ['C', 'E', 'n']: tmp_trns_numgears = 1
+        trns_numgears_list.append(tmp_trns_numgears)
+
+    matching_trns_numgears = pd.Series(trns_numgears_list, name='Number of Transmission Gears Category').astype(int)
+    # matching_trns_numgears = pd.Series(Edmunds_data_cleaned['TRANSMISSION'].str[0], name='Number of Transmission Gears Category').replace(['C', 'Co', 'E', 'n'], 1).astype(int)
     # matching_trns_numgears = pd.to_numeric(matching_trns_numgears, errors='coerce').astype(int)
 
     # matching_trns_numgears = pd.Series(Edmunds_data_cleaned['TRANSMISSION'].str[0], name='Number of Transmission Gears Category').replace('C',1).replace('E',1).astype(int)
@@ -160,7 +168,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
                                            matching_eng_disp, matching_drvtrn_layout, matching_trns_category, \
                                            matching_trns_numgears, matching_boost_category, matching_mfr_category, \
                                            matching_fuel_category, electrification_category, tire_codes],axis=1)
-    Edmunds_Final_Output.rename(columns={'WHEEL BASE':'WHEELBASE'})
+    Edmunds_Final_Output.rename(columns={'WHEEL BASE':'WHEEL_BASE_INCHES'})
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     print('output_path: ', output_path)
     Edmunds_Final_Output.to_csv(output_path+'\\'+'Edmunds Readin'+'_ '+'MY'+str(year)+' '+date_and_time+'.csv', index=False)

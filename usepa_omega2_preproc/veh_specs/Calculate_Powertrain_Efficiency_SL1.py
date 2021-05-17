@@ -79,10 +79,12 @@ def Tractive_Energy_Calculation(A,B,C,ETW,Enghp, FTP_dist_mi, FTP_time, FTP_dt, 
             FTP_forceavg_speed_mph, HWFET_forceavg_speed_mph,comb_forceavg_speed_mph,FTP_energyavg_speed_mph,\
             HWFET_energyavg_speed_mph,comb_energyavg_speed_mph)
 
-def Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, combmpg_col, run_input_path, \
+def Calculate_Powertrain_Efficiency_SL(ID_col, A_col, B_col, C_col, ETW_col, combmpg_col, run_input_path, \
                                     ftp_drivecycle_filename, hwfet_drivecycle_filename, engdisp_col, ratedhp_col, \
                                     fuelhv_col):
     import Drive_Cycle_Differentiation_and_Integration
+    from Unit_Conversion import lbf2n, gravity_mps2, mph2mps, mi2km, mph22mps2, hps2kwhr, mj2kwhr, km2mi
+
     from Unit_Conversion import mph2mps,mph22mps2
     (FTP_array, HWFET_array) = Drive_Cycle_Differentiation_and_Integration.\
         Drive_Cycle_Differentiation_and_Integration(run_input_path, ftp_drivecycle_filename, hwfet_drivecycle_filename)
@@ -117,9 +119,18 @@ def Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, combmp
     
     FTP_troadwork_mjpkm_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'FTP Tractive Road Energy Intensity (MJ/km)')
     HWFET_troadwork_mjpkm_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'HWFET Tractive Road Energy Intensity (MJ/km)')
-    Comb_LF_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'Combined Load Factor (%)')
+    Combined_tractive_mjpkm_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'Combined Tractive Road Energy Intensity (MJ/km)')
+
+    FTP_troadwork_whpmi_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'FTP Tractive Road Energy Intensity (Wh/mi)')
+    HWFET_troadwork_whpmi_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'HWFET Tractive Road Energy Intensity (Wh/mi)')
+    Combined_tractive_whpmi_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'Combined Tractive Road Energy Intensity (Wh/mi)')
+
     FTP_tractive_kWhr_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'FTP Tractive Energy (kWhr)')
     HWFET_tractive_kWhr_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'HWFET Tractive Energy (kWhr)')
+    Combined_tractive_kWhr_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'Combined Tractive Energy (kWhr)')
+
+    Comb_LF_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'Combined Load Factor (%)')
+
     FTP_forceavg_velocity_mph_col = pd.Series(np.zeros(len(unique_tractive_array)), name = 'FTP ForceAvg Velocity (mph)')
     HWFET_forceavg_velocity_mph_col = pd.Series(np.zeros(len(unique_tractive_array)), name='HWFET ForceAvg Velocity (mph)')
     comb_forceavg_velocity_mph_col = pd.Series(np.zeros(len(unique_tractive_array)), name='Combined ForceAvg Velocity (mph)')
@@ -158,41 +169,69 @@ def Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, combmp
 
         FTP_troadwork_mjpkm_col[data_count] = FTP_troadwork_mjpkm
         HWFET_troadwork_mjpkm_col[data_count] = HWFET_troadwork_mjpkm
+        FTP_troadwork_whpmi_col[data_count] = FTP_troadwork_mjpkm * (mj2kwhr/km2mi*1000)    # mj/km -> kwh/mi: mj2kwhr/km2mi
+        HWFET_troadwork_whpmi_col[data_count] = HWFET_troadwork_mjpkm * (mj2kwhr/km2mi*1000)
+        engdisp_col = engdisp_col.replace([0, ''], np.nan)
+        Combined_tractive_mjpkm_col[data_count]  = pd.Series(0.55 * FTP_troadwork_mjpkm + 0.45 * HWFET_troadwork_mjpkm)
+        Combined_tractive_whpmi_col[data_count]  = pd.Series(0.55 * FTP_troadwork_whpmi_col[data_count] + 0.45 * HWFET_troadwork_whpmi_col[data_count])
+
         Comb_LF_col[data_count] = Comb_LF
         FTP_tractive_kWhr_col[data_count] = FTP_tractive_kWhr
         HWFET_tractive_kWhr_col[data_count] = HWFET_tractive_kWhr
+        Combined_tractive_kWhr_col[data_count] = pd.Series(0.55 * FTP_tractive_kWhr + 0.45 * HWFET_tractive_kWhr)
+
         comb_energyavg_velocity_mph_col[data_count] = comb_energyavg_velocity_mph
         
-    tractive_table = pd.concat([A_col_new, B_col_new, C_col_new, ETW_col_new, ratedhp_col_new, FTP_troadwork_mjpkm_col, \
-                              HWFET_troadwork_mjpkm_col, FTP_tractive_kWhr_col, \
-                              HWFET_tractive_kWhr_col, Comb_LF_col, FTP_forceavg_velocity_mph_col, \
-                              HWFET_forceavg_velocity_mph_col, comb_forceavg_velocity_mph_col, \
-                              FTP_energyavg_velocity_mph_col, \
-                              HWFET_energyavg_velocity_mph_col, comb_energyavg_velocity_mph_col
-                              ],axis=1)
+    # tractive_table = pd.concat([A_col_new, B_col_new, C_col_new, ETW_col_new, ratedhp_col_new, FTP_troadwork_mjpkm_col, \
+    #                           HWFET_troadwork_mjpkm_col, FTP_troadwork_whpmi_col, HWFET_troadwork_whpmi_col, FTP_tractive_kWhr_col, \
+    #                           HWFET_tractive_kWhr_col, Comb_LF_col, FTP_forceavg_velocity_mph_col, \
+    #                           HWFET_forceavg_velocity_mph_col, comb_forceavg_velocity_mph_col, \
+    #                           FTP_energyavg_velocity_mph_col, \
+    #                           HWFET_energyavg_velocity_mph_col, comb_energyavg_velocity_mph_col],axis=1)
+    tractive_table = pd.concat([A_col_new, B_col_new, C_col_new, ETW_col_new, ratedhp_col_new, FTP_troadwork_whpmi_col, HWFET_troadwork_whpmi_col, Combined_tractive_whpmi_col, \
+                                FTP_tractive_kWhr_col, HWFET_tractive_kWhr_col, Combined_tractive_kWhr_col, Comb_LF_col],axis=1)
     output_table = pd.merge_ordered(input_array, tractive_table, how='left', \
         on = [A_col.name, B_col.name, C_col.name, ETW_col.name, ratedhp_col.name]).sort_values(ID_col.name).reset_index(drop=True)
-    engdisp_col = engdisp_col.replace([0,''],np.nan)
-    output_table['Combined Tractive Road Energy Intensity (MJ/km)'] \
-        = pd.Series(0.55*output_table['FTP Tractive Road Energy Intensity (MJ/km)'] + \
-                    0.45*output_table['HWFET Tractive Road Energy Intensity (MJ/km)'])
-    output_table['Displacement Specific Combined Tractive Road Energy Intensity (MJ/km/L)'] = \
-        pd.Series(np.zeros(len(output_table))).replace(0,'')
-    output_table['Displacement Specific Combined Tractive Road Energy Intensity (MJ/km/L)'][~pd.isnull(engdisp_col)] = \
-        pd.Series(output_table['Combined Tractive Road Energy Intensity (MJ/km)'][~pd.isnull(engdisp_col)] \
-        /engdisp_col[~pd.isnull(engdisp_col)])
-    output_table['Combined Tractive Energy (kWhr)'] \
-        = pd.Series(0.55*output_table['FTP Tractive Energy (kWhr)'] + \
-                    0.45*output_table['HWFET Tractive Energy (kWhr)'])
+    # engdisp_col = engdisp_col.replace([0,''],np.nan)
+    # output_table['Combined Tractive Road Energy Intensity (MJ/km)'] \
+    #     = pd.Series(0.55*output_table['FTP Tractive Road Energy Intensity (MJ/km)'] + \
+    #                 0.45*output_table['HWFET Tractive Road Energy Intensity (MJ/km)'])
+    # output_table['Combined Tractive Road Energy Intensity (Wh/mi)'] \
+    #     = pd.Series(0.55*output_table['FTP Tractive Road Energy Intensity (Wh/mi)'] + \
+    #                 0.45*output_table['HWFET Tractive Road Energy Intensity (Wh/mi)'])
+    # output_table['Displacement Specific Combined Tractive Road Energy Intensity (MJ/km/L)'] = \
+    #     pd.Series(np.zeros(len(output_table))).replace(0,'')
+    # output_table['Displacement Specific Combined Tractive Road Energy Intensity (MJ/km/L)'][~pd.isnull(engdisp_col)] = \
+    #     pd.Series(output_table['Combined Tractive Road Energy Intensity (MJ/km)'][~pd.isnull(engdisp_col)] \
+    #     /engdisp_col[~pd.isnull(engdisp_col)])
+    # output_table['Displacement Specific Combined Tractive Road Energy Intensity (Wh/mi/L)'] = \
+    #     pd.Series(np.zeros(len(output_table))).replace(0,'')
+    # output_table['Displacement Specific Combined Tractive Road Energy Intensity (Wh/mi/L)'][~pd.isnull(engdisp_col)] = \
+    #     pd.Series(output_table['Combined Tractive Road Energy Intensity (Wh/mi)'][~pd.isnull(engdisp_col)] \
+    #     /engdisp_col[~pd.isnull(engdisp_col)])
+
+    # output_table['Combined Tractive Energy (kWhr)'] \
+    #     = pd.Series(0.55*output_table['FTP Tractive Energy (kWhr)'] + \
+    #                 0.45*output_table['HWFET Tractive Energy (kWhr)'])
     output_table['Combined Fuel Energy Intensity (MJ/km)'] \
         = pd.Series((1/pd.to_numeric(combmpg_col))*fuelhv_col*km2mi*gal2l).replace([math.inf,''], np.nan)
-    output_table['Displacement Specific Combined Fuel Energy Intensity (MJ/km/L)'] = \
-        pd.Series(np.zeros(len(output_table))).replace(0,'')
-    output_table['Displacement Specific Combined Fuel Energy Intensity (MJ/km/L)'][~pd.isnull(engdisp_col)] = \
+    output_table['Combined Fuel Energy Intensity (Wh/mi)'] = output_table['Combined Fuel Energy Intensity (MJ/km)'] * (mj2kwhr/km2mi*1000)    # mj/km -> kwh/mi: mj2kwhr/km2mi
+
+    # output_table['Displacement Specific Combined Tractive Road Energy Intensity (MJ/km/L)'] = pd.Series(np.zeros(len(output_table))).replace(0,'')
+
+    output_table['Displacement Specific Combined Tractive Road Energy Intensity (MJ/km/L)'] = Combined_tractive_mjpkm_col /engdisp_col
+    # output_table['Displacement Specific Combined Tractive Road Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0,'')
+    output_table['Displacement Specific Combined Tractive Road Energy Intensity (Wh/mi/L)'] = Combined_tractive_whpmi_col/engdisp_col
+
+    output_table['Displacement Specific Combined Fuel Energy Intensity (MJ/km/L)'] = pd.Series(np.zeros(len(output_table))).replace(0,'')
+
+    output_table['Displacement Specific Combined Fuel Energy Intensity (MJ/km/L)']= \
         pd.Series(output_table['Combined Fuel Energy Intensity (MJ/km)'][(~pd.isnull(engdisp_col)) & (~pd.isnull(output_table['Combined Fuel Energy Intensity (MJ/km)']))] \
         /engdisp_col[(~pd.isnull(engdisp_col)) & (~pd.isnull(output_table['Combined Fuel Energy Intensity (MJ/km)']))])
-    output_table['Combined Powertrain Efficiency (%)'] = pd.Series(100 * output_table[ \
-        'Combined Tractive Road Energy Intensity (MJ/km)'] / output_table['Combined Fuel Energy Intensity (MJ/km)'])
-    output_table = output_table.drop([A_col.name, B_col.name, C_col.name, ETW_col.name, ratedhp_col.name, combmpg_col.name, \
-              fuelhv_col.name], axis=1).replace(0,np.nan)
+
+    output_table['Combined Fuel Energy Intensity (Wh/mi)'] = output_table['Combined Fuel Energy Intensity (MJ/km)'] * (mj2kwhr/km2mi*1000)    # mj/km -> kwh/mi: mj2kwhr/km2mi
+    output_table['Displacement Specific Combined Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0,'')
+    output_table['Displacement Specific Combined Fuel Energy Intensity (Wh/mi/L)'] = output_table['Displacement Specific Combined Fuel Energy Intensity (MJ/km/L)']* (mj2kwhr/km2mi*1000)    # mj/km -> kwh/mi: mj2kwhr/km2mi
+    output_table['Combined Powertrain Efficiency (%)'] = 100*Combined_tractive_mjpkm_col / output_table['Combined Fuel Energy Intensity (MJ/km)']
+    output_table = output_table.drop([A_col.name, B_col.name, C_col.name, ETW_col.name, ratedhp_col.name, combmpg_col.name, fuelhv_col.name], axis=1).replace(0,np.nan)
     return output_table
