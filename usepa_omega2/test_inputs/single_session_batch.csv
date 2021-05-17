@@ -14,6 +14,7 @@ IO Settings,,
 Manufacturers File,String,manufacturers.csv
 Market Classes File,String,market_classes.csv
 Vehicles File,String,vehicles.csv
+Vehicle On-road Calculations File,String,vehicle_onroad_calculations.csv
 Demanded Shares File,String,demanded_shares-gcam.csv
 Fuels File,String,fuels.csv
 Policy Fuel Upstream File,String,policy_fuel_upstream.csv

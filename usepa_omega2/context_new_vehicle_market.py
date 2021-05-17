@@ -20,7 +20,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     case_ID = Column('case_id', String)
     context_size_class = Column('context_size_class', String)
     calendar_year = Column(Numeric)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    context_reg_class_ID = Column('context_reg_class_ID', Enum(*reg_classes, validate_strings=True))
     sales_share_of_regclass = Column(Numeric)
     sales_share_of_total = Column(Numeric)
     sales = Column(Numeric)
@@ -99,24 +99,36 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
         cls._new_vehicle_prices[calendar_year] = price
 
     @staticmethod
-    def new_vehicle_sales(calendar_year, context_size_class=None):
+    def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
-        cache_key = '%s_%s_%s_%s_new_vehicle_sales' % (o2.options.context_id, o2.options.context_case_id, calendar_year, context_size_class)
+        cache_key = '%s_%s_%s_%s_%s_new_vehicle_sales' % (o2.options.context_id, o2.options.context_case_id,
+                                                          calendar_year, context_size_class, context_reg_class)
 
         if cache_key not in cache:
-            if context_size_class:
-                cache[cache_key] = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
-                                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
-                                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
-                                         filter(ContextNewVehicleMarket.context_size_class == context_size_class).
-                                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+            if context_size_class and context_reg_class:
+                projection_sales = (o2.session.query(func.sum(ContextNewVehicleMarket.sales))
+                                    .filter(ContextNewVehicleMarket.context_ID == o2.options.context_id)
+                                    .filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id)
+                                    .filter(ContextNewVehicleMarket.context_size_class == context_size_class)
+                                    .filter(ContextNewVehicleMarket.context_reg_class_ID == context_reg_class)
+                                    .filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+                if projection_sales is None:
+                    cache[cache_key] = 0
+                else:
+                    cache[cache_key] = float(projection_sales)
+            elif context_size_class:
+                cache[cache_key] = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales))
+                                         .filter(ContextNewVehicleMarket.context_ID == o2.options.context_id)
+                                         .filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id)
+                                         .filter(ContextNewVehicleMarket.context_size_class == context_size_class)
+                                         .filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
             else:
-                cache[cache_key] = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales)).
-                                         filter(ContextNewVehicleMarket.context_ID == o2.options.context_id).
-                                         filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id).
-                                         filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
+                cache[cache_key] = float(o2.session.query(func.sum(ContextNewVehicleMarket.sales))
+                                         .filter(ContextNewVehicleMarket.context_ID == o2.options.context_id)
+                                         .filter(ContextNewVehicleMarket.case_ID == o2.options.context_case_id)
+                                         .filter(ContextNewVehicleMarket.calendar_year == calendar_year).scalar())
 
         return cache[cache_key]
 
@@ -155,7 +167,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
                         case_ID=df.loc[i, 'case_id'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         calendar_year=df.loc[i, 'calendar_year'],
-                        reg_class_ID=df.loc[i, 'reg_class_id'],
+                        context_reg_class_ID=df.loc[i, 'reg_class_id'],
                         sales_share_of_regclass=df.loc[i, 'sales_share_of_regclass'],
                         sales_share_of_total=df.loc[i, 'sales_share_of_total'],
                         sales=df.loc[i, 'sales'],

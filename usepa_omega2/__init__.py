@@ -45,6 +45,7 @@ try:
     fueling_classes = OMEGAEnum(['BEV', 'ICE'])
     hauling_classes = OMEGAEnum(['hauling', 'non_hauling'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
+    legacy_reg_classes = OMEGAEnum(['car', 'truck'])
     reg_classes = OMEGAEnum(['car', 'truck'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
@@ -63,6 +64,7 @@ try:
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.vehicle_onroad_calculations_file = path + 'test_inputs/vehicle_onroad_calculations.csv'
             self.demanded_shares_file = path + 'test_inputs/demanded_shares-gcam.csv'
             self.fuels_file = path + 'test_inputs/fuels.csv'
             self.context_folder = ''

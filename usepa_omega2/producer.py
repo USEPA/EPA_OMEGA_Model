@@ -378,6 +378,28 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         for new_veh in manufacturer_vehicles:
             new_veh.market_share = new_veh.initial_registered_count / total_sales
 
+        # # group by context size class and legacy reg class
+        # csc_dict = dict()
+        # for new_veh in manufacturer_vehicles:
+        #     if new_veh.context_size_class not in csc_dict:
+        #         csc_dict[new_veh.context_size_class] = dict()
+        #     if new_veh.legacy_reg_class_ID not in csc_dict[new_veh.context_size_class]:
+        #         csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_ID] = []
+        #     csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_ID].append(new_veh)
+        #
+        # # distribute context size class sales to manufacturer_vehicles by relative market share
+        # for csc in csc_dict: # for each context size class
+        #     for lrc in csc_dict[csc]: # for each context (legacy) reg class
+        #         projection_initial_registered_count = \
+        #             ContextNewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc,
+        #                                                       context_reg_class=lrc)
+        #
+        #         print('%s:%s:%s' % (csc, lrc, projection_initial_registered_count))
+        #
+        #         distribute_by_attribute(csc_dict[csc][lrc], projection_initial_registered_count,
+        #                             weight_by='market_share',
+        #                             distribute_to='initial_registered_count')
+
         # group by context size class
         csc_dict = dict()
         for new_veh in manufacturer_vehicles:
@@ -386,15 +408,15 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
             csc_dict[new_veh.context_size_class].append(new_veh)
 
         # distribute context size class sales to manufacturer_vehicles by relative market share
-        for csc in csc_dict:
-            csc_initial_registered_count = \
+        for csc in csc_dict: # for each context size class
+            projection_initial_registered_count = \
                 ContextNewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc)
 
-            distribute_by_attribute(csc_dict[csc], csc_initial_registered_count,
-                                    weight_by='market_share',
-                                    distribute_to='initial_registered_count')
+            # print('%s:%s:%s' % (csc, projection_initial_registered_count))
 
-            # print('%s:%s' % (csc, csc_initial_registered_count))
+            distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
+                                weight_by='market_share',
+                                distribute_to='initial_registered_count')
 
         # calculate new vehicle market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:

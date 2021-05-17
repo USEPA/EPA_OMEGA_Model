@@ -121,15 +121,14 @@ if __name__ == '__main__':
                                                                     verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-        if get_template_name(o2.options.cost_file) == cost_curve_template_name:
-            init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
-        else:
-            init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
         init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
                                                                              verbose=o2.options.verbose)
 
-        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file,
+                                                                     o2.options.vehicle_onroad_calculations_file,
+                                                                     verbose=o2.options.verbose)
 
         init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)

@@ -709,7 +709,9 @@ def init_omega(o2_options):
 
         init_fail += Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
         
-        init_fail += VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail += VehicleFinal.init_database_from_file(o2.options.vehicles_file,
+                                                          o2.options.vehicle_onroad_calculations_file,
+                                                          verbose=o2.options.verbose)
 
         init_fail += ReregistrationFixedByAge.init_database_from_file(o2.options.reregistration_fixed_by_age_file, 
                                                                       verbose=o2.options.verbose)

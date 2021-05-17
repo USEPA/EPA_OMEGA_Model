@@ -110,8 +110,8 @@ if __name__ == '__main__':
         from consumer.market_classes import MarketClass  # needed for market class ID
         from fuels import Fuel  # needed for showroom fuel ID
         from consumer.demanded_shares_gcam import DemandedSharesGCAM
-        from cost_curves import CostCurve
         from GHG_standards_footprint import GHGStandardFootprint
+        from cost_clouds import CostCloud
 
         o2.options.GHG_standard = GHGStandardFootprint
         o2.options.ghg_standards_file = 'test_inputs/ghg_standards-footprint.csv'
@@ -127,11 +127,13 @@ if __name__ == '__main__':
                                                                     verbose=o2.options.verbose)
         init_fail = init_fail + DemandedSharesGCAM.init_database_from_file(o2.options.demanded_shares_file,
                                                                            verbose=o2.options.verbose)
-        init_fail = init_fail + CostCurve.init_database_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
         init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
                                                                              verbose=o2.options.verbose)
         init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file, verbose=o2.options.verbose)
+        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file,
+                                                                     o2.options.vehicle_onroad_calculations_file,
+                                                                     verbose=o2.options.verbose)
 
         if not init_fail:
             o2.options.analysis_initial_year = 2021
