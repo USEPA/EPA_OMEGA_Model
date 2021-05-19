@@ -71,6 +71,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
     @staticmethod
     def calculate_target_co2_Mg(vehicle, sales_variants=None):
         import numpy as np
+        from GHG_standards_sales_incentives import GHGStandardIncentives
 
         lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
@@ -84,11 +85,12 @@ class GHGStandardFootprint(SQABase, OMEGABase):
         else:
             sales = vehicle.initial_registered_count
 
-        return co2_gpmi * lifetime_VMT * sales / 1e6
+        return co2_gpmi * lifetime_VMT * sales * GHGStandardIncentives.get_sales_incentive(vehicle) / 1e6
 
     @staticmethod
     def calculate_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         import numpy as np
+        from GHG_standards_sales_incentives import GHGStandardIncentives
 
         lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
 
@@ -106,7 +108,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
             sales = vehicle.initial_registered_count
             co2_gpmi = vehicle.cert_co2_grams_per_mile
 
-        return co2_gpmi * lifetime_VMT * sales / 1e6
+        return co2_gpmi * lifetime_VMT * sales * GHGStandardIncentives.get_sales_incentive(vehicle) / 1e6
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):

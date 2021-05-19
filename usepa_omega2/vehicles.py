@@ -109,6 +109,7 @@ class CompositeVehicle(OMEGABase):
         self.initial_registered_count = 0
         for v in self.vehicle_list:
             self.initial_registered_count = self.initial_registered_count + v.initial_registered_count
+            v.set_cert_target_co2_Mg()
 
         self.total_weight = 0
         for v in self.vehicle_list:
@@ -124,6 +125,11 @@ class CompositeVehicle(OMEGABase):
             self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
 
         self.tech_option_iteration_num = 0
+
+        self.normalized_cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by,
+                                                            'normalized_cert_target_co2_Mg')
+
+        self.normalized_cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self, 1, 1)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -159,7 +165,7 @@ class CompositeVehicle(OMEGABase):
                                                               bounds_error=False)
                         v.__setattr__(ccv, ccv_interp1d(self.cert_co2_grams_per_mile))
                     else:
-                        v.__setattr__(ccv, self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)])
+                        v.__setattr__(ccv, self.cost_curve['veh_%s_%s' % (v.vehicle_ID, ccv)].item())
 
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
@@ -463,6 +469,7 @@ class Vehicle(OMEGABase):
             self.cert_target_co2_Mg = vehicle.cert_target_co2_Mg
             self.cert_co2_Mg = vehicle.cert_co2_Mg
 
+        self.normalized_cert_target_co2_Mg = self.cert_target_co2_Mg / self.initial_registered_count
 
     def create_frontier_df(self):
         from cost_clouds import CostCloud
@@ -602,6 +609,12 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def calc_cert_target_co2_Mg(model_year, manufacturer_id):
         return o2.session.query(func.sum(VehicleFinal.cert_target_co2_Mg)). \
+            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.model_year == model_year).scalar()
+
+    @staticmethod
+    def calc_cert_co2_Mg(model_year, manufacturer_id):
+        return o2.session.query(func.sum(VehicleFinal.cert_co2_Mg)). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 

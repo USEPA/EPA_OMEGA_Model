@@ -486,7 +486,6 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
-            #     v.cost_curve.to_csv(o2.options.output_folder + '%s_%s_cost_curve.csv' % (v.model_year, v.vehicle_ID))
             #     v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_ID))
             new_veh = VehicleFinal()
             new_veh.inherit_vehicle(v)
@@ -496,11 +495,13 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
 
     cert_target_co2_Mg = VehicleFinal.calc_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
+    cert_co2_Mg = VehicleFinal.calc_cert_co2_Mg(calendar_year, manufacturer_ID)
+
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(calendar_year=calendar_year,
                                         manufacturer_ID=manufacturer_ID,
                                         cert_target_co2_Mg=cert_target_co2_Mg,
-                                        calendar_year_cert_co2_Mg=winning_combo['total_combo_cert_co2_megagrams'],
+                                        calendar_year_cert_co2_Mg=cert_co2_Mg,
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
                                         )
     o2.session.flush()
@@ -567,19 +568,18 @@ def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehi
         vehicle_total_generalized_cost_dollars = market_class_sales * tech_share_combos_total['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID]
         tech_share_combos_total['veh_%s_generalized_total_cost_dollars' % new_veh.vehicle_ID] = vehicle_total_generalized_cost_dollars
 
-
         # calculate cert and target Mg for the vehicle
         co2_gpmi = tech_share_combos_total['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
 
-        cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(new_veh, co2_gpmi_variants=co2_gpmi,
-                                                                    sales_variants=market_class_sales)
-        target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(new_veh,
-                                                                        sales_variants=market_class_sales)
-        tech_share_combos_total['veh_%s_cert_co2_megagrams' % new_veh.vehicle_ID] = cert_co2_Mg
-        tech_share_combos_total['veh_%s_target_co2_megagrams' % new_veh.vehicle_ID] = target_co2_Mg
+        veh_cert_co2_Mg = new_veh.normalized_cert_co2_Mg * co2_gpmi * market_class_sales
+
+        veh_target_co2_Mg = new_veh.normalized_cert_target_co2_Mg * market_class_sales
+
+        tech_share_combos_total['veh_%s_cert_co2_megagrams' % new_veh.vehicle_ID] = veh_cert_co2_Mg
+        tech_share_combos_total['veh_%s_target_co2_megagrams' % new_veh.vehicle_ID] = veh_target_co2_Mg
         # update totals
-        total_target_co2_Mg = total_target_co2_Mg + target_co2_Mg
-        total_cert_co2_Mg = total_cert_co2_Mg + cert_co2_Mg
+        total_target_co2_Mg += veh_target_co2_Mg
+        total_cert_co2_Mg += veh_cert_co2_Mg
         total_cost_dollars += vehicle_total_cost_dollars
         total_generalized_cost_dollars += vehicle_total_generalized_cost_dollars
 

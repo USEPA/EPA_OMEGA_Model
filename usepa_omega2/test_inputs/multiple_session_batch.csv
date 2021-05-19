@@ -25,6 +25,7 @@ Cost File,String,simulated_vehicles.csv,simulated_vehicles.csv
 Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
 GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-flat.csv
+GHG Standards Sales Incentives File,String,ghg_standards-sales_incentives.csv,ghg_standards-sales_incentives.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv,ghg_standards-fuels.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
 ZEV Requirement File,String,required_zev_share.csv,required_zev_share.csv

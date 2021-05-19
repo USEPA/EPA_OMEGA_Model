@@ -307,6 +307,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.cost_file = self.read_parameter('Cost File')
         self.settings.ghg_standards_file = self.read_parameter('GHG Standards File')
+        self.settings.ghg_standards_sales_incentives_file = self.read_parameter('GHG Standards Sales Incentives File')
         self.settings.ghg_standards_fuels_file = self.read_parameter('GHG Standards Fuels File')
         self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
         self.settings.required_zev_share_file = self.read_parameter('ZEV Requirement File')
