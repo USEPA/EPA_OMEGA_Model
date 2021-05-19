@@ -211,8 +211,8 @@ class CompositeVehicle(OMEGABase):
             # update running total market share
             composite_frontier_df['market_share_frac'] = prior_market_share_frac + veh_market_share_frac
 
-            drop_columns = [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x')] + \
-                           ['_', 'frontier_factor']
+            drop_columns = [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x') or
+                            c.endswith('_market_share')] + ['_']
 
             composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
 
@@ -220,6 +220,8 @@ class CompositeVehicle(OMEGABase):
             composite_frontier_df = CostCloud.calculate_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
                                                                  'new_vehicle_mfr_generalized_cost_dollars',
                                                                  allow_upslope=True)
+
+            composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
 
         if plot:
             ax1.plot(composite_frontier_df['cert_co2_grams_per_mile'],
@@ -485,10 +487,10 @@ class Vehicle(OMEGABase):
         cost_name = 'veh_%s_new_vehicle_mfr_cost_dollars' % self.vehicle_ID
 
         self.cost_cloud['cert_direct_co2_grams_per_mile'] = \
-            DriveCycleWeights.calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(self.model_year, self.cost_cloud)
+            DriveCycleWeights.calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
 
         self.cost_cloud['cert_direct_kwh_per_mile'] = \
-            DriveCycleWeights.calc_weighted_drive_cycle_kwh_per_mile(self.model_year, self.cost_cloud)
+            DriveCycleWeights.calc_weighted_drive_cycle_kwh_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
 
         # calc onroad gap, etc...
         VehicleAttributeCalculations.perform_attribute_calculations(self, self.cost_cloud)
