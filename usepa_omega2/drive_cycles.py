@@ -28,8 +28,8 @@ class DriveCycles(OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'drive_cycles'
-        input_template_version = 0.1
-        input_template_columns = {'drive_cycle_id', 'description'}
+        input_template_version = 0.2
+        input_template_columns = {'drive_cycle_id', 'drive_cycle_distance_miles', 'description'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -42,6 +42,7 @@ class DriveCycles(OMEGABase):
 
             if not template_errors:
                 DriveCycles.data['drive_cycle_id'] = df['drive_cycle_id']
+                DriveCycles.data['drive_cycle_distance_miles'] = df['drive_cycle_distance_miles']
                 DriveCycles.data['description'] = df['description']
 
         return template_errors
