@@ -22,6 +22,10 @@ class DriveCycles(OMEGABase):
         return DriveCycles.data['drive_cycle_id'].to_list()
 
     @staticmethod
+    def get_drive_cycle_distance_miles(drive_cycle_id):
+        return DriveCycles.data['drive_cycle_distance_miles'].loc[DriveCycles.data['drive_cycle_id'] == drive_cycle_id].item()
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
 
         if verbose:
@@ -72,8 +76,9 @@ if __name__ == '__main__':
             DriveCycles.data.to_csv(
                 o2.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
-            print(DriveCycles.validate_drive_cycle_ID('ftp_1'))
-            print(DriveCycles.validate_drive_cycle_ID('hwfet'))
+            print(DriveCycles.validate_drive_cycle_ID('ftp_1:cert_direct_co2_grams_per_mile'))
+            print(DriveCycles.validate_drive_cycle_ID('hwfet:cert_direct_kwh_per_mile'))
+            print(DriveCycles.get_drive_cycle_distance_miles('ftp_1:cert_direct_co2_grams_per_mile'))
 
             print(DriveCycles.get_drive_cycles())
 
