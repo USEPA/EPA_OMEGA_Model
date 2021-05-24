@@ -350,13 +350,6 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     return dfx
 
 
-# function[rounded_number] = ASTM_round(var, precision)
-# var = var * (10 ^ precision);
-# z = rem(var, 2);
-# z(abs(z) ~= 0.5) = 0
-# rounded_number = round(var - z). / (10 ^ precision);
-# end
-
 def ASTM_round(var, precision=0):
     """
     Rounds numbers as defined in ISO / IEC / IEEE 60559
