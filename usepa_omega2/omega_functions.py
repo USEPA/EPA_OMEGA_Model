@@ -350,6 +350,94 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     return dfx
 
 
+# function[rounded_number] = ASTM_round(var, precision)
+# var = var * (10 ^ precision);
+# z = rem(var, 2);
+# z(abs(z) ~= 0.5) = 0
+# rounded_number = round(var - z). / (10 ^ precision);
+# end
+
+def ASTM_round(var, precision=0):
+    """
+    Rounds numbers as defined in ISO / IEC / IEEE 60559
+
+    Args:
+        var: number to be rounded, scalar or pandas Series
+        precision: number of decimal places in result
+
+    Returns:
+        var rounded using ASTM method with precision decimal places in result
+
+    """
+    import numpy as np
+
+    scaled_var = var * (10 ** precision)
+
+    z = np.remainder(scaled_var, 2)
+
+    if type(z) == pd.core.series.Series:
+        z.loc[z != 0.5] = 0
+    else:
+        if abs(z) != 0.5:
+            z = 0
+
+    rounded_number = np.round(scaled_var - z) / (10**precision)
+
+    return rounded_number
+
+
+def CityFUF(miles):
+    """
+
+    Args:
+        miles: distance travelled in "city" driving, scalar or pandas Series
+
+    Returns:
+        City utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
+
+    """
+    import numpy as np
+
+    miles_norm = miles/399
+
+    return ASTM_round(1-np.exp(-(
+                        1.486e+01 * miles_norm +
+                        2.965e+00 * miles_norm ** 2 +
+                        -8.405e+01 * miles_norm ** 3 +
+                        1.537e+02 * miles_norm ** 4 +
+                        -4.359e+01 * miles_norm ** 5 +
+                        -9.694e+01 * miles_norm ** 6 +
+                        1.447e+01 * miles_norm ** 7 +
+                        9.170e+01 * miles_norm ** 8 +
+                        -4.636e+01 * miles_norm ** 9
+    )), 3)
+
+
+def HighwayFUF(miles):
+    """
+
+    Args:
+        miles: distance travelled in "highway" driving, scalar or pandas Series
+
+    Returns:
+        Highway utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
+
+    """
+    import math
+    import numpy as np
+
+    miles_norm = miles/399
+
+    return ASTM_round(1-np.exp(-(
+                        4.8e+00 * miles_norm +
+                        1.3e+01 * miles_norm ** 2 +
+                        -6.5e+01* miles_norm ** 3 +
+                        1.2e+02 * miles_norm ** 4 +
+                        -1.0e+02 * miles_norm ** 5 +
+                        3.1e+01 * miles_norm ** 6
+    )), 3)
+
+
 if __name__ == '__main__':
     import pandas as pd
 
