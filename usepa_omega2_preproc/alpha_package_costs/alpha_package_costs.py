@@ -356,6 +356,7 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
     package_cost_df.insert(0, 'cs_cert_direct_oncycle_co2_grams_per_mile', combined_co2)
     package_cost_df.insert(0, 'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile', hwy_co2)
+    package_cost_df.insert(0, 'cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2) ## FOR NOW ONLY!!! -KNew
     package_cost_df.insert(0, 'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile', ftp3_co2)
     package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile', ftp1_co2)
@@ -393,6 +394,7 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
     package_cost_df.insert(0, 'cd_cert_direct_oncycle_kwh_per_mile', combined_kwh)
     package_cost_df.insert(0, 'cd_hwfet:cert_direct_oncycle_kwh_per_mile', hwy_kwh)
+    package_cost_df.insert(0, 'cd_ftp_4:cert_direct_oncycle_kwh_per_mile', ftp2_kwh) ## FOR NOW ONLY!!! -KNew
     package_cost_df.insert(0, 'cd_ftp_3:cert_direct_oncycle_kwh_per_mile', ftp3_kwh)
     package_cost_df.insert(0, 'cd_ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
     package_cost_df.insert(0, 'cd_ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
