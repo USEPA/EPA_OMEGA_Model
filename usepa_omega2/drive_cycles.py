@@ -76,9 +76,9 @@ if __name__ == '__main__':
             DriveCycles.data.to_csv(
                 o2.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
-            print(DriveCycles.validate_drive_cycle_ID('ftp_1:cert_direct_co2_grams_per_mile'))
-            print(DriveCycles.validate_drive_cycle_ID('hwfet:cert_direct_kwh_per_mile'))
-            print(DriveCycles.get_drive_cycle_distance_miles('ftp_1:cert_direct_co2_grams_per_mile'))
+            print(DriveCycles.validate_drive_cycle_ID('cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile'))
+            print(DriveCycles.validate_drive_cycle_ID('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
+            print(DriveCycles.get_drive_cycle_distance_miles('cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile'))
 
             print(DriveCycles.get_drive_cycles())
 

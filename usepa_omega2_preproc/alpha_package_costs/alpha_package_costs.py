@@ -26,17 +26,17 @@ def cost_vs_plot(settings, df, path, *years):
         hev_plot = list()
         hev_legends = list()
         for cost_curve_class in ice_classes:
-            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_direct_oncycle_co2_grams_per_mile'],
+            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cs_cert_direct_oncycle_co2_grams_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             ice_plot.append(ice_data[cost_curve_class])
             ice_legends.append(cost_curve_class)
         for cost_curve_class in bev_classes:
-            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_direct_oncycle_kwh_per_mile'],
+            bev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cd_cert_direct_oncycle_kwh_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             bev_plot.append(bev_data[cost_curve_class])
             bev_legends.append(cost_curve_class)
         for cost_curve_class in hev_classes:
-            hev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_direct_oncycle_co2_grams_per_mile'],
+            hev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cs_cert_direct_oncycle_co2_grams_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             hev_plot.append(hev_data[cost_curve_class])
             hev_legends.append(cost_curve_class)
@@ -354,11 +354,11 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cert_direct_oncycle_co2_grams_per_mile', combined_co2)
-    package_cost_df.insert(0, 'hwfet:cert_direct_oncycle_co2_grams_per_mile', hwy_co2)
-    package_cost_df.insert(0, 'ftp_3:cert_direct_oncycle_co2_grams_per_mile', ftp3_co2)
-    package_cost_df.insert(0, 'ftp_2:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2)
-    package_cost_df.insert(0, 'ftp_1:cert_direct_oncycle_co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'cs_cert_direct_oncycle_co2_grams_per_mile', combined_co2)
+    package_cost_df.insert(0, 'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile', hwy_co2)
+    package_cost_df.insert(0, 'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile', ftp3_co2)
+    package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2)
+    package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile', ftp1_co2)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
@@ -391,11 +391,11 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cert_direct_oncycle_kwh_per_mile', combined_kwh)
-    package_cost_df.insert(0, 'hwfet:cert_direct_oncycle_kwh_per_mile', hwy_kwh)
-    package_cost_df.insert(0, 'ftp_3:cert_direct_oncycle_kwh_per_mile', ftp3_kwh)
-    package_cost_df.insert(0, 'ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
-    package_cost_df.insert(0, 'ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
+    package_cost_df.insert(0, 'cd_cert_direct_oncycle_kwh_per_mile', combined_kwh)
+    package_cost_df.insert(0, 'cd_hwfet:cert_direct_oncycle_kwh_per_mile', hwy_kwh)
+    package_cost_df.insert(0, 'cd_ftp_3:cert_direct_oncycle_kwh_per_mile', ftp3_kwh)
+    package_cost_df.insert(0, 'cd_ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
+    package_cost_df.insert(0, 'cd_ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
