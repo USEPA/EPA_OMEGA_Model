@@ -70,7 +70,7 @@ try:
             self.context_folder = ''
             self.context_id = 'AEO2020'
             self.context_case_id = 'Reference case'
-            self.context_new_vehicle_prices_file = path + 'test_inputs/context_new_vehicle_prices.csv'
+            self.context_new_vehicle_generalized_costs_file = path + 'test_inputs/context_new_vehicle_prices.csv'
             self.generate_context_new_vehicle_prices_file = False
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_file = path + 'test_inputs/policy_fuel_upstream.csv'

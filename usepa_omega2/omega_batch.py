@@ -62,7 +62,7 @@ class OMEGABatchObject(OMEGABase):
         self.context_folder = ''
         self.context_id = ''
         self.context_case_id = ''
-        self.context_new_vehicle_prices_file = ''
+        self.context_new_vehicle_generalized_costs_file = ''
         self.generate_context_new_vehicle_prices_file = False
         self.output_path = "." + os.sep
         self.sessions = []
@@ -211,16 +211,16 @@ class OMEGABatchObject(OMEGABase):
         self.context_folder = self.read_parameter('Context Folder Name')
         self.context_id = self.read_parameter('Context Name')
         self.context_case_id = self.read_parameter('Context Case')
-        self.context_new_vehicle_prices_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
+        self.context_new_vehicle_generalized_costs_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
         # context_new_vehicle_prices_file can be one of:
         # relative path, absolute path, 'GENERATE' or 'GENERATE filename' where filename can be an absolute or relative path
         # if 'GENERATE' then the default file name will be batch_definition_path + 'context_new_vehicle_prices.csv'
-        if self.context_new_vehicle_prices_file.startswith('GENERATE'):
+        if self.context_new_vehicle_generalized_costs_file.startswith('GENERATE'):
             self.generate_context_new_vehicle_prices_file = True
-            self.context_new_vehicle_prices_file = \
-                self.context_new_vehicle_prices_file.replace('GENERATE', '').strip()
-            if not self.context_new_vehicle_prices_file:
-                self.context_new_vehicle_prices_file = 'context_new_vehicle_prices.csv'
+            self.context_new_vehicle_generalized_costs_file = \
+                self.context_new_vehicle_generalized_costs_file.replace('GENERATE', '').strip()
+            if not self.context_new_vehicle_generalized_costs_file:
+                self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
 
     def num_sessions(self):
         return len(self.dataframe.columns)
@@ -288,9 +288,9 @@ class OMEGASessionObject(OMEGABase):
             self.settings.generate_context_new_vehicle_prices_file = self.parent.generate_context_new_vehicle_prices_file
 
         if remote and self.num > 0:
-            self.settings.context_new_vehicle_prices_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
+            self.settings.context_new_vehicle_generalized_costs_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
         else: # local or self.num==0 (reference case)
-            self.settings.context_new_vehicle_prices_file = self.parent.context_new_vehicle_prices_file
+            self.settings.context_new_vehicle_generalized_costs_file = self.parent.context_new_vehicle_generalized_costs_file
 
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
@@ -703,7 +703,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 if i != 'Context New Vehicle Prices File':
                                     source_file_path = batch.dataframe.loc[i][session.num]
                                 else:
-                                    source_file_path = batch.context_new_vehicle_prices_file
+                                    source_file_path = batch.context_new_vehicle_generalized_costs_file
 
                                 if type(source_file_path) is str:
                                     # fix path separators, if necessary
@@ -730,7 +730,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 if session.num == 0:
                                     batch.dataframe.loc[i][session.num] = batch.dataframe.loc[i][session.num]
                                 else:
-                                    batch.dataframe.loc[i][session.num] = batch.context_new_vehicle_prices_file
+                                    batch.dataframe.loc[i][session.num] = batch.context_new_vehicle_generalized_costs_file
 
         import time
 

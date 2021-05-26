@@ -497,6 +497,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
     for mc in MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
+            # TODO: use ONROAD HERE
             winning_combo['average_co2_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
                                                                        'initial_registered_count',
                                                                        'cert_co2_grams_per_mile')
@@ -689,7 +690,7 @@ def init_omega(o2_options):
         init_fail += ContextNewVehicleMarket.init_database_from_file(o2.options.context_new_vehicle_market_file, 
                                                                      verbose=o2.options.verbose)
         
-        ContextNewVehicleMarket.init_context_new_vehicle_prices(o2.options.context_new_vehicle_prices_file)
+        ContextNewVehicleMarket.init_context_new_vehicle_generalized_costs(o2.options.context_new_vehicle_generalized_costs_file)
 
         init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
 
@@ -817,7 +818,7 @@ def run_omega(o2_options, standalone_run=False):
 
             if o2.options.session_is_reference and o2.options.generate_context_new_vehicle_prices_file:
                 from context_new_vehicle_market import ContextNewVehicleMarket
-                ContextNewVehicleMarket.save_context_new_vehicle_prices(o2.options.context_new_vehicle_prices_file)
+                ContextNewVehicleMarket.save_context_new_vehicle_generalized_costs(o2.options.context_new_vehicle_generalized_costs_file)
 
             omega_log.end_logfile("\nSession Complete")
 

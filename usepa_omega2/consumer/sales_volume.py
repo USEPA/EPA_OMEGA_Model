@@ -64,10 +64,10 @@ def new_vehicle_sales_response(calendar_year, P):
         P = np.array(P)
 
     if o2.options.session_is_reference and isinstance(P, float):
-        ContextNewVehicleMarket.set_new_vehicle_price(calendar_year, P)
+        ContextNewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, P)
 
     Q0 = ContextNewVehicleMarket.new_vehicle_sales(calendar_year)
-    P0 = ContextNewVehicleMarket.new_vehicle_prices(calendar_year)
+    P0 = ContextNewVehicleMarket.new_vehicle_generalized_costs(calendar_year)
 
     E = o2.options.new_vehicle_sales_response_elasticity
 

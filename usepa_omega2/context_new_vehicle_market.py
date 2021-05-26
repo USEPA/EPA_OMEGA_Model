@@ -37,46 +37,46 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
     hauling_context_size_class_info = dict()
     context_size_classes = dict()
-    _new_vehicle_prices = dict()
+    _new_vehicle_generalized_costs = dict()
 
     @classmethod
-    def init_context_new_vehicle_prices(cls, filename):
+    def init_context_new_vehicle_generalized_costs(cls, filename):
         """
-        Load context new vehicle prices from file or clear context_new_vehicle_prices and start from scratch
+        Load context new vehicle prices from file or clear context_new_vehicle_generalized_costs and start from scratch
 
-        Returns: updates context_new_vehicle_prices dict/dataframe
+        Returns: updates context_new_vehicle_generalized_costs dict/dataframe
 
         """
 
-        cls._new_vehicle_prices.clear()
+        cls._new_vehicle_generalized_costs.clear()
 
-        if not o2.options.generate_context_new_vehicle_prices_file:
+        if not o2.options.context_new_vehicle_generalized_costs_file:
             df = pd.read_csv(filename, index_col=0, dtype=str)
-            # cls._new_vehicle_prices = df['new_vehicle_price_dollars'].to_dict()
+            # cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
             # converts the strings to floats... they have different values than what's in the file
             # This is the workaround: let python do the conversion
             for key, value in df['new_vehicle_price_dollars'].items():
-                cls._new_vehicle_prices[key] = float(value)
+                cls._new_vehicle_generalized_costs[key] = float(value)
 
     @classmethod
-    def save_context_new_vehicle_prices(cls, filename):
+    def save_context_new_vehicle_generalized_costs(cls, filename):
         """
-        Save context_new_vehicle_prices to a .csv file
+        Save context_new_vehicle_generalized_costs to a .csv file
 
         """
-        # pd.DataFrame.from_dict(cls._new_vehicle_prices, orient='index', columns=['new_vehicle_price_dollars']).to_csv(
+        # pd.DataFrame.from_dict(cls._new_vehicle_generalized_costs, orient='index', columns=['new_vehicle_price_dollars']).to_csv(
         #     filename, index=True)
 
         # you shouldn't have to do this either... but somehow pandas (or maybe the OS) rounds the numbers when they get
         # written out to the file... this is the workaround: write the file yourself!
         with open(filename, 'w') as price_file:
             price_file.write(',new_vehicle_price_dollars\n')
-            for k, v in ContextNewVehicleMarket._new_vehicle_prices.items():
+            for k, v in ContextNewVehicleMarket._new_vehicle_generalized_costs.items():
                 price_file.write('%d, %.38f\n' % (k, v))
 
     @classmethod
-    def new_vehicle_prices(cls, calendar_year):
+    def new_vehicle_generalized_costs(cls, calendar_year):
         """
 
         Args:
@@ -85,18 +85,18 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
         Returns: context new vehicle price for the given calendar year
 
         """
-        return cls._new_vehicle_prices[calendar_year]
+        return cls._new_vehicle_generalized_costs[calendar_year]
 
     @classmethod
-    def set_new_vehicle_price(cls, calendar_year, price):
+    def set_new_vehicle_generalized_cost(cls, calendar_year, generalized_cost):
         """
         Set context new vehicle price for the given calendar year to the given price
         Args:
             calendar_year:
-            price:
+            generalized_cost:
 
         """
-        cls._new_vehicle_prices[calendar_year] = price
+        cls._new_vehicle_generalized_costs[calendar_year] = generalized_cost
 
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
