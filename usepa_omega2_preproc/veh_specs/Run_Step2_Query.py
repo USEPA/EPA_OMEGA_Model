@@ -245,9 +245,6 @@ for model_year in model_years:
             except KeyError:
                 pass
 
-        # if unique_sourcename != master_index_source:
-        #     print(unique_sourcename)
-
             try:
                 master_index_file[list(matching_categories)]
                 # print(master_index_file.WHEEL_BASE_INCHES)
@@ -329,21 +326,10 @@ for model_year in model_years:
                 if 'WHEELBASE' in list(matching_categories):
                     source_file['WHEELBASE'] = source_file['WHEELBASE'].astype(float).round(decimals=0).astype(str)
                     if unique_sourcename in 'OEM Towing Guide': OEM_towing_quide_unique_LineageID_list = source_file['LineageID'].unique().tolist()
-                        # master_index_file['Model Year'] = pd.Series(len(master_index_file)); master_index_file['Model Year'] = model_year
-                        # master_index_file['Max Loaded Trailer Weight'] = pd.Series(len(master_index_file)); master_index_file['Max Loaded Trailer Weight'] = str('-99999')
-                        # master_index_file['GCWR'] = pd.Series(len(master_index_file)); master_index_file['GCWR'] = str('-99999')
-                        # df_Edms_towing_capacity = pd.DataFrame(zip(master_index_file['Model Year'], master_index_file['LineageID'], master_index_file['BodyID'], master_index_file['WHEELBASE'], \
-                        #                            master_index_file['Number of Cylinders Category'], master_index_file['Engine Displacement Category'], \
-                        #                            master_index_file['Drivetrain Layout Category'], master_index_file['AXLE_RATIO'], master_index_file['WHEELS'], \
-                        #                            master_index_file['Fuel Type Category'], master_index_file['Max Loaded Trailer Weight'], master_index_file['GCWR']), \
-                        #                            columns = ["Model Year", "LineageID", "BodyID", "WHEELBASE", "Number of Cylinders Category", "Engine Displacement Category", \
-                        #                                       "Drivetrain Layout Category", "AXLE_RATIO", "WHEELS", "Fuel Type Category", "Max Loaded Trailer Weight", "GCWR"])
-                        # for i in range (len(OEM_towing_quide_unique_LineageID_list)):
-                        #     df_Edms_towing_capacity.drop(df_Edms_towing_capacity[df_Edms_towing_capacity.LineageID == OEM_towing_quide_unique_LineageID_list[i]].index, inplace=True)
-                        # tmp_source_file = pd.concat([source_file, df_Edms_towing_capacity], axis=0)
-                        # del df_Edms_towing_capacity
                 master_index_file_with_desired_fields_all_merges = master_index_file.merge( \
+                # master_index_file_with_desired_fields_all_merges=pd.merge_ordered(master_index_file, \
                     source_file[list(pd.Series(list(matching_categories) + list(all_subarray['Column Name'].unique())).unique())], \
+                    # how='left', on=list(matching_categories), left_by='WHEELBASE').replace([str(np.nan), ''], np.nan)
                     how='left', on=list(matching_categories)).replace([str(np.nan), ''], np.nan)
             except KeyError: #Master file is missing at least one of the data columns from the source file
                 original_source_columns = list(pd.Series(list(matching_categories)+list(all_subarray['Column Name'].unique())).unique())
@@ -353,6 +339,9 @@ for model_year in model_years:
             del source_file
         else:
             master_index_file_with_desired_fields_all_merges = master_index_file.replace([str(np.nan), ''], np.nan)
+        # if unique_sourcename == 'OEM Towing Guide':
+        #     print(query_output)
+
         for all_subarray_count in range(0,len(all_subarray)):
             query_type = all_subarray['QueryType'][all_subarray_count]
             weighting_field = all_subarray['AvgWtField'][all_subarray_count]
@@ -371,8 +360,7 @@ for model_year in model_years:
                         or query_type == 'std' or query_type == 'sum':
                     try:
                         master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(
-                                float)
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
                             information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
@@ -471,8 +459,8 @@ for model_year in model_years:
         del master_index_file_with_desired_fields_all_merges
         # if unique_sourcename == 'Edmunds':
         #     Edmunds_query_output = query_output.copy()
-        # elif unique_sourcename == 'OEM Towing Guide':
-        #     print(query_output)
+        if unique_sourcename == 'OEM Towing Guide':
+            print(query_output)
         #     query_output = query_output.drop(['Towing Capacity_Edmunds'], axis=1)
         #     query_output = pd.concat([Edmunds_query_output, query_output], axis=1)
     unique_column_names = pd.Series(all_array['Output Column'].unique()).dropna().reset_index(drop=True)
