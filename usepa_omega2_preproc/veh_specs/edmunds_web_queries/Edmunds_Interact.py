@@ -87,7 +87,7 @@ class HTMLTableParser:
 
         return df
 
-def merge_trim_options(tmp_raw_table0, _menu_columns, df_options, _trim_str):
+def merge_trim_options(tmp_raw_table0, _num_menu_columns, df_options, _trim_str):
     tmp_raw_table = tmp_raw_table0.copy(deep=True)
     _row_drop_start = 0
     _row_trim_str_init = 0
@@ -110,7 +110,7 @@ def merge_trim_options(tmp_raw_table0, _menu_columns, df_options, _trim_str):
                 elif k == 0:
                     _row_trim_str_init  = 1
 
-            for _index_col in range(_menu_columns):
+            for _index_col in range(_num_menu_columns):
                 trim_col = tmp_raw_table.columns[_index_col+2]
                 ioption = str(tmp_raw_table[trim_col][_row])
                 if ioption.lower() == 'yes':
@@ -124,7 +124,7 @@ def merge_trim_options(tmp_raw_table0, _menu_columns, df_options, _trim_str):
 
     return tmp_raw_table
 
-def trim_tires_wheels(tmp_raw_table, _menu_columns):
+def trim_tires_wheels(tmp_raw_table, _num_menu_columns):
     tmp_raw_table1 = tmp_raw_table.copy(deep=True)
 
     _index_all_season_tires = tmp_raw_table.index[tmp_raw_table['Specifications'].str.contains('All season tires')]
@@ -161,7 +161,7 @@ def trim_tires_wheels(tmp_raw_table, _menu_columns):
     tmp_raw_table1.iloc[0, 1] = 'wheels'
     tmp_raw_table1.iloc[1, 1] = 'tires'
     tmp_raw_table1.iloc[2, 1] = 'tire types'
-    for _jcol in range(_menu_columns):
+    for _jcol in range(_num_menu_columns):
         tmp_raw_table1.iloc[0, _jcol + 2] = tmp_raw_table.iloc[wheels_index, _jcol + 2]
         if tires_index < 0 or len(str(tmp_raw_table.iloc[tires_index, _jcol + 2])) == 0:
             tmp_raw_table1.iloc[1, _jcol + 2] = 'NA'
@@ -169,7 +169,7 @@ def trim_tires_wheels(tmp_raw_table, _menu_columns):
             tmp_raw_table1.iloc[1, _jcol + 2] = tmp_raw_table.iloc[tires_index, _jcol + 2]
         if wheels_index < 0 or len(str(tmp_raw_table.iloc[wheels_index, _jcol + 2])) == 0:
             tmp_raw_table1.iloc[0, _jcol + 2] = 'NA'
-    for _jcol in range(_menu_columns):
+    for _jcol in range(_num_menu_columns):
         if all_season_tires_index >= 0:
             tmp_raw_table1.iloc[2, _jcol + 2] = 'All season tires'
         if run_flat_tires_index >= 0:
@@ -184,24 +184,24 @@ def trim_tires_wheels(tmp_raw_table, _menu_columns):
         if all_season_tires_index == -1 and performance_tires_index == -1 and run_flat_tires_index == -1 and all_terrain_tires_index == -1:
             tmp_raw_table1.iloc[2, _jcol + 2] = 'NA'
 
-    tmp_raw_table = drop_merged_option(tmp_raw_table1, _menu_columns)
+    tmp_raw_table = drop_merged_option(tmp_raw_table1, _num_menu_columns)
     tmp_raw_table = tmp_raw_table.drop_duplicates(subset=['Specifications']).reset_index(drop=True)
 
     return tmp_raw_table
 
-def drop_merged_option(tmp_raw_table, _menu_columns):
-    if _menu_columns == 1:
+def drop_merged_option(tmp_raw_table, _num_menu_columns):
+    if _num_menu_columns == 1:
         tmp_raw_table = tmp_raw_table.dropna(how='all', subset=[tmp_raw_table.columns[2]])
-    elif _menu_columns == 2:
+    elif _num_menu_columns == 2:
         tmp_raw_table = tmp_raw_table.dropna(how='all', subset=[tmp_raw_table.columns[2], tmp_raw_table.columns[3]])
-    elif _menu_columns == 3:
+    elif _num_menu_columns == 3:
         tmp_raw_table = tmp_raw_table.dropna(how='all', subset=[tmp_raw_table.columns[2], tmp_raw_table.columns[3], tmp_raw_table.columns[4]])
 
     tmp_raw_table = tmp_raw_table.reset_index(drop=True)
 
     return tmp_raw_table
 
-def update_raw_tables(tmp_raw_table0, _menu_columns):
+def update_raw_tables(tmp_raw_table0, _num_menu_columns):
     tmp_raw_table = tmp_raw_table0.copy(deep=True)
     _overview_list = ['Engine Type', 'Transmission', 'Drive Type', 'Combined MPG', 'Total Seating', 'Basic Warranty', 'Cylinders']
     _drivetrain_simple_list =['Drive type', 'Transmission']
@@ -300,7 +300,7 @@ def update_raw_tables(tmp_raw_table0, _menu_columns):
             tmp_raw_table[tmp_raw_table.columns[1]][i] = _new_specs_text
             _num_new_specs_inserted = _num_new_specs_inserted + 1
             _irow = ispec_no + _num_new_specs_inserted
-            for j in range (_menu_columns):
+            for j in range (_num_menu_columns):
                 tmp_raw_table[tmp_raw_table.columns[j+2]][i] = ''
                 _new_spec_inserted = True
         elif _specs_skipped_pos[i] == 'yes':
@@ -313,7 +313,7 @@ def update_raw_tables(tmp_raw_table0, _menu_columns):
             _new_specs_text = tmp_raw_table0[tmp_raw_table0.columns[1]][ispec_no]
             if _new_specs_text == 'Maximum towing capacity': _index_towing_capacity = _irow
             tmp_raw_table[tmp_raw_table.columns[1]][_irow_adjusted] = _new_specs_text
-            for j in range (_menu_columns):
+            for j in range (_num_menu_columns):
                 _item = tmp_raw_table0[tmp_raw_table0.columns[j + 2]][ispec_no]
                 if _item == 'no' or _item == '' or  _item == np.nan:
                     if _specs in _no_to_nan_list: _item = ''
@@ -332,9 +332,9 @@ def est_max_towing_capacity(df):
     _index_curb_weight = _specs_list.index('Curb weight')
     _index_gross_weight = _specs_list.index('Gross weight')
     _index_max_payload = _specs_list.index('Maximum payload')
-    _menu_columns = _cols - 2
+    _num_menu_columns = _cols - 2
 
-    for j in range(_menu_columns):
+    for j in range(_num_menu_columns):
         max_payload = df.iloc[_index_max_payload, j+2]
         gross_weight = df.iloc[_index_gross_weight, j+2]
         curb_weight = df.iloc[_index_curb_weight, j+2]
@@ -344,7 +344,7 @@ def est_max_towing_capacity(df):
             if 'lbs.' in gross_weight:  gross_weight_str1 = gross_weight.split(' ')[0]
             if len(gross_weight_str1) > 0 and len(max_payload_str1) > 0:
                 df.iloc[_index_curb_weight, j + 2] = str(float(gross_weight_str1) - float(max_payload_str1)) + ' lbs.'
-    for j in range(_menu_columns):
+    for j in range(_num_menu_columns):
         _item = df.iloc[_index_towing_capacity, j+2]
         if len(_item) > 0 and _item != 'no' and ('lbs.' in _item):
             _towing_cols.append(j)
@@ -428,7 +428,7 @@ def est_max_towing_capacity(df):
                     and 'lbs.' in df.iloc[_index_curb_weight, sampling_lower[0] + 2] and len(sampling_lower) > 0:
                     curb_weight_lower = float(df.iloc[_index_curb_weight, sampling_lower[0] + 2].split(' ')[0])
                 if num_towing_capacity2 > 0 and (df.iloc[_index_curb_weight, sampling_upper[0] + 2] != 'no' and df.iloc[_index_curb_weight, sampling_upper[0] + 2] != '') \
-                        and 'lbs.' in df.iloc[_index_curb_weight, sampling_upper[0] + 2] and len(sampling_upper) > 0 and (sampling_upper[0] + 2) < _menu_columns:
+                        and 'lbs.' in df.iloc[_index_curb_weight, sampling_upper[0] + 2] and len(sampling_upper) > 0 and (sampling_upper[0] + 2) < _num_menu_columns:
                     curb_weight_upper = float(df.iloc[_index_curb_weight, sampling_upper[0] + 2].split(' ')[0])
                 if curb_weight_upper > 0 or curb_weight_lower > 0:
                     curb_weight_max = max(curb_weight_lower, curb_weight_upper)
@@ -469,17 +469,21 @@ def est_max_towing_capacity(df):
 def Edmunds_Interact(url):
     max_attempts = 10
     max_time = 60
+    sleep_3sec = 3
+    sleep_sec = 0.5
+    wait_sec = 30
     _max_trim_groups_count = 20 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
     _max_trim_buttons =  60     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
+    _num_menu_columns = 1 # 3 trims were displayed in 2020, and changed the trim column to 1 in 2021
     trim_options = []
+    num_column_shift = 2 #
+
     trim_dropdown_buttons_xpath = "//button[@data-test='select-menu']"  # The xpath for the trim selection drop-down button, which is repeated in 1-3 columns and multiple rows for each table
     trim_select_buttons_xpath = "//div[@class='dropdown-menu show']//button[@class='dropdown-item']"
 
     for geturl_attempt in range(0, max_attempts):
         print('URL Attempt ' + str(geturl_attempt + 1))
-        wait_time = 45
         chromedriver = 'chromedriver.exe'
-
         os.environ["webdriver.chrome.driver"] = chromedriver
         chromeOptions = Options()
         # caps = DesiredCapabilities().CHROME
@@ -489,19 +493,18 @@ def Edmunds_Interact(url):
         # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
         driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
         try:
-            driver.set_page_load_timeout(wait_time)
+            driver.set_page_load_timeout(wait_sec)
             driver.implicitly_wait(5)
-            time.sleep(1)
+            time.sleep(sleep_sec)
             driver.get(url)
             # find and click main button to reveal drop-down menu
             menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
-
-            time.sleep(1.5)
+            WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
+            time.sleep(sleep_sec)
             menus[0].click() # click the first dropdown menu button. Assumes all menus contain the same trim list.
             # find trim buttons in drop-down menu
             trim_buttons = driver.find_elements_by_xpath(trim_select_buttons_xpath)
-            WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
+            WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
 
             _trim_start = 0
             _trim_buttons = len(trim_buttons)
@@ -532,8 +535,9 @@ def Edmunds_Interact(url):
     #     # dropdown3 = Select(menu3)
     #     trim_group_length = 3
 
-    trim_groups_count = math.ceil(total_trims / 3)  # Number of trim groups (in groups of 3, add one if only 1-2 trims left)
-    last_group_count = total_trims % 3  # Length of last group
+    trim_groups_count = math.ceil(total_trims / _num_menu_columns)  # Number of trim groups (in groups of 3, add one if only 1-
+    if _num_menu_columns == 1: trim_groups_count = 1
+    last_group_count = total_trims % _num_menu_columns  # Length of last group
     readin_check = pd.Series(np.zeros(total_trims), name='Readin_Error').replace(0, '')
     if trim_groups_count > _max_trim_groups_count: trim_groups_count = _max_trim_groups_count
     for table_list_count in range(0, 1):
@@ -550,221 +554,204 @@ def Edmunds_Interact(url):
             try:
                 del df_tmp  # important_tables
             except NameError:
+                df = []; df_tmp = []
                 pass
             if trim_group == trim_groups_count - 1 and last_group_count != 0:  # Last (or only) trim group and less than 3 entries
                 trims = pd.Series(range(last_group_count)) + trim_groups_count * trim_group
+            elif _num_menu_columns == 1:
+                trims = pd.Series(range(total_trims)) + trim_groups_count * trim_group
             else:
                 trims = pd.Series(range(trim_groups_count)) + trim_groups_count * trim_group
-            _menu_columns = len(trims)
-            if _menu_columns < total_trims and trim_groups_count == 1: _menu_columns = total_trims
-            if (_index < (trim_groups_count-1)) and total_trims >= 3:
-                _menu_columns= 3
+            _num_trims_page = len(trims)
+            if _num_menu_columns < total_trims and trim_groups_count == 1: _num_trims_page = total_trims
+            if (_index < (trim_groups_count-1)) and total_trims >= _num_menu_columns and _num_menu_columns > 1:
+                _num_trims_page=_num_menu_columns
+            elif _num_menu_columns == 1:
+                _num_trims_page = total_trims
             else:
-                _menu_columns = total_trims % 3
-                if _menu_columns == 0: _menu_columns = 3
+                _num_trims_page = total_trims %_num_menu_columns
+                if _num_menu_columns == 0: _num_trims_page = _num_menu_columns
+            if _num_trims_page == 0: continue
 
-            if _menu_columns > 0:
-                try:
-                    for i in range(_menu_columns):
-                        WebDriverWait(driver, 60).until(
-                            EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
-                        time.sleep(3)
-                        menus[i].click()
-                        trims_text.append(trim_options[_index * 3 + i])
-                        option_text = trims_text[i]
-                        element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
-                        # dropdown_item = driver.find_element_by_xpath("//div[@class='dropdown-menu show']//button[text()='{}']".format(str(option_text)))
-                        dropdown_item = driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + i]
-                        actions = ActionChains(driver)
-                        actions.move_to_element(dropdown_item).click().perform()
-                        actions.reset_actions()
-                except TimeoutException:
-                    if i == 0: errorflag_1 = 1
-                    if i == 1: errorflag_2 = 1
-                    if i == 2: errorflag_3 = 1
-                    readin_check[trims[i]] = 'READIN_ERROR'
-            #     try:
-            #         menus[0].click()
-            #         # Choose first option
-            #         element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
-            #         driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + 0].click()
-            # #     except TimeoutException:
-            #         errorflag_1 = 1
-            #         readin_check[trims[0]] = 'READIN_ERROR'
-            # if _menu_columns >= 2:  # Choose second option (if applicable)
-            #     try:
-            #         menus[1].click()
-            #         # Choose second option
-            #         element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
-            #         driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + 1].click()
-            #     except TimeoutException:
-            #         errorflag_2 = 1
-            #         readin_check[trims[1]] = 'READIN_ERROR'
-            # if _menu_columns >= 3:  # Choose third option (if applicable)
-            #     try:
-            #         menus[2].click()
-            #         # Choose third option
-            #         element = WebDriverWait(driver, 60).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
-            #         driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * 3 + 2].click()
-            #     except TimeoutException:
-            #         errorflag_3 = 1
-            #         readin_check[trims[2]] = 'READIN_ERROR'
-            if table_list_count == 0:
-                time.sleep(1)
-                table_list = pd.read_html(driver.page_source, header=0)
-            else:
-                soup = BeautifulSoup(driver.page_source, "lxml")
-                hp = HTMLTableParser()
-                table_list = hp.get_html_table(soup, trim_group, errorflag_1, errorflag_2, errorflag_3)
-            # table_list[16].to_csv(
-            #     '/Users/Brandon/PycharmProjects/Web_Scraping' + '//' + str(trim_group) + ' ' + save_name, index=False)
-            num_table_list = len(table_list)
-            if len(table_list[num_table_list-1]) < 1:
-                del table_list[num_table_list-1]
-                num_table_list = num_table_list-1
-            for table_count in range(0, len(table_list)):
-                # if table_count == 12:
-                #     print(raw_table)
-                if table_list_count == 0 and len(table_list[table_count]) > 0:
-                    table_check = 1
-                    raw_table = table_list[table_count].reset_index(drop=True)
-                elif table_list_count == 1:
-                    table_check = 1
-                    raw_table = table_list[table_count].reset_index(drop=True)
-                else:
-                    table_check = 0
-                    pass
-                if table_check == 1:
-                    table_tag = raw_table.columns[0]
-
-                    if len(raw_table) > 0 and isinstance(raw_table, pd.DataFrame) and \
-                            not ("Highlights" in table_tag) \
-                            and table_tag != 'OVERVIEW':
-                        raw_table.columns = pd.Series(raw_table.columns).str.strip()
-
-                        # for col_count in range(1, len(raw_table.columns)):
-                        #     column = raw_table.columns[col_count]
-                        #     msrp = column[column.find('$'):].strip()
-                        #     # msrp=msrp.split(" ")[0]; msrp=msrp.strip('$'); msrp=msrp.replace(',', '')
-                        #     raw_table = raw_table.rename \
-                        #         (columns={column: column[column.rfind(')', 0, column.rfind(')')):column.rfind(')') + 1].strip().replace('  ', '').strip() + ' ' + msrp})
-                        # raw_table.to_csv('/Users/Brandon/PycharmProjects/Web_Scraping/'+'Raw Table.csv')
-                        if len(table_list[table_count].columns) > (1 + _menu_columns):
-                            for i in range(len(table_list[table_count].columns)-1, _menu_columns, -1):
-                                del_colname = table_list[table_count].columns[i]
-                                table_list[table_count].drop(del_colname, axis=1, inplace=True)
+            try:
+                for i in range(_num_trims_page):
+                    time.sleep(sleep_sec)
+                    element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
+                    time.sleep(sleep_3sec)
+                    try:
+                        if _num_menu_columns == 1:
+                            element.click()
+                        else:
+                            menus[i].click()
+                    except (NoSuchElementException, TimeoutException, UnboundLocalError):
+                        driver.quit()
+                        driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+                        driver.get(url)
+                        time.sleep(sleep_sec)
                         try:
-                            # important_tables = important_tables.loc[:, ~important_tables.columns.duplicated()]
-                            # important_tables = pd.concat([important_tables, raw_table])
-                            if table_count == 0: df_tmp = pd.concat([df_tmp, raw_table])
-                                # df_tmp = table_list[table_count]
-                            raw_table = raw_table.loc[:, ~raw_table.columns.duplicated()]
-                            name_category = table_list[table_count].columns[0]
-                            for i in range(_menu_columns):
-                                table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i]})
-                            tmp_raw_table = table_list[table_count]
-                            if tmp_raw_table.columns[0] != 'Category': tmp_raw_table.insert(0, 'Category', '')
-                            tmp_raw_table['Category'] = name_category
-                            tmp_raw_table = tmp_raw_table.rename(columns={name_category: 'Specifications'})
-                            front_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" front headrests")]
-                            rear_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" rear headrests")]
-                            months_of_provided_satellite_radio_service = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" Months of provided satellite radio service")]
-                            watts_stereo_output = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" watts stereo output")]
-                            total_speakers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" total speakers")]
-                            subwoofers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" subwoofer")]
-                            tires = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" tires")]
-                            wheels = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" in. wheels")]
-                            power_driver_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power driver seat")]
-                            power_passenger_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power passenger seat")]
-                            manual_driver_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("manual driver seat adjustment")]
-                            manual_passenger_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" manual passenger seat adjustment")]
-                            if str(tmp_raw_table['Category'][0]).lower() == 'safety' and (len(front_headrests)  > 0 or len(rear_headrests)  > 0):
-                                tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, front_headrests, 'front headrests')
-                                tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, rear_headrests, 'rear headrests')
-                                tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            # elif str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and (len(subwoofers)  > 0 or len(total_speakers)  > 0 or len(months_of_provided_satellite_radio_service) > 0 or len(watts_stereo_output) > 0):
-                            #     if len(subwoofers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, subwoofers, 'subwoofer(s)')
-                            #     if len(total_speakers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, total_speakers, 'total speakers')
-                            #     if len(months_of_provided_satellite_radio_service) > 0:
-                            #         tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, months_of_provided_satellite_radio_service, 'Months of provided satellite radio service')
-                            #     if len(watts_stereo_output) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, watts_stereo_output, 'watts stereo output')
-                            #     tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            elif str(tmp_raw_table['Category'][0]).lower() == 'tires & wheels' and (len(tires)  > 0 or len(wheels) > 0):
-                                tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, tires, 'tires')
-                                tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, wheels, 'wheels')
-                                tmp_raw_table = trim_tires_wheels(tmp_raw_table, _menu_columns)
-                                tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            elif str(tmp_raw_table['Category'][0]).lower() == 'front seats' and (len(power_driver_seat)  > 0 or len(power_passenger_seat)  > 0 or len(manual_driver_seat_adjustment) > 0 or len(manual_passenger_seat_adjustment) > 0):
-                                if len(power_driver_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, power_driver_seat, 'power driver seat')
-                                if len(power_passenger_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, power_passenger_seat, 'power passenger seat')
-                                if len(manual_driver_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, manual_driver_seat_adjustment, 'manual driver seat adjustment')
-                                if len(manual_passenger_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _menu_columns, manual_passenger_seat_adjustment, 'manual passenger seat adjustment')
-                                tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-                            elif str(tmp_raw_table['Category'][0]).lower() == 'overview' or str(tmp_raw_table['Category'][0]).lower() == 'drivetrain' or \
-                                    str(tmp_raw_table['Category'][0]).lower() == 'fuel & mpg' or str(tmp_raw_table['Category'][0]).lower() == 'engine' or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == False) or \
-                                str(tmp_raw_table['Category'][0]).lower() == 'measurements' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
-                                tmp_raw_table = update_raw_tables(tmp_raw_table, _menu_columns)
-                                tmp_raw_table = drop_merged_option(tmp_raw_table, _menu_columns)
-
-                            if (str(tmp_raw_table['Category'][0]).lower() == 'colors' and SKIP_PRINTING_COLORS == True) or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'exterior options' and SKIP_PRINTING_EXTERIOR_OPTIONS == True) or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == True) or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'packages' and SKIP_PRINTING_PACKAGES == True) or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and SKIP_IN_CAR_ENTERTAINMENT == True) or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'power feature' and SKIP_POWER_FEATURE == True) or \
-                                    (str(tmp_raw_table['Category'][0]).lower() == 'interior options' and SKIP_PRINTING_INTERIOR_OPTIONS == True):
-                                continue
+                            element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_dropdown_buttons_xpath)))
+                            time.sleep(sleep_3sec)
+                            if _num_menu_columns == 1:
+                                element.click()
                             else:
-                                df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
-                                df_tmp.fillna('', inplace=True)
-                            if table_count == (num_table_list-1):
-                                if trim_group == 0:
-                                    df = df_tmp
-                                else:
-                                    df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='inner')
-                                    df = df.drop_duplicates(subset=['Specifications'])
-                        except NameError:
-                            # important_tables = raw_table
-                            df_tmp = table_list[table_count]
-                            name_category = table_list[table_count].columns[0]
-                            if df_tmp.columns[0] != 'Category': df_tmp.insert(0, 'Category', '')
-                            df_tmp['Category'] = name_category
-                            if df_tmp.columns[1] != 'Specifications': df_tmp = df_tmp.rename(
-                                columns={df_tmp.columns[0]: 'Category', df_tmp.columns[1]: 'Specifications'})
-                            for i in range(_menu_columns): df_tmp = df_tmp.rename(columns={df_tmp.columns[2 + i]: trims_text[i]})
-                            df_tmp = update_raw_tables(df_tmp, _menu_columns)
-                            df_tmp = drop_merged_option(df_tmp, _menu_columns)
+                                menus = driver.find_elements_by_xpath(trim_dropdown_buttons_xpath)
+                                menus[i].click()
+                        except (NoSuchElementException, TimeoutException, UnboundLocalError):
+                            print('element click Timeout')
+                            continue
+                    trims_text.append(trim_options[_index * _num_menu_columns + i])
+                    element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, trim_select_buttons_xpath)))
+                    dropdown_item = driver.find_elements_by_xpath(trim_select_buttons_xpath)[_index * _num_menu_columns + i]
+                    actions = ActionChains(driver)
+                    actions.move_to_element(dropdown_item).click().perform()
+                    actions.reset_actions()
 
-            # important_array = important_array.replace(np.nan, '').astype(str).applymap(lambda x: x.strip()).reset_index(drop=True)
-            # important_tables.to_csv('/Users/Brandon/PycharmProjects/Web_Scraping/' + 'Important Tables.csv')
-            # for s in range(min(3, total_trims), important_tables.shape[1]):
-            #     if s == min(3, total_trims):
-            #         # category = important_tables.ix[:,s].astype(str)
-            #         category = important_tables.iloc[:, s].astype(str)
-            #     else:
-            #         category = category.str.cat(important_tables.iloc[:, s], sep='')
-            # category = pd.Series(category, name='Category')
-            # important_array = pd.concat([important_tables.iloc[:, 0:min(3, total_trims)], category], axis=1).reset_index(drop=True)
-            # if trim_group == 0:
-            #     output_array = important_array
-            # else:
-            #     merge_array = pd.concat([important_array['Category'], important_array[important_array.columns.difference(output_array.columns)]], axis=1)
-            #     output_array = pd.merge(output_array, merge_array, on='Category', how='outer')
-    # return (output_array, readin_check)
+                    if table_list_count == 0:
+                        time.sleep(sleep_sec)
+                        table_list = pd.read_html(driver.page_source, header=0)
+                    else:
+                        soup = BeautifulSoup(driver.page_source, "lxml")
+                        hp = HTMLTableParser()
+                        table_list = hp.get_html_table(soup, trim_group, errorflag_1, errorflag_2, errorflag_3)
+                    df_out = html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_text, i, trim_group, num_column_shift, df)
+                    df = df_out
+
+            except TimeoutException:
+                if i == 0: errorflag_1 = 1
+                if i == 1: errorflag_2 = 1
+                if i == 2: errorflag_3 = 1
+                readin_check[trims[i]] = 'READIN_ERROR'
+
     if DELETE_DISCONTINUED_MODELS == True:
         dfo = df.copy(deep=True)
         num_models = len(dfo.columns)
-        for i in range(num_models-1, 1, -1): # deleted the "Discontinued' model
+        for i in range(num_models - 1, 1, -1):  # deleted the "Discontinued' model
             _model_name = df.columns[i]
             print(i, _model_name)
             if 'Discontinued' in _model_name:
                 df.drop(_model_name, axis=1, inplace=True)
                 # df.drop(_model_name, axis=1, inplace=True)
         df.reset_index(drop=True, inplace=True)
-
-    df = est_max_towing_capacity(df)
-
+    # df = est_max_towing_capacity(df)
     driver.close()
-
     return (df, readin_check)
+
+def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_text, i_trims_page, trim_group, num_column_shift, df):
+
+    # if len(df_tmp) == 0: del df_tmp
+    # if _num_menu_columns == 1:
+    # try:
+    #     del df_tmp  # important_tables
+    # except NameError:
+    #     pass
+
+    num_table_list = len(table_list)
+    if len(table_list[num_table_list-1]) < 1:
+        del table_list[num_table_list-1]
+        num_table_list = num_table_list - 1
+
+    for table_count in range(0, len(table_list)):
+        # if table_count == 12:
+        #     print(raw_table)
+        if table_list_count == 0 and len(table_list[table_count]) > 0:
+            table_check = 1
+            raw_table = table_list[table_count].reset_index(drop=True)
+        elif table_list_count == 1:
+            table_check = 1
+            raw_table = table_list[table_count].reset_index(drop=True)
+        else:
+            table_check = 0
+            pass
+        if table_check == 0: continue
+
+        table_tag = raw_table.columns[0]
+        if len(raw_table) > 0 and isinstance(raw_table, pd.DataFrame) and \
+                not ("Highlights" in table_tag) \
+                and table_tag != 'OVERVIEW':
+            raw_table.columns = pd.Series(raw_table.columns).str.strip()
+
+            if len(table_list[table_count].columns) > (1 + _num_menu_columns):
+                for i in range(len(table_list[table_count].columns)-1, _num_menu_columns, -1):
+                    del_colname = table_list[table_count].columns[i]
+                    table_list[table_count].drop(del_colname, axis=1, inplace=True)
+            try:
+                # important_tables = important_tables.loc[:, ~important_tables.columns.duplicated()]
+                # important_tables = pd.concat([important_tables, raw_table])
+                if table_count == 0: df_tmp = pd.concat([df_tmp, raw_table])
+
+                raw_table = raw_table.loc[:, ~raw_table.columns.duplicated()]
+                name_category = table_list[table_count].columns[0]
+                for i in range(_num_menu_columns):
+                    table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i_trims_page]})
+                tmp_raw_table = table_list[table_count]
+                if tmp_raw_table.columns[0] != 'Category': tmp_raw_table.insert(0, 'Category', '')
+                tmp_raw_table['Category'] = name_category
+                tmp_raw_table = tmp_raw_table.rename(columns={name_category: 'Specifications'})
+                front_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" front headrests")]
+                rear_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" rear headrests")]
+                months_of_provided_satellite_radio_service = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" Months of provided satellite radio service")]
+                watts_stereo_output = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" watts stereo output")]
+                total_speakers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" total speakers")]
+                subwoofers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" subwoofer")]
+                tires = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" tires")]
+                wheels = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" in. wheels")]
+                power_driver_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power driver seat")]
+                power_passenger_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power passenger seat")]
+                manual_driver_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("manual driver seat adjustment")]
+                manual_passenger_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" manual passenger seat adjustment")]
+                if str(tmp_raw_table['Category'][0]).lower() == 'safety' and (len(front_headrests)  > 0 or len(rear_headrests)  > 0):
+                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, front_headrests, 'front headrests')
+                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, rear_headrests, 'rear headrests')
+                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                # elif str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and (len(subwoofers)  > 0 or len(total_speakers)  > 0 or len(months_of_provided_satellite_radio_service) > 0 or len(watts_stereo_output) > 0):
+                #     if len(subwoofers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, subwoofers, 'subwoofer(s)')
+                #     if len(total_speakers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, total_speakers, 'total speakers')
+                #     if len(months_of_provided_satellite_radio_service) > 0:
+                #         tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, months_of_provided_satellite_radio_service, 'Months of provided satellite radio service')
+                #     if len(watts_stereo_output) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, watts_stereo_output, 'watts stereo output')
+                #     tmp_raw_table = drop_merged_option(tmp_raw_table,_num_menu_columns)
+                elif str(tmp_raw_table['Category'][0]).lower() == 'tires & wheels' and (len(tires)  > 0 or len(wheels) > 0):
+                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, tires, 'tires')
+                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, wheels, 'wheels')
+                    tmp_raw_table = trim_tires_wheels(tmp_raw_table, _num_menu_columns)
+                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                elif str(tmp_raw_table['Category'][0]).lower() == 'front seats' and (len(power_driver_seat)  > 0 or len(power_passenger_seat)  > 0 or len(manual_driver_seat_adjustment) > 0 or len(manual_passenger_seat_adjustment) > 0):
+                    if len(power_driver_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, power_driver_seat, 'power driver seat')
+                    if len(power_passenger_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, power_passenger_seat, 'power passenger seat')
+                    if len(manual_driver_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, manual_driver_seat_adjustment, 'manual driver seat adjustment')
+                    if len(manual_passenger_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, manual_passenger_seat_adjustment, 'manual passenger seat adjustment')
+                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                elif str(tmp_raw_table['Category'][0]).lower() == 'overview' or str(tmp_raw_table['Category'][0]).lower() == 'drivetrain' or \
+                        str(tmp_raw_table['Category'][0]).lower() == 'fuel & mpg' or str(tmp_raw_table['Category'][0]).lower() == 'engine' or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == False) or \
+                    str(tmp_raw_table['Category'][0]).lower() == 'measurements' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
+                    tmp_raw_table = update_raw_tables(tmp_raw_table, _num_menu_columns)
+                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+
+                if (str(tmp_raw_table['Category'][0]).lower() == 'colors' and SKIP_PRINTING_COLORS == True) or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'exterior options' and SKIP_PRINTING_EXTERIOR_OPTIONS == True) or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == True) or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'packages' and SKIP_PRINTING_PACKAGES == True) or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and SKIP_IN_CAR_ENTERTAINMENT == True) or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'power feature' and SKIP_POWER_FEATURE == True) or \
+                        (str(tmp_raw_table['Category'][0]).lower() == 'interior options' and SKIP_PRINTING_INTERIOR_OPTIONS == True):
+                    continue
+                else:
+                    df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
+                    df_tmp.fillna('', inplace=True)
+                if table_count == (num_table_list-1):
+                    if (trim_group == 0 and _num_menu_columns > 1) or (i_trims_page == 0):
+                        df = df_tmp
+                    else:
+                        df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='inner')
+                        df = df.drop_duplicates(subset=['Specifications'])
+            except NameError:
+                df_tmp = table_list[table_count]
+                name_category = table_list[table_count].columns[0]
+                if df_tmp.columns[0] != 'Category': df_tmp.insert(0, 'Category', '')
+                df_tmp['Category'] = name_category
+                if df_tmp.columns[1] != 'Specifications': df_tmp = df_tmp.rename(columns={df_tmp.columns[0]: 'Category', df_tmp.columns[1]: 'Specifications'})
+                for i in range(_num_menu_columns): df_tmp = df_tmp.rename(columns={df_tmp.columns[num_column_shift + i]: trims_text[i_trims_page]})
+                df_tmp = update_raw_tables(df_tmp, _num_menu_columns)
+                df_tmp = drop_merged_option(df_tmp, _num_menu_columns)
+    return df

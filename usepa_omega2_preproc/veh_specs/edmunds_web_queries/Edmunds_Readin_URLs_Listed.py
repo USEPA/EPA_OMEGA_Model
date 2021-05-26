@@ -10,7 +10,7 @@ from pathlib import *
 # pip install pandas numpy selenium beautifulsoup4 html5lib lxml
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019_test'+'.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2012.csv')
 start_count = 0 #Set to 0 when time permits
 final_table_to_csv_inc = 50 # print final_table csv file at the final_table_to_csv_inc increments
 for run_count in range (0,len(run_controller)):
@@ -22,9 +22,11 @@ for run_count in range (0,len(run_controller)):
     model_year = str(run_controller['Model Year'][run_count])
     weberror = pd.Series(np.zeros(1), name = 'Website Errors').replace(0,'')
     edmunds_info = pd.read_csv(working_directory+input_name, encoding = "ISO-8859-1")
+    edmunds_info.dropna(subset=[url_column_name], inplace=True)
     edmunds_makes = edmunds_info['Make']
     edmunds_models = edmunds_info['Model']
     url_list = edmunds_info[url_column_name]
+
     final_table_to_csv_list = [i*final_table_to_csv_inc for i in range(1, math.ceil(len(url_list)/final_table_to_csv_inc))] # print every final_table_to_csv_inc URLs
     if continued_readin == 'y':
         readin_table = pd.read_csv(working_directory+output_name, dtype=object, encoding = "ISO-8859-1")
@@ -102,7 +104,6 @@ for run_count in range (0,len(run_controller)):
             #         index=False)
 
     final_table['URL'] = final_table['URL'].str.upper()
-    final_table = final_table.rename(columns={'WHEEL BASE': 'WHEELBASE'})
     final_table = final_table.sort_values('URL')
     final_table = final_table.dropna(how='all', subset=['Make', 'Model'])
     final_table = final_table.fillna('')
