@@ -6,7 +6,6 @@ omega_tree.py
 Routines and data structures for compliance-tree algorithms
 
 """
-import math
 
 from omega2 import *
 
@@ -44,7 +43,10 @@ class WeightedNode(OMEGABase):
 
     @property
     def weighted_value(self):
-        return self.weight * self.value
+        if self.weight is not None:
+            return self.weight * self.value
+        else:
+            return 0 * self.value
 
     @property
     def identifier(self):
@@ -60,7 +62,7 @@ class WeightedNode(OMEGABase):
 
 class WeightedTree(OMEGABase):
     def __init__(self, tree_df, verbose=False):
-        from treelib import Node, Tree
+        from treelib import Tree
         self.tree = Tree()
 
         for i, c in enumerate(tree_df.columns):
@@ -68,7 +70,10 @@ class WeightedTree(OMEGABase):
                 parent_name, child_name = c.split('->')
                 if not self.tree:  # if tree is empty, create root
                     self.tree.create_node(identifier=parent_name, data=WeightedNode(1.0))
-                self.tree.create_node(identifier=child_name, parent=parent_name, data=WeightedNode(tree_df[c].item()))
+                node_weight = tree_df[c].item()
+                if type(node_weight) is str:
+                    node_weight = eval(node_weight, {'__builtins__': None}, {})
+                self.tree.create_node(identifier=child_name, parent=parent_name, data=WeightedNode(node_weight))
 
         if verbose:
             self.tree.show(idhidden=False, data_property='weight')
@@ -77,13 +82,17 @@ class WeightedTree(OMEGABase):
         return self.tree.leaves()
 
     def validate_weights(self):
+        import sys
+
         tree_errors = []
 
         # validate note weights
         for node_id in self.tree.expand_tree(mode=self.tree.DEPTH):
             child_node_weights = [c.data.weight for c in self.tree.children(node_id)]
-            if child_node_weights:
-                if sum(child_node_weights) != 1.0:
+            if None in child_node_weights:
+                child_node_weights.remove(None)
+            if any(child_node_weights):
+                if abs(1-sum(child_node_weights)) > sys.float_info.epsilon:
                     tree_errors.append('weight error at %s' % node_id)
 
         return tree_errors
