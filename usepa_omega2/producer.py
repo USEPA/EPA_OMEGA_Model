@@ -311,11 +311,14 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
     import copy
     manufacturer_composite_vehicles = copy.deepcopy(manufacturer_composite_vehicles)
 
+    from vehicles import VehicleAttributeCalculations
+
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_composite_vehicles:
         new_veh.cert_co2_grams_per_mile = winning_combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
         new_veh.cert_direct_kwh_per_mile = winning_combo['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
         new_veh.initial_registered_count = winning_combo['veh_%s_sales' % new_veh.vehicle_ID]
+        VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
         new_veh.set_cert_target_co2_Mg()

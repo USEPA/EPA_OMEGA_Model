@@ -44,20 +44,8 @@ class VehicleAttributeCalculations(OMEGABase):
 
         return template_errors
 
-    # @staticmethod
-    # def perform_vehicle_attribute_calculations(vehicle):
-    #     cache_key = int(vehicle.model_year)
-    #     if cache_key in VehicleAttributeCalculations.cache:
-    #         calcs = VehicleAttributeCalculations.cache[cache_key]
-    #         for calc, value in calcs.items():
-    #             select_attribute, select_value, operator, action = calc.split(':')
-    #             if vehicle.__getattribute__(select_attribute) == select_value:
-    #                 attribute_source, attribute_target = action.split('->')
-    #                 # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
-    #                 vehicle.__setattr__(attribute_target, eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
-
     @staticmethod
-    def perform_attribute_calculations(vehicle, cost_cloud):
+    def perform_attribute_calculations(vehicle, cost_cloud=None):
         cache_key = int(vehicle.model_year)
         if cache_key in VehicleAttributeCalculations.cache:
             calcs = VehicleAttributeCalculations.cache[cache_key]
@@ -66,7 +54,11 @@ class VehicleAttributeCalculations(OMEGABase):
                 if vehicle.__getattribute__(select_attribute) == select_value:
                     attribute_source, attribute_target = action.split('->')
                     # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
-                    cost_cloud[attribute_target] = eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
+                    if cost_cloud is not None:
+                        cost_cloud[attribute_target] = eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
+                    else:
+                        vehicle.__setattr__(attribute_target,
+                                            eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
 
 
 class CompositeVehicle(OMEGABase):
@@ -97,7 +89,8 @@ class CompositeVehicle(OMEGABase):
         self.cert_co2_Mg = self.set_cert_co2_Mg()
 
         weighted_values = ['cert_co2_grams_per_mile', 'upstream_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
-                           'cert_direct_kwh_per_mile', 'footprint_ft2']
+                           'cert_direct_kwh_per_mile', 'footprint_ft2', 'onroad_direct_co2_grams_per_mile',
+                           'onroad_direct_kwh_per_mile']
 
         # calc sales-weighted values
         for wv in weighted_values:
@@ -311,24 +304,24 @@ class Vehicle(OMEGABase):
         self.reg_class_market_share_frac = 1.0
         self.epa_size_class = None
         self.context_size_class = None
-        self.market_share = None
+        self.market_share = 0
         self.non_responsive_market_group = None
         self.electrification_class = None
-        self.upstream_co2_grams_per_mile = None
-        self.cert_co2_grams_per_mile = None
-        self.cert_direct_co2_grams_per_mile = None
-        self.cert_direct_kwh_per_mile = None
-        self.onroad_direct_co2_grams_per_mile = None
-        self.onroad_direct_kwh_per_mile = None
-        self.cert_target_co2_grams_per_mile = None
-        self.cert_co2_Mg = None
-        self.cert_target_co2_Mg = None
-        self.new_vehicle_mfr_cost_dollars = None
-        self.new_vehicle_mfr_generalized_cost_dollars = None
+        self.upstream_co2_grams_per_mile = 0
+        self.cert_co2_grams_per_mile = 0
+        self.cert_direct_co2_grams_per_mile = 0
+        self.cert_direct_kwh_per_mile = 0
+        self.onroad_direct_co2_grams_per_mile = 0
+        self.onroad_direct_kwh_per_mile = 0
+        self.cert_target_co2_grams_per_mile = 0
+        self.cert_co2_Mg = 0
+        self.cert_target_co2_Mg = 0
+        self.new_vehicle_mfr_cost_dollars = 0
+        self.new_vehicle_mfr_generalized_cost_dollars = 0
         self.in_use_fuel_ID = None
         self.cert_fuel_ID = None
         self.market_class_ID = None
-        self.footprint_ft2 = None
+        self.footprint_ft2 = 0
         self._initial_registered_count = 0
         Vehicle.set_next_vehicle_ID()
         self.cost_cloud = None
@@ -460,6 +453,7 @@ class Vehicle(OMEGABase):
             self.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2_grams_per_mile
             self.set_cert_target_co2_Mg()  # varies by model year and initial_registered_count
             self.set_cert_co2_Mg()  # varies by model year and initial_registered_count
+            VehicleAttributeCalculations.perform_attribute_calculations(self)
         else:  # type(self) == VehicleFinal and type(vehicle == Vehicle)
             self.cert_co2_grams_per_mile = vehicle.cert_co2_grams_per_mile
             self.upstream_co2_grams_per_mile = vehicle.upstream_co2_grams_per_mile
