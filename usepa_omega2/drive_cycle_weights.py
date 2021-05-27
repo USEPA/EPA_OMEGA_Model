@@ -30,14 +30,16 @@ class DriveCycleWeights(OMEGABase):
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        import numpy as np
+
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'share_tree'
-        input_template_version = 0.2
-        input_template_columns = {'calendar_year', 'share_id', 'fueling_class'}
+        input_template_version = 0.3
+        input_template_columns = {'start_year', 'share_id', 'fueling_class'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -53,35 +55,47 @@ class DriveCycleWeights(OMEGABase):
                 weight_errors = []
                 cycle_name_errors = []
                 for fc in fueling_classes:
-                    for calendar_year in df['calendar_year']:
-                        tree = WeightedTree(df.loc[(df['calendar_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
-                        weight_errors += tree.validate_weights()
-                        if weight_errors:
-                            template_errors = ['weight error %s: %s' %
-                                               (calendar_year, error) for error in weight_errors]
-                        else:
-                            if not cache:
-                                # validate drive cycle names on first tree
-                                cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
-                                if cycle_name_errors:
-                                    template_errors =['cyclename error %s' % error for error in cycle_name_errors]
-                            if not cycle_name_errors:
-                                cache['%s_%s' % (calendar_year, fc)] = tree
+                    for calendar_year in df['start_year']:
+                        data = df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)]
+                        if not data.empty:
+                            tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
+                            weight_errors += tree.validate_weights()
+                            if weight_errors:
+                                template_errors = ['weight error %s: %s' %
+                                                   (calendar_year, error) for error in weight_errors]
+                            else:
+                                if not cache:
+                                    # validate drive cycle names on first tree
+                                    cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
+                                    if cycle_name_errors:
+                                        template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
+                                if not cycle_name_errors:
+                                    if fc not in cache:
+                                        cache[fc] = dict()
+                                    cache[fc][calendar_year] = tree
+
+                    cache[fc]['start_years'] = np.array(list(cache[fc].keys()))
 
         return template_errors
 
     @staticmethod
     def calculate_weighted_value(calendar_year, fueling_class, cycle_values_dict, node_id=None, weighted=True):
-        return cache['%s_%s' % (calendar_year, fueling_class)].calculate_weighted_value(cycle_values_dict, node_id=node_id,
-                                                             weighted=weighted)
+        import numpy as np
+
+        start_years = cache[fueling_class]['start_years']
+        calendar_year = max(start_years[start_years<=calendar_year])
+        return cache[fueling_class][calendar_year].calculate_weighted_value(cycle_values_dict, node_id=node_id,
+                                                                            weighted=weighted)
 
     @staticmethod
     def calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(calendar_year, fueling_class, df):
-        return DriveCycleWeights.calculate_weighted_value(calendar_year, fueling_class, df, 'cs_cert_direct_oncycle_co2_grams_per_mile', weighted=False)
+        return DriveCycleWeights.calculate_weighted_value(calendar_year, fueling_class, df,
+                                                          'cs_cert_direct_oncycle_co2_grams_per_mile', weighted=False)
 
     @staticmethod
     def calc_weighted_drive_cycle_kwh_per_mile(calendar_year, fueling_class, df):
-        return DriveCycleWeights.calculate_weighted_value(calendar_year, fueling_class, df, 'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
+        return DriveCycleWeights.calculate_weighted_value(calendar_year, fueling_class, df,
+                                                          'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
 
 
 if __name__ == '__main__':
