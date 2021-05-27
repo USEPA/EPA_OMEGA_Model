@@ -255,7 +255,11 @@ class OMEGASessionObject(OMEGABase):
         try:
             param = self.parent.dataframe.loc[index_str][self.num]
         except:
-            param = default_value
+            if default_value is None:
+                if index_str not in self.parent.dataframe:
+                    raise Exception('Batch file missing row "%s"' % index_str)
+            else:
+                param = default_value
         finally:
             return param
 
@@ -302,7 +306,6 @@ class OMEGASessionObject(OMEGABase):
         self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
         self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
-        self.settings.fuel_scenarios_file = self.read_parameter('Fuel Scenarios File')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.cost_file = self.read_parameter('Cost File')
