@@ -377,7 +377,8 @@ class Vehicle(OMEGABase):
         co2_emissions_grams_per_unit = 0
         fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
-            co2_emissions_grams_per_unit += Fuel.get_fuel_attributes(fuel, 'co2_tailpipe_emissions_grams_per_unit') * fuel_share
+            co2_emissions_grams_per_unit += \
+                Fuel.get_fuel_attributes(fuel, 'co2_tailpipe_emissions_grams_per_unit') * fuel_share
 
         return co2_emissions_grams_per_unit
 
