@@ -17,22 +17,30 @@ class PolicyFuelUpstream(OMEGABase):
 
     @staticmethod
     def get_upstream_co2e_grams_per_unit(calendar_year, fuel_ID):
+        start_years = PolicyFuelUpstream.values['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
         return PolicyFuelUpstream.values['%s:%s' % (fuel_ID, co2_units)].loc[
-                  PolicyFuelUpstream.values['calendar_year'] == calendar_year].item()
+                  PolicyFuelUpstream.values['start_year'] == calendar_year].item()
 
     @staticmethod
     def get_upstream_inefficiency(calendar_year, fuel_ID):
+        start_years = PolicyFuelUpstream.values['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
         return PolicyFuelUpstream.values['%s:%s' % (fuel_ID, electric_loss_units)].loc[
-                  PolicyFuelUpstream.values['calendar_year'] == calendar_year].item()
+                  PolicyFuelUpstream.values['start_year'] == calendar_year].item()
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        import numpy as np
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'policy_fuel_upstream'
-        input_template_version = 0.1
-        input_template_columns = {'calendar_year'}
+        input_template_version = 0.2
+        input_template_columns = {'start_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -46,7 +54,7 @@ class PolicyFuelUpstream(OMEGABase):
             if not template_errors:
                 from fuels import Fuel
 
-                PolicyFuelUpstream.values['calendar_year'] = df['calendar_year']
+                PolicyFuelUpstream.values['start_year'] = np.array(list(df['start_year']))
 
                 fuel_columns = [c for c in df.columns if (co2_units in c) or (electric_loss_units in c)]
 
