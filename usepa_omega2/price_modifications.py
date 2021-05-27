@@ -16,21 +16,26 @@ class PriceModifications(OMEGABase):
 
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
+        start_years = PriceModifications.values['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
         mod_key = '%s:%s' % (market_class_id, price_modification)
         if mod_key in PriceModifications.values:
             return PriceModifications.values['%s:%s' % (market_class_id, price_modification)].loc[
-                PriceModifications.values['calendar_year'] == calendar_year].item()
+                PriceModifications.values['start_year'] == calendar_year].item()
         else:
             return 0
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        import numpy as np
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'policy_price_modifications'
-        input_template_version = 0.1
-        input_template_columns = {'calendar_year'}
+        input_template_version = 0.2
+        input_template_columns = {'start_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -44,7 +49,7 @@ class PriceModifications(OMEGABase):
             if not template_errors:
                 from consumer.market_classes import MarketClass
 
-                PriceModifications.values['calendar_year'] = df['calendar_year']
+                PriceModifications.values['start_year'] = np.array(df['start_year'])
 
                 share_columns = [c for c in df.columns if (price_modification in c)]
 
