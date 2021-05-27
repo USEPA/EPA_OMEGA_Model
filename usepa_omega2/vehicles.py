@@ -55,7 +55,8 @@ class VehicleAttributeCalculations(OMEGABase):
                     attribute_source, attribute_target = action.split('->')
                     # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
                     if cost_cloud is not None:
-                        cost_cloud[attribute_target] = eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
+                        cost_cloud[attribute_target] = \
+                            eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
                     else:
                         vehicle.__setattr__(attribute_target,
                                             eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
@@ -345,7 +346,7 @@ class Vehicle(OMEGABase):
             calendar_year = self.model_year
 
         price = 0
-        fuel_dict = eval(self.in_use_fuel_ID)
+        fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             price += ContextFuelPrices.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
 
@@ -357,7 +358,7 @@ class Vehicle(OMEGABase):
             calendar_year = self.model_year
 
         price = 0
-        fuel_dict = eval(self.in_use_fuel_ID)
+        fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             price += ContextFuelPrices.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel) * fuel_share
 
@@ -367,7 +368,7 @@ class Vehicle(OMEGABase):
         from fuels import Fuel
 
         co2_emissions_grams_per_unit = 0
-        fuel_dict = eval(self.in_use_fuel_ID)
+        fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             co2_emissions_grams_per_unit += Fuel.get_fuel_attributes(fuel, 'co2_tailpipe_emissions_grams_per_unit') * fuel_share
 

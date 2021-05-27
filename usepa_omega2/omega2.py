@@ -816,7 +816,7 @@ def run_omega(o2_options, standalone_run=False):
             session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(o2.options.database_dump_folder)
 
-            if o2.options.session_is_reference and o2.options.generate_context_new_vehicle_prices_file:
+            if o2.options.session_is_reference and o2.options.generate_context_new_vehicle_generalized_costs_file:
                 from context_new_vehicle_market import ContextNewVehicleMarket
                 ContextNewVehicleMarket.save_context_new_vehicle_generalized_costs(o2.options.context_new_vehicle_generalized_costs_file)
 

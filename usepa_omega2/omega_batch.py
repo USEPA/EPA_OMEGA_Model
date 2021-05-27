@@ -63,7 +63,7 @@ class OMEGABatchObject(OMEGABase):
         self.context_id = ''
         self.context_case_id = ''
         self.context_new_vehicle_generalized_costs_file = ''
-        self.generate_context_new_vehicle_prices_file = False
+        self.generate_context_new_vehicle_generalized_costs_file = False
         self.output_path = "." + os.sep
         self.sessions = []
         self.dataframe = pd.DataFrame()
@@ -216,7 +216,7 @@ class OMEGABatchObject(OMEGABase):
         # relative path, absolute path, 'GENERATE' or 'GENERATE filename' where filename can be an absolute or relative path
         # if 'GENERATE' then the default file name will be batch_definition_path + 'context_new_vehicle_prices.csv'
         if self.context_new_vehicle_generalized_costs_file.startswith('GENERATE'):
-            self.generate_context_new_vehicle_prices_file = True
+            self.generate_context_new_vehicle_generalized_costs_file = True
             self.context_new_vehicle_generalized_costs_file = \
                 self.context_new_vehicle_generalized_costs_file.replace('GENERATE', '').strip()
             if not self.context_new_vehicle_generalized_costs_file:
@@ -283,9 +283,9 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_case_id = self.parent.context_case_id
 
         if self.num > 0:
-            self.settings.generate_context_new_vehicle_prices_file = False
+            self.settings.generate_context_new_vehicle_generalized_costs_file = False
         else:
-            self.settings.generate_context_new_vehicle_prices_file = self.parent.generate_context_new_vehicle_prices_file
+            self.settings.generate_context_new_vehicle_generalized_costs_file = self.parent.generate_context_new_vehicle_generalized_costs_file
 
         if remote and self.num > 0:
             self.settings.context_new_vehicle_generalized_costs_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
@@ -627,7 +627,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                             source_file_path = source_file_path.replace('\\', os.sep)
                         if (i != 'Context New Vehicle Prices File') or \
                                 ( (s == 0) and (i == 'Context New Vehicle Prices File') and
-                                 not batch.generate_context_new_vehicle_prices_file):
+                                 not batch.generate_context_new_vehicle_generalized_costs_file):
                             if is_absolute_path(source_file_path):
                                 if options.verbose: batch.batch_log.logwrite('validating %s=%s' % (i, source_file_path))
                                 validate_file(source_file_path)
@@ -699,7 +699,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                         if str(i).endswith(' File'):
                             if (i != 'Context New Vehicle Prices File') or \
                                     ((i == 'Context New Vehicle Prices File') and
-                                     not batch.generate_context_new_vehicle_prices_file):
+                                     not batch.generate_context_new_vehicle_generalized_costs_file):
                                 if i != 'Context New Vehicle Prices File':
                                     source_file_path = batch.dataframe.loc[i][session.num]
                                 else:
@@ -752,7 +752,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         if not options.no_sim:
             if options.dispy:  # run remote job on cluster, except for first job if generating context vehicle prices
                 dispy_session_list = session_list
-                if batch.generate_context_new_vehicle_prices_file:
+                if batch.generate_context_new_vehicle_generalized_costs_file:
                     import copy
                     # run reference case to generate vehicle prices then dispy the rest
                     run_bundled_sessions(copy.copy(batch), options, remote_batchfile, [0])

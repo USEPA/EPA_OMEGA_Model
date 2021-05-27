@@ -50,7 +50,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
         cls._new_vehicle_generalized_costs.clear()
 
-        if not o2.options.context_new_vehicle_generalized_costs_file:
+        if not o2.options.generate_context_new_vehicle_generalized_costs_file:
             df = pd.read_csv(filename, index_col=0, dtype=str)
             # cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
