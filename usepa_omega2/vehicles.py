@@ -14,6 +14,8 @@ class VehicleAttributeCalculations(OMEGABase):
 
     @staticmethod
     def init_vehicle_attribute_calculations_from_file(filename, clear_cache=False, verbose=False):
+        import numpy as np
+
         if clear_cache:
             VehicleAttributeCalculations.cache = dict()
 
@@ -21,8 +23,8 @@ class VehicleAttributeCalculations(OMEGABase):
             omega_log.logwrite('\nInitializing from %s...' % filename)
 
         input_template_name = 'vehicle_attribute_calculations'
-        input_template_version = 0.1
-        input_template_columns = {'model_year'}
+        input_template_version = 0.2
+        input_template_columns = {'start_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -33,7 +35,7 @@ class VehicleAttributeCalculations(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                df = df.set_index('model_year')
+                df = df.set_index('start_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 for idx, r in df.iterrows():
@@ -42,11 +44,16 @@ class VehicleAttributeCalculations(OMEGABase):
 
                     VehicleAttributeCalculations.cache[idx] = r.to_dict()
 
+                VehicleAttributeCalculations.cache['start_year'] = \
+                    np.array(list(VehicleAttributeCalculations.cache.keys()))
+
         return template_errors
 
     @staticmethod
     def perform_attribute_calculations(vehicle, cost_cloud=None):
-        cache_key = int(vehicle.model_year)
+        start_years = VehicleAttributeCalculations.cache['start_year']
+        cache_key = max(start_years[start_years <= vehicle.model_year])
+
         if cache_key in VehicleAttributeCalculations.cache:
             calcs = VehicleAttributeCalculations.cache[cache_key]
             for calc, value in calcs.items():

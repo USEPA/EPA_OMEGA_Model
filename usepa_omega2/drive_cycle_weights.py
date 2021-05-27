@@ -74,13 +74,13 @@ class DriveCycleWeights(OMEGABase):
                                         cache[fc] = dict()
                                     cache[fc][calendar_year] = tree
 
-                    cache[fc]['start_years'] = np.array(list(cache[fc].keys()))
+                    cache[fc]['start_year'] = np.array(list(cache[fc].keys()))
 
         return template_errors
 
     @staticmethod
     def calculate_weighted_value(calendar_year, fueling_class, cycle_values_dict, node_id=None, weighted=True):
-        start_years = cache[fueling_class]['start_years']
+        start_years = cache[fueling_class]['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
         return cache[fueling_class][calendar_year].calculate_weighted_value(cycle_values_dict, node_id=node_id,
                                                                             weighted=weighted)
