@@ -80,10 +80,8 @@ class DriveCycleWeights(OMEGABase):
 
     @staticmethod
     def calculate_weighted_value(calendar_year, fueling_class, cycle_values_dict, node_id=None, weighted=True):
-        import numpy as np
-
         start_years = cache[fueling_class]['start_years']
-        calendar_year = max(start_years[start_years<=calendar_year])
+        calendar_year = max(start_years[start_years <= calendar_year])
         return cache[fueling_class][calendar_year].calculate_weighted_value(cycle_values_dict, node_id=node_id,
                                                                             weighted=weighted)
 
