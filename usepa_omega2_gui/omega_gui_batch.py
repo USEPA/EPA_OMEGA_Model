@@ -17,6 +17,11 @@ import psutil
 import multitimer
 import time
 
+import pyqtgraph as pg
+from pyqtgraph.Qt import QtCore, QtGui
+import pyqtgraph.exporters
+import numpy as np
+
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 from playsound import playsound
@@ -29,7 +34,7 @@ from PySide2.QtCore import QFile, QObject
 
 from datetime import datetime
 
-from plyer import notification
+# from plyer import notification
 
 # Import functions from other files
 from usepa_omega2_gui.omega_gui_functions import *
@@ -1176,10 +1181,15 @@ def run_gui():
 
 if __name__ == '__main__':
     import platform
-
     if platform.system() == 'Darwin':
         # workaround for PySide2 on MacOS Big Sur
         import os
         os.environ['QT_MAC_WANTS_LAYER'] = '1'
-
+    # ***** Added for new plot
+    # import sys
+    # if sys.flags.interactive != 1 or not hasattr(pg.QtCore, 'PYQT_VERSION'):
+    #     pg.QtGui.QApplication.exec_()
+    # if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+    #     QtGui.QApplication.instance().exec_()
+    # *****
     run_gui()
