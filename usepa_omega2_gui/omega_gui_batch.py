@@ -9,22 +9,22 @@ The GUI uses QT Designer for the layout and PySide2 as the Python interface.
 
 import os
 import sys
-import subprocess
+# import subprocess
 
-import pandas
+# import pandas
 import psutil
 
 import multitimer
-import time
+# import time
 
-import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
-import pyqtgraph.exporters
-import numpy as np
+# import pyqtgraph as pg
+# from pyqtgraph.Qt import QtCore, QtGui
+# import pyqtgraph.exporters
+# import numpy as np
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
-from playsound import playsound
+# from playsound import playsound
 
 # PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
 import PySide2.QtXml
