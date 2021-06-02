@@ -10,6 +10,9 @@ print('importing %s' % __file__)
 from usepa_omega2 import *
 
 
+cache = dict()
+
+
 def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
     return 0
 
@@ -61,19 +64,28 @@ class PolicyFuelUpstreamMethods(OMEGABase):
 
     @staticmethod
     def get_upstream_method(calendar_year):
-        method = PolicyFuelUpstreamMethods.methods['upstream_calculation_method'].loc[
-                PolicyFuelUpstreamMethods.methods['calendar_year'] == calendar_year].item()
-        return upstream_method_dict[method]
 
+        start_years = cache['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
+        method = PolicyFuelUpstreamMethods.methods['upstream_calculation_method'].loc[
+                PolicyFuelUpstreamMethods.methods['start_year'] == calendar_year].item()
+
+        return upstream_method_dict[method]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+
+        import numpy as np
+
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'policy_fuel_upstream_methods'
-        input_template_version = 0.1
-        input_template_columns = {'calendar_year', 'upstream_calculation_method'}
+        input_template_version = 0.2
+        input_template_columns = {'start_year', 'upstream_calculation_method'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -85,8 +97,10 @@ class PolicyFuelUpstreamMethods(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                PolicyFuelUpstreamMethods.methods['calendar_year'] = df['calendar_year']
+                PolicyFuelUpstreamMethods.methods['start_year'] = df['start_year']
                 PolicyFuelUpstreamMethods.methods['upstream_calculation_method'] = df['upstream_calculation_method']
+
+            cache['start_year'] = np.array(list(df['start_year']))
 
         return template_errors
 
