@@ -39,15 +39,21 @@ class GHGStandardFlat(SQABase, OMEGABase):
 
     @staticmethod
     def calculate_target_co2_gpmi(vehicle):
+        start_years = cache[vehicle.reg_class_ID]['start_year']
+        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+
         cache_key = '%s_%s_target_co2_gpmi' % (vehicle.model_year, vehicle.reg_class_ID)
         if cache_key not in cache:
             cache[cache_key] = o2.session.query(GHGStandardFlat.GHG_target_co2_grams_per_mile). \
                 filter(GHGStandardFlat.reg_class_ID == vehicle.reg_class_ID). \
-                filter(GHGStandardFlat.model_year == vehicle.model_year).scalar()
+                filter(GHGStandardFlat.model_year == vehicle_model_year).scalar()
         return cache[cache_key]
 
     @staticmethod
     def calculate_cert_lifetime_vmt(reg_class_id, model_year):
+        start_years = cache[reg_class_id]['start_year']
+        model_year = max(start_years[start_years <= model_year])
+
         cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
         if cache_key not in cache:
             cache[cache_key] = o2.session.query(GHGStandardFlat.lifetime_VMT). \
@@ -58,9 +64,12 @@ class GHGStandardFlat(SQABase, OMEGABase):
     @staticmethod
     def calculate_target_co2_Mg(vehicle, sales_variants=None):
         import numpy as np
-        from GHG_standards_production_multipliers import GHGStandardIncentives
+        from GHG_standards_incentives import GHGStandardIncentives
 
-        lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
+        start_years = cache[vehicle.reg_class_ID]['start_year']
+        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+
+        lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         co2_gpmi = GHGStandardFlat.calculate_target_co2_gpmi(vehicle)
 
@@ -77,9 +86,12 @@ class GHGStandardFlat(SQABase, OMEGABase):
     @staticmethod
     def calculate_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         import numpy as np
-        from GHG_standards_production_multipliers import GHGStandardIncentives
+        from GHG_standards_incentives import GHGStandardIncentives
 
-        lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
+        start_years = cache[vehicle.reg_class_ID]['start_year']
+        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+
+        lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         if co2_gpmi_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -99,13 +111,16 @@ class GHGStandardFlat(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+
+        import numpy as np
+
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.0002
-        input_template_columns = {'model_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
+        input_template_version = 0.1
+        input_template_columns = {'start_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -121,13 +136,16 @@ class GHGStandardFlat(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(GHGStandardFlat(
-                        model_year=df.loc[i, 'model_year'],
+                        model_year=df.loc[i, 'start_year'],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
                         GHG_target_co2_grams_per_mile=df.loc[i, 'ghg_target_co2_grams_per_mile'],
                         lifetime_VMT=df.loc[i, 'lifetime_vmt'],
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
+
+                for rc in df['reg_class_id'].unique():
+                    cache[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
 
         return template_errors
 
