@@ -12,36 +12,53 @@ from usepa_omega2 import *
 min_share_units = 'minimum_share'
 max_share_units = 'maximum_share'
 
+cache = dict()
+
 
 class ProductionConstraints(OMEGABase):
     values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
+
+        start_years = cache['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
         min_key = '%s:%s' % (market_class_id, min_share_units)
+
         if min_key in ProductionConstraints.values:
             return ProductionConstraints.values[min_key].loc[
-                ProductionConstraints.values['calendar_year'] == calendar_year].item()
+                ProductionConstraints.values['start_year'] == calendar_year].item()
         else:
             return 0
 
     @staticmethod
     def get_maximum_share(calendar_year, market_class_id):
+
+        start_years = cache['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
         max_key = '%s:%s' % (market_class_id, max_share_units)
+
         if max_key in ProductionConstraints.values:
             return ProductionConstraints.values[max_key].loc[
-                ProductionConstraints.values['calendar_year'] == calendar_year].item()
+                ProductionConstraints.values['start_year'] == calendar_year].item()
         else:
             return 1
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+
+        import numpy as np
+
+        cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'production_constraints'
-        input_template_version = 0.1
-        input_template_columns = {'calendar_year'}
+        input_template_version = 0.2
+        input_template_columns = {'start_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -55,7 +72,7 @@ class ProductionConstraints(OMEGABase):
             if not template_errors:
                 from consumer.market_classes import MarketClass
 
-                ProductionConstraints.values['calendar_year'] = df['calendar_year']
+                ProductionConstraints.values['start_year'] = df['start_year']
 
                 share_columns = [c for c in df.columns if (min_share_units in c) or (max_share_units in c)]
 
@@ -65,6 +82,9 @@ class ProductionConstraints(OMEGABase):
                         ProductionConstraints.values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
+
+                cache['start_year'] = np.array(list(df['start_year']))
+
 
         return template_errors
 
