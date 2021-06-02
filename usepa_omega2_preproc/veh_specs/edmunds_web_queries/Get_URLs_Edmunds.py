@@ -18,7 +18,61 @@ from pathlib import *
 max_URLs = 1000
 _makers_no_models = ['BYTON', 'Lucid', 'Rivian']
 
-def url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory):
+chromedriver = 'chromedriver.exe'
+os.environ["webdriver.chrome.driver"] = chromedriver
+chromeOptions = Options()
+chromeOptions.add_argument("--start-maximized")
+wait_sec = 30
+sleep_short = 0.1
+sleep_long = 1.5
+
+def reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, model_idx, xpath_year,
+                        year_idx, xpath_go_button, url_list, working_directory):
+    # make_idx, model_icx, year_idx == -1 no execution, == 0 no select_by_index() since a dropdown item starts from 1
+    continue_flag = True
+    driver.quit()
+    driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
+    time.sleep(sleep_short)
+    driver.get(base_url)
+
+    time.sleep(sleep_short)
+    make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+    if make_idx > 0 and make_idx < len(make_dropdown.options):
+        time.sleep(sleep_short)
+        make_dropdown.select_by_index(make_idx)
+        # _maker = make_dropdown.options[make_idx].text
+    xpath_text = xpath_make
+    if model_idx >= 0:
+        time.sleep(sleep_short)
+        model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
+        if make_idx > 0: xpath_text = xpath_model
+        if model_idx > 0 and model_idx < len(model_dropdown.options):
+            time.sleep(sleep_short)
+            model_dropdown.select_by_index(model_idx)
+    if year_idx >= 0:
+        time.sleep(sleep_short)
+        year_dropdown = Select(driver.find_element_by_xpath(xpath_year))
+        if year_idx > 0 and year_idx < len(year_dropdown.options):
+            time.sleep(sleep_short)
+            year_dropdown.select_by_index(year_idx)
+            xpath_text = xpath_go_button
+        else:
+            xpath_text = xpath_year
+            # print('year_idx = ', year_idx, ' max year_idx = ', len(year_dropdown.options))
+    try:
+        time.sleep(sleep_short)
+        element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_text)))
+        if year_idx > 0 and xpath_year != xpath_go_button:
+            time.sleep(sleep_long)  # time.sleep(sleep_long)
+            element.click()
+        continue_flag = False
+    except (NoSuchElementException, TimeoutException, UnboundLocalError):
+        url_list_to_csv(url_list, make_idx, working_directory)
+
+    return driver, continue_flag
+
+def url_list_to_csv(url_list, make_idx, working_directory):
+    model_year = url_list[0].replace('//', '/').split('/')[4]
     url_column_name = 'Link ' + str(model_year)
     url_list = pd.DataFrame(url_list, columns=[url_column_name])
     url_list.insert(0, 'Make', '')
@@ -26,36 +80,29 @@ def url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory):
     rows, cols = url_list.shape
     last_rows = 0
     for i in range(rows):
-        url_str= url_list[url_column_name][i]
+        url_str = url_list[url_column_name][i]
         if url_str == '':
-            last_rows=i+1
+            last_rows = i+1
             break
         str_make_model = url_str.replace('//', '/').split('/')
         url_list['Make'][i] = str_make_model[2].capitalize()
         url_list['Model'][i] = str_make_model[3].upper()
         if str_make_model[4].isnumeric() == False: url_str = url_str + str(model_year) + '/'
-        if 'features-specs' not in str_make_model[-1] and ('features-specs/' not in url_str):
-            url_str = url_str + 'features-specs/'
-            url_list[url_column_name][i] = url_str
+        if 'features-specs' not in str_make_model: url_str = url_str + 'features-specs/'
+        url_list[url_column_name][i] = url_str
 
     num_csv_files = math.ceil(last_rows/max_URLs)
     timestr = time.strftime("%Y%m%d-%H%M%S")
+    csv_fname_PART = working_directory + 'Edmunds URLs_' + str(model_year) + '_part.csv'
     for i in range(num_csv_files):
-        if last_rows-1 < max_URLs:
-            if make_idx > 0:
-                url_list.iloc[i*max_URLs:(i+1)*max_URLs,:].to_csv(working_directory + 'Edmunds URLs_'+str(model_year) + '_'+ _maker + '_' + str(make_idx) + '.csv', index=False)
-            else:
-                url_list.iloc[i*max_URLs:(i+1)*max_URLs,:].to_csv(working_directory + 'Edmunds URLs_'+str(model_year) + '_all_'+ timestr + '.csv', index=False)
-        elif last_rows - 1 > (i + 1) * max_URLs:
-            url_list.iloc[i * max_URLs:(i + 1) * max_URLs, :].to_csv(working_directory + 'Edmunds URLs_' + str(model_year) + '_part' + str(i+1)  + '_' + timestr + '.csv', index=False)
+        if make_idx > 0:
+            url_list.iloc[i*max_URLs:(i+1)*max_URLs,:].to_csv(csv_fname_PART, index=False)
         else:
-            url_list.iloc[i*max_URLs:last_rows-1, :].to_csv(working_directory + 'Edmunds URLs_' + str(model_year) + '_part' + str(i+1) + '_' + timestr + '.csv', index=False)
+            if os.path.exists(csv_fname_PART): os.remove(csv_fname_PART)
+            url_list.iloc[i*max_URLs:(i+1)*max_URLs,:].to_csv(working_directory + 'Edmunds URLs_'+str(model_year) + '_'+ timestr + '.csv', index=False)
 
 def Get_URLs_Edmunds(model_year):
-    wait_sec = 30
-    sleep_sec = 0.25
-    sleep_3sec = 3
-    url_list = pd.Series(np.zeros(2000)).replace(0, '')
+    url_list = pd.Series(np.zeros(1000)).replace(0, '')
     url_list_count = 0
     working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
     base_url = 'https://www.edmunds.com/car-reviews/'
@@ -71,9 +118,9 @@ def Get_URLs_Edmunds(model_year):
     #chromeOptions.add_experimental_option('prefs', prefs)
     #chromeOptions.add_argument("--disable-extensions")
     # driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions, desired_capabilities=caps)
-    time.sleep(sleep_sec)
+    time.sleep(sleep_short)
     driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
-    time.sleep(sleep_sec)
+    time.sleep(sleep_short)
     driver.get(base_url)
 
     # used_car_element = driver.find_element_by_xpath("//a[@data-tracking-id = 'nav_mmy_select_used_car']")
@@ -85,62 +132,85 @@ def Get_URLs_Edmunds(model_year):
     xpath_model = "//select[@name = 'select-model']"
     xpath_year = "//select[@name = 'select-year']"
     xpath_go_button = "//button[@class = 'w-100 btn btn-success']"
-    time.sleep(sleep_sec)
+    time.sleep(sleep_short)
     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
-    # time.sleep(sleep_sec); element.click()
+    # time.sleep(sleep_short); element.click()
     make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
     total_make_options = len(make_dropdown.options)
     for make_idx in range (1, total_make_options):
-        make_dropdown.select_by_index(make_idx)
-        _maker = make_dropdown.options[make_idx].text
-        if _maker in _makers_no_models: continue
-
         try:
-            time.sleep(sleep_sec)
+            time.sleep(sleep_short)
+            make_dropdown.select_by_index(make_idx)
+        except:
+            [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, -1, xpath_year, -1,
+                                                          xpath_go_button, url_list, working_directory)
+            time.sleep(sleep_short)
+            make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
+            if continue_flag: continue
+        if make_dropdown.options[make_idx].text in _makers_no_models: continue
+        try:
+            time.sleep(sleep_short)
             element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_model)))
         except (NoSuchElementException, TimeoutException, UnboundLocalError):
-            driver.quit()
-            driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
-            driver.get(base_url)
-            time.sleep(sleep_sec)
-            try:
-                time.sleep(sleep_sec)
-                element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
-            except (NoSuchElementException, TimeoutException, UnboundLocalError):
-                url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory)
-                continue
+            [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, 0, xpath_year, -1,
+                                                          xpath_go_button, url_list, working_directory)
+            if continue_flag: continue
+
+            time.sleep(sleep_short)
             make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
             make_dropdown.select_by_index(make_idx)
             try:
-                time.sleep(sleep_sec)
+                time.sleep(sleep_short)
                 element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_model)))
             except (NoSuchElementException, TimeoutException, UnboundLocalError):
-                url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory)
-                continue
+                [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, 0, xpath_year, -1,
+                                                              xpath_go_button, url_list, working_directory)
+                if continue_flag: continue
 
+        time.sleep(sleep_short)
         model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
         total_model_options = len(model_dropdown.options)
         for model_idx in range(1, total_model_options):
-            model_dropdown.select_by_index(model_idx)
-            _model = model_dropdown.options[model_idx].text
             try:
-                time.sleep(sleep_sec)
+                time.sleep(sleep_short)
+                model_dropdown.select_by_index(model_idx)
+            except:
+                [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, model_idx,
+                                                              xpath_year, -1, xpath_go_button, url_list, working_directory)
+                if continue_flag: continue
+            try:
+                time.sleep(sleep_short)
                 element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_year)))
             except (NoSuchElementException, TimeoutException, UnboundLocalError):
-                url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory)
-                continue
+                [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, model_idx,
+                                                              xpath_year, 0, xpath_go_button, url_list, working_directory)
+                if continue_flag: continue
+
+            time.sleep(sleep_short)
             year_dropdown = Select(driver.find_element_by_xpath(xpath_year))
             total_year_options = len(year_dropdown.options)
-            if total_year_options == 1: continue
             for year_idx in range(1, total_year_options):
+                if int(year_dropdown.options[1].text.strip()) < int(model_year): break
                 if year_dropdown.options[year_idx].text == str(model_year):
+                    time.sleep(sleep_short)
                     year_dropdown.select_by_index(year_idx)
-                    time.sleep(sleep_sec)  # time.sleep(sleep_3sec)
+                    time.sleep(sleep_short)
                     go_button = driver.find_element_by_xpath(xpath_go_button)
-                    time.sleep(sleep_3sec)  # time.sleep(sleep_3sec)
-                    go_button.click()
-                    url_list[url_list_count] = str(driver.current_url).replace('review', 'features-specs')
-                    print(url_list_count, _maker, _model, url_list[url_list_count])
+                    try:
+                        time.sleep(sleep_long)  # time.sleep(sleep_long)
+                        go_button.click()
+                    except:
+                        [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, model_idx,
+                                                                      xpath_year, year_idx, xpath_go_button, url_list, working_directory)
+                        if continue_flag: continue
+
+                    if 'review' in str(driver.current_url):
+                        url_list[url_list_count] = str(driver.current_url).replace('review', 'features-specs')
+                    elif str(model_year) in str(driver.current_url):
+                        url_list[url_list_count] = str(driver.current_url) + 'features-specs/'
+                    else:
+                        url_list[url_list_count] = str(driver.current_url) + str(model_year) + '/features-specs/'
+                    print(url_list_count, make_idx, model_idx, url_list[url_list_count])
                     # if new_url[-1] == '\\':
                     #     url_list[url_list_count] = new_url + 'features-specs'
                     # else:
@@ -148,30 +218,26 @@ def Get_URLs_Edmunds(model_year):
                     url_list_count += 1
                     driver.get(base_url)
                     try:
-                        time.sleep(sleep_sec)
+                        time.sleep(sleep_short)
                         element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
                     except (NoSuchElementException, TimeoutException, UnboundLocalError):
-                        driver.quit()
-                        driver = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
-                        time.sleep(sleep_sec)
-                        driver.get(base_url)
-                        try:
-                            time.sleep(sleep_sec)
-                            element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
-                        except (NoSuchElementException, TimeoutException, UnboundLocalError):
-                            url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory)
-                            continue
-
+                        [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, 0, xpath_model, -1,
+                                                                      xpath_year, -1, xpath_go_button, url_list, working_directory)
+                        if continue_flag: continue
+                    time.sleep(sleep_short)
                     make_dropdown = Select(driver.find_element_by_xpath(xpath_make))
                     if make_dropdown.options[make_idx].text in _makers_no_models: break
+                    time.sleep(sleep_short)
                     make_dropdown.select_by_index(make_idx)
                     try:
-                        time.sleep(sleep_sec)
+                        time.sleep(sleep_short)
                         element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_model)))
                     except (NoSuchElementException, TimeoutException, UnboundLocalError):
-                        url_list_to_csv(model_year, url_list, _maker, make_idx, working_directory)
-                        continue
+                        [driver, continue_flag] = reset_url_clickable(driver, base_url, xpath_make, make_idx, xpath_model, 0,
+                                                                      xpath_year, -1, xpath_go_button, url_list, working_directory)
+                        if continue_flag: continue
+                    time.sleep(sleep_short)
                     model_dropdown = Select(driver.find_element_by_xpath(xpath_model))
                     break
 
-    url_list_to_csv(model_year, url_list, '', -1, working_directory)
+    url_list_to_csv(url_list, -1, working_directory)

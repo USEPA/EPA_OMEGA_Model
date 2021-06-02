@@ -13,6 +13,8 @@ import pandas
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
+# import pyqtgraph as pg
+
 
 def open_file_action(filepath):
     """
