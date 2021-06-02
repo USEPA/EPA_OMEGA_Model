@@ -699,8 +699,8 @@ def init_omega(o2_options):
         init_fail += o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file, 
                                                                      verbose=o2.options.verbose)
 
-        init_fail += GHGStandardIncentives.init_from_file(o2.options.ghg_standards_production_multipliers_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail += GHGStandardIncentives.init_from_file(o2.options.production_multipliers_file,
+                                                          verbose=o2.options.verbose)
 
         init_fail += GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file, 
                                                               verbose=o2.options.verbose)
