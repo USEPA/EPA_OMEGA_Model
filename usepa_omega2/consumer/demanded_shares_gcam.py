@@ -41,6 +41,10 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
         Returns: GCAM parameters for the given calendar year and market class
 
         """
+
+        start_years = cache[market_class_id]['start_year']
+        calendar_year = max(start_years[start_years <= calendar_year])
+
         key = '%s_%s' % (calendar_year, market_class_id)
         if not key in cache:
             cache[key] = o2.session.query(DemandedSharesGCAM). \
@@ -51,14 +55,16 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        import numpy as np
+
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'demanded_shares_gcam'
-        input_template_version = 0.11
-        input_template_columns = {'market_class_id', 'calendar_year', 'annual_vmt', 'payback_years',
+        input_template_version = 0.12
+        input_template_columns = {'market_class_id', 'start_year', 'annual_vmt', 'payback_years',
                                   'price_amortization_period', 'share_weight', 'discount_rate',
                                   'o_m_costs', 'average_occupancy', 'logit_exponent_mu'
                                   }
@@ -78,7 +84,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
                 for i in df.index:
                     obj_list.append(DemandedSharesGCAM(
                         market_class_ID=df.loc[i, 'market_class_id'],
-                        calendar_year=df.loc[i, 'calendar_year'],
+                        calendar_year=df.loc[i, 'start_year'],
                         annual_VMT=df.loc[i, 'annual_vmt'],
                         payback_years=df.loc[i, 'payback_years'],
                         price_amortization_period=df.loc[i, 'price_amortization_period'],
@@ -90,6 +96,9 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
+
+                for mc in df['market_class_id'].unique():
+                    cache[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
         return template_errors
 
