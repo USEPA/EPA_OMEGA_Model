@@ -661,7 +661,7 @@ def init_omega(o2_options):
     else:
         init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
-    from GHG_standards_sales_incentives import GHGStandardIncentives
+    from GHG_standards_incentives import GHGStandardIncentives
     from GHG_standards_fuels import GHGStandardFuels
     from GHG_credits import GHG_credit_bank
 
@@ -699,7 +699,7 @@ def init_omega(o2_options):
         init_fail += o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file, 
                                                                      verbose=o2.options.verbose)
 
-        init_fail += GHGStandardIncentives.init_from_file(o2.options.ghg_standards_sales_incentives_file,
+        init_fail += GHGStandardIncentives.init_from_file(o2.options.ghg_standards_production_multipliers_file,
                                                                      verbose=o2.options.verbose)
 
         init_fail += GHGStandardFuels.init_database_from_file(o2.options.ghg_standards_fuels_file, 

@@ -1,5 +1,5 @@
 """
-GHG_standards_sales_incentives.py
+GHG_standards_production_multipliers.py
 =================================
 
 
@@ -9,7 +9,7 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'incentive_sales_multipliers'
+input_template_name = 'production_multipliers'
 
 cache = dict()
 
@@ -18,8 +18,8 @@ class GHGStandardIncentives(OMEGABase):
     # --- database table properties ---
 
     @staticmethod
-    def get_sales_incentive(vehicle):
-        incentive_sales_multiplier = 1
+    def get_production_multiplier(vehicle):
+        production_multiplier = 1
 
         start_years = cache['start_year']
         if start_years[start_years <= vehicle.model_year]:
@@ -30,9 +30,9 @@ class GHGStandardIncentives(OMEGABase):
                 for calc, multiplier in calcs.items():
                     select_attribute, select_value = calc.split(':')
                     if vehicle.__getattribute__(select_attribute) == select_value:
-                        incentive_sales_multiplier = multiplier
+                        production_multiplier = multiplier
 
-        return incentive_sales_multiplier
+        return production_multiplier
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -43,7 +43,7 @@ class GHGStandardIncentives(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.2
+        input_template_version = 0.21
         input_template_columns = {'start_year'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail = init_fail + GHGStandardIncentives.init_from_file(o2.options.ghg_standards_sales_incentives_file,
+        init_fail = init_fail + GHGStandardIncentives.init_from_file(o2.options.ghg_standards_production_multipliers_file,
                                                                              verbose=o2.options.verbose)
 
         if not init_fail:
@@ -91,7 +91,7 @@ if __name__ == '__main__':
                 fueling_class = 'BEV'
 
             v = dummyVehicle()
-            print(GHGStandardIncentives.get_sales_incentives(v, 1.0))
+            print(GHGStandardIncentives.get_production_multipliers(v, 1.0))
 
         else:
             print(init_fail)

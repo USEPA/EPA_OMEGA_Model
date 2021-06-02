@@ -88,7 +88,7 @@ try:
             self.producer_calculate_generalized_cost = None
             self.consumer_calculate_generalized_cost = None
             self.ghg_standards_file = path + 'test_inputs/ghg_standards-footprint.csv'
-            self.ghg_standards_sales_incentives_file = path + 'test_inputs/ghg_standards-sales_incentives.csv'
+            self.ghg_standards_production_multipliers_file = path + 'test_inputs/ghg_standards-production_multipliers.csv'
             self.ghg_standards_fuels_file = path + 'test_inputs/ghg_standards-fuels.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
             self.required_zev_share_file = path + 'test_inputs/required_zev_share.csv'
