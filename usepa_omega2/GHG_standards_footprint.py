@@ -43,11 +43,14 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calculate_target_co2_gpmi(vehicle):
-        cache_key = '%s_%s_coefficients' % (vehicle.model_year, vehicle.reg_class_ID)
+        start_years = cache[vehicle.reg_class_ID]['start_year']
+        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+
+        cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_ID)
         if cache_key not in cache:
             cache[cache_key] = o2.session.query(GHGStandardFootprint). \
                 filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
-                filter(GHGStandardFootprint.model_year == vehicle.model_year).one()
+                filter(GHGStandardFootprint.model_year == vehicle_model_year).one()
         coefficients = cache[cache_key]
 
         if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
@@ -61,6 +64,9 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calculate_cert_lifetime_vmt(reg_class_id, model_year):
+        start_years = cache[reg_class_id]['start_year']
+        model_year = max(start_years[start_years <= model_year])
+
         cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
         if cache_key not in cache:
             cache[cache_key] = o2.session.query(GHGStandardFootprint.lifetime_VMT). \
@@ -73,7 +79,10 @@ class GHGStandardFootprint(SQABase, OMEGABase):
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
-        lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
+        start_years = cache[vehicle.reg_class_ID]['start_year']
+        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+
+        lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         co2_gpmi = GHGStandardFootprint.calculate_target_co2_gpmi(vehicle)
 
@@ -92,7 +101,10 @@ class GHGStandardFootprint(SQABase, OMEGABase):
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
-        lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle.model_year)
+        start_years = cache[vehicle.reg_class_ID]['start_year']
+        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+
+        lifetime_VMT = GHGStandardFootprint.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         if co2_gpmi_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -112,13 +124,16 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+
+        import numpy as np
+
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_version = 0.0003
-        input_template_columns = {'model_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
+        input_template_version = 0.1
+        input_template_columns = {'start_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
                                   'd_coeff', 'lifetime_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -135,7 +150,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(GHGStandardFootprint(
-                        model_year=df.loc[i, 'model_year'],
+                        model_year=df.loc[i, 'start_year'],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
                         footprint_min_sqft=df.loc[i, 'fp_min'],
                         footprint_max_sqft=df.loc[i, 'fp_max'],
@@ -147,6 +162,9 @@ class GHGStandardFootprint(SQABase, OMEGABase):
                     ))
                 o2.session.add_all(obj_list)
                 o2.session.flush()
+
+                for rc in df['reg_class_id'].unique():
+                    cache[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
 
         return template_errors
 
