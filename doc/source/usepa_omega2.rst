@@ -45,6 +45,14 @@ usepa\_omega2.GHG\_standards\_fuels module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.GHG\_standards\_incentives module
+-----------------------------------------------
+
+.. automodule:: usepa_omega2.GHG_standards_incentives
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.context\_fuel\_prices module
 ------------------------------------------
 
@@ -193,6 +201,14 @@ usepa\_omega2.omega\_plot module
 --------------------------------
 
 .. automodule:: usepa_omega2.omega_plot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+usepa\_omega2.omega\_trees module
+---------------------------------
+
+.. automodule:: usepa_omega2.omega_trees
    :members:
    :undoc-members:
    :show-inheritance:
