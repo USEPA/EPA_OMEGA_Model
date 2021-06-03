@@ -2,40 +2,50 @@
 context_fuel_prices.py
 ======================
 
+Routines to load and access fuel prices from the context
 
 """
 
 print('importing %s' % __file__)
 
-import sys
-
-import o2  # import global variables
 from usepa_omega2 import *
 
 cache = dict()
 
 
 class ContextFuelPrices(SQABase, OMEGABase):
+    """
+    Loads and provides access to fuel prices from the analysis context.
+
+    """
     # --- database table properties ---
     __tablename__ = 'context_fuels'
-    index = Column('index', Integer, primary_key=True)
-    context_ID = Column('context_id', String)
-    case_ID = Column('case_id', String)
-    fuel_ID = Column('fuel_id', String)
-    calendar_year = Column(Numeric)
-    retail_dollars_per_unit = Column(Float)
-    pretax_dollars_per_unit = Column(Float)
+    index = Column('index', Integer, primary_key=True)  #: database table index
+    context_ID = Column('context_id', String)  #: (e.g. 'AEO2020')
+    case_ID = Column('case_id', String)  #: (e.g. 'Reference case')
+    fuel_ID = Column('fuel_id', String)  #: (e.g. 'pump gasoline')
+    calendar_year = Column(Numeric)  #: calendar year of the price values
+    retail_dollars_per_unit = Column(Float)  #: retail fuel price in dollars
+    pretax_dollars_per_unit = Column(Float)  #: pre-tax fuel price in dollars
 
     @staticmethod
     def get_fuel_prices(calendar_year, price_types, fuel_id):
         """
+            Get fuel price data for fuel_id in calendar_year
 
         Args:
-            calendar_year: calendar year to get price for
+            calendar_year: calendar year to get price in
             price_types: a string or list of strings of the ContextFuelPrices attributes to get
             fuel_id: fuel ID
 
-        Returns: fuel price or tuple of fuel prices
+        Returns:
+            Fuel price or tuple of fuel prices if multiple fuel attributes were requested
+
+        Example:
+            ::
+
+                2030_pretax_pump_gas_price_dollars = ContextFuelPrices.get_fuel_prices(2030, 'pretax_dollars_per_unit', 'pump gasoline')
+                2030_pump_gas_attributes = ContextFuelPrices.get_fuel_prices(2030, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline')
 
         """
         if o2.options.flat_context:

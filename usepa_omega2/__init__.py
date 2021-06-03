@@ -2,6 +2,9 @@
 __init.py__
 ===========
 
+Top-level includes/definitions for the OMEGA model
+
+Defines class OMEGARuntimeOptions which control an individual simulation session
 
 """
 
@@ -50,7 +53,21 @@ try:
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
     class OMEGARuntimeOptions(OMEGABase):
+        """
+        An OMEGARuntimeOptions object defines the settings required for a simulation session
+        """
+
         def __init__(self):
+            """
+            Create an OMEGARuntimeOptions object with default settings used for testing and development.
+
+            The primary way to create an OMEGARuntimeOptions object is via the batch process.
+
+            See Also
+                omega_batch.py
+
+            """
+
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep

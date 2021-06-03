@@ -2,9 +2,12 @@
 __main__.py
 ===========
 
-OMEGA2 module-level run with default options
+Initiate OMEGA module-level run with default options
+
+Can be used to test OMEGA installation
 
 """
+
 print('importing %s' % __file__)
 
 import os
