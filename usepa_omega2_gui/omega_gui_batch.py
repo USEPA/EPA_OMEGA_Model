@@ -155,7 +155,7 @@ class Form(QObject):
         self.window.output_batch_directory_1_result.setReadOnly(1)
         # Set wizard window options
         # self.window.wizard_result.setReadOnly(1)
-        # Disable run model button
+        # Disable run model button graphic
         # self.enable_run_button(False)
 
         # Load stylesheet for tab control
