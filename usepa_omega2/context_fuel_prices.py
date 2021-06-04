@@ -21,12 +21,12 @@ class ContextFuelPrices(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'context_fuels'
     index = Column('index', Integer, primary_key=True)  #: database table index
-    context_ID = Column('context_id', String)  #: (e.g. 'AEO2020')
-    case_ID = Column('case_id', String)  #: (e.g. 'Reference case')
-    fuel_ID = Column('fuel_id', String)  #: (e.g. 'pump gasoline')
-    calendar_year = Column(Numeric)  #: calendar year of the price values
-    retail_dollars_per_unit = Column(Float)  #: retail fuel price in dollars
-    pretax_dollars_per_unit = Column(Float)  #: pre-tax fuel price in dollars
+    context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
+    case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
+    fuel_ID = Column('fuel_id', String)  #: str: e.g. 'pump gasoline'
+    calendar_year = Column(Numeric)  #: numeric: calendar year of the price values
+    retail_dollars_per_unit = Column(Float)  #: float: e.g. retail dollars per gallon, dollars per kWh
+    pretax_dollars_per_unit = Column(Float)  #: float: e.g. pre-tax dollars per gallon, dollars per kWh
 
     @staticmethod
     def get_fuel_prices(calendar_year, price_types, fuel_id):
@@ -34,20 +34,24 @@ class ContextFuelPrices(SQABase, OMEGABase):
             Get fuel price data for fuel_id in calendar_year
 
         Args:
-            calendar_year: calendar year to get price in
-            price_types: a string or list of strings of the ContextFuelPrices attributes to get
-            fuel_id: fuel ID
+            calendar_year (numeric): calendar year to get price in
+            price_types (str, [str1, str2...]): ContextFuelPrices attributes to get
+            fuel_id (str): fuel ID
 
         Returns:
-            Fuel price or tuple of fuel prices if multiple fuel attributes were requested
+            Fuel price or tuple of fuel prices if multiple attributes were requested
 
         Example:
             ::
 
-                2030_pretax_pump_gas_price_dollars = ContextFuelPrices.get_fuel_prices(2030, 'pretax_dollars_per_unit', 'pump gasoline')
-                2030_pump_gas_attributes = ContextFuelPrices.get_fuel_prices(2030, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline')
+                2030_pretax_pump_gas_price_dollars =
+                ContextFuelPrices.get_fuel_prices(2030, 'pretax_dollars_per_unit', 'pump gasoline')
+
+                2030_pump_gas_attributes =
+                ContextFuelPrices.get_fuel_prices(2030, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline')
 
         """
+
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 
@@ -106,8 +110,6 @@ class ContextFuelPrices(SQABase, OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
-
-            # TODO: do we need to validate no missing years, years in sequential order?
 
             if not template_errors:
                 obj_list = []
