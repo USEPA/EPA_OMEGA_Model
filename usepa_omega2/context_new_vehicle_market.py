@@ -66,7 +66,8 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
         """
         Load context new vehicle prices from file or clear context_new_vehicle_generalized_costs and start from scratch
 
-        Returns: updates context_new_vehicle_generalized_costs dict/dataframe
+        Args:
+            filename (str): name of file to load new vehicle generalized costs from if not generating a new one
 
         """
 
@@ -74,7 +75,7 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
         if not o2.options.generate_context_new_vehicle_generalized_costs_file:
             df = pd.read_csv(filename, index_col=0, dtype=str)
-            # cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
+            # wanted to do: cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
             # converts the strings to floats... they have different values than what's in the file
             # This is the workaround: let python do the conversion
@@ -86,9 +87,13 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
         """
         Save context_new_vehicle_generalized_costs to a .csv file
 
+        Args:
+            filename (str): name of file to save new vehicle generalized costs to
+
         """
-        # pd.DataFrame.from_dict(cls._new_vehicle_generalized_costs, orient='index', columns=['new_vehicle_price_dollars']).to_csv(
-        #     filename, index=True)
+
+        # wanted to do: pd.DataFrame.from_dict(cls._new_vehicle_generalized_costs, orient='index',
+        #       columns=['new_vehicle_price_dollars']).to_csv(filename, index=True)
 
         # you shouldn't have to do this either... but somehow pandas (or maybe the OS) rounds the numbers when they get
         # written out to the file... this is the workaround: write the file yourself!
@@ -98,38 +103,59 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
                 price_file.write('%d, %.38f\n' % (k, v))
 
     @classmethod
-    def new_vehicle_generalized_costs(cls, calendar_year):
+    def new_vehicle_generalized_cost(cls, calendar_year):
         """
+        Get sales-weighted new vehicle generalized cost for a given year, in OMEGA-centric dollars
 
         Args:
-            calendar_year:
+            calendar_year (numeric): calendar year
 
-        Returns: context new vehicle price for the given calendar year
+        Returns:
+            OMEGA-centric context new vehicle generalized cost for the given calendar year
+
 
         """
+
         return cls._new_vehicle_generalized_costs[calendar_year]
 
     @classmethod
     def set_new_vehicle_generalized_cost(cls, calendar_year, generalized_cost):
         """
-        Set context new vehicle price for the given calendar year to the given price
+        Store new vehicle generalized cost for the given calendar year
+
         Args:
-            calendar_year:
-            generalized_cost:
+            calendar_year (numeric): calendar year
+            generalized_cost (float): total sales-weighted OMEGA-centric generalized cost for the calendar year
 
         """
+
         cls._new_vehicle_generalized_costs[calendar_year] = generalized_cost
 
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
         """
+        Get new vehicle sales by session context ID, session context case, calendar year, context size class
+        and context reg class
 
         Args:
-            calendar_year:
-            context_size_class:
-            context_reg_class:
+            calendar_year (numeric): calendar year
+            context_size_class (str): optional context size class, e.g. 'Small Crossover'
+            context_reg_class (str): optional context reg class, e.g. 'car' or 'truck'
 
         Returns:
+            new vehicle total sales or sales by context size class or by context size class and reg class
+
+        Examples:
+            ::
+
+                total_new_vehicle_sales_2030 =
+                    ContextNewVehicleMarket.new_vehicle_sales(2030)
+
+                small_crossover_new_vehicle_sales_2030 =
+                    ContextNewVehicleMarket.new_vehicle_sales(2030, context_size_class='Small Crossover')
+
+                small_crossover_car_new_vehicle_sales_2030 =
+                    ContextNewVehicleMarket.new_vehicle_sales(2030, context_size_class='Small Crossover', context_reg_class='car')
 
         """
         if o2.options.flat_context:
@@ -166,6 +192,19 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file
+
+        Args:
+            filename: name of input file
+            verbose: enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+
         cache.clear()
 
         if verbose:

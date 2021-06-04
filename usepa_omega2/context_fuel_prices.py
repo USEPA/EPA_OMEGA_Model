@@ -48,10 +48,10 @@ class ContextFuelPrices(SQABase, OMEGABase):
         Example:
             ::
 
-                2030_pretax_pump_gas_price_dollars =
+                pretax_pump_gas_price_dollars_2030 =
                 ContextFuelPrices.get_fuel_prices(2030, 'pretax_dollars_per_unit', 'pump gasoline')
 
-                2030_pump_gas_attributes =
+                pump_gas_attributes_2030 =
                 ContextFuelPrices.get_fuel_prices(2030, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline')
 
         """

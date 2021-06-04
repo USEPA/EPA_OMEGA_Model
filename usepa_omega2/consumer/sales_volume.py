@@ -67,7 +67,7 @@ def new_vehicle_sales_response(calendar_year, P):
         ContextNewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, P)
 
     Q0 = ContextNewVehicleMarket.new_vehicle_sales(calendar_year)
-    P0 = ContextNewVehicleMarket.new_vehicle_generalized_costs(calendar_year)
+    P0 = ContextNewVehicleMarket.new_vehicle_generalized_cost(calendar_year)
 
     E = o2.options.new_vehicle_sales_response_elasticity
 
