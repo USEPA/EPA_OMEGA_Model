@@ -1,7 +1,21 @@
 """
-vehicles.py
-===========
+context_new_vehicle_market.py
+=============================
 
+**Routines to load, access, and save new vehicle market data from/relative to the analysis context**
+
+
+Market data includes total sales as well as sales by context size class (e.g. 'Small Crossover')
+
+This module also saves new vehicle generalized costs (based in part on OMEGA tech costs)
+from the reference session corresponding to the analysis context.  The reference session vehicle sales (new vehicle market)
+will follow the analysis context sales, but prices/generalized costs within OMEGA will be different from prices within the
+context due to differences in costing approaches, etc.  By saving the sales-weighted new vehicle generalized costs from
+the reference session, subsequent sessions (with higher, lower, or the same costs) will have an internally consistent
+(lower, higher or the same, respectively) overall sales response.  Whether the vehicle generalized costs file will be
+loaded from a file or created from scratch is controlled by the batch process.  Generally speaking, best practice is to
+always auto-generate the new vehicle generalized costs file from the reference session to guarantee consistency with the
+simulated vehicles file costs and all other factors affecting generalized cost (such as fuel prices, cost years, etc).
 
 """
 
@@ -13,31 +27,39 @@ cache = dict()
 
 
 class ContextNewVehicleMarket(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'context_new_vehicle_market'
-    index = Column('index', Integer, primary_key=True)
-    context_ID = Column('context_id', String)
-    case_ID = Column('case_id', String)
-    context_size_class = Column('context_size_class', String)
-    calendar_year = Column(Numeric)
-    context_reg_class_ID = Column('context_reg_class_ID', Enum(*reg_classes, validate_strings=True))
-    sales_share_of_regclass = Column(Numeric)
-    sales_share_of_total = Column(Numeric)
-    sales = Column(Numeric)
-    weight_lbs = Column(Numeric)
-    horsepower = Column(Numeric)
-    horsepower_to_weight_ratio = Column(Numeric)
-    mpg_conventional = Column(Numeric)
-    mpg_conventional_onroad = Column(Numeric)
-    mpg_alternative = Column(Numeric)
-    mpg_alternative_onroad = Column(Numeric)
-    onroad_to_cycle_mpg_ratio = Column(Numeric)
-    ice_price_dollars = Column(Numeric)
-    bev_price_dollars = Column(Numeric)
+    """
+    **Loads, provides access to and saves new vehicle market data from/relative to the analysis context**
 
-    hauling_context_size_class_info = dict()
-    context_size_classes = dict()
-    _new_vehicle_generalized_costs = dict()
+    For each calendar year, context total vehicle sales are broken down by size class, with one row for each unique
+    combination of size class and reg class
+
+    """
+
+    # --- database table properties ---
+    __tablename__ = 'context_new_vehicle_market'  # database table name
+    index = Column('index', Integer, primary_key=True)  #: database table index
+    context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
+    case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
+    context_size_class = Column('context_size_class', String)   #: str: e.g. 'Small Crossover'
+    calendar_year = Column(Numeric)  #: numeric: calendar year of the market data
+    context_reg_class_ID = Column('context_reg_class_ID', Enum(*reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
+    sales_share_of_regclass = Column(Numeric)   #: numeric: percent of reg class represented by the context size class
+    sales_share_of_total = Column(Numeric)  #: numeric: percent of total sales represented by the context size class
+    sales = Column(Numeric)  #: numeric:  size class new vehicle sales
+    weight_lbs = Column(Numeric)  #: numeric: sales-weighted average weight (lbs) of a vehicle in the size class
+    horsepower = Column(Numeric)  #: numeric: sales-weighted average horsepower of a vehicle in the size class
+    horsepower_to_weight_ratio = Column(Numeric)  #: numeric: sales-weighted average horsepower to weight ratio of a vehicle in the size class
+    mpg_conventional = Column(Numeric)  #: numeric: sales-weighted average miles per gallon (mpg) of a vehicle in the size class
+    mpg_conventional_onroad = Column(Numeric)  #: numeric: sales-weighted average on-road miles per gallon (mpg) of a vehicle in the size class
+    mpg_alternative = Column(Numeric)  #: numeric: sales-weighted average XXX of a vehicle in the size class
+    mpg_alternative_onroad = Column(Numeric)  #: numeric: sales-weighted average XXX of a vehicle in the size class
+    onroad_to_cycle_mpg_ratio = Column(Numeric)  #: numeric: ratio of on-road to 2-cycle miles per gallon
+    ice_price_dollars = Column(Numeric)  #: numeric: sales-weighted average price of an internal combustion engine (ICE) vehicle in the size class
+    bev_price_dollars = Column(Numeric)  #: numeric: sales-weighted average price of an battery-electric vehicle (BEV) in the size class
+
+    hauling_context_size_class_info = dict()  #: dict: information about which context size classes are considered hauling and non-hauling as well as what share of the size class is hauling or not.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    context_size_classes = dict()  #: dict: lists for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    _new_vehicle_generalized_costs = dict()  # private dict,  stores total sales-weighted new vehicle generalized costs for use in determining overall sales response as a function of new vehicle generalized cost
 
     @classmethod
     def init_context_new_vehicle_generalized_costs(cls, filename):
@@ -100,6 +122,16 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
 
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
+        """
+
+        Args:
+            calendar_year:
+            context_size_class:
+            context_reg_class:
+
+        Returns:
+
+        """
         if o2.options.flat_context:
             calendar_year = o2.options.flat_context_year
 

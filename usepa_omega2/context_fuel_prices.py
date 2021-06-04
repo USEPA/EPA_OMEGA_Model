@@ -2,7 +2,10 @@
 context_fuel_prices.py
 ======================
 
-Routines to load and access fuel prices from the context
+**Routines to load and access fuel prices from the analysis context**
+
+Context fuel price data includes retail and pre-tax costs in dollars per unit (e.g. $/gallon, $/kWh)
+
 
 """
 
@@ -15,11 +18,12 @@ cache = dict()
 
 class ContextFuelPrices(SQABase, OMEGABase):
     """
-    Loads and provides access to fuel prices from the analysis context.
+    **Loads and provides access to fuel prices from the analysis context**
 
     """
+
     # --- database table properties ---
-    __tablename__ = 'context_fuels'
+    __tablename__ = 'context_fuels'  # database table name
     index = Column('index', Integer, primary_key=True)  #: database table index
     context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
     case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
