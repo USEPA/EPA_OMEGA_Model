@@ -135,7 +135,8 @@ class ContextNewVehicleMarket(SQABase, OMEGABase):
     def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
         """
         Get new vehicle sales by session context ID, session context case, calendar year, context size class
-        and context reg class
+        and context reg class.  User can specify total sales (no optional arguments) or sales by context size class or
+        sales by context size class and context reg class depending on the arguments provided
 
         Args:
             calendar_year (numeric): calendar year
