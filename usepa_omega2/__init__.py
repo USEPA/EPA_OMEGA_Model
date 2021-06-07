@@ -113,6 +113,7 @@ try:
             self.reregistration_fixed_by_age_file = path + 'test_inputs/reregistration_fixed_by_age.csv'
             self.annual_vmt_fixed_by_age_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
             self.slice_tech_combo_cloud_tables = True
+            self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
             self.allow_backsliding = True
 
