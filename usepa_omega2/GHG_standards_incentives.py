@@ -9,8 +9,6 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'production_multipliers'
-
 cache = dict()
 
 
@@ -43,6 +41,7 @@ class GHGStandardIncentives(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        input_template_name = 'production_multipliers'
         input_template_version = 0.21
         input_template_columns = {'start_year'}
 

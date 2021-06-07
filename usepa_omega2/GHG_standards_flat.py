@@ -7,10 +7,7 @@ GHG_standards_flat.py
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
 from usepa_omega2 import *
-
-input_template_name = 'ghg_standards-flat'
 
 cache = dict()
 
@@ -119,6 +116,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        input_template_name = 'ghg_standards-flat'
         input_template_version = 0.1
         input_template_columns = {'start_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
 

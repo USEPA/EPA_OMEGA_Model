@@ -29,10 +29,10 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'simulated_vehicles'
-
 cache = dict()
 
+# define list of non-numeric columns to ignore during frontier creation since they goof up pandas auto-typing of
+# columns when switching between Series and DataFrame representations
 cloud_non_numeric_columns = ['simulated_vehicle_id']
 
 
@@ -47,18 +47,23 @@ class CostCloud(OMEGABase):
     def init_cost_clouds_from_file(filename, verbose=False):
         """
 
+        Initialize class data from input file
+
         Args:
-            filename:
-            verbose:
+            filename: name of input file
+            verbose: enable additional console and logfile output if True
 
         Returns:
+            List of template/input errors, else empty list on success
 
         """
+
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        input_template_name = 'simulated_vehicles'
         input_template_version = 0.2
         input_template_columns = {'cost_curve_class', 'model_year', 'simulated_vehicle_id',
                                   'new_vehicle_mfr_cost_dollars'}

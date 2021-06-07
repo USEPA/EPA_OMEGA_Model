@@ -9,8 +9,6 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'ghg_standards-footprint'
-
 cache = dict()
 
 
@@ -132,6 +130,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        input_template_name = 'ghg_standards-footprint'
         input_template_version = 0.1
         input_template_columns = {'start_year', 'reg_class_id', 'fp_min', 'fp_max', 'a_coeff', 'b_coeff', 'c_coeff',
                                   'd_coeff', 'lifetime_vmt'}

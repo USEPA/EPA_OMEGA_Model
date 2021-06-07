@@ -6,11 +6,10 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-input_template_name = 'ghg_credit_history'
-
 credit_max_life_years = 5
 debit_max_life_years = 3
 
+input_template_name = 'ghg_credit_history'
 input_template_version = 0.1
 input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
 
