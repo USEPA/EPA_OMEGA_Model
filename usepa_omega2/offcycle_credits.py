@@ -14,17 +14,40 @@ under-represent vehicle idle duration in real-world driving so there may be some
 
 
 """
+import pandas as pd
 
 print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
 
-class OffcycleCredits(OMEGABase):
+class OffCycleCredits(OMEGABase):
     values = dict()
 
+    offcycle_credit_names = []  #: list of cycle names, populated during init
+
     @staticmethod
-    def init_from_file(filename, verbose=False):
+    def apply_off_cycle_credits(vehicle):
+        start_years = OffCycleCredits.values['start_year']
+        calendar_year = max(start_years[start_years <= vehicle.model_year])
+
+        df = OffCycleCredits.values['data']
+        offcycle_credits = df.loc[df['start_year'] == calendar_year]
+
+        # off cycle groups can be used to apply credit limits by credit group
+        offcycle_groups = df['credit_group'].unique()
+        group_totals = dict()
+        for ocg in offcycle_groups:
+            group_totals[ocg] = 0
+
+        vehicle.cost_cloud['cert_direct_offcycle_co2_grams_per_mile'] = 0
+        vehicle.cost_cloud['cert_indirect_offcycle_co2_grams_per_mile'] = 0
+
+        for i in offcycle_credits.iterrows():
+            print(i)
+
+    @classmethod
+    def init_from_file(cls, filename, verbose=False):
         import numpy as np
 
         if verbose:
@@ -44,8 +67,10 @@ class OffcycleCredits(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                OffcycleCredits.values['start_year'] = np.array(df['start_year'])
-                OffcycleCredits.values['data'] = df
+                OffCycleCredits.values['start_year'] = np.array(df['start_year'])
+                OffCycleCredits.values['data'] = df
+
+                cls.offcycle_credit_names = df['credit_name'].unique().tolist()
 
                 credit_columns = [c for c in df.columns if ('reg_class_id:' in c)]
 
@@ -71,14 +96,21 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + OffcycleCredits.init_from_file(o2.options.offcycle_credits_file,
+        init_fail += OffCycleCredits.init_from_file(o2.options.offcycle_credits_file,
                                                                 verbose=o2.options.verbose)
 
         if not init_fail:
             fileio.validate_folder(o2.options.database_dump_folder)
-            OffcycleCredits.values['data'].to_csv(
+            OffCycleCredits.values['data'].to_csv(
                 o2.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
 
+            class dummyVehicle:
+                model_year = 2020
+                cost_cloud = pd.DataFrame()
+
+            vehicle = dummyVehicle()
+
+            OffCycleCredits.apply_off_cycle_credits(vehicle)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

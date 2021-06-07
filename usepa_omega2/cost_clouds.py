@@ -58,6 +58,8 @@ class CostCloud(OMEGABase):
 
         """
 
+        from offcycle_credits import OffCycleCredits  # offcycle_credits must be initalized first
+
         cache.clear()
 
         if verbose:
@@ -65,8 +67,9 @@ class CostCloud(OMEGABase):
 
         input_template_name = 'simulated_vehicles'
         input_template_version = 0.2
-        input_template_columns = {'cost_curve_class', 'model_year', 'simulated_vehicle_id',
+        input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
                                   'new_vehicle_mfr_cost_dollars'}
+        input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)

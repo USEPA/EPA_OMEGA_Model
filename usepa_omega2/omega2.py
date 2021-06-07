@@ -664,6 +664,7 @@ def init_omega(o2_options):
     from GHG_standards_incentives import GHGStandardIncentives
     from GHG_standards_fuels import GHGStandardFuels
     from GHG_credits import GHG_credit_bank
+    from offcycle_credits import OffCycleCredits
 
     # instantiate database tables
     SQABase.metadata.create_all(o2.engine)
@@ -693,6 +694,11 @@ def init_omega(o2_options):
         ContextNewVehicleMarket.init_context_new_vehicle_generalized_costs(o2.options.context_new_vehicle_generalized_costs_file)
 
         init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+
+        # off cycle credits must be initialized prior to reading in cost clouds and vehicles
+        # (to get names of offcycle credit columns)
+        init_fail += OffCycleCredits.init_from_file(o2.options.offcycle_credits_file,
+                                                                verbose=o2.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
