@@ -27,7 +27,7 @@ class OffCycleCredits(OMEGABase):
     offcycle_credit_names = []  #: list of cycle names, populated during init
 
     @staticmethod
-    def apply_off_cycle_credits(vehicle):
+    def calc_off_cycle_credits(vehicle):
         start_years = OffCycleCredits.values['start_year']
         calendar_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -43,8 +43,14 @@ class OffCycleCredits(OMEGABase):
         vehicle.cost_cloud['cert_direct_offcycle_co2_grams_per_mile'] = 0
         vehicle.cost_cloud['cert_indirect_offcycle_co2_grams_per_mile'] = 0
 
-        for i in offcycle_credits.iterrows():
-            print(i)
+        for cc in OffCycleCredits.values['credit_columns']:
+            attribute, value = cc.split(':')
+            if vehicle.__getattribute__(attribute) == value:
+                for i in offcycle_credits.itertuples():
+                    credit_value = df[cc].loc[i.Index]
+                    vehicle.cost_cloud[i.credit_destination] += credit_value * vehicle.cost_cloud[i.credit_name]
+
+        return vehicle.cost_cloud
 
     @classmethod
     def init_from_file(cls, filename, verbose=False):
@@ -72,9 +78,9 @@ class OffCycleCredits(OMEGABase):
 
                 cls.offcycle_credit_names = df['credit_name'].unique().tolist()
 
-                credit_columns = [c for c in df.columns if ('reg_class_id:' in c)]
+                OffCycleCredits.values['credit_columns'] = [c for c in df.columns if (':' in c)]
 
-                for cc in credit_columns:
+                for cc in OffCycleCredits.values['credit_columns']:
                     reg_class_id = cc.split(':')[1]
                     if not reg_class_id in reg_classes:
                         template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
@@ -110,7 +116,7 @@ if __name__ == '__main__':
 
             vehicle = dummyVehicle()
 
-            OffCycleCredits.apply_off_cycle_credits(vehicle)
+            OffCycleCredits.calc_off_cycle_credits(vehicle)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

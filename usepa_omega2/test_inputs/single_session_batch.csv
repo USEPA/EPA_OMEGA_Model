@@ -28,6 +28,7 @@ GHG Standards File,String,ghg_standards-footprint.csv
 GHG Standards Fuels File,String,ghg_standards-fuels.csv
 Production Multipliers File,String,production_multipliers.csv
 GHG Credits File,String,ghg_credits.csv
+Off-Cycle Credits File,String,offcycle_credits.csv
 ZEV Requirement File,String,required_zev_share.csv
 Price Modifications File,String,price_modifications.csv
 Production Constraints File,String,production_constraints.csv
