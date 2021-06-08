@@ -115,22 +115,22 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(o2.engine)
 
-        init_fail = init_fail + Manufacturer.init_database_from_file(o2.options.manufacturers_file,
+        init_fail += Manufacturer.init_database_from_file(o2.options.manufacturers_file,
                                                                      verbose=o2.options.verbose)
-        init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+        init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
                                                                     verbose=o2.options.verbose)
-        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
-        init_fail = init_fail + o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
+        init_fail += o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
                                                                              verbose=o2.options.verbose)
 
-        init_fail = init_fail + VehicleFinal.init_database_from_file(o2.options.vehicles_file,
+        init_fail += VehicleFinal.init_database_from_file(o2.options.vehicles_file,
                                                                      o2.options.vehicle_onroad_calculations_file,
                                                                      verbose=o2.options.verbose)
 
-        init_fail = init_fail + ContextNewVehicleMarket.init_database_from_file(
+        init_fail += ContextNewVehicleMarket.init_database_from_file(
             o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
 
         if not init_fail:

@@ -68,7 +68,7 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + DriveCycles.init_from_file(o2.options.drive_cycles_file,
+        init_fail += DriveCycles.init_from_file(o2.options.drive_cycles_file,
                                                            verbose=o2.options.verbose)
 
         if not init_fail:

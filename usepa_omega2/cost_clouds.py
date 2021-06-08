@@ -218,7 +218,7 @@ if __name__ == '__main__':
         o2.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
 
         init_fail = []
-        init_fail = init_fail + CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=True)
+        init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=True)
 
         if not init_fail:
             pass

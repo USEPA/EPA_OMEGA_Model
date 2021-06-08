@@ -121,7 +121,7 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + PolicyFuelUpstreamMethods.init_from_file(o2.options.fuel_upstream_methods_file,
+        init_fail += PolicyFuelUpstreamMethods.init_from_file(o2.options.fuel_upstream_methods_file,
                                                                   verbose=o2.options.verbose)
 
         if not init_fail:

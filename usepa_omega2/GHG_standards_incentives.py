@@ -81,7 +81,7 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail = init_fail + GHGStandardIncentives.init_from_file(o2.options.production_multipliers_file,
+        init_fail += GHGStandardIncentives.init_from_file(o2.options.production_multipliers_file,
                                                                      verbose=o2.options.verbose)
 
         if not init_fail:

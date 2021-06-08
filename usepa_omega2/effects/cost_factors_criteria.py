@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        init_fail = init_fail + CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
+        init_fail += CostFactorsCriteria.init_database_from_file(o2.options.criteria_cost_factors_file,
                                                                             verbose=o2.options.verbose)
 
         if not init_fail:

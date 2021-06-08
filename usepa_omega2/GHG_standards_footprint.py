@@ -183,7 +183,7 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
+        init_fail += GHGStandardFootprint.init_database_from_file(o2.options.ghg_standards_file,
                                                                              verbose=o2.options.verbose)
 
         if not init_fail:

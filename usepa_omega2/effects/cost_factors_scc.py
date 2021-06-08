@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        init_fail = init_fail + CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
+        init_fail += CostFactorsSCC.init_database_from_file(o2.options.scc_cost_factors_file,
                                                                        verbose=o2.options.verbose)
 
 

@@ -84,8 +84,8 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        init_fail = init_fail + Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
-        init_fail = init_fail + PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file,
+        init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        init_fail += PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file,
                                                                   verbose=o2.options.verbose)
 
         if not init_fail:

@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        init_fail = init_fail + CostFactorsEnergySecurity.init_database_from_file(o2.options.energysecurity_cost_factors_file,
+        init_fail += CostFactorsEnergySecurity.init_database_from_file(o2.options.energysecurity_cost_factors_file,
                                                                                   verbose=o2.options.verbose)
 
         if not init_fail:

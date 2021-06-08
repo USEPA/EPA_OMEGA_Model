@@ -124,10 +124,10 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(o2.engine)
 
         init_fail = []
-        # init_fail = init_fail + MarketClass.init_database_from_file(o2.options.market_classes_file,
+        # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
         #                                                             verbose=o2.options.verbose)
 
-        init_fail = init_fail + EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,
+        init_fail += EmissionFactorsRefinery.init_database_from_file(o2.options.emission_factors_refinery_file,
                                                                                 verbose=o2.options.verbose)
 
         if not init_fail:
