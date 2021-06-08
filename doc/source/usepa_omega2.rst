@@ -149,6 +149,14 @@ usepa\_omega2.o2 module
    :undoc-members:
    :show-inheritance:
 
+usepa\_omega2.offcycle\_credits module
+--------------------------------------
+
+.. automodule:: usepa_omega2.offcycle_credits
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 usepa\_omega2.omega2 module
 ---------------------------
 
