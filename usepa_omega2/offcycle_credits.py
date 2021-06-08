@@ -2,7 +2,7 @@
 offycle_credits.py
 ==================
 
-**Routines to load and access offcycle credit values**
+**Routines to load, access and apply off-cycle credit values**
 
 Off-cycle credits represent GHG benefits of technologies that have no or limited on-cycle benefits.
 
@@ -14,7 +14,6 @@ under-represent vehicle idle duration in real-world driving so there may be some
 
 
 """
-import pandas as pd
 
 print('importing %s' % __file__)
 
@@ -22,19 +21,34 @@ from usepa_omega2 import *
 
 
 class OffCycleCredits(OMEGABase):
-    values = dict()
+    """
+    **Loads, stores and applies off-cycle credits to vehicle cost clouds**
 
-    offcycle_credit_names = []  #: list of cycle names, populated during init
+    """
+
+    _values = dict()
+
+    offcycle_credit_names = []  #: List of cycle names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
 
     @staticmethod
     def calc_off_cycle_credits(vehicle):
-        start_years = OffCycleCredits.values['start_year']
+        """
+        Calculate vehicle off-cycle credits for the vehicle's cost cloud
+
+        Args:
+            vehicle (class Vehicle): the vehicle to apply off-cycle credits to
+
+        Returns:
+            vehicle.cost_cloud with off-cycle credits calculated
+
+        """
+        start_years = OffCycleCredits._values['start_year']
         calendar_year = max(start_years[start_years <= vehicle.model_year])
 
-        df = OffCycleCredits.values['data']
+        df = OffCycleCredits._values['data']
         offcycle_credits = df.loc[df['start_year'] == calendar_year]
 
-        # off cycle groups can be used to apply credit limits by credit group
+        # TODO: off cycle groups can be used to apply credit limits by credit group
         offcycle_groups = df['credit_group'].unique()
         group_totals = dict()
         for ocg in offcycle_groups:
@@ -43,7 +57,7 @@ class OffCycleCredits(OMEGABase):
         vehicle.cost_cloud['cert_direct_offcycle_co2_grams_per_mile'] = 0
         vehicle.cost_cloud['cert_indirect_offcycle_co2_grams_per_mile'] = 0
 
-        for cc in OffCycleCredits.values['credit_columns']:
+        for cc in OffCycleCredits._values['credit_columns']:
             attribute, value = cc.split(':')
             if vehicle.__getattribute__(attribute) == value:
                 for i in offcycle_credits.itertuples():
@@ -54,6 +68,18 @@ class OffCycleCredits(OMEGABase):
 
     @classmethod
     def init_from_file(cls, filename, verbose=False):
+        """
+
+        Initialize class data from input file
+
+        Args:
+            filename: name of input file
+            verbose: enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         if verbose:
@@ -73,14 +99,14 @@ class OffCycleCredits(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                OffCycleCredits.values['start_year'] = np.array(df['start_year'])
-                OffCycleCredits.values['data'] = df
+                OffCycleCredits._values['start_year'] = np.array(df['start_year'])
+                OffCycleCredits._values['data'] = df
 
                 cls.offcycle_credit_names = df['credit_name'].unique().tolist()
 
-                OffCycleCredits.values['credit_columns'] = [c for c in df.columns if (':' in c)]
+                OffCycleCredits._values['credit_columns'] = [c for c in df.columns if (':' in c)]
 
-                for cc in OffCycleCredits.values['credit_columns']:
+                for cc in OffCycleCredits._values['credit_columns']:
                     reg_class_id = cc.split(':')[1]
                     if not reg_class_id in reg_classes:
                         template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
@@ -107,7 +133,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             fileio.validate_folder(o2.options.database_dump_folder)
-            OffCycleCredits.values['data'].to_csv(
+            OffCycleCredits._values['data'].to_csv(
                 o2.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
 
             class dummyVehicle:

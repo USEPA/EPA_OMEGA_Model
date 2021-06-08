@@ -79,20 +79,20 @@ class DriveCycleWeights(OMEGABase):
         return template_errors
 
     @staticmethod
-    def calculate_weighted_value(calendar_year, fueling_class, cycle_values_dict, node_id=None, weighted=True):
+    def calc_weighted_value(calendar_year, fueling_class, cycle_values_dict, node_id=None, weighted=True):
         start_years = cache[fueling_class]['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
-        return cache[fueling_class][calendar_year].calculate_weighted_value(cycle_values_dict, node_id=node_id,
+        return cache[fueling_class][calendar_year].calc_weighted_value(cycle_values_dict, node_id=node_id,
                                                                             weighted=weighted)
 
     @staticmethod
     def calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(calendar_year, fueling_class, df):
-        return DriveCycleWeights.calculate_weighted_value(calendar_year, fueling_class, df,
+        return DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, df,
                                                           'cs_cert_direct_oncycle_co2_grams_per_mile', weighted=False)
 
     @staticmethod
     def calc_weighted_drive_cycle_kwh_per_mile(calendar_year, fueling_class, df):
-        return DriveCycleWeights.calculate_weighted_value(calendar_year, fueling_class, df,
+        return DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, df,
                                                           'cd_cert_direct_oncycle_kwh_per_mile', weighted=False)
 
 

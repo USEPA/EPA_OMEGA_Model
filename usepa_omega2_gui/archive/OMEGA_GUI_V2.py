@@ -72,7 +72,7 @@ class MyApp(QMainWindow):
         # self.ui.validate_rolling_reduction_button.clicked.connect(self.validate_rolling_reduction)
         # self.ui.validate_aero_reduction_button.clicked.connect(self.validate_aero_reduction)
         # self.ui.validate_engine_sizing_button.clicked.connect(self.validate_engine_sizing)
-        # self.ui.calculate_iterations_button.clicked.connect(self.calculate_iterations)
+        # self.ui.calc_iterations_button.clicked.connect(self.calc_iterations)
 
         self.ui.action_new_file.triggered.connect(self.new_file)
         self.ui.action_open_file.triggered.connect(self.open_file)
@@ -85,7 +85,7 @@ class MyApp(QMainWindow):
         # self.ui.validate_rolling_reduction_button.setVisible(0)
         # self.ui.validate_aero_reduction_button.setVisible(0)
         # self.ui.validate_engine_sizing_button.setVisible(0)
-        # self.ui.calculate_iterations_button.setVisible(0)
+        # self.ui.calc_iterations_button.setVisible(0)
 
         # self.ui.number_of_iterations.setText(str(1))
 

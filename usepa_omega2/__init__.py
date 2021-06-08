@@ -102,8 +102,8 @@ try:
             self.analysis_final_year = None
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
-            self.producer_calculate_generalized_cost = None
-            self.consumer_calculate_generalized_cost = None
+            self.producer_calc_generalized_cost = None
+            self.consumer_calc_generalized_cost = None
             self.ghg_standards_file = path + 'test_inputs/ghg_standards-footprint.csv'
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
             self.ghg_standards_fuels_file = path + 'test_inputs/ghg_standards-fuels.csv'

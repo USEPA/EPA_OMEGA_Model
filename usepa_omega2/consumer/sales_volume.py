@@ -10,7 +10,7 @@ from usepa_omega2 import *
 
 
 # placeholder for consumer generalized vehicle cost:
-def calculate_generalized_cost(cost_factors):
+def calc_generalized_cost(cost_factors):
     pass
 
 

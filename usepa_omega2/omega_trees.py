@@ -98,22 +98,22 @@ class WeightedTree(OMEGABase):
         return tree_errors
 
     @staticmethod
-    def calculate_node_weighted_value(tree, node_id):
+    def calc_node_weighted_value(tree, node_id):
         if not tree.children(node_id):
             try:
                 return tree.get_node(node_id).data.weighted_value
             except:
                 raise Exception(
-                    '*** Missing drive cycle "%s" in input to WeightedTree.calculate_node_weighted_value() ***' %
+                    '*** Missing drive cycle "%s" in input to WeightedTree.calc_node_weighted_value() ***' %
                     node_id)
         else:
             n = tree.get_node(node_id)
             n.data.value = 0
             for child in tree.children(node_id):
-                n.data.value += WeightedTree.calculate_node_weighted_value(tree, child.identifier)
+                n.data.value += WeightedTree.calc_node_weighted_value(tree, child.identifier)
             return n.data.weighted_value
 
-    def calculate_weighted_value(self, values_dict, node_id=None, weighted=False):
+    def calc_weighted_value(self, values_dict, node_id=None, weighted=False):
         # clear all values
         for n in self.tree.nodes:
             self.tree.get_node(n).data.value = None
@@ -127,7 +127,7 @@ class WeightedTree(OMEGABase):
         if node_id is None:
             node_id = self.tree.root
 
-        WeightedTree.calculate_node_weighted_value(self.tree, node_id)
+        WeightedTree.calc_node_weighted_value(self.tree, node_id)
 
         if weighted:
             return self.tree.get_node(node_id).data.weighted_value

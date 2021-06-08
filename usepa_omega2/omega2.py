@@ -251,17 +251,17 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
     while continue_search:
         price_options_df = producer_decision.to_frame().transpose()
 
-        continue_search, price_options_df = calculate_price_options(calendar_year, continue_search, multiplier_columns,
+        continue_search, price_options_df = calc_price_options(calendar_year, continue_search, multiplier_columns,
                                                                     prev_multiplier_range, price_options_df,
                                                                     producer_decision_and_response)
 
         producer_decision_and_response = get_demanded_shares(price_options_df, calendar_year)
 
         ###############################################################################################################
-        calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
+        calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
-        producer.calculate_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+        producer.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
                                                    total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
@@ -292,10 +292,10 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         # any slight offset during the convergence process:
         # ###############################################################################################################
         # if o2.options.session_is_reference:
-        #     calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
+        #     calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         #     # propagate total sales down to composite vehicles by market class share and reg class share,
         #     # calculate new compliance status for each producer-technology / consumer response combination
-        #     producer.calculate_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+        #     producer.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
         #                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
         #
         #     # propagate vehicle sales up to market class sales
@@ -335,7 +335,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 
 
-def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response):
+def calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response):
     """
 
     Args:
@@ -380,7 +380,7 @@ def calculate_sales_totals(calendar_year, market_class_vehicle_dict, producer_de
                                                          producer_decision_and_response['average_generalized_cost_total'])
 
 
-def calculate_price_options(calendar_year, continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
+def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
                             producer_decision_and_response):
     """
 
@@ -530,12 +530,12 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
 
         # winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
 
-    calculate_market_sector_data(winning_combo)
+    calc_market_sector_data(winning_combo)
 
     return market_class_vehicle_dict
 
 
-def calculate_market_sector_data(winning_combo):
+def calc_market_sector_data(winning_combo):
     """
 
     Args:
@@ -674,8 +674,8 @@ def init_omega(o2_options):
 
     fileio.validate_folder(o2.options.output_folder)
 
-    o2.options.producer_calculate_generalized_cost = producer.calculate_generalized_cost
-    o2.options.consumer_calculate_generalized_cost = consumer.calculate_generalized_cost
+    o2.options.producer_calc_generalized_cost = producer.calc_generalized_cost
+    o2.options.consumer_calc_generalized_cost = consumer.calc_generalized_cost
 
     try:
         init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)

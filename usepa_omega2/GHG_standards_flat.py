@@ -37,7 +37,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
         return reg_class_ID
 
     @staticmethod
-    def calculate_target_co2_gpmi(vehicle):
+    def calc_target_co2_gpmi(vehicle):
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -49,7 +49,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
         return cache[cache_key]
 
     @staticmethod
-    def calculate_cert_lifetime_vmt(reg_class_id, model_year):
+    def calc_cert_lifetime_vmt(reg_class_id, model_year):
         start_years = cache[reg_class_id]['start_year']
         model_year = max(start_years[start_years <= model_year])
 
@@ -61,16 +61,16 @@ class GHGStandardFlat(SQABase, OMEGABase):
         return cache[cache_key]
 
     @staticmethod
-    def calculate_target_co2_Mg(vehicle, sales_variants=None):
+    def calc_target_co2_Mg(vehicle, sales_variants=None):
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = GHGStandardFlat.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
-        co2_gpmi = GHGStandardFlat.calculate_target_co2_gpmi(vehicle)
+        co2_gpmi = GHGStandardFlat.calc_target_co2_gpmi(vehicle)
 
         if sales_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -83,14 +83,14 @@ class GHGStandardFlat(SQABase, OMEGABase):
         return co2_gpmi * lifetime_VMT * sales * GHGStandardIncentives.get_production_multiplier(vehicle) / 1e6
 
     @staticmethod
-    def calculate_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+    def calc_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = GHGStandardFlat.calculate_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = GHGStandardFlat.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         if co2_gpmi_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -190,18 +190,18 @@ if __name__ == '__main__':
             truck_vehicle.reg_class_ID = reg_classes.truck
             truck_vehicle.initial_registered_count = 1
 
-            car_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(car_vehicle)
-            car_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(car_vehicle)
-            car_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
+            car_target_co2_gpmi = o2.options.GHG_standard.calc_target_co2_gpmi(car_vehicle)
+            car_target_co2_Mg = o2.options.GHG_standard.calc_target_co2_Mg(car_vehicle)
+            car_certs_co2_Mg = o2.options.GHG_standard.calc_cert_co2_Mg(car_vehicle,
                                                                              co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(car_vehicle,
+            car_certs_sales_co2_Mg = o2.options.GHG_standard.calc_cert_co2_Mg(car_vehicle,
                                                                                    co2_gpmi_variants=[0, 50, 100, 150],
                                                                                    sales_variants=[1, 2, 3, 4])
 
-            truck_target_co2_gpmi = o2.options.GHG_standard.calculate_target_co2_gpmi(truck_vehicle)
-            truck_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(truck_vehicle)
-            truck_certs_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
+            truck_target_co2_gpmi = o2.options.GHG_standard.calc_target_co2_gpmi(truck_vehicle)
+            truck_target_co2_Mg = o2.options.GHG_standard.calc_target_co2_Mg(truck_vehicle)
+            truck_certs_co2_Mg = o2.options.GHG_standard.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
+            truck_certs_sales_co2_Mg = o2.options.GHG_standard.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
                                                                                      sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)

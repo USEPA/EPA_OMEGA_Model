@@ -54,7 +54,7 @@ class MyApp(QMainWindow):
         self.ui.validate_rolling_reduction_button.clicked.connect(self.validate_rolling_reduction)
         self.ui.validate_aero_reduction_button.clicked.connect(self.validate_aero_reduction)
         self.ui.validate_engine_sizing_button.clicked.connect(self.validate_engine_sizing)
-        self.ui.calculate_iterations_button.clicked.connect(self.calculate_iterations)
+        self.ui.calc_iterations_button.clicked.connect(self.calc_iterations)
 
         self.ui.action_new_file.triggered.connect(self.new_file)
         self.ui.action_open_file.triggered.connect(self.open_file)
@@ -67,7 +67,7 @@ class MyApp(QMainWindow):
         self.ui.validate_rolling_reduction_button.setVisible(0)
         self.ui.validate_aero_reduction_button.setVisible(0)
         self.ui.validate_engine_sizing_button.setVisible(0)
-        self.ui.calculate_iterations_button.setVisible(0)
+        self.ui.calc_iterations_button.setVisible(0)
 
         self.ui.number_of_iterations.setText(str(1))
 
@@ -139,7 +139,7 @@ class MyApp(QMainWindow):
             self.ui.mass_reduction_step_select.clear()
             self.ui.mass_reduction_step_select.addItem("0")
 
-        self.calculate_iterations()
+        self.calc_iterations()
 
     def validate_rolling_reduction(self):
         # Rolling Reduction
@@ -159,7 +159,7 @@ class MyApp(QMainWindow):
             self.ui.rolling_reduction_step_select.clear()
             self.ui.rolling_reduction_step_select.addItem("0")
 
-        self.calculate_iterations()
+        self.calc_iterations()
 
     def validate_aero_reduction(self):
         # Aero Reduction
@@ -179,7 +179,7 @@ class MyApp(QMainWindow):
             self.ui.aero_reduction_step_select.clear()
             self.ui.aero_reduction_step_select.addItem("0")
 
-        self.calculate_iterations()
+        self.calc_iterations()
 
     def validate_engine_sizing(self):
         # Engine Sizing
@@ -199,12 +199,12 @@ class MyApp(QMainWindow):
             self.ui.engine_sizing_step_select.clear()
             self.ui.engine_sizing_step_select.addItem("0")
 
-        self.calculate_iterations()
+        self.calc_iterations()
 
         # test_routine()
         # test_routine1()
 
-    def calculate_iterations(self):
+    def calc_iterations(self):
 
         global mass_iterations
         mass_iterations = int(self.ui.mass_reduction_max_select.value())

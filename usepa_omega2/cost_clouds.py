@@ -123,7 +123,7 @@ class CostCloud(OMEGABase):
         plt.savefig(o2.options.output_folder + '%s versus %s %s' % (y_key, x_key, cost_curve_class))
 
     @staticmethod
-    def calculate_frontier(cloud, x_key, y_key, allow_upslope=False):
+    def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         """
         Args:
             cloud (DataFrame): a set of points to find the frontier of

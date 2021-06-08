@@ -222,7 +222,7 @@ class CompositeVehicle(OMEGABase):
         self.normalized_cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                             'normalized_cert_target_co2_Mg')
 
-        self.normalized_cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self, 1, 1)
+        self.normalized_cert_co2_Mg = o2.options.GHG_standard.calc_cert_co2_Mg(self, 1, 1)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -328,7 +328,7 @@ class CompositeVehicle(OMEGABase):
             composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
 
             # calculate new sales-weighted frontier
-            composite_frontier_df = CostCloud.calculate_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
+            composite_frontier_df = CostCloud.calc_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
                                                                  'new_vehicle_mfr_generalized_cost_dollars',
                                                                  allow_upslope=True)
 
@@ -592,7 +592,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_grams_per_mile = o2.options.GHG_standard.calculate_target_co2_gpmi(self)
+        self.cert_target_co2_grams_per_mile = o2.options.GHG_standard.calc_target_co2_gpmi(self)
 
     def set_cert_target_co2_Mg(self):
         """
@@ -600,7 +600,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_Mg = o2.options.GHG_standard.calculate_target_co2_Mg(self)
+        self.cert_target_co2_Mg = o2.options.GHG_standard.calc_target_co2_Mg(self)
 
     def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
         """
@@ -655,7 +655,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_co2_Mg = o2.options.GHG_standard.calculate_cert_co2_Mg(self)
+        self.cert_co2_Mg = o2.options.GHG_standard.calc_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
         """
@@ -761,12 +761,12 @@ class Vehicle(OMEGABase):
                                                      self.cost_cloud['cert_indirect_offcycle_co2_grams_per_mile']
 
         # calculate producer generalized cost
-        self.cost_cloud = o2.options.producer_calculate_generalized_cost(self, 'onroad_direct_co2_grams_per_mile',
+        self.cost_cloud = o2.options.producer_calc_generalized_cost(self, 'onroad_direct_co2_grams_per_mile',
                                                                          'onroad_direct_kwh_per_mile',
                                                                          'new_vehicle_mfr_cost_dollars')
 
         # calculate frontier from updated cloud
-        cost_curve = CostCloud.calculate_frontier(self.cost_cloud, 'cert_co2_grams_per_mile',
+        cost_curve = CostCloud.calc_frontier(self.cost_cloud, 'cert_co2_grams_per_mile',
                                                   'new_vehicle_mfr_cost_dollars', allow_upslope=True)
 
         # CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')

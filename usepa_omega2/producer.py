@@ -15,7 +15,7 @@ import consumer
 cache = dict()
 
 
-def calculate_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
+def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     """
 
     Args:
@@ -257,7 +257,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
                                                             winning_combos, share_range,
                                                             producer_decision_and_response)
 
-        calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total)
+        calc_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total)
 
         tech_share_combos_total['share_range'] = share_range
 
@@ -510,7 +510,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     o2.session.flush()
 
 
-def calculate_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total,
+def calc_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total,
                                       total_sales=None):
     """
     on the first time through, from the producer module, total_sales = None => use context sales, market shares
