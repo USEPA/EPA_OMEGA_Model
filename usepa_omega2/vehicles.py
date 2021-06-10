@@ -734,10 +734,10 @@ class Vehicle(OMEGABase):
         from offcycle_credits import OffCycleCredits
 
         self.cost_cloud['cert_direct_oncycle_co2_grams_per_mile'] = \
-            DriveCycleWeights.calc_weighted_drive_cycle_cert_direct_co2_grams_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
+            DriveCycleWeights.calc_cert_direct_oncycle_co2_grams_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
 
         self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
-            DriveCycleWeights.calc_weighted_drive_cycle_kwh_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
+            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
 
         # initialize onroad values
         self.cost_cloud['onroad_direct_co2_grams_per_mile'] = 0
