@@ -125,7 +125,7 @@ try:
             self.producer_convergence_factor = 0.33
 
             self.iterate_producer_consumer = True
-            self.producer_consumer_max_iterations = 5
+            self.producer_consumer_max_iterations = 2  # recommend 2+
             self.producer_consumer_iteration_tolerance = 1e-3
 
             self.consumer_pricing_num_options = 4
