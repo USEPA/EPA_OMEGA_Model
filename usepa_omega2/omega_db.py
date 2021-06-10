@@ -18,6 +18,7 @@ from sqlalchemy import create_engine
 # to be able to easily use them and see them in database dumps, so model_year is Numeric, not Integer
 # The only place where Integer works as expected is for primary keys
 
+import sqlalchemy
 from sqlalchemy import String, ForeignKey, Enum, Float, Numeric, Integer
 from sqlalchemy import func
 from sqlalchemy import MetaData, Table, Column

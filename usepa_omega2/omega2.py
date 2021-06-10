@@ -621,6 +621,7 @@ def init_omega(o2_options):
     from fuels import Fuel
     from policy_fuel_upstream import PolicyFuelUpstream
     from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
+    from offcycle_credits import OffCycleCredits
     from context_fuel_prices import ContextFuelPrices
     from context_new_vehicle_market import ContextNewVehicleMarket
     from consumer.market_classes import MarketClass
@@ -664,10 +665,6 @@ def init_omega(o2_options):
     from GHG_standards_incentives import GHGStandardIncentives
     from GHG_standards_fuels import GHGStandardFuels
     from GHG_credits import GHG_credit_bank
-    from offcycle_credits import OffCycleCredits
-
-    # instantiate database tables
-    SQABase.metadata.create_all(o2.engine)
 
     import consumer.sales_volume as consumer
     import producer
@@ -678,6 +675,20 @@ def init_omega(o2_options):
     o2.options.consumer_calc_generalized_cost = consumer.calc_generalized_cost
 
     try:
+        init_fail += OffCycleCredits.init_from_file(o2.options.offcycle_credits_file,
+                                                    verbose=o2.options.verbose)
+
+        from vehicles import DecompositionAttributes
+        DecompositionAttributes.init()
+
+        # dynmically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
+        for attr in DecompositionAttributes.values:
+            sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr,
+                                                                       Column(attr, Float))  # WORKS
+
+        # instantiate database tables
+        SQABase.metadata.create_all(o2.engine)
+
         init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
 
         init_fail += PolicyFuelUpstream.init_from_file(o2.options.fuel_upstream_file, verbose=o2.options.verbose)
@@ -697,8 +708,8 @@ def init_omega(o2_options):
 
         # off cycle credits must be initialized prior to reading in cost clouds and vehicles
         # (to get names of offcycle credit columns)
-        init_fail += OffCycleCredits.init_from_file(o2.options.offcycle_credits_file,
-                                                                verbose=o2.options.verbose)
+        # init_fail += OffCycleCredits.init_from_file(o2.options.offcycle_credits_file,
+        #                                                         verbose=o2.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
 
