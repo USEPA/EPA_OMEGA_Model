@@ -180,7 +180,7 @@ class CompositeVehicle(OMEGABase):
         Build composite vehicle from list of vehicles
         :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
         """
-        import copy
+
         from omega_functions import weighted_value
 
         self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
@@ -195,28 +195,26 @@ class CompositeVehicle(OMEGABase):
         self.reg_class_ID = self.vehicle_list[0].reg_class_ID
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_ID = self.vehicle_list[0].market_class_ID
-        self.cert_target_co2_Mg = self.set_cert_target_co2_Mg()
-        self.cert_co2_Mg = self.set_cert_co2_Mg()
 
-        weighted_values = ['cert_co2_grams_per_mile', 'upstream_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
-                           'cert_direct_kwh_per_mile', 'footprint_ft2', 'onroad_direct_co2_grams_per_mile',
-                           'onroad_direct_kwh_per_mile']
+        self.weighted_values = ['cert_co2_grams_per_mile',
+                                'cert_direct_co2_grams_per_mile',
+                                'cert_direct_kwh_per_mile',
+                                'onroad_direct_co2_grams_per_mile',
+                                'onroad_direct_kwh_per_mile',
+                                'new_vehicle_mfr_cost_dollars',
+                                'new_vehicle_mfr_generalized_cost_dollars',
+                                ]
 
-        # calc sales-weighted values
-        for wv in weighted_values:
+        # calc weighted values
+        for wv in self.weighted_values:
             self.__setattr__(wv, weighted_value(self.vehicle_list, weight_by, wv))
 
-        self.set_new_vehicle_mfr_cost_dollars()
-        self.set_new_vehicle_mfr_generalized_cost_dollars()
-
+        self.total_weight = 0
         self.initial_registered_count = 0
         for v in self.vehicle_list:
-            self.initial_registered_count = self.initial_registered_count + v.initial_registered_count
-            v.set_cert_target_co2_Mg()
-
-        self.total_weight = 0
-        for v in self.vehicle_list:
             self.total_weight += v.__getattribute__(self.weight_by)
+            self.initial_registered_count += v.initial_registered_count
+            v.set_cert_target_co2_Mg()
 
         for v in self.vehicle_list:
             if self.total_weight != 0:
@@ -306,12 +304,8 @@ class CompositeVehicle(OMEGABase):
         composite_frontier_df = pd.DataFrame()
         composite_frontier_df['market_share_frac'] = [0]
 
-        # calculated weighted values
-        weighted_values = ['cert_co2_grams_per_mile', 'cert_direct_co2_grams_per_mile',
-                           'upstream_co2_grams_per_mile', 'cert_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars',
-                           'new_vehicle_mfr_generalized_cost_dollars']
-
-        for wv in weighted_values:
+        # calc weighted values
+        for wv in self.weighted_values:
             composite_frontier_df[wv] = [0]
 
         for v in self.vehicle_list:
@@ -323,7 +317,7 @@ class CompositeVehicle(OMEGABase):
             prior_market_share_frac = composite_frontier_df['market_share_frac']
             veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_ID]
 
-            for wv in weighted_values:
+            for wv in self.weighted_values:
                 composite_frontier_df[wv] = \
                     (composite_frontier_df[wv] * prior_market_share_frac +
                      composite_frontier_df['veh_%s_%s' % (v.vehicle_ID, wv)] * veh_market_share_frac) / \
@@ -427,15 +421,15 @@ class CompositeVehicle(OMEGABase):
         self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_cost_dollars')
 
-    def set_new_vehicle_mfr_generalized_cost_dollars(self):
-        """
-
-        Returns:
-
-        """
-        from omega_functions import weighted_value
-        self.new_vehicle_mfr_generalized_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
-                                                           'new_vehicle_mfr_generalized_cost_dollars')
+    # def set_new_vehicle_mfr_generalized_cost_dollars(self):
+    #     """
+    #
+    #     Returns:
+    #
+    #     """
+    #     from omega_functions import weighted_value
+    #     self.new_vehicle_mfr_generalized_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
+    #                                                        'new_vehicle_mfr_generalized_cost_dollars')
 
     def set_cert_target_co2_Mg(self):
         """
