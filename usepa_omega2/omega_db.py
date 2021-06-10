@@ -25,7 +25,7 @@ from sqlalchemy import MetaData, Table, Column
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 
-SQABase = declarative_base()
+SQABase = declarative_base(name='SQABase')
 
 
 def init_omega_db():
