@@ -71,7 +71,7 @@ class OffCycleCredits(OMEGABase):
     def init_from_file(cls, filename, verbose=False):
         """
 
-        Initialize class data from input file
+        Initialize class data from input file.
 
         Args:
             filename: name of input file

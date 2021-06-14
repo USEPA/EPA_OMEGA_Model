@@ -85,11 +85,11 @@ class ContextFuelPrices(SQABase, OMEGABase):
     def init_database_from_file(filename, verbose=False):
         """
 
-        Initialize class data from input file
+        Initialize class data from input file.
 
         Args:
-            filename: name of input file
-            verbose: enable additional console and logfile output if True
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
             List of template/input errors, else empty list on success

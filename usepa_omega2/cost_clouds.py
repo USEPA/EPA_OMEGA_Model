@@ -2,25 +2,25 @@
 cost_clouds.py
 ==============
 
-**Routines to load simulated vehicle data (vehicle energy/CO2 consumption and cost data) and calculate frontiers from
-"clouds" of points**
+**Routines to load simulated vehicle data (vehicle energy/CO2 consumption, off-cycle tech application, and cost data)
+and calculate frontiers from "clouds" of points**
 
 Also contains a function to plot frontiers for troubleshooting purposes
 
 Cost cloud frontiers are at the heart of OMEGA's optimization and compliance processes.  For every set of points
 represented in $/CO2_g/mi (or Y versus X in general) there is a set of points that represent the lowest cost for each
 CO2 level, this is referred to as the frontier of the cloud.  Each point in the cloud (and on the frontier) can store
-multiple parameters, implemented as rows in a pandas DataFrame where each row can have multiple columns of data
+multiple parameters, implemented as rows in a pandas DataFrame where each row can have multiple columns of data.
 
 Each manufacturer vehicle, in each model year, gets its own frontier.  The frontiers are combined in a sales-weighted
 fashion to create composite frontiers for groups of vehicles that can be considered simultaneously for compliance
 purposes.  These groups of vehicles are called composite vehicles (*see also vehicles.py, class CompositeVehicle*).
 The points of the composite frontiers are in turn combined and sales-weighted in various combinations during
-manufacturer compliance search iteration
+manufacturer compliance search iteration.
 
 Frontiers can hew closely to the points of the source cloud or can cut through a range of representative points
 depending on the value of ``o2.options.cost_curve_frontier_affinity_factor``.  Higher values pick up more points, lower
-values are a looser fit.  The default value provides a good compromise between number of points and accuracy of fit
+values are a looser fit.  The default value provides a good compromise between number of points and accuracy of fit.
 
 
 """
@@ -38,20 +38,20 @@ cloud_non_numeric_columns = ['simulated_vehicle_id']
 
 class CostCloud(OMEGABase):
     """
-
+    **Loads and provides access to simulated vehicle data, provides methods to calculate and plot frontiers.**
     """
 
-    max_year = 0
+    max_year = 0  #: maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
 
     @staticmethod
     def init_cost_clouds_from_file(filename, verbose=False):
         """
 
-        Initialize class data from input file
+        Initialize class data from input file.
 
         Args:
-            filename: name of input file
-            verbose: enable additional console and logfile output if True
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
             List of template/input errors, else empty list on success
@@ -97,38 +97,47 @@ class CostCloud(OMEGABase):
         return template_errors
 
     @staticmethod
-    def plot_frontier(cost_cloud, cost_curve_class, frontier_df, x_key, y_key):
+    def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
         """
+        Plot a cloud and its frontier.  Saves plot to ``o2.options.output_folder``.
 
         Args:
-            cost_cloud:
-            cost_curve_class:
-            frontier_df:
-            x_key:
-            y_key:
+            cost_cloud (DataFrame): set of points to plot
+            cost_curve_name (str): name of  plot
+            frontier_df (DataFrame): set of points on the frontier
+            x_key (str): column name of x-value
+            y_key (str): columns name of y-value
 
-        Returns:
+        Example:
+
+            ::
+
+                # from create_frontier_df() in vehicles.py
+                CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
         """
         import matplotlib.pyplot as plt
         plt.figure()
         plt.plot(cost_cloud[x_key], cost_cloud[y_key],
                  '.')
-        plt.title('Cost versus %s %s' % (x_key, cost_curve_class))
+        plt.title('Cost versus %s %s' % (x_key, cost_curve_name))
         plt.xlabel('%s' % x_key)
         plt.ylabel('%s' % y_key)
         plt.plot(frontier_df[x_key], frontier_df[y_key],
                  'r-')
         plt.grid()
-        plt.savefig(o2.options.output_folder + '%s versus %s %s' % (y_key, x_key, cost_curve_class))
+        plt.savefig(o2.options.output_folder + '%s versus %s %s' % (y_key, x_key, cost_curve_name))
 
     @staticmethod
     def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         """
+        Calculate the frontier of a cloud.
+
         Args:
             cloud (DataFrame): a set of points to find the frontier of
             x_key (str): name of the column holding x-axis data
             y_key (str): name of the column holding y-axis data
+            allow_upslope (bool): allow U-shaped frontier
 
         Returns:
             DataFrame containing the frontier points
@@ -186,12 +195,14 @@ class CostCloud(OMEGABase):
     @staticmethod
     def get_cloud(model_year, cost_curve_class):
         """
+        Retrieve cost cloud for the given model year and cost curve class.
 
         Args:
-            model_year:
-            cost_curve_class:
+            model_year (numeric): model year
+            cost_curve_class (str): name of cost curve class (e.g. 'ice_MPW_LRL')
 
         Returns:
+            Copy of the requested cost cload data.
 
         """
         return cache[cost_curve_class][model_year].copy()
@@ -199,8 +210,10 @@ class CostCloud(OMEGABase):
     @staticmethod
     def get_max_year():
         """
+        Get maximum year of cost cloud data.
 
         Returns:
+            CostCloud.max_year
 
         """
         return CostCloud.max_year
