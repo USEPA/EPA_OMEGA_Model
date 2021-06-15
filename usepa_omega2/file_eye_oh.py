@@ -1,7 +1,10 @@
 """
-**file_eye_oh.py**
+file_eye_oh.py
+==============
 
-Handy file system routines for general uses
+**Handy file system routines for general use**
+
+Generally, user-friendly wrappers for functionality provided by the ``os`` and ``shutil`` packages.
 
 """
 
@@ -129,13 +132,3 @@ def sysprint(str):
     :param str: string to echo
     """
     os.system('echo {}'.format(str))
-
-
-def gui_comm(text):
-    # file1 = open("../comm_file.txt", "a")  # append mode
-    # file1.close()
-    # num_lines = sum(1 for line in open('../comm_file.txt'))
-    file1 = open("comm_file.txt", "a")  # append mode
-    file1.write(text + " \n")
-    # file1.write('line' + str(num_lines + 1) + " " + text + " \n")
-    file1.close()
