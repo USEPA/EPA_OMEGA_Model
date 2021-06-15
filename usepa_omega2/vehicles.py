@@ -767,14 +767,15 @@ class Vehicle(OMEGABase):
 
         # calculate producer generalized cost
         self.cost_cloud = o2.options.producer_calc_generalized_cost(self, 'onroad_direct_co2_grams_per_mile',
-                                                                         'onroad_direct_kwh_per_mile',
-                                                                         'new_vehicle_mfr_cost_dollars')
+                                                                    'onroad_direct_kwh_per_mile',
+                                                                    'new_vehicle_mfr_cost_dollars')
 
         # calculate frontier from updated cloud
+        allow_upslope = True
         cost_curve = CostCloud.calc_frontier(self.cost_cloud, 'cert_co2_grams_per_mile',
-                                                  'new_vehicle_mfr_cost_dollars', allow_upslope=True)
+                                             'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
-        # CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
+        # CostCloud.plot_frontier(self.cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, o2.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
         # rename generic columns to vehicle-specific columns
         cost_curve = DecompositionAttributes.rename_decomposition_columns(self, cost_curve)

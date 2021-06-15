@@ -22,7 +22,6 @@ Frontiers can hew closely to the points of the source cloud or can cut through a
 depending on the value of ``o2.options.cost_curve_frontier_affinity_factor``.  Higher values pick up more points, lower
 values are a looser fit.  The default value provides a good compromise between number of points and accuracy of fit.
 
-
 """
 
 print('importing %s' % __file__)
@@ -126,7 +125,7 @@ class CostCloud(OMEGABase):
         plt.plot(frontier_df[x_key], frontier_df[y_key],
                  'r-')
         plt.grid()
-        plt.savefig(o2.options.output_folder + '%s versus %s %s' % (y_key, x_key, cost_curve_name))
+        plt.savefig(o2.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
 
     @staticmethod
     def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
@@ -142,53 +141,87 @@ class CostCloud(OMEGABase):
         Returns:
             DataFrame containing the frontier points
 
+        .. figure:: _static/ug_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_0.75.png
+            :scale: 75 %
+            :align: center
+
+            Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=0.75`` ``allow_upslope=True``
+            These are the default settings
+
+        .. figure:: _static/ug_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_10.png
+            :scale: 75 %
+            :align: center
+
+            Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=10`` ``allow_upslope=True``
+            Higher affinity factor follows cloud points more closely
+
+        .. figure:: _static/ug_figures/cost_cloud_ice_Truck_no_upslope_frontier_affinity_factor_0.75.png
+            :scale: 75 %
+            :align: center
+
+            Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=0.75`` ``allow_upslope=False``
+            Default affinity factor, no up-slope
+
         """
 
         import numpy as np
 
-        frontier_pts = []
+        if len(cloud) > 1:
+            frontier_pts = []
 
-        # drop non-numeric columns so dtypes don't become "object"
-        cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
+            # drop non-numeric columns so dtypes don't become "object"
+            cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
-        # find frontier starting point, lowest GHGs, and add to frontier
-        idxmin = cloud[x_key].idxmin()
-        frontier_pts.append(cloud.loc[idxmin])
-        min_frontier_factor = 0
+            # normalize data (helps with up-slope frontier)
+            cloud['y_norm'] = (cloud[y_key] - cloud[y_key].min()) / (cloud[y_key].max() - cloud[y_key].min())
+            cloud['x_norm'] = (cloud[x_key] - cloud[x_key].min()) / (cloud[x_key].max() - cloud[x_key].min())
 
-        if cloud[x_key].min() != cloud[x_key].max():
-            while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) and not np.isinf(min_frontier_factor):
-                # calculate frontier factor (more negative is more better) = slope of each point relative
-                # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) \
-                                           / (cloud[x_key] - frontier_pts[-1][x_key]) \
-                                           ** o2.options.cost_curve_frontier_affinity_factor
+            x_key = 'x_norm'
+            y_key = 'y_norm'
 
-                # find next frontier point (lowest slope), if there is one, and add to frontier list
-                min_frontier_factor = cloud['frontier_factor'].min()
+            # find frontier starting point, lowest x-value, and add to frontier
+            idxmin = cloud[x_key].idxmin()
+            frontier_pts.append(cloud.loc[idxmin])
+            min_frontier_factor = 0
 
-                if min_frontier_factor > 0:
-                    # frontier factor is different for up-slope
+            if cloud[x_key].min() != cloud[x_key].max():
+                while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) \
+                        and not np.isinf(min_frontier_factor) and not cloud.empty:
+                    # calculate frontier factor (more negative is more better) = slope of each point relative
+                    # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
+                    cloud = cloud.loc[cloud[x_key] > frontier_pts[-1][x_key]].copy()
                     cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
                                                (cloud[x_key] - frontier_pts[-1][x_key]) \
-                                               ** (1 + 1 - o2.options.cost_curve_frontier_affinity_factor)
+                                               ** o2.options.cost_curve_frontier_affinity_factor
+                    # find next frontier point (lowest slope), if there is one, and add to frontier list
                     min_frontier_factor = cloud['frontier_factor'].min()
 
-                if not np.isinf(min_frontier_factor):
-                    if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
-                        # if multiple points with the same slope, take the one with the highest index (highest x-value)
-                        idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor].index.max()
-                    else:
-                        idxmin = cloud['frontier_factor'].idxmin()
-                else:
-                    idxmin = cloud['frontier_factor'].idxmax()
+                    if min_frontier_factor > 0 and allow_upslope:
+                        # frontier factor is different for up-slope (swap x & y and invert "y")
+                        cloud['frontier_factor'] = (frontier_pts[-1][x_key] - cloud[x_key]) / \
+                                                   (cloud[y_key] - frontier_pts[-1][y_key]) \
+                                                   ** o2.options.cost_curve_frontier_affinity_factor
+                        min_frontier_factor = cloud['frontier_factor'].min()
 
-                if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
-                    frontier_pts.append(cloud.loc[idxmin])
+                    if not cloud.empty:
+                        if not np.isinf(min_frontier_factor):
+                            if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
+                                # if multiple points with the same slope, take the one with the highest x-value
+                                idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
+                            else:
+                                idxmin = cloud['frontier_factor'].idxmin()
+                        else:
+                            idxmin = cloud['frontier_factor'].idxmax()
 
-        frontier_df = pd.concat(frontier_pts, axis=1)
-        frontier_df = frontier_df.transpose()
-        frontier_df['frontier_factor'] = 0
+                        if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
+                            frontier_pts.append(cloud.loc[idxmin])
+
+            frontier_df = pd.concat(frontier_pts, axis=1)
+            frontier_df = frontier_df.transpose()
+            frontier_df['frontier_factor'] = 0
+        else:
+            frontier_df = cloud
+            frontier_df['frontier_factor'] = 0
 
         return frontier_df.copy()
 
