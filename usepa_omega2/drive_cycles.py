@@ -2,6 +2,9 @@
 drive_cycles.py
 ===============
 
+**Routines to load, validate, and provide access to drive cycle definition data**
+
+Drive cycles and cycle phasese are defined by a name, a distance and a brief description.
 
 """
 
@@ -11,22 +14,65 @@ from usepa_omega2 import *
 
 
 class DriveCycles(OMEGABase):
-    data = pd.DataFrame()
+    """
+    **Load and provides routines to access drive cycle descriptive data**
+
+    """
+    _data = pd.DataFrame()
 
     @staticmethod
     def validate_drive_cycle_ID(drive_cycle_id):
-        return drive_cycle_id in DriveCycles.data['drive_cycle_id'].values
+        """
+        Validate drive cycle name.
+
+        Args:
+            drive_cycle_id(str): drive cycle name to validate e.g. 'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile'
+
+        Returns:
+            True if drive cycle name is in the list of known drive cycles.
+
+        """
+        return drive_cycle_id in DriveCycles._data['drive_cycle_id'].values
 
     @staticmethod
     def get_drive_cycles():
-        return DriveCycles.data['drive_cycle_id'].to_list()
+        """
+        Get list of known drive cycle names
+
+        Returns:
+            List of known drive cycle names
+
+        """
+        return DriveCycles._data['drive_cycle_id'].to_list()
 
     @staticmethod
     def get_drive_cycle_distance_miles(drive_cycle_id):
-        return DriveCycles.data['drive_cycle_distance_miles'].loc[DriveCycles.data['drive_cycle_id'] == drive_cycle_id].item()
+        """
+        Get the target driven distance (in miles) of a drive cycle
+
+        Args:
+            drive_cycle_id(str): drive cycle name
+
+        Returns:
+            Drive cycle distance in miles
+
+        """
+        return DriveCycles._data['drive_cycle_distance_miles'].loc[DriveCycles._data['drive_cycle_id'] == drive_cycle_id].item()
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -45,9 +91,9 @@ class DriveCycles(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                DriveCycles.data['drive_cycle_id'] = df['drive_cycle_id']
-                DriveCycles.data['drive_cycle_distance_miles'] = df['drive_cycle_distance_miles']
-                DriveCycles.data['description'] = df['description']
+                DriveCycles._data['drive_cycle_id'] = df['drive_cycle_id']
+                DriveCycles._data['drive_cycle_distance_miles'] = df['drive_cycle_distance_miles']
+                DriveCycles._data['description'] = df['description']
 
         return template_errors
 
@@ -69,11 +115,11 @@ if __name__ == '__main__':
 
         init_fail = []
         init_fail += DriveCycles.init_from_file(o2.options.drive_cycles_file,
-                                                           verbose=o2.options.verbose)
+                                                verbose=o2.options.verbose)
 
         if not init_fail:
             fileio.validate_folder(o2.options.database_dump_folder)
-            DriveCycles.data.to_csv(
+            DriveCycles._data.to_csv(
                 o2.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
             print(DriveCycles.validate_drive_cycle_ID('cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile'))

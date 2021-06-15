@@ -40,7 +40,7 @@ class CostCloud(OMEGABase):
     **Loads and provides access to simulated vehicle data, provides methods to calculate and plot frontiers.**
     """
 
-    max_year = 0  #: maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
+    _max_year = 0  # maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
 
     @staticmethod
     def init_cost_clouds_from_file(filename, verbose=False):
@@ -91,7 +91,7 @@ class CostCloud(OMEGABase):
                     cache[cost_curve_class] = dict()
                     for model_year in cloud_model_years:
                         cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
-                        CostCloud.max_year = max(CostCloud.max_year, model_year)
+                        CostCloud._max_year = max(CostCloud._max_year, model_year)
 
         return template_errors
 
@@ -249,7 +249,7 @@ class CostCloud(OMEGABase):
             CostCloud.max_year
 
         """
-        return CostCloud.max_year
+        return CostCloud._max_year
 
 
 if __name__ == '__main__':
