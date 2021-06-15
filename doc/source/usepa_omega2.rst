@@ -77,14 +77,6 @@ usepa\_omega2.cost\_clouds module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.drive\_cycle\_energy\_calcs module
-------------------------------------------------
-
-.. automodule:: usepa_omega2.drive_cycle_energy_calcs
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.drive\_cycle\_weights module
 ------------------------------------------
 
