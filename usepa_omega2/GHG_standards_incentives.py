@@ -1,6 +1,4 @@
 """
-GHG_standards_incentives.py
-===========================
 
 **Routines to load and provide access to 'incentives' such as production multipliers for battery-electric vehicles.**
 
@@ -22,6 +20,9 @@ Column Name and Description
 
         Example:
             ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply incentive``
+
+Code
+----
 
 """
 
