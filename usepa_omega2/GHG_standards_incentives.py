@@ -1,5 +1,7 @@
 """
 
+----
+
 **Routines to load and provide access to 'incentives' such as production multipliers for battery-electric vehicles.**
 
 Currently, only production multipliers are implemented here, but other incentives may be added later.
