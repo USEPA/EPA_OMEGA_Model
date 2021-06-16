@@ -26,17 +26,21 @@ Example:
     * - start_year
       - Start year of incentive, incentive applies until the next available start year
     * - `dynamic column(s)`
-      - e.g. 'fueling_class:BEV'
+      - ::
 
-        Interpretation:
+        {attribute_name}:{attribute_value}
+
+        Example:
             'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
 
 Column Names and Description
     :start_year: Start year of incentive, incentive applies until the next available start year
     :`dynamic column(s)`:
-        e.g. 'fueling_class:BEV'
+        ::
 
-        Interpretation:
+        {attribute_name}:{attribute_value}
+
+        Example:
             'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
 
 """
