@@ -13,35 +13,15 @@ The input file format uses a flexible column headers notation such as 'fueling_c
 ':') is the name of a ``Vehicle`` object attribute and the suffix is compared with the attribute value to see if the
 incentive applies to the particular vehicle.
 
-Example:
-
-    'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
-
-.. list-table:: Input File Format
-    :widths: 33 33
-    :header-rows: 1
-
-    * - Column Name
-      - Description
-    * - start_year
-      - Start year of incentive, incentive applies until the next available start year
-    * - `dynamic column(s)`
-      - ::
-
-        {attribute_name}:{attribute_value}
-
-        Example:
-            'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
-
 Column Names and Description
-    :start_year: Start year of incentive, incentive applies until the next available start year
-    :`dynamic column(s)`:
-        ::
+    :start_year:
+        Start year of incentive, incentive applies until the next available start year
 
-        {attribute_name}:{attribute_value}
+    :dynamic column(s):
+        ``{attribute_name}:{attribute_value}``
 
         Example:
-            'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
+            ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply incentive``
 
 """
 
