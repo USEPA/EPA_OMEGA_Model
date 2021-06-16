@@ -6,18 +6,18 @@ GHG_standards_incentives.py
 
 Currently, only production multipliers are implemented here, but other incentives may be added later.
 
+
 Input File Format
 -----------------
 
-The input file format uses a flexible column headers notation such as 'fueling_class:BEV'.  The prefix (before the
-':') is the name of a ``Vehicle`` object attribute and the suffix is compared with the attribute value to see if the
-incentive applies to the particular vehicle.
+The input file format uses a flexible column header notation, as detailed below.
 
-Column Names and Description
+Column Name and Description
     :start_year:
         Start year of incentive, incentive applies until the next available start year
 
     :dynamic column(s):
+        One or more dynamic columns with the format
         ``{attribute_name}:{attribute_value}``
 
         Example:
