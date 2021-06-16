@@ -2,6 +2,11 @@
 GHG_standards_footprint.py
 ==========================
 
+**Loads parameters and provides calculations for an attribute-based (vehicle footprint) GHG standard.**
+
+This is based on the current standards, with two regulatory classes with lifetime VMT and
+parameter-based target calculations that define a "footprint curve" based on four coefficients
+("A" through "D") and min and max footprint limits.
 
 """
 
@@ -15,27 +20,33 @@ cache = dict()
 
 
 class GHGStandardFootprint(SQABase, OMEGABase):
+    """
+
+    """
     # --- database table properties ---
     __tablename__ = 'ghg_standards_footprint'
-    index = Column(Integer, primary_key=True)
-    model_year = Column(Numeric)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
-    footprint_min_sqft = Column('footprint_min_sqft', Float)
-    footprint_max_sqft = Column('footprint_max_sqft', Float)
-    coeff_a = Column('coeff_a', Float)
-    coeff_b = Column('coeff_b', Float)
-    coeff_c = Column('coeff_c', Float)
-    coeff_d = Column('coeff_d', Float)
-    lifetime_VMT = Column('lifetime_vmt', Float)
+    index = Column(Integer, primary_key=True)  #: database index
+    model_year = Column(Numeric)  #: model year (or start year of the applied parameters)
+    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))  #: reg class name, e.g. 'car','truck'
+    footprint_min_sqft = Column('footprint_min_sqft', Float)  #: minimum footprint (square feet) of curve
+    footprint_max_sqft = Column('footprint_max_sqft', Float)  #: maximum footprint (square feet) of curve
+    coeff_a = Column('coeff_a', Float)  #: footprint curve A coefficient
+    coeff_b = Column('coeff_b', Float)  #: footprint curve B coefficient
+    coeff_c = Column('coeff_c', Float)  #: footprint curve C coefficient
+    coeff_d = Column('coeff_d', Float)  #: footprint curve D coefficient
+    lifetime_VMT = Column('lifetime_vmt', Float)  #: regulatory lifetime VMT (in miles) of the given reg class
 
     @staticmethod
     def get_vehicle_reg_class(vehicle):
         """
-        Return vehicle reg class based on vehicle characteristics
-        Args:
-            vehicle: vehicle object
+        Get vehicle regulatory class based on vehicle characteristics.
 
-        Returns: vehicle reg class based on vehicle characteristics
+        Args:
+            vehicle (VehicleFinal): the vehicle to determine the reg class of
+
+        Returns:
+
+            Vehicle reg class based on vehicle characteristics.
 
         """
         reg_class_ID = vehicle.reg_class_ID
@@ -43,6 +54,17 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calc_target_co2_gpmi(vehicle):
+        """
+        Calculate vehicle target CO2 g/mi.
+
+        Args:
+            vehicle (Vehicle): the vehicle to get the target for
+
+        Returns:
+
+            Vehicle target CO2 in g/mi.
+
+        """
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -64,6 +86,18 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calc_cert_lifetime_vmt(reg_class_id, model_year):
+        """
+        Get lifetime VMT as a function of regulatory class and model year.
+
+        Args:
+            reg_class_id (str): e.g. 'car','truck'
+            model_year (numeric): model year
+
+        Returns:
+
+            Lifetime VMT for the regulatory class and model year.
+
+        """
         start_years = cache[reg_class_id]['start_year']
         model_year = max(start_years[start_years <= model_year])
 
@@ -76,6 +110,24 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calc_target_co2_Mg(vehicle, sales_variants=None):
+        """
+        Calculate vehicle target CO2 Mg as a function of the vehicle, the standards and optional sales options.
+
+        Includes the effect of production multipliers.
+
+        See Also:
+
+            GHG_standards_incentives.GHGStandardIncentives
+
+        Args:
+            vehicle (Vehicle): the vehicle
+            sales_variants (numeric list-like): optional sales variants
+
+        Returns:
+
+            Target CO2 Mg value(s) for the given vehicle and/or sales variants.
+
+        """
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
@@ -98,6 +150,25 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def calc_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+        """
+        Calculate vehicle cert CO2 Mg as a function of the vehicle, the standards, CO2 g/mi options and optional sales
+        options.
+
+        Includes the effect of production multipliers.
+
+        See Also:
+
+            GHG_standards_incentives.GHGStandardIncentives
+
+        Args:
+            vehicle (Vehicle): the vehicle
+            sales_variants (numeric list-like): optional sales variants
+
+        Returns:
+
+            Cert CO2 Mg value(s) for the given vehicle, CO2 g/mi variants and/or sales variants.
+
+        """
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
@@ -124,7 +195,18 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
 
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         cache.clear()

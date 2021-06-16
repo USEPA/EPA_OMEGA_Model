@@ -30,7 +30,7 @@ class GHGStandardFlat(SQABase, OMEGABase):
     model_year = Column(Numeric)  #: model year (or start year of the applied parameters)
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))  #: reg class name, e.g. 'car','truck'
     GHG_target_co2_grams_per_mile = Column('ghg_target_co2_grams_per_mile', Float)  #: CO2 target g/mi
-    lifetime_VMT = Column('lifetime_vmt', Float)  #: regulatory lifetime VMT of the given reg class
+    lifetime_VMT = Column('lifetime_vmt', Float)  #: regulatory lifetime VMT (in miles) of the given reg class
 
     @staticmethod
     def get_vehicle_reg_class(vehicle):
@@ -156,7 +156,6 @@ class GHGStandardFlat(SQABase, OMEGABase):
             Cert CO2 Mg value(s) for the given vehicle, CO2 g/mi variants and/or sales variants.
 
         """
-
         import numpy as np
         from GHG_standards_incentives import GHGStandardIncentives
 
