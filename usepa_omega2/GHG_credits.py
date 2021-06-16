@@ -1,29 +1,70 @@
 """
-Attempt at Averaging, Banking and (not) Trading emissions credits
+GHG_credits.py
+==============
+
+**Routines to load initial GHG credits (in CO2 Mg), provide access to credit banking data, and handle credit
+transactions, along the lines of Averaging, Bank and Trading (ABT)**
+
+Not all features of ABT are implemented (notably, explicit between-manufacturer Trading).  Credits can be earned,
+used to pay debits (model year compliance deficits) and/or may expire unused.
+
+See also ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
+
 """
 
 print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-credit_max_life_years = 5
-debit_max_life_years = 3
+credit_max_life_years = 5  #: credit max life, in years, a.k.a. credit carry-foward
+debit_max_life_years = 3  #: debit max life, in years, a.k.a. credit carry-back
 
-input_template_name = 'ghg_credit_history'
-input_template_version = 0.1
-input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
+_input_template_name = 'ghg_credit_history'
+_input_template_version = 0.1
+_input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
 
 
 class GHG_credit_info(OMEGABase):
+    """
+    **Stores GHG credit info (i.e. remaining balance, remaining years)**
+
+    Used by GHG_credit_bank.get_credit_info() to return a list of non-expired credit and debit data
+
+    """
     def __init__(self, remaining_balance_Mg, remaining_years):
+        """
+        Create GHG_credit_info object
+
+        Args:
+            remaining_balance_Mg (numeric): remaining credit balance, CO2 Mg
+            remaining_years (numeric): remaining years of life before expiration
+        """
         self.remaining_balance_Mg = remaining_balance_Mg
         self.remaining_years = remaining_years
 
 
 class GHG_credit_bank(OMEGABase):
+    """
+    **Provides objects and methods to handle credit transactions and provide credit bank information.**
 
+    Each manufacturer will use its own unique credit bank object.
+
+    """
     def __init__(self, filename, manufacturer_name, verbose=False):
-        # call init after validating ghg_credits template
+        """
+
+        Initialize credit bank data from input file, call after validating ghg_credits template.
+
+        Args:
+            filename (str): name of input file containing pre-existing credit info
+            manufacturer_name (str): name of manufacturer, e.g. 'USA Motors'
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+
         if verbose:
             omega_log.logwrite('\nInitializing credit bank from %s...' % filename)
 
@@ -39,29 +80,62 @@ class GHG_credit_bank(OMEGABase):
 
     @staticmethod
     def validate_ghg_credits_template(filename, verbose):
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+        """
+        Validate GHG credit input file template.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template errors, or empty list on success.
+
+        """
+        template_errors = validate_template_version_info(filename, _input_template_name, _input_template_version,
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
+            template_errors = validate_template_columns(filename, _input_template_columns, _input_template_columns,
                                                         verbose=verbose)
 
         return template_errors
 
     @staticmethod
-    def create_credit():
+    def create_credit(calendar_year, manufacturer_id, beginning_balance_Mg):
+        """
+        Create a new GHG credit data structure.
+
+        Args:
+            calendar_year (numeric): calendar year of credit creation
+            manufacturer_id (str): manufacturer name, e.g. 'USA Motors'
+            beginning_balance_Mg (numeric): starting balance of credit in CO2 Mg
+
+        Returns:
+            DataFrame of new (age zero) credit info
+
+        """
         new_credit = dict()
-        new_credit['calendar_year'] = None
-        new_credit['model_year'] = None
-        new_credit['manufacturer'] = None
-        new_credit['beginning_balance_Mg'] = None
-        new_credit['ending_balance_Mg'] = None
-        new_credit['age'] = None
+        new_credit['calendar_year'] = calendar_year
+        new_credit['model_year'] = calendar_year
+        new_credit['manufacturer'] = manufacturer_id
+        new_credit['beginning_balance_Mg'] = beginning_balance_Mg
+        new_credit['ending_balance_Mg'] = beginning_balance_Mg
+        new_credit['age'] = 0
         new_credit = pd.DataFrame(new_credit, columns=new_credit.keys(), index=[0])
         return new_credit
 
     @staticmethod
     def create_credit_transaction(credit):
+        """
+        Create an empty (no value, no destination) credit transaction.
+
+        Args:
+            credit (Series): see GHG_credit_bank.create_credit()
+
+        Returns:
+            DataFrame of new, empty, credit transaction
+
+        """
         new_credit_transaction = dict()
         new_credit_transaction['calendar_year'] = credit['calendar_year']
         new_credit_transaction['model_year'] = credit['model_year']
@@ -72,6 +146,16 @@ class GHG_credit_bank(OMEGABase):
         return new_credit_transaction
 
     def get_credit_info(self, calendar_year):
+        """
+        Get lists of valid (non-expired) credits and debits for the given year.
+
+        Args:
+            calendar_year (numeric): calendar year to query for credits and debits
+
+        Returns:
+            Tuple of lists of ``GHG_credit_info`` objects ([current_credits], [current_debits])
+
+        """
         current_credits = []
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
@@ -96,6 +180,16 @@ class GHG_credit_bank(OMEGABase):
         return current_credits, current_debits
 
     def get_expiring_credits_Mg(self, calendar_year):
+        """
+        Get value of expiring credits in CO2 Mg for the given year.
+
+        Args:
+            calendar_year (numeric): calendar year to get expiring credits from
+
+        Returns:
+            Value of expiring credits in CO2 Mg
+
+        """
         expiring_credits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
@@ -109,6 +203,17 @@ class GHG_credit_bank(OMEGABase):
         return expiring_credits_Mg
 
     def get_expiring_debits_Mg(self, calendar_year):
+        """
+        Get value of expiring debits in CO2 Mg for the given year.
+
+        Args:
+            calendar_year (numeric): calendar year to get expiring debits from
+
+        Returns:
+            Value of expiring debits in CO2 Mg
+
+        """
+
         expiring_debits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
@@ -122,6 +227,24 @@ class GHG_credit_bank(OMEGABase):
         return expiring_debits_Mg
 
     def update_credit_age(self, calendar_year):
+        """
+        Take each credit in the ``credit_bank`` and age it by one year then apply lifetime limits to drop
+        expired credits and zero-value credits and debits.
+
+        Credits and debits with zero balance are dropped silently after age zero.
+
+        Expiration takes the form of entries in the ``transaction_log``.
+
+            * Expiring credits with non-zero balances are marked as 'EXPIRATION' transactions and then dropped
+            * Expiring debits with non-zero balances are marked as 'PAST_DUE' transactions and are not dropped
+
+        Result is an updated ``credit_bank`` and an updated ``transaction_log``, as needed
+
+        Args:
+            calendar_year (numeric): calendar year to update credits in
+
+        """
+
         # grab last years
         last_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year - 1].copy()
 
@@ -159,16 +282,40 @@ class GHG_credit_bank(OMEGABase):
 
         self.credit_bank = pd.DataFrame.append(self.credit_bank, last_years_credits)
 
-    def handle_credit(self, calendar_year, manufacturer, beginning_balance_Mg):
-        new_credit = GHG_credit_bank.create_credit()
-        new_credit['calendar_year'] = calendar_year
-        new_credit['model_year'] = calendar_year
-        new_credit['manufacturer'] = manufacturer
-        new_credit['beginning_balance_Mg'] = beginning_balance_Mg
-        new_credit['ending_balance_Mg'] = beginning_balance_Mg
-        new_credit['age'] = 0
+    def handle_credit(self, calendar_year, manufacturer_id, beginning_balance_Mg):
+        """
+        Handle mandatory credit (and default debit) behavior.
+
+        If the manufacturer's compliance state in the given year is over-compliance, ``beginning_balance_Mg`` will
+        be positive (> 0).  In this case past under-compliance (debits) **MUST** be paid before banking any excess.
+        Debits are paid starting with the oldest first and working forwards until they are all paid or the full value
+        of the current credit has been paid out, whichever comes first.
+
+        If the manufacturer's compliance state in the given year is under-compliance, ``beginning_balance_Mg`` will
+        be negative (< 0).  In this case, the payment of debits is up to the programmer, there are no mandatory
+        debit payment requirements.  As implemented, fresh debits are immediately paid by any available banked credits,
+        so a debit will only be carried if it can't be paid in full at the time of its creation.
+
+        Result is an updated ``credit_bank`` and an updated ``transaction_log``, as needed (via the ``pay_debit()``
+        method).
+
+        Note:
+
+            It's possible to conceive of many different credit/debit strategies (once mandatory credit behavior has been
+            handled).  In the case of OMEGA, strategic over- and under-compliance will eventually be handled by the
+            year-over-year compliance tree which will allow a search of various "earn and burn" credit paths.  As such,
+            it's important to leave the implentation of such schemes out of this method and the default handling here
+            allows for that.
+
+        Args:
+            calendar_year (numeric): calendar year of credit creation
+            manufacturer_id (str): manufacturer name, e.g. 'USA Motors'
+            beginning_balance_Mg (numeric): starting balance of credit (or debit) in CO2 Mg
+
+        """
+        new_credit = GHG_credit_bank.create_credit(calendar_year, manufacturer_id, beginning_balance_Mg)
         self.credit_bank = pd.DataFrame.append(self.credit_bank, new_credit, ignore_index=True)
-        new_credit = self.credit_bank.iloc[-1].copy()  # grab credit as a series
+        new_credit = self.credit_bank.iloc[-1].copy()  # grab credit as a Series
 
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year].copy()
 
@@ -194,6 +341,26 @@ class GHG_credit_bank(OMEGABase):
         self.credit_bank[self.credit_bank['calendar_year'] == calendar_year] = this_years_credits  # update bank
 
     def pay_debit(self, credit, debit, this_years_credits):
+        """
+        Pay a debit with a credit, create a transaction in the ``transaction_log`` and update manufacter model year
+        compliance status (in CO2 Mg).
+
+        Other than expiration, paying debits is the only way credits can be consumed.
+
+        Result is an updated ``transaction_log`` and ``ManufacturerAnnualData`` for the model years involved in the
+        transaction.
+
+        See Also:
+
+            ``manufacturer_annual_data.ManufacturerAnnualData.update_model_year_cert_co2_Mg()``
+
+        Args:
+            credit (Series): source credit to pay from
+            debit (Series): destination debit to pay
+            this_years_credits (DataFrame): DataFrame containing the valid, non-expired credits and debits in the
+                current year.
+
+        """
         from manufacturer_annual_data import ManufacturerAnnualData
         transaction_amount_Mg = min(abs(debit['ending_balance_Mg']), credit['ending_balance_Mg'])
         t = GHG_credit_bank.create_credit_transaction(credit)
@@ -228,9 +395,6 @@ if __name__ == '__main__':
             credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
         credit_bank.credit_bank.to_csv('../out/__dump/credit_bank.csv', index=False)
         credit_bank.transaction_log.to_csv('../out/__dump/credit_bank_transactions.csv', index=False)
-        # else:
-        #     for l in init_fail:
-        #         print(l)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

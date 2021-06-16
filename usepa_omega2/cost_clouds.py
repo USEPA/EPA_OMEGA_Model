@@ -38,6 +38,7 @@ cloud_non_numeric_columns = ['simulated_vehicle_id']
 class CostCloud(OMEGABase):
     """
     **Loads and provides access to simulated vehicle data, provides methods to calculate and plot frontiers.**
+
     """
 
     _max_year = 0  # maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
