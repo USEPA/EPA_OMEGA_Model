@@ -1,7 +1,43 @@
 """
-GHG_standards_production_multipliers.py
-=================================
+GHG_standards_incentives.py
+===========================
 
+**Routines to load and provide access to 'incentives' such as production multipliers for battery-electric vehicles.**
+
+Currently, only production multipliers are implemented here, but other incentives may be added later.
+
+Input File Format
+-----------------
+
+The input file format uses a flexible column headers notation such as 'fueling_class:BEV'.  The prefix (before the
+':') is the name of a ``Vehicle`` object attribute and the suffix is compared with the attribute value to see if the
+incentive applies to the particular vehicle.
+
+Example:
+
+    'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
+
+.. list-table:: Input File Format
+    :widths: 33 33
+    :header-rows: 1
+
+    * - Column Name
+      - Description
+    * - start_year
+      - Start year of incentive, incentive applies until the next available start year
+    * - `dynamic column(s)`
+      - e.g. 'fueling_class:BEV'
+
+        Interpretation:
+            'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
+
+Column Names and Description
+    :start_year: Start year of incentive, incentive applies until the next available start year
+    :`dynamic column(s)`:
+        e.g. 'fueling_class:BEV'
+
+        Interpretation:
+            'fueling_class:BEV' => ``if vehicle.fueling_class == 'BEV' then apply incentive``
 
 """
 
@@ -13,10 +49,23 @@ cache = dict()
 
 
 class GHGStandardIncentives(OMEGABase):
-    # --- database table properties ---
+    """
+    **Loads and provides access to GHG incentives.**
 
+    """
     @staticmethod
     def get_production_multiplier(vehicle):
+        """
+        Get production multiplier (if any) for the given vehicle.
+
+        Args:
+            vehicle (Vehicle): the vehicle to get the multiplier for
+
+        Returns:
+
+            The production multiplier, if applicable, or 1.0
+
+        """
         production_multiplier = 1
 
         start_years = cache['start_year']
@@ -34,6 +83,18 @@ class GHGStandardIncentives(OMEGABase):
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         cache.clear()

@@ -2,6 +2,15 @@
 GHG_standards_fuels.py
 ======================
 
+**Routines to load and provide access to policy-defined fuel attributes.**
+
+The primary fuel attribute is CO2 grams per unit (i.e. g/gallon, g/kWh) when consumed.
+
+Used by ``policy_fuel_upstream`` functions.
+
+See Also:
+
+    ``policy_fuel_upstream.py``
 
 """
 
@@ -9,19 +18,35 @@ print('importing %s' % __file__)
 
 from usepa_omega2 import *
 
-
 cache = dict()
 
+
 class GHGStandardFuels(SQABase, OMEGABase):
+    """
+    **Provides methods to store and access policy fuel attributes.**
+
+    """
     # --- database table properties ---
     __tablename__ = 'ghg_standards_fuels'
-    index = Column('index', Integer, primary_key=True)
-    fuel_ID = Column('fuel_id', String)
-    calendar_year = Column(Numeric)
-    cert_co2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)
+    index = Column('index', Integer, primary_key=True)  #: database index
+    fuel_ID = Column('fuel_id', String)  #: fuel iD (e.g. 'gasoline', 'US electricity')
+    calendar_year = Column(Numeric)  #: calendar year (or start year of fuel attributes)
+    cert_co2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)  #: emitted CO2 grams per unit when consumed
 
     @staticmethod
     def get_fuel_attributes(calendar_year, fuel_id, attribute_types):
+        """
+        Get fuel attributes for the given calendar year and fuel
+
+        Args:
+            calendar_year (numeric): calendar year to get properties in
+            fuel_id (str): (e.g. 'gasoline', 'US electricity')
+            attribute_types (str, [str]): name(s) of attributes to get, (e.g. 'cert_co2_grams_per_unit')
+
+        Returns:
+            Attribute value(s) as scalars or tuples if multiple ``attribute_types``.
+
+        """
         start_years = cache[fuel_id]
         calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -47,6 +72,18 @@ class GHGStandardFuels(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         cache.clear()
