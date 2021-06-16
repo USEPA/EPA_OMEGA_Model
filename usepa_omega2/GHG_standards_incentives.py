@@ -4,9 +4,10 @@
 
 Currently, only production multipliers are implemented here, but other incentives may be added later.
 
+----
 
-Input File Format
------------------
+**INPUT FILE FORMAT**
+
 
 The input file format uses a flexible column header notation, as detailed below.
 
@@ -21,8 +22,9 @@ Column Name and Description
         Example:
             ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply incentive``
 
-Code
 ----
+
+**CODE**
 
 """
 
