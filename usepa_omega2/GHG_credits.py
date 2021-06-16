@@ -261,7 +261,7 @@ class GHG_credit_bank(OMEGABase):
                 if ((credit['age'] > 0) and (credit['ending_balance_Mg'] == 0)) or \
                         credit['age'] > credit_max_life_years:
                     if credit['ending_balance_Mg'] > 0:
-                        t = GHG_credit_bank.create_credit_transaction(credit)
+                        t = self.create_credit_transaction(credit)
                         t['credit_value_Mg'] = credit['ending_balance_Mg']
                         t['credit_destination'] = 'EXPIRATION'
                         self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
@@ -275,7 +275,7 @@ class GHG_credit_bank(OMEGABase):
                     last_years_credits = last_years_credits.drop(idx)
                 elif debit['age'] > debit_max_life_years:
                     # mark past due debits
-                    t = GHG_credit_bank.create_credit_transaction(debit)
+                    t = self.create_credit_transaction(debit)
                     t['credit_value_Mg'] = debit['ending_balance_Mg']
                     t['credit_destination'] = 'PAST_DUE'
                     self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
@@ -313,7 +313,7 @@ class GHG_credit_bank(OMEGABase):
             beginning_balance_Mg (numeric): starting balance of credit (or debit) in CO2 Mg
 
         """
-        new_credit = GHG_credit_bank.create_credit(calendar_year, manufacturer_id, beginning_balance_Mg)
+        new_credit = self.create_credit(calendar_year, manufacturer_id, beginning_balance_Mg)
         self.credit_bank = pd.DataFrame.append(self.credit_bank, new_credit, ignore_index=True)
         new_credit = self.credit_bank.iloc[-1].copy()  # grab credit as a Series
 
@@ -363,7 +363,7 @@ class GHG_credit_bank(OMEGABase):
         """
         from manufacturer_annual_data import ManufacturerAnnualData
         transaction_amount_Mg = min(abs(debit['ending_balance_Mg']), credit['ending_balance_Mg'])
-        t = GHG_credit_bank.create_credit_transaction(credit)
+        t = self.create_credit_transaction(credit)
         t['credit_value_Mg'] = transaction_amount_Mg
         t['credit_destination'] = debit['model_year']
         credit['ending_balance_Mg'] -= transaction_amount_Mg
