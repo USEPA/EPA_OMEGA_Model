@@ -15,6 +15,83 @@ loaded from a file or created from scratch is controlled by the batch process.  
 always auto-generate the new vehicle generalized costs file from the reference session to guarantee consistency with the
 simulated vehicles file costs and all other factors affecting generalized cost (such as fuel prices, cost years, etc).
 
+----
+
+**INPUT FILE FORMAT**
+
+The input file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The input file represents vehicle sales broken out by size class and regulatory class for each year of data for various
+context cases.  Some size classes are represented in more than one regulatory class, some are not.
+
+.. csv-table:: Template Header
+
+   input_template_name:,context_new_vehicle_market,input_template_version:,0.1
+
+.. csv-table:: Sample Data Columns
+    :widths: auto
+
+    context_id,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
+    AEO2020,Reference case,Minicompact,2019,car,0.42,0.19,30958.78204,2938.287598,266.538513,0.090712193,32.889961,26.8584355,57.07032,46.60447937,0.816615,76875.038,0
+    AEO2020,Reference case,Large Utility,2019,truck,5.01,2.67,419179.8267,5278.119141,347.891754,0.065912069,25.18989,20.53877833,28.389875,23.1479117,0.815358,62510.323,109753.937
+
+Data Column Name and Description
+    :context_id:
+        The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
+
+    :case_id:
+        The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
+
+    :context_size_class:
+        The name of the vehicle size class, e.g. 'Minicompact', 'Large Utility', etc
+
+    :calendar_year:
+        The calendar year of the vehicle market data
+
+    :reg_class_id:
+        The regulatory class of the vehicle data (within the context, reg class definitions may differ across
+        years within the simulation.  ``reg_class_id`` can be considered a 'historical' or 'legacy' reg class.
+
+    :sales_share_of_regclass:
+        Sales share of the size class within its regulatory class
+
+    :sales_share_of_total:
+        Sales share of the total vehicle sales
+
+    :sales:
+        Number of vehicles sold of the size class
+
+    :weight_lbs:
+        Sales weighted average vehicle weight (pounds) of the size class
+
+    :horsepower:
+        Sales weighted average vehicle power (horsepower) of the size class
+
+    :horsepower_to_weight_ratio:
+        Sales weighted average vehicle power to weight ratio (horsepower/pound) of the size class
+
+    :mpg_conventional:
+        Sales weighted average certification fuel economy (miles per gallon, MPG)
+
+    :mpg_conventional_onroad:
+        Sales weighted average in-use fuel economy (miles per gallon, MPG), lower than the certification fuel economy by
+        the ``onroad_to_cycle_mpg_ratio``
+
+    :mpg_alternative:
+        Sales weighted average battery electric certification fuel economy (miles per gallon equivalent, MPGe)
+
+    :mpg_alternative_onroad:
+        Sales weighted average battery electric in-use fuel economy (miles per gallon equivalent, MPGe)
+
+    :onroad_to_cycle_mpg_ratio:
+        The ratio of in-use to certfication fuel economy
+
+    :ice_price_dollars:
+        Sales weighted average internal combustion engine (ICE) vehicle price (dollars)
+
+    :bev_price_dollars:
+        Sales weighted average battery electric vehicle (BEV) vehicle price (dollars)
 
 ----
 
