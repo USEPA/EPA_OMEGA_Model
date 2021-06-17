@@ -16,6 +16,7 @@ rows.  The data header uses a dynamic column notation, as detailed below.
    input_template_name:,production_multipliers,input_template_version:,0.21
 
 .. csv-table:: Sample Data Columns
+    :widths: auto
 
    start_year,fueling_class:BEV,
    2020, 2.0

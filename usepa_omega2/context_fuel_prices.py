@@ -17,6 +17,7 @@ rows.
    input_template_name:,context_fuel_prices,input_template_version:,0.1
 
 .. csv-table:: Sample Data Columns
+    :widths: auto
 
     context_id,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
     AEO2020,Reference case,pump gasoline,2019,2.665601,2.10838
