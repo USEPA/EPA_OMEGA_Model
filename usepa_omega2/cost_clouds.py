@@ -55,7 +55,7 @@ Data Column Name and Description
     :cost_curve_class:
         The name of the cost curve class, e.g. 'bev_LPW_LRL', 'ice_MPW_HRL', etc
 
-    Charge-depleting simulation results
+    CHARGE-DEPLETING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
 
         :cd_ftp_1:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
@@ -67,7 +67,7 @@ Data Column Name and Description
     :new_vehicle_mfr_cost_dollars:
         The manufacturer cost associated with the simulation results, based on vehicle technology content and model year
 
-    Charge-sustaining simulation results
+    CHARGE-SUSTAINING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
 
         :cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
