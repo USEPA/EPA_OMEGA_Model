@@ -2,7 +2,6 @@
 
 **Routines to load, access, and save new vehicle market data from/relative to the analysis context**
 
-
 Market data includes total sales as well as sales by context size class (e.g. 'Small Crossover')
 
 This module also saves new vehicle generalized costs (based in part on OMEGA tech costs)
@@ -19,24 +18,27 @@ simulated vehicles file costs and all other factors affecting generalized cost (
 
 **INPUT FILE FORMAT**
 
-File Type: comma-separated values (CSV)
-
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
 The data represents vehicle sales broken out by size class and regulatory class for each year of data for various
 context cases.  Some size classes are represented in more than one regulatory class, some are not.
 
-.. csv-table:: Template Header
+File Type
+    comma-separated values (CSV)
 
-   input_template_name:,context_new_vehicle_market,input_template_version:,0.1
+Template Header
+    .. csv-table::
 
-.. csv-table:: Sample Data Columns
-    :widths: auto
+       input_template_name:,context_new_vehicle_market,input_template_version:,0.1
 
-    context_id,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
-    AEO2020,Reference case,Minicompact,2019,car,0.42,0.19,30958.78204,2938.287598,266.538513,0.090712193,32.889961,26.8584355,57.07032,46.60447937,0.816615,76875.038,0
-    AEO2020,Reference case,Large Utility,2019,truck,5.01,2.67,419179.8267,5278.119141,347.891754,0.065912069,25.18989,20.53877833,28.389875,23.1479117,0.815358,62510.323,109753.937
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        context_id,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
+        AEO2020,Reference case,Minicompact,2019,car,0.42,0.19,30958.78204,2938.287598,266.538513,0.090712193,32.889961,26.8584355,57.07032,46.60447937,0.816615,76875.038,0
+        AEO2020,Reference case,Large Utility,2019,truck,5.01,2.67,419179.8267,5278.119141,347.891754,0.065912069,25.18989,20.53877833,28.389875,23.1479117,0.815358,62510.323,109753.937
 
 Data Column Name and Description
     :context_id:
@@ -53,7 +55,8 @@ Data Column Name and Description
 
     :reg_class_id:
         The regulatory class of the vehicle data (within the context, reg class definitions may differ across
-        years within the simulation.  ``reg_class_id`` can be considered a 'historical' or 'legacy' reg class.
+        years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical' or
+        'legacy' reg class.
 
     :sales_share_of_regclass:
         Sales share of the size class within its regulatory class

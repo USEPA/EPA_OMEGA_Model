@@ -4,28 +4,30 @@
 
 Context fuel price data includes retail and pre-tax costs in dollars per unit (e.g. $/gallon, $/kWh)
 
-
 ----
 
 **INPUT FILE FORMAT**
-
-File Type: comma-separated values (CSV)
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
 The data represents fuel prices by context case, fuel type, and calendar year.
 
-.. csv-table:: Template Header
+File Type
+    comma-separated values (CSV)
 
-   input_template_name:,context_fuel_prices,input_template_version:,0.1
+Template Header
+    .. csv-table::
 
-.. csv-table:: Sample Data Columns
-    :widths: auto
+       input_template_name:,context_fuel_prices,input_template_version:,0.1
 
-    context_id,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
-    AEO2020,Reference case,pump gasoline,2019,2.665601,2.10838
-    AEO2020,Reference case,US electricity,2019,0.12559407,0.10391058
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        context_id,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
+        AEO2020,Reference case,pump gasoline,2019,2.665601,2.10838
+        AEO2020,Reference case,US electricity,2019,0.12559407,0.10391058
 
 Data Column Name and Description
     :context_id:

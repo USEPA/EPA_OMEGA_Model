@@ -20,6 +20,73 @@ Frontiers can hew closely to the points of the source cloud or can cut through a
 depending on the value of ``o2.options.cost_curve_frontier_affinity_factor``.  Higher values pick up more points, lower
 values are a looser fit.  The default value provides a good compromise between number of points and accuracy of fit.
 
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents vehicle technology options and costs by simulation class (cost curve class) and model year.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,simulated_vehicles,input_template_version:,0.2,``{optional_source_data_comment}``
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        simulated_vehicle_id,model_year,cost_curve_class,cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_4:cert_direct_oncycle_kwh_per_mile,cd_hwfet:cert_direct_oncycle_kwh_per_mile,new_vehicle_mfr_cost_dollars,cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile,cs_hwfet:cert_direct_oncycle_co2_grams_per_mile,ac_efficiency,ac_leakage,high_eff_alternator,start_stop
+        1_bev,2020,bev_LPW_LRL,0.12992078,0.10534883,0.1247339,0.10534883,0.13151191,30837.9095774431,0,0,0,0,0,1,0,0,0
+        9086_ice,2031,ice_MPW_HRL,0,0,0,0,0,28995.8504073507,285.798112,269.100823,246.852389,269.100823,191.235952,1,1,1,1
+
+Data Column Name and Description
+    :simulated_vehicle_id:
+        Unique row identifier, unused otherwise
+
+    :model_year:
+        The model year of the data (particularly for ``new_vehicle_mfr_cost_dollars``)
+
+    :cost_curve_class:
+        The name of the cost curve class, e.g. 'bev_LPW_LRL', 'ice_MPW_HRL', etc
+
+    Charge-depleting simulation results
+        Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
+
+        :cd_ftp_1:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
+        :cd_ftp_2:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
+        :cd_ftp_3:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
+        :cd_ftp_4:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
+        :cd_hwfet:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
+
+    :new_vehicle_mfr_cost_dollars:
+        The manufacturer cost associated with the simulation results, based on vehicle technology content and model year
+
+    Charge-sustaining simulation results
+        Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
+
+        :cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_hwfet:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
+
+    :ac_efficiency:
+        = 1 if vehicle qualifies for the AC efficiency off-cycle credit, = 0 otherwise
+
+    :ac_leakage:
+        = 1 if vehicle qualifies for the AC leakage off-cycle credit, = 0 otherwise
+
+    :high_eff_alternator:
+        = 1 if vehicle qualifies for the high efficiency alternator off-cycle credit, = 0 otherwise
+
+    :start_stop:
+        = 1 if vehicle qualifies for the engine start-stop off-cycle credit, = 0 otherwise
 
 ----
 
@@ -83,6 +150,8 @@ class CostCloud(OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns,
                                                         verbose=verbose)
+
+            # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
 
             if not template_errors:
                 # convert cost clouds into curves and set up cost_curves table...

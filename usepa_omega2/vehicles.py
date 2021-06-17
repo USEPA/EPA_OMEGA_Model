@@ -1,5 +1,81 @@
 """
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents base-year vehicle attributes and sales.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,vehicles,input_template_version:,0.4
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_co2_grams_per_mile,cert_direct_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs
+        ICE Small Utility truck,USA Motors,2019,truck,Small SUV 4WD,Small Utility,N,non_hauling,ice_LPW_HRL,{'pump gasoline':1.0},{'MTE Gasoline':1.0},3204422,312.3688658,0,47.00990646,216.1551053,14.29126821,4090.657984,183.2251956,73.74951226,66.63903079,7.976806551,107.4727695,140.101209,34200.17292,5.29582511,1173.586089,2726.343428
+        BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,non_hauling,bev_LPW_LRL,{'US electricity':1.0},{'MTE US electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
+
+Data Column Name and Description
+    :vehicle_id:
+        The vehicle name or description, e.g. 'ICE Small Utility truck', 'BEV Subcompact car', etc
+
+    :manufacturer_id:
+        Manufacturer name, must be consistent with the data loaded by ``class manufacturers.Manufacturer``
+
+    :model_year:
+        The model year of the vehicle data, e.g. 2020
+
+    :reg_class_id:
+        Vehicle regulatory class at the time of certification, e.g. 'car','truck'.  Reg class definitions may differ
+        across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
+        or 'legacy' reg class.
+
+    :epa_size_class:
+        The EPA size class of the vehicle
+
+    :context_size_class:
+        The context size class of the vehicle, for future sales mix projections.  Must be consistent with the context
+        input file loaded by ``class context_new_vehicle_market.ContextNewVehicleMarket``
+
+    :electrification_class:
+        The electrification class of the vehicle, such as 'EV', 'HEV', (or 'N' for none - final format TBD)
+
+    :hauling_class:
+        The hauling class of the vehicle, e.g. 'hauling', 'non_hauling'
+
+    :cost_curve_class:
+        The name of the cost curve class of the vehicle, used to determine which technology options and associated costs
+        are available to be applied to this vehicle.  Must be consistent with the data loaded by
+        ``class cost_clouds.CostCloud``
+
+    :in_use_fuel_id:
+    :cert_fuel_id:
+    :sales:
+    :cert_co2_grams_per_mile:
+    :cert_direct_kwh_per_mile:
+    :footprint_ft2:
+    :eng_rated_hp:
+    :tot_road_load_hp:
+    :etw_lbs:
+    :length_in:
+    :width_in:
+    :height_in:
+    :ground_clearance_in:
+    :wheelbase_in:
+    :interior_volume_cuft:
+    :msrp_dollars:
+    :passenger_capacity:
+    :payload_capacity_lbs:
+    :towing_capacity_lbs:
+
 
 ----
 
