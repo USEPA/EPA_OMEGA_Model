@@ -9,8 +9,12 @@ Context fuel price data includes retail and pre-tax costs in dollars per unit (e
 
 **INPUT FILE FORMAT**
 
-The input file format consists of a one-row template header followed by a one-row data header and subsequent data
+File Type: comma-separated values (CSV)
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
+
+The data represents fuel prices by context case, fuel type, and calendar year.
 
 .. csv-table:: Template Header
 

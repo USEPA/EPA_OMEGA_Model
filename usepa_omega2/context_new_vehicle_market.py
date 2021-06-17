@@ -19,10 +19,12 @@ simulated vehicles file costs and all other factors affecting generalized cost (
 
 **INPUT FILE FORMAT**
 
-The input file format consists of a one-row template header followed by a one-row data header and subsequent data
+File Type: comma-separated values (CSV)
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The input file represents vehicle sales broken out by size class and regulatory class for each year of data for various
+The data represents vehicle sales broken out by size class and regulatory class for each year of data for various
 context cases.  Some size classes are represented in more than one regulatory class, some are not.
 
 .. csv-table:: Template Header

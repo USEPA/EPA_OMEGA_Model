@@ -8,8 +8,12 @@ Currently, only production multipliers are implemented here, but other incentive
 
 **INPUT FILE FORMAT**
 
-The input file format consists of a one-row template header followed by a one-row data header and subsequent data
+File Type: comma-separated values (CSV)
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents production multiplier incentives as a function of vehicle attribute values.
 
 .. csv-table:: Template Header
 
