@@ -1,6 +1,4 @@
 """
-cost_clouds.py
-==============
 
 **Routines to load simulated vehicle data (vehicle energy/CO2 consumption, off-cycle tech application, and cost data)
 and calculate frontiers from "clouds" of points**
@@ -142,21 +140,21 @@ class CostCloud(OMEGABase):
         Returns:
             DataFrame containing the frontier points
 
-        .. figure:: _static/ug_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_0.75.png
+        .. figure:: _static/code_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_0.75.png
             :scale: 75 %
             :align: center
 
             Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=0.75`` ``allow_upslope=True``
             These are the default settings
 
-        .. figure:: _static/ug_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_10.png
+        .. figure:: _static/code_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_10.png
             :scale: 75 %
             :align: center
 
             Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=10`` ``allow_upslope=True``
             Higher affinity factor follows cloud points more closely
 
-        .. figure:: _static/ug_figures/cost_cloud_ice_Truck_no_upslope_frontier_affinity_factor_0.75.png
+        .. figure:: _static/code_figures/cost_cloud_ice_Truck_no_upslope_frontier_affinity_factor_0.75.png
             :scale: 75 %
             :align: center
 

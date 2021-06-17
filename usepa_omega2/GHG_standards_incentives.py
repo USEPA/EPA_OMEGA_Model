@@ -1,7 +1,5 @@
 """
 
-----
-
 **Routines to load and provide access to 'incentives' such as production multipliers for battery-electric vehicles.**
 
 Currently, only production multipliers are implemented here, but other incentives may be added later.
@@ -9,7 +7,6 @@ Currently, only production multipliers are implemented here, but other incentive
 ----
 
 **INPUT FILE FORMAT**
-
 
 The input file format uses a flexible column header notation, as detailed below.
 
