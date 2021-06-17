@@ -94,3 +94,5 @@ latex_elements = {
 
 # set top level document to index.rst:
 master_doc = 'index'
+
+add_module_names = False

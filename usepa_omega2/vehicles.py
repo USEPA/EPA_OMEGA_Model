@@ -1,11 +1,19 @@
 """
 
+**Routines to load base-year vehicle data, data structures to represent vehicles during compliance modeling
+(transient or ephemeral vehicles), finalized vehicles (manufacturer-produced compliance vehicles), and composite
+vehicles (used to group vehicles by various characterstics during compliance modeling).**
+
+Classes are also implemented to handle composition and decomposition of vehicle attributes as part of the composite
+vehicle workflow.  Some vehicle attributes are known and fixed in advance, others are created at runtime (e.g. off-cycle
+credit attributes which may vary by policy).
+
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents base-year vehicle attributes and sales.
+The data represents base-year (and eventually 'historic') vehicle attributes and sales.
 
 File Type
     comma-separated values (CSV)
@@ -57,25 +65,67 @@ Data Column Name and Description
         ``class cost_clouds.CostCloud``
 
     :in_use_fuel_id:
-    :cert_fuel_id:
-    :sales:
-    :cert_co2_grams_per_mile:
-    :cert_direct_kwh_per_mile:
-    :footprint_ft2:
-    :eng_rated_hp:
-    :tot_road_load_hp:
-    :etw_lbs:
-    :length_in:
-    :width_in:
-    :height_in:
-    :ground_clearance_in:
-    :wheelbase_in:
-    :interior_volume_cuft:
-    :msrp_dollars:
-    :passenger_capacity:
-    :payload_capacity_lbs:
-    :towing_capacity_lbs:
+        In-use fuel id, for use with context fuel prices, must be consistent with the context data read by
+        ``class context_fuel_prices.ContextFuelPrices``
 
+    :cert_fuel_id:
+        Certification fuel id, for determining certification upstream CO2 grams/mile, must be in the table loaded by
+        ``class fuels.Fuel``
+
+    :sales:
+        Number of vehicles sold in the ``model_year``
+
+    :cert_co2_grams_per_mile:
+        Vehicle certification emissions CO2 grams/mile
+
+    :cert_direct_kwh_per_mile:
+        Vehicle certification electricity consumption kWh/mile
+
+    :eng_rated_hp:
+        Vehicle engine rated power (horsepower)
+
+    :tot_road_load_hp:
+        Vehicle roadload power (horsepower) at a vehicle speed of 50 miles per hour
+
+    VEHICLE PHYSICAL CHARACTERSTICS
+        These characteristics may be used to determine vehicle regulatory class (e.g. 'car','truck') based on the
+        simulated policy
+
+        :footprint_ft2:
+            Vehicle footprint based on vehicle wheelbase and track (square feet)
+
+        :etw_lbs:
+            Vehicle equivalent test weight (ETW) (pounds)
+
+        :length_in:
+            Vehicle overall length (inches)
+
+        :width_in:
+            Vehicle overall width (inches)
+
+        :height_in:
+            Vehicle overall height (inches)
+
+        :ground_clearance_in:
+            Vehicle ground clearance (inches)
+
+        :wheelbase_in:
+            Vehicle wheelbase (inches)
+
+        :interior_volume_cuft:
+            Vehicle interior volume (cubic feet)
+
+        :msrp_dollars:
+            Vehicle manufacturer suggested retail price (MSRP)
+
+        :passenger_capacity:
+            Vehicle passenger capacity (number of occupants)
+
+        :payload_capacity_lbs:
+            Vehicle payload capacity (pounds)
+
+        :towing_capacity_lbs:
+            Vehicle towing capacity (pounds)
 
 ----
 

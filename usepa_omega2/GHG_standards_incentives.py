@@ -36,7 +36,7 @@ Data Column Name and Description
         Zero or more dynamic columns with the format
         ``{attribute_name}:{attribute_value}``
 
-        Unspecified attribute-value pairs will have a production multiplier of 1.0, so only non-1.0 multipliers need
+        Unspecified vehicle attribute-value pairs will have a production multiplier of 1.0, so only non-1.0 multipliers need
         to be specified here.
 
         Example:

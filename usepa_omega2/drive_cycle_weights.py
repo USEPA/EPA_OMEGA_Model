@@ -18,6 +18,54 @@ the same overall tree).
 
 Drive cycles and weights may vary model year, depending on the policy being simulated, the share tree supports this.
 
+Sample Drive Cycle Weight Tree
+    ::
+
+        1.0[weighted_combined]
+        ├── 1[cd_cert_direct_oncycle_kwh_per_mile]
+        │   ├── 0.55[cd_ftp_kwh]
+        │   │   ├── 0.20726577181208053[cd_ftp_1:cert_direct_oncycle_kwh_per_mile]
+        │   │   ├── 0.517986577181208[cd_ftp_2:cert_direct_oncycle_kwh_per_mile]
+        │   │   ├── 0.2747476510067114[cd_ftp_3:cert_direct_oncycle_kwh_per_mile]
+        │   │   └── None[cd_ftp_4:cert_direct_oncycle_kwh_per_mile]
+        │   └── 0.45[cd_hwfet:cert_direct_oncycle_kwh_per_mile]
+        └── 0[cs_cert_direct_oncycle_co2_grams_per_mile]
+            ├── 0.55[cs_ftp_co2]
+            │   ├── 0.20726577181208053[cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile]
+            │   ├── 0.517986577181208[cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile]
+            │   ├── 0.2747476510067114[cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile]
+            │   └── None[cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile]
+            └── 0.45[cs_hwfet:cert_direct_oncycle_co2_grams_per_mile]
+
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents drive-cycle weighting factors (distance shares) in a hierarchical tree datastructure, by model year
+and fueling class.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,share_tree,input_template_version:,0.3
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,share_id,fueling_class,weighted_combined->cs_cert_direct_oncycle_co2_grams_per_mile,weighted_combined->cd_cert_direct_oncycle_kwh_per_mile,cs_cert_direct_oncycle_co2_grams_per_mile->cs_ftp_co2,cs_cert_direct_oncycle_co2_grams_per_mile->cs_hwfet:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile,cd_cert_direct_oncycle_kwh_per_mile->cd_ftp_kwh,cd_cert_direct_oncycle_kwh_per_mile->cd_hwfet:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_4:cert_direct_oncycle_kwh_per_mile
+        2020,cert,ICE,1,0,0.55,0.45,0.43*3.591/7.45,3.859/7.45,0.57*3.591/7.45,None,0.55,0.45,0.43*3.591/7.45,3.859/7.45,0.57*3.591/7.45,None
+
+Data Column Name and Description
+    :start_year:
+    :share_id:
+    :fueling_class:
 
 ----
 
@@ -208,22 +256,24 @@ if __name__ == '__main__':
                                                 verbose=o2.options.verbose)
 
         init_fail += DriveCycleWeights.init_from_file(o2.options.drive_cycle_weights_file,
-                                                      verbose=o2.options.verbose)
+                                                      verbose=True)
 
         if not init_fail:
 
             sample_cycle_results = {
                             'cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile': 277.853416,
-                            'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile': 272.779239,
+                            'cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile': 272.779239,
                             'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile': 242.292152,
+                            'cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile': 272.779239,
                             'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile': 182.916104,
-                            'ftp_1:cert_direct_kwh_per_mile': 0.26559971,
-                            'ftp_2:cert_direct_kwh_per_mile': 0.2332757,
-                            'ftp_3:cert_direct_kwh_per_mile': 0.25938633,
-                            'hwfet:cert_direct_kwh_per_mile': 0.22907605,
+                            'cd_ftp_1:cert_direct_oncycle_kwh_per_mile': 0.26559971,
+                            'cd_ftp_2:cert_direct_oncycle_kwh_per_mile': 0.2332757,
+                            'cd_ftp_3:cert_direct_oncycle_kwh_per_mile': 0.25938633,
+                            'cd_ftp_4:cert_direct_oncycle_kwh_per_mile': 0.2332757,
+                            'cd_hwfet:cert_direct_oncycle_kwh_per_mile': 0.22907605,
             }
-            print(DriveCycleWeights.calc_cert_direct_oncycle_co2_grams_per_mile(2020, sample_cycle_results))
-            print(DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, sample_cycle_results))
+            print(DriveCycleWeights.calc_cert_direct_oncycle_co2_grams_per_mile(2020, 'ICE', sample_cycle_results))
+            print(DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, 'BEV', sample_cycle_results))
 
         else:
             print(init_fail)
