@@ -18,7 +18,7 @@ rows.  The data header uses a dynamic column notation, as detailed below.
 .. csv-table:: Sample Data Columns
     :widths: auto
 
-    start_year,fueling_class:BEV,
+    start_year,fueling_class:BEV
     2020, 2.0
 
 Data Column Name and Description
