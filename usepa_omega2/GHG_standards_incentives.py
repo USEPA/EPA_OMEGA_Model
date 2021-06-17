@@ -8,26 +8,31 @@ Currently, only production multipliers are implemented here, but other incentive
 
 **INPUT FILE FORMAT**
 
-The input file format uses a flexible column header notation, as detailed below.
+The input file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
 
-.. csv-table:: Input File Header
+.. csv-table:: Template Header
 
-   input_template_name:,production_multipliers,input_template_version:,``{template_version}``
+   input_template_name:,production_multipliers,input_template_version:,0.21
 
 .. csv-table:: Sample Data Columns
 
-   start_year,fueling_class:BEV,,
+   start_year,fueling_class:BEV,
+   2020, 2.0
 
 Data Column Name and Description
     :start_year:
         Start year of incentive, incentive applies until the next available start year
 
     :dynamic column(s):
-        One or more dynamic columns with the format
+        Zero or more dynamic columns with the format
         ``{attribute_name}:{attribute_value}``
 
+        Unspecified attribute-value pairs will have a production multiplier of 1.0, so only non-1.0 multipliers need
+        to be specified here.
+
         Example:
-            ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply incentive``
+            ``fueling_class:BEV`` => ``if vehicle.fueling_class == 'BEV' then apply production multiplier``
 
 ----
 
@@ -96,6 +101,7 @@ class GHGStandardIncentives(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        # don't forget to update the module docstring with changes hereƒß
         input_template_name = 'production_multipliers'
         input_template_version = 0.21
         input_template_columns = {'start_year'}

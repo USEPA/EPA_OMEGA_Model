@@ -7,6 +7,43 @@ Context fuel price data includes retail and pre-tax costs in dollars per unit (e
 
 ----
 
+**INPUT FILE FORMAT**
+
+The input file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+.. csv-table:: Template Header
+
+   input_template_name:,context_fuel_prices,input_template_version:,0.1
+
+.. csv-table:: Sample Data Columns
+
+    context_id,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
+    AEO2020,Reference case,pump gasoline,2019,2.665601,2.10838
+    AEO2020,Reference case,US electricity,2019,0.12559407,0.10391058
+
+Data Column Name and Description
+    :context_id:
+        The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
+
+    :case_id:
+        The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
+
+    :fuel_id:
+        The name of the vehicle in-use fuel, must be in the table loaded by ``class fuels.Fuel`` and consistent with
+        the base year vehicles file (column ``in_use_fuel_id``) loaded by ``class vehicles.VehicleFinal``
+
+    :calendar_year:
+        The calendar year of the fuel costs
+
+    :retail_dollars_per_unit:
+        Retail dollars per unit
+
+    :pretax_dollars_per_unit:
+        Pre-tax dollars per unit
+
+----
+
 **CODE**
 
 """
@@ -97,12 +134,12 @@ class ContextFuelPrices(SQABase, OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
         cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
+        # don't forget to update the module docstring with changes here
         input_template_name = 'context_fuel_prices'
         input_template_version = 0.1
         input_template_columns = {'context_id', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
@@ -118,17 +155,25 @@ class ContextFuelPrices(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
+                from fuels import Fuel
+
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(ContextFuelPrices(
-                        context_ID=df.loc[i, 'context_id'],
-                        case_ID=df.loc[i, 'case_id'],
-                        fuel_ID=df.loc[i, 'fuel_id'],
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        retail_dollars_per_unit=df.loc[i, 'retail_dollars_per_unit'],
-                        pretax_dollars_per_unit=df.loc[i, 'pretax_dollars_per_unit'],
-                    ))
+                    fuel_id = df.loc[i, 'fuel_id']
+                    if Fuel.validate_fuel_ID(fuel_id):
+                        obj_list.append(ContextFuelPrices(
+                            context_ID=df.loc[i, 'context_id'],
+                            case_ID=df.loc[i, 'case_id'],
+                            fuel_ID=fuel_id,
+                            calendar_year=df.loc[i, 'calendar_year'],
+                            retail_dollars_per_unit=df.loc[i, 'retail_dollars_per_unit'],
+                            pretax_dollars_per_unit=df.loc[i, 'pretax_dollars_per_unit'],
+                        ))
+                    else:
+                        template_errors.append('*** Invalid Context Fuel Price fuel ID "%s" in %s ***' %
+                                               (fuel_id, filename))
+
                 o2.session.add_all(obj_list)
                 o2.session.flush()
 
