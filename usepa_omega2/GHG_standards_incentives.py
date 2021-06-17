@@ -10,7 +10,15 @@ Currently, only production multipliers are implemented here, but other incentive
 
 The input file format uses a flexible column header notation, as detailed below.
 
-Column Name and Description
+.. csv-table:: Input File Header
+
+   input_template_name:,production_multipliers,input_template_version:,``{template_version}``
+
+.. csv-table:: Sample Data Columns
+
+   start_year,fueling_class:BEV,,
+
+Data Column Name and Description
     :start_year:
         Start year of incentive, incentive applies until the next available start year
 
