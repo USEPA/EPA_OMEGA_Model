@@ -1,10 +1,13 @@
 """
-__init.py__
-===========
 
 Top-level includes/definitions for the OMEGA model
 
 Defines class OMEGARuntimeOptions which control an individual simulation session
+
+
+----
+
+**CODE**
 
 """
 

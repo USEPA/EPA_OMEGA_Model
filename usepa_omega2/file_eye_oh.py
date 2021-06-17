@@ -1,10 +1,13 @@
 """
-file_eye_oh.py
-==============
 
 **Handy file system routines for general use**
 
 Generally, user-friendly wrappers for functionality provided by the ``os`` and ``shutil`` packages.
+
+
+----
+
+**CODE**
 
 """
 

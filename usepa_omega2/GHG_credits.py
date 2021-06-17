@@ -1,6 +1,4 @@
 """
-GHG_credits.py
-==============
 
 **Routines to load initial GHG credits (in CO2 Mg), provide access to credit banking data, and handle credit
 transactions, along the lines of Averaging, Bank and Trading (ABT)**
@@ -9,6 +7,11 @@ Not all features of ABT are implemented (notably, explicit between-manufacturer 
 used to pay debits (model year compliance deficits) and/or may expire unused.
 
 See also ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
+
+
+----
+
+**CODE**
 
 """
 

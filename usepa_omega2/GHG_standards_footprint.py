@@ -1,12 +1,15 @@
 """
-GHG_standards_footprint.py
-==========================
 
 **Loads parameters and provides calculations for an attribute-based (vehicle footprint) GHG standard.**
 
 This is based on the current standards, with two regulatory classes with lifetime VMT and
 parameter-based target calculations that define a "footprint curve" based on four coefficients
 ("A" through "D") and min and max footprint limits.
+
+
+----
+
+**CODE**
 
 """
 

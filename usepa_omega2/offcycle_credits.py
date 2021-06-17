@@ -1,6 +1,4 @@
 """
-offycle_credits.py
-==================
 
 **Routines to load, access and apply off-cycle credit values**
 
@@ -12,6 +10,10 @@ testing (tests are performed with headlights off).
 As another example, engine Stop-Start has an on-cycle benefit but the vehicle idle duration during testing may
 under-represent vehicle idle duration in real-world driving so there may be some additional benefit available.
 
+
+----
+
+**CODE**
 
 """
 

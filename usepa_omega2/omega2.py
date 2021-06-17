@@ -1,8 +1,11 @@
 """
-omega2.py
-=========
 
 OMEGA2 top level code
+
+
+----
+
+**CODE**
 
 """
 

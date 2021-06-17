@@ -1,8 +1,11 @@
 """
-omega_functions.py
-==================
 
 Functions that may be used throughout OMEGA
+
+
+----
+
+**CODE**
 
 """
 

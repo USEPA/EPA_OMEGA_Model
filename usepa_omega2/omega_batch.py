@@ -1,10 +1,13 @@
 """
-omega_batch.py
-==================
 
 example usage:
 
     python omega_batch.py --batch_file inputs\phase0_default_batch_file.xlsx
+
+
+----
+
+**CODE**
 
 """
 

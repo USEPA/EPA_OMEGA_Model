@@ -1,6 +1,4 @@
 """
-drive_cycle_weights.py
-======================
 
 **Routines to load cycle weight values and perform tree-based drive cycle weighting (distance-share based)**
 
@@ -19,6 +17,11 @@ these are used to ignore unused nodes (different vehicle types have different nu
 the same overall tree).
 
 Drive cycles and weights may vary model year, depending on the policy being simulated, the share tree supports this.
+
+
+----
+
+**CODE**
 
 """
 

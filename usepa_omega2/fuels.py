@@ -1,10 +1,13 @@
 """
-fuels.py
-========
 
 **Routines to load and retrieve fuel attribute data**
 
 Fuel data includes a name, units (e.g. gallons, kWh), energy density in MJ/unit and CO2 g/unit.
+
+
+----
+
+**CODE**
 
 """
 

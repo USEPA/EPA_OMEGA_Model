@@ -1,6 +1,14 @@
 """
+
 placeholder, for now, but the dispy stuff should not really be in the omega_batch.py...
+
+
+----
+
+**CODE**
+
 """
+
 from usepa_omega2 import omega_log
 
 from usepa_omega2 import OMEGARuntimeOptions

@@ -1,6 +1,4 @@
 """
-GHG_standards_fuels.py
-======================
 
 **Routines to load and provide access to policy-defined fuel attributes.**
 
@@ -11,6 +9,11 @@ Used by ``policy_fuel_upstream`` functions.
 See Also:
 
     ``policy_fuel_upstream.py``
+
+
+----
+
+**CODE**
 
 """
 

@@ -1,10 +1,13 @@
 """
-__main__.py
-===========
 
 Initiate OMEGA module-level run with default options
 
 Can be used to test OMEGA installation
+
+
+----
+
+**CODE**
 
 """
 

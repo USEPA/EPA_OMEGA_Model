@@ -1,3 +1,12 @@
+"""
+
+
+----
+
+**CODE**
+
+"""
+
 from consumer.sales_share_gcam import *
 
 # overall market categories

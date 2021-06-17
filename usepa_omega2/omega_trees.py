@@ -1,9 +1,11 @@
 """
 
-omega_tree.py
-=============
-
 Routines and data structures for compliance-tree algorithms
+
+
+----
+
+**CODE**
 
 """
 

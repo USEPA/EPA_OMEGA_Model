@@ -1,6 +1,4 @@
 """
-context_new_vehicle_market.py
-=============================
 
 **Routines to load, access, and save new vehicle market data from/relative to the analysis context**
 
@@ -16,6 +14,11 @@ the reference session, subsequent sessions (with higher, lower, or the same cost
 loaded from a file or created from scratch is controlled by the batch process.  Generally speaking, best practice is to
 always auto-generate the new vehicle generalized costs file from the reference session to guarantee consistency with the
 simulated vehicles file costs and all other factors affecting generalized cost (such as fuel prices, cost years, etc).
+
+
+----
+
+**CODE**
 
 """
 

@@ -20,6 +20,11 @@ Frontiers can hew closely to the points of the source cloud or can cut through a
 depending on the value of ``o2.options.cost_curve_frontier_affinity_factor``.  Higher values pick up more points, lower
 values are a looser fit.  The default value provides a good compromise between number of points and accuracy of fit.
 
+
+----
+
+**CODE**
+
 """
 
 print('importing %s' % __file__)

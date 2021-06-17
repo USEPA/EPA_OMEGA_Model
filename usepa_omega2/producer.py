@@ -1,9 +1,12 @@
 """
-producer.py
-===========
 
 Producer module, could potentially be part of the manufacturers.py, but maybe it's best if it's separate and
 the manufacturers.py is primarily related to the schema and class methods...
+
+
+----
+
+**CODE**
 
 """
 
