@@ -6,6 +6,44 @@ This is just a simple standard with two regulatory classes, a year-based CO2 g/m
 
 Primarily used for testing.
 
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents a simple set of GHG standards (CO2 g/mi) by regulatory class and model year.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,ghg_standards-flat,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        reg_class_id,start_year,ghg_target_co2_grams_per_mile,lifetime_vmt
+        car,2020,210,195264
+        truck,2020,280,225865
+
+Data Column Name and Description
+
+:reg_class_id:
+    Regulatory class name, e.g. 'car', 'truck'
+
+:start_year:
+    The start year of the standards, applies until the next available start year
+
+:ghg_target_co2_grams_per_mile:
+    Vehicle GHG target (CO2 g/mi)
+
+:lifetime_vmt:
+    Lifetime Vehicle Miles Travelled for computing CO2 Mg
 
 ----
 
