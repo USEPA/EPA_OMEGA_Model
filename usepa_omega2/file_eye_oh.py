@@ -4,7 +4,6 @@
 
 Generally, user-friendly wrappers for functionality provided by the ``os`` and ``shutil`` packages.
 
-
 ----
 
 **CODE**

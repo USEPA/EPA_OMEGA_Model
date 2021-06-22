@@ -2,14 +2,49 @@
 
 **Routines to load and provide access to policy-defined fuel attributes.**
 
-The primary fuel attribute is CO2 grams per unit (i.e. g/gallon, g/kWh) when consumed.
+The primary fuel attribute is CO2 grams per unit (i.e. g/gallon, g/kWh) when consumed, by policy year.
 
 Used by ``policy_fuel_upstream`` functions.
 
 See Also:
 
-    ``policy_fuel_upstream.py``
+    ``policy_fuel_upstream`` module
 
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents fuel property data for compliance purposes, by policy year.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,ghg_standards-fuels,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        fuel_id,start_year,cert_co2_grams_per_unit
+        US electricity,2020,534
+        gasoline,2020,8887
+
+Data Column Name and Description
+
+:fuel_id:
+    The Fuel ID, as referenced by the ``policy_fuel_upstream`` module.
+
+:start_year:
+    Start year of fuel properties, properties apply until the next available start year
+
+:cert_co2_grams_per_unit:
+    CO2 emissions per unit when consumed, for compliance purposes
 
 ----
 

@@ -4,6 +4,48 @@
 
 Fuel data includes a name, units (e.g. gallons, kWh), energy density in MJ/unit and CO2 g/unit.
 
+See Also:
+
+    ``vehicles`` and ``context_fuel_prices`` modules, and ``consumer`` subpackage
+
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents fuel property data for on-road/in-use purposes.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,fuels,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        fuel_id,unit,energy_density_megajoules_per_unit,co2_tailpipe_emissions_grams_per_unit
+        pump gasoline,gallon,129.46,8887
+        US electricity,kWh,3.6,0
+
+Data Column Name and Description
+
+:fuel_id:
+    The Fuel ID, as referenced by the ``vehicles`` and ``context_fuel_prices`` modules, and ``consumer`` subpackage.
+
+:unit:
+    Fuel unit, e.g. 'gallon', 'kWh'
+
+:energy_density_megajoules_per_unit:
+    Energy density (MJ/unit)
+
+:co2_tailpipe_emissions_grams_per_unit:
+    CO2 emissions per unit when consumed
 
 ----
 
