@@ -4,6 +4,42 @@
 
 Drive cycles and cycle phasese are defined by a name, a distance and a brief description.
 
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents drive cycles by name/phase, a distance and a brief description.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,drive_cycles,input_template_version:,0.2
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        drive_cycle_id,drive_cycle_distance_miles,description,
+        cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2 g/mi,
+        cs_hwfet:cert_direct_oncycle_co2_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2 g/mi,
+
+Data Column Name and Description
+
+:drive_cycle_id:
+    Name of the drive cycle or drive cycle phase.  This must be consistent the leaves of the drive cycle weights tree,
+    see also ``drive_cycle_weights.DriveCycleWeights``.
+
+:drive_cycle_distance_miles:
+    Drive cycle/phase distances (miles).
+
+:description:
+    A brief description of the drive cycle/phase.
 
 ----
 
