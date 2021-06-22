@@ -6,7 +6,7 @@ transactions, along the lines of Averaging, Bank and Trading (ABT)**
 Not all features of ABT are implemented (notably, explicit between-manufacturer Trading).  Credits can be earned,
 used to pay debits (model year compliance deficits) and/or may expire unused.
 
-See Also
+See Also:
     The ``manufacturers`` module and ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
 
 ----

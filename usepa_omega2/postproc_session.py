@@ -40,7 +40,7 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, s
     if not standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % o2.options.session_name)
 
-    calendar_years = ManufacturerAnnualData.get_calendar_years()
+    calendar_years = ManufacturerAnnualData.get_model_years()
 
     plot_iteration(iteration_log)
 

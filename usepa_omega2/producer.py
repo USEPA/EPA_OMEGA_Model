@@ -504,7 +504,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     cert_co2_Mg = VehicleFinal.calc_cert_co2_Mg(calendar_year, manufacturer_ID)
 
     ManufacturerAnnualData. \
-        create_manufacturer_annual_data(calendar_year=calendar_year,
+        create_manufacturer_annual_data(model_year=calendar_year,
                                         manufacturer_ID=manufacturer_ID,
                                         cert_target_co2_Mg=cert_target_co2_Mg,
                                         calendar_year_cert_co2_Mg=cert_co2_Mg,
