@@ -1,7 +1,8 @@
 """
 
-Routines to validate input file formats and/or values
+**Routines to validate input file formats and/or values.**
 
+Used during the initialization process.
 
 ----
 
@@ -17,6 +18,17 @@ import pandas as pd
 
 
 def get_template_name(filename):
+    """
+    Get input file template name.  Can be used to identify the type of input file during simulation initialization
+    when more than one type of input file may be provided (e.g. various GHG standards).
+
+    Args:
+        filename (str): name of the file from which to get the input template name
+
+    Returns:
+        The input file template name
+
+    """
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
     if 'input_template_name:' not in version_data:
@@ -29,7 +41,19 @@ def get_template_name(filename):
 
 
 def validate_template_version_info(filename, input_template_name, input_template_version, verbose=False):
+    """
+    Reads the template version infor from an input file and validates the template name and version number.
 
+    Args:
+        filename (str): name of the input file to validate
+        input_template_name (str): target template name
+        input_template_version (numeric): target template version
+        verbose (bool): enable additional console and logfile output if True
+
+    Returns:
+        List of template errors, else empty list on success
+
+    """
     # read first row of input file as list of values
     version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
 
@@ -71,7 +95,19 @@ def validate_template_version_info(filename, input_template_name, input_template
 
 
 def validate_template_columns(filename, input_template_columns, columns, verbose=False):
+    """
+    Validate input columns against target template columns.
 
+    Args:
+        filename (str): name of the input file to validate
+        input_template_columns ([strs]): list of target template column names
+        columns ([strs]): list of column names to validate
+        verbose: enable additional console and logfile output if True
+
+    Returns:
+        List of column name errors, else empty list on success
+
+    """
     error_list = []
     columns_set = set(columns)
 
