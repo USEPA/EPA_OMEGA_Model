@@ -7,8 +7,7 @@ Not all features of ABT are implemented (notably, explicit between-manufacturer 
 used to pay debits (model year compliance deficits) and/or may expire unused.
 
 See Also
-    The `manufacturers`` module.
-    ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
+    The ``manufacturers`` module and ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
 
 ----
 
