@@ -2,7 +2,8 @@
 
 **Loads parameters and provides calculations for a "flat" (non-attribute-based) GHG standard.**
 
-This is just a simple standard with two regulatory classes, a year-based CO2 g/mi target and lifetime VMT for each.
+This is just a simple standard with two regulatory classes, a year-based vehicle CO2 g/mi target and lifetime
+VMT for each.
 
 Primarily used for testing.
 

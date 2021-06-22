@@ -6,6 +6,60 @@ This is based on the current standards, with two regulatory classes with lifetim
 parameter-based target calculations that define a "footprint curve" based on four coefficients
 ("A" through "D") and min and max footprint limits.
 
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents a set of GHG standards (vehicle target CO2 g/mi) by regulatory class and model year as a function
+of vehicle footprint in square feet.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,ghg_standards-footprint,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        reg_class_id,start_year,fp_min,fp_max,a_coeff,b_coeff,c_coeff,d_coeff,lifetime_vmt
+        car,2020,41,56,166,226,4.01,1.9,195264
+        truck,2020,41,68.3,212,337,4.57,24.6,225865
+
+Data Column Name and Description
+
+:reg_class_id:
+    Regulatory class name, e.g. 'car', 'truck'
+
+:start_year:
+    The start year of the standard coefficients, applies until the next available start year
+
+:fp_min:
+    Minimum footprint limit of the curve (square feet)
+
+:fp_max:
+    Maximum footprint limit of the curve (square feet)
+
+:a_coeff:
+    Footprint curve "A" coefficient
+
+:b_coeff:
+    Footprint curve "B" coefficient
+
+:c_coeff:
+    Footprint curve "C" coefficient
+
+:d_coeff:
+    Footprint curve "D" coefficient
+
+:lifetime_vmt:
+    Lifetime Vehicle Miles Travelled for computing CO2 Mg
 
 ----
 
