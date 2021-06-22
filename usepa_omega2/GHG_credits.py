@@ -6,8 +6,47 @@ transactions, along the lines of Averaging, Bank and Trading (ABT)**
 Not all features of ABT are implemented (notably, explicit between-manufacturer Trading).  Credits can be earned,
 used to pay debits (model year compliance deficits) and/or may expire unused.
 
-See also ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
+See Also
+    The `manufacturers`` module.
+    ``postproc_session.plot_manufacturer_compliance()`` for credit plotting routines.
 
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents GHG credits that are available to manufacturers in the compliance analysis years.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,ghg_credit_history,input_template_version:,0.2
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        calendar_year,model_year,manufacturer_id,balance_Mg
+        2019,2016,USA Motors,151139573
+
+Data Column Name and Description
+
+:calendar_year:
+    Calendar year of the data, e.g. the analysis base year
+
+:model_year:
+    The model year of the available credits, determines remaining credit life
+
+:manufacturer_id:
+    Identifies the credit owner, consistent with the data loaded by the ``manufacturers`` module
+
+:balance_Mg:
+    Model year credit remaining balance in the calendar year (CO2 Mg)
 
 ----
 
@@ -23,8 +62,8 @@ credit_max_life_years = 5  #: credit max life, in years, a.k.a. credit carry-fow
 debit_max_life_years = 3  #: debit max life, in years, a.k.a. credit carry-back
 
 _input_template_name = 'ghg_credit_history'
-_input_template_version = 0.1
-_input_template_columns = {'calendar_year', 'model_year', 'manufacturer', 'balance_Mg'}
+_input_template_version = 0.2
+_input_template_columns = {'calendar_year', 'model_year', 'manufacturer_id', 'balance_Mg'}
 
 
 class GHG_credit_info(OMEGABase):
@@ -53,14 +92,14 @@ class GHG_credit_bank(OMEGABase):
     Each manufacturer will use its own unique credit bank object.
 
     """
-    def __init__(self, filename, manufacturer_name, verbose=False):
+    def __init__(self, filename, manufacturer_id, verbose=False):
         """
 
         Initialize credit bank data from input file, call after validating ghg_credits template.
 
         Args:
             filename (str): name of input file containing pre-existing credit info
-            manufacturer_name (str): name of manufacturer, e.g. 'USA Motors'
+            manufacturer_id (str): name of manufacturer, e.g. 'USA Motors'
             verbose (bool): enable additional console and logfile output if True
 
         Returns:
@@ -74,7 +113,7 @@ class GHG_credit_bank(OMEGABase):
         # read in the data portion of the input file
         self.credit_bank = pd.read_csv(filename, skiprows=1)
 
-        self.credit_bank[self.credit_bank['manufacturer'] == manufacturer_name]
+        self.credit_bank[self.credit_bank['manufacturer_id'] == manufacturer_id]
         self.credit_bank = self.credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
         self.credit_bank['ending_balance_Mg'] = self.credit_bank['beginning_balance_Mg']
         self.credit_bank['age'] = self.credit_bank['calendar_year'] - self.credit_bank['model_year']

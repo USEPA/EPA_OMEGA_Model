@@ -1,5 +1,5 @@
-input_template_name:,ghg_credit_history,input_template_version:,0.1
-calendar_year,model_year,manufacturer,balance_Mg
+input_template_name:,ghg_credit_history,input_template_version:,0.2
+calendar_year,model_year,manufacturer_id,balance_Mg
 2019,2016,USA Motors,151139573
 2019,2017,USA Motors,21747811
 2019,2018,USA Motors,33996607
