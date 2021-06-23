@@ -31,6 +31,7 @@ run_folder = str(input('Enter Run Folder Name: '))
 run_controller = pd.read_csv(main_path + '\\' + run_folder + '\Run Query Controller.csv')
 run_controller = run_controller.replace(np.nan, '', regex=True)
 _rows, _cols = run_controller.shape
+SetBodyIDtoLineageID = int(run_controller.SetBodyIDtoLineageID[0])
 model_year = []
 # master_index_source = []
 aggregating_fields_input = []
@@ -91,8 +92,10 @@ for model_year in model_years:
 
     #Determine Total Number of Schemas
     total_schema_count = 0
-    for run_count in range(0,len(run_controller)):
+    for run_count in range(0, len(run_controller)):
         information_toget = str(run_controller['Desired Field'][run_count])
+        if information_toget == 'Set Coef A':
+            print(information_toget)
         information_priority = field_mapping_df[
             list(pd.Series(field_mapping_df.columns)[pd.Series(field_mapping_df.columns).str.contains('Priority')])] \
             [field_mapping_df['UserFriendlyName'] == information_toget].reset_index(drop=True)
@@ -228,6 +231,14 @@ for model_year in model_years:
                     converters={'LineageID': int, 'BodyID': int}).astype(str)
             except FileNotFoundError:
                 continue
+            if SetBodyIDtoLineageID == 1:
+                source_file['BodyID'] = source_file['LineageID']
+            if unique_sourcename == 'Edmunds':
+                source_file['WHEELS-raw'] = pd.Series(np.zeros(len(source_file['WHEELS'])), name='WHEELS-raw')
+                source_file['WHEELS-raw'] = source_file['WHEELS']
+                for i in range (len(source_file['WHEELS-raw'])):
+                    source_file['WHEELS'][i] = float(source_file['WHEELS-raw'][i].split(' ')[0])
+                source_file['WHEELS'] = source_file['WHEELS'].astype(float).round(1)
             try:
                 source_file['CALC_ID'] = source_file['CALC_ID'].astype(float).astype(int).astype(str)
                 if 'WHEELBASE' in list(matching_categories):
@@ -246,6 +257,7 @@ for model_year in model_years:
                 pass
 
             try:
+                if 'WHEELS' in list(matching_categories): print(matching_categories)
                 master_index_file[list(matching_categories)]
                 # print(master_index_file.WHEEL_BASE_INCHES)
             except KeyError: #Matching Column not in master index file
@@ -457,8 +469,6 @@ for model_year in model_years:
                         on=list(aggregating_columns)).sort_values(list(aggregating_columns)).reset_index(drop=True)
                 del query_output_source
         del master_index_file_with_desired_fields_all_merges
-        # if unique_sourcename == 'Edmunds':
-        #     Edmunds_query_output = query_output.copy()
         if unique_sourcename == 'OEM Towing Guide':
             print(query_output)
         #     query_output = query_output.drop(['Towing Capacity_Edmunds'], axis=1)
