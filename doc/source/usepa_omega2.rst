@@ -7,7 +7,9 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   usepa_omega2.common
    usepa_omega2.consumer
+   usepa_omega2.context
    usepa_omega2.effects
 
 Submodules
@@ -53,22 +55,6 @@ usepa\_omega2.GHG\_standards\_incentives module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.context\_fuel\_prices module
-------------------------------------------
-
-.. automodule:: usepa_omega2.context_fuel_prices
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.context\_new\_vehicle\_market module
---------------------------------------------------
-
-.. automodule:: usepa_omega2.context_new_vehicle_market
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.cost\_clouds module
 ---------------------------------
 
@@ -93,30 +79,6 @@ usepa\_omega2.drive\_cycles module
    :undoc-members:
    :show-inheritance:
 
-usepa\_omega2.file\_eye\_oh module
-----------------------------------
-
-.. automodule:: usepa_omega2.file_eye_oh
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.fuels module
---------------------------
-
-.. automodule:: usepa_omega2.fuels
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.input\_validation module
---------------------------------------
-
-.. automodule:: usepa_omega2.input_validation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 usepa\_omega2.manufacturer\_annual\_data module
 -----------------------------------------------
 
@@ -129,14 +91,6 @@ usepa\_omega2.manufacturers module
 ----------------------------------
 
 .. automodule:: usepa_omega2.manufacturers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.o2 module
------------------------
-
-.. automodule:: usepa_omega2.o2
    :members:
    :undoc-members:
    :show-inheritance:
@@ -161,62 +115,6 @@ usepa\_omega2.omega\_batch module
 ---------------------------------
 
 .. automodule:: usepa_omega2.omega_batch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_db module
-------------------------------
-
-.. automodule:: usepa_omega2.omega_db
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_dispy module
----------------------------------
-
-.. automodule:: usepa_omega2.omega_dispy
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_functions module
--------------------------------------
-
-.. automodule:: usepa_omega2.omega_functions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_log module
--------------------------------
-
-.. automodule:: usepa_omega2.omega_log
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_plot module
---------------------------------
-
-.. automodule:: usepa_omega2.omega_plot
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_trees module
----------------------------------
-
-.. automodule:: usepa_omega2.omega_trees
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.omega\_types module
----------------------------------
-
-.. automodule:: usepa_omega2.omega_types
    :members:
    :undoc-members:
    :show-inheritance:
@@ -281,14 +179,6 @@ usepa\_omega2.required\_zev\_share module
 -----------------------------------------
 
 .. automodule:: usepa_omega2.required_zev_share
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-usepa\_omega2.unit\_conversions module
---------------------------------------
-
-.. automodule:: usepa_omega2.unit_conversions
    :members:
    :undoc-members:
    :show-inheritance:

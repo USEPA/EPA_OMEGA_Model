@@ -399,7 +399,7 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
     """
     import numpy as np
     from consumer.market_classes import MarketClass
-    from price_modifications import PriceModifications
+    from context.price_modifications import PriceModifications
 
     if producer_decision_and_response.empty:
         # first time through, span full range
@@ -620,12 +620,12 @@ def init_omega(o2_options):
     init_fail = []
 
     # import database modules to populate ORM context
-    from fuels import Fuel
+    from context.onroad_fuels import OnroadFuel
     from policy_fuel_upstream import PolicyFuelUpstream
     from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
     from offcycle_credits import OffCycleCredits
-    from context_fuel_prices import ContextFuelPrices
-    from context_new_vehicle_market import ContextNewVehicleMarket
+    from context.fuel_prices import FuelPrice
+    from context.new_vehicle_market import NewVehicleMarket
     from consumer.market_classes import MarketClass
     from cost_clouds import CostCloud
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
@@ -646,8 +646,8 @@ def init_omega(o2_options):
     from effects.cost_effects_criteria import CostEffectsCriteria
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
     from required_zev_share import RequiredZevShare
-    from price_modifications import PriceModifications
-    from production_constraints import ProductionConstraints
+    from context.price_modifications import PriceModifications
+    from context.production_constraints import ProductionConstraints
     from drive_cycles import DriveCycles
     from drive_cycle_weights import DriveCycleWeights
 
@@ -691,20 +691,20 @@ def init_omega(o2_options):
         # instantiate database tables
         SQABase.metadata.create_all(globals.engine)
 
-        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
 
         init_fail += PolicyFuelUpstream.init_from_file(globals.options.fuel_upstream_file, verbose=globals.options.verbose)
         
         init_fail += PolicyFuelUpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
                                                               verbose=globals.options.verbose)
         
-        init_fail += ContextFuelPrices.init_database_from_file(globals.options.context_fuel_prices_file,
-                                                               verbose=globals.options.verbose)
+        init_fail += FuelPrice.init_database_from_file(globals.options.context_fuel_prices_file,
+                                                       verbose=globals.options.verbose)
 
-        init_fail += ContextNewVehicleMarket.init_database_from_file(globals.options.context_new_vehicle_market_file,
-                                                                     verbose=globals.options.verbose)
+        init_fail += NewVehicleMarket.init_database_from_file(globals.options.context_new_vehicle_market_file,
+                                                              verbose=globals.options.verbose)
         
-        ContextNewVehicleMarket.init_context_new_vehicle_generalized_costs(
+        NewVehicleMarket.init_context_new_vehicle_generalized_costs(
             globals.options.context_new_vehicle_generalized_costs_file)
 
         init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file, verbose=globals.options.verbose)
@@ -834,8 +834,8 @@ def run_omega(o2_options, standalone_run=False):
             dump_omega_db_to_csv(globals.options.database_dump_folder)
 
             if globals.options.session_is_reference and globals.options.generate_context_new_vehicle_generalized_costs_file:
-                from context_new_vehicle_market import ContextNewVehicleMarket
-                ContextNewVehicleMarket.save_context_new_vehicle_generalized_costs(
+                from context.new_vehicle_market import NewVehicleMarket
+                NewVehicleMarket.save_context_new_vehicle_generalized_costs(
                     globals.options.context_new_vehicle_generalized_costs_file)
 
             omega_log.end_logfile("\nSession Complete")

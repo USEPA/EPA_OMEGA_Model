@@ -585,7 +585,7 @@ def plot_market_shares(calendar_years, total_sales):
 
     """
     from consumer.market_classes import MarketClass
-    from context_new_vehicle_market import ContextNewVehicleMarket
+    from context.new_vehicle_market import NewVehicleMarket
     from vehicle_annual_data import VehicleAnnualData
     from vehicles import VehicleFinal
     import consumer
@@ -620,7 +620,7 @@ def plot_market_shares(calendar_years, total_sales):
         market_share_results['abs_share_frac_%s' % mc] = market_category_abs_share_frac
 
     # tally up context size class sales
-    for csc in ContextNewVehicleMarket.context_size_classes:
+    for csc in NewVehicleMarket.context_size_classes:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             market_category_abs_share_frac.append(float(globals.session.query(func.sum(VehicleAnnualData.registered_count))
@@ -661,11 +661,11 @@ def plot_market_shares(calendar_years, total_sales):
 
     # plot context size class results
     fig, ax1 = figure()
-    for csc in ContextNewVehicleMarket.context_size_classes:
+    for csc in NewVehicleMarket.context_size_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % csc], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nContext Size Class Absolute Market Shares' % globals.options.session_unique_name)
-    ax1.legend(ContextNewVehicleMarket.context_size_classes.keys(), ncol=2, loc='upper center')
+    ax1.legend(NewVehicleMarket.context_size_classes.keys(), ncol=2, loc='upper center')
     fig.savefig(globals.options.output_folder + '%s CSC Shares.png' % globals.options.session_unique_name)
 
     # plot reg class results

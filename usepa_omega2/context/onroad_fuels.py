@@ -1,6 +1,6 @@
 """
 
-**Routines to load and retrieve fuel attribute data**
+**Routines to load and retrieve onroad (in-use) fuel attribute data**
 
 Fuel data includes a name, units (e.g. gallons, kWh), energy density in MJ/unit and CO2 g/unit.
 
@@ -60,14 +60,14 @@ from usepa_omega2 import *
 cache = dict()
 
 
-class Fuel(SQABase, OMEGABase):
+class OnroadFuel(SQABase, OMEGABase):
     """
-    **Loads and provides methods to access fuel attribute data.**
+    **Loads and provides methods to access onroad fuel attribute data.**
 
     """
 
     # --- database table properties ---
-    __tablename__ = 'fuels'
+    __tablename__ = 'onroad_fuels'
     fuel_ID = Column('fuel_id', String, primary_key=True)   #: name of fuel
     unit = Column(Enum(*fuel_units, validate_strings=True))  #: fuel units (e.g. gallon, kWh)
     energy_density_MJ_per_unit = Column('energy_density_megajoules_per_unit', Float)  #: fuel energy density
@@ -98,10 +98,10 @@ class Fuel(SQABase, OMEGABase):
             if type(attribute_types) is not list:
                 attribute_types = [attribute_types]
 
-            attrs = Fuel.get_class_attributes(attribute_types)
+            attrs = OnroadFuel.get_class_attributes(attribute_types)
 
             result = globals.session.query(*attrs). \
-                filter(Fuel.fuel_ID == fuel_id).all()[0]
+                filter(OnroadFuel.fuel_ID == fuel_id).all()[0]
 
             if len(attribute_types) == 1:
                 cache[cache_key] = result[0]
@@ -123,7 +123,7 @@ class Fuel(SQABase, OMEGABase):
             True if the fuel ID is valid, False otherwise
 
         """
-        result = globals.session.query(Fuel.fuel_ID).filter(Fuel.fuel_ID == fuel_id).all()
+        result = globals.session.query(OnroadFuel.fuel_ID).filter(OnroadFuel.fuel_ID == fuel_id).all()
         if result:
             return True
         else:
@@ -167,7 +167,7 @@ class Fuel(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(Fuel(
+                    obj_list.append(OnroadFuel(
                         fuel_ID=df.loc[i, 'fuel_id'],
                         unit=df.loc[i, 'unit'],
                         energy_density_MJ_per_unit=df.loc[i, 'energy_density_megajoules_per_unit'],
@@ -195,7 +195,7 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(globals.options.database_dump_folder)

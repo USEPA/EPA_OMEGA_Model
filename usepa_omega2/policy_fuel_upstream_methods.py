@@ -112,7 +112,7 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        from fuels import Fuel
+        from context.onroad_fuels import OnroadFuel
 
         # set up global variables:
         globals.options = OMEGARuntimeOptions()

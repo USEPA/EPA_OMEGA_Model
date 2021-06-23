@@ -62,14 +62,14 @@ from usepa_omega2 import *
 cache = dict()
 
 
-class ContextFuelPrices(SQABase, OMEGABase):
+class FuelPrice(SQABase, OMEGABase):
     """
     **Loads and provides access to fuel prices from the analysis context**
 
     """
 
     # --- database table properties ---
-    __tablename__ = 'context_fuels'  # database table name
+    __tablename__ = 'context_fuel_prices'  # database table name
     index = Column('index', Integer, primary_key=True)  #: database table index
     context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
     case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
@@ -112,13 +112,13 @@ class ContextFuelPrices(SQABase, OMEGABase):
             if type(price_types) is not list:
                 price_types = [price_types]
 
-            attrs = ContextFuelPrices.get_class_attributes(price_types)
+            attrs = FuelPrice.get_class_attributes(price_types)
 
             result = globals.session.query(*attrs).\
-                filter(ContextFuelPrices.context_ID == globals.options.context_id).\
-                filter(ContextFuelPrices.case_ID == globals.options.context_case_id).\
-                filter(ContextFuelPrices.calendar_year == calendar_year).\
-                filter(ContextFuelPrices.fuel_ID == fuel_id).all()[0]
+                filter(FuelPrice.context_ID == globals.options.context_id).\
+                filter(FuelPrice.case_ID == globals.options.context_case_id).\
+                filter(FuelPrice.calendar_year == calendar_year).\
+                filter(FuelPrice.fuel_ID == fuel_id).all()[0]
 
             if len(price_types) == 1:
                 cache[cache_key] = result[0]
@@ -162,14 +162,14 @@ class ContextFuelPrices(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                from fuels import Fuel
+                from context.onroad_fuels import OnroadFuel
 
                 obj_list = []
                 # load data into database
                 for i in df.index:
                     fuel_id = df.loc[i, 'fuel_id']
-                    if Fuel.validate_fuel_ID(fuel_id):
-                        obj_list.append(ContextFuelPrices(
+                    if OnroadFuel.validate_fuel_ID(fuel_id):
+                        obj_list.append(FuelPrice(
                             context_ID=df.loc[i, 'context_id'],
                             case_ID=df.loc[i, 'case_id'],
                             fuel_ID=fuel_id,
@@ -200,18 +200,18 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += ContextFuelPrices.init_database_from_file(globals.options.context_fuel_prices_file,
-                                                               verbose=globals.options.verbose)
+        init_fail += FuelPrice.init_database_from_file(globals.options.context_fuel_prices_file,
+                                                       verbose=globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(globals.options.database_dump_folder)
 
-            print(ContextFuelPrices.get_retail_fuel_price(2020, 'pump gasoline'))
-            print(ContextFuelPrices.get_pretax_fuel_price(2020, 'pump gasoline'))
+            print(FuelPrice.get_retail_fuel_price(2020, 'pump gasoline'))
+            print(FuelPrice.get_pretax_fuel_price(2020, 'pump gasoline'))
 
-            print(ContextFuelPrices.get_fuel_price(2020, 'retail_dollars_per_unit', 'pump gasoline'))
-            print(ContextFuelPrices.get_fuel_price(2020, 'pretax_dollars_per_unit', 'pump gasoline'))
-            print(ContextFuelPrices.get_fuel_price(2020, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline'))
+            print(FuelPrice.get_fuel_price(2020, 'retail_dollars_per_unit', 'pump gasoline'))
+            print(FuelPrice.get_fuel_price(2020, 'pretax_dollars_per_unit', 'pump gasoline'))
+            print(FuelPrice.get_fuel_price(2020, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline'))
 
         else:
             print(init_fail)

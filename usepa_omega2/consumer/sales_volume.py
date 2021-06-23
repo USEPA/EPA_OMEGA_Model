@@ -25,7 +25,7 @@ def context_new_vehicle_sales(model_year):
 
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
     from vehicle_annual_data import VehicleAnnualData
-    from context_new_vehicle_market import ContextNewVehicleMarket
+    from context.new_vehicle_market import NewVehicleMarket
 
     sales_dict = dict()
 
@@ -33,7 +33,7 @@ def context_new_vehicle_sales(model_year):
         model_year = globals.options.flat_context_year
 
     # get total sales from context
-    total_sales = ContextNewVehicleMarket.new_vehicle_sales(model_year)
+    total_sales = NewVehicleMarket.new_vehicle_sales(model_year)
 
     total_sales_initial = VehicleAnnualData.get_initial_registered_count()
     ICE_share = VehicleAnnualData.get_initial_fueling_class_registered_count('ICE') / total_sales_initial
@@ -41,9 +41,9 @@ def context_new_vehicle_sales(model_year):
 
     # pulling in hauling sales, non_hauling = total minus hauling
     hauling_sales = 0
-    for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
-        hauling_sales += ContextNewVehicleMarket.new_vehicle_sales(model_year, context_size_class=hsc) * \
-                         ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
+    for hsc in NewVehicleMarket.hauling_context_size_class_info:
+        hauling_sales += NewVehicleMarket.new_vehicle_sales(model_year, context_size_class=hsc) * \
+                         NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
 
     sales_dict['hauling'] = hauling_sales
     sales_dict['non_hauling'] = total_sales - hauling_sales
@@ -60,17 +60,17 @@ def new_vehicle_sales_response(calendar_year, P):
     :param P: a single price or a list-like of prices
     :return: total new vehicle sales volume at each price
     """
-    from context_new_vehicle_market import ContextNewVehicleMarket
+    from context.new_vehicle_market import NewVehicleMarket
 
     if type(P) is list:
         import numpy as np
         P = np.array(P)
 
     if globals.options.session_is_reference and isinstance(P, float):
-        ContextNewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, P)
+        NewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, P)
 
-    Q0 = ContextNewVehicleMarket.new_vehicle_sales(calendar_year)
-    P0 = ContextNewVehicleMarket.new_vehicle_generalized_cost(calendar_year)
+    Q0 = NewVehicleMarket.new_vehicle_sales(calendar_year)
+    P0 = NewVehicleMarket.new_vehicle_generalized_cost(calendar_year)
 
     E = globals.options.new_vehicle_sales_response_elasticity
 
@@ -97,9 +97,9 @@ if __name__ == '__main__':
         from vehicle_annual_data import VehicleAnnualData
         from manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
-        from fuels import Fuel  # needed for showroom fuel ID
+        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from cost_clouds import CostCloud  # needed for vehicle cost from CO2
-        from context_new_vehicle_market import ContextNewVehicleMarket
+        from context.new_vehicle_market import NewVehicleMarket
 
         from GHG_standards_flat import input_template_name as flat_template_name
         from GHG_standards_footprint import input_template_name as footprint_template_name
@@ -122,7 +122,7 @@ if __name__ == '__main__':
                                                           verbose=globals.options.verbose)
         init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
                                                          verbose=globals.options.verbose)
-        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
                                                           globals.options.vehicle_onroad_calculations_file,
                                                           verbose=globals.options.verbose)
 
-        init_fail += ContextNewVehicleMarket.init_database_from_file(
+        init_fail += NewVehicleMarket.init_database_from_file(
             globals.options.context_new_vehicle_market_file, verbose=globals.options.verbose)
 
         if not init_fail:

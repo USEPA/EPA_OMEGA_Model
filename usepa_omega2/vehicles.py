@@ -654,14 +654,14 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        from context_fuel_prices import ContextFuelPrices
+        from context.fuel_prices import FuelPrice
         if calendar_year is None:
             calendar_year = self.model_year
 
         price = 0
         fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
-            price += ContextFuelPrices.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+            price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
 
         return price
 
@@ -674,14 +674,14 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        from context_fuel_prices import ContextFuelPrices
+        from context.fuel_prices import FuelPrice
         if calendar_year is None:
             calendar_year = self.model_year
 
         price = 0
         fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
-            price += ContextFuelPrices.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel) * fuel_share
+            price += FuelPrice.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel) * fuel_share
 
         return price
 
@@ -691,13 +691,13 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        from fuels import Fuel
+        from context.onroad_fuels import OnroadFuel
 
         co2_emissions_grams_per_unit = 0
         fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             co2_emissions_grams_per_unit += \
-                Fuel.get_fuel_attributes(fuel, 'co2_tailpipe_emissions_grams_per_unit') * fuel_share
+                OnroadFuel.get_fuel_attributes(fuel, 'co2_tailpipe_emissions_grams_per_unit') * fuel_share
 
         return co2_emissions_grams_per_unit
 
@@ -1085,7 +1085,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        from context_new_vehicle_market import ContextNewVehicleMarket
+        from context.new_vehicle_market import NewVehicleMarket
         from consumer.market_classes import MarketClass
 
         vehicle_shares_dict = {'total': 0}
@@ -1159,16 +1159,16 @@ class VehicleFinal(SQABase, Vehicle):
                     vehicles_list.append(veh)
 
                     if veh.hauling_class == 'hauling':
-                        if veh.context_size_class not in ContextNewVehicleMarket.hauling_context_size_class_info:
-                            ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class] = \
+                        if veh.context_size_class not in NewVehicleMarket.hauling_context_size_class_info:
+                            NewVehicleMarket.hauling_context_size_class_info[veh.context_size_class] = \
                                 {'total': veh.initial_registered_count, 'hauling_share': 0}
                         else:
-                            ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class]['total'] = \
-                                ContextNewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
+                            NewVehicleMarket.hauling_context_size_class_info[veh.context_size_class]['total'] = \
+                                NewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
                                     'total'] + veh.initial_registered_count
 
-                    if veh.context_size_class not in ContextNewVehicleMarket.context_size_classes:
-                        ContextNewVehicleMarket.context_size_classes[veh.context_size_class] = []
+                    if veh.context_size_class not in NewVehicleMarket.context_size_classes:
+                        NewVehicleMarket.context_size_classes[veh.context_size_class] = []
 
                     if verbose:
                         print(veh)
@@ -1199,9 +1199,9 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.cert_direct_co2_grams_per_mile = 0
                     alt_veh.cert_direct_kwh_per_mile = 0
 
-                for hsc in ContextNewVehicleMarket.hauling_context_size_class_info:
-                    ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
-                        ContextNewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
+                for hsc in NewVehicleMarket.hauling_context_size_class_info:
+                    NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
+                        NewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
                         vehicle_shares_dict[hsc]
 
         return template_errors
@@ -1247,9 +1247,9 @@ if __name__ == '__main__':
 
         from manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
-        from fuels import Fuel  # needed for showroom fuel ID
-        from context_fuel_prices import ContextFuelPrices # needed for retail fuel price
-        from context_new_vehicle_market import ContextNewVehicleMarket # needed for context size class hauling info
+        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
+        from context.fuel_prices import FuelPrice # needed for retail fuel price
+        from context.new_vehicle_market import NewVehicleMarket # needed for context size class hauling info
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 
@@ -1278,10 +1278,10 @@ if __name__ == '__main__':
                                                           verbose=globals.options.verbose)
         init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
                                                          verbose=globals.options.verbose)
-        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
 
-        init_fail += ContextFuelPrices.init_database_from_file(globals.options.context_fuel_prices_file,
-                                                               verbose=globals.options.verbose)
+        init_fail += FuelPrice.init_database_from_file(globals.options.context_fuel_prices_file,
+                                                       verbose=globals.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
 

@@ -67,7 +67,7 @@ if __name__ == '__main__':
         init_omega_db()
         omega_log.init_logfile()
 
-        from fuels import Fuel
+        from context.onroad_fuels import OnroadFuel
         from consumer.market_classes import MarketClass
         from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData

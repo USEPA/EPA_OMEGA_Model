@@ -54,7 +54,7 @@ class PolicyFuelUpstream(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                from fuels import Fuel
+                from context.onroad_fuels import OnroadFuel
 
                 PolicyFuelUpstream.values['start_year'] = np.array(list(df['start_year']))
 
@@ -62,7 +62,7 @@ class PolicyFuelUpstream(OMEGABase):
 
                 for fc in fuel_columns:
                     fuel = fc.split(':')[0]
-                    if Fuel.validate_fuel_ID(fuel):
+                    if OnroadFuel.validate_fuel_ID(fuel):
                         PolicyFuelUpstream.values[fc] = df[fc]
                     else:
                         template_errors.append('*** Invalid Policy Upstream fuel ID "%s" in %s ***' % (fuel, filename))
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        from fuels import Fuel
+        from context.onroad_fuels import OnroadFuel
 
         # set up global variables:
         globals.options = OMEGARuntimeOptions()
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
         init_fail += PolicyFuelUpstream.init_from_file(globals.options.fuel_upstream_file,
                                                        verbose=globals.options.verbose)
 

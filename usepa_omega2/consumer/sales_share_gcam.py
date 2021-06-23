@@ -20,14 +20,14 @@ def get_demanded_shares(market_class_data, calendar_year):
     """
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from consumer.market_classes import MarketClass
-    from fuels import Fuel
+    from context.onroad_fuels import OnroadFuel
 
     if globals.options.flat_context:
         calendar_year = globals.options.flat_context_year
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
-    carbon_intensity_gasoline = Fuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
+    carbon_intensity_gasoline = OnroadFuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
 
     sales_share_denominator_all_hauling = 0
     sales_share_denominator_all_nonhauling = 0
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
         from manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
-        from fuels import Fuel  # needed for showroom fuel ID
+        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from consumer.demanded_shares_gcam import DemandedSharesGCAM
         from GHG_standards_footprint import GHGStandardFootprint
         from cost_clouds import CostCloud
@@ -131,7 +131,7 @@ if __name__ == '__main__':
         init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
         init_fail += GHGStandardFootprint.init_database_from_file(globals.options.ghg_standards_file,
                                                                   verbose=globals.options.verbose)
-        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
         init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
                                                           globals.options.vehicle_onroad_calculations_file,
                                                           verbose=globals.options.verbose)

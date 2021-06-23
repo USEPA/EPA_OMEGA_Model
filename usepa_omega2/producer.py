@@ -33,7 +33,7 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     """
 
     from consumer.market_classes import MarketClass
-    from price_modifications import PriceModifications
+    from context.price_modifications import PriceModifications
 
     producer_generalized_cost_fuel_years, \
     producer_generalized_cost_annual_vmt = \
@@ -169,7 +169,7 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
             share_column_names = [producer_prefix + c for c in children]
 
         if all(s in consumer.responsive_market_categories for s in children):
-            from production_constraints import ProductionConstraints
+            from context.production_constraints import ProductionConstraints
             from required_zev_share import RequiredZevShare
 
             min_constraints = dict()
@@ -343,7 +343,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     """
     from vehicles import VehicleFinal, Vehicle, CompositeVehicle
     from consumer.market_classes import MarketClass, populate_market_classes
-    from context_new_vehicle_market import ContextNewVehicleMarket
+    from context.new_vehicle_market import NewVehicleMarket
 
     cache_key = calendar_year
     if cache_key not in cache:
@@ -417,7 +417,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         # distribute context size class sales to manufacturer_vehicles by relative market share
         for csc in csc_dict: # for each context size class
             projection_initial_registered_count = \
-                ContextNewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc)
+                NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc)
 
             # print('%s:%s:%s' % (csc, projection_initial_registered_count))
 

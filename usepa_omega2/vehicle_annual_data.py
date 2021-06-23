@@ -182,7 +182,7 @@ if __name__ == '__main__':
         init_omega_db()
 
         from manufacturers import Manufacturer  # required by vehicles
-        from fuels import Fuel  # required by vehicles
+        from context.onroad_fuels import OnroadFuel  # required by vehicles
         from consumer.market_classes import MarketClass  # required by vehicles
         from vehicles import VehicleFinal  # for foreign key vehicle_ID
 
