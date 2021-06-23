@@ -37,7 +37,9 @@ for run_count in range (0,len(run_controller)):
     model_type_exceptions_table_filename = str(run_controller['Model Type File Exceptions Table filename'][run_count])
     footprint_exceptions_table_filename = str(run_controller['Footprint File Exceptions Table filename'][run_count])
     roadload_coefficient_table_filename = str(run_controller['Roadload Coefficient Table Filename'][run_count])
+    test_car_filename_path = str(run_controller['Test Car File Path'][run_count])
     set_roadload_coefficient_table_filename = str(run_controller['Fuel Economy Test Filename'][run_count])
+    set_bodyid_to_lineageid = int(run_controller['SetBodyIDtoLineageID'][run_count])
     drivecycle_filename = str(run_controller['Drive Cycle Filenames'][run_count])
     drivecycle_filename = drivecycle_filename.strip('{ }')
     drivecycle_filename = drivecycle_filename.split(',')
@@ -86,11 +88,9 @@ for run_count in range (0,len(run_controller)):
         import Subconfig_ModelType_Footprint_Bodyid_Expansion
         Subconfig_ModelType_Footprint_Bodyid_Expansion.Subconfig_ModelType_Footprint_Bodyid_Expansion\
             (input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
-             bool_run_new_manual_filter, manual_filter_filename, \
-             expanded_footprint_filename, subconfig_filename, model_type_filename, \
-             vehghg_filename, output_path_vehghgid, \
-             footprint_exceptions_table, modeltype_exceptions_table, model_year, roadload_coefficient_table_filename, \
-             drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, set_roadload_coefficient_table_filename)
+             bool_run_new_manual_filter, manual_filter_filename, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path_vehghgid, \
+             footprint_exceptions_table, modeltype_exceptions_table, model_year, roadload_coefficient_table_filename, set_bodyid_to_lineageid,  \
+             drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, test_car_filename_path, set_roadload_coefficient_table_filename)
         # import Subconfig_Expansion
         # Subconfig_Expansion.Subconfig_Expansion(input_path, subconfig_filename, output_path_intermediate, \
         #                                         expanded_footprint_filename, output_path_vehghgid, vehghg_filename, 2016)
