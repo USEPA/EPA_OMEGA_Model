@@ -282,9 +282,9 @@ def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, m
     output_table['Combined Tractive Road Energy Intensity (Wh/mi)'] = comb_troadwork_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific Combined Tractive Road Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table['Displacement Specific Combined Tractive Road Energy Intensity (Wh/mi/L)'] = comb_troadwork_mjpkm_col/engdisp_col * (mj2kwhr/km2mi) * 1000
-    output_table['Combined Tractive Energy (kWhr)'] = (0.55 * FTP_tractive_kWhr_col + 0.45 * HWFET_tractive_kWhr_col).round(1)
-    output_table['Combined Fuel Energy Intensity (Wh/mi)'] = (comb_fuel_energy_mjpkm_col * (mj2kwhr/km2mi)*1000).round(1)
+    output_table['Combined Tractive Energy (kWhr)'] = (0.55 * FTP_tractive_kWhr_col + 0.45 * HWFET_tractive_kWhr_col)
+    output_table['Combined Fuel Energy Intensity (Wh/mi)'] = (comb_fuel_energy_mjpkm_col * (mj2kwhr/km2mi)*1000)
     output_table['Displacement Specific Combined Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table['Displacement Specific Combined Fuel Energy Intensity (Wh/mi/L)'] = comb_fuel_energy_mjpkm_col/engdisp_col * (mj2kwhr / km2mi)*1000
-    output_table['Powertrain Efficiency (%)'] = (100 * comb_troadwork_mjpkm_col / comb_fuel_energy_mjpkm_col).round(2)
+    output_table['Powertrain Efficiency (%)'] = (100 * comb_troadwork_mjpkm_col / comb_fuel_energy_mjpkm_col)
     return output_table
