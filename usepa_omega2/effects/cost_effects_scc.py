@@ -44,4 +44,4 @@ class CostEffectsSCC(SQABase, OMEGABase):
         for k, v in med_dict.items():
             med_veh.__setattr__(k, v)
 
-        globals.session.flush()
+        omega_globals.session.flush()

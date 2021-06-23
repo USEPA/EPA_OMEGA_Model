@@ -46,14 +46,14 @@ class ManufacturerAnnualData(SQABase):
             manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost (sum of vehicle sales X vehicle cost)
 
         """
-        globals.session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
-                                                   model_year=model_year,
-                                                   cert_target_co2_Mg=cert_target_co2_Mg,
-                                                   calendar_year_cert_co2_Mg=calendar_year_cert_co2_Mg,
-                                                   model_year_cert_co2_Mg=calendar_year_cert_co2_Mg,  # to start with
-                                                   manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
-                                                   ))
-        globals.session.flush()
+        omega_globals.session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
+                                                         model_year=model_year,
+                                                         cert_target_co2_Mg=cert_target_co2_Mg,
+                                                         calendar_year_cert_co2_Mg=calendar_year_cert_co2_Mg,
+                                                         model_year_cert_co2_Mg=calendar_year_cert_co2_Mg,  # to start with
+                                                         manufacturer_vehicle_cost_dollars=manufacturer_vehicle_cost_dollars,
+                                                         ))
+        omega_globals.session.flush()
 
     @staticmethod
     def get_model_years():
@@ -63,7 +63,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
 
-        return sql_unpack_result(globals.session.query(ManufacturerAnnualData.model_year).all())
+        return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.model_year).all())
 
     @staticmethod
     def get_cert_target_co2_Mg():
@@ -72,7 +72,7 @@ class ManufacturerAnnualData(SQABase):
         Returns: A list of target CO2 Mg for each model year
 
         """
-        return sql_unpack_result(globals.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
+        return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.cert_target_co2_Mg).all())
 
     @staticmethod
     def get_calendar_year_cert_co2_Mg():
@@ -81,7 +81,7 @@ class ManufacturerAnnualData(SQABase):
         Returns: A list of initial compliance state data (CO2 Mg) of the vehicles produced by model year
 
         """
-        return sql_unpack_result(globals.session.query(ManufacturerAnnualData.calendar_year_cert_co2_Mg).all())
+        return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.calendar_year_cert_co2_Mg).all())
 
     @staticmethod
     def get_model_year_cert_co2_Mg():
@@ -91,7 +91,7 @@ class ManufacturerAnnualData(SQABase):
         to/from other model years
 
         """
-        return sql_unpack_result(globals.session.query(ManufacturerAnnualData.model_year_cert_co2_Mg).all())
+        return sql_unpack_result(omega_globals.session.query(ManufacturerAnnualData.model_year_cert_co2_Mg).all())
 
     @staticmethod
     def get_total_cost_billions():
@@ -101,7 +101,7 @@ class ManufacturerAnnualData(SQABase):
 
         """
         return float(
-            globals.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar()) / 1e9
+            omega_globals.session.query(func.sum(ManufacturerAnnualData.manufacturer_vehicle_cost_dollars)).scalar()) / 1e9
 
     @staticmethod
     def update_model_year_cert_co2_Mg(model_year, manufacturer_id, transaction_amount_Mg):
@@ -114,7 +114,7 @@ class ManufacturerAnnualData(SQABase):
             transaction_amount_Mg (numeric): the transaction amount, may be positive (receiving credits) or negative (transferring credits)
 
         """
-        mad = globals.session.query(ManufacturerAnnualData)\
+        mad = omega_globals.session.query(ManufacturerAnnualData)\
             .filter(ManufacturerAnnualData.model_year == model_year)\
             .filter(ManufacturerAnnualData.manufacturer_ID == manufacturer_id).one_or_none()
 
@@ -128,12 +128,12 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
 
         from manufacturers import Manufacturer  # required by vehicles
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

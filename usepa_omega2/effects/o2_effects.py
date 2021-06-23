@@ -13,7 +13,7 @@ from effects.social_costs import calc_carbon_emission_costs, calc_criteria_emiss
 
 
 def run_effects_calcs():
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
 
     calendar_years = VehicleAnnualData.get_calendar_years()
     calendar_years = pd.Series(calendar_years).unique()
@@ -33,7 +33,7 @@ def run_effects_calcs():
         omega_log.logwrite(f'Calculating social costs of carbon emissions for {int(calendar_year)}')
         calc_carbon_emission_costs(calendar_year)
 
-    if globals.options.calc_criteria_emission_costs:
+    if omega_globals.options.calc_criteria_emission_costs:
         for calendar_year in calendar_years:
             print(f'Calculating social costs of criteria emissions for {int(calendar_year)}')
             omega_log.logwrite(f'Calculating social costs of criteria emissions for {int(calendar_year)}')

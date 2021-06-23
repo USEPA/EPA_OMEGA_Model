@@ -22,8 +22,8 @@ def get_demanded_shares(market_class_data, calendar_year):
     from consumer.market_classes import MarketClass
     from context.onroad_fuels import OnroadFuel
 
-    if globals.options.flat_context:
-        calendar_year = globals.options.flat_context_year
+    if omega_globals.options.flat_context:
+        calendar_year = omega_globals.options.flat_context_year
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
@@ -103,45 +103,45 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        from manufacturers import Manufacturer  # needed for manufacturers table
+        from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from consumer.demanded_shares_gcam import DemandedSharesGCAM
         from policy.targets_footprint import TargetsFootprint
-        from cost_clouds import CostCloud
+        from context.cost_clouds import CostCloud
 
-        globals.options.GHG_standard = TargetsFootprint
-        globals.options.ghg_standards_file = 'test_inputs/ghg_standards-footprint.csv'
-        from vehicles import VehicleFinal
-        from vehicle_annual_data import VehicleAnnualData
+        omega_globals.options.GHG_standard = TargetsFootprint
+        omega_globals.options.ghg_standards_file = 'test_inputs/ghg_standards-footprint.csv'
+        from producer.vehicles import VehicleFinal
+        from producer.vehicle_annual_data import VehicleAnnualData
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += Manufacturer.init_database_from_file(globals.options.manufacturers_file,
-                                                          verbose=globals.options.verbose)
-        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
-                                                         verbose=globals.options.verbose)
-        init_fail += DemandedSharesGCAM.init_database_from_file(globals.options.demanded_shares_file,
-                                                                verbose=globals.options.verbose)
-        init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
-        init_fail += TargetsFootprint.init_database_from_file(globals.options.ghg_standards_file,
-                                                              verbose=globals.options.verbose)
-        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
-        init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
-                                                          globals.options.vehicle_onroad_calculations_file,
-                                                          verbose=globals.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+                                                          verbose=omega_globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=omega_globals.options.verbose)
+        init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
+                                                                verbose=omega_globals.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
+        init_fail += TargetsFootprint.init_database_from_file(omega_globals.options.ghg_standards_file,
+                                                              verbose=omega_globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
+                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            globals.options.analysis_initial_year = 2021
-            globals.options.analysis_final_year = 2035
-            globals.options.database_dump_folder = '__dump'
+            omega_globals.options.analysis_initial_year = 2021
+            omega_globals.options.analysis_final_year = 2035
+            omega_globals.options.database_dump_folder = '__dump'
 
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             # test market shares at different CO2 and price levels
             mcd = pd.DataFrame()
@@ -152,7 +152,7 @@ if __name__ == '__main__':
                 mcd['producer_non_hauling_share_frac'] = [0.8, 0.85]
                 mcd['producer_hauling_share_frac'] = [0.2, 0.15]
 
-            share_demand = get_demanded_shares(mcd, globals.options.analysis_initial_year)
+            share_demand = get_demanded_shares(mcd, omega_globals.options.analysis_initial_year)
 
         else:
             print(init_fail)

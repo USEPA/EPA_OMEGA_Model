@@ -49,7 +49,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
 
         key = '%s_%s' % (calendar_year, market_class_id)
         if not key in cache:
-            cache[key] = globals.session.query(DemandedSharesGCAM). \
+            cache[key] = omega_globals.session.query(DemandedSharesGCAM). \
                 filter(DemandedSharesGCAM.calendar_year == calendar_year). \
                 filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
 
@@ -96,8 +96,8 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
                         average_occupancy=df.loc[i, 'average_occupancy'],
                         logit_exponent_mu=df.loc[i, 'logit_exponent_mu'],
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
                 for mc in df['market_class_id'].unique():
                     cache[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
@@ -113,21 +113,21 @@ if __name__ == '__main__':
         from consumer.market_classes import MarketClass  # needed for market class ID
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
-                                                         verbose=globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=omega_globals.options.verbose)
 
-        init_fail += DemandedSharesGCAM.init_database_from_file(globals.options.demanded_shares_file,
-                                                                verbose=globals.options.verbose)
+        init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
+                                                                verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

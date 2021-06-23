@@ -521,7 +521,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     import sys
 
     # print('run_omega_batch sys.path = %s' % sys.path)
-    from common import globals
+    from common import omega_globals
 
     options = OMEGABatchOptions()
     options.validate_batch = not no_validate
@@ -553,7 +553,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         sys.path.extend([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list)
 
-    globals.options = options
+    omega_globals.options = options
 
     # get batch info
     import shutil

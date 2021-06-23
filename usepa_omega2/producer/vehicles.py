@@ -358,7 +358,7 @@ class CompositeVehicle(OMEGABase):
         self.normalized_cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                             'normalized_cert_target_co2_Mg')
 
-        self.normalized_cert_co2_Mg = globals.options.GHG_standard.calc_cert_co2_Mg(self, 1, 1)
+        self.normalized_cert_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(self, 1, 1)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -421,8 +421,7 @@ class CompositeVehicle(OMEGABase):
         Returns:
 
         """
-        from cost_clouds import CostCloud
-        from common.omega_functions import cartesian_prod
+        from common.omega_functions import cartesian_prod, calc_frontier
         from common.omega_plot import figure, label_xy
 
         if plot:
@@ -460,7 +459,7 @@ class CompositeVehicle(OMEGABase):
             composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
 
             # calculate new sales-weighted frontier
-            composite_frontier_df = CostCloud.calc_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
+            composite_frontier_df = calc_frontier(composite_frontier_df, 'cert_co2_grams_per_mile',
                                                                  'new_vehicle_mfr_generalized_cost_dollars',
                                                                  allow_upslope=True)
 
@@ -720,7 +719,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_grams_per_mile = globals.options.GHG_standard.calc_target_co2_gpmi(self)
+        self.cert_target_co2_grams_per_mile = omega_globals.options.GHG_standard.calc_target_co2_gpmi(self)
 
     def set_cert_target_co2_Mg(self):
         """
@@ -728,7 +727,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_Mg = globals.options.GHG_standard.calc_target_co2_Mg(self)
+        self.cert_target_co2_Mg = omega_globals.options.GHG_standard.calc_target_co2_Mg(self)
 
     def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
         """
@@ -783,7 +782,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_co2_Mg = globals.options.GHG_standard.calc_cert_co2_Mg(self)
+        self.cert_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
         """
@@ -813,7 +812,7 @@ class Vehicle(OMEGABase):
 
         if type(self) == Vehicle and type(vehicle) == VehicleFinal:
             from policy.upstream_methods import UpstreamMethods
-            from cost_clouds import CostCloud
+            from context.cost_clouds import CostCloud
 
             # need to add upstream to direct co2 g/mi and calculate this year's frontier
             self.cert_direct_co2_grams_per_mile = vehicle.cert_direct_co2_grams_per_mile
@@ -824,8 +823,8 @@ class Vehicle(OMEGABase):
             self.upstream_co2_grams_per_mile = upstream(self, self.cert_direct_co2_grams_per_mile, self.cert_direct_kwh_per_mile)
             self.cert_co2_grams_per_mile = self.cert_direct_co2_grams_per_mile + self.upstream_co2_grams_per_mile
 
-            if globals.options.flat_context:
-                self.cost_cloud = CostCloud.get_cloud(globals.options.flat_context_year, self.cost_curve_class)
+            if omega_globals.options.flat_context:
+                self.cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, self.cost_curve_class)
             else:
                 self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
             self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
@@ -850,7 +849,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        from cost_clouds import CostCloud
+        from common.omega_functions import calc_frontier
         from policy.upstream_methods import UpstreamMethods
         from policy.drive_cycle_weights import DriveCycleWeights
         from policy.offcycle_credits import OffCycleCredits
@@ -894,13 +893,13 @@ class Vehicle(OMEGABase):
                                                      self.cost_cloud['cert_indirect_offcycle_co2_grams_per_mile']
 
         # calculate producer generalized cost
-        self.cost_cloud = globals.options.producer_calc_generalized_cost(self, 'onroad_direct_co2_grams_per_mile',
+        self.cost_cloud = omega_globals.options.producer_calc_generalized_cost(self, 'onroad_direct_co2_grams_per_mile',
                                                                     'onroad_direct_kwh_per_mile',
                                                                     'new_vehicle_mfr_cost_dollars')
 
         # calculate frontier from updated cloud
         allow_upslope = True
-        cost_curve = CostCloud.calc_frontier(self.cost_cloud, 'cert_co2_grams_per_mile',
+        cost_curve = calc_frontier(self.cost_cloud, 'cert_co2_grams_per_mile',
                                              'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
         # CostCloud.plot_frontier(self.cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, o2.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
@@ -971,10 +970,10 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        from vehicle_annual_data import VehicleAnnualData
+        from producer.vehicle_annual_data import VehicleAnnualData
         self._initial_registered_count = initial_registered_count
 
-        globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
+        omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
         # o2.session.flush()
 
         VehicleAnnualData.update_registered_count(self,
@@ -988,7 +987,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        return globals.session.query(func.max(VehicleFinal.model_year)).scalar()
+        return omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()
 
     @staticmethod
     def get_manufacturer_vehicles(calendar_year, manufacturer_id):
@@ -1001,7 +1000,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        return globals.session.query(VehicleFinal). \
+        return omega_globals.session.query(VehicleFinal). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
             filter(VehicleFinal.model_year == calendar_year).all()
 
@@ -1019,7 +1018,7 @@ class VehicleFinal(SQABase, Vehicle):
         if type(attributes) is not list:
             attributes = [attributes]
         attrs = VehicleFinal.get_class_attributes(attributes)
-        return globals.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
+        return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
 
     @staticmethod
     def calc_cert_target_co2_Mg(model_year, manufacturer_id):
@@ -1032,7 +1031,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        return globals.session.query(func.sum(VehicleFinal.cert_target_co2_Mg)). \
+        return omega_globals.session.query(func.sum(VehicleFinal.cert_target_co2_Mg)). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
@@ -1047,7 +1046,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        return globals.session.query(func.sum(VehicleFinal.cert_co2_Mg)). \
+        return omega_globals.session.query(func.sum(VehicleFinal.cert_co2_Mg)). \
             filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
@@ -1137,7 +1136,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.reg_class_ID = globals.options.GHG_standard.get_vehicle_reg_class(veh)
+                    veh.reg_class_ID = omega_globals.options.GHG_standard.get_vehicle_reg_class(veh)
                     veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.cert_direct_co2_grams_per_mile = veh.cert_direct_oncycle_co2_grams_per_mile  # TODO: minus any credits??
@@ -1236,64 +1235,64 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = True
+        omega_globals.engine.echo = True
         omega_log.init_logfile()
 
         init_fail = []
 
         from common.omega_functions import weighted_value, unweighted_value
 
-        from manufacturers import Manufacturer  # needed for manufacturers table
+        from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.fuel_prices import FuelPrice # needed for retail fuel price
         from context.new_vehicle_market import NewVehicleMarket # needed for context size class hauling info
-        # from vehicles import Vehicle
-        from vehicle_annual_data import VehicleAnnualData
+        # from producer.vehicles import Vehicle
+        from producer.vehicle_annual_data import VehicleAnnualData
 
         from policy.targets_flat import input_template_name as flat_template_name
         from policy.targets_footprint import input_template_name as footprint_template_name
-        ghg_template_name = get_template_name(globals.options.ghg_standards_file)
+        ghg_template_name = get_template_name(omega_globals.options.ghg_standards_file)
 
         if ghg_template_name == flat_template_name:
             from policy.targets_flat import TargetsFlat
 
-            globals.options.GHG_standard = TargetsFlat
+            omega_globals.options.GHG_standard = TargetsFlat
         elif ghg_template_name == footprint_template_name:
             from policy.targets_footprint import TargetsFootprint
 
-            globals.options.GHG_standard = TargetsFootprint
+            omega_globals.options.GHG_standard = TargetsFootprint
         else:
             init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
         from policy.policy_fuels import PolicyFuel
 
-        from cost_clouds import CostCloud
+        from context.cost_clouds import CostCloud
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += Manufacturer.init_database_from_file(globals.options.manufacturers_file,
-                                                          verbose=globals.options.verbose)
-        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
-                                                         verbose=globals.options.verbose)
-        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+                                                          verbose=omega_globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=omega_globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
 
-        init_fail += FuelPrice.init_database_from_file(globals.options.context_fuel_prices_file,
-                                                       verbose=globals.options.verbose)
+        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
+                                                       verbose=omega_globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += globals.options.GHG_standard.init_database_from_file(globals.options.ghg_standards_file,
-                                                                          verbose=globals.options.verbose)
+        init_fail += omega_globals.options.GHG_standard.init_database_from_file(omega_globals.options.ghg_standards_file,
+                                                                                verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuel.init_database_from_file(globals.options.ghg_standards_fuels_file,
-                                                        verbose=globals.options.verbose)
+        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.ghg_standards_fuels_file,
+                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
-                                                          globals.options.vehicle_onroad_calculations_file,
-                                                          verbose=globals.options.verbose)
+        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
+                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          verbose=omega_globals.options.verbose)
 
         if not init_fail:
 
@@ -1305,7 +1304,7 @@ if __name__ == '__main__':
             VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2020, 'annual_vmt', 15000)
 
             # dump database with updated vehicle annual data
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
 
@@ -1324,6 +1323,6 @@ if __name__ == '__main__':
             os._exit(-1)
 
     except:
-        dump_omega_db_to_csv(globals.options.database_dump_folder)
+        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

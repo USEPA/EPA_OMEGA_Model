@@ -169,136 +169,6 @@ class CostCloud(OMEGABase):
         return template_errors
 
     @staticmethod
-    def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
-        """
-        Plot a cloud and its frontier.  Saves plot to ``o2.options.output_folder``.
-
-        Args:
-            cost_cloud (DataFrame): set of points to plot
-            cost_curve_name (str): name of  plot
-            frontier_df (DataFrame): set of points on the frontier
-            x_key (str): column name of x-value
-            y_key (str): columns name of y-value
-
-        Example:
-
-            ::
-
-                # from create_frontier_df() in vehicles.py
-                CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
-
-        """
-        import matplotlib.pyplot as plt
-        plt.figure()
-        plt.plot(cost_cloud[x_key], cost_cloud[y_key],
-                 '.')
-        plt.title('Cost versus %s %s' % (x_key, cost_curve_name))
-        plt.xlabel('%s' % x_key)
-        plt.ylabel('%s' % y_key)
-        plt.plot(frontier_df[x_key], frontier_df[y_key],
-                 'r-')
-        plt.grid()
-        plt.savefig(globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
-
-    @staticmethod
-    def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
-        """
-        Calculate the frontier of a cloud.
-
-        Args:
-            cloud (DataFrame): a set of points to find the frontier of
-            x_key (str): name of the column holding x-axis data
-            y_key (str): name of the column holding y-axis data
-            allow_upslope (bool): allow U-shaped frontier
-
-        Returns:
-            DataFrame containing the frontier points
-
-        .. figure:: _static/code_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_0.75.png
-            :scale: 75 %
-            :align: center
-
-            Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=0.75`` ``allow_upslope=True``
-            These are the default settings
-
-        .. figure:: _static/code_figures/cost_cloud_ice_Truck_allow_upslope_frontier_affinity_factor_10.png
-            :scale: 75 %
-            :align: center
-
-            Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=10`` ``allow_upslope=True``
-            Higher affinity factor follows cloud points more closely
-
-        .. figure:: _static/code_figures/cost_cloud_ice_Truck_no_upslope_frontier_affinity_factor_0.75.png
-            :scale: 75 %
-            :align: center
-
-            Cost cloud and frontier, ``o2.options.cost_curve_frontier_affinity_factor=0.75`` ``allow_upslope=False``
-            Default affinity factor, no up-slope
-
-        """
-
-        import numpy as np
-
-        if len(cloud) > 1:
-            frontier_pts = []
-
-            # drop non-numeric columns so dtypes don't become "object"
-            cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
-
-            # normalize data (helps with up-slope frontier)
-            cloud['y_norm'] = (cloud[y_key] - cloud[y_key].min()) / (cloud[y_key].max() - cloud[y_key].min())
-            cloud['x_norm'] = (cloud[x_key] - cloud[x_key].min()) / (cloud[x_key].max() - cloud[x_key].min())
-
-            x_key = 'x_norm'
-            y_key = 'y_norm'
-
-            # find frontier starting point, lowest x-value, and add to frontier
-            idxmin = cloud[x_key].idxmin()
-            frontier_pts.append(cloud.loc[idxmin])
-            min_frontier_factor = 0
-
-            if cloud[x_key].min() != cloud[x_key].max():
-                while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) \
-                        and not np.isinf(min_frontier_factor) and not cloud.empty:
-                    # calculate frontier factor (more negative is more better) = slope of each point relative
-                    # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                    cloud = cloud.loc[cloud[x_key] > frontier_pts[-1][x_key]].copy()
-                    cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
-                                               (cloud[x_key] - frontier_pts[-1][x_key]) \
-                                               ** globals.options.cost_curve_frontier_affinity_factor
-                    # find next frontier point (lowest slope), if there is one, and add to frontier list
-                    min_frontier_factor = cloud['frontier_factor'].min()
-
-                    if min_frontier_factor > 0 and allow_upslope:
-                        # frontier factor is different for up-slope (swap x & y and invert "y")
-                        cloud['frontier_factor'] = (frontier_pts[-1][x_key] - cloud[x_key]) / \
-                                                   (cloud[y_key] - frontier_pts[-1][y_key]) \
-                                                   ** globals.options.cost_curve_frontier_affinity_factor
-                        min_frontier_factor = cloud['frontier_factor'].min()
-
-                    if not cloud.empty:
-                        if not np.isinf(min_frontier_factor):
-                            if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
-                                # if multiple points with the same slope, take the one with the highest x-value
-                                idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
-                            else:
-                                idxmin = cloud['frontier_factor'].idxmin()
-                        else:
-                            idxmin = cloud['frontier_factor'].idxmax()
-
-                        if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
-                            frontier_pts.append(cloud.loc[idxmin])
-
-            frontier_df = pd.concat(frontier_pts, axis=1)
-            frontier_df = frontier_df.transpose()
-            frontier_df['frontier_factor'] = 0
-        else:
-            frontier_df = cloud
-            frontier_df['frontier_factor'] = 0
-
-        return frontier_df.copy()
-
-    @staticmethod
     def get_cloud(model_year, cost_curve_class):
         """
         Retrieve cost cloud for the given model year and cost curve class.
@@ -331,13 +201,13 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        globals.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
+        omega_globals.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
 
         init_fail = []
-        init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=True)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=True)
 
         if not init_fail:
             pass

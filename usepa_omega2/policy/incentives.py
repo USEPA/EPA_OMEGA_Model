@@ -144,14 +144,14 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
 
         init_omega_db()
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail += Incentives.init_from_file(globals.options.production_multipliers_file,
-                                               verbose=globals.options.verbose)
+        init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
+                                               verbose=omega_globals.options.verbose)
 
         if not init_fail:
             class dummyVehicle:

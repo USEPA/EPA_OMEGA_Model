@@ -113,13 +113,13 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
                     new_veh.tech_option_iteration_num = 0  # reset vehicle tech option progression
 
                 if new_veh.fueling_class == 'ICE':
-                    num_tech_options = globals.options.producer_num_tech_options_per_ice_vehicle
+                    num_tech_options = omega_globals.options.producer_num_tech_options_per_ice_vehicle
                 else:
-                    num_tech_options = globals.options.producer_num_tech_options_per_bev_vehicle
+                    num_tech_options = omega_globals.options.producer_num_tech_options_per_bev_vehicle
 
                 veh_min_co2_gpmi = new_veh.get_min_co2_gpmi()
 
-                if globals.options.allow_backsliding:
+                if omega_globals.options.allow_backsliding:
                     veh_max_co2_gpmi = new_veh.get_max_co2_gpmi()
                 else:
                     veh_max_co2_gpmi = new_veh.cert_co2_grams_per_mile
@@ -131,7 +131,7 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
                         if (combo['veh_%s_sales' % new_veh.vehicle_ID] > 0) or (new_veh.tech_option_iteration_num > 0):
                             new_veh.tech_option_iteration_num += 1
 
-                        tech_share_range = globals.options.producer_convergence_factor ** new_veh.tech_option_iteration_num
+                        tech_share_range = omega_globals.options.producer_convergence_factor ** new_veh.tech_option_iteration_num
                         veh_co2_gpmi = combo['veh_%s_co2_gpmi' % new_veh.vehicle_ID]
                         min_co2_gpmi = max(veh_min_co2_gpmi, veh_co2_gpmi * (1 - tech_share_range))
                         max_co2_gpmi = min(veh_max_co2_gpmi, veh_co2_gpmi * (1 + tech_share_range))
@@ -184,13 +184,13 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
 
             if share_range == 1.0:
                 # span the whole space of shares
-                sales_share_df = partition(share_column_names, num_levels=globals.options.producer_num_market_share_options,
+                sales_share_df = partition(share_column_names, num_levels=omega_globals.options.producer_num_market_share_options,
                                            min_constraints=min_constraints, max_constraints=max_constraints)
             else:
                 # narrow search span to a range of shares around the winners
                 from common.omega_functions import generate_constrained_nearby_shares
                 sales_share_df = generate_constrained_nearby_shares(share_column_names, winning_combos, share_range,
-                                                                    globals.options.producer_num_market_share_options,
+                                                                    omega_globals.options.producer_num_market_share_options,
                                                                     min_constraints=min_constraints,
                                                                     max_constraints=max_constraints)
         else:
@@ -241,19 +241,19 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
     winning_combos = None
     producer_compliance_possible = False
 
-    if (calendar_year == globals.options.analysis_initial_year) and (iteration_num == 0):
+    if (calendar_year == omega_globals.options.analysis_initial_year) and (iteration_num == 0):
         cache.clear()
 
     producer_iteration_log = \
         omega_log.IterationLog('%s%d_%d_producer_iteration_log.csv' % (
-            globals.options.output_folder, calendar_year, iteration_num))
+            omega_globals.options.output_folder, calendar_year, iteration_num))
 
     iterate_producer = True
     producer_iteration = 0
     best_combo = None  # producer_decision_and_response
 
-    while iterate_producer and producer_iteration < globals.options.producer_max_iterations:
-        share_range = globals.options.producer_convergence_factor ** producer_iteration
+    while iterate_producer and producer_iteration < omega_globals.options.producer_max_iterations:
+        share_range = omega_globals.options.producer_convergence_factor ** producer_iteration
 
         manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
@@ -280,7 +280,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
         if (best_combo is None) or (winning_combos['compliance_score'].min() < best_combo['compliance_score'].min()):
             best_combo = winning_combos.loc[winning_combos['compliance_score'].idxmin()]
 
-        if 'producer' in globals.options.verbose_console:
+        if 'producer' in omega_globals.options.verbose_console:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, iteration_num,
                                               producer_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
                                     best_combo['compliance_ratio']), echo_console=True)
@@ -288,9 +288,9 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
         producer_iteration += 1
 
         # iterate_producer = abs(1 - best_combo['compliance_ratio']) > o2.options.producer_iteration_tolerance and (len(winning_combos) > 1)
-        iterate_producer = abs(1 - best_combo['compliance_ratio']) > globals.options.producer_iteration_tolerance # and (len(winning_combos) > 1)
+        iterate_producer = abs(1 - best_combo['compliance_ratio']) > omega_globals.options.producer_iteration_tolerance # and (len(winning_combos) > 1)
 
-    if 'producer' in globals.options.verbose_console:
+    if 'producer' in omega_globals.options.verbose_console:
         omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_combo['compliance_ratio']),
                            echo_console=True)
 
@@ -306,7 +306,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
 
     winning_combo = winning_combo.rename({'compliance_ratio': 'compliance_ratio_producer'})
     winning_combo['producer_iteration'] = producer_iteration - 1    # log the final iteration, as opposed to the winning iteration
-    if 'producer' in globals.options.verbose_console:
+    if 'producer' in omega_globals.options.verbose_console:
         from consumer.market_classes import MarketClass
         for mc in MarketClass.market_classes:
             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' % (winning_combo['producer_abs_share_frac_%s' % mc]), echo_console=True)
@@ -315,7 +315,7 @@ def run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_r
     import copy
     manufacturer_composite_vehicles = copy.deepcopy(manufacturer_composite_vehicles)
 
-    from vehicles import VehicleAttributeCalculations
+    from producer.vehicles import VehicleAttributeCalculations
 
     # assign co2 values and sales to vehicles...
     for new_veh in manufacturer_composite_vehicles:
@@ -341,7 +341,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     Returns:
 
     """
-    from vehicles import VehicleFinal, Vehicle, CompositeVehicle
+    from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle
     from consumer.market_classes import MarketClass, populate_market_classes
     from context.new_vehicle_market import NewVehicleMarket
 
@@ -478,8 +478,8 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     Returns:
 
     """
-    from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import VehicleFinal
+    from producer.manufacturer_annual_data import ManufacturerAnnualData
+    from producer.vehicles import VehicleFinal
 
     manufacturer_new_vehicles = []
 
@@ -487,9 +487,9 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     for cv in manufacturer_composite_vehicles:
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_ID]
-        if ((globals.options.log_producer_iteration_years == 'all') or
-            (calendar_year in globals.options.log_producer_iteration_years)) and 'producer' in globals.options.verbose_console:
-            cv.cost_curve.to_csv(globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_ID))
+        if ((omega_globals.options.log_producer_iteration_years == 'all') or
+            (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console:
+            cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_ID))
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
@@ -498,7 +498,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
             new_veh.inherit_vehicle(v)
             manufacturer_new_vehicles.append(new_veh)
 
-    globals.session.add_all(manufacturer_new_vehicles)
+    omega_globals.session.add_all(manufacturer_new_vehicles)
 
     cert_target_co2_Mg = VehicleFinal.calc_cert_target_co2_Mg(calendar_year, manufacturer_ID)
 
@@ -511,7 +511,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
                                         calendar_year_cert_co2_Mg=cert_co2_Mg,
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_combo_cost_dollars'],
                                         )
-    globals.session.flush()
+    omega_globals.session.flush()
 
 
 def calc_tech_share_combos_total(calendar_year, manufacturer_composite_vehicles, tech_share_combos_total,
@@ -722,10 +722,10 @@ def select_winning_combos(tech_share_combos_total, calendar_year, producer_itera
         # lowest cost:
         # winning_combos = tech_share_combos_total.loc[[[cost_name].idxmin()]]
 
-    if (globals.options.log_producer_iteration_years == 'all') or (calendar_year in globals.options.log_producer_iteration_years):
-        if 'producer' in globals.options.verbose_console:
+    if (omega_globals.options.log_producer_iteration_years == 'all') or (calendar_year in omega_globals.options.log_producer_iteration_years):
+        if 'producer' in omega_globals.options.verbose_console:
             tech_share_combos_total.loc[winning_combos.index, 'winner'] = True
-            if globals.options.slice_tech_combo_cloud_tables:
+            if omega_globals.options.slice_tech_combo_cloud_tables:
                 tech_share_combos_total = tech_share_combos_total[tech_share_combos_total['compliance_ratio'] <= 1.2]
             producer_iteration_log.write(tech_share_combos_total)
         else:

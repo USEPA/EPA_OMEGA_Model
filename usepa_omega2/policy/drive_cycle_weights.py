@@ -243,19 +243,19 @@ if __name__ == '__main__':
         from drive_cycles import DriveCycles
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = globals.options.verbose
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
-        init_fail += DriveCycles.init_from_file(globals.options.drive_cycles_file,
-                                                verbose=globals.options.verbose)
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
 
-        init_fail += DriveCycleWeights.init_from_file(globals.options.drive_cycle_weights_file,
+        init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file,
                                                       verbose=True)
 
         if not init_fail:

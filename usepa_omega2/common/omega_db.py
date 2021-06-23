@@ -10,7 +10,7 @@
 print('importing %s' % __file__)
 
 # import o2  # import global variables
-from common import globals, omega_log
+from common import omega_globals, omega_log
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -55,10 +55,10 @@ SQABase = declarative_base(name='DeclarativeMeta')
 
 
 def init_omega_db():
-    globals.engine = create_engine('sqlite:///:memory:', echo=False)
-    globals.session = Session(bind=globals.engine)
+    omega_globals.engine = create_engine('sqlite:///:memory:', echo=False)
+    omega_globals.session = Session(bind=omega_globals.engine)
     # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
-    globals.session.execute('pragma foreign_keys=on')
+    omega_globals.session.execute('pragma foreign_keys=on')
 
 
 def sql_unpack_result(query_result_tuples, index=0):
@@ -92,7 +92,7 @@ def sql_get_column_names(table_name, exclude=None):
     """
 
     # get table row data:
-    result = globals.session.execute('PRAGMA table_info(%s)' % table_name)
+    result = omega_globals.session.execute('PRAGMA table_info(%s)' % table_name)
 
     # make list of column names:
     columns = [r[1] for r in result.fetchall()]
@@ -124,14 +124,14 @@ def dump_omega_db_to_csv(output_folder, verbose=False):
     # validate output folder
     file_io.validate_folder(output_folder)
 
-    globals.session.flush()  # make sure database is up to date
+    omega_globals.session.flush()  # make sure database is up to date
 
     if verbose:
-        omega_log.logwrite('\ndumping %s database to %s...' % (globals.engine.name, output_folder))
+        omega_log.logwrite('\ndumping %s database to %s...' % (omega_globals.engine.name, output_folder))
 
     # dump tables to .csv files using pandas!
-    for table in globals.engine.table_names():
+    for table in omega_globals.engine.table_names():
         if verbose:
             omega_log.logwrite(table)
-        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=globals.engine)
+        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=omega_globals.engine)
         sql_df.to_csv('%s/%s_table.csv' % (output_folder, table), index=False)

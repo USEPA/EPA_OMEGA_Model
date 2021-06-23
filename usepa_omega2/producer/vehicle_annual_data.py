@@ -80,7 +80,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
         """
         age = calendar_year - vehicle.model_year
 
-        vad = globals.session.query(VehicleAnnualData). \
+        vad = omega_globals.session.query(VehicleAnnualData). \
             filter(VehicleAnnualData.vehicle_ID == vehicle.vehicle_ID). \
             filter(VehicleAnnualData.calendar_year == calendar_year). \
             filter(VehicleAnnualData.age == age).one_or_none()
@@ -88,28 +88,28 @@ class VehicleAnnualData(SQABase, OMEGABase):
         if vad:
             vad.registered_count = registered_count
         else:
-            globals.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
-                                                  calendar_year=calendar_year,
-                                                  registered_count=registered_count,
-                                                  age=age))
+            omega_globals.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
+                                                        calendar_year=calendar_year,
+                                                        registered_count=registered_count,
+                                                        age=age))
 
     @staticmethod
     def update_vehicle_annual_data(vehicle, calendar_year, attribute, attribute_value):
 
         age = calendar_year - vehicle.model_year
 
-        vad = globals.session.query(VehicleAnnualData). \
+        vad = omega_globals.session.query(VehicleAnnualData). \
             filter(VehicleAnnualData.vehicle_ID == vehicle.vehicle_ID). \
             filter(VehicleAnnualData.calendar_year == calendar_year). \
             filter(VehicleAnnualData.age == age).one()
 
         vad.__setattr__(attribute, attribute_value)
 
-        globals.session.flush()
+        omega_globals.session.flush()
 
     @staticmethod
     def get_calendar_years():
-        return sql_unpack_result(globals.session.query(VehicleAnnualData.calendar_year).all())
+        return sql_unpack_result(omega_globals.session.query(VehicleAnnualData.calendar_year).all())
 
     @staticmethod
     def get_initial_registered_count():
@@ -119,11 +119,11 @@ class VehicleAnnualData(SQABase, OMEGABase):
 
         """
 
-        cache_key = '%s_initial_registered_count' % (globals.options.analysis_initial_year - 1)
+        cache_key = '%s_initial_registered_count' % (omega_globals.options.analysis_initial_year - 1)
         if cache_key not in cache:
             cache[cache_key] = float(
-                globals.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
-                    VehicleAnnualData.calendar_year == globals.options.analysis_initial_year - 1).scalar())
+                omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
+                    VehicleAnnualData.calendar_year == omega_globals.options.analysis_initial_year - 1).scalar())
 
         return cache[cache_key]
 
@@ -137,22 +137,22 @@ class VehicleAnnualData(SQABase, OMEGABase):
         Returns: registered count of vehicles of the given ``fueling_class`` prior to initial analysis year
 
         """
-        cache_key = '%s_%s_initial_registered_count' % (globals.options.analysis_initial_year - 1, fueling_class)
+        cache_key = '%s_%s_initial_registered_count' % (omega_globals.options.analysis_initial_year - 1, fueling_class)
         if cache_key not in cache:
-            from vehicles import VehicleFinal
+            from producer.vehicles import VehicleFinal
             cache[cache_key] = float(
-                globals.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
+                omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
                     VehicleFinal.fueling_class == fueling_class).filter(
-                    VehicleAnnualData.calendar_year == globals.options.analysis_initial_year - 1).scalar())
+                    VehicleAnnualData.calendar_year == omega_globals.options.analysis_initial_year - 1).scalar())
 
         return cache[cache_key]
 
     @staticmethod
     def insert_vmt(vehicle_ID, calendar_year, annual_vmt):
-        vmt = globals.session.query(VehicleAnnualData.registered_count). \
+        vmt = omega_globals.session.query(VehicleAnnualData.registered_count). \
                   filter(VehicleAnnualData.vehicle_ID == vehicle_ID). \
                   filter(VehicleAnnualData.calendar_year == calendar_year).scalar() * annual_vmt
-        vad = globals.session.query(VehicleAnnualData). \
+        vad = omega_globals.session.query(VehicleAnnualData). \
             filter(VehicleAnnualData.vehicle_ID == vehicle_ID). \
             filter(VehicleAnnualData.calendar_year == calendar_year).all()
         vad[0].annual_vmt = annual_vmt
@@ -161,13 +161,13 @@ class VehicleAnnualData(SQABase, OMEGABase):
     @staticmethod
     def get_vehicle_annual_data(calendar_year, attributes=None):
         if attributes is None:
-            return globals.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+            return omega_globals.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
         else:
             if type(attributes) is not list:
                 attributes = [attributes]
             attrs = VehicleAnnualData.get_class_attributes(attributes)
 
-            result = globals.session.query(*attrs).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+            result = omega_globals.session.query(*attrs).filter(VehicleAnnualData.calendar_year == calendar_year).all()
 
             return result
 
@@ -178,15 +178,15 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
 
-        from manufacturers import Manufacturer  # required by vehicles
+        from producer.manufacturers import Manufacturer  # required by vehicles
         from context.onroad_fuels import OnroadFuel  # required by vehicles
         from consumer.market_classes import MarketClass  # required by vehicles
-        from vehicles import VehicleFinal  # for foreign key vehicle_ID
+        from producer.vehicles import VehicleFinal  # for foreign key vehicle_ID
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

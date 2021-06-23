@@ -36,7 +36,7 @@ try:
     import pandas as pd
     pd.set_option('chained_assignment', 'raise')
 
-    from common.globals import *
+    from common.omega_globals import *
     from common.omega_types import *
     from common.omega_db import *
     from common import file_io, omega_log

@@ -46,13 +46,13 @@ class Manufacturer(SQABase, OMEGABase):
                     obj_list.append(Manufacturer(
                         manufacturer_ID=manufacturer_ID,
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
-                template_errors = CreditBank.validate_ghg_credits_template(globals.options.ghg_credits_file, verbose)
+                template_errors = CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file, verbose)
 
                 if not template_errors:
-                    initial_credit_bank[manufacturer_ID] = CreditBank(globals.options.ghg_credits_file, manufacturer_ID)
+                    initial_credit_bank[manufacturer_ID] = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_ID)
 
         return template_errors
 
@@ -63,22 +63,22 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         from context.onroad_fuels import OnroadFuel
         from consumer.market_classes import MarketClass
-        from vehicles import VehicleFinal
-        from vehicle_annual_data import VehicleAnnualData
+        from producer.vehicles import VehicleFinal
+        from producer.vehicle_annual_data import VehicleAnnualData
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += Manufacturer.init_database_from_file(globals.options.manufacturers_file, verbose=globals.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

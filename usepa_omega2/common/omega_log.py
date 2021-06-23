@@ -11,7 +11,7 @@ Functions to log diagnostic data
 
 print('importing %s' % __file__)
 
-from common import globals  # import global variables
+from common import omega_globals  # import global variables
 from common.omega_types import OMEGABase
 
 
@@ -71,18 +71,18 @@ def init_logfile():
     import common.file_io as file_io
     from usepa_omega2 import code_version
 
-    file_io.validate_folder(globals.options.output_folder)
-    globals.options.logfilename = '%s%s.txt' % (
-        globals.options.output_folder + globals.options.logfile_prefix, globals.options.session_unique_name)
-    with open(globals.options.logfilename, 'w') as log:
+    file_io.validate_folder(omega_globals.options.output_folder)
+    omega_globals.options.logfilename = '%s%s.txt' % (
+        omega_globals.options.output_folder + omega_globals.options.logfile_prefix, omega_globals.options.session_unique_name)
+    with open(omega_globals.options.logfilename, 'w') as log:
         log.write('OMEGA2 %s session %s started at %s %s\n\n' % (
-            code_version, globals.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
+            code_version, omega_globals.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
 
 
 def end_logfile(message):
     import time
-    globals.options.end_time = time.time()
-    elapsed_time = (globals.options.end_time - globals.options.start_time)
+    omega_globals.options.end_time = time.time()
+    elapsed_time = (omega_globals.options.end_time - omega_globals.options.start_time)
     import datetime
     logwrite('\nSession ended at %s %s\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
     logwrite('Elapsed Time %.2f Seconds\n' % elapsed_time)
@@ -91,11 +91,11 @@ def end_logfile(message):
 
 
 def logwrite(message, echo_console=False, terminator='\n'):
-    with open(globals.options.logfilename, 'a') as log:
+    with open(omega_globals.options.logfilename, 'a') as log:
         if type(message) is list:
             for m in message:
                 log.write(m + terminator)
         else:
             log.write(message + terminator)
-        if globals.options.verbose or echo_console:
+        if omega_globals.options.verbose or echo_console:
             print(message)

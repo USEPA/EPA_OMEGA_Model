@@ -73,23 +73,23 @@ if __name__ == '__main__':
         from consumer.market_classes import MarketClass
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = globals.options.verbose
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
-                                                         verbose=globals.options.verbose)
-        init_fail += PriceModifications.init_from_file(globals.options.price_modifications_file,
-                                                       verbose=globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=omega_globals.options.verbose)
+        init_fail += PriceModifications.init_from_file(omega_globals.options.price_modifications_file,
+                                                       verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.database_dump_folder)
             PriceModifications.values.to_csv(
-                globals.options.database_dump_folder + os.sep + 'policy_price_modifications.csv', index=False)
+                omega_globals.options.database_dump_folder + os.sep + 'policy_price_modifications.csv', index=False)
 
             print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))
             print(PriceModifications.get_price_modification(2020, 'non_hauling.BEV'))

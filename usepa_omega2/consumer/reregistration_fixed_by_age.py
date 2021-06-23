@@ -27,7 +27,7 @@ class ReregistrationFixedByAge(SQABase, OMEGABase):
         cache_key = '%s_%s' % (market_class_id, age)
 
         if cache_key not in cache:
-            cache[cache_key] = float(globals.session.query(ReregistrationFixedByAge.reregistered_proportion).
+            cache[cache_key] = float(omega_globals.session.query(ReregistrationFixedByAge.reregistered_proportion).
                                      filter(ReregistrationFixedByAge.market_class_ID == market_class_id).
                                      filter(ReregistrationFixedByAge.age == age).scalar())
         return cache[cache_key]
@@ -61,8 +61,8 @@ class ReregistrationFixedByAge(SQABase, OMEGABase):
                         market_class_ID=df.loc[i, 'market_class_id'],
                         reregistered_proportion=df.loc[i, 'reregistered_proportion'],
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
         return template_errors
 
@@ -73,23 +73,23 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         from consumer.market_classes import MarketClass  # needed for market class ID
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
-                                                         verbose=globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=omega_globals.options.verbose)
 
         init_fail += ReregistrationFixedByAge.init_database_from_file(
-            globals.options.reregistration_fixed_by_age_file, verbose=globals.options.verbose)
+            omega_globals.options.reregistration_fixed_by_age_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

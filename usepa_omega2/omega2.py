@@ -109,24 +109,24 @@ def run_producer_consumer():
     :return: iteration log dataframe, updated omega database with final vehicle technology and market share data
     """
 
-    from manufacturers import Manufacturer
-    import producer
+    from producer.manufacturers import Manufacturer
+    from producer import compliance_strategy
     from policy.credit_banking import CreditBank
 
-    for manufacturer in globals.session.query(Manufacturer.manufacturer_ID).all():
+    for manufacturer in omega_globals.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
-        omega_log.logwrite("Running %s: Manufacturer=%s" % (globals.options.session_unique_name, manufacturer_ID), echo_console=True)
+        omega_log.logwrite("Running %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, manufacturer_ID), echo_console=True)
 
         iteration_log = pd.DataFrame()
 
-        if globals.options.num_analysis_years is None:
-            analysis_end_year = globals.options.analysis_final_year + 1
+        if omega_globals.options.num_analysis_years is None:
+            analysis_end_year = omega_globals.options.analysis_final_year + 1
         else:
-            analysis_end_year = globals.options.analysis_initial_year + globals.options.num_analysis_years
+            analysis_end_year = omega_globals.options.analysis_initial_year + omega_globals.options.num_analysis_years
 
-        credit_bank = CreditBank(globals.options.ghg_credits_file, manufacturer_ID)
+        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_ID)
 
-        for calendar_year in range(globals.options.analysis_initial_year, analysis_end_year):
+        for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
             credit_bank.update_credit_age(calendar_year)
             expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
@@ -150,12 +150,12 @@ def run_producer_consumer():
 
             while iterate_producer_consumer:
                 omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
-                                   (globals.options.session_unique_name, calendar_year, iteration_num),
+                                   (omega_globals.options.session_unique_name, calendar_year, iteration_num),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    producer.run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_response,
-                                                  iteration_num, credits_offset_Mg)
+                    compliance_strategy.run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_response,
+                                                             iteration_num, credits_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                    winning_combo)
@@ -177,36 +177,36 @@ def run_producer_consumer():
                                      producer_consumer_iteration, producer_compliant, convergence_error)
 
                 # decide whether to continue iterating or not
-                iterate_producer_consumer = globals.options.iterate_producer_consumer \
-                                            and iteration_num < globals.options.producer_consumer_max_iterations \
+                iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
+                                            and iteration_num < omega_globals.options.producer_consumer_max_iterations \
                                             and not converged
 
                 if iterate_producer_consumer:
                     iteration_num += 1
                 else:
-                    if iteration_num >= globals.options.producer_consumer_max_iterations:
+                    if iteration_num >= omega_globals.options.producer_consumer_max_iterations:
                         omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION', echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
-            producer.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
-                                         producer_decision_and_response)
+            compliance_strategy.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
+                                                    producer_decision_and_response)
 
             credit_bank.handle_credit(calendar_year, manufacturer_ID,
                                       producer_decision_and_response['total_combo_credits_co2_megagrams'])
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
-        if (globals.options.log_consumer_iteration_years == 'all') or \
-                (calendar_year in globals.options.log_consumer_iteration_years)\
+        if (omega_globals.options.log_consumer_iteration_years == 'all') or \
+                (calendar_year in omega_globals.options.log_consumer_iteration_years)\
                 or (calendar_year == analysis_end_year-1):
-            iteration_log.to_csv(globals.options.output_folder + globals.options.session_unique_name +
+            iteration_log.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                                  '_producer_consumer_iteration_log.csv', index=False)
 
-        credit_bank.credit_bank.to_csv(globals.options.output_folder + globals.options.session_unique_name + '_credit_bank.csv',
+        credit_bank.credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_credit_bank.csv',
                                        index=False)
 
         credit_bank.transaction_log.to_csv(
-            globals.options.output_folder + globals.options.session_unique_name + '_credit_bank_transactions.csv', index=False)
+            omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_credit_bank_transactions.csv', index=False)
 
     return iteration_log, credit_bank
 
@@ -229,7 +229,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
 
     """
     from consumer.market_classes import MarketClass
-    import producer
+    from producer import compliance_strategy
     import consumer
     from consumer.sales_share_gcam import get_demanded_shares
 
@@ -264,8 +264,8 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
-        producer.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-                                                   total_sales=producer_decision_and_response['new_vehicle_sales'])
+        compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+                                                         total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################
@@ -283,10 +283,10 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
 
         producer_decision_and_response['pricing_convergence_score'] = pricing_convergence_score**1
 
-        if globals.options.log_producer_decision_and_response_years == 'all' or \
-                calendar_year in globals.options.log_producer_decision_and_response_years:
+        if omega_globals.options.log_producer_decision_and_response_years == 'all' or \
+                calendar_year in omega_globals.options.log_producer_decision_and_response_years:
             producer_decision_and_response.to_csv('%sproducer_decision_and_response_%s_%s_%s.csv' %
-                                                  (globals.options.output_folder, calendar_year, iteration_num, producer_pricing_iteration))
+                                                  (omega_globals.options.output_folder, calendar_year, iteration_num, producer_pricing_iteration))
 
         producer_decision_and_response = \
             producer_decision_and_response.loc[producer_decision_and_response['pricing_convergence_score'].idxmin()]
@@ -298,7 +298,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         #     calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         #     # propagate total sales down to composite vehicles by market class share and reg class share,
         #     # calculate new compliance status for each producer-technology / consumer response combination
-        #     producer.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+        #     compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
         #                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
         #
         #     # propagate vehicle sales up to market class sales
@@ -316,7 +316,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
 
         iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
-        if 'consumer' in globals.options.verbose_console:
+        if 'consumer' in omega_globals.options.verbose_console:
             logwrite_shares_and_costs(calendar_year, convergence_error, producer_decision_and_response, iteration_num,
                                       producer_pricing_iteration)
 
@@ -327,7 +327,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
 
         continue_search = continue_search and not converged
 
-    if 'consumer' in globals.options.verbose_console:
+    if 'consumer' in omega_globals.options.verbose_console:
         for mc, cc in zip(MarketClass.market_classes, multiplier_columns):
             omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc], echo_console=True)
         if converged:
@@ -404,9 +404,9 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
     if producer_decision_and_response.empty:
         # first time through, span full range
         multiplier_range = \
-            np.unique(np.append(np.linspace(globals.options.consumer_pricing_multiplier_min,
-                                            globals.options.consumer_pricing_multiplier_max,
-                                            globals.options.consumer_pricing_num_options), 1.0))
+            np.unique(np.append(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
+                                            omega_globals.options.consumer_pricing_multiplier_max,
+                                            omega_globals.options.consumer_pricing_num_options), 1.0))
 
     search_collapsed = True
     for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
@@ -427,7 +427,7 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
 
     if not producer_decision_and_response.empty and search_collapsed:
         continue_search = False
-        if 'consumer' in globals.options.verbose_console:
+        if 'consumer' in omega_globals.options.verbose_console:
             omega_log.logwrite('SEARCH COLLAPSED')
 
     return continue_search, price_options_df
@@ -451,23 +451,23 @@ def tighten_multiplier_range(mcc, prev_multiplier_range, producer_decision_and_r
     prev_multiplier_span_frac = prev_multiplier_range[mcc][-1] / prev_multiplier_range[mcc][0] - 1
     index = np.nonzero(prev_multiplier_range[mcc] == producer_decision_and_response[mcc])[0][0]
     if index == 0:
-        min_val = max(globals.options.consumer_pricing_multiplier_min,
+        min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
                       producer_decision_and_response[mcc] - prev_multiplier_span_frac *
                       producer_decision_and_response[mcc])
     else:
         min_val = prev_multiplier_range[mcc][index - 1]
     if index == len(prev_multiplier_range[mcc]) - 1:
-        max_val = min(globals.options.consumer_pricing_multiplier_max,
+        max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
                       producer_decision_and_response[mcc] + prev_multiplier_span_frac *
                       producer_decision_and_response[mcc])
     else:
         max_val = prev_multiplier_range[mcc][index + 1]
     # try new range, include prior value in range...
     multiplier_range = np.unique(np.append(
-        np.linspace(min_val, max_val, globals.options.consumer_pricing_num_options),
+        np.linspace(min_val, max_val, omega_globals.options.consumer_pricing_num_options),
         producer_decision_and_response[mcc]))
     search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or ((max_val / min_val - 1) <= 1e-3))
-    if 'consumer' in globals.options.verbose_console:
+    if 'consumer' in omega_globals.options.verbose_console:
         omega_log.logwrite(('%s' % mcc).ljust(50) + '= %.5f MR:%s R:%f' % (
             producer_decision_and_response[mcc], multiplier_range, max_val / min_val), echo_console=True)
 
@@ -588,7 +588,7 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
         convergence_error = \
             max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] - \
                                     producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-        converged = converged and (convergence_error <= globals.options.producer_consumer_iteration_tolerance)
+        converged = converged and (convergence_error <= omega_globals.options.producer_consumer_iteration_tolerance)
 
     return converged, convergence_error
 
@@ -606,16 +606,16 @@ def init_omega(o2_options):
     from common.omega_log import OMEGALog
 
     # set up global variables:
-    globals.options = o2_options
+    omega_globals.options = o2_options
 
-    if globals.options.auto_close_figures:
+    if omega_globals.options.auto_close_figures:
         import matplotlib
         matplotlib.use('Agg')
 
     omega_log.init_logfile()
 
     init_omega_db()
-    globals.engine.echo = globals.options.verbose
+    omega_globals.engine.echo = omega_globals.options.verbose
 
     init_fail = []
 
@@ -627,12 +627,12 @@ def init_omega(o2_options):
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
     from consumer.market_classes import MarketClass
-    from cost_clouds import CostCloud
+    from context.cost_clouds import CostCloud
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
-    from manufacturers import Manufacturer
-    from manufacturer_annual_data import ManufacturerAnnualData
-    from vehicles import VehicleFinal
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.manufacturers import Manufacturer
+    from producer.manufacturer_annual_data import ManufacturerAnnualData
+    from producer.vehicles import VehicleFinal
+    from producer.vehicle_annual_data import VehicleAnnualData
     from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
     from effects.cost_factors_criteria import CostFactorsCriteria
@@ -653,14 +653,14 @@ def init_omega(o2_options):
 
     from policy.targets_flat import input_template_name as flat_template_name
     from policy.targets_footprint import input_template_name as footprint_template_name
-    ghg_template_name = get_template_name(globals.options.ghg_standards_file)
+    ghg_template_name = get_template_name(omega_globals.options.ghg_standards_file)
 
     if ghg_template_name == flat_template_name:
         from policy.targets_flat import TargetsFlat
-        globals.options.GHG_standard = TargetsFlat
+        omega_globals.options.GHG_standard = TargetsFlat
     elif ghg_template_name == footprint_template_name:
         from policy.targets_footprint import TargetsFootprint
-        globals.options.GHG_standard = TargetsFootprint
+        omega_globals.options.GHG_standard = TargetsFootprint
     else:
         init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
@@ -669,18 +669,18 @@ def init_omega(o2_options):
     from policy.credit_banking import CreditBank
 
     import consumer.sales_volume as consumer
-    import producer
+    from producer import compliance_strategy
 
-    file_io.validate_folder(globals.options.output_folder)
+    file_io.validate_folder(omega_globals.options.output_folder)
 
-    globals.options.producer_calc_generalized_cost = producer.calc_generalized_cost
-    globals.options.consumer_calc_generalized_cost = consumer.calc_generalized_cost
+    omega_globals.options.producer_calc_generalized_cost = compliance_strategy.calc_generalized_cost
+    omega_globals.options.consumer_calc_generalized_cost = consumer.calc_generalized_cost
 
     try:
-        init_fail += OffCycleCredits.init_from_file(globals.options.offcycle_credits_file,
-                                                    verbose=globals.options.verbose)
+        init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
+                                                    verbose=omega_globals.options.verbose)
 
-        from vehicles import DecompositionAttributes
+        from producer.vehicles import DecompositionAttributes
         DecompositionAttributes.init()
 
         # dynmically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
@@ -689,100 +689,100 @@ def init_omega(o2_options):
                 sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
 
         # instantiate database tables
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuelUpstream.init_from_file(globals.options.fuel_upstream_file, verbose=globals.options.verbose)
+        init_fail += PolicyFuelUpstream.init_from_file(omega_globals.options.fuel_upstream_file, verbose=omega_globals.options.verbose)
         
-        init_fail += UpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
-                                                    verbose=globals.options.verbose)
+        init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
+                                                    verbose=omega_globals.options.verbose)
         
-        init_fail += FuelPrice.init_database_from_file(globals.options.context_fuel_prices_file,
-                                                       verbose=globals.options.verbose)
+        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
+                                                       verbose=omega_globals.options.verbose)
 
-        init_fail += NewVehicleMarket.init_database_from_file(globals.options.context_new_vehicle_market_file,
-                                                              verbose=globals.options.verbose)
+        init_fail += NewVehicleMarket.init_database_from_file(omega_globals.options.context_new_vehicle_market_file,
+                                                              verbose=omega_globals.options.verbose)
         
         NewVehicleMarket.init_context_new_vehicle_generalized_costs(
-            globals.options.context_new_vehicle_generalized_costs_file)
+            omega_globals.options.context_new_vehicle_generalized_costs_file)
 
-        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file, verbose=globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file, verbose=omega_globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += globals.options.GHG_standard.init_database_from_file(globals.options.ghg_standards_file,
-                                                                          verbose=globals.options.verbose)
+        init_fail += omega_globals.options.GHG_standard.init_database_from_file(omega_globals.options.ghg_standards_file,
+                                                                                verbose=omega_globals.options.verbose)
 
-        init_fail += Incentives.init_from_file(globals.options.production_multipliers_file,
-                                               verbose=globals.options.verbose)
+        init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
+                                               verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuel.init_database_from_file(globals.options.ghg_standards_fuels_file,
-                                                        verbose=globals.options.verbose)
+        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.ghg_standards_fuels_file,
+                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += CreditBank.validate_ghg_credits_template(globals.options.ghg_credits_file,
-                                                              verbose=globals.options.verbose)
+        init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
+                                                              verbose=omega_globals.options.verbose)
 
-        init_fail += DemandedSharesGCAM.init_database_from_file(globals.options.demanded_shares_file,
-                                                                verbose=globals.options.verbose)
+        init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
+                                                                verbose=omega_globals.options.verbose)
 
-        init_fail += Manufacturer.init_database_from_file(globals.options.manufacturers_file, verbose=globals.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, verbose=omega_globals.options.verbose)
         
-        init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
-                                                          globals.options.vehicle_onroad_calculations_file,
-                                                          verbose=globals.options.verbose)
+        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
+                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += ReregistrationFixedByAge.init_database_from_file(globals.options.reregistration_fixed_by_age_file,
-                                                                      verbose=globals.options.verbose)
+        init_fail += ReregistrationFixedByAge.init_database_from_file(omega_globals.options.reregistration_fixed_by_age_file,
+                                                                      verbose=omega_globals.options.verbose)
         
-        globals.options.stock_scrappage = ReregistrationFixedByAge
+        omega_globals.options.stock_scrappage = ReregistrationFixedByAge
 
-        init_fail += AnnualVMTFixedByAge.init_database_from_file(globals.options.annual_vmt_fixed_by_age_file,
-                                                                 verbose=globals.options.verbose)
+        init_fail += AnnualVMTFixedByAge.init_database_from_file(omega_globals.options.annual_vmt_fixed_by_age_file,
+                                                                 verbose=omega_globals.options.verbose)
         
-        globals.options.stock_vmt = AnnualVMTFixedByAge
+        omega_globals.options.stock_vmt = AnnualVMTFixedByAge
 
-        init_fail += CostFactorsCriteria.init_database_from_file(globals.options.criteria_cost_factors_file,
-                                                                 globals.options.cpi_deflators_file,
-                                                                 verbose=globals.options.verbose)
+        init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
+                                                                 omega_globals.options.cpi_deflators_file,
+                                                                 verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsSCC.init_database_from_file(globals.options.scc_cost_factors_file,
-                                                            verbose=globals.options.verbose)
+        init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
+                                                            verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsEnergySecurity.init_database_from_file(globals.options.energysecurity_cost_factors_file,
-                                                                       verbose=globals.options.verbose)
+        init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
+                                                                       verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsCongestionNoise.init_database_from_file(globals.options.congestion_noise_cost_factors_file,
-                                                                        verbose=globals.options.verbose)
+        init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
+                                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += EmissionFactorsPowersector.init_database_from_file(globals.options.emission_factors_powersector_file,
-                                                                        verbose=globals.options.verbose)
+        init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += EmissionFactorsRefinery.init_database_from_file(globals.options.emission_factors_refinery_file,
-                                                                     verbose=globals.options.verbose)
+        init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                                     verbose=omega_globals.options.verbose)
 
-        init_fail += EmissionFactorsVehicles.init_database_from_file(globals.options.emission_factors_vehicles_file,
-                                                                     verbose=globals.options.verbose)
+        init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                                     verbose=omega_globals.options.verbose)
 
-        init_fail += RequiredZevShare.init_from_file(globals.options.required_zev_share_file, verbose=globals.options.verbose)
+        init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file, verbose=omega_globals.options.verbose)
 
-        init_fail += PriceModifications.init_from_file(globals.options.price_modifications_file, verbose=globals.options.verbose)
+        init_fail += PriceModifications.init_from_file(omega_globals.options.price_modifications_file, verbose=omega_globals.options.verbose)
 
-        init_fail += ProductionConstraints.init_from_file(globals.options.production_constraints_file,
-                                                          verbose=globals.options.verbose)
+        init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
+                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += DriveCycles.init_from_file(globals.options.drive_cycles_file, verbose=globals.options.verbose)
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file, verbose=omega_globals.options.verbose)
 
-        init_fail += DriveCycleWeights.init_from_file(globals.options.drive_cycle_weights_file, verbose=globals.options.verbose)
+        init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file, verbose=omega_globals.options.verbose)
 
         # initial year = initial fleet model year (latest year of data)
-        globals.options.analysis_initial_year = int(globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+        omega_globals.options.analysis_initial_year = int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
         # final year = last year of cost curve data
         # o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
         # o2.options.analysis_final_year = 2022
-        globals.options.analysis_final_year = CostCloud.get_max_year()
+        omega_globals.options.analysis_final_year = CostCloud.get_max_year()
 
-        stock.update_stock(globals.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
+        stock.update_stock(omega_globals.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
     except Exception as e:
         if init_fail:
             omega_log.logwrite("\n#INIT FAIL")
@@ -793,7 +793,7 @@ def init_omega(o2_options):
         omega_log.logwrite("### Check OMEGA log for error messages ###")
         omega_log.logwrite("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
-        dump_omega_db_to_csv(globals.options.database_dump_folder)
+        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
         return init_fail
 
@@ -824,15 +824,15 @@ def run_omega(o2_options, standalone_run=False):
     try:
         init_fail = init_omega(o2_options)
 
-        omega_log.logwrite("Running %s: OMEGA 2 Version %s" % (globals.options.session_unique_name, code_version))
+        omega_log.logwrite("Running %s: OMEGA 2 Version %s" % (omega_globals.options.session_unique_name, code_version))
 
         if not init_fail:
-            if globals.options.run_profiler:
+            if omega_globals.options.run_profiler:
                 # run with profiler
                 import cProfile
                 import re
                 cProfile.run('iteration_log, credit_history = run_producer_consumer()', filename='omega2_profile.dmp')
-                session_summary_results = postproc_session.run_postproc(globals()['iteration_log', 'credit_history'],
+                session_summary_results = postproc_session.run_postproc(omega_globals()['iteration_log', 'credit_history'],
                                                                         standalone_run)  # return values of cProfile.run() show up in the globals namespace
             else:
                 # run without profiler
@@ -840,26 +840,26 @@ def run_omega(o2_options, standalone_run=False):
                 session_summary_results = postproc_session.run_postproc(iteration_log, credit_history, standalone_run)
 
             # write output files
-            summary_filename = globals.options.output_folder + globals.options.session_unique_name + '_summary_results.csv'
+            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_summary_results.csv'
             session_summary_results.to_csv(summary_filename, index=False)
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            if globals.options.session_is_reference and globals.options.generate_context_new_vehicle_generalized_costs_file:
+            if omega_globals.options.session_is_reference and omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
                 from context.new_vehicle_market import NewVehicleMarket
                 NewVehicleMarket.save_context_new_vehicle_generalized_costs(
-                    globals.options.context_new_vehicle_generalized_costs_file)
+                    omega_globals.options.context_new_vehicle_generalized_costs_file)
 
             omega_log.end_logfile("\nSession Complete")
 
-            if globals.options.run_profiler:
+            if omega_globals.options.run_profiler:
                 os.system('snakeviz omega2_profile.dmp')
 
             # shut down the db
-            globals.session.close()
-            globals.engine.dispose()
-            globals.engine = None
-            globals.session = None
-            globals.options = None
+            omega_globals.session.close()
+            omega_globals.engine.dispose()
+            omega_globals.engine = None
+            omega_globals.session = None
+            omega_globals.options = None
         else:
             omega_log.logwrite("\n#INIT FAIL")
             omega_log.logwrite(init_fail)
@@ -876,7 +876,7 @@ def run_omega(o2_options, standalone_run=False):
         omega_log.logwrite("### Check OMEGA log for error messages ###")
         omega_log.logwrite("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
-        dump_omega_db_to_csv(globals.options.database_dump_folder)
+        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ vehicles_cache = dict()
 
 
 def get_vehicle_info(vehicle_ID):
-    from vehicles import VehicleFinal
+    from producer.vehicles import VehicleFinal
 
     if vehicle_ID not in vehicles_cache:
         vehicles_cache[vehicle_ID] = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['market_class_ID', 'model_year',
@@ -30,20 +30,20 @@ def update_stock(calendar_year):
     :return: updates vehicle annual data table
     """
 
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
 
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
-    globals.session.add_all(this_years_vehicle_annual_data)
+    omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
         age = calendar_year - model_year # float(model_year)
 
-        scrappage_factor = globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
+        scrappage_factor = omega_globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
 
-        annual_vmt = globals.options.stock_vmt.get_vmt(market_class_id, age)
+        annual_vmt = omega_globals.options.stock_vmt.get_vmt(market_class_id, age)
 
         registered_count = initial_registered_count * scrappage_factor
 
@@ -60,9 +60,9 @@ def update_stock(calendar_year):
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_ID)
             age = calendar_year - model_year  # float(model_year)
 
-            scrappage_factor = globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
+            scrappage_factor = omega_globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
 
-            annual_vmt = globals.options.stock_vmt.get_vmt(market_class_id, age)
+            annual_vmt = omega_globals.options.stock_vmt.get_vmt(market_class_id, age)
 
             registered_count = initial_registered_count * scrappage_factor
 
@@ -74,7 +74,7 @@ def update_stock(calendar_year):
                                               vmt=annual_vmt * registered_count)
                             )
 
-    globals.session.add_all(vad_list)
+    omega_globals.session.add_all(vad_list)
 
 
 if __name__ == '__main__':

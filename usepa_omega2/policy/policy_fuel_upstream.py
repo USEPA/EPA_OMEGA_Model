@@ -78,22 +78,22 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = globals.options.verbose
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
-        init_fail += PolicyFuelUpstream.init_from_file(globals.options.fuel_upstream_file,
-                                                       verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += PolicyFuelUpstream.init_from_file(omega_globals.options.fuel_upstream_file,
+                                                       verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.database_dump_folder)
             PolicyFuelUpstream.values.to_csv(
-                globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
+                omega_globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 
             print(PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(2020, 'pump gasoline'))
             print(PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(2021, 'US electricity'))

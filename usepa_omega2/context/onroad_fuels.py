@@ -100,7 +100,7 @@ class OnroadFuel(SQABase, OMEGABase):
 
             attrs = OnroadFuel.get_class_attributes(attribute_types)
 
-            result = globals.session.query(*attrs). \
+            result = omega_globals.session.query(*attrs). \
                 filter(OnroadFuel.fuel_ID == fuel_id).all()[0]
 
             if len(attribute_types) == 1:
@@ -123,7 +123,7 @@ class OnroadFuel(SQABase, OMEGABase):
             True if the fuel ID is valid, False otherwise
 
         """
-        result = globals.session.query(OnroadFuel.fuel_ID).filter(OnroadFuel.fuel_ID == fuel_id).all()
+        result = omega_globals.session.query(OnroadFuel.fuel_ID).filter(OnroadFuel.fuel_ID == fuel_id).all()
         if result:
             return True
         else:
@@ -173,8 +173,8 @@ class OnroadFuel(SQABase, OMEGABase):
                         energy_density_MJ_per_unit=df.loc[i, 'energy_density_megajoules_per_unit'],
                         co2_tailpipe_emissions_grams_per_unit=df.loc[i, 'co2_tailpipe_emissions_grams_per_unit'],
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
         return template_errors
 
@@ -187,18 +187,18 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = globals.options.verbose
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
+        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
 

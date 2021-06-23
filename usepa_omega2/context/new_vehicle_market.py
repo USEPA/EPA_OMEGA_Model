@@ -158,7 +158,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         cls._new_vehicle_generalized_costs.clear()
 
-        if not globals.options.generate_context_new_vehicle_generalized_costs_file:
+        if not omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
             df = pd.read_csv(filename, index_col=0, dtype=str)
             # wanted to do: cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
@@ -244,17 +244,17 @@ class NewVehicleMarket(SQABase, OMEGABase):
                     ContextNewVehicleMarket.new_vehicle_sales(2030, context_size_class='Small Crossover', context_reg_class='car')
 
         """
-        if globals.options.flat_context:
-            calendar_year = globals.options.flat_context_year
+        if omega_globals.options.flat_context:
+            calendar_year = omega_globals.options.flat_context_year
 
-        cache_key = '%s_%s_%s_%s_%s_new_vehicle_sales' % (globals.options.context_id, globals.options.context_case_id,
+        cache_key = '%s_%s_%s_%s_%s_new_vehicle_sales' % (omega_globals.options.context_id, omega_globals.options.context_case_id,
                                                           calendar_year, context_size_class, context_reg_class)
 
         if cache_key not in cache:
             if context_size_class and context_reg_class:
-                projection_sales = (globals.session.query(func.sum(NewVehicleMarket.sales))
-                                    .filter(NewVehicleMarket.context_ID == globals.options.context_id)
-                                    .filter(NewVehicleMarket.case_ID == globals.options.context_case_id)
+                projection_sales = (omega_globals.session.query(func.sum(NewVehicleMarket.sales))
+                                    .filter(NewVehicleMarket.context_ID == omega_globals.options.context_id)
+                                    .filter(NewVehicleMarket.case_ID == omega_globals.options.context_case_id)
                                     .filter(NewVehicleMarket.context_size_class == context_size_class)
                                     .filter(NewVehicleMarket.context_reg_class_ID == context_reg_class)
                                     .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
@@ -263,15 +263,15 @@ class NewVehicleMarket(SQABase, OMEGABase):
                 else:
                     cache[cache_key] = float(projection_sales)
             elif context_size_class:
-                cache[cache_key] = float(globals.session.query(func.sum(NewVehicleMarket.sales))
-                                         .filter(NewVehicleMarket.context_ID == globals.options.context_id)
-                                         .filter(NewVehicleMarket.case_ID == globals.options.context_case_id)
+                cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
+                                         .filter(NewVehicleMarket.context_ID == omega_globals.options.context_id)
+                                         .filter(NewVehicleMarket.case_ID == omega_globals.options.context_case_id)
                                          .filter(NewVehicleMarket.context_size_class == context_size_class)
                                          .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
             else:
-                cache[cache_key] = float(globals.session.query(func.sum(NewVehicleMarket.sales))
-                                         .filter(NewVehicleMarket.context_ID == globals.options.context_id)
-                                         .filter(NewVehicleMarket.case_ID == globals.options.context_case_id)
+                cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
+                                         .filter(NewVehicleMarket.context_ID == omega_globals.options.context_id)
+                                         .filter(NewVehicleMarket.case_ID == omega_globals.options.context_case_id)
                                          .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
 
         return cache[cache_key]
@@ -339,8 +339,8 @@ class NewVehicleMarket(SQABase, OMEGABase):
                         # ice_price_dollars=df.loc[i, 'ice_price_dollars'],
                         # bev_price_dollars=df.loc[i, 'bev_price_dollars'],
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
         return template_errors
 
@@ -351,19 +351,19 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = True
+        omega_globals.engine.echo = True
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
         init_fail += NewVehicleMarket.init_database_from_file(
-            globals.options.context_new_vehicle_market_file, verbose=globals.options.verbose)
+            omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
             print(NewVehicleMarket.new_vehicle_sales(2021))
             # print(ContextNewVehicleMarket.get_new_vehicle_sales_weighted_price(2021))
         else:

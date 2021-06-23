@@ -20,7 +20,7 @@ vehicles_dict = dict()
 
 
 def get_vehicle_info(vehicle_id):
-    from vehicles import VehicleFinal
+    from producer.vehicles import VehicleFinal
 
     # add kwh_per_mile_cycle here when available in VehicleFinal
     attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_co2_grams_per_mile']
@@ -106,7 +106,7 @@ def calc_inventory(calendar_year):
     :param calendar_year: calendar year
     :return: Fills data in the vehicle_annual_data table that has not been filled to this point.
     """
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
 
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 

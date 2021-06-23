@@ -115,21 +115,21 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = globals.options.verbose
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += UpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
-                                                    verbose=globals.options.verbose)
+        init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
+                                                    verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.database_dump_folder)
             UpstreamMethods.methods.to_csv(
-                globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
+                omega_globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 
             print(UpstreamMethods.get_upstream_method(2020))
             print(UpstreamMethods.get_upstream_method(2027))

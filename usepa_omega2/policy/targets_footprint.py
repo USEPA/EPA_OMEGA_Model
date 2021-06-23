@@ -127,7 +127,7 @@ class TargetsFootprint(SQABase, OMEGABase):
 
         cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_ID)
         if cache_key not in cache:
-            cache[cache_key] = globals.session.query(TargetsFootprint). \
+            cache[cache_key] = omega_globals.session.query(TargetsFootprint). \
                 filter(TargetsFootprint.reg_class_ID == vehicle.reg_class_ID). \
                 filter(TargetsFootprint.model_year == vehicle_model_year).one()
         coefficients = cache[cache_key]
@@ -160,7 +160,7 @@ class TargetsFootprint(SQABase, OMEGABase):
 
         cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
         if cache_key not in cache:
-            cache[cache_key] = globals.session.query(TargetsFootprint.lifetime_VMT). \
+            cache[cache_key] = omega_globals.session.query(TargetsFootprint.lifetime_VMT). \
                 filter(TargetsFootprint.reg_class_ID == reg_class_id). \
                 filter(TargetsFootprint.model_year == model_year).scalar()
         return cache[cache_key]
@@ -299,8 +299,8 @@ class TargetsFootprint(SQABase, OMEGABase):
                         coeff_d=df.loc[i, 'd_coeff'],
                         lifetime_VMT=df.loc[i, 'lifetime_vmt'],
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
                 for rc in df['reg_class_id'].unique():
                     cache[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
@@ -314,21 +314,21 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
-        globals.options.ghg_standards_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/ghg_standards-footprint.csv'
+        omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options.ghg_standards_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/ghg_standards-footprint.csv'
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += TargetsFootprint.init_database_from_file(globals.options.ghg_standards_file,
-                                                              verbose=globals.options.verbose)
+        init_fail += TargetsFootprint.init_database_from_file(omega_globals.options.ghg_standards_file,
+                                                              verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            globals.options.GHG_standard = TargetsFootprint
+            omega_globals.options.GHG_standard = TargetsFootprint
 
 
             class dummyVehicle:
@@ -353,19 +353,19 @@ if __name__ == '__main__':
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
 
-            car_target_co2_gpmi = globals.options.GHG_standard.calc_target_co2_gpmi(car_vehicle)
-            car_target_co2_Mg = globals.options.GHG_standard.calc_target_co2_Mg(car_vehicle)
-            car_certs_co2_Mg = globals.options.GHG_standard.calc_cert_co2_Mg(car_vehicle,
-                                                                             co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2_Mg = globals.options.GHG_standard.calc_cert_co2_Mg(car_vehicle,
-                                                                                   co2_gpmi_variants=[0, 50, 100, 150],
-                                                                                   sales_variants=[1, 2, 3, 4])
+            car_target_co2_gpmi = omega_globals.options.GHG_standard.calc_target_co2_gpmi(car_vehicle)
+            car_target_co2_Mg = omega_globals.options.GHG_standard.calc_target_co2_Mg(car_vehicle)
+            car_certs_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(car_vehicle,
+                                                                                   co2_gpmi_variants=[0, 50, 100, 150])
+            car_certs_sales_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(car_vehicle,
+                                                                                         co2_gpmi_variants=[0, 50, 100, 150],
+                                                                                         sales_variants=[1, 2, 3, 4])
 
-            truck_target_co2_gpmi = globals.options.GHG_standard.calc_target_co2_gpmi(truck_vehicle)
-            truck_target_co2_Mg = globals.options.GHG_standard.calc_target_co2_Mg(truck_vehicle)
-            truck_certs_co2_Mg = globals.options.GHG_standard.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2_Mg = globals.options.GHG_standard.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
-                                                                                     sales_variants=[1, 2, 3, 4])
+            truck_target_co2_gpmi = omega_globals.options.GHG_standard.calc_target_co2_gpmi(truck_vehicle)
+            truck_target_co2_Mg = omega_globals.options.GHG_standard.calc_target_co2_Mg(truck_vehicle)
+            truck_certs_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
+            truck_certs_sales_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                                           sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

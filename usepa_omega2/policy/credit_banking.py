@@ -402,7 +402,7 @@ class CreditBank(OMEGABase):
                 current year.
 
         """
-        from manufacturer_annual_data import ManufacturerAnnualData
+        from producer.manufacturer_annual_data import ManufacturerAnnualData
         transaction_amount_Mg = min(abs(debit['ending_balance_Mg']), credit['ending_balance_Mg'])
         t = self.create_credit_transaction(credit)
         t['credit_value_Mg'] = transaction_amount_Mg

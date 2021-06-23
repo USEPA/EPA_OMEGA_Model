@@ -96,7 +96,7 @@ class PolicyFuel(SQABase, OMEGABase):
 
             attrs = PolicyFuel.get_class_attributes(attribute_types)
 
-            result = globals.session.query(*attrs) \
+            result = omega_globals.session.query(*attrs) \
                 .filter(PolicyFuel.fuel_ID == fuel_id) \
                 .filter(PolicyFuel.calendar_year == calendar_year) \
                 .all()[0]
@@ -151,8 +151,8 @@ class PolicyFuel(SQABase, OMEGABase):
                         calendar_year=df.loc[i, 'start_year'],
                         cert_co2_grams_per_unit=df.loc[i, 'cert_co2_grams_per_unit'],
                     ))
-                globals.session.add_all(obj_list)
-                globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
                 for fid in df['fuel_id'].unique():
                     cache[fid] = np.array(df['start_year'].loc[df['fuel_id'] == fid])
@@ -166,18 +166,18 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += PolicyFuel.init_database_from_file(globals.options.ghg_standards_fuels_file,
-                                                        verbose=globals.options.verbose)
+        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.ghg_standards_fuels_file,
+                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

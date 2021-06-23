@@ -83,7 +83,7 @@ def calc_carbon_emission_costs(calendar_year):
     :param calendar_year: calendar year
     :return: Fills data in the cost effects scc data table that is empty at this point.
     """
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_scc import CostEffectsSCC
 
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year, ['vehicle_ID', 'age', 'co2_total_metrictons',
@@ -154,7 +154,7 @@ def calc_carbon_emission_costs(calendar_year):
                                       n2o_global_70_social_cost_dollars = n2o_global_70_social_cost_dollars,
                                       )
                         )
-    globals.session.add_all(ed_list)
+    omega_globals.session.add_all(ed_list)
 
 
 def calc_criteria_emission_costs(calendar_year):
@@ -163,7 +163,7 @@ def calc_criteria_emission_costs(calendar_year):
     :param calendar_year: calendar year
     :return: Fills data in the cost effects criteria table that has not been filled to this point.
     """
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_criteria import CostEffectsCriteria
 
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year,
@@ -205,7 +205,7 @@ def calc_criteria_emission_costs(calendar_year):
                                            nox_high_mortality_70_social_cost_dollars = nox_high_mortality_70_social_cost_dollars,
                                            )
                         )
-    globals.session.add_all(ed_list)
+    omega_globals.session.add_all(ed_list)
 
 
 def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
@@ -214,10 +214,10 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
     :param calendar_year: calendar year
     :return: Fills data in the cost effects non-emissions table that has not been filled to this point.
     """
-    from vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
     from context.fuel_prices import FuelPrice
-    from vehicles import VehicleFinal
+    from producer.vehicles import VehicleFinal
 
     # get vehicle annual data
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year, ['vehicle_ID', 'age', 'fuel_consumption', 'vmt'])
@@ -285,4 +285,4 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
                                                noise_70_social_cost_dollars=noise_70_social_cost_dollars,
                                                )
                         )
-    globals.session.add_all(ed_list)
+    omega_globals.session.add_all(ed_list)

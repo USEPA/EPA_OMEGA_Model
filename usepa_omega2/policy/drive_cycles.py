@@ -145,21 +145,21 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        globals.engine.echo = globals.options.verbose
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += DriveCycles.init_from_file(globals.options.drive_cycles_file,
-                                                verbose=globals.options.verbose)
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(globals.options.database_dump_folder)
+            file_io.validate_folder(omega_globals.options.database_dump_folder)
             DriveCycles._data.to_csv(
-                globals.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
+                omega_globals.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
             print(DriveCycles.validate_drive_cycle_ID('cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile'))
             print(DriveCycles.validate_drive_cycle_ID('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
