@@ -76,12 +76,12 @@ input_template_name = 'ghg_standards-footprint'
 cache = dict()
 
 
-class GHGStandardFootprint(SQABase, OMEGABase):
+class TargetsFootprint(SQABase, OMEGABase):
     """
 
     """
     # --- database table properties ---
-    __tablename__ = 'ghg_standards_footprint'
+    __tablename__ = 'targets_footprint'
     index = Column(Integer, primary_key=True)  #: database index
     model_year = Column(Numeric)  #: model year (or start year of the applied parameters)
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))  #: reg class name, e.g. 'car','truck'
@@ -127,9 +127,9 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
         cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_ID)
         if cache_key not in cache:
-            cache[cache_key] = globals.session.query(GHGStandardFootprint). \
-                filter(GHGStandardFootprint.reg_class_ID == vehicle.reg_class_ID). \
-                filter(GHGStandardFootprint.model_year == vehicle_model_year).one()
+            cache[cache_key] = globals.session.query(TargetsFootprint). \
+                filter(TargetsFootprint.reg_class_ID == vehicle.reg_class_ID). \
+                filter(TargetsFootprint.model_year == vehicle_model_year).one()
         coefficients = cache[cache_key]
 
         if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
@@ -160,9 +160,9 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
         cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
         if cache_key not in cache:
-            cache[cache_key] = globals.session.query(GHGStandardFootprint.lifetime_VMT). \
-                filter(GHGStandardFootprint.reg_class_ID == reg_class_id). \
-                filter(GHGStandardFootprint.model_year == model_year).scalar()
+            cache[cache_key] = globals.session.query(TargetsFootprint.lifetime_VMT). \
+                filter(TargetsFootprint.reg_class_ID == reg_class_id). \
+                filter(TargetsFootprint.model_year == model_year).scalar()
         return cache[cache_key]
 
     @staticmethod
@@ -186,14 +186,14 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
         """
         import numpy as np
-        from GHG_standards_incentives import GHGStandardIncentives
+        from policy.incentives import Incentives
 
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = GHGStandardFootprint.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = TargetsFootprint.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
-        co2_gpmi = GHGStandardFootprint.calc_target_co2_gpmi(vehicle)
+        co2_gpmi = TargetsFootprint.calc_target_co2_gpmi(vehicle)
 
         if sales_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -203,7 +203,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
         else:
             sales = vehicle.initial_registered_count
 
-        return co2_gpmi * lifetime_VMT * sales * GHGStandardIncentives.get_production_multiplier(vehicle) / 1e6
+        return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
 
     @staticmethod
     def calc_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
@@ -227,12 +227,12 @@ class GHGStandardFootprint(SQABase, OMEGABase):
 
         """
         import numpy as np
-        from GHG_standards_incentives import GHGStandardIncentives
+        from policy.incentives import Incentives
 
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = GHGStandardFootprint.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = TargetsFootprint.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         if co2_gpmi_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -248,7 +248,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
             sales = vehicle.initial_registered_count
             co2_gpmi = vehicle.cert_co2_grams_per_mile
 
-        return co2_gpmi * lifetime_VMT * sales * GHGStandardIncentives.get_production_multiplier(vehicle) / 1e6
+        return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -288,7 +288,7 @@ class GHGStandardFootprint(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(GHGStandardFootprint(
+                    obj_list.append(TargetsFootprint(
                         model_year=df.loc[i, 'start_year'],
                         reg_class_ID=df.loc[i, 'reg_class_id'],
                         footprint_min_sqft=df.loc[i, 'fp_min'],
@@ -322,13 +322,13 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += GHGStandardFootprint.init_database_from_file(globals.options.ghg_standards_file,
-                                                                  verbose=globals.options.verbose)
+        init_fail += TargetsFootprint.init_database_from_file(globals.options.ghg_standards_file,
+                                                              verbose=globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(globals.options.database_dump_folder)
 
-            globals.options.GHG_standard = GHGStandardFootprint
+            globals.options.GHG_standard = TargetsFootprint
 
 
             class dummyVehicle:

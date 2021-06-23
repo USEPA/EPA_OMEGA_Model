@@ -22,7 +22,7 @@ class Manufacturer(SQABase, OMEGABase):
     # --- static properties ---
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        from GHG_credits import GHG_credit_bank
+        from policy.credit_banking import CreditBank
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -49,10 +49,10 @@ class Manufacturer(SQABase, OMEGABase):
                 globals.session.add_all(obj_list)
                 globals.session.flush()
 
-                template_errors = GHG_credit_bank.validate_ghg_credits_template(globals.options.ghg_credits_file, verbose)
+                template_errors = CreditBank.validate_ghg_credits_template(globals.options.ghg_credits_file, verbose)
 
                 if not template_errors:
-                    initial_credit_bank[manufacturer_ID] = GHG_credit_bank(globals.options.ghg_credits_file, manufacturer_ID)
+                    initial_credit_bank[manufacturer_ID] = CreditBank(globals.options.ghg_credits_file, manufacturer_ID)
 
         return template_errors
 

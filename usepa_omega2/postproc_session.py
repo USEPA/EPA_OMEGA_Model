@@ -11,10 +11,10 @@ post-compliance-modeling output generation (charts, summary files, etc)
 
 from usepa_omega2 import *
 from common.omega_plot import *
-from GHG_credits import GHG_credit_bank
+from policy.credit_banking import CreditBank
 
 
-def run_postproc(iteration_log: pd.DataFrame, credit_history: GHG_credit_bank, standalone_run: bool):
+def run_postproc(iteration_log: pd.DataFrame, credit_history: CreditBank, standalone_run: bool):
     """
     Generate charts and output files for a single simulation
 

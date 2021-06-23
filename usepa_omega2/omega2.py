@@ -111,7 +111,7 @@ def run_producer_consumer():
 
     from manufacturers import Manufacturer
     import producer
-    from GHG_credits import GHG_credit_bank
+    from policy.credit_banking import CreditBank
 
     for manufacturer in globals.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
@@ -124,7 +124,7 @@ def run_producer_consumer():
         else:
             analysis_end_year = globals.options.analysis_initial_year + globals.options.num_analysis_years
 
-        credit_bank = GHG_credit_bank(globals.options.ghg_credits_file, manufacturer_ID)
+        credit_bank = CreditBank(globals.options.ghg_credits_file, manufacturer_ID)
 
         for calendar_year in range(globals.options.analysis_initial_year, analysis_end_year):
 
@@ -621,9 +621,9 @@ def init_omega(o2_options):
 
     # import database modules to populate ORM context
     from context.onroad_fuels import OnroadFuel
-    from policy_fuel_upstream import PolicyFuelUpstream
-    from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
-    from offcycle_credits import OffCycleCredits
+    from policy.policy_fuel_upstream import PolicyFuelUpstream
+    from policy.upstream_methods import UpstreamMethods
+    from policy.offcycle_credits import OffCycleCredits
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
     from consumer.market_classes import MarketClass
@@ -645,28 +645,28 @@ def init_omega(o2_options):
     from effects.cost_effects_scc import CostEffectsSCC
     from effects.cost_effects_criteria import CostEffectsCriteria
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
-    from required_zev_share import RequiredZevShare
+    from policy.required_zev_share import RequiredZevShare
     from context.price_modifications import PriceModifications
     from context.production_constraints import ProductionConstraints
-    from drive_cycles import DriveCycles
-    from drive_cycle_weights import DriveCycleWeights
+    from policy.drive_cycles import DriveCycles
+    from policy.drive_cycle_weights import DriveCycleWeights
 
-    from GHG_standards_flat import input_template_name as flat_template_name
-    from GHG_standards_footprint import input_template_name as footprint_template_name
+    from policy.targets_flat import input_template_name as flat_template_name
+    from policy.targets_footprint import input_template_name as footprint_template_name
     ghg_template_name = get_template_name(globals.options.ghg_standards_file)
 
     if ghg_template_name == flat_template_name:
-        from GHG_standards_flat import GHGStandardFlat
-        globals.options.GHG_standard = GHGStandardFlat
+        from policy.targets_flat import TargetsFlat
+        globals.options.GHG_standard = TargetsFlat
     elif ghg_template_name == footprint_template_name:
-        from GHG_standards_footprint import GHGStandardFootprint
-        globals.options.GHG_standard = GHGStandardFootprint
+        from policy.targets_footprint import TargetsFootprint
+        globals.options.GHG_standard = TargetsFootprint
     else:
         init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
-    from GHG_standards_incentives import GHGStandardIncentives
-    from GHG_standards_fuels import GHGStandardFuels
-    from GHG_credits import GHG_credit_bank
+    from policy.incentives import Incentives
+    from policy.policy_fuels import PolicyFuel
+    from policy.credit_banking import CreditBank
 
     import consumer.sales_volume as consumer
     import producer
@@ -695,8 +695,8 @@ def init_omega(o2_options):
 
         init_fail += PolicyFuelUpstream.init_from_file(globals.options.fuel_upstream_file, verbose=globals.options.verbose)
         
-        init_fail += PolicyFuelUpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
-                                                              verbose=globals.options.verbose)
+        init_fail += UpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
+                                                    verbose=globals.options.verbose)
         
         init_fail += FuelPrice.init_database_from_file(globals.options.context_fuel_prices_file,
                                                        verbose=globals.options.verbose)
@@ -714,14 +714,14 @@ def init_omega(o2_options):
         init_fail += globals.options.GHG_standard.init_database_from_file(globals.options.ghg_standards_file,
                                                                           verbose=globals.options.verbose)
 
-        init_fail += GHGStandardIncentives.init_from_file(globals.options.production_multipliers_file,
-                                                          verbose=globals.options.verbose)
+        init_fail += Incentives.init_from_file(globals.options.production_multipliers_file,
+                                               verbose=globals.options.verbose)
 
-        init_fail += GHGStandardFuels.init_database_from_file(globals.options.ghg_standards_fuels_file,
+        init_fail += PolicyFuel.init_database_from_file(globals.options.ghg_standards_fuels_file,
+                                                        verbose=globals.options.verbose)
+
+        init_fail += CreditBank.validate_ghg_credits_template(globals.options.ghg_credits_file,
                                                               verbose=globals.options.verbose)
-
-        init_fail += GHG_credit_bank.validate_ghg_credits_template(globals.options.ghg_credits_file,
-                                                                   verbose=globals.options.verbose)
 
         init_fail += DemandedSharesGCAM.init_database_from_file(globals.options.demanded_shares_file,
                                                                 verbose=globals.options.verbose)
@@ -783,7 +783,18 @@ def init_omega(o2_options):
         globals.options.analysis_final_year = CostCloud.get_max_year()
 
         stock.update_stock(globals.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
-    finally:
+    except Exception as e:
+        if init_fail:
+            omega_log.logwrite("\n#INIT FAIL")
+            omega_log.logwrite(init_fail)
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        print("### Check OMEGA log for error messages ###")
+        omega_log.logwrite("### Check OMEGA log for error messages ###")
+        omega_log.logwrite("### RUNTIME FAIL ###")
+        omega_log.end_logfile("\nSession Fail")
+        dump_omega_db_to_csv(globals.options.database_dump_folder)
+
         return init_fail
 
 

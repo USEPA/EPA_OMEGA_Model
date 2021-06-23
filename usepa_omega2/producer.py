@@ -170,7 +170,7 @@ def create_compliance_options(calendar_year, market_class_dict, winning_combos, 
 
         if all(s in consumer.responsive_market_categories for s in children):
             from context.production_constraints import ProductionConstraints
-            from required_zev_share import RequiredZevShare
+            from policy.required_zev_share import RequiredZevShare
 
             min_constraints = dict()
             max_constraints = dict()

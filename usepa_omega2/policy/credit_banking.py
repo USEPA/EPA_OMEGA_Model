@@ -65,7 +65,7 @@ _input_template_version = 0.2
 _input_template_columns = {'calendar_year', 'model_year', 'manufacturer_id', 'balance_Mg'}
 
 
-class GHG_credit_info(OMEGABase):
+class CreditInfo(OMEGABase):
     """
     **Stores GHG credit info (i.e. remaining balance, remaining years)**
 
@@ -84,7 +84,7 @@ class GHG_credit_info(OMEGABase):
         self.remaining_years = remaining_years
 
 
-class GHG_credit_bank(OMEGABase):
+class CreditBank(OMEGABase):
     """
     **Provides objects and methods to handle credit transactions and provide credit bank information.**
 
@@ -206,7 +206,7 @@ class GHG_credit_bank(OMEGABase):
             for _, credit in ghg_credits.iterrows():
                 if credit['age'] <= credit_max_life_years:
                     current_credits.append(
-                        GHG_credit_info(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1))
+                        CreditInfo(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1))
 
         current_debits = []
 
@@ -216,7 +216,7 @@ class GHG_credit_bank(OMEGABase):
             for _, debit in ghg_debits.iterrows():
                 if debit['age'] <= debit_max_life_years:
                     current_debits.append(
-                        GHG_credit_info(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1))
+                        CreditInfo(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1))
 
         return current_credits, current_debits
 
@@ -421,13 +421,13 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        credit_bank = GHG_credit_bank('test_inputs/ghg_debits.csv', 'USA Motors')
+        credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'USA Motors')
         credit_bank.update_credit_age(2020)
         credit_bank.handle_credit(2020, 'USA Motors', 0.55)
         credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
         credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
-        credit_bank = GHG_credit_bank('test_inputs/ghg_credits.csv', 'USA Motors')
+        credit_bank = CreditBank('../test_inputs/ghg_credits.csv', 'USA Motors')
         import random
 
         for year in range(2020, 2030):

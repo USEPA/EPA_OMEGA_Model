@@ -151,7 +151,7 @@ class DecompositionAttributes(OMEGABase):
 
     @classmethod
     def init(cls):
-        from offcycle_credits import OffCycleCredits
+        from policy.offcycle_credits import OffCycleCredits
 
         cls.values = ['cert_co2_grams_per_mile',
                       'new_vehicle_mfr_generalized_cost_dollars',
@@ -812,14 +812,14 @@ class Vehicle(OMEGABase):
         self.initial_registered_count = vehicle.initial_registered_count
 
         if type(self) == Vehicle and type(vehicle) == VehicleFinal:
-            from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
+            from policy.upstream_methods import UpstreamMethods
             from cost_clouds import CostCloud
 
             # need to add upstream to direct co2 g/mi and calculate this year's frontier
             self.cert_direct_co2_grams_per_mile = vehicle.cert_direct_co2_grams_per_mile
 
             # calculate cert co2 g/mi
-            upstream = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
+            upstream = UpstreamMethods.get_upstream_method(self.model_year)
             self.cert_direct_kwh_per_mile = vehicle.cert_direct_kwh_per_mile
             self.upstream_co2_grams_per_mile = upstream(self, self.cert_direct_co2_grams_per_mile, self.cert_direct_kwh_per_mile)
             self.cert_co2_grams_per_mile = self.cert_direct_co2_grams_per_mile + self.upstream_co2_grams_per_mile
@@ -851,9 +851,9 @@ class Vehicle(OMEGABase):
 
         """
         from cost_clouds import CostCloud
-        from policy_fuel_upstream_methods import PolicyFuelUpstreamMethods
-        from drive_cycle_weights import DriveCycleWeights
-        from offcycle_credits import OffCycleCredits
+        from policy.upstream_methods import UpstreamMethods
+        from policy.drive_cycle_weights import DriveCycleWeights
+        from policy.offcycle_credits import OffCycleCredits
 
         self.cost_cloud['cert_direct_oncycle_co2_grams_per_mile'] = \
             DriveCycleWeights.calc_cert_direct_oncycle_co2_grams_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
@@ -883,7 +883,7 @@ class Vehicle(OMEGABase):
         VehicleAttributeCalculations.perform_attribute_calculations(self, self.cost_cloud)
 
         # add upstream calcs
-        upstream_method = PolicyFuelUpstreamMethods.get_upstream_method(self.model_year)
+        upstream_method = UpstreamMethods.get_upstream_method(self.model_year)
 
         self.cost_cloud['upstream_co2_grams_per_mile'] = \
             upstream_method(self, self.cost_cloud['cert_direct_co2_grams_per_mile'],
@@ -1253,22 +1253,22 @@ if __name__ == '__main__':
         # from vehicles import Vehicle
         from vehicle_annual_data import VehicleAnnualData
 
-        from GHG_standards_flat import input_template_name as flat_template_name
-        from GHG_standards_footprint import input_template_name as footprint_template_name
+        from policy.targets_flat import input_template_name as flat_template_name
+        from policy.targets_footprint import input_template_name as footprint_template_name
         ghg_template_name = get_template_name(globals.options.ghg_standards_file)
 
         if ghg_template_name == flat_template_name:
-            from GHG_standards_flat import GHGStandardFlat
+            from policy.targets_flat import TargetsFlat
 
-            globals.options.GHG_standard = GHGStandardFlat
+            globals.options.GHG_standard = TargetsFlat
         elif ghg_template_name == footprint_template_name:
-            from GHG_standards_footprint import GHGStandardFootprint
+            from policy.targets_footprint import TargetsFootprint
 
-            globals.options.GHG_standard = GHGStandardFootprint
+            globals.options.GHG_standard = TargetsFootprint
         else:
             init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
-        from GHG_standards_fuels import GHGStandardFuels
+        from policy.policy_fuels import PolicyFuel
 
         from cost_clouds import CostCloud
 
@@ -1288,8 +1288,8 @@ if __name__ == '__main__':
         init_fail += globals.options.GHG_standard.init_database_from_file(globals.options.ghg_standards_file,
                                                                           verbose=globals.options.verbose)
 
-        init_fail += GHGStandardFuels.init_database_from_file(globals.options.ghg_standards_fuels_file,
-                                                              verbose=globals.options.verbose)
+        init_fail += PolicyFuel.init_database_from_file(globals.options.ghg_standards_fuels_file,
+                                                        verbose=globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
                                                           globals.options.vehicle_onroad_calculations_file,

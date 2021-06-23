@@ -20,8 +20,8 @@ def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
 
 
 def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
-    from policy_fuel_upstream import PolicyFuelUpstream
-    from GHG_standards_fuels import GHGStandardFuels
+    from policy.policy_fuel_upstream import PolicyFuelUpstream
+    from policy.policy_fuels import PolicyFuel
     import numpy as np
 
     if vehicle.fueling_class == 'BEV':
@@ -29,7 +29,7 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
                                                                                     'US electricity')
         upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
         upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-        fuel_gco2_per_gal = GHGStandardFuels.get_fuel_attributes(vehicle.model_year, 'MTE gasoline',
+        fuel_gco2_per_gal = PolicyFuel.get_fuel_attributes(vehicle.model_year, 'MTE gasoline',
                                                                  'cert_co2_grams_per_unit')
 
         upstream = np.maximum(0, kwh_per_mile * upstream_gco2_per_kwh / (1 - upstream_inefficiency) -
@@ -41,13 +41,13 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
 
 
 def upstream_actual(vehicle, co2_grams_per_mile, kwh_per_mile):
-    from policy_fuel_upstream import PolicyFuelUpstream
-    from GHG_standards_fuels import GHGStandardFuels
+    from policy.policy_fuel_upstream import PolicyFuelUpstream
+    from policy.policy_fuels import PolicyFuel
 
     upstream_gco2_per_kwh = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'US electricity')
     upstream_inefficiency = PolicyFuelUpstream.get_upstream_inefficiency(vehicle.model_year, 'US electricity')
     upstream_gco2_per_gal = PolicyFuelUpstream.get_upstream_co2e_grams_per_unit(vehicle.model_year, 'pump gasoline')
-    fuel_gco2_per_gal = GHGStandardFuels.get_fuel_attributes(vehicle.model_year, 'MTE gasoline',
+    fuel_gco2_per_gal = PolicyFuel.get_fuel_attributes(vehicle.model_year, 'MTE gasoline',
                                                              'cert_co2_grams_per_unit')
 
     # TODO: need "utility factor" or percentage of electric and gas miles to weight these terms
@@ -61,7 +61,7 @@ upstream_method_dict = {'upstream_zero': upstream_zero, 'upstream_xev_ice_delta'
                         'upstream_actual': upstream_actual}
 
 
-class PolicyFuelUpstreamMethods(OMEGABase):
+class UpstreamMethods(OMEGABase):
     methods = pd.DataFrame()
 
     @staticmethod
@@ -70,8 +70,8 @@ class PolicyFuelUpstreamMethods(OMEGABase):
         start_years = cache['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
-        method = PolicyFuelUpstreamMethods.methods['upstream_calculation_method'].loc[
-                PolicyFuelUpstreamMethods.methods['start_year'] == calendar_year].item()
+        method = UpstreamMethods.methods['upstream_calculation_method'].loc[
+            UpstreamMethods.methods['start_year'] == calendar_year].item()
 
         return upstream_method_dict[method]
 
@@ -99,8 +99,8 @@ class PolicyFuelUpstreamMethods(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                PolicyFuelUpstreamMethods.methods['start_year'] = df['start_year']
-                PolicyFuelUpstreamMethods.methods['upstream_calculation_method'] = df['upstream_calculation_method']
+                UpstreamMethods.methods['start_year'] = df['start_year']
+                UpstreamMethods.methods['upstream_calculation_method'] = df['upstream_calculation_method']
 
             cache['start_year'] = np.array(list(df['start_year']))
 
@@ -123,17 +123,17 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += PolicyFuelUpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
-                                                              verbose=globals.options.verbose)
+        init_fail += UpstreamMethods.init_from_file(globals.options.fuel_upstream_methods_file,
+                                                    verbose=globals.options.verbose)
 
         if not init_fail:
             file_io.validate_folder(globals.options.database_dump_folder)
-            PolicyFuelUpstreamMethods.methods.to_csv(
+            UpstreamMethods.methods.to_csv(
                 globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 
-            print(PolicyFuelUpstreamMethods.get_upstream_method(2020))
-            print(PolicyFuelUpstreamMethods.get_upstream_method(2027))
-            print(PolicyFuelUpstreamMethods.get_upstream_method(2050))
+            print(UpstreamMethods.get_upstream_method(2020))
+            print(UpstreamMethods.get_upstream_method(2027))
+            print(UpstreamMethods.get_upstream_method(2050))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

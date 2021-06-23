@@ -111,10 +111,10 @@ if __name__ == '__main__':
         from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from consumer.demanded_shares_gcam import DemandedSharesGCAM
-        from GHG_standards_footprint import GHGStandardFootprint
+        from policy.targets_footprint import TargetsFootprint
         from cost_clouds import CostCloud
 
-        globals.options.GHG_standard = GHGStandardFootprint
+        globals.options.GHG_standard = TargetsFootprint
         globals.options.ghg_standards_file = 'test_inputs/ghg_standards-footprint.csv'
         from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
@@ -129,8 +129,8 @@ if __name__ == '__main__':
         init_fail += DemandedSharesGCAM.init_database_from_file(globals.options.demanded_shares_file,
                                                                 verbose=globals.options.verbose)
         init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
-        init_fail += GHGStandardFootprint.init_database_from_file(globals.options.ghg_standards_file,
-                                                                  verbose=globals.options.verbose)
+        init_fail += TargetsFootprint.init_database_from_file(globals.options.ghg_standards_file,
+                                                              verbose=globals.options.verbose)
         init_fail += OnroadFuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
         init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
                                                           globals.options.vehicle_onroad_calculations_file,

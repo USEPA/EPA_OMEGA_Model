@@ -101,18 +101,18 @@ if __name__ == '__main__':
         from cost_clouds import CostCloud  # needed for vehicle cost from CO2
         from context.new_vehicle_market import NewVehicleMarket
 
-        from GHG_standards_flat import input_template_name as flat_template_name
-        from GHG_standards_footprint import input_template_name as footprint_template_name
+        from policy.targets_flat import input_template_name as flat_template_name
+        from policy.targets_footprint import input_template_name as footprint_template_name
         ghg_template_name = get_template_name(globals.options.ghg_standards_file)
 
         if ghg_template_name == flat_template_name:
-            from GHG_standards_flat import GHGStandardFlat
+            from policy.targets_flat import TargetsFlat
 
-            globals.options.GHG_standard = GHGStandardFlat
+            globals.options.GHG_standard = TargetsFlat
         elif ghg_template_name == footprint_template_name:
-            from GHG_standards_footprint import GHGStandardFootprint
+            from policy.targets_footprint import TargetsFootprint
 
-            globals.options.GHG_standard = GHGStandardFootprint
+            globals.options.GHG_standard = TargetsFootprint
         else:
             init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 

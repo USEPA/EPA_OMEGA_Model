@@ -102,7 +102,7 @@ class DriveCycleWeights(OMEGABase):
 
         """
 
-        from drive_cycles import DriveCycles
+        from policy.drive_cycles import DriveCycles
 
         cycle_name_errors = []
 

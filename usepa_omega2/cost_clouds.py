@@ -128,7 +128,7 @@ class CostCloud(OMEGABase):
 
         """
 
-        from offcycle_credits import OffCycleCredits  # offcycle_credits must be initalized first
+        from policy.offcycle_credits import OffCycleCredits  # offcycle_credits must be initalized first
 
         cache.clear()
 

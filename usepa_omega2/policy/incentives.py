@@ -55,7 +55,7 @@ from usepa_omega2 import *
 cache = dict()
 
 
-class GHGStandardIncentives(OMEGABase):
+class Incentives(OMEGABase):
     """
     **Loads and provides access to GHG incentives.**
 
@@ -150,8 +150,8 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail += GHGStandardIncentives.init_from_file(globals.options.production_multipliers_file,
-                                                          verbose=globals.options.verbose)
+        init_fail += Incentives.init_from_file(globals.options.production_multipliers_file,
+                                               verbose=globals.options.verbose)
 
         if not init_fail:
             class dummyVehicle:
@@ -159,7 +159,7 @@ if __name__ == '__main__':
                 fueling_class = 'BEV'
 
             v = dummyVehicle()
-            print(GHGStandardIncentives.get_production_multipliers(v, 1.0))
+            print(Incentives.get_production_multipliers(v, 1.0))
 
         else:
             print(init_fail)
