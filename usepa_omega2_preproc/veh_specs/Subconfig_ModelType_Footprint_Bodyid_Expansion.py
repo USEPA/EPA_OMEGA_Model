@@ -3,16 +3,16 @@ import datetime
 import numpy as np
 
 
-def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filename, footprint_lineage_filename,
+def Subconfig_ModelType_Footprint_Bodyid_Expansion_SL(input_path, footprint_filename, footprint_lineage_filename,
                                                       bodyid_filename, \
                                                       bool_run_new_manual_filter, manual_filter_name,
                                                       expanded_footprint_filename, \
                                                       subconfig_filename, model_type_filename, vehghg_filename,
                                                       output_path, \
                                                       footprint_exceptions_table, modeltype_exceptions_table, year,
-                                                      roadload_coefficient_table_filename, \
+                                                      roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
                                                       drivecycle_filenames, drivecycle_input_filenames,
-                                                      drivecycle_output_filenames,
+                                                      drivecycle_output_filenames, test_car_filename_path,
                                                       set_roadload_coefficient_table_filename):
     footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding="ISO-8859-1",
                                  na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
@@ -20,6 +20,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
     # body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
     body_id_table_readin = pd.read_csv(input_path + '\\' + bodyid_filename, na_values={''}, keep_default_na=False,
                                        encoding="ISO-8859-1")
+    if set_bodyid_to_lineageid == 1: body_id_table_readin['BodyID'] = body_id_table_readin['LineageID']
     body_id_table_readin = body_id_table_readin[body_id_table_readin['BodyID EndYear'] != 'xx'].reset_index(drop=True)
     body_id_table_int = body_id_table_readin[(~pd.isnull(body_id_table_readin['BodyID EndYear'])) \
                                              & (body_id_table_readin['BodyID StartYear'] <= year)].reset_index(
@@ -51,7 +52,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
         df_CAFE_ID_not_matched = pd.DataFrame(CAFE_ID_not_matched,
                                               columns=['FOOTPRINT_DIVISION_NM', 'FOOTPRINT_CARLINE_NM',
                                                        'footprint_file_CAFE_ID', 'lineage_file_CAFE_ID'])
-        df_CAFE_ID_not_matched.to_csv(output_path + '\\' + 'CAFE_ID_not_matched_' + date_and_time + '.csv', index=False)
+        df_CAFE_ID_not_matched.to_csv(output_path + '\\' + 'CAFE_ID_not_matched.csv', index=False)
 
     for error_check_count in range(0, len(footprint_exceptions_table)):
         if footprint_exceptions_table['Numeric (y/n)'][error_check_count] == 'y':
@@ -173,7 +174,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             vehghg_file = vehghg_file_data.dropna(
                 subset=list(footprint_indexing_categories) + list(subconfig_indexing_categories),
                 how='any').reset_index(drop=True)
-            # Honda_Accord = vehghg_file_data[(vehghg_file_data['MFR_DIVISION_NM'] == 'Honda') & (vehghg_file_data['CARLINE_NAME'] == 'ACCORD')]
             missing_entries_1 = vehghg_file[pd.isnull(vehghg_file['LineageID'])].reset_index(drop=True)
             missing_entries_2 = vehghg_file[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS'])].reset_index(drop=True)
             missing_entries = pd.concat([missing_entries_1, missing_entries_2]).reset_index(drop=True)
@@ -249,24 +249,21 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             vehghg_file = vehghg_file.dropna(subset=list(['LineageID', 'BodyID']), how='any').reset_index(drop=True)
             vehghg_file['LineageID'] = vehghg_file['LineageID'].astype(int)
             vehghg_file['BodyID'] = vehghg_file['BodyID'].astype(int)
-            # Resolve flex fuel vehicles
-            vehghg_file_allfuel = vehghg_file  # [vehghg_file['FUEL_USAGE'] != 'E'].reset_index(drop=True)
-            # Model Type Volumes
+            vehghg_file_nonflexfuel = vehghg_file  # [vehghg_file['FUEL_USAGE'] != 'E'].reset_index(drop=True)
+
             model_type_volumes = model_type_file[
                 ['CALC_ID', 'PRODUCTION_VOLUME_FE_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE']].groupby(
                 'CALC_ID').sum().reset_index()
-            vehghg_file_allfuel = pd.merge_ordered(vehghg_file_allfuel.drop( \
+            vehghg_file_nonflexfuel = pd.merge_ordered(vehghg_file_nonflexfuel.drop( \
                 ['PRODUCTION_VOLUME_FE_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE'], axis=1), model_type_volumes,
                 how='left', on='CALC_ID').reset_index(drop=True)
-            merging_columns = list(vehghg_file_allfuel.drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', \
-                                                             'PROD_VOL_GHG_TOTAL_50_STATE',
-                                                             'PRODUCTION_VOLUME_GHG_50_STATE', \
-                                                             'PRODUCTION_VOLUME_FE_50_STATE',
-                                                             'PROD_VOL_GHG_TLAAS_50_STATE',
-                                                             'PROD_VOL_GHG_STD_50_STATE'], axis=1).columns)
+            merging_columns = list(vehghg_file_nonflexfuel.drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', \
+                                                                 'PROD_VOL_GHG_TOTAL_50_STATE',
+                                                                 'PRODUCTION_VOLUME_GHG_50_STATE', \
+                                                                 'PRODUCTION_VOLUME_FE_50_STATE',
+                                                                 'PROD_VOL_GHG_TLAAS_50_STATE',
+                                                                 'PROD_VOL_GHG_STD_50_STATE'], axis=1).columns)
 
-            # Powertrain Efficiency, roadload_coefficient_table_filename = CAFE_Subconfig input file
-            # ENG_RATED_HP in the "CAFE_Model_Type_.csv"
             roadload_coefficient_table = pd.read_csv(input_path + '\\' + roadload_coefficient_table_filename,
                                                      encoding="ISO-8859-1", na_values=[
                     '-'])  # EVCIS Qlik Sense query results contain hyphens for nan
@@ -281,21 +278,22 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                               'MFR_DIVISION_SHORT_NM', 'CARLINE_NAME',
                                                               'INERTIA_WT_CLASS', 'CONFIG_INDEX', 'SUBCONFIG_INDEX',
                                                               'TRANS_TYPE', 'HYBRID_YN']
-            vehghg_file_allfuel = vehghg_file_allfuel.merge(roadload_coefficient_table, how='left', \
-                                                            left_on=list(
-                                                                roadload_coefficient_table_indexing_categories) + [
-                                                                        'FUEL_USAGE'], right_on=list(
-                    roadload_coefficient_table_indexing_categories) + ['SUBCFG_FUEL_USAGE'])
+            roadload_coefficient_table__flexfuel = roadload_coefficient_table[
+                roadload_coefficient_table['SUBCFG_FUEL_USAGE'] == 'E'].reset_index(drop=True)
+            roadload_coefficient_table__nonflexfuel = roadload_coefficient_table[
+                roadload_coefficient_table['SUBCFG_FUEL_USAGE'] != 'E'].reset_index(drop=True)
+            # roadload_coefficient_table__nonflexfuel = roadload_coefficient_table__nonflexfuel.rename({'SUBCFG_FUEL_USAGE':'FUEL_USAGE'}, axis=1)
+            vehghg_file_flexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] == 'E'].reset_index(
+                drop=True)
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] != 'E'].reset_index(
+                drop=True)
 
-            vehghg_file_flexfuel = vehghg_file_allfuel[vehghg_file_allfuel['FUEL_USAGE'] == 'E']
-            vehghg_file_nonflexfuel = vehghg_file_allfuel[vehghg_file_allfuel['FUEL_USAGE'] != 'E'].reset_index(
-                drop=True)  # remove the E85 fuel for ALPHA data inputs
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(roadload_coefficient_table__nonflexfuel, how='left',
+                                                                    on=list(
+                                                                        roadload_coefficient_table_indexing_categories))
             vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(
                 vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE'].astype(float) * vehghg_file_nonflexfuel[
                     'FUEL_GRAVITY'].astype(float) * btu2mj * kg2lbm)
-            # vehghg_file_nonflexfuel[['EPA_CAFE_MT_CALC_CITY_FE_4', 'EPA_CAFE_MT_CALC_HWY_FE_4', 'Engine Displacement Category']] = vehghg_file_nonflexfuel[['EPA_CAFE_MT_CALC_CITY_FE_4', 'EPA_CAFE_MT_CALC_HWY_FE_4', 'Engine Displacement Category']].round(1)
-            # vehghg_file_nonflexfuel['ETW'] = vehghg_file_nonflexfuel['ETW'].round(0)
-
             set_roadload_coefficient_table_indexing_categories = ['Model Year', 'Veh Mfr Code',
                                                                   'Represented Test Veh Model', 'Test Number',
                                                                   'Test Category', 'Equivalent Test Weight (lbs.)',
@@ -303,45 +301,48 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                   'CO2 (g/mi)', 'RND_ADJ_FE', 'FE Bag 1', 'FE Bag 2',
                                                                   'FE Bag 3', 'Set Coef A (lbf)',
                                                                   'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']
-            set_roadload_coefficient_table = pd.read_csv(input_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
-            set_roadload_coefficient_table = set_roadload_coefficient_table[set_roadload_coefficient_table_indexing_categories]
-            # set_roadload_coefficient_table[['RND_ADJ_FE', 'Test Veh Displacement (L)', 'FE Bag 1', 'FE Bag 2', 'FE Bag 3']] = set_roadload_coefficient_table[['RND_ADJ_FE', 'Test Veh Displacement (L)', 'FE Bag 1', 'FE Bag 2', 'FE Bag 3']].round(1)
-            # set_roadload_coefficient_table[['Set Coef A (lbf)', 'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']] = set_roadload_coefficient_table[['Set Coef A (lbf)', 'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']].round(6)
-            # set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'] = set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'].round(0)
+            set_roadload_coefficient_table = pd.read_csv(
+                test_car_filename_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1",
+                na_values=['-'])
+            # EVCIS Qlik Sense query results contain hyphens for nan
+            set_roadload_coefficient_table = set_roadload_coefficient_table[
+                set_roadload_coefficient_table_indexing_categories]
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(set_roadload_coefficient_table, how='left',
-                                                                            left_on=['MODEL_YEAR', 'TEST_NUMBER', 'TEST_PROC_CATEGORY'],
-                                                                            right_on=['Model Year', 'Test Number', 'Test Category'])
-            # vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[['TEST_NUMBER', ]].replace([np.nan, 'nan'], '', regex=True)
+                                                                    left_on=['CAFE_MFR_CD', 'TEST_NUMBER',
+                                                                             'TEST_PROC_CATEGORY'],
+                                                                    right_on=['Veh Mfr Code', 'Test Number',
+                                                                              'Test Category'])
+            # fex = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['CAFE_MFR_CD'] == 'FEX']
+            # print(fex[['TARGET_COEF_A', 'Set Coef A (lbf)']])
+
+            for i in range(len(vehghg_file_nonflexfuel['NV_RATIO'])):
+                if str(vehghg_file_nonflexfuel['NV_RATIO'][i]) == 'nan' and vehghg_file_nonflexfuel['N/V Ratio'][i] > 0:
+                    vehghg_file_nonflexfuel['NV_RATIO'][i] = vehghg_file_nonflexfuel['N/V Ratio'][i]
+            # vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[['TEST_NUMBER']].replace([np.nan, 'nan'], '', regex=True)
 
             # for i in range(len(vehghg_file_nonflexfuel)):
-            #     if (str(vehghg_file_nonflexfuel['Set Coef A (lbf)'][i]) != 'nan') or (
-            #             str(vehghg_file_nonflexfuel['ETW'][i]) == 'nan'): continue
+            #     if (str(vehghg_file_nonflexfuel['Set Coef A (lbf)'][i]) != 'nan'): continue
             #     for j in range(len(set_roadload_coefficient_table)):
             #         if (vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'][i] == set_roadload_coefficient_table['Test Category'][j]) and \
             #             (vehghg_file_nonflexfuel['CAFE_MFR_CD'][i] == set_roadload_coefficient_table['Veh Mfr Code'][j]) and \
             #             (vehghg_file_nonflexfuel['Engine Displacement Category'][i] == set_roadload_coefficient_table['Test Veh Displacement (L)'][j]) and \
-            #             ((vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'][i] == 'FTP' and \
-            #               vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'][i].round(1) == set_roadload_coefficient_table['RND_ADJ_FE'][j].round(1)) or \
-            #              (vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'][i] == 'HWY' and \
-            #               vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'][i].round(1) == set_roadload_coefficient_table['RND_ADJ_FE'][j].round(1))):
+            #             ((vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'][i] == 'FTP' and  vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'][i] == set_roadload_coefficient_table['RND_ADJ_FE'][j]) or \
+            #             (vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'][i] == 'HWY' and vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'][i] == set_roadload_coefficient_table['RND_ADJ_FE'][j])):
             #             # (vehghg_file_nonflexfuel['ETW'][i] == set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'][j]) and \
-            #             vehghg_file_nonflexfuel['N/V Ratio'][i] = set_roadload_coefficient_table['N/V Ratio'][j]
-            #             vehghg_file_nonflexfuel['CO2 (g/mi)'][i] = set_roadload_coefficient_table['CO2 (g/mi)'][j]
-            #             vehghg_file_nonflexfuel['FE Bag 1'][i] = set_roadload_coefficient_table['FE Bag 1'][j]
-            #             vehghg_file_nonflexfuel['FE Bag 2'][i] = set_roadload_coefficient_table['FE Bag 2'][j]
-            #             vehghg_file_nonflexfuel['FE Bag 3'][i] = set_roadload_coefficient_table['FE Bag 3'][j]
-            #             vehghg_file_nonflexfuel['Set Coef A (lbf)'][i] = set_roadload_coefficient_table['Set Coef A (lbf)'][j]
-            #             vehghg_file_nonflexfuel['Set Coef B (lbf/mph)'][i] = set_roadload_coefficient_table['Set Coef B (lbf/mph)'][j]
-            #             vehghg_file_nonflexfuel['Set Coef C (lbf/mph**2)'][i] = set_roadload_coefficient_table['Set Coef C (lbf/mph**2)'][j]
+            #             vehghg_file_nonflexfuel['N/V Ratio'][i] = (set_roadload_coefficient_table['N/V Ratio'][j])
+            #             vehghg_file_nonflexfuel['CO2 (g/mi)'][i] = (set_roadload_coefficient_table['CO2 (g/mi)'][j])
+            #             vehghg_file_nonflexfuel['FE Bag 1'][i] = (set_roadload_coefficient_table['FE Bag 1'][j])
+            #             vehghg_file_nonflexfuel['FE Bag 2'][i] = (set_roadload_coefficient_table['FE Bag 2'][j])
+            #             vehghg_file_nonflexfuel['FE Bag 3'][i] = (set_roadload_coefficient_table['FE Bag 3'][j])
+            #             (vehghg_file_nonflexfuel['Set Coef A (lbf)'][i]) = (set_roadload_coefficient_table['Set Coef A (lbf)'][j])
+            #             vehghg_file_nonflexfuel['Set Coef B (lbf/mph)'][i] = (set_roadload_coefficient_table['Set Coef B (lbf/mph)'][j])
+            #             vehghg_file_nonflexfuel['Set Coef C (lbf/mph**2)'][i] = (set_roadload_coefficient_table['Set Coef C (lbf/mph**2)'][j])
 
-            import Calculate_Powertrain_Efficiency
+            import Calculate_Powertrain_Efficiency_SL
             vehghg_file_nonflexfuel = pd.concat(
                 [pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
-            # vehghg_file_nonflexfuel['ENG_DISPL'] =  pd.to_numeric(vehghg_file_nonflexfuel['ENG_DISPL']); vehghg_file_nonflexfuel['ENG_RATED_HP'] = pd.to_numeric(vehghg_file_nonflexfuel['ENG_RATED_HP'])
-            # vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'] = pd.to_numeric(vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE']); vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_FE_4'] = pd.to_numeric(vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_FE_4'])
-            # vehghg_file_nonflexfuel['VEH_ETW'] = pd.to_numeric(vehghg_file_nonflexfuel['VEH_ETW'])
-
-            output_array = Calculate_Powertrain_Efficiency.Calculate_Powertrain_Efficiency( \
+            # EPA_CAFE_MT_CALC_CITY_FE_4, EPA_CAFE_MT_CALC_HWY_FE_4, EPA_CAFE_MT_CALC_COMB_FE_4, TEST_UNROUNDED_UNADJUSTED_FE, RND_ADJ_FE
+            output_array = Calculate_Powertrain_Efficiency_SL.Calculate_Powertrain_Efficiency_SL( \
                 vehghg_file_nonflexfuel['TEMP_ID'], vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'],
                 vehghg_file_nonflexfuel['TARGET_COEF_A'], vehghg_file_nonflexfuel['TARGET_COEF_B'], \
                 vehghg_file_nonflexfuel['TARGET_COEF_C'], vehghg_file_nonflexfuel['VEH_ETW'],
@@ -355,7 +356,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                on=['TEMP_ID', 'TEST_PROC_CATEGORY']).reset_index(drop=True).rename(
                 columns={'Powertrain Efficiency (%)': 'PTEFF_FROM_RLCOEFFS'}).drop('TEMP_ID', axis=1)
 
-            # Resolve Volumes
             total_allocated_volumes_to_footprint = pd.DataFrame(
                 vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)[
                     'FINAL_MODEL_YR_GHG_PROD_UNITS'].sum().reset_index()) \
@@ -416,13 +416,13 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             mixed_volumes['FOOTPRINT_SUBCONFIG_VOLUMES'] = mixed_volumes[
                 ['FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES', 'SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES']].mean(axis=1)
             vehghg_file_nonflexfuel = pd.concat([vehghg_file_nonflexfuel, distributed_volumes, mixed_volumes], axis=1)
-
-            vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='Vehghg_ID') + 1, vehghg_file_nonflexfuel], axis=1)
+            vehghg_file_nonflexfuel = pd.concat(
+                [pd.Series(range(len(vehghg_file_nonflexfuel)), name='Vehghg_ID') + 1, vehghg_file_nonflexfuel], axis=1)
 
             vehghg_file_flexfuel = vehghg_file[vehghg_file['FUEL_USAGE'] == 'E'].reset_index(drop=True) \
                 .drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', 'PROD_VOL_GHG_TOTAL_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE', \
-                       'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'], axis=1)
-            # vehghg_file_flexfuel = pd.merge_ordered(vehghg_file_flexfuel, \
+                       'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'],
+                      axis=1)
 
             vehghg_file_flexfuel = pd.merge(vehghg_file_flexfuel, \
                                             vehghg_file_nonflexfuel[
@@ -442,7 +442,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             # only output non flex fuel
             vehghg_file_output = vehghg_file_nonflexfuel
             # vehghg_file_output = pd.merge_ordered(vehghg_file_nonflexfuel, vehghg_file_flexfuel, how='outer', on=merging_columns + ['Vehghg_ID']).sort_values('Vehghg_ID').reset_index(drop=True)
-
             # vehghg_file_output = vehghg_file_output.replace('none', np.nan)
             del vehghg_file
             vehghg_file_output = vehghg_file_output.loc[:, ~vehghg_file_output.columns.str.contains('^Unnamed')]
@@ -491,28 +490,42 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                     + 2 * (((-2e-6 * rpm_rear ** 2) + (.0023 * rpm_rear + 1.2157) / (
                         vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * n2lbf)
             F_drivetrain = 20 * n2lbf
-            vehghg_file_output['ROLLING_FORCE_50MPH'] = vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] - F_hub - F_brake - F_drivetrain
-            vehghg_file_output['RRC_FROM_RLCOEFFS'] = (1000 * vehghg_file_output['ROLLING_FORCE_50MPH'] / vehghg_file_output['ETW']).replace(0, np.nan)
+            vehghg_file_output['ROLLING_FORCE_50MPH'] = vehghg_file_output[
+                                                            'NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] - F_hub - F_brake - F_drivetrain
+            vehghg_file_output['RRC_FROM_RLCOEFFS'] = (
+                        1000 * vehghg_file_output['ROLLING_FORCE_50MPH'] / vehghg_file_output['ETW']).replace(0, np.nan)
             vehghg_file_output = vehghg_file_output.drop(['ROLLING_FORCE_50MPH'], axis=1)
             vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS_NORMALIZED_BY_ETW'] = \
                 vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] / vehghg_file_output['ETW']
             vehghg_file_output['Transmission Short Name'] = pd.Series(vehghg_file_output['TRANS_TYPE'] + \
                                                                       vehghg_file_output[
-                                                                          'TOTAL_NUM_TRANS_GEARS'].astype(str)).replace('CVT1', 'CVT')
+                                                                          'TOTAL_NUM_TRANS_GEARS'].astype(str)).replace(
+                'CVT1', 'CVT')
+
             vehghg_file_output['ROAD_LOAD_LABEL'] = pd.Series(
                 vehghg_file_output['CALC_ID'].astype(float).astype(int).astype(str) + '_' \
                 + vehghg_file_output['FOOTPRINT_CARLINE_NM'] + '_' + vehghg_file_output['BodyID'].astype(str) + '_' \
                 + vehghg_file_output['ENG_DISPL'].astype(str) + '_' + vehghg_file_output[
                     'Transmission Short Name'] + '_' + \
                 'Axle Ratio:(' + vehghg_file_output['AXLE_RATIO'].round(2).astype(str) + ')' + '_' + \
+ \
                 'RLHP:(' + vehghg_file_output['RLHP_FROM_RLCOEFFS'].round(2).astype(str) + ')' + '_' + \
+ \
                 'CDA:(' + vehghg_file_output['CDA_FROM_RLCOEFFS'].round(2).astype(str) + ')' + '_' + \
-                'Non-Aero:(' + vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'].round(2).astype(str) + ')' + '_' + \
+ \
+                'Non-Aero:(' + vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'].round(2).astype(
+                    str) + ')' + '_' + \
+ \
                 'RRC:(' + vehghg_file_output['RRC_FROM_RLCOEFFS'].round(1).astype(str) + ')' + '_' + \
+ \
                 vehghg_file_output['FRONT_BASE_TIRE_CODE'] + '_' + \
-                vehghg_file_output['ETW'].replace(np.nan, 0).astype(float).round(0).astype(int).replace(0, 'na').astype(str))
-
-            vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv', index=False)
+                vehghg_file_output['ETW'].replace(np.nan, 0).astype(float).round(0).astype(int).replace(0, 'na').astype(
+                    str))
+            vehghg_file_output = vehghg_file_output.rename(
+                {'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B',
+                 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
+            vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv',
+                                      index=False)
         else:
             # New BodyID table sought, previous data included
             full_expanded_footprint_filter_table = full_expanded_footprint_filter_table.merge \
