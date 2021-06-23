@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 
 
-def Subconfig_ModelType_Footprint_Bodyid_Expansion_SL(input_path, footprint_filename, footprint_lineage_filename,
+def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filename, footprint_lineage_filename,
                                                       bodyid_filename, \
                                                       bool_run_new_manual_filter, manual_filter_name,
                                                       expanded_footprint_filename, \
@@ -338,11 +338,11 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion_SL(input_path, footprint_file
             #             vehghg_file_nonflexfuel['Set Coef B (lbf/mph)'][i] = (set_roadload_coefficient_table['Set Coef B (lbf/mph)'][j])
             #             vehghg_file_nonflexfuel['Set Coef C (lbf/mph**2)'][i] = (set_roadload_coefficient_table['Set Coef C (lbf/mph**2)'][j])
 
-            import Calculate_Powertrain_Efficiency_SL
+            import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat(
                 [pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
             # EPA_CAFE_MT_CALC_CITY_FE_4, EPA_CAFE_MT_CALC_HWY_FE_4, EPA_CAFE_MT_CALC_COMB_FE_4, TEST_UNROUNDED_UNADJUSTED_FE, RND_ADJ_FE
-            output_array = Calculate_Powertrain_Efficiency_SL.Calculate_Powertrain_Efficiency_SL( \
+            output_array = Calculate_Powertrain_Efficiency.Calculate_Powertrain_Efficiency( \
                 vehghg_file_nonflexfuel['TEMP_ID'], vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'],
                 vehghg_file_nonflexfuel['TARGET_COEF_A'], vehghg_file_nonflexfuel['TARGET_COEF_B'], \
                 vehghg_file_nonflexfuel['TARGET_COEF_C'], vehghg_file_nonflexfuel['VEH_ETW'],

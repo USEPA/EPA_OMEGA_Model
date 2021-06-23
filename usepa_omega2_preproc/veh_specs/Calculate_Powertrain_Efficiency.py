@@ -22,14 +22,14 @@ def Tractive_Energy_Calculation(A,B,C,ETW,Enghp, drivecycle_dist_mi, drivecycle_
         drivecycle_LF = 0
     return (drivecycle_troadwork_mjpkm, drivecycle_LF, drivecycle_tractive_kWhr)
 
-def Calculate_Powertrain_Efficiency_SL(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col, C_col, ETW_col, mpg_col, comb_mpg_col, run_input_path, \
+def Calculate_Powertrain_Efficiency(ID_col, TEST_PROC_CATEGORY_col, A_col, B_col, C_col, ETW_col, mpg_col, comb_mpg_col, run_input_path, \
                                     drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, engdisp_col, ratedhp_col, fuelhv_col):
-    import Drive_Cycle_Differentiation_and_Integration_SL
+    import Drive_Cycle_Differentiation_and_Integration
     from Unit_Conversion import lbf2n, gravity_mps2, mph2mps, mi2km, mph22mps2, hps2kwhr, mj2kwhr, km2mi
 
     from Unit_Conversion import mph2mps,mph22mps2
-    (FTP_array, HWFET_array, US06_Array, Custom_Array) = Drive_Cycle_Differentiation_and_Integration_SL.\
-        Drive_Cycle_Differentiation_and_Integration_SL(run_input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames)
+    (FTP_array, HWFET_array, US06_Array, Custom_Array) = Drive_Cycle_Differentiation_and_Integration.\
+        Drive_Cycle_Differentiation_and_Integration(run_input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames)
 
     if len(FTP_array) > 0:
         FTP_dist_mi = FTP_array['Displacement (mi)'].sum()
