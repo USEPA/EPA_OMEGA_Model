@@ -7,7 +7,6 @@
 
 """
 
-import o2  # import global variables
 from usepa_omega2 import *
 
 cache = dict()
@@ -27,7 +26,7 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
         cache_key = '%s_%s' % (market_class_id, age)
 
         if cache_key not in cache:
-            cache[cache_key] = float(o2.session.query(AnnualVMTFixedByAge.annual_vmt).
+            cache[cache_key] = float(globals.session.query(AnnualVMTFixedByAge.annual_vmt).
                                      filter(AnnualVMTFixedByAge.market_class_ID == market_class_id).
                                      filter(AnnualVMTFixedByAge.age == age).scalar())
 
@@ -62,8 +61,8 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
                         market_class_ID=df.loc[i, 'market_class_id'],
                         annual_vmt=df.loc[i, 'annual_vmt'],
                     ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
         return template_errors
 
@@ -71,26 +70,26 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         from consumer.market_classes import MarketClass  # needed for market class ID
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                    verbose=o2.options.verbose)
+        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
+                                                         verbose=globals.options.verbose)
 
-        init_fail += AnnualVMTFixedByAge.init_database_from_file(o2.options.annual_vmt_fixed_by_age_file,
-                                                                            verbose=o2.options.verbose)
+        init_fail += AnnualVMTFixedByAge.init_database_from_file(globals.options.annual_vmt_fixed_by_age_file,
+                                                                 verbose=globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

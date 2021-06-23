@@ -9,9 +9,8 @@
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
-import omega_log
-import file_eye_oh as fileio
+# import o2  # import global variables
+from common import globals, omega_log
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -21,21 +20,45 @@ from sqlalchemy import create_engine
 # to be able to easily use them and see them in database dumps, so model_year is Numeric, not Integer
 # The only place where Integer works as expected is for primary keys
 
+# noinspection PyUnresolvedReferences
 import sqlalchemy
-from sqlalchemy import String, ForeignKey, Enum, Float, Numeric, Integer
-from sqlalchemy import func
-from sqlalchemy import MetaData, Table, Column
+# noinspection PyUnresolvedReferences
+from sqlalchemy import MetaData, Table, Column, String, ForeignKey, Enum, Float, Numeric, Integer, func
 from sqlalchemy.ext.declarative import declarative_base
+# noinspection PyUnresolvedReferences
 from sqlalchemy.orm import relationship, Session
+
+from decimal import Decimal
+import sqlalchemy.types as types
+
+# TODO: use this to override Integer, instead of Numeric
+class SqliteNumeric(types.TypeDecorator):
+    impl = types.String
+
+    def load_dialect_impl(self, dialect):
+        return dialect.type_descriptor(types.VARCHAR(100))
+
+    def process_bind_param(self, value, dialect):
+        return str(value)
+
+    def process_result_value(self, value, dialect):
+        return Decimal(value)
+
+
+# can overwrite the imported type name
+# @note: the TypeDecorator does not guarantie the scale and precision.
+# you can do this with separate checks
+Numeric = SqliteNumeric
+
 
 SQABase = declarative_base(name='DeclarativeMeta')
 
 
 def init_omega_db():
-    o2.engine = create_engine('sqlite:///:memory:', echo=False)
-    o2.session = Session(bind=o2.engine)
+    globals.engine = create_engine('sqlite:///:memory:', echo=False)
+    globals.session = Session(bind=globals.engine)
     # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
-    o2.session.execute('pragma foreign_keys=on')
+    globals.session.execute('pragma foreign_keys=on')
 
 
 def sql_unpack_result(query_result_tuples, index=0):
@@ -69,7 +92,7 @@ def sql_get_column_names(table_name, exclude=None):
     """
 
     # get table row data:
-    result = o2.session.execute('PRAGMA table_info(%s)' % table_name)
+    result = globals.session.execute('PRAGMA table_info(%s)' % table_name)
 
     # make list of column names:
     columns = [r[1] for r in result.fetchall()]
@@ -96,17 +119,19 @@ def sql_valid_name(name_str):
 
 
 def dump_omega_db_to_csv(output_folder, verbose=False):
-    # validate output folder
-    fileio.validate_folder(output_folder)
+    import common.file_io as file_io
 
-    o2.session.flush()  # make sure database is up to date
+    # validate output folder
+    file_io.validate_folder(output_folder)
+
+    globals.session.flush()  # make sure database is up to date
 
     if verbose:
-        omega_log.logwrite('\ndumping %s database to %s...' % (o2.engine.name, output_folder))
+        omega_log.logwrite('\ndumping %s database to %s...' % (globals.engine.name, output_folder))
 
     # dump tables to .csv files using pandas!
-    for table in o2.engine.table_names():
+    for table in globals.engine.table_names():
         if verbose:
             omega_log.logwrite(table)
-        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=o2.engine)
+        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=globals.engine)
         sql_df.to_csv('%s/%s_table.csv' % (output_folder, table), index=False)

@@ -94,28 +94,28 @@ class ProductionConstraints(OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         from consumer.market_classes import MarketClass
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        o2.engine.echo = o2.options.verbose
+        globals.engine.echo = globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                    verbose=o2.options.verbose)
-        init_fail += ProductionConstraints.init_from_file(o2.options.production_constraints_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
+                                                         verbose=globals.options.verbose)
+        init_fail += ProductionConstraints.init_from_file(globals.options.production_constraints_file,
+                                                          verbose=globals.options.verbose)
 
         if not init_fail:
-            fileio.validate_folder(o2.options.database_dump_folder)
+            file_io.validate_folder(globals.options.database_dump_folder)
             ProductionConstraints.values.to_csv(
-                o2.options.database_dump_folder + os.sep + 'production_constraints.csv', index=False)
+                globals.options.database_dump_folder + os.sep + 'production_constraints.csv', index=False)
 
             print(ProductionConstraints.get_minimum_share(2020, 'hauling.BEV'))
             print(ProductionConstraints.get_minimum_share(2020, 'non_hauling.BEV'))

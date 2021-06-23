@@ -33,7 +33,7 @@ def run_effects_calcs():
         omega_log.logwrite(f'Calculating social costs of carbon emissions for {int(calendar_year)}')
         calc_carbon_emission_costs(calendar_year)
 
-    if o2.options.calc_criteria_emission_costs:
+    if globals.options.calc_criteria_emission_costs:
         for calendar_year in calendar_years:
             print(f'Calculating social costs of criteria emissions for {int(calendar_year)}')
             omega_log.logwrite(f'Calculating social costs of criteria emissions for {int(calendar_year)}')

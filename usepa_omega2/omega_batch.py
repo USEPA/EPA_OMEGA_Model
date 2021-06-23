@@ -21,9 +21,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # print('usepa_omega2 omega_batch.py path = %s' %  os.path.abspath(__file__))
 # print('SYS Path = %s' % sys.path)
 
-from o2 import OMEGABase
+from common.omega_types import OMEGABase
 from usepa_omega2 import OMEGARuntimeOptions
-from file_eye_oh import validate_file, relocate_file
+from common.file_io import validate_file, relocate_file
 
 bundle_input_folder_name = 'in'
 bundle_output_folder_name = OMEGARuntimeOptions().output_folder
@@ -445,7 +445,7 @@ class OMEGABatchOptions(OMEGABase):
 
 def run_bundled_sessions(batch, options, remote_batchfile, session_list):
     import pandas as pd
-    from omega_log import OMEGALog
+    from common.omega_log import OMEGALog
     import time
 
     batch = OMEGABatchObject()
@@ -521,7 +521,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     import sys
 
     # print('run_omega_batch sys.path = %s' % sys.path)
-    import o2
+    from common import globals
 
     options = OMEGABatchOptions()
     options.validate_batch = not no_validate
@@ -553,15 +553,14 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         sys.path.extend([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list)
 
-    o2.options = options
+    globals.options = options
 
     # get batch info
-    import socket, shutil
+    import shutil
     import pandas as pd
     from datetime import datetime
-    import numpy as np
 
-    from omega_dispy import DispyCluster
+    from common.omega_dispy import DispyCluster
 
     if options.dispy_ping:
         dispycluster = DispyCluster(options)
@@ -596,7 +595,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         options.logfilename = options.batch_path + options.logfilename
 
-        from omega_log import OMEGALog
+        from common.omega_log import OMEGALog
         batch.batch_log = OMEGALog(options)
 
         batch.add_sessions(verbose=options.verbose)
@@ -717,11 +716,11 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                     source_file_path = source_file_path.replace('\\', os.sep)
 
                                 if is_absolute_path(source_file_path):
-                                    import file_eye_oh as fileio
+                                    # from common import file_eye_oh as file_io
                                     # file_path is absolute path
                                     if options.verbose:
                                         batch.batch_log.logwrite('relocating %s to %s' % (
-                                        source_file_path, options.session_path + fileio.get_filenameext(source_file_path)))
+                                        source_file_path, options.session_path + file_io.get_filenameext(source_file_path)))
                                     batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
                                         options.session_path + bundle_input_folder_name, source_file_path)
                                 else:

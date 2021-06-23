@@ -102,11 +102,11 @@ class ContextFuelPrices(SQABase, OMEGABase):
 
         """
 
-        if o2.options.flat_context:
-            calendar_year = o2.options.flat_context_year
+        if globals.options.flat_context:
+            calendar_year = globals.options.flat_context_year
 
         cache_key = '%s_%s_%s_%s_%s' % \
-                    (o2.options.context_id, o2.options.context_case_id, calendar_year, price_types, fuel_id)
+                    (globals.options.context_id, globals.options.context_case_id, calendar_year, price_types, fuel_id)
 
         if cache_key not in cache:
             if type(price_types) is not list:
@@ -114,9 +114,9 @@ class ContextFuelPrices(SQABase, OMEGABase):
 
             attrs = ContextFuelPrices.get_class_attributes(price_types)
 
-            result = o2.session.query(*attrs).\
-                filter(ContextFuelPrices.context_ID == o2.options.context_id).\
-                filter(ContextFuelPrices.case_ID == o2.options.context_case_id).\
+            result = globals.session.query(*attrs).\
+                filter(ContextFuelPrices.context_ID == globals.options.context_id).\
+                filter(ContextFuelPrices.case_ID == globals.options.context_case_id).\
                 filter(ContextFuelPrices.calendar_year == calendar_year).\
                 filter(ContextFuelPrices.fuel_ID == fuel_id).all()[0]
 
@@ -181,8 +181,8 @@ class ContextFuelPrices(SQABase, OMEGABase):
                         template_errors.append('*** Invalid Context Fuel Price fuel ID "%s" in %s ***' %
                                                (fuel_id, filename))
 
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
         return template_errors
 
@@ -190,21 +190,21 @@ class ContextFuelPrices(SQABase, OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += ContextFuelPrices.init_database_from_file(o2.options.context_fuel_prices_file,
-                                                                          verbose=o2.options.verbose)
+        init_fail += ContextFuelPrices.init_database_from_file(globals.options.context_fuel_prices_file,
+                                                               verbose=globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
 
             print(ContextFuelPrices.get_retail_fuel_price(2020, 'pump gasoline'))
             print(ContextFuelPrices.get_pretax_fuel_price(2020, 'pump gasoline'))

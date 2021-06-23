@@ -198,7 +198,7 @@ class CostCloud(OMEGABase):
         plt.plot(frontier_df[x_key], frontier_df[y_key],
                  'r-')
         plt.grid()
-        plt.savefig(o2.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
+        plt.savefig(globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
 
     @staticmethod
     def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
@@ -265,7 +265,7 @@ class CostCloud(OMEGABase):
                     cloud = cloud.loc[cloud[x_key] > frontier_pts[-1][x_key]].copy()
                     cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
                                                (cloud[x_key] - frontier_pts[-1][x_key]) \
-                                               ** o2.options.cost_curve_frontier_affinity_factor
+                                               ** globals.options.cost_curve_frontier_affinity_factor
                     # find next frontier point (lowest slope), if there is one, and add to frontier list
                     min_frontier_factor = cloud['frontier_factor'].min()
 
@@ -273,7 +273,7 @@ class CostCloud(OMEGABase):
                         # frontier factor is different for up-slope (swap x & y and invert "y")
                         cloud['frontier_factor'] = (frontier_pts[-1][x_key] - cloud[x_key]) / \
                                                    (cloud[y_key] - frontier_pts[-1][y_key]) \
-                                                   ** o2.options.cost_curve_frontier_affinity_factor
+                                                   ** globals.options.cost_curve_frontier_affinity_factor
                         min_frontier_factor = cloud['frontier_factor'].min()
 
                     if not cloud.empty:
@@ -328,16 +328,16 @@ class CostCloud(OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        o2.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
+        globals.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
 
         init_fail = []
-        init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=True)
+        init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=True)
 
         if not init_fail:
             pass

@@ -100,7 +100,7 @@ class Fuel(SQABase, OMEGABase):
 
             attrs = Fuel.get_class_attributes(attribute_types)
 
-            result = o2.session.query(*attrs). \
+            result = globals.session.query(*attrs). \
                 filter(Fuel.fuel_ID == fuel_id).all()[0]
 
             if len(attribute_types) == 1:
@@ -123,7 +123,7 @@ class Fuel(SQABase, OMEGABase):
             True if the fuel ID is valid, False otherwise
 
         """
-        result = o2.session.query(Fuel.fuel_ID).filter(Fuel.fuel_ID == fuel_id).all()
+        result = globals.session.query(Fuel.fuel_ID).filter(Fuel.fuel_ID == fuel_id).all()
         if result:
             return True
         else:
@@ -173,8 +173,8 @@ class Fuel(SQABase, OMEGABase):
                         energy_density_MJ_per_unit=df.loc[i, 'energy_density_megajoules_per_unit'],
                         co2_tailpipe_emissions_grams_per_unit=df.loc[i, 'co2_tailpipe_emissions_grams_per_unit'],
                     ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
         return template_errors
 
@@ -184,21 +184,21 @@ if __name__ == '__main__':
         import os
 
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        o2.engine.echo = o2.options.verbose
+        globals.engine.echo = globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
         else:
             print(init_fail)
 

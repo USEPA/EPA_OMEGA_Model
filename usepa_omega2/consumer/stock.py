@@ -35,15 +35,15 @@ def update_stock(calendar_year):
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
-    o2.session.add_all(this_years_vehicle_annual_data)
+    globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
-        age = calendar_year - float(model_year)
+        age = calendar_year - model_year # float(model_year)
 
-        scrappage_factor = o2.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
+        scrappage_factor = globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
 
-        annual_vmt = o2.options.stock_vmt.get_vmt(market_class_id, age)
+        annual_vmt = globals.options.stock_vmt.get_vmt(market_class_id, age)
 
         registered_count = initial_registered_count * scrappage_factor
 
@@ -58,11 +58,11 @@ def update_stock(calendar_year):
     if prior_year_vehicle_ids:
         for vehicle_ID in prior_year_vehicle_ids:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_ID)
-            age = calendar_year - float(model_year)
+            age = calendar_year - model_year  # float(model_year)
 
-            scrappage_factor = o2.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
+            scrappage_factor = globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
 
-            annual_vmt = o2.options.stock_vmt.get_vmt(market_class_id, age)
+            annual_vmt = globals.options.stock_vmt.get_vmt(market_class_id, age)
 
             registered_count = initial_registered_count * scrappage_factor
 
@@ -74,13 +74,13 @@ def update_stock(calendar_year):
                                               vmt=annual_vmt * registered_count)
                             )
 
-    o2.session.add_all(vad_list)
+    globals.session.add_all(vad_list)
 
 
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

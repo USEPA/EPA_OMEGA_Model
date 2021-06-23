@@ -31,17 +31,17 @@ if 'darwin' in sys.platform:
 
 import traceback
 
+
 try:
     import pandas as pd
     pd.set_option('chained_assignment', 'raise')
 
-    from o2 import OMEGABase
-    from omega_db import *
-    from omega_types import *
-    import omega_log
-    import file_eye_oh as fileio
-    from input_validation import *
-    from omega_functions import *
+    from common.globals import *
+    from common.omega_types import *
+    from common.omega_db import *
+    from common import file_io, omega_log
+    from common.input_validation import *
+    from common.omega_functions import *
 
     import scipy.interpolate
 
@@ -159,7 +159,7 @@ try:
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
-            self.num_analysis_years = None  # number of years to run, if not all (None = run all)
+            self.num_analysis_years = 1  # None  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging

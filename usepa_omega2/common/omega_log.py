@@ -11,8 +11,9 @@ Functions to log diagnostic data
 
 print('importing %s' % __file__)
 
-import o2  # import global variables
-from o2 import OMEGABase
+from common import globals  # import global variables
+from common.omega_types import OMEGABase
+
 
 class IterationLog():
     def __init__(self, logfilename):
@@ -23,7 +24,6 @@ class IterationLog():
             self.logfilename += '.csv'
 
     def write(self, dataframe):
-        import os
         if self.init:
             dataframe.to_csv(self.logfilename, mode='w')
             self.init = False
@@ -68,21 +68,21 @@ class OMEGALog(OMEGABase):
 
 def init_logfile():
     import time, datetime
-    import file_eye_oh as fileio
+    import common.file_io as file_io
     from usepa_omega2 import code_version
 
-    fileio.validate_folder(o2.options.output_folder)
-    o2.options.logfilename = '%s%s.txt' % (
-        o2.options.output_folder + o2.options.logfile_prefix, o2.options.session_unique_name)
-    with open(o2.options.logfilename, 'w') as log:
+    file_io.validate_folder(globals.options.output_folder)
+    globals.options.logfilename = '%s%s.txt' % (
+        globals.options.output_folder + globals.options.logfile_prefix, globals.options.session_unique_name)
+    with open(globals.options.logfilename, 'w') as log:
         log.write('OMEGA2 %s session %s started at %s %s\n\n' % (
-            code_version, o2.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
+            code_version, globals.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
 
 
 def end_logfile(message):
     import time
-    o2.options.end_time = time.time()
-    elapsed_time = (o2.options.end_time - o2.options.start_time)
+    globals.options.end_time = time.time()
+    elapsed_time = (globals.options.end_time - globals.options.start_time)
     import datetime
     logwrite('\nSession ended at %s %s\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
     logwrite('Elapsed Time %.2f Seconds\n' % elapsed_time)
@@ -91,11 +91,11 @@ def end_logfile(message):
 
 
 def logwrite(message, echo_console=False, terminator='\n'):
-    with open(o2.options.logfilename, 'a') as log:
+    with open(globals.options.logfilename, 'a') as log:
         if type(message) is list:
             for m in message:
                 log.write(m + terminator)
         else:
             log.write(message + terminator)
-        if o2.options.verbose or echo_console:
+        if globals.options.verbose or echo_console:
             print(message)

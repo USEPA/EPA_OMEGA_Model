@@ -9,7 +9,7 @@ placeholder, for now, but the dispy stuff should not really be in the omega_batc
 
 """
 
-from usepa_omega2 import omega_log
+from common import omega_log
 
 from usepa_omega2 import OMEGARuntimeOptions
 bundle_output_folder_name = OMEGARuntimeOptions().output_folder

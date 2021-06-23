@@ -141,17 +141,17 @@ class GHGStandardIncentives(OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
 
         init_omega_db()
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail += GHGStandardIncentives.init_from_file(o2.options.production_multipliers_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail += GHGStandardIncentives.init_from_file(globals.options.production_multipliers_file,
+                                                          verbose=globals.options.verbose)
 
         if not init_fail:
             class dummyVehicle:

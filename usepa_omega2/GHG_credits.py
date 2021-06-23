@@ -419,7 +419,7 @@ class GHG_credit_bank(OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         credit_bank = GHG_credit_bank('test_inputs/ghg_debits.csv', 'USA Motors')
         credit_bank.update_credit_age(2020)

@@ -150,7 +150,7 @@ class DriveCycleWeights(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                from omega_trees import WeightedTree
+                from common.omega_trees import WeightedTree
                 weight_errors = []
                 cycle_name_errors = []
                 for fc in fueling_classes:
@@ -238,24 +238,24 @@ class DriveCycleWeights(OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         from drive_cycles import DriveCycles
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        o2.engine.echo = o2.options.verbose
+        globals.engine.echo = globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
 
-        init_fail += DriveCycles.init_from_file(o2.options.drive_cycles_file,
-                                                verbose=o2.options.verbose)
+        init_fail += DriveCycles.init_from_file(globals.options.drive_cycles_file,
+                                                verbose=globals.options.verbose)
 
-        init_fail += DriveCycleWeights.init_from_file(o2.options.drive_cycle_weights_file,
+        init_fail += DriveCycleWeights.init_from_file(globals.options.drive_cycle_weights_file,
                                                       verbose=True)
 
         if not init_fail:

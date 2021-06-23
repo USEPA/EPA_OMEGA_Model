@@ -13,7 +13,7 @@ Generally, user-friendly wrappers for functionality provided by the ``os`` and `
 print('importing %s' % __file__)
 
 import sys, os, shutil
-import omega_log
+from common import omega_log
 
 
 def validate_folder(dstfolder):

@@ -154,7 +154,7 @@ def calc_carbon_emission_costs(calendar_year):
                                       n2o_global_70_social_cost_dollars = n2o_global_70_social_cost_dollars,
                                       )
                         )
-    o2.session.add_all(ed_list)
+    globals.session.add_all(ed_list)
 
 
 def calc_criteria_emission_costs(calendar_year):
@@ -205,7 +205,7 @@ def calc_criteria_emission_costs(calendar_year):
                                            nox_high_mortality_70_social_cost_dollars = nox_high_mortality_70_social_cost_dollars,
                                            )
                         )
-    o2.session.add_all(ed_list)
+    globals.session.add_all(ed_list)
 
 
 def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
@@ -285,4 +285,4 @@ def calc_non_emission_costs(calendar_year): # TODO congestion/noise/other?
                                                noise_70_social_cost_dollars=noise_70_social_cost_dollars,
                                                )
                         )
-    o2.session.add_all(ed_list)
+    globals.session.add_all(ed_list)

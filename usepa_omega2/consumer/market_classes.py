@@ -146,7 +146,7 @@ class MarketClass(SQABase, OMEGABase):
 
             attrs = MarketClass.get_class_attributes(attribute_types)
 
-            result = o2.session.query(*attrs). \
+            result = globals.session.query(*attrs). \
                 filter(MarketClass.market_class_ID == market_class_id).all()[0]
 
             if len(attribute_types) == 1:
@@ -192,8 +192,8 @@ class MarketClass(SQABase, OMEGABase):
                         producer_generalized_cost_fuel_years=df.loc[i, 'producer_generalized_cost_fuel_years'],
                         producer_generalized_cost_annual_vmt=df.loc[i, 'producer_generalized_cost_annual_vmt'],
                     ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
                 MarketClass.market_classes = list(df['market_class_id'].unique())
                 MarketClass.market_classes.sort()
@@ -209,22 +209,22 @@ class MarketClass(SQABase, OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file, verbose=o2.options.verbose)
+        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file, verbose=globals.options.verbose)
 
         if not init_fail:
-            from omega_functions import print_dict
+            from common.omega_functions import print_dict
 
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
 
             market_class_list = [
                 'hauling.ICE',

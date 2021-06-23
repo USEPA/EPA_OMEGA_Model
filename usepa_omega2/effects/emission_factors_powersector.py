@@ -50,7 +50,7 @@ class EmissionFactorsPowersector(SQABase, OMEGABase):
                 cost_factors = [emission_factors]
             attrs = EmissionFactorsPowersector.get_class_attributes(emission_factors)
 
-            result = o2.session.query(*attrs).filter(EmissionFactorsPowersector.calendar_year == calendar_year).all()[0]
+            result = globals.session.query(*attrs).filter(EmissionFactorsPowersector.calendar_year == calendar_year).all()[0]
 
             if len(emission_factors) == 1:
                 cache[cache_key] = result[0]
@@ -104,8 +104,8 @@ class EmissionFactorsPowersector(SQABase, OMEGABase):
                         n2o_grams_per_kwh=df.loc[i, 'n2o_grams_per_kwh'],
                         co2_grams_per_kwh=df.loc[i, 'co2_grams_per_kwh'],
                     ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
         return template_errors
 
@@ -113,26 +113,26 @@ class EmissionFactorsPowersector(SQABase, OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         from consumer.market_classes import MarketClass  # needed for market class ID
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
         # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
         #                                                             verbose=o2.options.verbose)
 
-        init_fail += EmissionFactorsPowersector.init_database_from_file(o2.options.emission_factors_powersector_file,
-                                                                                   verbose=o2.options.verbose)
+        init_fail += EmissionFactorsPowersector.init_database_from_file(globals.options.emission_factors_powersector_file,
+                                                                        verbose=globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

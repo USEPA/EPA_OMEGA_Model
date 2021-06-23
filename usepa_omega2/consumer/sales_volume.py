@@ -29,8 +29,8 @@ def context_new_vehicle_sales(model_year):
 
     sales_dict = dict()
 
-    if o2.options.flat_context:
-        model_year = o2.options.flat_context_year
+    if globals.options.flat_context:
+        model_year = globals.options.flat_context_year
 
     # get total sales from context
     total_sales = ContextNewVehicleMarket.new_vehicle_sales(model_year)
@@ -66,13 +66,13 @@ def new_vehicle_sales_response(calendar_year, P):
         import numpy as np
         P = np.array(P)
 
-    if o2.options.session_is_reference and isinstance(P, float):
+    if globals.options.session_is_reference and isinstance(P, float):
         ContextNewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, P)
 
     Q0 = ContextNewVehicleMarket.new_vehicle_sales(calendar_year)
     P0 = ContextNewVehicleMarket.new_vehicle_generalized_cost(calendar_year)
 
-    E = o2.options.new_vehicle_sales_response_elasticity
+    E = globals.options.new_vehicle_sales_response_elasticity
 
     M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
 
@@ -84,10 +84,10 @@ def new_vehicle_sales_response(calendar_year, P):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
@@ -103,43 +103,43 @@ if __name__ == '__main__':
 
         from GHG_standards_flat import input_template_name as flat_template_name
         from GHG_standards_footprint import input_template_name as footprint_template_name
-        ghg_template_name = get_template_name(o2.options.ghg_standards_file)
+        ghg_template_name = get_template_name(globals.options.ghg_standards_file)
 
         if ghg_template_name == flat_template_name:
             from GHG_standards_flat import GHGStandardFlat
 
-            o2.options.GHG_standard = GHGStandardFlat
+            globals.options.GHG_standard = GHGStandardFlat
         elif ghg_template_name == footprint_template_name:
             from GHG_standards_footprint import GHGStandardFootprint
 
-            o2.options.GHG_standard = GHGStandardFootprint
+            globals.options.GHG_standard = GHGStandardFootprint
         else:
             init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
-        init_fail += Manufacturer.init_database_from_file(o2.options.manufacturers_file,
-                                                                     verbose=o2.options.verbose)
-        init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
-                                                                    verbose=o2.options.verbose)
-        init_fail += Fuel.init_database_from_file(o2.options.fuels_file, verbose=o2.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(globals.options.manufacturers_file,
+                                                          verbose=globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(globals.options.market_classes_file,
+                                                         verbose=globals.options.verbose)
+        init_fail += Fuel.init_database_from_file(globals.options.fuels_file, verbose=globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(o2.options.cost_file, verbose=o2.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(globals.options.cost_file, verbose=globals.options.verbose)
 
-        init_fail += o2.options.GHG_standard.init_database_from_file(o2.options.ghg_standards_file,
-                                                                             verbose=o2.options.verbose)
+        init_fail += globals.options.GHG_standard.init_database_from_file(globals.options.ghg_standards_file,
+                                                                          verbose=globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(o2.options.vehicles_file,
-                                                                     o2.options.vehicle_onroad_calculations_file,
-                                                                     verbose=o2.options.verbose)
+        init_fail += VehicleFinal.init_database_from_file(globals.options.vehicles_file,
+                                                          globals.options.vehicle_onroad_calculations_file,
+                                                          verbose=globals.options.verbose)
 
         init_fail += ContextNewVehicleMarket.init_database_from_file(
-            o2.options.context_new_vehicle_market_file, verbose=o2.options.verbose)
+            globals.options.context_new_vehicle_market_file, verbose=globals.options.verbose)
 
         if not init_fail:
-            o2.options.analysis_initial_year = VehicleFinal.get_max_model_year() + 1
+            globals.options.analysis_initial_year = VehicleFinal.get_max_model_year() + 1
 
-            sales_demand = context_new_vehicle_sales(o2.options.analysis_initial_year)
+            sales_demand = context_new_vehicle_sales(globals.options.analysis_initial_year)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

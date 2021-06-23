@@ -8,6 +8,11 @@
 """
 
 print('importing %s' % __file__)
+# see https://matplotlib.org/stable/tutorials/introductory/customizing.html#matplotlib-rcparams and
+# https://matplotlib.org/stable/tutorials/introductory/customizing.html#the-matplotlibrc-file for more info
+# on customizing matplotlib default settings
+from matplotlib import rcParams
+rcParams['figure.max_open_warning'] = -1  # disable max open figure warnings
 
 import matplotlib.pyplot as plt
 

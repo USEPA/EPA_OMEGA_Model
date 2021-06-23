@@ -46,13 +46,13 @@ class Manufacturer(SQABase, OMEGABase):
                     obj_list.append(Manufacturer(
                         manufacturer_ID=manufacturer_ID,
                     ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
-                template_errors = GHG_credit_bank.validate_ghg_credits_template(o2.options.ghg_credits_file, verbose)
+                template_errors = GHG_credit_bank.validate_ghg_credits_template(globals.options.ghg_credits_file, verbose)
 
                 if not template_errors:
-                    initial_credit_bank[manufacturer_ID] = GHG_credit_bank(o2.options.ghg_credits_file, manufacturer_ID)
+                    initial_credit_bank[manufacturer_ID] = GHG_credit_bank(globals.options.ghg_credits_file, manufacturer_ID)
 
         return template_errors
 
@@ -60,10 +60,10 @@ class Manufacturer(SQABase, OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
@@ -72,13 +72,13 @@ if __name__ == '__main__':
         from vehicles import VehicleFinal
         from vehicle_annual_data import VehicleAnnualData
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += Manufacturer.init_database_from_file(o2.options.manufacturers_file, verbose=o2.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(globals.options.manufacturers_file, verbose=globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

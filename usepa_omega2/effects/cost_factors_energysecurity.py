@@ -40,7 +40,7 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
                 cost_factors = [cost_factors]
             attrs = CostFactorsEnergySecurity.get_class_attributes(cost_factors)
 
-            result = o2.session.query(*attrs).filter(CostFactorsEnergySecurity.calendar_year == calendar_year).all()[0]
+            result = globals.session.query(*attrs).filter(CostFactorsEnergySecurity.calendar_year == calendar_year).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]
@@ -75,7 +75,7 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = pd.read_csv(o2.options.ip_deflators_file, skiprows=1, index_col=0)
+            deflators = pd.read_csv(globals.options.ip_deflators_file, skiprows=1, index_col=0)
             df = gen_fxns.adjust_dollars(df, deflators, 'dollars_per_gallon')
 
             if not template_errors:
@@ -88,8 +88,8 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
                         dollars_per_gallon = df.loc[i, 'dollars_per_gallon'],
                         foreign_oil_fraction = df.loc[i, 'foreign_oil_fraction'],
                     ))
-                o2.session.add_all(obj_list)
-                o2.session.flush()
+                globals.session.add_all(obj_list)
+                globals.session.flush()
 
         return template_errors
 
@@ -97,22 +97,22 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
 
-        init_fail += CostFactorsEnergySecurity.init_database_from_file(o2.options.energysecurity_cost_factors_file,
-                                                                                  verbose=o2.options.verbose)
+        init_fail += CostFactorsEnergySecurity.init_database_from_file(globals.options.energysecurity_cost_factors_file,
+                                                                       verbose=globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(o2.options.database_dump_folder)
+            dump_omega_db_to_csv(globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

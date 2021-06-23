@@ -120,24 +120,24 @@ class OffCycleCredits(OMEGABase):
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
-            print(fileio.get_filenameext(__file__))
+            print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        o2.options = OMEGARuntimeOptions()
+        globals.options = OMEGARuntimeOptions()
         init_omega_db()
-        o2.engine.echo = o2.options.verbose
+        globals.engine.echo = globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(o2.engine)
+        SQABase.metadata.create_all(globals.engine)
 
         init_fail = []
-        init_fail += OffCycleCredits.init_from_file(o2.options.offcycle_credits_file,
-                                                                verbose=o2.options.verbose)
+        init_fail += OffCycleCredits.init_from_file(globals.options.offcycle_credits_file,
+                                                    verbose=globals.options.verbose)
 
         if not init_fail:
-            fileio.validate_folder(o2.options.database_dump_folder)
+            file_io.validate_folder(globals.options.database_dump_folder)
             OffCycleCredits._values['data'].to_csv(
-                o2.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
+                globals.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
 
             class dummyVehicle:
                 model_year = 2020
