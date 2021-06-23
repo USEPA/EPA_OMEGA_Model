@@ -27,12 +27,12 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
-    packages=["usepa_omega2"],                # or something like packages=find_packages(exclude=("tests",)),
+    packages=["omega_model"],                # or something like packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     install_requires=["numpy", "matplotlib"],
     entry_points={
         "console_scripts": [
-            "omega2=usepa_omega2.__main__:main",
+            "omega2=omega_model.__main__:main",
         ]
     },
 )

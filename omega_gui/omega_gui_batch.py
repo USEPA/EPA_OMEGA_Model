@@ -67,11 +67,11 @@ configuration_file_valid = False
 input_batch_file_valid = False
 output_batch_directory_valid = False
 # Images for model run button
-run_button_image_disabled = path + "usepa_omega2_gui/elements/green_car_1.jpg"
-run_button_image_enabled = path + "usepa_omega2_gui/elements/green_car_1.jpg"
-epa_button_image = path + "usepa_omega2_gui/elements/epa_seal_large_trim.gif"
-green_check_image = path + "usepa_omega2_gui/elements/green_check.png"
-red_x_image = path + "usepa_omega2_gui/elements/red_x.png"
+run_button_image_disabled = path + "omega_gui/elements/green_car_1.jpg"
+run_button_image_enabled = path + "omega_gui/elements/green_car_1.jpg"
+epa_button_image = path + "omega_gui/elements/epa_seal_large_trim.gif"
+green_check_image = path + "omega_gui/elements/green_check.png"
+red_x_image = path + "omega_gui/elements/red_x.png"
 # Common spacer between events
 event_separator = "----------"
 # OMEGA 2 version
@@ -81,7 +81,7 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
-button_click_sound = path + 'usepa_omega2_gui/elements/click.mp3'
+button_click_sound = path + 'omega_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -110,7 +110,7 @@ class Form(QObject):
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
-        self.window.setWindowIcon(QIcon(path + "usepa_omega2_gui/elements/omega2_icon.jpg"))
+        self.window.setWindowIcon(QIcon(path + "omega_gui/elements/omega2_icon.jpg"))
 
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
@@ -750,7 +750,7 @@ class Form(QObject):
         self.window.repaint()
 
         # This call works but gui freezes until new process ends
-        # os.system("python usepa_omega2/__main__.py")
+        # os.system("python omega_model/__main__.py")
         # Open batch definition
         if '.xls' in input_batch_file:
             batch_definition_df = pandas.read_excel(input_batch_file, index_col=0, sheet_name='Sessions')
@@ -787,7 +787,7 @@ class Form(QObject):
         # notification.notify(
         #     title="OMEGA Notification",
         #     message="Model Run Started\n" + "Input File =\n" + "  " + os.path.basename(input_batch_file),
-        #     # app_icon=path + "usepa_omega2_gui/elements/omega2_icon.ico",
+        #     # app_icon=path + "omega_gui/elements/omega2_icon.ico",
         #     timeout=5
         # )
 
@@ -921,7 +921,7 @@ class Form(QObject):
         #     title="OMEGA Notification",
         #     message="Model Run Completed\n" + str(elapsed_time) + "\n" + "Output Directory =\n" +
         #             "  " + os.path.basename(output_batch_directory),
-        #     # app_icon= path + "usepa_omega2_gui/elements/omega2_icon.ico",
+        #     # app_icon= path + "omega_gui/elements/omega2_icon.ico",
         #     timeout=5
         # )
 
@@ -1059,7 +1059,7 @@ class Form(QObject):
         # print(plot_select_directory_name)
 
         self.window.list_graphs_1.clear()
-        input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
+        input_file = path + 'omega_gui/elements/plot_definition.csv'
         plot_data_df = pandas.read_csv(input_file)
         for index, row in plot_data_df.iterrows():
             # print(row['plot_name'])
@@ -1091,7 +1091,7 @@ class Form(QObject):
         global plot_select_directory_name
         global plot_select_directory
         self.window.list_graphs_1.clear()
-        input_file = path + 'usepa_omega2_gui/elements/plot_definition.csv'
+        input_file = path + 'omega_gui/elements/plot_definition.csv'
         plot_data_df = pandas.read_csv(input_file)
         for index, row in plot_data_df.iterrows():
             self.window.list_graphs_1.addItem(row['plot_name'])
@@ -1173,7 +1173,7 @@ def run_gui():
 
     app = QApplication(sys.argv)
     # Load the gui
-    uifilename = path + 'usepa_omega2_gui/elements/omega_gui_v22.ui'
+    uifilename = path + 'omega_gui/elements/omega_gui_v22.ui'
     print('uifilename = %s' % uifilename)
     form = Form(uifilename)
     sys.exit(app.exec_())

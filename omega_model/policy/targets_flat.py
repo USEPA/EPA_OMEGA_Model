@@ -158,7 +158,7 @@ class TargetsFlat(SQABase, OMEGABase):
 
         """
         import numpy as np
-        from incentives import Incentives
+        from policy.incentives import Incentives
 
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
@@ -199,7 +199,7 @@ class TargetsFlat(SQABase, OMEGABase):
 
         """
         import numpy as np
-        from incentives import Incentives
+        from policy.incentives import Incentives
 
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])

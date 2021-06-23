@@ -15,10 +15,10 @@ print('importing %s' % __file__)
 
 import os, sys
 
-# make sure top-level project folder is on the path (i.e. folder that contains usepa_omega2)
+# make sure top-level project folder is on the path (i.e. folder that contains omega_model)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# print('usepa_omega2 omega_batch.py path = %s' %  os.path.abspath(__file__))
+# print('omega_model omega_batch.py path = %s' %  os.path.abspath(__file__))
 # print('SYS Path = %s' % sys.path)
 
 from common.omega_types import OMEGABase
@@ -545,7 +545,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     if options.no_bundle:
         batchfile_path = os.path.split(args.batch_file)[0]
 
-        package_folder = batchfile_path + os.sep + 'usepa_omega2'
+        package_folder = batchfile_path + os.sep + 'omega_model'
 
         subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
                            if os.path.isdir(package_folder + os.sep + d)

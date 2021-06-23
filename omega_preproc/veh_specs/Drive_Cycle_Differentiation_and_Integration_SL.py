@@ -3,7 +3,7 @@ def Drive_Cycle_Differentiation_and_Integration_SL(input_path, drivecycle_filena
     import numpy as np
     from pathlib import Path
     home = str(Path.home())
-    dynamometer_drive_schedules_path = home + '/PycharmProjects/EPA_OMEGA_Model/usepa_omega2_preproc/veh_specs/dynamometer_drive_schedules/'
+    dynamometer_drive_schedules_path = home + '/PycharmProjects/EPA_OMEGA_Model/omega_preproc/veh_specs/dynamometer_drive_schedules/'
 
 #Read in FTP and HWFET drive cycle
     #print ('Evaluating Drive Cycles')

@@ -151,7 +151,7 @@ def status_cb(status, node, job):
 def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, retry_count=0):
     import sys, subprocess, os, time
     # build shell command
-    cmd = '"{}" "{}/{}/usepa_omega2/omega_batch.py" --bundle_path "{}" \
+    cmd = '"{}" "{}/{}/omega_model/omega_batch.py" --bundle_path "{}" \
             --batch_file "{}.csv" --session_num {} --no_validate --no_bundle'.format(
         sys.executable, network_batch_path_root, batch_name, network_batch_path_root, batch_file, session_num).replace(
         '/', os.sep)

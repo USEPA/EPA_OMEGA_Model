@@ -616,11 +616,11 @@ class PackageCost:
 
 class SetInputs:
     path_cwd = Path.cwd()
-    path_preproc = path_cwd / 'usepa_omega2_preproc'
+    path_preproc = path_cwd / 'omega_preproc'
     path_here = path_preproc / 'alpha_package_costs'
     path_outputs = path_here / 'outputs'
     path_alpha_inputs = path_here / 'ALPHA'
-    path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
+    path_input_templates = path_cwd / 'omega_model/test_inputs'
 
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 

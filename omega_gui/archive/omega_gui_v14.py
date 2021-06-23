@@ -580,7 +580,7 @@ class Form(QObject):
         # self.event_monitor("Copying Files Complete\n    " + temp, color, 'dt')
 
         # This call works but gui freezes until new process ends
-        # os.system("python usepa_omega2/__main__.py")
+        # os.system("python omega_model/__main__.py")
 
         # Delete contents of comm_file.txt used to communicate with other processes
         # file1 = open("gui/comm_file.txt", "a")  # append mode
@@ -596,7 +596,7 @@ class Form(QObject):
         sound1 = subprocess.Popen(['python', os.path.realpath('gui/sound_gui.py'), model_sound_start], close_fds=True)
 
         # This call works and runs a completely separate process
-        # omega2 = subprocess.Popen(['python', os.path.realpath('usepa_omega2/__main__.py'), 'Test333'], close_fds=True)
+        # omega2 = subprocess.Popen(['python', os.path.realpath('omega_model/__main__.py'), 'Test333'], close_fds=True)
         # omega2.terminate()
 
         omega_batch = subprocess.Popen(['python', os.path.realpath('gui/run_omega_batch_gui.py'),

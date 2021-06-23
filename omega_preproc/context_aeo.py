@@ -186,11 +186,11 @@ class GetContext:
 class SetInputs:
     aeo_version = '2021'
     path_cwd = Path.cwd()
-    path_aeo_inputs = path_cwd / f'usepa_omega2_preproc/aeo_tables/AEO{aeo_version}'
-    path_bea_inputs = path_cwd / f'usepa_omega2_preproc/bea_tables/BEA{aeo_version}'
-    path_outputs = path_cwd / 'usepa_omega2_preproc/output_context_aeo'
+    path_aeo_inputs = path_cwd / f'omega_preproc/aeo_tables/AEO{aeo_version}'
+    path_bea_inputs = path_cwd / f'omega_preproc/bea_tables/BEA{aeo_version}'
+    path_outputs = path_cwd / 'omega_preproc/output_context_aeo'
     path_outputs.mkdir(exist_ok=True)
-    path_input_templates = path_cwd / 'usepa_omega2/test_inputs'
+    path_input_templates = path_cwd / 'omega_model/test_inputs'
 
     vehicles_context_template = 'context_new_vehicle_market.csv'
     fuels_context_template = 'context_fuel_prices.csv'
@@ -447,7 +447,7 @@ def main():
     fleet_context_df.to_csv(path_of_run_folder / settings.vehicles_context_template, index=False)
     fuel_context_df.to_csv(path_of_run_folder / settings.fuels_context_template, index=False)
     deflators.to_csv(path_of_run_folder / settings.price_deflators_template, index=False)
-    deflators.to_csv(settings.path_cwd / f'usepa_omega2_preproc/bea_tables/implicit_price_deflators_{usd_basis}.csv', index=False)
+    deflators.to_csv(settings.path_cwd / f'omega_preproc/bea_tables/implicit_price_deflators_{usd_basis}.csv', index=False)
     cpi_table.to_csv(path_of_run_folder / settings.cpiu_deflators_template, index=False)
 
 

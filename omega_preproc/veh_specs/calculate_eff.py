@@ -9,7 +9,7 @@ import Subconfig_ModelType_Footprint_Bodyid_Expansion
 import Calculate_Powertrain_Efficiency_SL
 
 home = str(Path.home())
-dynamometer_drive_schedules = home + '/PycharmProjects/EPA_OMEGA_Model/usepa_omega2_preproc/veh_specs/dynamometer_drive_schedules/'
+dynamometer_drive_schedules = home + '/PycharmProjects/EPA_OMEGA_Model/omega_preproc/veh_specs/dynamometer_drive_schedules/'
 
 input_path = 'C:/Users/slee02/Documents/Python/inputs/'
 working_directory = 'C:/Users/slee02/Documents/Python/outputs/'
@@ -26,7 +26,7 @@ hwfet_drivecycle_filename1 = 'drivetrace_HWFE.csv'
 
 # subconfig_filename = 'CAFE_Subconfig_Sales_MY2019_20210213_607c2aa6-c48d-483e-835e-ac4f0de2f88e.csv'
 # roadload_coefficient_table_filename = 'CAFE_Subconfig_MY2019_20210213_cc75eaa5-1c57-4c54-bd98-95177db74925.csv'
-dynamometer_drive_schedules = home + '/PycharmProjects/EPA_OMEGA_Model/usepa_omega2_preproc/veh_specs/dynamometer_drive_schedules/'
+dynamometer_drive_schedules = home + '/PycharmProjects/EPA_OMEGA_Model/omega_preproc/veh_specs/dynamometer_drive_schedules/'
 ftp_drivecycle_filename = dynamometer_drive_schedules + 'ftpcol10hz.csv'
 hwfet_drivecycle_filename = dynamometer_drive_schedules + 'hwycol10hz.csv'
 us06_drivecycle_filename = dynamometer_drive_schedules + 'us06col.csv'
