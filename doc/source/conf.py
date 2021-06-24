@@ -99,3 +99,6 @@ latex_elements = {
 master_doc = 'index'
 
 add_module_names = False
+
+from sphinx.apidoc import main
+main(['--force', '--append-syspath', '--doc-project "Code Details"', '--doc-version 0.7.1', '--module-first', '--tocfile code_details'])
