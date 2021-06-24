@@ -75,33 +75,6 @@ def Drive_Cycle_Differentiation_and_Integration(input_path, drivecycle_filenames
     else:
         HWFET_Array = []
 
-    if len(drivecycle_file_Custom) > 0:
-        Custom_ws = pd.read_csv(dynamometer_drive_schedules_path + '\\' + drivecycle_file_Custom, encoding='ISO-8859-1', skiprows=1)
-        Custom_time = Custom_ws['seconds']
-        Custom_velocity_mph = Custom_ws['mph']
-        Custom_length = len(Custom_time)
-        Custom_disp_mi = np.zeros(Custom_length)
-        Custom_acceleration_mph2 = np.zeros(Custom_length)
-        for f in range(0, Custom_length):
-            if f == 0 or f == Custom_length - 1:
-                Custom_acceleration_mph2[f] = 0
-            else:
-                # Custom_acceleration_mph2[f] = (Custom_velocity_mph[f+1]-Custom_velocity_mph[f-1])/((Custom_time[f+1]-Custom_time[f-1])/3600)
-                Custom_acceleration_mph2[f] = (Custom_velocity_mph[f] - Custom_velocity_mph[f - 1]) / ((Custom_time[f] - Custom_time[f - 1]) / 3600)
-            if f == 0:
-                Custom_disp_mi[f] = 0
-            else:
-                Custom_disp_mi[f] = 0.5 * (Custom_time[f] - Custom_time[f - 1]) * (
-                            Custom_velocity_mph[f - 1] + Custom_velocity_mph[f]) / 3600
-        Custom_time = pd.Series(Custom_time, name='Time (s)')
-        Custom_velocity_mph = pd.Series(Custom_velocity_mph, name='Velocity (mph)')
-        Custom_disp_mi = pd.Series(Custom_disp_mi, name='Displacement (mi)')
-        Custom_acceleration_mph2 = pd.Series(Custom_acceleration_mph2, name='Acceleration (mph2)')
-
-        Custom_Array = pd.concat([Custom_time, Custom_velocity_mph, Custom_disp_mi, Custom_acceleration_mph2], axis=1)
-    else:
-        Custom_Array = []
-
     if len(drivecycle_file_US06) > 0:
         US06_ws = pd.read_csv(dynamometer_drive_schedules_path + '\\' + drivecycle_file_US06, encoding='ISO-8859-1', skiprows=1)
         US06_time = US06_ws['seconds']
@@ -129,5 +102,30 @@ def Drive_Cycle_Differentiation_and_Integration(input_path, drivecycle_filenames
     else:
         US06_Array = []
 
+    if len(drivecycle_file_Custom) > 0:
+        Custom_ws = pd.read_csv(dynamometer_drive_schedules_path + '\\' + drivecycle_file_Custom, encoding='ISO-8859-1', skiprows=1)
+        Custom_time = Custom_ws['seconds']
+        Custom_velocity_mph = Custom_ws['mph']
+        Custom_length = len(Custom_time)
+        Custom_disp_mi = np.zeros(Custom_length)
+        Custom_acceleration_mph2 = np.zeros(Custom_length)
+        for f in range(0, Custom_length):
+            if f == 0 or f == Custom_length - 1:
+                Custom_acceleration_mph2[f] = 0
+            else:
+                Custom_acceleration_mph2[f] = (Custom_velocity_mph[f] - Custom_velocity_mph[f - 1]) / ((Custom_time[f] - Custom_time[f - 1]) / 3600)
+            if f == 0:
+                Custom_disp_mi[f] = 0
+            else:
+                Custom_disp_mi[f] = 0.5 * (Custom_time[f] - Custom_time[f - 1]) * (
+                            Custom_velocity_mph[f - 1] + Custom_velocity_mph[f]) / 3600
+        Custom_time = pd.Series(Custom_time, name='Time (s)')
+        Custom_velocity_mph = pd.Series(Custom_velocity_mph, name='Velocity (mph)')
+        Custom_disp_mi = pd.Series(Custom_disp_mi, name='Displacement (mi)')
+        Custom_acceleration_mph2 = pd.Series(Custom_acceleration_mph2, name='Acceleration (mph2)')
+
+        Custom_Array = pd.concat([Custom_time, Custom_velocity_mph, Custom_disp_mi, Custom_acceleration_mph2], axis=1)
+    else:
+        Custom_Array = []
 
     return (FTP_Array, HWFET_Array, US06_Array, Custom_Array)
