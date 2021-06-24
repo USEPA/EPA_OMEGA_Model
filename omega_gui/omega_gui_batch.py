@@ -42,8 +42,8 @@ from omega_gui.omega_gui_stylesheets import *
 
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
 
-print('omega_gui_batch.py path = %s' % path)
-print('SYS Path = %s' % sys.path)
+# print('omega_gui_batch.py path = %s' % path)
+# print('SYS Path = %s' % sys.path)
 
 # Initialize global variables
 # Contains the complete path (including filename) to the configuration file
