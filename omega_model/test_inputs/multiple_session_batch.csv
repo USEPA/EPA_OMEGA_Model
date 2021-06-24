@@ -17,7 +17,6 @@ Vehicles File,String,vehicles.csv,vehicles.csv
 Vehicle On-road Calculations File,String,vehicle_onroad_calculations.csv,vehicle_onroad_calculations.csv
 Demanded Shares File,String,demanded_shares-gcam.csv,demanded_shares-gcam.csv
 Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
-Policy Fuel Upstream File,String,policy_fuel_upstream.csv,policy_fuel_upstream.csv
 Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
@@ -27,7 +26,7 @@ Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_ne
 GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-flat.csv
 Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
 Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
-GHG Standards Fuels File,String,ghg_standards-fuels.csv,ghg_standards-fuels.csv
+GHG Standards Fuels File,String,policy_fuels.csv,policy_fuels.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
 ZEV Requirement File,String,required_zev_share.csv,required_zev_share.csv
 Price Modifications File,String,price_modifications.csv,price_modifications.csv
