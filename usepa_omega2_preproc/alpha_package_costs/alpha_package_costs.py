@@ -10,8 +10,19 @@ from usepa_omega2_preproc.context_aeo import SetInputs as context_aeo_inputs
 
 weight_cost_cache = dict()
 
-# TODO add stop-start field to cost cloud file with value of 0 or 1
 def cost_vs_plot(settings, df, path, *years):
+    """
+
+    Args:
+        settings: The SetInputs class.
+        df: A DataFrame cost cloud consisting of ICE, BEV and HEV packages.
+        path: The path for saving the plot.
+        years: The years for which cost cloud plots are to be generated and saved.
+
+    Returns:
+        Nothing, but plots for the given years will be saved to the passed path.
+
+    """
     ice_classes = [x for x in df['cost_curve_class'].unique() if 'ice' in x]
     bev_classes = [x for x in df['cost_curve_class'].unique() if 'bev' in x]
     hev_classes = [x for x in df['cost_curve_class'].unique() if 'hev' in x and 'phev' not in x]
@@ -85,42 +96,39 @@ def cost_vs_plot(settings, df, path, *years):
             plt.savefig(path / f'hev_{year}_{settings.name_id}.png')
 
 
-def cost_vs_plot_combined(settings, df, path, *years): # can't do this with co2/mi and kWh/mi
-    classes = [x for x in df['cost_curve_class'].unique()]
-    for year in years:
-        class_data = dict()
-        class_plot = list()
-        class_legends = list()
-        for cost_curve_class in classes:
-            class_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cert_grams_per_mile'],
-                                            df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
-            class_plot.append(class_data[cost_curve_class])
-            class_legends.append(cost_curve_class)
+def create_cost_df_in_consistent_dollar_basis(deflators, dollar_basis, file, sheet_name, *args, index_col=0):
+    """
 
-        class_plot = tuple(class_plot)
-        class_legends = tuple(class_legends)
+    Args:
+        deflators: A dictionary of GDP deflators with years as the keys.
+        dollar_basis: The dollar basis to which all monetized values are to be converted.
+        file: The file containing monetized values to be converted into dollar_basis dollars.
+        sheet_name: The specific worksheet within file for which monetized values are to be converted.
+        args: The arguments to be converted.
 
-        # create ice plot
-        fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1)
-        ax.grid(True)
-        for class_plot, class_legends in zip(class_plot, class_legends):
-            x, y = class_plot
-            ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=class_legends)
-            ax.set(xlim=(0, 500), ylim=(10000, 60000))
-            plt.legend(loc=1)
-            plt.title(f'{year}')
-            plt.savefig(path / f'{year}_{settings.name_id}.png')
+    Returns:
+         A DataFrame of monetized values in a consistent dollar_basis valuation.
 
-
-def create_df_and_convert_dollars(deflators, dollar_basis, file, sheet_name, *args, index_col=0):
+    """
     df = pd.read_excel(file, sheet_name, index_col=index_col)
     df = convert_dollars_to_analysis_basis(df, deflators, dollar_basis, *args)
     return df
 
 
 def convert_dollars_to_analysis_basis(df, deflators, dollar_basis, *args):
-    dollar_years = pd.Series(df['dollar_basis']).unique()
+    """
+
+    Args:
+        df: A DataFrame containing monetized values to be converted into a consistent dollar_basis.
+        deflators: A dictionary of GDP deflators with years as the keys.
+        dollar_basis: The dollar basis to which all monetized values are to be converted.
+        args: The arguments to be converted.
+
+    Returns:
+        A DataFrame of monetized values in a consistent dollar_basis valuation.
+
+    """
+    dollar_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
     for year in dollar_years:
         for arg in args:
             df.loc[df['dollar_basis'] == year, arg] = df[arg] * deflators[year]['adjustment_factor']
@@ -128,20 +136,36 @@ def convert_dollars_to_analysis_basis(df, deflators, dollar_basis, *args):
     return df
 
 
-def dollar_basis_year(df):
-    for i in range(len(df)):
-        if df.iloc[i]['adjustment_factor'] == 1:
-            dollar_year = df.index[i]
-    return dollar_year
-
-
 def calc_year_over_year_costs(df, arg, years, learning_rate):
+    """
+
+    Args:
+        df: A DataFrame of ALPHA packages with costs for a single start year.
+        arg: The argument for which year-over-year costs are to be calculated.
+        years: The years for which year-over-year costs are to be calculated.
+        learning_rate: The learning rate to apply to start year costs to calculated year-over-year costs.
+
+    Returns:
+        A DataFrame of ALPHA packages with costs for all years passed.
+
+    """
     for year in years:
         df.insert(len(df.columns), f'{arg}_{year}', df[arg] * (1 - learning_rate) ** (year - years[0]))
     return df
 
 
 def sum_vehicle_parts(df, years, new_arg, *args):
+    """
+
+    Args:
+        df: A DataFrame of ALPHA packages with year-over-year costs for all years.
+        years: The years for which new_arg year-over-year costs are to be calculated.
+        args: The arguments to sum into a single new_arg value for each of the passed years.
+
+    Returns:
+        A DataFrame of year-over-year costs that now includes summed args expressed as the new_arg.
+
+    """
     for year in years:
         df.insert(len(df.columns), f'{new_arg}_{year}', 0)
         for arg in args:
@@ -150,8 +174,22 @@ def sum_vehicle_parts(df, years, new_arg, *args):
 
 
 def reshape_df_for_cloud_file(settings, df_source, *id_args):
+    """
+
+    Args:
+        settings: The SetInputs class.
+        df_source: A DataFrame of ALPHA packages containing year-over-year costs to be reshaped into the cost cloud.
+        id_args: The arguments to use as ID variables in the reshaped DataFrame (pd.melt).
+
+    Return:
+        A DataFrame in the desired shape of the cost cloud file.
+
+    """
     df_return = pd.DataFrame()
     id_variables = [id_arg for id_arg in id_args]
+    credit_args = [col for col in df_source.columns if col.__contains__('credit')]
+    for credit_arg in credit_args:
+        id_variables.append(credit_arg)
     if settings.run_bev or settings.run_phev:
         for arg in df_source.columns:
             if arg.__contains__('kwh_per_mile'):
@@ -172,6 +210,16 @@ def reshape_df_for_cloud_file(settings, df_source, *id_args):
 
 
 def drop_columns(df, *args):
+    """
+
+    Args:
+        df: A DataFrame in which a column is to be dropped.
+        args: The column names to be dropped.
+
+    Returns:
+        A DataFrame without columns=args.
+
+    """
     cols_to_drop = list()
     for arg in args:
         if arg in df.columns:
@@ -184,9 +232,13 @@ def drop_columns(df, *args):
 def clean_alpha_data(input_df, *args):
     """
 
-    :param input_df: A DataFrame of ALPHA results.
-    :param args: Arguments within the passed DataFrame to clean of '%' signs.
-    :return: The passed DataFrame with *args washed of % signs.
+    Args:
+        input_df: A DataFrame based on a single ALPHA file is which some data is to be cleaned.
+        args: The arguments for which cleaning is to be done.
+
+    Returns:
+        The passed DataFrame with data cleaned (text values converted to integers, % signs removed, etc.).
+
     """
     # clean data with percent signs
     df = input_df.copy()
@@ -203,8 +255,12 @@ def clean_alpha_data(input_df, *args):
 def add_elements_for_package_key(input_df):
     """
 
-    :param input_df: A DataFrame of ALPHA results.
-    :return: The passed DataFrame with additional columns for use in the package_key function.
+    Args:
+        input_df: A DataFrame of ALPHA packages for which columns are to be created for use in the package key.
+
+    Returns:
+        The passed DataFrame with additional columns for use in the package key.
+
     """
     df = input_df.copy().fillna(0)
     df = pd.DataFrame(df.loc[df['Vehicle Type'] != 0, :]).reset_index(drop=True)
@@ -218,6 +274,16 @@ def add_elements_for_package_key(input_df):
 
 
 def calc_battery_kwh_gross(settings, input_df):
+    """
+
+    Args:
+        settings: The SetInputs class.
+        input_df: A DataFrame of plug-in vehicles for which battery gross kWh is to be calculated based on values set in the module's input file.
+
+    Returns:
+        A list of gross kWh values indexed exactly as the input_df.
+
+    """
     battery_kwh_list = list()
     for kwh_per_100_miles in input_df['Combined Consumption Rate']:
         battery_kwh_list.append(settings.onroad_bev_range_miles / settings.bev_usable_soc * (kwh_per_100_miles / 100) / (1 - settings.bev_gap))
@@ -225,16 +291,38 @@ def calc_battery_kwh_gross(settings, input_df):
 
 
 def calc_battery_weight(settings, battery_kwh_list, curves_dict):
+    """
+
+    Args:
+        settings: The SetInputs class.
+        battery_kwh_list: A list of gross battery kWh values for which battery weights are to be calculated.
+        curves_dict: A dictionary of battery metrics including kWh_pack_per_kg_pack_curve.
+
+    Returns:
+        A list of battery weights for each battery in the passed battery_kwh_list.
+
+    """
     battery_weight_list = list()
     for battery_kwh in battery_kwh_list:
-        battery_weight_list.append(settings.lbs_per_kg * battery_kwh / (curves_dict['x_cubed_factor']['kWh_pack_per_kg_pack_curve'] * battery_kwh ** 3
-                                                                        + curves_dict['x_squared_factor']['kWh_pack_per_kg_pack_curve'] * battery_kwh ** 2
-                                                                        + curves_dict['x_factor']['kWh_pack_per_kg_pack_curve'] * battery_kwh
-                                                                        + curves_dict['constant']['kWh_pack_per_kg_pack_curve']))
+        battery_weight_list.append(settings.lbs_per_kg * battery_kwh / (curves_dict['kWh_pack_per_kg_pack_curve']['x_cubed_factor'] * battery_kwh ** 3
+                                                                        + curves_dict['kWh_pack_per_kg_pack_curve']['x_squared_factor'] * battery_kwh ** 2
+                                                                        + curves_dict['kWh_pack_per_kg_pack_curve']['x_factor'] * battery_kwh
+                                                                        + curves_dict['kWh_pack_per_kg_pack_curve']['constant']))
     return battery_weight_list
 
 
 def calc_glider_weight(settings, battery_weight_list, curb_weight_series, fuel_id):
+    """
+    Args:
+        settings: The SetInputs class.
+        battery_weight_list: A list of battery weights.
+        curb_weight_series: A Series of curb weights.
+        fuel_id: The fuel ID (i.e., 'ice', 'bev', 'hev').
+
+    Returns:
+        A list of glider weights for fuel_id vehicles having the curb weights and battery weights according to the passed lists.
+
+    """
     glider_weight_list = list()
     if fuel_id == 'ice':
         for idx, battery_weight in enumerate(battery_weight_list):
@@ -248,11 +336,17 @@ def calc_glider_weight(settings, battery_weight_list, curb_weight_series, fuel_i
     return glider_weight_list
 
 
-def package_key(settings, input_df, fuel_id):
+def create_package_dict(settings, input_df, fuel_id):
     """
 
-    :param input_df: A DataFrame of ALPHA results.
-    :return: A Series of package keys and the passed DataFrame converted to a dictionary.
+    Args:
+        settings: The SetInputs class.
+        input_df: A DataFrame of ALPHA packages having the passed fuel_id (i.e., 'ice', 'bev', 'hev').
+        fuel_id: The fuel ID (i.e., 'ice', 'bev', 'hev').
+
+    Returns:
+        The passed DataFrame converted to a dictionary having package_keys as the dictionary keys.
+
     """
     df = input_df.copy().fillna(0)
     alpha_keys = pd.Series(df['Key'])
@@ -269,25 +363,43 @@ def package_key(settings, input_df, fuel_id):
     if fuel_id == 'bev':
         hev_keys = pd.Series([0] * len(df))
         battery_kwh_gross_list = calc_battery_kwh_gross(settings, df)
+        # determine onboard charger specs
+        onboard_charger_kw_list = list()
+        for battery_kwh_gross in battery_kwh_gross_list:
+            if battery_kwh_gross < 70: onboard_charger_kw_list.append(7)
+            elif 70 <= battery_kwh_gross < 100: onboard_charger_kw_list.append(11)
+            else: onboard_charger_kw_list.append(19)
+        # determine single or dual motor bev
+        number_of_motors_list = list()
+        for structure_class in structure_keys:
+            if structure_class == 'unibody': number_of_motors_list.append('single')
+            else: number_of_motors_list.append('dual')
+        size_scaler_list = pd.cut(df['Test Weight lbs'] - 300, settings.size_bins, labels=list(range(1, settings.size_bins + 1)))
         pev_keys = pd.Series(zip(pd.Series([settings.onroad_bev_range_miles] * len(df)),
                                  df['Combined Consumption Rate'] / 100,
                                  pd.Series([settings.bev_usable_soc] * len(df)),
                                  pd.Series([settings.bev_gap] * len(df)),
                                  battery_kwh_gross_list,
-                                 pd.Series([settings.bev_motor_power] * len(df))))
+                                 pd.Series([settings.bev_motor_power] * len(df)),
+                                 number_of_motors_list,
+                                 onboard_charger_kw_list,
+                                 size_scaler_list))
     if fuel_id == 'hev':
         pev_keys = pd.Series([0] * len(df))
         battery_kwh_gross_list = df['battery_kwh_gross']
         motor_kw_list = df['motor_kw']
+        # onboard_charger_list = pd.Series([0] * len(df))
+        size_scaler_list = pd.cut(df['Test Weight lbs'] - 300, settings.size_bins, labels=list(range(1, settings.size_bins + 1)))
         hev_keys = pd.Series(zip(pd.Series([settings.hev_metrics_dict['usable_soc_hev']['value']] * len(df)),
                                  pd.Series([settings.hev_metrics_dict['gap_hev']['value']] * len(df)),
                                  battery_kwh_gross_list,
-                                 motor_kw_list))
+                                 motor_kw_list,
+                                 size_scaler_list))
     if fuel_id != 'bev': trans_keys = pd.Series(df['Transmission'])
     else: trans_keys = pd.Series([0] * len(df))
 
     if fuel_id != 'bev': accessory_keys = pd.Series(df['Accessory'])
-    else: accessory_keys = pd.Series([0] * len(df))
+    else: accessory_keys = pd.Series(['REGEN'] * len(df))
 
     if fuel_id != 'bev': aero_keys = pd.Series(df['Aero Improvement %'])
     else: aero_keys = pd.Series([20] * len(df))
@@ -320,15 +432,33 @@ def package_key(settings, input_df, fuel_id):
     df.insert(0, 'key', keys)
     df.set_index('key', inplace=True)
     df_dict = df.to_dict('index')
-    return keys, df_dict
+    # return keys, df_dict
+    return df_dict
 
 
 def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
+    """
+
+    This function generates costs, etc., of ICE packages or ICE elements of electrified packages.
+
+    Args:
+        settings: The SetInputs class.
+        key: The key within the alpha_file_dict that uniquely identifies the package (see the create_package_dict function).
+        alpha_file_dict: A dictionary of ALPHA packages created by the create_package_dict function.
+        alpha_file_name: The name of the file from which the ALPHA packages are derived.
+
+    Returns:
+        A single row DataFrame containing necessary cycle results, credit flags, and first year costs of the given package.
+
+    """
     pkg_obj = PackageCost(key)
     alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
     print(cost_key)
 
-    fuel_key, alpha_class_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key'])
+    fuel_key, alpha_class_key, engine_key, accessory_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'engine_key', 'accessory_key'])
+    startstop = engine_key[4]
+    if accessory_key.__contains__('REGEN'): accessory_key_value = 1
+    else: accessory_key_value = 0
     ftp1_co2, ftp2_co2, ftp3_co2, hwy_co2, combined_co2 = alpha_file_dict[key]['EPA_FTP_1 gCO2/mi'], \
                                                           alpha_file_dict[key]['EPA_FTP_2 gCO2/mi'], \
                                                           alpha_file_dict[key]['EPA_FTP_3 gCO2/mi'], \
@@ -340,7 +470,7 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     ac_cost = pkg_obj.calc_ac_cost(settings.ac_cost_dict)
     if fuel_key == 'hev':
         hev_key = pkg_obj.get_object_attributes(['hev_key'])
-        battery_cost, motor_cost, hev_cost = pkg_obj.electrification_cost(settings)
+        battery_cost, non_battery_cost, hev_cost = pkg_obj.electrification_cost(settings)
     else: hev_cost = 0
     powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost + hev_cost
     powertrain_cost_df = pd.DataFrame(powertrain_cost, columns=['ice_powertrain'], index=[alpha_key])
@@ -360,6 +490,10 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     package_cost_df.insert(0, 'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile', ftp3_co2)
     package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'credit_start_stop', startstop)
+    package_cost_df.insert(0, 'credit_high_eff_alternator', accessory_key_value)
+    package_cost_df.insert(0, 'credit_ac_leakage', 1)
+    package_cost_df.insert(0, 'credit_ac_efficiency', 1)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
@@ -369,20 +503,34 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
 
 
 def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
+    """
+
+    This function generates costs, etc., of BEV packages or plug-in electric elements of electrified packages.
+
+    Args:
+        settings: The SetInputs class.
+        key: The key within the alpha_file_dict that uniquely identifies the package (see the create_package_dict function).
+        alpha_file_dict: A dictionary of ALPHA packages created by the create_package_dict function.
+        alpha_file_name: The name of the file from which the ALPHA packages are derived.
+
+    Returns:
+        A single row DataFrame containing necessary cycle results, credit flags, and first year costs of the given package.
+
+    """
     pkg_obj = PackageCost(key)
     alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
     print(cost_key)
     fuel_key, alpha_class_key, pev_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'pev_key'])
-    onroad_range, oncycle_kwh_per_mile, usable_soc, gap, battery_kwh_gross, motor_power = pev_key
+    onroad_range, oncycle_kwh_per_mile, usable_soc, gap, battery_kwh_gross, motor_power, number_of_motors, onboard_charger_kw, size_scaler = pev_key
     ftp1_kwh, ftp2_kwh, ftp3_kwh, hwy_kwh, combined_kwh = alpha_file_dict[key]['EPA_FTP_1_kWhr/100mi'] / 100, \
                                                           alpha_file_dict[key]['EPA_FTP_2_kWhr/100mi'] / 100, \
                                                           alpha_file_dict[key]['EPA_FTP_3_kWhr/100mi'] / 100, \
                                                           alpha_file_dict[key]['EPA_HWFET_kWhr/100mi'] / 100, \
                                                           oncycle_kwh_per_mile
     ac_cost = pkg_obj.calc_ac_cost(settings.ac_cost_dict)
-    battery_cost, motor_cost, pev_cost = pkg_obj.electrification_cost(settings)
+    battery_cost, nonbattery_cost, pev_cost = pkg_obj.electrification_cost(settings)
     powertrain_cost = pev_cost + ac_cost
-    powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_motor': motor_cost, 'pev_powertrain': powertrain_cost}, index=[alpha_key])
+    powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_nonbattery': nonbattery_cost, 'pev_powertrain': powertrain_cost}, index=[alpha_key])
     aero_cost = pkg_obj.calc_aero_cost(settings.aero_cost_dict)
     nonaero_cost = pkg_obj.calc_nonaero_cost(settings.nonaero_cost_dict)
     roadload_cost = aero_cost + nonaero_cost
@@ -398,6 +546,10 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     package_cost_df.insert(0, 'cd_ftp_3:cert_direct_oncycle_kwh_per_mile', ftp3_kwh)
     package_cost_df.insert(0, 'cd_ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
     package_cost_df.insert(0, 'cd_ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
+    package_cost_df.insert(0, 'credit_start_stop', 1)
+    package_cost_df.insert(0, 'credit_high_eff_alternator', 1)
+    package_cost_df.insert(0, 'credit_ac_leakage', 1)
+    package_cost_df.insert(0, 'credit_ac_efficiency', 1)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
@@ -408,22 +560,43 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
 
 
 def read_and_clean_file(settings, alpha_file, fuel_id):
+    """
+
+    Args:
+        settings: The SetInputs class.
+        alpha_file: The name of the file from which the ALPHA packages are derived.
+        fuel_id: The fuel ID (i.e., 'ice', 'bev', 'hev').
+
+    Returns:
+         A dictionary based on the passed alpha_file created by the create_package_dict function with data cleaned as stipulated by the clean_alpha_data function.
+
+    """
     df = pd.read_csv(alpha_file, skiprows=range(1, 2))
     if fuel_id == 'ice':
         df = clean_alpha_data(df, 'Aero Improvement %', 'Crr Improvement %', 'Weight Reduction %')
     df = add_elements_for_package_key(df)
-    keys, alpha_file_dict = package_key(settings, df, fuel_id)
-    return keys, alpha_file_dict
-
-
-def create_cost_cloud_verbose(df, cols_to_use, cols_to_split, pattern=None, expand=True):
-    df_return = pd.DataFrame(df, columns=cols_to_use)
-    for col_to_split in cols_to_split:
-        df_return[col_to_split].str.split(pat=pattern, expand=expand)
-    return df_return
+    alpha_file_dict = create_package_dict(settings, df, fuel_id)
+    return alpha_file_dict
+#
+#
+# def create_cost_cloud_verbose(df, cols_to_use, cols_to_split, pattern=None, expand=True):
+#     """
+#
+#     Args:
+#         df: A cost_cloud DataFrame
+#     """
+#     df_return = pd.DataFrame(df, columns=cols_to_use)
+#     for col_to_split in cols_to_split:
+#         df_return[col_to_split].str.split(pat=pattern, expand=expand)
+#     return df_return
 
 
 class Engines:
+    """
+
+    The Engines class defines specific technologies on each ALPHA engine benchmarked by EPA.
+
+    """
     def __init__(self):
         self._engines = {'engine_2013_GM_Ecotec_LCV_2L5_PFI_Tier3': {'turb': '',
                                                                      'finj': 'PFI',
@@ -483,16 +656,43 @@ class Engines:
                          }
 
     def get_techs(self, engine_name):
+        """
+
+        Args:
+            engine_name: The ALPHA engine name read from the ALPHA file.
+
+        Returns:
+            The technology cost codes for specific engine technologies.
+
+        """
         turb, finj, atk, cegr = self._engines.get(engine_name).values()
         return turb, finj, atk, cegr
 
 
 class EngineCost:
+    """
+
+    The EngineCost class calculates the cost of specific technologies contained on the given engine.
+
+    """
     def __init__(self, engine_key, weight_key):
         self.engine_name, self.disp, self.cyl, self.deac, self.startstop = engine_key
         self.weight_key = weight_key
 
-    def calc_engine_cost(self, engine_cost_dict, startstop_cost_dict, boost_multiplier):
+    def calc_engine_cost(self, engine_cost_dict, startstop_cost_dict, boost_multiplier, fuel_id):
+        """
+
+        Args:
+            engine_cost_dict: A dictionary of engine costs as read from the alpha package cost input file.
+            startstop_cost_dict: A dictionary of start-stop cost metrics as read from the alpha package cost input file.
+            boost_multiplier: A numeric value entered in the alpha package cost input file that represents the multiplier to be applied to engine costs to reflect the additional costs
+            associated with boosted engines.
+            fuel_id: The fuel ID (i.e., 'ice', 'bev', 'hev').
+
+        Returns:
+            A numeric value representing the cost of the given engine in the given package.
+
+        """
         turb, finj, atk, cegr = Engines().get_techs(self.engine_name)
         curb_wt, glider_weight, battery_weight, weight_rdxn = self.weight_key
         cost = self.disp * engine_cost_dict['dollars_per_liter']['item_cost']
@@ -503,7 +703,7 @@ class EngineCost:
         if self.deac != 0: cost += engine_cost_dict[f'DeacPD_{self.cyl}']['item_cost']
         if atk: cost += engine_cost_dict[f'ATK2_{self.cyl}']['item_cost']
         ss_cost = 0
-        if self.startstop != 0:
+        if self.startstop == 1 and fuel_id == 'ice':
             for ss_key in startstop_cost_dict.keys():
                 if startstop_cost_dict[ss_key]['curb_weight_min'] < curb_wt <= startstop_cost_dict[ss_key]['curb_weight_max']:
                     ss_cost = startstop_cost_dict[ss_key]['item_cost']
@@ -514,6 +714,11 @@ class EngineCost:
 
 
 class PackageCost:
+    """
+
+    The PackageCost class calculates the cost of the passed package based on the package cost key.
+
+    """
     def __init__(self, key):
         self.alpha_key, self.cost_key = key
         self.fuel_key, self.structure_key, self.price_key, self.alpha_class_key, self.engine_key, self.hev_key, self.pev_key, \
@@ -526,74 +731,189 @@ class PackageCost:
             self: the object to get attributes from
             attribute_list: a list of attribute names
 
-        Returns: a list containing the values of the requested attributes
+        Returns:
+            A list containing the values of the requested attributes
 
         """
         return [self.__getattribute__(attr) for attr in attribute_list]
 
     def engine_cost(self, engine_cost_dict, startstop_cost_dict, boost_multiplier):
-        return EngineCost(self.engine_key, self.weight_key).calc_engine_cost(engine_cost_dict, startstop_cost_dict, boost_multiplier)
+        """
+
+        The engine_cost function passes necessary data to the EngineCost class.
+
+        Args:
+            engine_cost_dict: A dictionary of engine costs as read from the alpha package cost input file.
+            startstop_cost_dict: A dictionary of start-stop cost metrics as read from the alpha package cost input file.
+            boost_multiplier: A numeric value entered in the alpha package cost input file that represents the multiplier to be applied to engine costs to reflect the additional costs
+            associated with boosted engines.
+
+        Returns:
+            The engine cost after resulting from the EngineCost class.
+
+        """
+        return EngineCost(self.engine_key, self.weight_key).calc_engine_cost(engine_cost_dict, startstop_cost_dict, boost_multiplier, self.fuel_key)
 
     def electrification_cost(self, settings):
         """
-        Cost of batteries and motors.
-        :return:
+        The electrification_cost function calculates the cost of batteries and motors.
+
+        Args:
+            settings: The SetInputs class.
+
+        Returns:
+            The battery cost, the motor cost and the combined cost for the given package.
+
         """
         battery_kwh_gross, motor_power, markup = 0, 0, 0
         curves_dict = dict()
         if self.fuel_key == 'bev':
-            range, energy_rate, soc, gap, battery_kwh_gross, motor_power = self.pev_key
+            range, energy_rate, soc, gap, battery_kwh_gross, motor_power, number_of_motors, onboard_charger_kw, size_scaler = self.pev_key
             curves_dict = settings.bev_curves_dict
+            if number_of_motors == 'single':
+                nonbattery_dict = settings.bev_nonbattery_single_dict
+                motor_power_divisor = 1
+            else:
+                nonbattery_dict = settings.bev_nonbattery_dual_dict
+                motor_power_divisor = 2
             markup = settings.bev_powertrain_markup
+            dcdc_converter_plus_obc = curves_dict['kW_DCDC_converter']['constant'] + onboard_charger_kw
+
         elif self.fuel_key == 'hev':
-            soc, gap, battery_kwh_gross, motor_power = self.hev_key
+            soc, gap, battery_kwh_gross, motor_power, size_scaler = self.hev_key
             curves_dict = settings.hev_curves_dict
+            nonbattery_dict = settings.hev_nonbattery_dict
             markup = settings.hev_metrics_dict['powertrain_markup_hev']['value']
-        battery_cost = battery_kwh_gross * (curves_dict['x_cubed_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 3 \
-                                            + curves_dict['x_squared_factor']['dollars_per_kWh_curve'] * battery_kwh_gross ** 2 \
-                                            + curves_dict['x_factor']['dollars_per_kWh_curve'] * battery_kwh_gross \
-                                            + curves_dict['constant']['dollars_per_kWh_curve'])
-        motor_cost = motor_power * (curves_dict['x_cubed_factor']['dollars_per_kW_curve'] * motor_power ** 3 \
-                                    + curves_dict['x_squared_factor']['dollars_per_kW_curve'] * motor_power ** 2 \
-                                    + curves_dict['x_factor']['dollars_per_kW_curve'] * motor_power \
-                                    + curves_dict['constant']['dollars_per_kW_curve'])
+            onboard_charger_kw = 0
+            motor_power_divisor = 1
+            dcdc_converter_plus_obc = curves_dict['kW_DCDC_converter']['constant'] + onboard_charger_kw
+
+            # motor_cost = nonbattery_dict['motor']['quantity'] * (motor_power * nonbattery_dict['motor']['slope'] + nonbattery_dict['motor']['intercept'])
+            # inverter_cost = nonbattery_dict['inverter']['quantity'] * (motor_power * nonbattery_dict['inverter']['slope'] + nonbattery_dict['inverter']['intercept'])
+            # dcdc_converter = nonbattery_dict['DCDC_converter']['quantity'] * nonbattery_dict['DCDC_converter']['slope'] * dcdc_converter_plus_obc
+            # hv_orange_cables = size_scaler * nonbattery_dict['HV_orange_cables']['quantity'] * (nonbattery_dict['HV_orange_cables']['slope'] + nonbattery_dict['HV_orange_cables']['intercept'])
+            # lv_battery = size_scaler * nonbattery_dict['LV_battery']['quantity'] * (nonbattery_dict['LV_battery']['slope'] + nonbattery_dict['LV_battery']['intercept'])
+            # hvac = size_scaler * nonbattery_dict['HVAC']['quantity'] * (nonbattery_dict['HVAC']['slope'] + nonbattery_dict['HVAC']['intercept'])
+            # brake_sensors_actuators = nonbattery_dict['brake_sensors_actuators']['quantity'] * nonbattery_dict['brake_sensors_actuators']['intercept']
+            # non_battery_cost = motor_cost + inverter_cost + dcdc_converter + hv_orange_cables + lv_battery + hvac + brake_sensors_actuators
+
+        battery_cost = battery_kwh_gross * (curves_dict['dollars_per_kWh_curve']['x_cubed_factor'] * battery_kwh_gross ** 3
+                                            + curves_dict['dollars_per_kWh_curve']['x_squared_factor'] * battery_kwh_gross ** 2
+                                            + curves_dict['dollars_per_kWh_curve']['x_factor'] * battery_kwh_gross
+                                            + curves_dict['dollars_per_kWh_curve']['constant'])
+
+        motor_cost = nonbattery_dict['motor']['quantity'] * (nonbattery_dict['motor']['slope'] * motor_power / motor_power_divisor + nonbattery_dict['motor']['intercept'])
+        inverter_cost = nonbattery_dict['inverter']['quantity'] * (nonbattery_dict['inverter']['slope'] * motor_power / motor_power_divisor + nonbattery_dict['inverter']['intercept'])
+        induction_motor_cost = nonbattery_dict['induction_motor']['quantity'] * nonbattery_dict['induction_motor']['slope'] * motor_power / motor_power_divisor
+        induction_inverter_cost = nonbattery_dict['induction_inverter']['quantity'] * nonbattery_dict['induction_inverter']['slope'] * motor_power / motor_power_divisor
+        dcdc_converter_cost = nonbattery_dict['DCDC_converter']['quantity'] * nonbattery_dict['DCDC_converter']['slope'] * dcdc_converter_plus_obc
+        hv_orange_cables_cost =  nonbattery_dict['HV_orange_cables']['quantity'] * nonbattery_dict['HV_orange_cables']['slope'] * size_scaler + nonbattery_dict['HV_orange_cables']['intercept']
+        lv_battery_cost = nonbattery_dict['LV_battery']['quantity'] * nonbattery_dict['LV_battery']['slope'] * size_scaler + nonbattery_dict['LV_battery']['intercept']
+        hvac_cost = nonbattery_dict['HVAC']['quantity'] * nonbattery_dict['HVAC']['slope'] * size_scaler + nonbattery_dict['HVAC']['intercept']
+        single_speed_gearbox_cost = nonbattery_dict['single_speed_gearbox']['quantity'] * nonbattery_dict['single_speed_gearbox']['intercept']
+        powertrain_cooling_loop_cost = nonbattery_dict['powertrain_cooling_loop']['quantity'] * nonbattery_dict['powertrain_cooling_loop']['intercept']
+        charging_cord_kit_cost = nonbattery_dict['charging_cord_kit']['quantity'] * nonbattery_dict['charging_cord_kit']['intercept']
+        DC_fast_charge_circuitry_cost = nonbattery_dict['DC_fast_charge_circuitry']['quantity'] * nonbattery_dict['DC_fast_charge_circuitry']['intercept']
+        power_management_and_distribution_cost = nonbattery_dict['power_management_and_distribution']['quantity'] * nonbattery_dict['power_management_and_distribution']['intercept']
+        additional_pair_of_half_shafts_cost = nonbattery_dict['additional_pair_of_half_shafts']['quantity'] * nonbattery_dict['additional_pair_of_half_shafts']['intercept']
+        brake_sensors_actuators_cost = nonbattery_dict['brake_sensors_actuators']['quantity'] * nonbattery_dict['brake_sensors_actuators']['intercept']
+
+        non_battery_cost = motor_cost + inverter_cost + induction_motor_cost + induction_inverter_cost \
+                           + dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost + hvac_cost \
+                           + single_speed_gearbox_cost + powertrain_cooling_loop_cost + charging_cord_kit_cost \
+                           + DC_fast_charge_circuitry_cost + power_management_and_distribution_cost \
+                           + additional_pair_of_half_shafts_cost + brake_sensors_actuators_cost
+
         battery_cost = battery_cost * markup
-        motor_cost = motor_cost * markup
-        cost = battery_cost + motor_cost
-        return battery_cost, motor_cost, cost 
+        non_battery_cost = non_battery_cost * markup
+        cost = battery_cost + non_battery_cost
+        return battery_cost, non_battery_cost, cost
 
     def calc_phev_cost(self):
         """
-        Cost of batteries and motors.
-        :return:
+
+        Args:
+
+        Returns:
+
         """
         cost = 0
         return cost
 
     def calc_trans_cost(self, trans_cost_dict):
+        """
+
+        Args:
+            trans_cost_dict: A dictionary of transmission costs as read from the alpha package cost input file.
+
+        Returns:
+            The transmission cost for the given package based on its trans_key.
+
+        """
         return trans_cost_dict[self.trans_key]['item_cost']
 
     def calc_accessory_cost(self, accessory_cost_dict):
+        """
+
+        Args:
+            accessory_cost_dict: A dictionary of accessory costs as read from the alpha package cost input file.
+
+        Returns:
+            The accessory cost for the given package based on its accessory_key.
+
+        """
         return accessory_cost_dict[self.accessory_key]['item_cost']
 
     def calc_aero_cost(self, aero_cost_dict):
+        """
+
+        Args:
+            aero_cost_dict: A dictionary of aero costs as read from the alpha package cost input file.
+
+        Returns:
+            The aero cost for the given package based on its aero_key.
+
+        """
         tech_class = f'{self.structure_key}_{self.aero_key}'
         return aero_cost_dict[tech_class]['item_cost']
 
     def calc_nonaero_cost(self, nonaero_cost_dict):
+        """
+
+        Args:
+            aero_cost_dict: A dictionary of aero costs as read from the alpha package cost input file.
+
+        Returns:
+            The aero cost for the given package based on its aero_key.
+
+        """
         tech_class = f'{self.structure_key}_{self.nonaero_key}'
         return nonaero_cost_dict[tech_class]['item_cost']
 
     def calc_ac_cost(self, ac_cost_dict):
+        """
+
+        Args:
+            ac_cost_dict: A dictionary of ac costs as read from the alpha package cost input file.
+
+        Returns:
+            The ac cost for the given package based on its structure_key.
+
+        """
         return ac_cost_dict[self.structure_key]['item_cost']
 
     def calc_weight_cost(self, weight_cost_dict, price_class_dict):
         """
+
         Weight costs are calculated as an absolute cost associated with the curb weight of the vehicle and are then adjusted according to the weight reduction.
-        :param start_year: First year to calc costs.
-        :param techcosts_weight: The input DataFrame associated with weight costs.
-        :param work_class: Hauling vs Non-hauling work class designation.
-        :return: The passed DataFrame with weight costs merged in.
+
+        Args:
+            weight_cost_dict: A dictionary of weight costs as read from the alpha package cost input file.
+            price_class_dict: A dictionary of price class multipliers as read from the alpha package cost input file. These are applied as multipliers to the weight costs..
+
+        Returns:
+            The cost associated with the steel, aluminum, plastic, etc., of the given vehicle package.
+
         """
         curb_wt, glider_weight, battery_weight, weight_rdxn = self.weight_key
         weight_rdxn = weight_rdxn / 100
@@ -615,6 +935,9 @@ class PackageCost:
 
 
 class SetInputs:
+    """
+    The SetInputs class sets input values for this module as well as reading the input file and creating dictionaries for use throughout the module.
+    """
     path_cwd = Path.cwd()
     path_preproc = path_cwd / 'usepa_omega2_preproc'
     path_here = path_preproc / 'alpha_package_costs'
@@ -640,17 +963,22 @@ class SetInputs:
     # read tech costs input file, convert dollar values to dollar basis, and create dictionaries
     techcosts_file = pd.ExcelFile(path_here / 'alpha_package_costs_module_inputs.xlsx')
     price_class_dict = pd.read_excel(techcosts_file, 'price_class', index_col=0).to_dict('index')
-    engine_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'engine', 'item_cost', 'dmc').to_dict('index')
-    trans_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'trans', 'item_cost', 'dmc', 'dmc_increment').to_dict('index')
-    accessories_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'accessories', 'item_cost', 'dmc').to_dict('index')
-    startstop_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'start-stop', 'item_cost', 'dmc').to_dict('index')
-    weight_cost_ice_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'weight_ice', 'item_cost', 'dmc_per_pound').to_dict('index')
-    weight_cost_pev_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'weight_pev', 'item_cost', 'dmc_per_pound').to_dict('index')
-    aero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'aero', 'item_cost', 'dmc').to_dict('index')
-    nonaero_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'nonaero', 'item_cost', 'dmc').to_dict('index')
-    ac_cost_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'ac', 'item_cost', 'dmc').to_dict('index')
-    bev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'dollars_per_kWh_curve', 'dollars_per_kW_curve').to_dict('index')
-    hev_curves_dict = create_df_and_convert_dollars(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'dollars_per_kWh_curve', 'dollars_per_kW_curve').to_dict('index')
+    engine_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'engine', 'item_cost', 'dmc').to_dict('index')
+    trans_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'trans', 'item_cost', 'dmc', 'dmc_increment').to_dict('index')
+    accessories_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'accessories', 'item_cost', 'dmc').to_dict('index')
+    startstop_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'start-stop', 'item_cost', 'dmc').to_dict('index')
+    weight_cost_ice_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'weight_ice', 'item_cost', 'dmc_per_pound').to_dict('index')
+    weight_cost_pev_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'weight_pev', 'item_cost', 'dmc_per_pound').to_dict('index')
+    aero_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'aero', 'item_cost', 'dmc').to_dict('index')
+    nonaero_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'nonaero', 'item_cost', 'dmc').to_dict('index')
+    ac_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'ac', 'item_cost', 'dmc').to_dict('index')
+
+    bev_curves_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'x_cubed_factor', 'x_squared_factor', 'x_factor', 'constant').to_dict('index')
+    hev_curves_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'x_cubed_factor', 'x_squared_factor', 'x_factor', 'constant').to_dict('index')
+
+    bev_nonbattery_single_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'bev_nonbattery_single', 'slope', 'intercept').to_dict('index')
+    bev_nonbattery_dual_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'bev_nonbattery_dual', 'slope', 'intercept').to_dict('index')
+    hev_nonbattery_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'hev_nonbattery', 'slope', 'intercept').to_dict('index')
     # phev_curves_dict = 0
     pev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
     hev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
@@ -681,6 +1009,12 @@ class SetInputs:
     bev_gap = pev_metrics_dict['gap_bev']['value']
     bev_powertrain_markup = pev_metrics_dict['powertrain_markup_bev']['value']
 
+    size_bins = 7
+    # for now, set HEV size bins here
+    hev_size_bins = 7
+    bin_size_scaling_interval = 0.05
+    bin_with_scaler_equal_1 = 3
+
     # set constants
     lbs_per_kg = 2.2
 
@@ -695,8 +1029,8 @@ def main():
         alpha_folder = settings.path_alpha_inputs / 'BEV'
         alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
         for idx, alpha_file_name in enumerate(alpha_file_names):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
-            for key in keys:
+            alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
+            for key in alpha_file_dict.keys():
                 package_result = pev_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 bev_packages_df = pd.concat([bev_packages_df, package_result], axis=0, ignore_index=False)
 
@@ -705,8 +1039,10 @@ def main():
         alpha_folder = settings.path_alpha_inputs / 'PHEV'
         alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
         for idx, alpha_file_name in enumerate(alpha_file_names):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
-            for key in keys:
+            alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
+            for key in alpha_file_dict.keys():
+            # keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
+            # for key in keys:
                 package_result = pev_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 phev_packages_df = pd.concat([phev_packages_df, package_result], axis=0, ignore_index=False)
 
@@ -715,8 +1051,8 @@ def main():
         alpha_folder = settings.path_alpha_inputs / 'HEV'
         alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
         for idx, alpha_file_name in enumerate(alpha_file_names):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
-            for key in keys:
+            alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
+            for key in alpha_file_dict.keys():
                 package_result = ice_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 hev_packages_df = pd.concat([hev_packages_df, package_result], axis=0, ignore_index=False)
 
@@ -725,15 +1061,17 @@ def main():
         alpha_folder = settings.path_alpha_inputs / 'ICE'
         alpha_file_names = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
         for idx, alpha_file_name in enumerate(alpha_file_names):
-            keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
-            for key in keys:
+            alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
+            for key in alpha_file_dict.keys():
+            # keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
+            # for key in keys:
                 package_result = ice_package_results(settings, key, alpha_file_dict, alpha_file_name)
                 ice_packages_df = pd.concat([ice_packages_df, package_result], axis=0, ignore_index=False)
 
     # calculate YoY bev costs with learning
     if settings.run_bev:
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_battery', settings.years, settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_motor', settings.years, settings.learning_rate_bev)
+        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_nonbattery', settings.years, settings.learning_rate_bev)
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_powertrain', settings.years, settings.learning_rate_bev)
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'roadload', settings.years, settings.learning_rate_roadload)
         bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'body', settings.years, settings.learning_rate_weight)
