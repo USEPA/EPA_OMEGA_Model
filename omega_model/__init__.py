@@ -88,7 +88,7 @@ try:
             self.demanded_shares_file = path + 'test_inputs/demanded_shares-gcam.csv'
             self.fuels_file = path + 'test_inputs/fuels.csv'
             self.context_folder = ''
-            self.context_id = 'AEO2020'
+            self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
             self.context_new_vehicle_generalized_costs_file = path + 'test_inputs/context_new_vehicle_prices.csv'
             self.generate_context_new_vehicle_generalized_costs_file = False
