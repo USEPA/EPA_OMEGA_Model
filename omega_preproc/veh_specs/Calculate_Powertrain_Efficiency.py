@@ -223,7 +223,7 @@ def comb_Tractive_Energy_Calculation(A, B, C, ETW, Enghp, FTP_array, HWFET_array
         Comb_LF = 0
     return (FTP_troadwork_mjpkm, HWFET_troadwork_mjpkm, US06_troadwork_mjpkm, Comb_LF, FTP_tractive_kWhr, HWFET_tractive_kWhr, US06_tractive_kWhr)
 
-def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, mpg_col, , city_mpg_col, hwy_mpg_col, combmpg_col, run_input_path, \
+def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, mpg_col, city_mpg_col, hwy_mpg_col, combmpg_col, run_input_path, \
                                          FTP_array, HWFET_array, US06_array, engdisp_col, ratedhp_col, fuelhv_col, output_table):
     from Unit_Conversion import lbf2n, gravity_mps2, mph2mps, mi2km, mph22mps2, hps2kwhr, mj2kwhr, km2mi
 
