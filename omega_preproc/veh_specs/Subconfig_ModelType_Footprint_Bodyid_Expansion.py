@@ -298,8 +298,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                   'Test Category', 'Equivalent Test Weight (lbs.)',
                                                                   'Test Veh Displacement (L)', 'N/V Ratio', \
                                                                   'CO2 (g/mi)', 'RND_ADJ_FE', 'FE Bag 1', 'FE Bag 2',
-                                                                  'FE Bag 3', 'Set Coef A (lbf)',
-                                                                  'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']
+                                                                  'FE Bag 3', 'Set Coef A (lbf)', 'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)',
+                                                                  'Target Coef A (lbf)', 'Target Coef B (lbf/mph)', 'Target Coef C (lbf/mph**2)']
             set_roadload_coefficient_table = pd.read_csv(
                 test_car_filename_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1",
                 na_values=['-'])
@@ -335,9 +335,12 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                         vehghg_file_nonflexfuel.loc[i, 'FE Bag 1'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 1']
                         vehghg_file_nonflexfuel.loc[i, 'FE Bag 2'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 2']
                         vehghg_file_nonflexfuel.loc[i, 'FE Bag 3'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 3']
-                        vehghg_file_nonflexfuel.loc[i, 'Set Coef A (lbf)']) = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
-                        vehghg_file_nonflexfuel.loc[i, 'Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
-                        vehghg_file_nonflexfuel.loc[i, 'Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
+                        if _set_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'Set Coef A (lbf)']) = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
+                        if _set_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
+                        if _set_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
+                        if _target_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_A']) = df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']
+                        if _target_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_B'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef B (lbf/mph)']
+                        if _target_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_C'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef C (lbf/mph**2)']
 
             import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat(
