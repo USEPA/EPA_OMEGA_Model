@@ -14,7 +14,7 @@ from omega_model import *
 class CostEffectsCriteria(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_effects_criteria'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
     vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
     calendar_year = Column(Numeric)
     age = Column(Numeric)

@@ -16,11 +16,11 @@ cache = dict()
 class ReregistrationFixedByAge(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'reregistration_fixed_by_age'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
 
-    age = Column('age', Numeric)
+    age = Column(Numeric)
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    reregistered_proportion = Column('reregistered_proportion', Float)
+    reregistered_proportion = Column(Float)
 
     @staticmethod
     def get_reregistered_proportion(market_class_id, age):

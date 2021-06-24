@@ -18,8 +18,8 @@ class CostFactorsSCC(SQABase, OMEGABase):
     __tablename__ = 'cost_factors_scc'
     index = Column('index', Integer, primary_key=True)
 
-    calendar_year = Column('calendar_year', Numeric)
-    dollar_basis = Column('dollar_basis', Numeric)
+    calendar_year = Column(Numeric)
+    dollar_basis = Column(Numeric)
     co2_domestic_cost_factor_25 = Column('co2_interimdomestic_2.5_USD_per_metricton', Float)
     co2_domestic_cost_factor_30 = Column('co2_interimdomestic_3.0_USD_per_metricton', Float)
     co2_domestic_cost_factor_70 = Column('co2_interimdomestic_7.0_USD_per_metricton', Float)

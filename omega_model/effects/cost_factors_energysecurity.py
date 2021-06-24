@@ -16,9 +16,9 @@ cache = dict()
 class CostFactorsEnergySecurity(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_energysecurity'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
     calendar_year = Column(Numeric)
-    dollar_basis = Column(Numeric)
+    dollar_basis = Column(Float)
     dollars_per_gallon = Column(Float)
     foreign_oil_fraction = Column(Float)
 

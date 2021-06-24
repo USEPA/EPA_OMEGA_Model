@@ -20,7 +20,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
     index = Column('index', Integer, primary_key=True)
     vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
     calendar_year = Column(Numeric)
-    registered_count = Column(Numeric)
+    registered_count = Column(Float)
     annual_vmt = Column(Float)
     vmt = Column(Float)
     age = Column(Numeric)

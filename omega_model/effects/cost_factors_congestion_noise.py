@@ -18,7 +18,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
     __tablename__ = 'cost_factors_congestion_noise'
     index = Column('index', Integer, primary_key=True)
     reg_class_ID = Column(String)
-    dollar_basis = Column(Numeric)
+    dollar_basis = Column(Float)
     congestion_cost_dollars_per_mile = Column(Float)
     noise_cost_dollars_per_mile = Column(Float)
 

@@ -17,13 +17,13 @@ cache = dict()
 class DemandedSharesGCAM(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'demanded_shares_gcam'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
 
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    annual_VMT = Column('annual_vmt', Numeric)
-    calendar_year = Column(Float)
-    payback_years = Column(Float)
-    price_amortization_period = Column(Float)
+    annual_VMT = Column('annual_vmt', Float)
+    calendar_year = Column(Numeric)
+    payback_years = Column(Numeric)
+    price_amortization_period = Column(Numeric)
     discount_rate = Column(Float)
     share_weight = Column(Float)
     demanded_share = Column(Float)

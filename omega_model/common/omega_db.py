@@ -32,7 +32,7 @@ from decimal import Decimal
 import sqlalchemy.types as types
 
 # TODO: use this to override Integer, instead of Numeric
-class SqliteNumeric(types.TypeDecorator):
+class StringNumeric(types.TypeDecorator):
     impl = types.String
 
     def load_dialect_impl(self, dialect):
@@ -45,10 +45,8 @@ class SqliteNumeric(types.TypeDecorator):
         return Decimal(value)
 
 
-# can overwrite the imported type name
-# @note: the TypeDecorator does not guarantie the scale and precision.
-# you can do this with separate checks
-Numeric = SqliteNumeric
+# Use Numeric a.k.a StringNumeric for integer values stored as strings (e.g. model_year)
+Numeric = StringNumeric
 
 
 SQABase = declarative_base(name='DeclarativeMeta')

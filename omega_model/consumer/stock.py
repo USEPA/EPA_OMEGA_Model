@@ -39,7 +39,7 @@ def update_stock(calendar_year):
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
-        age = calendar_year - model_year # float(model_year)
+        age = calendar_year - model_year
 
         scrappage_factor = omega_globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
 
@@ -58,7 +58,7 @@ def update_stock(calendar_year):
     if prior_year_vehicle_ids:
         for vehicle_ID in prior_year_vehicle_ids:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_ID)
-            age = calendar_year - model_year  # float(model_year)
+            age = calendar_year - model_year
 
             scrappage_factor = omega_globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
 

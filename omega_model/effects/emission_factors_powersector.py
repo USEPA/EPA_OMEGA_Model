@@ -15,22 +15,22 @@ cache = dict()
 class EmissionFactorsPowersector(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'emission_factors_powersector'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
 
-    calendar_year = Column('calendar_year', Numeric)
-    voc_grams_per_kwh = Column('voc_grams_per_kwh', Float)
-    co_grams_per_kwh = Column('co_grams_per_kwh', Float)
-    nox_grams_per_kwh = Column('nox_grams_per_kwh', Float)
-    pm25_grams_per_kwh = Column('pm25_grams_per_kwh', Float)
-    sox_grams_per_kwh = Column('sox_grams_per_kwh', Float)
-    benzene_grams_per_kwh = Column('benzene_grams_per_kwh', Float)
-    butadiene13_grams_per_kwh = Column('butadiene13_grams_per_kwh', Float)
-    formaldehyde_grams_per_kwh = Column('formaldehyde_grams_per_kwh', Float)
-    acetaldehyde_grams_per_kwh = Column('acetaldehyde_grams_per_kwh', Float)
-    acrolein_grams_per_kwh = Column('acrolein_grams_per_kwh', Float)
-    ch4_grams_per_kwh = Column('ch4_grams_per_kwh', Float)
-    n2o_grams_per_kwh = Column('n2o_grams_per_kwh', Float)
-    co2_grams_per_kwh = Column('co2_grams_per_kwh', Float)
+    calendar_year = Column(Numeric)
+    voc_grams_per_kwh = Column(Float)
+    co_grams_per_kwh = Column(Float)
+    nox_grams_per_kwh = Column(Float)
+    pm25_grams_per_kwh = Column(Float)
+    sox_grams_per_kwh = Column(Float)
+    benzene_grams_per_kwh = Column(Float)
+    butadiene13_grams_per_kwh = Column(Float)
+    formaldehyde_grams_per_kwh = Column(Float)
+    acetaldehyde_grams_per_kwh = Column(Float)
+    acrolein_grams_per_kwh = Column(Float)
+    ch4_grams_per_kwh = Column(Float)
+    n2o_grams_per_kwh = Column(Float)
+    co2_grams_per_kwh = Column(Float)
 
     @staticmethod
     def get_emission_factors(calendar_year, emission_factors):

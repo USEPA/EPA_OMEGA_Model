@@ -122,25 +122,25 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
     # --- database table properties ---
     __tablename__ = 'context_new_vehicle_market'  # database table name
-    index = Column('index', Integer, primary_key=True)  #: database table index
+    index = Column(Integer, primary_key=True)  #: database table index
     context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
     case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
-    context_size_class = Column('context_size_class', String)   #: str: e.g. 'Small Crossover'
+    context_size_class = Column(String)   #: str: e.g. 'Small Crossover'
     calendar_year = Column(Numeric)  #: numeric: calendar year of the market data
     context_reg_class_ID = Column('context_reg_class_ID', Enum(*reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
-    # sales_share_of_regclass = Column(Numeric)   #: numeric: percent of reg class represented by the context size class
-    # sales_share_of_total = Column(Numeric)  #: numeric: percent of total sales represented by the context size class
-    sales = Column(Numeric)  #: numeric:  size class new vehicle sales
-    # weight_lbs = Column(Numeric)  #: numeric: sales-weighted average weight (lbs) of a vehicle in the size class
-    # horsepower = Column(Numeric)  #: numeric: sales-weighted average horsepower of a vehicle in the size class
-    # horsepower_to_weight_ratio = Column(Numeric)  #: numeric: sales-weighted average horsepower to weight ratio of a vehicle in the size class
-    # mpg_conventional = Column(Numeric)  #: numeric: sales-weighted average miles per gallon (mpg) of a vehicle in the size class
-    # mpg_conventional_onroad = Column(Numeric)  #: numeric: sales-weighted average on-road miles per gallon (mpg) of a vehicle in the size class
-    # mpg_alternative = Column(Numeric)  #: numeric: sales-weighted average MPGe of a vehicle in the size class
-    # mpg_alternative_onroad = Column(Numeric)  #: numeric: sales-weighted average onroad MPGe of a vehicle in the size class
-    # onroad_to_cycle_mpg_ratio = Column(Numeric)  #: numeric: ratio of on-road to 2-cycle miles per gallon
-    # ice_price_dollars = Column(Numeric)  #: numeric: sales-weighted average price of an internal combustion engine (ICE) vehicle in the size class
-    # bev_price_dollars = Column(Numeric)  #: numeric: sales-weighted average price of an battery-electric vehicle (BEV) in the size class
+    # sales_share_of_regclass = Column(Float)   #: float: percent of reg class represented by the context size class
+    # sales_share_of_total = Column(Float)  #: float: percent of total sales represented by the context size class
+    sales = Column(Float)  #: float:  size class new vehicle sales
+    # weight_lbs = Column(Float)  #: float: sales-weighted average weight (lbs) of a vehicle in the size class
+    # horsepower = Column(Float)  #: float: sales-weighted average horsepower of a vehicle in the size class
+    # horsepower_to_weight_ratio = Column(Float)  #: float: sales-weighted average horsepower to weight ratio of a vehicle in the size class
+    # mpg_conventional = Column(Float)  #: float: sales-weighted average miles per gallon (mpg) of a vehicle in the size class
+    # mpg_conventional_onroad = Column(Float)  #: float: sales-weighted average on-road miles per gallon (mpg) of a vehicle in the size class
+    # mpg_alternative = Column(Float)  #: float: sales-weighted average MPGe of a vehicle in the size class
+    # mpg_alternative_onroad = Column(Float)  #: float: sales-weighted average onroad MPGe of a vehicle in the size class
+    # onroad_to_cycle_mpg_ratio = Column(Float)  #: float: ratio of on-road to 2-cycle miles per gallon
+    # ice_price_dollars = Column(Float)  #: float: sales-weighted average price of an internal combustion engine (ICE) vehicle in the size class
+    # bev_price_dollars = Column(Float)  #: float: sales-weighted average price of an battery-electric vehicle (BEV) in the size class
 
     hauling_context_size_class_info = dict()  #: dict: information about which context size classes are considered hauling and non-hauling as well as what share of the size class is hauling or not.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
     context_size_classes = dict()  #: dict: lists for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()

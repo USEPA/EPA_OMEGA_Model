@@ -43,7 +43,7 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 logit_exponent_mu = gcam_data_cy.logit_exponent_mu
 
-                price_amortization_period = gcam_data_cy.price_amortization_period
+                price_amortization_period = float(gcam_data_cy.price_amortization_period)
                 discount_rate = gcam_data_cy.discount_rate
                 annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** price_amortization_period) - 1)
 

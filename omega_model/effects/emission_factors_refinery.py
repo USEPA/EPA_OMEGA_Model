@@ -17,7 +17,7 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
     __tablename__ = 'emission_factors_refinery'
     index = Column('index', Integer, primary_key=True)
 
-    calendar_year = Column('calendar_year', Numeric)
+    calendar_year = Column(Numeric)
     voc_grams_per_gallon = Column('voc_grams_per_gallon', Float)
     co_grams_per_gallon = Column('co_grams_per_gallon', Float)
     nox_grams_per_gallon = Column('nox_grams_per_gallon', Float)

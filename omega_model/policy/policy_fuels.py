@@ -66,10 +66,10 @@ class PolicyFuel(SQABase, OMEGABase):
     """
     # --- database table properties ---
     __tablename__ = 'policy_fuels'
-    index = Column('index', Integer, primary_key=True)  #: database index
+    index = Column(Integer, primary_key=True)  #: database index
     fuel_ID = Column('fuel_id', String)  #: fuel iD (e.g. 'gasoline', 'US electricity')
     calendar_year = Column(Numeric)  #: calendar year (or start year of fuel attributes)
-    cert_co2_grams_per_unit = Column('cert_co2_grams_per_unit', Float)  #: emitted CO2 grams per unit when consumed
+    cert_co2_grams_per_unit = Column(Float)  #: emitted CO2 grams per unit when consumed
 
     @staticmethod
     def get_fuel_attributes(calendar_year, fuel_id, attribute_types):

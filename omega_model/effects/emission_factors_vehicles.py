@@ -17,7 +17,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
     __tablename__ = 'emission_factors_vehicles'
     index = Column('index', Integer, primary_key=True)
 
-    model_year = Column('model_year', Numeric)
+    model_year = Column(Numeric)
     age = Column('age', Numeric)
     in_use_fuel_id = Column('in_use_fuel_id', String)
     reg_class_ID = Column('reg_class_id', String)

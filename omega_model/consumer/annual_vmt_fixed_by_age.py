@@ -15,11 +15,11 @@ cache = dict()
 class AnnualVMTFixedByAge(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'annual_vmt_fixed_by_age'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
 
-    age = Column('age', Numeric)
+    age = Column(Numeric)
     market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    annual_vmt = Column('annual_vmt', Numeric)
+    annual_vmt = Column(Numeric)
 
     @staticmethod
     def get_vmt(market_class_id, age):

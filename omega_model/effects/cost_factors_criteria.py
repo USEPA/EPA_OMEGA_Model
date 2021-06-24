@@ -16,10 +16,10 @@ cache = dict()
 class CostFactorsCriteria(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_criteria'
-    index = Column('index', Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)
 
-    calendar_year = Column('calendar_year', Numeric)
-    dollar_basis = Column('dollar_basis', Numeric)
+    calendar_year = Column(Numeric)
+    dollar_basis = Column(Numeric)
     pm25_low_mortality_30 = Column('pm25_low-mortality_3.0_USD_per_uston', Float)
     pm25_high_mortality_30 = Column('pm25_high-mortality_3.0_USD_per_uston', Float)
     nox_low_mortality_30 = Column('nox_low-mortality_3.0_USD_per_uston', Float)
