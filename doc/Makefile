@@ -6,7 +6,7 @@
 
 SOURCEDIR   = source
 BUILDDIR    = build
-DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 0.7.0 --module-first --tocfile code_details
+DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 0.7.1 --module-first --tocfile code_details
 BUILDOPTS   = -v
 
 SPHINXBUILD   ?= sphinx-build

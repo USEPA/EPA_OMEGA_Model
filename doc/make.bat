@@ -7,7 +7,7 @@ if "%1" == "" goto help
 REM Command file for Sphinx documentation
 REM Call from venv command-line, e.g. "make html"
 
-DOCOPTS=--force --append-syspath --doc-project "Code Details" --doc-version 0.7.0 --module-first --tocfile code_details
+DOCOPTS=--force --append-syspath --doc-project "Code Details" --doc-version 0.7.1 --module-first --tocfile code_details
 
 sphinx-apidoc -o source ".." %DOCOPTS%
 
