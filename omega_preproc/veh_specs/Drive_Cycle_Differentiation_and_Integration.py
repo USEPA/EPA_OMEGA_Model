@@ -19,6 +19,9 @@ def Drive_Cycle_Differentiation_and_Integration(input_path, drivecycle_filenames
         if ('custom' in drivecycle_filename) or ('Custom' in drivecycle_filename) or ('user-defined' in drivecycle_filename):
             drivecycle_file_Custom = drivecycle_filename
 
+    if drivecycle_file_FTP == '': drivecycle_file_FTP = 'ftpcol10hz.csv'
+    if drivecycle_file_HWFET == '': drivecycle_file_HWFET = 'hwycol10hz.csv'
+    if drivecycle_file_US06 == '': drivecycle_file_US06 = 'us06col.csv'
     if len(drivecycle_file_FTP) > 0:
         FTP_ws = pd.read_csv(dynamometer_drive_schedules_path + '\\' + drivecycle_file_FTP, encoding='ISO-8859-1', skiprows=1)
         FTP_time = FTP_ws['seconds']
