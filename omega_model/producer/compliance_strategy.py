@@ -34,6 +34,7 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
 
     from consumer.market_classes import MarketClass
     from context.price_modifications import PriceModifications
+    from context.onroad_fuels import OnroadFuel
 
     producer_generalized_cost_fuel_years, \
     producer_generalized_cost_annual_vmt = \
@@ -46,11 +47,13 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     cost_cloud = vehicle.cost_cloud
     vehicle_cost = cost_cloud[cost_name]
     vehicle_co2_grams_per_mile = cost_cloud[co2_name]
-    vehicle_cert_direct_kwh_per_mile = cost_cloud[kwh_name]
+    vehicle_direct_kwh_per_mile = cost_cloud[kwh_name] / OnroadFuel.get_fuel_attribute(vehicle.model_year,
+                                                                                            'US electricity',
+                                                                                            'refuel_efficiency')
 
     price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_ID)
 
-    grams_co2_per_unit = vehicle.fuel_tailpipe_co2_emissions_grams_per_unit()
+    grams_co2_per_unit = vehicle.onroad_co2_emissions_grams_per_unit()
     liquid_generalized_fuel_cost = 0
     electric_generalized_fuel_cost = 0
 
@@ -61,10 +64,10 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
              producer_generalized_cost_annual_vmt *
              producer_generalized_cost_fuel_years)
 
-    if any(vehicle_cert_direct_kwh_per_mile > 0):
-        electric_generalized_fuel_cost = (vehicle_cert_direct_kwh_per_mile *
-                                         vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
-                                         producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
+    if any(vehicle_direct_kwh_per_mile > 0):
+        electric_generalized_fuel_cost = (vehicle_direct_kwh_per_mile *
+                                          vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
+                                          producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
 
     generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 

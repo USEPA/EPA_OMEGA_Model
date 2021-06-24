@@ -692,7 +692,7 @@ def init_omega(o2_options):
         # instantiate database tables
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
         init_fail += PolicyFuelUpstream.init_from_file(omega_globals.options.fuel_upstream_file, verbose=omega_globals.options.verbose)
         

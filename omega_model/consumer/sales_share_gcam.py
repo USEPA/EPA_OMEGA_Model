@@ -27,8 +27,6 @@ def get_demanded_shares(market_class_data, calendar_year):
 
     #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
-    carbon_intensity_gasoline = OnroadFuel.get_fuel_attributes('pump gasoline', 'co2_tailpipe_emissions_grams_per_unit')
-
     sales_share_denominator_all_hauling = 0
     sales_share_denominator_all_nonhauling = 0
 
@@ -45,23 +43,33 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 price_amortization_period = float(gcam_data_cy.price_amortization_period)
                 discount_rate = gcam_data_cy.discount_rate
-                annualization_factor = discount_rate + discount_rate / (((1 + discount_rate) ** price_amortization_period) - 1)
+                annualization_factor = discount_rate + discount_rate / (
+                        ((1 + discount_rate) ** price_amortization_period) - 1)
 
                 total_capital_costs = market_class_data['average_modified_cross_subsidized_price_%s' % market_class_id]
                 average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
                 average_kwh_pmi = market_class_data['average_kwh_pmi_%s' % market_class_id]
 
+                carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
+                                                                          'direct_co2_grams_per_unit')
+
+                refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
+                                                                  'refuel_efficiency')
+
+                recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
+                                                                    'refuel_efficiency')
+
                 if market_class_id == 'non_hauling.BEV':
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi
+                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
                     annual_o_m_costs = gcam_data_cy.o_m_costs
                 elif market_class_id == 'hauling.BEV':
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi
+                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
                     annual_o_m_costs = gcam_data_cy.o_m_costs
                 elif market_class_id == 'non_hauling.ICE':
-                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
+                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline / refuel_efficiency
                     annual_o_m_costs = gcam_data_cy.o_m_costs
                 elif market_class_id == 'hauling.ICE':
-                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline
+                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline / refuel_efficiency
                     annual_o_m_costs = gcam_data_cy.o_m_costs
 
                 # consumer_generalized_cost_dollars = total_capital_costs
@@ -71,7 +79,8 @@ def get_demanded_shares(market_class_data, calendar_year):
                 total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
                 total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
                 total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy.average_occupancy
-                sales_share_numerator[market_class_id] = gcam_data_cy.share_weight * (total_cost_w_fuel_per_PMT ** logit_exponent_mu)
+                sales_share_numerator[market_class_id] = gcam_data_cy.share_weight * (
+                        total_cost_w_fuel_per_PMT ** logit_exponent_mu)
 
                 market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
@@ -128,10 +137,12 @@ if __name__ == '__main__':
                                                          verbose=omega_globals.options.verbose)
         init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
                                                                 verbose=omega_globals.options.verbose)
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+                                                          verbose=omega_globals.options.verbose)
         init_fail += TargetsFootprint.init_database_from_file(omega_globals.options.ghg_standards_file,
                                                               verbose=omega_globals.options.verbose)
-        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
+                                               verbose=omega_globals.options.verbose)
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.vehicle_onroad_calculations_file,
                                                           verbose=omega_globals.options.verbose)

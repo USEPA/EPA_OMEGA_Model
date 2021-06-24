@@ -684,7 +684,7 @@ class Vehicle(OMEGABase):
 
         return price
 
-    def fuel_tailpipe_co2_emissions_grams_per_unit(self):
+    def onroad_co2_emissions_grams_per_unit(self):
         """
 
         Returns:
@@ -696,7 +696,8 @@ class Vehicle(OMEGABase):
         fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             co2_emissions_grams_per_unit += \
-                OnroadFuel.get_fuel_attributes(fuel, 'co2_tailpipe_emissions_grams_per_unit') * fuel_share
+                (OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'direct_co2_grams_per_unit') /
+                 OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'refuel_efficiency') * fuel_share)
 
         return co2_emissions_grams_per_unit
 
@@ -1277,7 +1278,7 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
-        init_fail += OnroadFuel.init_database_from_file(omega_globals.options.fuels_file, verbose=omega_globals.options.verbose)
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
         init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
                                                        verbose=omega_globals.options.verbose)
