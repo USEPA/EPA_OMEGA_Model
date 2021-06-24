@@ -339,6 +339,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                         if _target_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_B'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef B (lbf/mph)']
                         if _target_coef_A == 0: vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_C'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef C (lbf/mph**2)']
 
+            del df_set_roadload_coefficient_table, set_roadload_coefficient_table, roadload_coefficient_table
             import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
             # EPA_CAFE_MT_CALC_CITY_FE_4, EPA_CAFE_MT_CALC_HWY_FE_4, EPA_CAFE_MT_CALC_COMB_FE_4, TEST_UNROUNDED_UNADJUSTED_FE, RND_ADJ_FE
@@ -418,8 +419,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
 
             vehghg_file_flexfuel = vehghg_file[vehghg_file['FUEL_USAGE'] == 'E'].reset_index(drop=True) \
                 .drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', 'PROD_VOL_GHG_TOTAL_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE', \
-                       'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'],
-                      axis=1)
+                       'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'], axis=1)
 
             vehghg_file_flexfuel = pd.merge(vehghg_file_flexfuel, \
                                             vehghg_file_nonflexfuel[
@@ -442,41 +442,34 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             # vehghg_file_output = vehghg_file_output.replace('none', np.nan)
             del vehghg_file
             vehghg_file_output = vehghg_file_output.loc[:, ~vehghg_file_output.columns.str.contains('^Unnamed')]
-            vehghg_file_output['Distributed Footprint Volumes'][vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
-            vehghg_file_output['Distributed Subconfig Volumes'][vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
-            vehghg_file_output['Total Subconfig Volume Allocated to Footprint'][
-                vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
-            vehghg_file_output['Total Footprint Volume Allocated to Subconfig'][
-                vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
-            vehghg_file_output['FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES'][vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
-            vehghg_file_output['SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES'][vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
-            vehghg_file_output['FOOTPRINT_SUBCONFIG_VOLUMES'][vehghg_file_output['FUEL_USAGE'] == 'E'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'Distributed Footprint Volumes'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'Distributed Subconfig Volumes'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'Total Subconfig Volume Allocated to Footprint'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'Total Footprint Volume Allocated to Subconfig'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES'] = 0
+            vehghg_file_output.loc[vehghg_file_output['FUEL_USAGE'] == 'E', 'FOOTPRINT_SUBCONFIG_VOLUMES'] = 0
 
-            vehghg_file_output['RLHP_FROM_RLCOEFFS'] = (
-                        (vehghg_file_output['TARGET_COEF_A'] + (50 * vehghg_file_output['TARGET_COEF_B']) \
+            vehghg_file_output['RLHP_FROM_RLCOEFFS'] = ((vehghg_file_output['TARGET_COEF_A'] + (50 * vehghg_file_output['TARGET_COEF_B']) \
                          + ((50 * 50) * vehghg_file_output['TARGET_COEF_C'])) * 50 * lbfmph2hp).replace(0, np.nan)
             v_aero_mph = 45
             air_density = 1.17 * kgpm32slugpft3
             vehghg_file_output['CDA_FROM_RLCOEFFS'] = pd.Series(
                 (vehghg_file_output['TARGET_COEF_B'] + 2 * vehghg_file_output['TARGET_COEF_C'] * v_aero_mph) \
                 * ftps2mph / (air_density * v_aero_mph * mph2ftps)).replace(0, np.nan)
-            vehghg_file_output['TOTAL_ROAD_LOAD_FORCE_50MPH'] = vehghg_file_output['RLHP_FROM_RLCOEFFS'] * hp2lbfmph * (
-                        1 / 50)
+            vehghg_file_output['TOTAL_ROAD_LOAD_FORCE_50MPH'] = vehghg_file_output['RLHP_FROM_RLCOEFFS'] * hp2lbfmph * (1 / 50)
             vehghg_file_output['AERO_FORCE_50MPH'] = 0.5 * air_density * vehghg_file_output['CDA_FROM_RLCOEFFS'] * (
                         (50 * mph2ftps) ** 2)
-            vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] = (
-                        vehghg_file_output['TOTAL_ROAD_LOAD_FORCE_50MPH'] - vehghg_file_output[
+            vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] = (vehghg_file_output['TOTAL_ROAD_LOAD_FORCE_50MPH'] - vehghg_file_output[
                     'AERO_FORCE_50MPH']).replace(0, np.nan)
             vehghg_file_output = vehghg_file_output.drop(['TOTAL_ROAD_LOAD_FORCE_50MPH', 'AERO_FORCE_50MPH'], axis=1)
 
             vehghg_file_output['FRONT_TIRE_RADIUS_IN'] = pd.Series(
-                vehghg_file_output['FRONT_BASE_TIRE_CODE']).str.split( \
-                'R').str.get(1).str.extract('(\d+)').astype(float) * 0.5
+                vehghg_file_output['FRONT_BASE_TIRE_CODE']).str.split('R').str.get(1).str.extract('(\d+)').astype(float) * 0.5
             vehghg_file_output['REAR_TIRE_RADIUS_IN'] = pd.Series(vehghg_file_output['REAR_BASE_TIRE_CODE']).str.split( \
                 'R').str.get(1).str.extract('(\d+)').astype(float) * 0.5
             vehghg_file_output['TIRE_WIDTH_INS'] = pd.Series(vehghg_file_output['FRONT_BASE_TIRE_CODE']).str.split(
-                '/').str.get(
-                0).str.extract('(\d+)').astype(float) / in2mm
+                '/').str.get(0).str.extract('(\d+)').astype(float) / in2mm
 
             F_brake = 2 * (0.4 / (vehghg_file_output['FRONT_TIRE_RADIUS_IN'] * in2m)) * n2lbf + 2 * ( \
                         0.4 / (vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * n2lbf
@@ -512,8 +505,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 vehghg_file_output['ETW'].replace(np.nan, 0).astype(float).round(0).astype(int).replace(0, 'na').astype(str))
             vehghg_file_output = vehghg_file_output.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
             vehghg_file_output = vehghg_file_output.loc[:, ~vehghg_file_output.columns.duplicated()]
-            vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv',
-                                      index=False)
+            vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv', index=False)
         else:
             # New BodyID table sought, previous data included
             full_expanded_footprint_filter_table = full_expanded_footprint_filter_table.merge \
@@ -526,5 +518,4 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 full_expanded_footprint_filter_table['LineageID'].isin(changed_lineageids)] = np.nan
             full_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
             full_expanded_footprint_filter_table.to_csv(
-                output_path.replace('\VehghgID', '\intermediate files') + '\\' + full_filter_table_save_name,
-                index=False)
+                output_path.replace('\VehghgID', '\intermediate files') + '\\' + full_filter_table_save_name, index=False)
