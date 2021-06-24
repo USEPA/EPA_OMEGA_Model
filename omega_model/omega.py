@@ -622,7 +622,6 @@ def init_omega(o2_options):
 
     # import database modules to populate ORM context
     from context.onroad_fuels import OnroadFuel
-    from policy.policy_fuel_upstream import PolicyFuelUpstream
     from policy.upstream_methods import UpstreamMethods
     from policy.offcycle_credits import OffCycleCredits
     from context.fuel_prices import FuelPrice
@@ -694,8 +693,6 @@ def init_omega(o2_options):
 
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuelUpstream.init_from_file(omega_globals.options.fuel_upstream_file, verbose=omega_globals.options.verbose)
-        
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=omega_globals.options.verbose)
         
@@ -718,8 +715,8 @@ def init_omega(o2_options):
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.ghg_standards_fuels_file,
-                                                        verbose=omega_globals.options.verbose)
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
                                                               verbose=omega_globals.options.verbose)

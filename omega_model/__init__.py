@@ -93,7 +93,6 @@ try:
             self.context_new_vehicle_generalized_costs_file = path + 'test_inputs/context_new_vehicle_prices.csv'
             self.generate_context_new_vehicle_generalized_costs_file = False
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
-            self.fuel_upstream_file = path + 'test_inputs/policy_fuel_upstream.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
             self.price_modifications_file = path + 'test_inputs/price_modifications.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
@@ -109,7 +108,7 @@ try:
             self.consumer_calc_generalized_cost = None
             self.ghg_standards_file = path + 'test_inputs/ghg_standards-footprint.csv'
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
-            self.ghg_standards_fuels_file = path + 'test_inputs/ghg_standards-fuels.csv'
+            self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'
             self.required_zev_share_file = path + 'test_inputs/required_zev_share.csv'
             self.production_constraints_file = path + 'test_inputs/production_constraints.csv'

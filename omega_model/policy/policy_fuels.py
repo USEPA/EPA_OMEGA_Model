@@ -4,11 +4,6 @@
 
 The primary fuel attribute is CO2 grams per unit (i.e. g/gallon, g/kWh) when consumed, by policy year.
 
-Used by ``policy_fuel_upstream`` functions.
-
-See Also:
-
-    ``policy_fuel_upstream`` module
 
 ----
 
@@ -59,57 +54,54 @@ from omega_model import *
 cache = dict()
 
 
-class PolicyFuel(SQABase, OMEGABase):
+class PolicyFuel(OMEGABase):
     """
-    **Provides methods to store and access policy fuel attributes.**
+    **Loads and provides methods to access onroad fuel attribute data.**
 
     """
-    # --- database table properties ---
-    __tablename__ = 'policy_fuels'
-    index = Column(Integer, primary_key=True)  #: database index
-    fuel_ID = Column('fuel_id', String)  #: fuel iD (e.g. 'gasoline', 'US electricity')
-    calendar_year = Column(Numeric)  #: calendar year (or start year of fuel attributes)
-    cert_co2_grams_per_unit = Column(Float)  #: emitted CO2 grams per unit when consumed
 
     @staticmethod
-    def get_fuel_attributes(calendar_year, fuel_id, attribute_types):
+    def get_fuel_attribute(calendar_year, fuel_id, attribute):
         """
-        Get fuel attributes for the given calendar year and fuel
 
         Args:
-            calendar_year (numeric): calendar year to get properties in
-            fuel_id (str): (e.g. 'gasoline', 'US electricity')
-            attribute_types (str, [str]): name(s) of attributes to get, (e.g. 'cert_co2_grams_per_unit')
+            calendar_year (numeric): year to get fuel properties in
+            fuel_id (str): e.g. 'pump gasoline')
+            attribute (str): name of attribute to retrieve
 
         Returns:
-            Attribute value(s) as scalars or tuples if multiple ``attribute_types``.
+            Fuel attribute value for the given year.
+
+        Example:
+
+            ::
+
+                carbon_intensity_gasoline =
+                    OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2_grams_per_unit')
 
         """
-        start_years = cache[fuel_id]
-        calendar_year = max(start_years[start_years <= calendar_year])
+        start_years = cache['start_year']
+        if start_years[start_years <= calendar_year]:
+            cache_key = max(start_years[start_years <= calendar_year])
 
-        cache_key = '%s_%s_%s' % (calendar_year, fuel_id, attribute_types)
-
-        if cache_key not in cache:
-            if type(attribute_types) is not list:
-                attribute_types = [attribute_types]
-
-            attrs = PolicyFuel.get_class_attributes(attribute_types)
-
-            result = omega_globals.session.query(*attrs) \
-                .filter(PolicyFuel.fuel_ID == fuel_id) \
-                .filter(PolicyFuel.calendar_year == calendar_year) \
-                .all()[0]
-
-            if len(attribute_types) == 1:
-                cache[cache_key] = result[0]
-            else:
-                cache[cache_key] = result
-
-        return cache[cache_key]
+        return cache[cache_key][fuel_id][attribute]
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def validate_fuel_ID(fuel_id):
+        """
+        Validate fuel ID
+
+        Args:
+            fuel_id (str): e.g. 'pump gasoline')
+
+        Returns:
+            True if the fuel ID is valid, False otherwise
+
+        """
+        return fuel_id in cache['fuel_id']
+
+    @staticmethod
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -129,9 +121,10 @@ class PolicyFuel(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'ghg_standards-fuels'
+        input_template_name = 'policy-fuels'
         input_template_version = 0.1
-        input_template_columns = {'fuel_id', 'start_year', 'cert_co2_grams_per_unit'}
+        input_template_columns = {'fuel_id', 'start_year', 'unit', 'direct_co2_grams_per_unit',
+                                  'upstream_co2_grams_per_unit', 'transmission_efficiency'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -143,45 +136,43 @@ class PolicyFuel(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(PolicyFuel(
-                        fuel_ID=df.loc[i, 'fuel_id'],
-                        calendar_year=df.loc[i, 'start_year'],
-                        cert_co2_grams_per_unit=df.loc[i, 'cert_co2_grams_per_unit'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                df = df.set_index('start_year')
 
-                for fid in df['fuel_id'].unique():
-                    cache[fid] = np.array(df['start_year'].loc[df['fuel_id'] == fid])
+                for idx, r in df.iterrows():
+                    if idx not in cache:
+                        cache[idx] = dict()
+
+                    cache[idx][r.fuel_id] = r.to_dict()
+
+                cache['start_year'] = np.array(list(cache.keys()))
+                cache['fuel_id'] = np.array(list(df['fuel_id'].unique()))
 
         return template_errors
 
 
 if __name__ == '__main__':
     try:
+        import os
+
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
+        omega_globals.engine.echo = omega_globals.options.verbose
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
-        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.ghg_standards_fuels_file,
-                                                        verbose=omega_globals.options.verbose)
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            print(PolicyFuel.validate_fuel_ID('gasoline'))
+            print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2_grams_per_unit'))
+            print(PolicyFuel.get_fuel_attribute(2020, 'electricity', 'transmission_efficiency'))
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

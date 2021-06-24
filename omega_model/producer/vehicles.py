@@ -1288,7 +1288,7 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.GHG_standard.init_database_from_file(omega_globals.options.ghg_standards_file,
                                                                                 verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.ghg_standards_fuels_file,
+        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.policy_fuels_file,
                                                         verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
