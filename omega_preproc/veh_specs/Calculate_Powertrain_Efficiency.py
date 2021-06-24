@@ -298,7 +298,7 @@ def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, m
     output_table['City Fuel Energy Intensity (Wh/mi)'] = city_fuel_energy_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific City Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table.loc[engdisp_col > 0, 'Displacement Specific City Fuel Energy Intensity (Wh/mi/L)'] = city_fuel_energy_mjpkm_col/engdisp_col * (mj2kwhr / km2mi)*1000
-    output_table['Powertrain Efficiency (%)'] = 100 * FTP_troadwork_mjpkm_col / city_fuel_energy_mjpkm_col
+    output_table['City Powertrain Efficiency (%)'] = 100 * FTP_troadwork_mjpkm_col / city_fuel_energy_mjpkm_col
 
     output_table['Hwy Tractive Road Energy Intensity (Wh/mi)'] = HWFET_troadwork_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific Hwy Tractive Road Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
@@ -307,7 +307,7 @@ def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, m
     output_table['Hwy Fuel Energy Intensity (Wh/mi)'] = hwy_fuel_energy_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific Hwy Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table.loc[engdisp_col > 0, 'Displacement Specific Hwy Fuel Energy Intensity (Wh/mi/L)'] = hwy_fuel_energy_mjpkm_col/engdisp_col * (mj2kwhr / km2mi)*1000
-    output_table['Powertrain Efficiency (%)'] = 100 * HWFET_troadwork_mjpkm_col / hwy_fuel_energy_mjpkm_col
+    output_table['Hwy Powertrain Efficiency (%)'] = 100 * HWFET_troadwork_mjpkm_col / hwy_fuel_energy_mjpkm_col
 
     output_table['Combined MPGe (kWh/100mi)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table['Combined MPGe (kWh/100mi)'] = 3370.5/combmpg_col # 1 gallon gasoline = 33.705 kWh
@@ -327,6 +327,6 @@ def comb_Calculate_Powertrain_Efficiency(ID_col, A_col, B_col, C_col, ETW_col, m
     output_table['US06 Fuel Energy Intensity (Wh/mi)'] = us06_fuel_energy_mjpkm_col * (mj2kwhr/km2mi)*1000
     output_table['Displacement Specific US06 Fuel Energy Intensity (Wh/mi/L)'] = pd.Series(np.zeros(len(output_table))).replace(0, '')
     output_table.loc[engdisp_col > 0, 'Displacement Specific US06 Fuel Energy Intensity (Wh/mi/L)'] = us06_fuel_energy_mjpkm_col/engdisp_col * (mj2kwhr / km2mi)*1000
-    output_table['Powertrain Efficiency (%)'] = 100 * US06_troadwork_mjpkm_col / us06_fuel_energy_mjpkm_col
+    output_table['US06 Powertrain Efficiency (%)'] = 100 * US06_troadwork_mjpkm_col / us06_fuel_energy_mjpkm_col
 
     return output_table
