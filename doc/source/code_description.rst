@@ -51,9 +51,8 @@ You can test your install with the following:
 Versioning and Distribution Tools
 ---------------------------------
 
-The ``crank_win`` folder contains batch files for "turning the crank" and updating code version numbers and
-creating distributions that can be uploaded to PyPi, for example.  The ``_win`` refers to Windows, in the future
-maybe there will be a ``_nix`` folder for routines that perform the equivalent job on unix/linux machines.
+The ``versioning`` folder contains batch files for updating code version numbers and
+creating distributions that can be uploaded to PyPi, for example.
 
 Versioning
 ++++++++++
