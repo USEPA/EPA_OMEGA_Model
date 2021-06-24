@@ -10,7 +10,7 @@ README = (HERE / "README.rst").read_text()
 # This call to setup() does all the work
 setup(
     name="usepa-omega2",
-    version="0.6.0",
+    version="0.7.1",
     description="OMEGA Model, version 2",
     long_description=README,
     long_description_content_type="text/x-rst",
@@ -27,12 +27,12 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
-    packages=["usepa_omega2"],                # or something like packages=find_packages(exclude=("tests",)),
+    packages=["omega_model"],                # or something like packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     install_requires=["numpy", "matplotlib"],
     entry_points={
         "console_scripts": [
-            "omega2=usepa_omega2.__main__:main",
+            "omega2=omega_model.__main__:main",
         ]
     },
 )

@@ -55,12 +55,12 @@ if __name__ == "__main__":
     try:
         init_logfile()
 
-        pythonpathstr = 'set PYTHONPATH=.;.\\usepa_omega2'
+        pythonpathstr = 'set PYTHONPATH=.;.\\omega_model'
         pythoncommand = 'python -u'
 
         results = {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}
 
-        for source_folder in ['usepa_omega2', 'usepa_omega2\\consumer', 'usepa_omega2\\effects']:
+        for source_folder in ['omega_model', 'omega_model\\consumer', 'omega_model\\effects']:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
                 cmd_opts = ''
 
                 if f == 'omega_batch.py':
-                    cmd_opts = '--batch_file usepa_omega2\\test_inputs\\single_session_batch.xlsx --verbose'
+                    cmd_opts = '--batch_file omega_model\\test_inputs\\single_session_batch.xlsx --verbose'
 
                 cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 

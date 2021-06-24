@@ -4,10 +4,9 @@ Code Details
 .. toctree::
    :maxdepth: 4
 
-   code_doc_samples
    exe_entry
+   omega_gui
+   omega_model
+   omega_preproc
    setup
    test_omega2
-   usepa_omega2
-   usepa_omega2_gui
-   usepa_omega2_preproc

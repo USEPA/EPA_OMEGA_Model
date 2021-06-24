@@ -1,18 +1,18 @@
 """
 
-# build usepa_omega2 package:
-pyinstaller exe_entry.py --name omega2 --paths usepa_omega2 --add-data usepa_omega2/test_inputs;usepa_omega2/test_inputs --noconfirm
+# build omega_model package:
+pyinstaller exe_entry.py --name omega2 --paths omega_model --add-data omega_model/test_inputs;omega_model/test_inputs --noconfirm
 
-# WINDOWS build usepa_omega2_gui package:
-pyinstaller exe_entry.py --name omega2 --paths usepa_omega2;usepa_omega2_gui --add-data usepa_omega2;usepa_omega2 --add-data usepa_omega2_gui;usepa_omega2_gui --noconfirm --onefile
+# WINDOWS build omega_gui package:
+pyinstaller exe_entry.py --name omega2 --paths omega_model;omega_gui --add-data omega_model;omega_model --add-data omega_gui;omega_gui --noconfirm --onefile
 
-# *NIX build usepa_omega2_gui package:
-pyinstaller exe_entry.py --name omega2 --paths usepa_omega2:usepa_omega2_gui --add-data usepa_omega2:usepa_omega2 --add-data usepa_omega2_gui:usepa_omega2_gui --noconfirm --onefile
+# *NIX build omega_gui package:
+pyinstaller exe_entry.py --name omega2 --paths omega_model:omega_gui --add-data omega_model:omega_model --add-data omega_gui:omega_gui --noconfirm --onefile
 
 """
 
-# import usepa_omega2
-import usepa_omega2_gui.omega_gui_batch
+# import omega_model
+import omega_gui.omega_gui_batch
 
-# usepa_omega2.run_omega(usepa_omega2.OMEGARuntimeOptions(), standalone_run=True)
-usepa_omega2_gui.omega_gui_batch.run_gui()
+# omega_model.run_omega(omega_model.OMEGARuntimeOptions(), standalone_run=True)
+omega_gui.omega_gui_batch.run_gui()
