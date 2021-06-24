@@ -289,8 +289,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 drop=True)
 
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(roadload_coefficient_table__nonflexfuel, how='left',
-                                                                    on=list(
-                                                                        roadload_coefficient_table_indexing_categories))
+                                                                    on=list(roadload_coefficient_table_indexing_categories))
             vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(
                 vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE'].astype(float) * vehghg_file_nonflexfuel[
                     'FUEL_GRAVITY'].astype(float) * btu2mj * kg2lbm)
@@ -312,12 +311,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                              'TEST_PROC_CATEGORY'],
                                                                     right_on=['Veh Mfr Code', 'Test Number',
                                                                               'Test Category'])
-            # fex = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['CAFE_MFR_CD'] == 'FEX']
-            # print(fex[['TARGET_COEF_A', 'Set Coef A (lbf)']])
-
-            for i in range(len(vehghg_file_nonflexfuel['NV_RATIO'])):
-                if str(vehghg_file_nonflexfuel['NV_RATIO'][i]) == 'nan' and vehghg_file_nonflexfuel['N/V Ratio'][i] > 0:
-                    vehghg_file_nonflexfuel['NV_RATIO'][i] = vehghg_file_nonflexfuel['N/V Ratio'][i]
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
+            vehghg_file_nonflexfuel['NV_RATIO'].replace(['nan', np.nan, ''], 0, inplace=True)
+            vehghg_file_nonflexfuel['NV_RATIO'] = vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['NV_RATIO'] <= 0, 'NV_RATIO']= vehghg_file_nonflexfuel['N/V Ratio']
             # vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[['TEST_NUMBER']].replace([np.nan, 'nan'], '', regex=True)
 
             # for i in range(len(vehghg_file_nonflexfuel)):
@@ -343,14 +339,11 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 [pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
             # EPA_CAFE_MT_CALC_CITY_FE_4, EPA_CAFE_MT_CALC_HWY_FE_4, EPA_CAFE_MT_CALC_COMB_FE_4, TEST_UNROUNDED_UNADJUSTED_FE, RND_ADJ_FE
             output_array = Calculate_Powertrain_Efficiency.Calculate_Powertrain_Efficiency( \
-                vehghg_file_nonflexfuel['TEMP_ID'], vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'],
-                vehghg_file_nonflexfuel['TARGET_COEF_A'], vehghg_file_nonflexfuel['TARGET_COEF_B'], \
-                vehghg_file_nonflexfuel['TARGET_COEF_C'], vehghg_file_nonflexfuel['VEH_ETW'],
-                vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'],
-                vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_FE_4'], \
-                input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames,
-                vehghg_file_nonflexfuel['ENG_DISPL'], vehghg_file_nonflexfuel['ENG_RATED_HP'], \
-                vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'])
+                vehghg_file_nonflexfuel['TEMP_ID'], vehghg_file_nonflexfuel['TEST_PROC_CATEGORY'], \
+                vehghg_file_nonflexfuel['TARGET_COEF_A'], vehghg_file_nonflexfuel['TARGET_COEF_B'], vehghg_file_nonflexfuel['TARGET_COEF_C'], vehghg_file_nonflexfuel['VEH_ETW'], \
+                vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'], vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'], vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'], \
+                vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_FE_4'], input_path, drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, \
+                vehghg_file_nonflexfuel['ENG_DISPL'], vehghg_file_nonflexfuel['ENG_RATED_HP'], vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'])
 
             vehghg_file_nonflexfuel = pd.merge(vehghg_file_nonflexfuel, output_array, how='left', \
                                                on=['TEMP_ID', 'TEST_PROC_CATEGORY']).reset_index(drop=True).rename(
