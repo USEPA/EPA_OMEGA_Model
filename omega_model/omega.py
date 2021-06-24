@@ -2,6 +2,7 @@
 
 OMEGA2 top level code
 
+Runs a single session.
 
 ----
 
