@@ -494,6 +494,7 @@ for model_year in model_years:
     query_output = query_output.replace([np.nan, str(np.nan)], '')
     query_output = query_output[list(aggregating_columns) + list(all_array['Output Column'].unique())+list(all_array['Output Column Name'].unique())]
     query_output = query_output.sort_values(list(aggregating_columns)).reset_index(drop=True)
+    query_output = query_output.loc[:, ~query_output.columns.duplicated()]
     query_output.to_csv(output_path + '\\' + str(model_year) + ' Query' + ' ' + date_and_time + '.csv',index=False)
     del query_output
     del all_array

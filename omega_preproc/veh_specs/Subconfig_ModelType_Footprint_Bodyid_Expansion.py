@@ -311,13 +311,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                              'TEST_PROC_CATEGORY'],
                                                                     right_on=['Veh Mfr Code', 'Test Number',
                                                                               'Test Category'])
-            # fex = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['CAFE_MFR_CD'] == 'FEX']
-            # print(fex[['TARGET_COEF_A', 'Set Coef A (lbf)']])
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
             vehghg_file_nonflexfuel['NV_RATIO'].replace(['nan', np.nan, ''], 0, inplace=True)
             vehghg_file_nonflexfuel['NV_RATIO'] = vehghg_file_nonflexfuel.loc[vehghg_file_nonflexfuel['NV_RATIO'] <= 0, 'NV_RATIO']= vehghg_file_nonflexfuel['N/V Ratio']
-            # for i in range(len(vehghg_file_nonflexfuel['NV_RATIO'])):
-            #     if str(vehghg_file_nonflexfuel['NV_RATIO'][i]) == 'nan' and vehghg_file_nonflexfuel['N/V Ratio'][i] > 0:
-            #         vehghg_file_nonflexfuel['NV_RATIO'][i] = vehghg_file_nonflexfuel['N/V Ratio'][i]
             # vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[['TEST_NUMBER']].replace([np.nan, 'nan'], '', regex=True)
 
             # for i in range(len(vehghg_file_nonflexfuel)):
