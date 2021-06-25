@@ -94,8 +94,6 @@ for model_year in model_years:
     total_schema_count = 0
     for run_count in range(0, len(run_controller)):
         information_toget = str(run_controller['Desired Field'][run_count])
-        if information_toget == 'Set Coef A':
-            print(information_toget)
         information_priority = field_mapping_df[
             list(pd.Series(field_mapping_df.columns)[pd.Series(field_mapping_df.columns).str.contains('Priority')])] \
             [field_mapping_df['UserFriendlyName'] == information_toget].reset_index(drop=True)
@@ -496,6 +494,10 @@ for model_year in model_years:
     query_output = query_output.sort_values(list(aggregating_columns)).reset_index(drop=True)
     query_output = query_output.loc[:, ~query_output.columns.duplicated()]
     query_output.to_csv(output_path + '\\' + str(model_year) + ' Query' + ' ' + date_and_time + '.csv',index=False)
+    query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
+    query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
+    query_output = query_output.drop(query_output.filter(regex='OEM Towing Guide').columns, axis=1)
+    query_output.to_csv(output_path + '\\' + str(model_year) + ' Query' + ' ' + date_and_time + '_noduplicatecolumns.csv',index=False)
     del query_output
     del all_array
     del master_index_file
