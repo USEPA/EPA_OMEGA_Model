@@ -517,8 +517,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS_NORMALIZED_BY_ETW'] = \
                 vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] / vehghg_file_output['ETW']
             vehghg_file_output['Transmission Short Name'] = pd.Series(vehghg_file_output['TRANS_TYPE'] + \
-                                                                      vehghg_file_output[
-                                                                          'TOTAL_NUM_TRANS_GEARS'].astype(str)).replace('CVT1', 'CVT')
+                                                                      vehghg_file_output['TOTAL_NUM_TRANS_GEARS'].astype(str)).replace('CVT1', 'CVT')
             vehghg_file_output['ROAD_LOAD_LABEL'] = pd.Series(
                 vehghg_file_output['CALC_ID'].astype(float).astype(int).astype(str) + '_' \
                 + vehghg_file_output['FOOTPRINT_CARLINE_NM'] + '_' + vehghg_file_output['BodyID'].astype(str) + '_' \
@@ -532,6 +531,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 vehghg_file_output['FRONT_BASE_TIRE_CODE'] + '_' + \
                 vehghg_file_output['ETW'].replace(np.nan, 0).astype(float).round(0).astype(int).replace(0, 'na').astype(str))
             vehghg_file_output = vehghg_file_output.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
+            vehghg_file_output.drop([['Model Year', 'Veh Mfr Code', 'Represented Test Veh Model', 'Test Number', 'Test Category', 'Equivalent Test Weight (lbs.)', \
+                                      'Test Veh Displacement (L)', 'N/V Ratio']], axis=1, inplace=True)
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv', index=False)
         else:
             # New BodyID table sought, previous data included
