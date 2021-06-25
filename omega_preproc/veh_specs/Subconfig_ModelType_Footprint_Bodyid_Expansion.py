@@ -288,30 +288,30 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                     left_on=['CAFE_MFR_CD', 'TEST_NUMBER', 'TEST_PROC_CATEGORY'],
                                                                     right_on=['Veh Mfr Code', 'Test Number', 'Test Category'])
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
-            # vehghg_file_nonflexfuel.drop_duplicates(keep=False, inplace=True)
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
 
             vehghg_file_nonflexfuel['NV_RATIO'].replace(['nan', np.nan, ''], 0, inplace=True)
             vehghg_file_nonflexfuel['TARGET_COEF_A'].replace(['nan', np.nan, ''], 0, inplace=True)
-            vehghg_file_nonflexfuel['Set Coef A (lbf)'].replace(['nan', np.nan, ''], 0, inplace=True)
+            vehghg_file_nonflexfuel['SET_COEF_A'].replace(['nan', np.nan, ''], 0, inplace=True)
             vehghg_file_nonflexfuel['CO2 (g/mi)'].replace(['nan', np.nan, ''], 0, inplace=True)
             vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'].replace(['nan', np.nan, ''], 0, inplace=True)
             vehghg_file_nonflexfuel['NV_RATIO'] = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['NV_RATIO'] <= 0), 'NV_RATIO']= vehghg_file_nonflexfuel['N/V Ratio']
 
-            df_vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['Set Coef A (lbf)'] == 0) & (vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'] > 0), :]
+            df_vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['SET_COEF_A'] == 0) & (vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'] > 0), :]
             df_vehghg_file_nonflexfuel_index = list(df_vehghg_file_nonflexfuel.index)
             df_vehghg_file_nonflexfuel = df_vehghg_file_nonflexfuel.reset_index(drop=True)
             # print(len(df_vehghg_file_nonflexfuel)
             vehghg_file_nonflexfuel['est TARGET_COEF_A'] = vehghg_file_nonflexfuel['TARGET_COEF_A'].copy()
             vehghg_file_nonflexfuel['est TARGET_COEF_B'] = vehghg_file_nonflexfuel['TARGET_COEF_B'].copy()
             vehghg_file_nonflexfuel['est TARGET_COEF_C'] = vehghg_file_nonflexfuel['TARGET_COEF_C'].copy()
-            vehghg_file_nonflexfuel['est Set Coef A (lbf)'] = vehghg_file_nonflexfuel['Set Coef A (lbf)'].copy()
-            vehghg_file_nonflexfuel['est Set Coef B (lbf/mph)'] = vehghg_file_nonflexfuel['Set Coef B (lbf/mph)'].copy()
-            vehghg_file_nonflexfuel['est Set Coef C (lbf/mph**2)'] = vehghg_file_nonflexfuel['Set Coef C (lbf/mph**2)'].copy()
+            vehghg_file_nonflexfuel['est SET_COEF_A'] = vehghg_file_nonflexfuel['SET_COEF_A'].copy()
+            vehghg_file_nonflexfuel['est SET_COEF_B'] = vehghg_file_nonflexfuel['SET_COEF_B'].copy()
+            vehghg_file_nonflexfuel['est SET_COEF_C'] = vehghg_file_nonflexfuel['SET_COEF_C'].copy()
 
             for k in range(len(df_vehghg_file_nonflexfuel)):
                 i = df_vehghg_file_nonflexfuel_index[k]
                 _target_coef_A = vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_A']
-                _set_coef_A = vehghg_file_nonflexfuel.loc[i, 'Set Coef A (lbf)']
+                _set_coef_A = vehghg_file_nonflexfuel.loc[i, 'SET_COEF_A']
                 if k > 0 and (vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD'] == df_set_roadload_coefficient_table.loc[0, 'Veh Mfr Code']): pass
                 else:
                     df_set_roadload_coefficient_table = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Veh Mfr Code'] == vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD']) &
@@ -339,9 +339,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                             vehghg_file_nonflexfuel.loc[i, 'FE Bag 3'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 3']
                             _flag_FE_Bag_1 = i
                         if _set_coef_A == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']) != 'nan') and _flag_SET_COEF_A == 0:
-                            vehghg_file_nonflexfuel.loc[i, 'est Set Coef A (lbf)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
-                            vehghg_file_nonflexfuel.loc[i, 'est Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
-                            vehghg_file_nonflexfuel.loc[i, 'est Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
+                            vehghg_file_nonflexfuel.loc[i, 'est SET_COEF_A'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
+                            vehghg_file_nonflexfuel.loc[i, 'est SET_COEF_B'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
+                            vehghg_file_nonflexfuel.loc[i, 'est SET_COEF_C'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
                             _flag_SET_COEF_A = i
                         if _target_coef_A == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']) != 'nan') and _flag_TARGET_COEF_A == 0:
                             vehghg_file_nonflexfuel.loc[i, 'est TARGET_COEF_A'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']
@@ -368,13 +368,14 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                             vehghg_file_nonflexfuel.loc[i, 'FE Bag 2'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 2']
                             vehghg_file_nonflexfuel.loc[i, 'FE Bag 3'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 3']
                             _flag_FE_Bag_1 = i
-                        vehghg_file_nonflexfuel.loc[i, 'est Set Coef A (lbf)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
-                        vehghg_file_nonflexfuel.loc[i, 'est Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
-                        vehghg_file_nonflexfuel.loc[i, 'est Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
+                        vehghg_file_nonflexfuel.loc[i, 'est SET_COEF_A'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
+                        vehghg_file_nonflexfuel.loc[i, 'est SET_COEF_B'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
+                        vehghg_file_nonflexfuel.loc[i, 'est SET_COEF_C'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
                         _flag_SET_COEF_A = i
                         continue
 
             del df_set_roadload_coefficient_table, set_roadload_coefficient_table, roadload_coefficient_table
+            # vehghg_file_nonflexfuel.drop([['Model Year', 'Veh Mfr Code', 'Represented Test Veh Model', 'Test Number', 'Test Category', 'Equivalent Test Weight (lbs.)', 'Test Veh Displacement (L)', 'N/V Ratio']], axis=1, inplace=True)
 
             import Calculate_Powertrain_Efficiency
             vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='TEMP_ID') + 1, vehghg_file_nonflexfuel], axis=1)
@@ -530,9 +531,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 'RRC:(' + vehghg_file_output['RRC_FROM_RLCOEFFS'].round(1).astype(str) + ')' + '_' + \
                 vehghg_file_output['FRONT_BASE_TIRE_CODE'] + '_' + \
                 vehghg_file_output['ETW'].replace(np.nan, 0).astype(float).round(0).astype(int).replace(0, 'na').astype(str))
-            vehghg_file_output = vehghg_file_output.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
-            vehghg_file_output.drop([['Model Year', 'Veh Mfr Code', 'Represented Test Veh Model', 'Test Number', 'Test Category', 'Equivalent Test Weight (lbs.)', \
-                                      'Test Veh Displacement (L)', 'N/V Ratio']], axis=1, inplace=True)
+            vehghg_file_output.drop_duplicates(keep=False, inplace=True)
             vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv', index=False)
         else:
             # New BodyID table sought, previous data included
