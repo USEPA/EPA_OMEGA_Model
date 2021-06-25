@@ -388,7 +388,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 vehghg_file_nonflexfuel['ENG_DISPL'], vehghg_file_nonflexfuel['ENG_RATED_HP'], vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'])
 
             vehghg_file_nonflexfuel = pd.merge(vehghg_file_nonflexfuel, output_array, how='left', \
-                                               on=['TEMP_ID', 'TEST_PROC_CATEGORY']).reset_index(drop=True).rename(columns={'Powertrain Efficiency (%)': 'PTEFF_FROM_RLCOEFFS'}).drop('TEMP_ID', axis=1)
+                                               on=['TEMP_ID', 'TEST_PROC_CATEGORY']).reset_index(drop=True).rename( \
+                columns={'Powertrain Efficiency (%)': 'PTEFF_FROM_RLCOEFFS', 'City Powertrain Efficiency (%)': 'City PTEFF_FROM_RLCOEFFS', 'Hwy Powertrain Efficiency (%)': 'Hwy PTEFF_FROM_RLCOEFFS'}).drop('TEMP_ID', axis=1)
 
             total_allocated_volumes_to_footprint = pd.DataFrame(
                 vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)[
