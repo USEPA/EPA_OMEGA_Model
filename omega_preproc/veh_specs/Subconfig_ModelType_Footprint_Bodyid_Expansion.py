@@ -288,6 +288,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                     left_on=['CAFE_MFR_CD', 'TEST_NUMBER', 'TEST_PROC_CATEGORY'],
                                                                     right_on=['Veh Mfr Code', 'Test Number', 'Test Category'])
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
+            vehghg_file_nonflexfuel.drop_duplicates(keep=False, inplace=True)
 
             vehghg_file_nonflexfuel['NV_RATIO'].replace(['nan', np.nan, ''], 0, inplace=True)
             vehghg_file_nonflexfuel['TARGET_COEF_A'].replace(['nan', np.nan, ''], 0, inplace=True)
@@ -299,50 +300,79 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             df_vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['Set Coef A (lbf)'] == 0) & (vehghg_file_nonflexfuel['TEST_UNROUNDED_UNADJUSTED_FE'] > 0), :]
             df_vehghg_file_nonflexfuel_index = list(df_vehghg_file_nonflexfuel.index)
             df_vehghg_file_nonflexfuel = df_vehghg_file_nonflexfuel.reset_index(drop=True)
-            print(len(df_vehghg_file_nonflexfuel))
-
-            _flag_NV_RATIO = pd.Series(np.zeros(len(df_vehghg_file_nonflexfuel)))
-            _flag_TARGET_COEF_A = pd.Series(np.zeros(len(df_vehghg_file_nonflexfuel)))
-            _flag_SET_COEF_A = pd.Series(np.zeros(len(df_vehghg_file_nonflexfuel)))
-            _flag_FE_Bag_1 = pd.Series(np.zeros(len(df_vehghg_file_nonflexfuel)))
-            _flag_CO2_gpmi = pd.Series(np.zeros(len(df_vehghg_file_nonflexfuel)))
+            # print(len(df_vehghg_file_nonflexfuel)
+            vehghg_file_nonflexfuel['est TARGET_COEF_A'] = vehghg_file_nonflexfuel['TARGET_COEF_A'].copy()
+            vehghg_file_nonflexfuel['est TARGET_COEF_B'] = vehghg_file_nonflexfuel['TARGET_COEF_B'].copy()
+            vehghg_file_nonflexfuel['est TARGET_COEF_C'] = vehghg_file_nonflexfuel['TARGET_COEF_C'].copy()
+            vehghg_file_nonflexfuel['est Set Coef A (lbf)'] = vehghg_file_nonflexfuel['Set Coef A (lbf)'].copy()
+            vehghg_file_nonflexfuel['est Set Coef B (lbf/mph)'] = vehghg_file_nonflexfuel['Set Coef B (lbf/mph)'].copy()
+            vehghg_file_nonflexfuel['est Set Coef C (lbf/mph**2)'] = vehghg_file_nonflexfuel['Set Coef C (lbf/mph**2)'].copy()
 
             for k in range(len(df_vehghg_file_nonflexfuel)):
                 i = df_vehghg_file_nonflexfuel_index[k]
                 _target_coef_A = vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_A']
                 _set_coef_A = vehghg_file_nonflexfuel.loc[i, 'Set Coef A (lbf)']
                 if k > 0 and (vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD'] == df_set_roadload_coefficient_table.loc[0, 'Veh Mfr Code']): pass
-                else: df_set_roadload_coefficient_table = set_roadload_coefficient_table[set_roadload_coefficient_table['Veh Mfr Code'] == vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD']].reset_index(drop=True)
+                else:
+                    df_set_roadload_coefficient_table = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Veh Mfr Code'] == vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD']) &
+                                                                                           ((set_roadload_coefficient_table['Test Category'] == 'FTP') |
+                                                                                            (set_roadload_coefficient_table['Test Category'] == 'HWY')), :].reset_index(drop=True)
+                _flag_NV_RATIO = 0; _flag_CO2_gpmi = 0; _flag_FE_Bag_1 = 0; _flag_SET_COEF_A = 0; _flag_TARGET_COEF_A = 0
                 for j in range(len(df_set_roadload_coefficient_table)):
-                    if (_target_coef_A > 0) and (_set_coef_A > 0): continue
+                    if (_target_coef_A != 0) and (_set_coef_A != 0): continue
+                    if (_flag_TARGET_COEF_A > 0) and (_flag_SET_COEF_A > 0): continue
                     # vehghg_file_nonflexfuel.loc[i, 'ETW'][i] == set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'] and \
                     if (vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == df_set_roadload_coefficient_table.loc[j, 'Test Category']) and \
                         (vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD'] == df_set_roadload_coefficient_table.loc[j, 'Veh Mfr Code']) and \
                         (vehghg_file_nonflexfuel.loc[i, 'Engine Displacement Category'] == df_set_roadload_coefficient_table.loc[j, 'Test Veh Displacement (L)']) and \
-                        ((vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == 'FTP' and  vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'][i] == df_set_roadload_coefficient_table.loc[j, 'RND_ADJ_FE']) or \
-                        (vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == 'HWY' and vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'][i] == df_set_roadload_coefficient_table.loc[j, 'RND_ADJ_FE'])):
-                        if vehghg_file_nonflexfuel.loc[i, 'NV_RATIO'] == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'N/V Ratio']) != 'nan') and _flag_NV_RATIO[k] == 0:
+                        ((vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == 'FTP' and  vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'][i].round(1) == df_set_roadload_coefficient_table.loc[j, 'RND_ADJ_FE']) or \
+                        (vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == 'HWY' and vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'][i].round(1) == df_set_roadload_coefficient_table.loc[j, 'RND_ADJ_FE'])):
+                        if vehghg_file_nonflexfuel.loc[i, 'NV_RATIO'] == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'N/V Ratio']) != 'nan') and _flag_NV_RATIO == 0:
                             vehghg_file_nonflexfuel.loc[i, 'NV_RATIO'] = df_set_roadload_coefficient_table.loc[j, 'N/V Ratio']
-                            _flag_NV_RATIO[k] = i
-                        if vehghg_file_nonflexfuel.loc[i, 'CO2 (g/mi)'] == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'CO2 (g/mi)']) != 'nan')  and _flag_CO2_gpmi[k] == 0:
+                            _flag_NV_RATIO = i
+                        if vehghg_file_nonflexfuel.loc[i, 'CO2 (g/mi)'] == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'CO2 (g/mi)']) != 'nan')  and _flag_CO2_gpmi == 0:
                             vehghg_file_nonflexfuel.loc[i, 'CO2 (g/mi)'] = df_set_roadload_coefficient_table.loc[j, 'CO2 (g/mi)']
-                            _flag_CO2_gpmi[k] = i
-                        if (str(vehghg_file_nonflexfuel.loc[i, 'FE Bag 1']) == 'nan') and (str(df_set_roadload_coefficient_table.loc[j, 'FE Bag 1']) != 'nan')  and _flag_FE_Bag_1[k] == 0:
+                            _flag_CO2_gpmi = i
+                        if (str(vehghg_file_nonflexfuel.loc[i, 'FE Bag 1']) == 'nan') and (str(df_set_roadload_coefficient_table.loc[j, 'FE Bag 1']) != 'nan')  and _flag_FE_Bag_1 == 0:
                             vehghg_file_nonflexfuel.loc[i, 'FE Bag 1'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 1']
                             vehghg_file_nonflexfuel.loc[i, 'FE Bag 2'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 2']
                             vehghg_file_nonflexfuel.loc[i, 'FE Bag 3'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 3']
-                            _flag_FE_Bag_1[k] = i
+                            _flag_FE_Bag_1 = i
+                        if _set_coef_A == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']) != 'nan') and _flag_SET_COEF_A == 0:
+                            vehghg_file_nonflexfuel.loc[i, 'est Set Coef A (lbf)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
+                            vehghg_file_nonflexfuel.loc[i, 'est Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
+                            vehghg_file_nonflexfuel.loc[i, 'est Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
+                            _flag_SET_COEF_A = i
+                        if _target_coef_A == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']) != 'nan') and _flag_TARGET_COEF_A == 0:
+                            vehghg_file_nonflexfuel.loc[i, 'est TARGET_COEF_A'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']
+                            vehghg_file_nonflexfuel.loc[i, 'est TARGET_COEF_B'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef B (lbf/mph)']
+                            vehghg_file_nonflexfuel.loc[i, 'est TARGET_COEF_C'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef C (lbf/mph**2)']
+                            _flag_TARGET_COEF_A = i
 
-                        if _set_coef_A == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']) != 'nan') and _flag_SET_COEF_A[k] == 0:
-                            vehghg_file_nonflexfuel.loc[i, 'Set Coef A (lbf)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
-                            vehghg_file_nonflexfuel.loc[i, 'Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
-                            vehghg_file_nonflexfuel.loc[i, 'Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
-                            _flag_SET_COEF_A[k] = i
-                        if _target_coef_A == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']) != 'nan') and _flag_TARGET_COEF_A[k] == 0:
-                            vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_A'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)']
-                            vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_B'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef B (lbf/mph)']
-                            vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_C'] = df_set_roadload_coefficient_table.loc[j, 'Target Coef C (lbf/mph**2)']
-                            _flag_TARGET_COEF_A[k] = i
+                    if (_target_coef_A != 0 and _set_coef_A == 0) and \
+                        (vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == df_set_roadload_coefficient_table.loc[j, 'Test Category']) and \
+                        (vehghg_file_nonflexfuel.loc[i, 'CAFE_MFR_CD'] == df_set_roadload_coefficient_table.loc[j, 'Veh Mfr Code']) and \
+                        (vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_A'].round(3) == df_set_roadload_coefficient_table.loc[j, 'Target Coef A (lbf)'].round(3)) and \
+                        (vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_B'].round(3) == df_set_roadload_coefficient_table.loc[j, 'Target Coef B (lbf/mph)'].round(3)) and \
+                        (vehghg_file_nonflexfuel.loc[i, 'TARGET_COEF_C'].round(3) == df_set_roadload_coefficient_table.loc[j, 'Target Coef C (lbf/mph**2)'].round(3)) and \
+                        ((vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == 'FTP' and  vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_CITY_FE_4'][i].round(1) == df_set_roadload_coefficient_table.loc[j, 'RND_ADJ_FE']) or \
+                        (vehghg_file_nonflexfuel.loc[i, 'TEST_PROC_CATEGORY'] == 'HWY' and vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_HWY_FE_4'][i].round(1) == df_set_roadload_coefficient_table.loc[j, 'RND_ADJ_FE'])):
+                        if vehghg_file_nonflexfuel.loc[i, 'NV_RATIO'] == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'N/V Ratio']) != 'nan') and _flag_NV_RATIO == 0:
+                            vehghg_file_nonflexfuel.loc[i, 'NV_RATIO'] = df_set_roadload_coefficient_table.loc[j, 'N/V Ratio']
+                            _flag_NV_RATIO = i
+                        if vehghg_file_nonflexfuel.loc[i, 'CO2 (g/mi)'] == 0 and (str(df_set_roadload_coefficient_table.loc[j, 'CO2 (g/mi)']) != 'nan')  and _flag_CO2_gpmi == 0:
+                            vehghg_file_nonflexfuel.loc[i, 'CO2 (g/mi)'] = df_set_roadload_coefficient_table.loc[j, 'CO2 (g/mi)']
+                            _flag_CO2_gpmi = i
+                        if (str(vehghg_file_nonflexfuel.loc[i, 'FE Bag 1']) == 'nan') and (str(df_set_roadload_coefficient_table.loc[j, 'FE Bag 1']) != 'nan')  and _flag_FE_Bag_1 == 0:
+                            vehghg_file_nonflexfuel.loc[i, 'FE Bag 1'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 1']
+                            vehghg_file_nonflexfuel.loc[i, 'FE Bag 2'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 2']
+                            vehghg_file_nonflexfuel.loc[i, 'FE Bag 3'] = df_set_roadload_coefficient_table.loc[j, 'FE Bag 3']
+                            _flag_FE_Bag_1 = i
+                        vehghg_file_nonflexfuel.loc[i, 'est Set Coef A (lbf)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef A (lbf)']
+                        vehghg_file_nonflexfuel.loc[i, 'est Set Coef B (lbf/mph)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef B (lbf/mph)']
+                        vehghg_file_nonflexfuel.loc[i, 'est Set Coef C (lbf/mph**2)'] = df_set_roadload_coefficient_table.loc[j, 'Set Coef C (lbf/mph**2)']
+                        _flag_SET_COEF_A = i
+                        continue
 
             del df_set_roadload_coefficient_table, set_roadload_coefficient_table, roadload_coefficient_table
 
