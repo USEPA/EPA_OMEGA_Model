@@ -1,5 +1,9 @@
 """
 
+**SQLite/SQLAlchemy Database Functionality.**
+
+Routines to initialize the database, create a connection,
+and other handle database utilities.
 
 ----
 
@@ -32,7 +36,10 @@ from decimal import Decimal
 import sqlalchemy.types as types
 
 # TODO: use this to override Integer, instead of Numeric
-class StringNumeric(types.TypeDecorator):
+class _StringNumeric(types.TypeDecorator):
+    """
+    Decorator Class to store "numeric" values (e.g. integers) as strings in the database.
+    """
     impl = types.String
 
     def load_dialect_impl(self, dialect):
@@ -46,13 +53,18 @@ class StringNumeric(types.TypeDecorator):
 
 
 # Use Numeric a.k.a StringNumeric for integer values stored as strings (e.g. model_year)
-Numeric = StringNumeric
+Numeric = _StringNumeric
 
 
-SQABase = declarative_base(name='DeclarativeMeta')
+SQABase = declarative_base(name='DeclarativeMeta')  #: base class for SQLAlchemy-based classes
 
 
 def init_omega_db():
+    """
+    Create SQLite database engine (in memory) and associated session, set omega_globals variables (engine, session).
+    Set up any necessary database options.
+
+    """
     omega_globals.engine = create_engine('sqlite:///:memory:', echo=False)
     omega_globals.session = Session(bind=omega_globals.engine)
     # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
@@ -60,17 +72,48 @@ def init_omega_db():
 
 
 def sql_unpack_result(query_result_tuples, index=0):
+    """
+    Unpack a database query result (list of tuples).
+
+    Args:
+        query_result_tuples: List of tuples to unpack
+        index (int): tuple index to build result list from
+
+    Returns:
+        List of query results by tuple index, e.g. ``[r[index] for r in query_result_tuples]``
+
+    """
     return [r[index] for r in query_result_tuples]
 
 
-def sql_format_list_str(list_in):
+def _sql_format_list_str(list_in):
+    """
+    Reformat a list of strings, delete single quotes and braces.
+
+    Args:
+        list_in: list to reformat
+
+    Returns:
+        String version of list, without single quotes and braces.
+
+    """
     return str(tuple(list_in)).replace("'", ""). \
         replace('(', '').replace(')', ''). \
         replace('{', '').replace('}', ''). \
         replace('[', '').replace(']', '')
 
 
-def sql_format_value_list_str(list_in):
+def _sql_format_value_list_str(list_in):
+    """
+    Convert a list of strings to a comma-separated list of tuples.
+
+    Args:
+        list_in: list of strings to convert
+
+    Returns:
+        List of strings as a comma-separated list of tuples.
+
+    """
     values_str = ''
     for li in list_in:
         if type(li) is not tuple:
@@ -81,14 +124,17 @@ def sql_format_value_list_str(list_in):
     return values_str
 
 
-def sql_get_column_names(table_name, exclude=None):
+def _sql_get_column_names(table_name, exclude=None):
     """
-    For creating arguments to SQL expressions that need a list of column names
-    :param table_name: name of database table to query
-    :param exclude: column name or list of column names to exclude
-    :return: comma separated list of column names string
-    """
+    For creating arguments to SQL expressions that need a list of column names.
+    Args:
+        table_name: name of database table to query
+        exclude: column name or list of column names to exclude
 
+    Returns:
+        Comma-separated list of column names string.
+
+    """
     # get table row data:
     result = omega_globals.session.execute('PRAGMA table_info(%s)' % table_name)
 
@@ -104,7 +150,7 @@ def sql_get_column_names(table_name, exclude=None):
                 columns.remove(e)
 
     # create string with no quotes or parentheses
-    columns_str = sql_format_list_str(columns)  # str(tuple(columns)).replace("'", "").replace('(','').replace(')','')
+    columns_str = _sql_format_list_str(columns)  # str(tuple(columns)).replace("'", "").replace('(','').replace(')','')
 
     # table_columns = [table_name + '.' + c for c in columns]
     # table_columns_str = str(tuple(table_columns)).replace("'", "").replace('(','').replace(')','')
@@ -112,11 +158,29 @@ def sql_get_column_names(table_name, exclude=None):
     return columns_str  # , table_columns_str
 
 
-def sql_valid_name(name_str):
+def _sql_valid_name(name_str):
+    """
+    Convert a string to a valid SQLite column name.
+
+    Args:
+        name_str (str): input string
+
+    Returns:
+        Input string with spaces replaced by underscores.
+
+    """
     return name_str.replace(' ', '_').lower()
 
 
 def dump_omega_db_to_csv(output_folder, verbose=False):
+    """
+    Dump database tables to .csv files in an output folder.
+
+    Args:
+        output_folder (str): name of output folder
+        verbose (bool): enable additional console and logfile output if True
+
+    """
     import common.file_io as file_io
 
     # validate output folder
