@@ -10,6 +10,7 @@ from omega_preproc.context_aeo import SetInputs as context_aeo_inputs
 
 weight_cost_cache = dict()
 
+
 def cost_vs_plot(settings, df, path, *years):
     """
 
@@ -206,6 +207,9 @@ def reshape_df_for_cloud_file(settings, df_source, *id_args):
         temp.insert(1, 'model_year', year)
         temp.drop(columns='variable', inplace=True)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
+    for arg in df_return.columns:
+        if arg.__contains__('credit'):
+            df_return.rename(columns={arg: arg.rsplit('credit_')[1]}, inplace=True)
     return df_return
 
 
