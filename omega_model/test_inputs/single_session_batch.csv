@@ -1,0 +1,59 @@
+Parameter,Type,Value
+Batch Settings,,
+Batch Name,String,single_session_batch
+Context Folder Name,String,
+Context Name,String,AEO2021
+Context Case,String,Reference case
+Context New Vehicle Prices File,GENERATE {X.Y} / String,GENERATE context_new_vehicle_prices.csv
+,,
+Session Settings,,
+Enable Session,TRUE / FALSE,TRUE
+Session Name,String,ReferencePolicy
+,,
+IO Settings,,
+Manufacturers File,String,manufacturers.csv
+Market Classes File,String,market_classes.csv
+Vehicles File,String,vehicles.csv
+Vehicle On-road Calculations File,String,vehicle_onroad_calculations.csv
+Demanded Shares File,String,demanded_shares-gcam.csv
+Onroad Fuels File,String,onroad_fuels.csv
+Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv
+Drive Cycles File,String,drive_cycles.csv
+Drive Cycle Weights File,String,drive_cycle_weights.csv
+Context Fuel Prices File,String,context_fuel_prices.csv
+Context New Vehicle Market File,String,context_new_vehicle_market.csv
+Cost File,String,simulated_vehicles.csv
+GHG Standards File,String,ghg_standards-footprint.csv
+GHG Standards Fuels File,String,policy_fuels.csv
+Production Multipliers File,String,production_multipliers.csv
+GHG Credits File,String,ghg_credits.csv
+Off-Cycle Credits File,String,offcycle_credits.csv
+ZEV Requirement File,String,required_zev_share.csv
+Price Modifications File,String,price_modifications.csv
+Production Constraints File,String,production_constraints.csv
+Stock Deregistration File,String,reregistration_fixed_by_age.csv
+Stock VMT File,String,annual_vmt_fixed_by_age.csv
+Verbose Output,TRUE / FALSE,FALSE
+Slice Tech Combo Tables,TRUE / FALSE,TRUE
+,,
+Runtime Settings,,
+Num Market Share Options,#,5
+Num Tech Options per ICE Vehicle,#,5
+Num Tech Options per BEV Vehicle,#,1
+Allow Backsliding,TRUE / FALSE,TRUE
+Cost Curve Frontier Affinity Factor,#,0.75
+Iterate Producer-Consumer,TRUE / FALSE,TRUE
+New Vehicle Price Sales Response Elasticity,#,-0.5
+Consumer Pricing Multiplier Min,#,0.95
+Consumer Pricing Multiplier Max,#,1.05
+,,
+Postproc Settings,,
+Context Criteria Cost Factors File,String,cost_factors-criteria.csv
+Context SCC Cost Factors File,String,cost_factors-scc.csv
+Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv
+Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv
+Context Powersector Emission Factors File,String,emission_factors-powersector.csv
+Context Refinery Emission Factors File,String,emission_factors-refinery.csv
+Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv
+Context Implicit Price Deflators File,String,implicit_price_deflators.csv
+Context Consumer Price Index File,String,cpi_price_deflators.csv

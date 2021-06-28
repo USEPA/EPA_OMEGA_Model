@@ -13,19 +13,17 @@
 import os
 import sys
 path = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2'))
-sys.path.insert(0, os.path.join(path, '..', '..', 'usepa_omega2_gui'))
-sys.path.insert(0, os.path.join(path, '..', '..', 'code_doc_samples'))
-sys.path.insert(0, os.path.join(path, '..', '..'))
+sys.path.insert(0, os.path.join(path, '..', '..', 'omega_model'))  # picks up omega_model sub-packages
+sys.path.insert(0, os.path.join(path, '..', '..'))  # picks up the top-level packages
 
 # -- Project information -----------------------------------------------------
 
 project = 'OMEGA2'
-copyright = '2020, US EPA'
+copyright = '2021, US EPA'
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5.0'
+release = '0.7.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,7 +38,10 @@ extensions = [
     'sphinx.ext.todo'
 ]
 
-autodoc_member_order = 'bysource'  # 'bysource' presents autodocs in the same order as they appear in the code, as opposed to alphabetical
+autodoc_default_options = {
+    'member-order': 'bysource',  # other option is 'alphabetical'
+    'special-members': '__init__',
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -94,3 +95,5 @@ latex_elements = {
 
 # set top level document to index.rst:
 master_doc = 'index'
+
+add_module_names = False

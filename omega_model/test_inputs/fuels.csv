@@ -1,0 +1,6 @@
+input_template_name:,fuels,input_template_version:,0.1
+fuel_id,unit,energy_density_megajoules_per_unit,co2_tailpipe_emissions_grams_per_unit
+MTE Gasoline,gallon,129.46,8887
+MTE US electricity,kWh,3.6,0
+pump gasoline,gallon,129.46,8887
+US electricity,kWh,3.6,0

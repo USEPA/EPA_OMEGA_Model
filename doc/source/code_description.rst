@@ -51,9 +51,8 @@ You can test your install with the following:
 Versioning and Distribution Tools
 ---------------------------------
 
-The ``crank_win`` folder contains batch files for "turning the crank" and updating code version numbers and
-creating distributions that can be uploaded to PyPi, for example.  The ``_win`` refers to Windows, in the future
-maybe there will be a ``_nix`` folder for routines that perform the equivalent job on unix/linux machines.
+The ``versioning`` folder contains batch files for updating code version numbers and
+creating distributions that can be uploaded to PyPi, for example.
 
 Versioning
 ++++++++++
@@ -102,6 +101,20 @@ http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
 https://devguide.python.org/documenting/
 
 https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst
+
+FAQ
+^^^
+
+Multiprocessor
+--------------
+
+Dispy and Pycos Versions
+++++++++++++++++++++++++
+
+Some versions of dispy and pycos have proved to be incompatible with each other.  The following versions have been tested together successfully:
+
+* dispy v4.12.2 and pycos v4.18.15
+* dispy v4.12.4 and pycos v4.11.0
 
 
 

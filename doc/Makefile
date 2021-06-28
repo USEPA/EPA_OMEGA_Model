@@ -3,10 +3,13 @@
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
-SPHINXOPTS    ?= -v
+
+SOURCEDIR   = source
+BUILDDIR    = build
+DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 0.7.1 --module-first --tocfile code_details
+BUILDOPTS   = -v
+
 SPHINXBUILD   ?= sphinx-build
-SOURCEDIR     = source
-BUILDDIR      = build
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -14,7 +17,6 @@ help:
 
 .PHONY: help Makefile
 
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	sphinx-apidoc -o "$(SOURCEDIR)" ".." $(DOCOPTS)
+	$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(BUILDOPTS)

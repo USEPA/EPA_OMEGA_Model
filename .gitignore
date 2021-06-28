@@ -3,8 +3,8 @@ venv
 env
 build
 dist
-/usepa_omega2/output/*
-/usepa_omega2_preproc/output_context_aeo
+/omega_model/output/*
+/omega_preproc/output_context_aeo
 outputs
 .pytest_cache
 .coverage
@@ -123,9 +123,9 @@ composer.lock
 # Mac
 *.DS_Store
 /__dump/*
-/usepa_omega2/_sequester/
+/omega_model/_sequester/
 /output/
-/usepa_omega2/consumer/output/
+/omega_model/consumer/output/
 /dev/*
 /bundle/*
 *log*.txt
@@ -135,6 +135,6 @@ composer.lock
 *_expanded*
 
 /comm_file.txt
-/usepa_omega2_preproc/output_context_aeo/
+/omega_preproc/output_context_aeo/
 /venv*/
 *out*/

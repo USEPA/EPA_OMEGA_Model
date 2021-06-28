@@ -1,0 +1,1 @@
+# OMEGA common functionality subpackage

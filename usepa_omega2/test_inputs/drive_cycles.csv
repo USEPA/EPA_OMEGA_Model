@@ -1,7 +1,0 @@
-input_template_name:,drive_cycles,input_template_version:,0.1
-drive_cycle_id,description,,
-ftp_1,EPA FTP (city) cycle phase 1,,
-ftp_2,EPA FTP (city) cycle phase 2,,
-ftp_3,EPA FTP (city) cycle phase 3,,
-hwfet,EPA HWFET cycle,,
-us06,EPA US06 cycle,,
