@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from common.omega_types import OMEGABase
 from omega_model import OMEGARuntimeOptions
-from common.file_io import validate_file, relocate_file
+from common.file_io import validate_file, relocate_file, get_filenameext
 
 bundle_input_folder_name = 'in'
 bundle_output_folder_name = OMEGARuntimeOptions().output_folder
@@ -715,11 +715,10 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                     source_file_path = source_file_path.replace('\\', os.sep)
 
                                 if is_absolute_path(source_file_path):
-                                    # from common import file_eye_oh as file_io
                                     # file_path is absolute path
                                     if options.verbose:
                                         batch.batch_log.logwrite('relocating %s to %s' % (
-                                        source_file_path, options.session_path + file_io.get_filenameext(source_file_path)))
+                                        source_file_path, options.session_path + get_filenameext(source_file_path)))
                                     batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
                                         options.session_path + bundle_input_folder_name, source_file_path)
                                 else:

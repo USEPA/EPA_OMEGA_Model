@@ -781,6 +781,7 @@ def init_omega(o2_options):
         omega_globals.options.analysis_final_year = CostCloud.get_max_year()
 
         stock.update_stock(omega_globals.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
+
     except Exception as e:
         if init_fail:
             omega_log.logwrite("\n#INIT FAIL")
@@ -793,7 +794,7 @@ def init_omega(o2_options):
         omega_log.end_logfile("\nSession Fail")
         dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-        return init_fail
+    return init_fail
 
 
 def run_omega(o2_options, standalone_run=False):
