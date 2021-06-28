@@ -35,7 +35,7 @@ from sqlalchemy.orm import relationship, Session
 from decimal import Decimal
 import sqlalchemy.types as types
 
-# TODO: use this to override Integer, instead of Numeric
+
 class _StringNumeric(types.TypeDecorator):
     """
     Decorator Class to store "numeric" values (e.g. integers) as strings in the database.
