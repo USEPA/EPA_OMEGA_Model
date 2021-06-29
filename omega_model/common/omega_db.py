@@ -39,8 +39,10 @@ import sqlalchemy.types as types
 class _StringNumeric(types.TypeDecorator):
     """
     Decorator Class to store "numeric" values (e.g. integers) as strings in the database.
+
     """
     impl = types.String
+    cache_ok = True  # for SQLAlchemy >= 1.4 request caching
 
     def load_dialect_impl(self, dialect):
         return dialect.type_descriptor(types.VARCHAR(100))
