@@ -106,16 +106,21 @@ In its primary function as a regulatory support tool, OMEGA’s modeled outputs 
 
 * Key examples of monetized effects that OMEGA will estimate:
 	* Vehicle production costs
-	* Vehicle ownership and operation costs, including fuel and maintenance
-	* Impacts on consumers 
-	* Societal costs of criteria air pollutants
-	* Societal cost of GHG pollutants
+	* Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
+	* Impacts of criteria air pollutants
+	* Impacts of greenhouse gas pollutants
 	* Congestion, noise, and safety costs
 * Key examples of physical effects that OMEGA will estimate:
 	* Stock of registered vehicles, along with key attributes
 	* VMT of registered vehicles
 	* Tailpipe GHG and criteria pollutant emissions
-	* Upstream GHG and criteria pollutant emissions
+	* Upstream (refinery, power sector) GHG and criteria pollutant emissions
+
+Note that the calculation of criteria and GHG emission impacts is done using the $/ton estimates included in the cost_factors-criteria.csv and cost_factors-scc.csv input files. The $/ton estimates
+provided in those files are best understood to be the marginal costs associated with the reduction of the individual pollutants as opposed to the absolute costs associated with a ton of each pollutant.
+As such, the criteria and climate "costs" calculated by the model should not be seen as true costs associated with pollution, but rather the first step in estimating the benefits associated with reductions
+of those pollutants. For that reason, the user must be careful not to consider those as absolute costs, but once compared to the "costs" of another scenario (presumably via calculation of a difference
+in "costs" between two scenarios) the result can be interpreted as a benefit.
 
 Module Integration and Iteration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
