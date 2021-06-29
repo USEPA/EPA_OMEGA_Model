@@ -1,9 +1,30 @@
 """
 
-placeholder, for now, but the dispy stuff should not really be in the omega_batch.py...
+**Routines and data structures to support multi-processor / multi-machine OMEGA simulations via the dispy package.**
+
+Generally speaking, running with ``dispy`` is a bit of an advanced topic, and is not required in order to run a
+multi-session batch.  When getting started with ``dispy`` it's best to get started on a single machine before
+working up to a multi-machine setup.
+
+To run using ``dispy``, each machine must have a running instance of ``dispynode``, typically launched from a command
+line script.  Also, each machine must have access to a shared folder where the source files for each
+run will be staged.
+
+Example:
+
+    ::
+
+        #! /bin/zsh
+
+        PYTHONPATH="/Users/omega_user/Code/GitHub/USEPA_OMEGA2/venv3.8/bin"
+        DISPYPATH="/Users/omega_user/Code/GitHub/USEPA_OMEGA2/venv3.8/lib/python3.8/site-packages/dispy"
+
+        $PYTHONPATH/python3 $DISPYPATH/dispynode.py --clean --cpus=8 --client_shutdown --ping_interval=15 --daemon --zombie_interval=5
 
 
 ----
+
+Since this is an advanced use case, EPA can provide limited support for its use.
 
 **CODE**
 
@@ -17,21 +38,39 @@ bundle_output_folder_name = OMEGARuntimeOptions().output_folder
 print('importing %s' % __file__)
 
 
-def sysprint(str):
+def sysprint(message):
+    """
+    Echo/print a message to the system standard output (i.e. the console)
+
+    Args:
+        message (str): the message to print
+
+    """
     import os
-    os.system('echo {}'.format(str))
+    os.system('echo {}'.format(message))
 
 
 def dispy_node_setup():
+    """
+    Prints a short hello message to the console, verifying that the dispynode is up and running (used during ping mode).
+
+    """
     import socket
     sysprint('node "%s" standing by...' % str(socket.gethostbyname_ex(socket.gethostname())))
     sysprint('.')
 
 
-retry_count = dict()  # track retry attempts for terminated or abandoned jobs
+_retry_count = dict()  # track retry attempts for terminated or abandoned jobs
 
 
 def restart_job(job):
+    """
+    Restart an abandonded or failed DispyJob.
+
+    Args:
+        job (DispyJob): the job to restart
+
+    """
     import os
     global dispycluster
     global dispy_debug
@@ -39,24 +78,31 @@ def restart_job(job):
     job_id_str = job.id['batch_path'] + os.sep + job.id['batch_name'] + os.sep + job.id['session_name'] + ': #' + str(
         job.id['session_num'])
 
-    if retry_count.__contains__(str(job.id)):
-        retry_count[str(job.id)] += 1
+    if _retry_count.__contains__(str(job.id)):
+        _retry_count[str(job.id)] += 1
     else:
-        retry_count[str(job.id)] = 0
+        _retry_count[str(job.id)] = 0
 
-    if retry_count[str(job.id)] <= 10:
+    if _retry_count[str(job.id)] <= 10:
         if dispy_debug: sysprint('#### Retrying job %s ####\n' % job_id_str)
         new_job = dispycluster.cluster.submit(job.id['batch_name'], job.id['batch_path'], job.id['batch_file'],
                                               job.id['session_num'], job.id['session_name'])
         if new_job is not None:
             new_job.id = job.id
-            retry_count[str(job.id)] += 1
+            _retry_count[str(job.id)] += 1
             if dispy_debug: sysprint('#### Terminated job restarted %s ####\n' % job_id_str)
     else:  # too many retries, abandon job
         if dispy_debug: sysprint('#### Cancelling job %s, too many retry attempts ####\n' % job_id_str)
 
 
 def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, DispyJob.Abandoned)
+    """
+    Job callback function.  Gets called for: (DispyJob.Finished, DispyJob.Terminated, DispyJob.Abandoned)
+
+    Args:
+        job (DispyJob): the job associated with the callback
+
+    """
     import os
     import dispy
     global dispy_debug
@@ -89,9 +135,16 @@ def job_cb(job):  # gets called for: (DispyJob.Finished, DispyJob.Terminated, Di
     return
 
 
-# 'cluster_status' callback function. It is called by dispy (client)
-# to indicate node / job status changes.
 def status_cb(status, node, job):
+    """
+    Cluster status callback function.  It is called by ``dispy`` (client) to indicate node / job status changes.
+
+    Args:
+        status: job status (e.g. dispy.DispyJob.Created, dispy.DispyJob.Running, etc)
+        node (DispyNode, IP address, or host name): the node associated with the cluster
+        job (DispyJob): the job associated with the callback
+
+    """
     import os
     import dispy
     global dispy_debug
@@ -149,6 +202,18 @@ def status_cb(status, node, job):
 
 
 def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_num, session_name, retry_count=0):
+    """
+    Runs an OMEGA simulation session on a DispyNode.
+
+    Args:
+        batch_name (str): the name of the batch
+        network_batch_path_root (str): name/path to a shared folder where the source files will be staged
+        batch_file (str): path to the batch file being run
+        session_num (int): the session number to be run
+        session_name (str): the name of the session being run
+        retry_count (int): retry count of the session
+
+    """
     import sys, subprocess, os, time
     # build shell command
     cmd = '"{}" "{}/{}/omega_model/omega_batch.py" --bundle_path "{}" \
@@ -188,15 +253,24 @@ def dispy_run_session(batch_name, network_batch_path_root, batch_file, session_n
         else:
             sysprint('!!! Abandoning Session "%s"... !!!' % session_name)
 
-    return True
-
 
 dispy_debug = None
 dispycluster = None
 
 
 class DispyCluster(object):
+    """
+    Implements an object to run OMEGA sessions on dispy nodes.
+
+    """
     def __init__(self, options):
+        """
+        Create a  DispyCluster object with the provided batch options.
+
+        Args:
+            options (OMEGABatchOptions): batch options, see ``omega_batch.py`` for more info
+
+        """
         import dispy
         self.master_ip = ''
         self.desired_node_list = []
@@ -231,7 +305,7 @@ class DispyCluster(object):
         ::
             
             >>> socket.gethostbyname_ex(socket.gethostname())
-            ('kevins-mac-mini.local', [], ['127.0.0.1', '192.168.1.20'])
+            ('mac-mini.local', [], ['127.0.0.1', '192.168.1.20'])
         
         Returns: list of local IP address(es)
 
@@ -242,6 +316,10 @@ class DispyCluster(object):
         return socket.gethostbyname_ex(socket.gethostname())[2]
 
     def find_nodes(self):
+        """
+        Look for available DispyNodes and update ``self.found_node_list`` with a list of the discovered nodes.
+
+        """
         import dispy, time, sys
 
         print("Finding dispynodes...")
@@ -299,6 +377,17 @@ class DispyCluster(object):
         cluster.shutdown()
 
     def submit_sessions(self, batch, batch_name, batch_path, batch_file, session_list):
+        """
+        Submit sessions to a DispyCluster.  Called from ``omega_batch.py``.
+
+        Args:
+            batch (OMEGABatchObject): the batch object, see ``omega_batch.py``
+            batch_name (str): the name of the batch, e.g. '2021_06_29_13_34_44_multiple_session_batch'
+            batch_path (str): the filesystem path to the bundle folder for the batch, e.g. '/Users/omega_user/bundle'
+            batch_file (str): the filesystem path to the batch file to run (minus the '.csv' extension), e.g. '/Users/omega_user/bundle/2021_06_29_13_34_44_batch/2021_06_29_13_34_44_batch'
+            session_list (iterable): a list or range of one or more sessions to run, by session number, e.g. range(1, 3)
+
+        """
         import dispy, time, sys
 
         if self.options.dispy_exclusive:
