@@ -1243,7 +1243,7 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        from common.omega_functions import weighted_value, unweighted_value
+        from common.omega_functions import weighted_value
 
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
