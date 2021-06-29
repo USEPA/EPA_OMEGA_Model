@@ -7,7 +7,11 @@ Model Architecture and Algorithms
 Modules
 ^^^^^^^
 
-Consumer Decision Module
+Producer Module
+------------------------
+Algorithm descriptions, code snippets, equations, etc
+
+Consumer Module
 ------------------------
 Algorithm descriptions, code snippets, equations, etc
 
@@ -91,17 +95,27 @@ Overall Model Equilibrium
    *  Cross subsidization clears the market for EV and ICE hauling and non-hauling shares
    *  There are 2 ways of doing the cross subsidization
 
-Producer Decision Module
-------------------------
-Algorithm descriptions, code snippets, equations, etc
 
-Policy Decision Module
+Policy Module
 ----------------------
 Algorithm descriptions, code snippets, equations, etc
 
 Effects Module
 --------------
-Algorithm descriptions, code snippets, equations, etc
+In its primary function as a regulatory support tool, OMEGA’s modeled outputs are intended to inform the type of benefit-cost analyses used in EPA rulemakings. We would likely use many of OMEGA’s outputs directly in the analysis for a regulatory action. In other cases, OMEGA produces values that might help inform other models like MOVES. The scope of OMEGA’s effects modeling includes estimating both monetized effects and physical effects.
+
+* Key examples of monetized effects that OMEGA will estimate:
+	* Vehicle production costs
+	* Vehicle ownership and operation costs, including fuel and maintenance
+	* Impacts on consumers 
+	* Societal costs of criteria air pollutants
+	* Societal cost of GHG pollutants
+	* Congestion, noise, and safety costs
+* Key examples of physical effects that OMEGA will estimate:
+	* Stock of registered vehicles, along with key attributes
+	* VMT of registered vehicles
+	* Tailpipe GHG and criteria pollutant emissions
+	* Upstream GHG and criteria pollutant emissions
 
 Module Integration and Iteration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
