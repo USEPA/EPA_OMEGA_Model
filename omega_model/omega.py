@@ -686,7 +686,10 @@ def init_omega(o2_options):
         # dynmically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
         for attr in DecompositionAttributes.values:
             if attr not in VehicleFinal.__dict__:
-                sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                if int(sqlalchemy.__version__.split('.')[1]) > 3:
+                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                else:
+                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
 
         # instantiate database tables
         SQABase.metadata.create_all(omega_globals.engine)
