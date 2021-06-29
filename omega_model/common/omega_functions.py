@@ -145,10 +145,12 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
 def print_dict(dict_in, num_tabs=0):
     """
-    pretty-print a dict...
-    :param dict_in:
-    :param num_tabs:
-    :return:
+    Attempt to printy-print a dictionary to the Python console.
+
+    Args:
+        dict_in (dict): dictionary to print
+        num_tabs (int): optional argument, used to indent subsequent layers of the dictionary
+
     """
     if num_tabs == 0:
         print()
@@ -171,6 +173,18 @@ def print_dict(dict_in, num_tabs=0):
 
 
 def linspace(min, max, num_values):
+    """
+    Create a list of num_values evenly spaced values between min and max.  Based on ``Matlab`` linspace command.
+
+    Args:
+        min (numeric): the minimum value
+        max (numeric): the maximum value
+        num_values (int): the total number of values to return
+
+    Returns:
+        A list of evenly spaced values between min and max
+
+    """
     import numpy as np
     ans = np.arange(min, max + (max-min) / (num_values-1), (max-min) / (num_values-1))
     return ans[0:num_values]
@@ -196,7 +210,10 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
         ::
 
-        p = partition_x(['BEV','ICE','PHEV'], min_constraints={'BEV':0.1}, max_constraints={'BEV':0.2, 'PHEV':0.25}, num_levels=5, verbose=True)
+            p = partition_x(['BEV','ICE','PHEV'],
+                min_constraints={'BEV':0.1},
+                max_constraints={'BEV':0.2, 'PHEV':0.25},
+                num_levels=5, verbose=True)
 
 
     """
@@ -296,12 +313,15 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
 def unique(vector):
     """
-    Find unique values in a list of values, in order of appearance
+    Return unique values in a list of values, in order of appearance.
 
-    :param vector: list of values
-    :return: unique values, in order of appearance
+    Args:
+        vector ([numeric]): list of values
+
+    Returns:
+        List of unique values, in order of appearance
+
     """
-
     import numpy as np
 
     indexes = np.unique(vector, return_index=True)[1]
@@ -310,14 +330,16 @@ def unique(vector):
 
 def distribute_by_attribute(obj_list, value, weight_by, distribute_to):
     """
+    Used to take a value and distribute it to source values by a weight factor.  Used to assign composite attributes
+    to source objects, e.g. composite vehicle sales to source vehicle sales, etc.  The weight factor is normalized
+    by the sum of the object weights.  For example, if there were two objects, one with a 0.2 weight and one with a 0.1
+    weight, the first object would get 2/3 of the value and the second would get 1/3 of the value.
 
     Args:
-        obj_list:
-        value:
-        weight_by:
-        distribute_to:
-
-    Returns:
+        obj_list ([objs]): list of objects to distribute to
+        value (numeric): the value to to distribute
+        weight_by (str): the name of the object attribute to use as a weight factor
+        distribute_to (str): the name of the object attribute to distribute to
 
     """
     attribute_total = 0
@@ -330,12 +352,18 @@ def distribute_by_attribute(obj_list, value, weight_by, distribute_to):
 
 def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     """
+    Calculate a weighted value from values taken from a set of objects.  The contribution of each object is normalized
+    by the sum of the object weight attribute values.
 
-    :param objects: list-like of objects
-    :param weight_attribute: name of object attribute to weight by (e.g. 'sales')
-    :param attribute: name of attribute to calculate weighted value from (e.g. 'footprint_ft2')
-    :param attribute_args: arguments to attribute if it's a method (e.g. calendar year)
-    :return: weighted value
+    Args:
+        objects ([objs]): list of source objects
+        weight_attribute (str): the name of the object attribute to weight by (e.g. 'sales')
+        attribute (str): the name of the attribute to calculate the weighted value of, e.g. vehicle CO2 g/mi, etc
+        attribute_args: arguments to the attribute, if the attribute is a method or function, e.g. calendar_year
+
+    Returns:
+        The weighted value
+
     """
     weighted_sum = 0
     total = 0
@@ -354,15 +382,21 @@ def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     return weighted_sum / total
 
 
-def unweighted_value(obj, weighted_value, objects, weight_attribute, attribute):
+def _unweighted_value(obj, weighted_value, objects, weight_attribute, attribute):
     """
+    Return the unweighted value of a single object, given a weighted value and all the objects that the weighted value
+    was created from
 
-    :param objects:
-    :param weight:
-    :param attribute:
-    :param obj:
-    :param weighted_value:
-    :return:
+    Args:
+        obj (object): the object to get the unweighted value for
+        weighted_value (numeric): the value to unweight
+        objects ([objs]): the list of source objects
+        weight_attribute (str): the name of the weight attribute, e.g. 'sales'
+        attribute (str): the name of the weighted attribute, e.g. vehicle CO2 g/mi
+
+    Returns:
+        The appopriate attribute value of the object
+
     """
     total = 0
     weighted_sum = 0
@@ -377,12 +411,17 @@ def unweighted_value(obj, weighted_value, objects, weight_attribute, attribute):
 
 def cartesian_prod(left_df, right_df, drop=False):
     """
-    Calculate cartesian product of the dataframe rows
+    Calculate cartesian product of the dataframe rows.
 
-    :param left_df: 'left' dataframe
-    :param right_df: 'right' dataframe
-    :param drop: if True, drop join-column '_' from dataframes
-    :return: cartesian product of the dataframe rows
+    Args:
+        left_df (DataFrame): 'left' dataframe
+        right_df (DataFrame): 'right' dataframe
+        drop (bool): if ``True``, drop join-column '_' from dataframes
+
+    Returns:
+        Cartesian product of the dataframe rows (the combination of every row in the left dataframe with every row in
+        the right dataframe).
+
     """
     import pandas as pd
     import numpy as np
@@ -406,16 +445,21 @@ def cartesian_prod(left_df, right_df, drop=False):
     return leftXright
 
 
-def generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_level=0.001, verbose=False):
+def _generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_level=0.001, verbose=False):
     """
-    Generate a partition of share values in the neighborhood of an initial set of share values
-    :param columns: list-like, list of values that represent shares in combo
-    :param combos: dict-like, typically a Series or Dataframe that contains the initial set of share values
-    :param half_range_frac: search "radius" [0..1], half the search range
-    :param num_steps: number of values to divide the search range into
-    :param min_level: specifies minimum share value (max will be 1-min_value), e.g. 0.001
-    :param verbose: if True then partition dataframe is printed to the console
-    :return: partition dataframe, with columns as specified, values near the initial values from combo
+    Generate a partition of share values in the neighborhood of an initial set of share values.
+
+    Args:
+        columns ([strs]): list of values that represent shares in combo
+        combos (Series, DataFrame): typically a Series or Dataframe that contains the initial set of share values
+        half_range_frac (float): search "radius" [0..1], half the search range
+        num_steps (int): number of values to divide the search range into
+        min_level (numeric): specifies minimum share value (max will be 1-min_value), e.g. 0.001
+        verbose (bool): if ``True`` then partition dataframe is printed to the console
+
+    Returns:
+        Partition dataframe, with columns as specified, values near the initial values from combo.
+
     """
     import numpy as np
     import pandas as pd
@@ -449,14 +493,62 @@ def generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_leve
 def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_steps, min_constraints, max_constraints,
                                        verbose=False):
     """
-    Generate a partition of share values in the neighborhood of an initial set of share values
-    :param columns: list-like, list of values that represent shares in combo
-    :param combos: dict-like, typically a Series or Dataframe that contains the initial set of share values
-    :param half_range_frac: search "radius" [0..1], half the search range
-    :param num_steps: number of values to divide the search range into
-    :param min_level: specifies minimum share value (max will be 1-min_value), e.g. 0.001
-    :param verbose: if True then partition dataframe is printed to the console
-    :return: partition dataframe, with columns as specified, values near the initial values from combo
+    Generate a partition of share values in the neighborhood of an initial set of share values.
+
+    See Also:
+
+        ``compliance_strategy.create_compliance_options()``
+
+    Args:
+        columns ([strs]): list of values that represent shares in combo
+        combos (Series, DataFrame): typically a Series or Dataframe that contains the initial set of share values
+        half_range_frac (float): search "radius" [0..1], half the search range
+        num_steps (int): number of values to divide the search range into
+        min_constraints (dict): minimum partition constraints [0..1], by column name
+        max_constraints (dict): maximum partition constraints [0..1], by column name
+        verbose (bool): if ``True`` then partition dataframe is printed to the console
+
+    Returns:
+        DataFrame of partion values.
+
+    Example:
+
+        ::
+
+            >>>columns
+            ['producer_share_frac_non_hauling.BEV', 'producer_share_frac_non_hauling.ICE']
+
+            >>>combos
+                  veh_non_hauling.BEV.car_co2_gpmi  ...  slope
+            1510                          15.91862  ...      0
+            2135                          15.91862  ...      0
+            [2 rows x 79 columns]
+
+            >>>half_range_frac
+            0.33
+
+            >>>num_steps
+            5
+
+            >>>min_constraints
+            {'producer_share_frac_non_hauling.BEV': 0.001, 'producer_share_frac_non_hauling.ICE': 0}
+
+            >>>max_constraints
+            {'producer_share_frac_non_hauling.BEV': 1, 'producer_share_frac_non_hauling.ICE': 1}
+
+            Returns:
+               producer_share_frac_non_hauling.BEV  producer_share_frac_non_hauling.ICE
+            0                               0.0010                               0.9990
+            1                               0.0835                               0.9165
+            2                               0.1660                               0.8340
+            3                               0.2485                               0.7515
+            4                               0.3310                               0.6690
+            5                               0.0010                               0.9990
+
+    Note:
+        In the example above, there appear to be repeated rows, however the values are unique in floating-point terms,
+        e.g. 0.00100000000000000002 versus 0.00100000000000000089
+
     """
     import numpy as np
     import pandas as pd
@@ -491,8 +583,8 @@ def ASTM_round(var, precision=0):
     Rounds numbers as defined in ISO / IEC / IEEE 60559
 
     Args:
-        var: number to be rounded, scalar or pandas Series
-        precision: number of decimal places in result
+        var (float, Series): number to be rounded, scalar or pandas Series
+        precision (int): number of decimal places in result
 
     Returns:
         var rounded using ASTM method with precision decimal places in result
@@ -517,6 +609,7 @@ def ASTM_round(var, precision=0):
 
 def CityFUF(miles):
     """
+    Calculate "city" PHEV fleet utility factor, from SAEJ2841 SEP2010.
 
     Args:
         miles: distance travelled in "city" driving, scalar or pandas Series
@@ -544,6 +637,7 @@ def CityFUF(miles):
 
 def HighwayFUF(miles):
     """
+    Calculate "highway" PHEV fleet utility factor, from SAEJ2841 SEP2010.
 
     Args:
         miles: distance travelled in "highway" driving, scalar or pandas Series
@@ -576,4 +670,4 @@ if __name__ == '__main__':
     # nearby shares test
     share_combo = pd.Series({'a': 0.5, 'b': 0.2, 'c': 0.3})
     column_names = ['a', 'b', 'c']
-    dfx = generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)
+    dfx = _generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)
