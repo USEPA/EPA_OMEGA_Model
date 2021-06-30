@@ -610,6 +610,7 @@ def ASTM_round(var, precision=0):
 def CityFUF(miles):
     """
     Calculate "city" PHEV fleet utility factor, from SAEJ2841 SEP2010.
+    https://www.sae.org/standards/content/j2841_201009/
 
     Args:
         miles: distance travelled in "city" driving, scalar or pandas Series
@@ -638,6 +639,7 @@ def CityFUF(miles):
 def HighwayFUF(miles):
     """
     Calculate "highway" PHEV fleet utility factor, from SAEJ2841 SEP2010.
+    https://www.sae.org/standards/content/j2841_201009/
 
     Args:
         miles: distance travelled in "highway" driving, scalar or pandas Series
