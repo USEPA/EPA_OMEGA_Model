@@ -1,7 +1,6 @@
 """
 
-Routines and data structures for compliance-tree algorithms
-
+**Routines and data structures for tree-based algorithms and functions.**
 
 ----
 
@@ -12,19 +11,20 @@ Routines and data structures for compliance-tree algorithms
 from omega import *
 
 
-class OMEGATree(OMEGABase):
+class _OMEGATree(OMEGABase):
     """
-        data stucture to hold tree top-level info
-    """
+    Data stucture to hold tree top-level info
 
+    """
     def __init__(self, root_omeganode):
         self.root = root_omeganode
         self.best_path_cost = None
 
 
-class OMEGANode(OMEGABase):
+class _OMEGANode(OMEGABase):
     """
-        data structure to hold OMEGATree node info
+    Data structure to hold OMEGATree node info
+
     """
 
     def __init__(self, parent_name, name, ghg_credit_bank, vehicle_list, path_cost):
@@ -37,14 +37,32 @@ class OMEGANode(OMEGABase):
 
 
 class WeightedNode(OMEGABase):
-    import math
+    """
+    Implements nodes in a tree where nodes have weights and values.
+    Used for drive cycle weighting, but could also be used for weighting in general, if needed.
+    ``WeightedNodes`` are stored as node *data* in a ``WeightedTree.tree`` (see below), which is a ``treelib.Tree``.
 
+    """
     def __init__(self, weight):
+        """
+        Create WeightedNode
+
+        Args:
+            weight (numeric): node weight
+
+        """
         self.weight = weight
         self.value = None
 
     @property
     def weighted_value(self):
+        """
+        Calculate node weighted value.
+
+        Returns:
+            Node weight times node value if weight is not ``None``, else returns 0.
+
+        """
         if self.weight is not None:
             return self.weight * self.value
         else:
@@ -52,6 +70,13 @@ class WeightedNode(OMEGABase):
 
     @property
     def identifier(self):
+        """
+        Generate a node ID string.
+
+        Returns:
+            Node ID string.
+
+        """
         id_str = ''
         try:
             wv = self.weighted_value
@@ -63,7 +88,25 @@ class WeightedNode(OMEGABase):
 
 
 class WeightedTree(OMEGABase):
+    """
+    Implements a tree data structure of ``WeightedNodes`` and methods of querying node values.
+
+    """
     def __init__(self, tree_df, verbose=False):
+        """
+        Create WeightedTree from a dataframe containing node connections as column headers and weights as row
+        values.
+
+        Args:
+            tree_df (DataFrame): a dataframe with column headers such as ``'A->B', 'A->C', 'B->D'`` etc.
+            verbose (bool): prints the tree to the console if True
+
+        Note:
+            The first element of the first column containing an arrow  (``->``) is taken as the root node.
+            Parent nodes must be referenced before child nodes, otherwise there is no particular pre-defined order.
+            In the above example, B is a child of A before D can be a child of B.
+
+        """
         from treelib import Tree
         self.tree = Tree()
 
@@ -81,9 +124,25 @@ class WeightedTree(OMEGABase):
             self.tree.show(idhidden=False, data_property='weight')
 
     def leaves(self):
+        """
+        Get list of tree leaves.
+
+        Returns:
+            List of tree nodes (type ``treelib.node.Node``) that have no children.
+
+        """
         return self.tree.leaves()
 
     def validate_weights(self):
+        """
+        Validated node weights.
+        The sum of a parent node's child node weights must equal 1.0.
+        Nodes with a weight of ``None`` are ignored during summation.
+
+        Returns:
+            List of node weight errors, or empty list on success.
+
+        """
         import sys
 
         tree_errors = []
@@ -101,6 +160,20 @@ class WeightedTree(OMEGABase):
 
     @staticmethod
     def calc_node_weighted_value(tree, node_id):
+        """
+        Calculate node weighted value.
+        If the node has no children then the weighted value is the node's weighted value, see ``WeightedNode`` above.
+        If the node has children then the weighted value is the sum of the weighted values of the children,
+        recursively if necessary.
+
+        Args:
+            tree (treelib.Tree): the tree to query
+            node_id (str): the id of the node to query
+
+        Returns:
+            Node weighted value
+
+        """
         if not tree.children(node_id):
             try:
                 return tree.get_node(node_id).data.weighted_value
@@ -115,7 +188,20 @@ class WeightedTree(OMEGABase):
                 n.data.value += WeightedTree.calc_node_weighted_value(tree, child.identifier)
             return n.data.weighted_value
 
-    def calc_weighted_value(self, values_dict, node_id=None, weighted=False):
+    def calc_value(self, values_dict, node_id=None, weighted=False):
+        """
+        Assign values to tree leaves then calculate the value or weighted value at the given ``node_id`` or at the root
+        if no ``node_id`` is provided.  Previously calculated values are cleared first.
+
+        Args:
+            values_dict (dict-like): values to assign to leaves
+            node_id (str): node id to calculate weighted value of, or tree root if not provided
+            weighted (bool): if True then return weighted value, else return node value
+
+        Returns:
+            Node (or tree) value (or weighted value)
+
+        """
         # clear all values
         for n in self.tree.nodes:
             self.tree.get_node(n).data.value = None
@@ -137,4 +223,8 @@ class WeightedTree(OMEGABase):
             return self.tree.get_node(node_id).data.value
 
     def show(self):
+        """
+        Print the tree to the console.
+
+        """
         self.tree.show(idhidden=False, data_property='identifier')
