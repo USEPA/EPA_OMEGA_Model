@@ -1,5 +1,9 @@
 """
 
+**Functions to get vehicle data based on vehicle ID, vehicle emission factors for the given vehicle model year and reg-class, refinery and power section emission factors for the given calendar year,
+and then to calculate from them the pollutant inventories, including fuel consumed, for each year in the analysis.**
+
+
 
 ----
 
@@ -8,7 +12,7 @@
 """
 
 grams_per_us_ton = 907185
-grams_per_metric_ton = 1000000
+grams_per_metric_ton = 1_000_000
 transloss = 0.07
 gap_ice = 0.8
 gap_bev = 0.7
@@ -20,7 +24,10 @@ vehicles_dict = dict()
 
 
 def get_vehicle_info(vehicle_id):
-    from producer.vehicles import VehicleFinal
+    """
+
+    """
+    from omega_model.producer.vehicles import VehicleFinal
 
     # add kwh_per_mile_cycle here when available in VehicleFinal
     attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID', 'cert_co2_grams_per_mile']
@@ -31,72 +38,68 @@ def get_vehicle_info(vehicle_id):
     return vehicles_dict[vehicle_id]
 
 
-def get_vehicle_ef(calendar_year, model_year, reg_class_id):
-    from effects.emission_factors_vehicles import EmissionFactorsVehicles
+def get_vehicle_ef(calendar_year, model_year, reg_class_id, in_use_fuel_id):
+    from emission_factors_vehicles import EmissionFactorsVehicles
 
-    emission_factors = [
-        'voc_grams_per_mile',
-        'co_grams_per_mile',
-        'nox_grams_per_mile',
-        'pm25_grams_per_mile',
-        'sox_grams_per_gallon',
-        'benzene_grams_per_mile',
-        'butadiene13_grams_per_mile',
-        'formaldehyde_grams_per_mile',
-        'acetaldehyde_grams_per_mile',
-        'acrolein_grams_per_mile',
-        'ch4_grams_per_mile',
-        'n2o_grams_per_mile',
-    ]
+    emission_factors = ['voc_grams_per_mile',
+                        'co_grams_per_mile',
+                        'nox_grams_per_mile',
+                        'pm25_grams_per_mile',
+                        'so2_grams_per_gallon',
+                        'benzene_grams_per_mile',
+                        'butadiene13_grams_per_mile',
+                        'formaldehyde_grams_per_mile',
+                        'acetaldehyde_grams_per_mile',
+                        'acrolein_grams_per_mile',
+                        'ch4_grams_per_mile',
+                        'n2o_grams_per_mile',
+                        ]
 
     age = calendar_year - model_year
 
-    return EmissionFactorsVehicles.get_emission_factors(model_year, age, reg_class_id, emission_factors)
+    return EmissionFactorsVehicles.get_emission_factors(model_year, age, reg_class_id, in_use_fuel_id, emission_factors)
 
 
 def get_powersector_ef(calendar_year):
-    from effects.emission_factors_powersector import EmissionFactorsPowersector
+    from emission_factors_powersector import EmissionFactorsPowersector
 
-    emission_factors = [
-        'voc_grams_per_kwh',
-        'co_grams_per_kwh',
-        'nox_grams_per_kwh',
-        'pm25_grams_per_kwh',
-        'sox_grams_per_kwh',
-        'benzene_grams_per_kwh',
-        'butadiene13_grams_per_kwh',
-        'formaldehyde_grams_per_kwh',
-        'acetaldehyde_grams_per_kwh',
-        'acrolein_grams_per_kwh',
-        'co2_grams_per_kwh',
-        'ch4_grams_per_kwh',
-        'n2o_grams_per_kwh',
-    ]
+    emission_factors = ['voc_grams_per_kwh',
+                        'co_grams_per_kwh',
+                        'nox_grams_per_kwh',
+                        'pm25_grams_per_kwh',
+                        'sox_grams_per_kwh',
+                        'benzene_grams_per_kwh',
+                        'butadiene13_grams_per_kwh',
+                        'formaldehyde_grams_per_kwh',
+                        'acetaldehyde_grams_per_kwh',
+                        'acrolein_grams_per_kwh',
+                        'co2_grams_per_kwh',
+                        'ch4_grams_per_kwh',
+                        'n2o_grams_per_kwh',
+                        ]
 
     return EmissionFactorsPowersector.get_emission_factors(calendar_year, emission_factors)
 
 
-def get_refinery_ef(calendar_year):
-    from effects.emission_factors_refinery import EmissionFactorsRefinery
+def get_refinery_ef(calendar_year, in_use_fuel_id):
+    from emission_factors_refinery import EmissionFactorsRefinery
 
-    emission_factors = [
-        'voc_grams_per_gallon',
-        'co_grams_per_gallon',
-        'nox_grams_per_gallon',
-        'pm25_grams_per_gallon',
-        'sox_grams_per_gallon',
-        'benzene_grams_per_gallon',
-        'butadiene13_grams_per_gallon',
-        'formaldehyde_grams_per_gallon',
-        'acetaldehyde_grams_per_gallon',
-        'acrolein_grams_per_gallon',
-        'naphthalene_grams_per_gallon',
-        'co2_grams_per_gallon',
-        'ch4_grams_per_gallon',
-        'n2o_grams_per_gallon',
-    ]
+    emission_factors = ['voc_grams_per_gallon',
+                        'co_grams_per_gallon',
+                        'nox_grams_per_gallon',
+                        'pm25_grams_per_gallon',
+                        'sox_grams_per_gallon',
+                        'benzene_grams_per_gallon',
+                        'butadiene13_grams_per_gallon',
+                        'formaldehyde_grams_per_gallon',
+                        'acetaldehyde_grams_per_gallon',
+                        'acrolein_grams_per_gallon',
+                        'co2_grams_per_gallon',
+                        'ch4_grams_per_gallon',
+                        'n2o_grams_per_gallon',
+                        ]
 
-    return EmissionFactorsRefinery.get_emission_factors(calendar_year, emission_factors)
+    return EmissionFactorsRefinery.get_emission_factors(calendar_year, in_use_fuel_id, emission_factors)
 
 
 def calc_inventory(calendar_year):
@@ -106,7 +109,7 @@ def calc_inventory(calendar_year):
     :param calendar_year: calendar year
     :return: Fills data in the vehicle_annual_data table that has not been filled to this point.
     """
-    from producer.vehicle_annual_data import VehicleAnnualData
+    from omega_model.producer.vehicle_annual_data import VehicleAnnualData
 
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 

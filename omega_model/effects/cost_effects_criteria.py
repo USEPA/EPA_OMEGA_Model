@@ -1,6 +1,5 @@
 """
 
-
 ----
 
 **CODE**
@@ -18,19 +17,25 @@ class CostEffectsCriteria(SQABase, OMEGABase):
     vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
     calendar_year = Column(Numeric)
     age = Column(Numeric)
-    discount_status = Column(String)
-    pm25_low_mortality_30_social_cost_dollars = Column(Float)
-    pm25_high_mortality_30_social_cost_dollars = Column(Float)
-    nox_low_mortality_30_social_cost_dollars = Column(Float)
-    nox_high_mortality_30_social_cost_dollars = Column(Float)
-    sox_low_mortality_30_social_cost_dollars = Column(Float)
-    sox_high_mortality_30_social_cost_dollars = Column(Float)
-    pm25_low_mortality_70_social_cost_dollars = Column(Float)
-    pm25_high_mortality_70_social_cost_dollars = Column(Float)
-    nox_low_mortality_70_social_cost_dollars = Column(Float)
-    nox_high_mortality_70_social_cost_dollars = Column(Float)
-    sox_low_mortality_70_social_cost_dollars = Column(Float)
-    sox_high_mortality_70_social_cost_dollars = Column(Float)
+    discount_rate = Column(Float)
+    pm25_tailpipe_3_cost_dollars = Column(Float)
+    pm25_upstream_3_cost_dollars = Column(Float)
+    nox_tailpipe_3_cost_dollars = Column(Float)
+    nox_upstream_3_cost_dollars = Column(Float)
+    so2_tailpipe_3_cost_dollars = Column(Float)
+    so2_upstream_3_cost_dollars = Column(Float)
+    pm25_tailpipe_7_cost_dollars = Column(Float)
+    pm25_upstream_7_cost_dollars = Column(Float)
+    nox_tailpipe_7_cost_dollars = Column(Float)
+    nox_upstream_7_cost_dollars = Column(Float)
+    so2_tailpipe_7_cost_dollars = Column(Float)
+    so2_upstream_7_cost_dollars = Column(Float)
+    criteria_tailpipe_3_cost_dollars = Column(Float)
+    criteria_upstream_3_cost_dollars = Column(Float)
+    criteria_tailpipe_7_cost_dollars = Column(Float)
+    criteria_upstream_7_cost_dollars = Column(Float)
+    criteria_3_cost_dollars = Column(Float)
+    criteria_7_cost_dollars = Column(Float)
 
 
     @staticmethod
@@ -39,4 +44,4 @@ class CostEffectsCriteria(SQABase, OMEGABase):
         for k, v in med_dict.items():
             med_veh.__setattr__(k, v)
 
-        omega_globals.session.flush()
+        common.omega_globals.session.flush()

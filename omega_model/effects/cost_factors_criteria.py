@@ -1,5 +1,34 @@
 """
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents $/ton benefits estimates associated with criteria air pollutants by calendar year for both tailpipe and upstream sources.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,context_cost_factors-criteria,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        calendar_year,dollar_basis,pm25_tailpipe_3.0_USD_per_uston,pm25_upstream_3.0_USD_per_uston,nox_tailpipe_3.0_USD_per_uston,nox_upstream_3.0_USD_per_uston,so2_tailpipe_3.0_USD_per_uston,so2_upstream_3.0_USD_per_uston,pm25_tailpipe_7.0_USD_per_uston,pm25_upstream_7.0_USD_per_uston,nox_tailpipe_7.0_USD_per_uston,nox_upstream_7.0_USD_per_uston,so2_tailpipe_7.0_USD_per_uston,so2_upstream_7.0_USD_per_uston
+        2020,2018,602362.7901,380000,6394.459424,8100,153440.3911,81000,543698.0811,350000,5770.584738,7300,138496.0826,74000
+
+Data Column Name and Description
+    :calendar_year:
+        The calendar year for which $/ton values are applicable.
+
+    :dollar_basis:
+        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+
 
 ----
 
@@ -20,18 +49,18 @@ class CostFactorsCriteria(SQABase, OMEGABase):
 
     calendar_year = Column(Numeric)
     dollar_basis = Column(Numeric)
-    pm25_low_mortality_30 = Column('pm25_low-mortality_3.0_USD_per_uston', Float)
-    pm25_high_mortality_30 = Column('pm25_high-mortality_3.0_USD_per_uston', Float)
-    nox_low_mortality_30 = Column('nox_low-mortality_3.0_USD_per_uston', Float)
-    nox_high_mortality_30 = Column('nox_high-mortality_3.0_USD_per_uston', Float)
-    sox_low_mortality_30 = Column('sox_low-mortality_3.0_USD_per_uston', Float)
-    sox_high_mortality_30 = Column('sox_high-mortality_3.0_USD_per_uston', Float)
-    pm25_low_mortality_70 = Column('pm25_low-mortality_7.0_USD_per_uston', Float)
-    pm25_high_mortality_70 = Column('pm25_high-mortality_7.0_USD_per_uston', Float)
-    nox_low_mortality_70 = Column('nox_low-mortality_7.0_USD_per_uston', Float)
-    nox_high_mortality_70 = Column('nox_high-mortality_7.0_USD_per_uston', Float)
-    sox_low_mortality_70 = Column('sox_low-mortality_7.0_USD_per_uston', Float)
-    sox_high_mortality_70 = Column('sox_high-mortality_7.0_USD_per_uston', Float)
+    pm25_tailpipe_3 = Column('pm25_tailpipe_3.0_USD_per_uston', Float)
+    pm25_upstream_3 = Column('pm25_upstream_3.0_USD_per_uston', Float)
+    nox_tailpipe_3 = Column('nox_tailpipe_3.0_USD_per_uston', Float)
+    nox_upstream_3 = Column('nox_upstream_3.0_USD_per_uston', Float)
+    so2_tailpipe_3 = Column('so2_tailpipe_3.0_USD_per_uston', Float)
+    so2_upstream_3 = Column('so2_upstream_3.0_USD_per_uston', Float)
+    pm25_tailpipe_7 = Column('pm25_tailpipe_7.0_USD_per_uston', Float)
+    pm25_upstream_7 = Column('pm25_upstream_7.0_USD_per_uston', Float)
+    nox_tailpipe_7 = Column('nox_tailpipe_7.0_USD_per_uston', Float)
+    nox_upstream_7 = Column('nox_upstream_7.0_USD_per_uston', Float)
+    so2_tailpipe_7 = Column('so2_tailpipe_7.0_USD_per_uston', Float)
+    so2_upstream_7 = Column('so2_upstream_7.0_USD_per_uston', Float)
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
@@ -68,20 +97,20 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} and {cpi_deflators_file}...')
 
         input_template_name = 'context_cost_factors-criteria'
-        input_template_version = 0.2
+        input_template_version = 0.3
         cost_factors_input_template_columns = {'calendar_year', 'dollar_basis',
-                                               'pm25_low-mortality_3.0_USD_per_uston',
-                                               'pm25_high-mortality_3.0_USD_per_uston',
-                                               'nox_low-mortality_3.0_USD_per_uston',
-                                               'nox_high-mortality_3.0_USD_per_uston',
-                                               'sox_low-mortality_3.0_USD_per_uston',
-                                               'sox_high-mortality_3.0_USD_per_uston',
-                                               'pm25_low-mortality_7.0_USD_per_uston',
-                                               'pm25_high-mortality_7.0_USD_per_uston',
-                                               'nox_low-mortality_7.0_USD_per_uston',
-                                               'nox_high-mortality_7.0_USD_per_uston',
-                                               'sox_low-mortality_7.0_USD_per_uston',
-                                               'sox_high-mortality_7.0_USD_per_uston'}
+                                               'pm25_tailpipe_3.0_USD_per_uston',
+                                               'pm25_upstream_3.0_USD_per_uston',
+                                               'nox_tailpipe_3.0_USD_per_uston',
+                                               'nox_upstream_3.0_USD_per_uston',
+                                               'so2_tailpipe_3.0_USD_per_uston',
+                                               'so2_upstream_3.0_USD_per_uston',
+                                               'pm25_tailpipe_7.0_USD_per_uston',
+                                               'pm25_upstream_7.0_USD_per_uston',
+                                               'nox_tailpipe_7.0_USD_per_uston',
+                                               'nox_upstream_7.0_USD_per_uston',
+                                               'so2_tailpipe_7.0_USD_per_uston',
+                                               'so2_upstream_7.0_USD_per_uston'}
 
         template_errors = validate_template_version_info(criteria_cost_factors_file, input_template_name,
                                                          input_template_version, verbose=verbose)
@@ -107,18 +136,18 @@ class CostFactorsCriteria(SQABase, OMEGABase):
                                                         deflators.columns, verbose=verbose)
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, deflators,
-                                             'pm25_low-mortality_3.0_USD_per_uston',
-                                             'pm25_high-mortality_3.0_USD_per_uston',
-                                             'nox_low-mortality_3.0_USD_per_uston',
-                                             'nox_high-mortality_3.0_USD_per_uston',
-                                             'sox_low-mortality_3.0_USD_per_uston',
-                                             'sox_high-mortality_3.0_USD_per_uston',
-                                             'pm25_low-mortality_7.0_USD_per_uston',
-                                             'pm25_high-mortality_7.0_USD_per_uston',
-                                             'nox_low-mortality_7.0_USD_per_uston',
-                                             'nox_high-mortality_7.0_USD_per_uston',
-                                             'sox_low-mortality_7.0_USD_per_uston',
-                                             'sox_high-mortality_7.0_USD_per_uston',
+                                             'pm25_tailpipe_3.0_USD_per_uston',
+                                             'pm25_upstream_3.0_USD_per_uston',
+                                             'nox_tailpipe_3.0_USD_per_uston',
+                                             'nox_upstream_3.0_USD_per_uston',
+                                             'so2_tailpipe_3.0_USD_per_uston',
+                                             'so2_upstream_3.0_USD_per_uston',
+                                             'pm25_tailpipe_7.0_USD_per_uston',
+                                             'pm25_upstream_7.0_USD_per_uston',
+                                             'nox_tailpipe_7.0_USD_per_uston',
+                                             'nox_upstream_7.0_USD_per_uston',
+                                             'so2_tailpipe_7.0_USD_per_uston',
+                                             'so2_upstream_7.0_USD_per_uston',
                                              )
 
                 obj_list = []
@@ -127,18 +156,18 @@ class CostFactorsCriteria(SQABase, OMEGABase):
                     obj_list.append(CostFactorsCriteria(
                         calendar_year=df.loc[i, 'calendar_year'],
                         dollar_basis=df.loc[i, 'dollar_basis'],
-                        pm25_low_mortality_30=df.loc[i, 'pm25_low-mortality_3.0_USD_per_uston'],
-                        pm25_high_mortality_30=df.loc[i, 'pm25_high-mortality_3.0_USD_per_uston'],
-                        nox_low_mortality_30=df.loc[i, 'nox_low-mortality_3.0_USD_per_uston'],
-                        nox_high_mortality_30=df.loc[i, 'nox_high-mortality_3.0_USD_per_uston'],
-                        sox_low_mortality_30=df.loc[i, 'sox_low-mortality_3.0_USD_per_uston'],
-                        sox_high_mortality_30=df.loc[i, 'sox_high-mortality_3.0_USD_per_uston'],
-                        pm25_low_mortality_70=df.loc[i, 'pm25_low-mortality_7.0_USD_per_uston'],
-                        pm25_high_mortality_70=df.loc[i, 'pm25_high-mortality_7.0_USD_per_uston'],
-                        nox_low_mortality_70=df.loc[i, 'nox_low-mortality_7.0_USD_per_uston'],
-                        nox_high_mortality_70=df.loc[i, 'nox_high-mortality_7.0_USD_per_uston'],
-                        sox_low_mortality_70=df.loc[i, 'sox_low-mortality_7.0_USD_per_uston'],
-                        sox_high_mortality_70=df.loc[i, 'sox_high-mortality_7.0_USD_per_uston'],
+                        pm25_tailpipe_3=df.loc[i, 'pm25_tailpipe_3.0_USD_per_uston'],
+                        pm25_upstream_3=df.loc[i, 'pm25_upstream_3.0_USD_per_uston'],
+                        nox_tailpipe_3=df.loc[i, 'nox_tailpipe_3.0_USD_per_uston'],
+                        nox_upstream_3=df.loc[i, 'nox_upstream_3.0_USD_per_uston'],
+                        so2_tailpipe_3=df.loc[i, 'so2_tailpipe_3.0_USD_per_uston'],
+                        so2_upstream_3=df.loc[i, 'so2_upstream_3.0_USD_per_uston'],
+                        pm25_tailpipe_7=df.loc[i, 'pm25_tailpipe_7.0_USD_per_uston'],
+                        pm25_upstream_7=df.loc[i, 'pm25_upstream_7.0_USD_per_uston'],
+                        nox_tailpipe_7=df.loc[i, 'nox_tailpipe_7.0_USD_per_uston'],
+                        nox_upstream_7=df.loc[i, 'nox_upstream_7.0_USD_per_uston'],
+                        so2_tailpipe_7=df.loc[i, 'so2_tailpipe_7.0_USD_per_uston'],
+                        so2_upstream_7=df.loc[i, 'so2_upstream_7.0_USD_per_uston'],
                         ))
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
@@ -153,7 +182,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         from omega_model import *
-        from common import omega_globals
+        from omega_model.common import omega_globals
 
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()

@@ -1,5 +1,34 @@
 """
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents $/gallon cost estimates associated with energy security.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,context_cost_factors-energysecurity,input_template_version:,0.2
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        calendar_year,dollar_basis,dollars_per_gallon,foreign_oil_fraction
+        2020,2018,0.081357143,0.9
+
+Data Column Name and Description
+    :calendar_year:
+        The calendar year for which $/gallon values are applicable.
+
+    :dollar_basis:
+        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+
 
 ----
 

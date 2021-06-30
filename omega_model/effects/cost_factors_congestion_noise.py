@@ -1,5 +1,37 @@
 """
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents $/mile cost estimates associated with congestion and noise associated with road travel.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,context_cost_factors-congestion-noise,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        reg_class_id,dollar_basis,congestion_cost_dollars_per_mile,noise_cost_dollars_per_mile
+        car,2018,0.063390239,0.000940863
+        truck,2018,0.056598428,0.000940863
+
+Data Column Name and Description
+    :reg_class_id:
+        Vehicle regulatory class at the time of certification, e.g. 'car','truck'.  Reg class definitions may differ
+        across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
+        or 'legacy' reg class.
+
+    :dollar_basis:
+        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+
 
 ----
 
@@ -40,7 +72,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
                 cost_factors = [cost_factors]
             attrs = CostFactorsCongestionNoise.get_class_attributes(cost_factors)
 
-            result = omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_ID == reg_class_id).all()[0]
+            result = common.omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_ID == reg_class_id).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]
@@ -74,7 +106,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0)
+            deflators = pd.read_csv(common.omega_globals.options.ip_deflators_file, skiprows=1, index_col=0)
             df = gen_fxns.adjust_dollars(df, deflators, 'congestion_cost_dollars_per_mile', 'noise_cost_dollars_per_mile')
 
             if not template_errors:
@@ -87,8 +119,8 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
                         congestion_cost_dollars_per_mile = df.loc[i, 'congestion_cost_dollars_per_mile'],
                         noise_cost_dollars_per_mile = df.loc[i, 'noise_cost_dollars_per_mile'],
                     ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                common.omega_globals.session.add_all(obj_list)
+                common.omega_globals.session.flush()
 
         return template_errors
 
@@ -99,19 +131,19 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
+        common.omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        SQABase.metadata.create_all(common.omega_globals.engine)
 
         init_fail = []
 
-        init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                        verbose=omega_globals.options.verbose)
+        init_fail += CostFactorsCongestionNoise.init_database_from_file(common.omega_globals.options.congestion_noise_cost_factors_file,
+                                                                        verbose=common.omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            dump_omega_db_to_csv(common.omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
