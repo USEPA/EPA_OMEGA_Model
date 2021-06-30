@@ -197,8 +197,8 @@ class DriveCycleWeights(OMEGABase):
         """
         start_years = cache[fueling_class]['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
-        return cache[fueling_class][calendar_year].calc_weighted_value(cycle_values, node_id=node_id,
-                                                                       weighted=weighted)
+        return cache[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+                                                              weighted=weighted)
 
     @staticmethod
     def calc_cert_direct_oncycle_co2_grams_per_mile(calendar_year, fueling_class, cycle_values):
