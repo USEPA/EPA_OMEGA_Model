@@ -65,7 +65,6 @@ todo_include_todos = True
 html_theme_options = {
     'navigation_depth': 5,
     'style_nav_header_background': '#0071BC'
-    ''
 }
 
 # EPA Palette
