@@ -642,7 +642,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 validate_file(batch.batch_definition_path + source_file_path)
 
                 batch.batch_log.logwrite('Validating Session %d Parameters...' % s)
-                session.create_file(validate_only=True)
+                session.init(validate_only=True)
 
         batch.batch_log.logwrite("\n*** validation complete ***")
 
