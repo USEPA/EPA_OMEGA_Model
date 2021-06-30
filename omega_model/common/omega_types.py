@@ -149,6 +149,13 @@ class OMEGAEnum:
 
     """
     def __init__(self, enum_list):
+        """
+        Create OMEGAEnum object from list of values.
+
+        Args:
+            enum_list (list): list of enumeration values
+
+        """
         self.__value_list = enum_list
         self.__identifier_list = [make_valid_python_identifier(i) for i in self.__value_list]
         self.__dict = dict()
