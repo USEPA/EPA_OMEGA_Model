@@ -1,6 +1,6 @@
 """
 
-Functions that may be used throughout OMEGA
+**Various functions that may be used throughout OMEGA.**
 
 
 ----
