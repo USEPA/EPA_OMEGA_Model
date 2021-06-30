@@ -604,7 +604,7 @@ def init_omega(o2_options):
     Returns:
 
     """
-    from common.omega_log import OMEGALog
+    from common.omega_log import OMEGABatchLog
 
     # set up global variables:
     omega_globals.options = o2_options

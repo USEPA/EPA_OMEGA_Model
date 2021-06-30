@@ -444,12 +444,12 @@ class OMEGABatchOptions(OMEGABase):
 
 def run_bundled_sessions(batch, options, remote_batchfile, session_list):
     import pandas as pd
-    from common.omega_log import OMEGALog
+    from common.omega_log import OMEGABatchLog
     import time
 
     batch = OMEGABatchObject()
     batch.batch_definition_path = options.batch_path
-    batch.batch_log = OMEGALog(options)
+    batch.batch_log = OMEGABatchLog(options)
     batch.batch_log.logwrite('REMOTE BATCHFILE = %s' % remote_batchfile)
     batch.dataframe = pd.read_csv(remote_batchfile, index_col=0)
     batch.dataframe.replace(to_replace={'True': True, 'False': False, 'TRUE': True, 'FALSE': False},
@@ -594,8 +594,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         options.logfilename = options.batch_path + options.logfilename
 
-        from common.omega_log import OMEGALog
-        batch.batch_log = OMEGALog(options)
+        from common.omega_log import OMEGABatchLog
+        batch.batch_log = OMEGABatchLog(options)
 
         batch.add_sessions(verbose=options.verbose)
 
@@ -642,7 +642,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 validate_file(batch.batch_definition_path + source_file_path)
 
                 batch.batch_log.logwrite('Validating Session %d Parameters...' % s)
-                session.init(validate_only=True)
+                session.create_file(validate_only=True)
 
         batch.batch_log.logwrite("\n*** validation complete ***")
 

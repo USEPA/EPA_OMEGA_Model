@@ -1,7 +1,6 @@
 """
 
-Functions to log diagnostic data
-
+**Functions to manage batch and session log files.**
 
 ----
 
@@ -15,24 +14,56 @@ from common import omega_globals  # import global variables
 from common.omega_types import OMEGABase
 
 
-class IterationLog():
+class IterationLog(OMEGABase):
+    """
+    Handles creation and writing of a dataframe to a .csv file, possibly multiple times via appending.
+    Used to log producer-consumer iteration, but could be used to log any dataframe.
+
+    """
     def __init__(self, logfilename):
-        self.init = True
+        """
+        Create IterationLog object
+
+        Args:
+            logfilename: name of file to create, '.csv' extension added if not provided.
+
+        """
+        self.create_file = True
         self.logfilename = logfilename
 
         if not self.logfilename.endswith('.csv'):
             self.logfilename += '.csv'
 
     def write(self, dataframe):
-        if self.init:
+        """
+        Write dataframe to a .csv file, file is created on first write, subsequent writes append.
+
+        Args:
+            dataframe (DataFrame): dataframe to write to file
+
+
+        """
+        if self.create_file:
             dataframe.to_csv(self.logfilename, mode='w')
-            self.init = False
+            self.create_file = False
         else:
             dataframe.to_csv(self.logfilename, mode='a', header=False)
 
 
-class OMEGALog(OMEGABase):
+class OMEGABatchLog(OMEGABase):
+    """
+    Handles logfile creation at the batch level.
+
+    """
     def __init__(self, o2_options, verbose=True):
+        """
+        Create OMEGABatchLog object
+
+        Args:
+            o2_options (OMEGABatchOptions): provides the logfile name
+            verbose (bool): if True enables optional output to console as well as logfile
+
+        """
         import datetime, time
 
         self.logfilename = o2_options.logfilename
@@ -43,6 +74,14 @@ class OMEGALog(OMEGABase):
             log.write('OMEGA batch log started at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
 
     def logwrite(self, message, terminator='\n'):
+        """
+        Write a message to a logfile (and console if verbose)
+
+        Args:
+            message (str): message string to write
+            terminator (str): end of message terminator, default is newline (``\\n``)
+
+        """
         with open(self.logfilename, 'a') as log:
             if type(message) is list:
                 for m in message:
@@ -52,7 +91,14 @@ class OMEGALog(OMEGABase):
             if self.verbose:
                 print(message)
 
-    def end_logfile(self, message, echo_console=True):
+    def end_logfile(self, message):
+        """
+        End logfile with closing message, record elapsed time.
+
+        Args:
+            message (str): message string to write
+
+        """
         import time
         elapsed_time = (time.time() - self.start_time)
         import datetime
@@ -67,6 +113,10 @@ class OMEGALog(OMEGABase):
 
 
 def init_logfile():
+    """
+    Create a session logfile.
+
+    """
     import time, datetime
     import common.file_io as file_io
     from omega_model import code_version
@@ -80,6 +130,13 @@ def init_logfile():
 
 
 def end_logfile(message):
+    """
+    End logfile with closing message, record elapsed time.
+
+    Args:
+        message (str): message string to write
+
+    """
     import time
     omega_globals.options.end_time = time.time()
     elapsed_time = (omega_globals.options.end_time - omega_globals.options.start_time)
@@ -91,6 +148,15 @@ def end_logfile(message):
 
 
 def logwrite(message, echo_console=False, terminator='\n'):
+    """
+    Write message to logfile.
+
+    Args:
+        message (str): message string to write
+        echo_console (bool): write message to console if True
+        terminator (str): end of message terminator, default is newline (``\\n``)
+
+    """
     with open(omega_globals.options.logfilename, 'a') as log:
         if type(message) is list:
             for m in message:
