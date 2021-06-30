@@ -58,12 +58,14 @@ exclude_patterns = ['*setup*', '*exe_entry*']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+html_logo = '_static/OMEGA_logo_transparent.png'
 numfig = True
 todo_include_todos = True
 
 html_theme_options = {
     'navigation_depth': 5,
     'style_nav_header_background': '#0071BC'
+    ''
 }
 
 # EPA Palette
