@@ -174,10 +174,11 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                     if grp_volumes_vehghg_file[i].round(0) != grp_volumes_footprint_file_with_lineage[i].round(0):
                         print(grp_volumes_vehghg_file.index[i], grp_volumes_footprint_file_with_lineage[i], grp_volumes_vehghg_file[i])
 
-            vehghg_file.loc[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS']), 'TOTAL_NUM_TRANS_GEARS'] = 1
+            # vehghg_file.loc[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS']), 'TOTAL_NUM_TRANS_GEARS'] = 1
             missing_entries_1 = vehghg_file[pd.isnull(vehghg_file['LineageID'])].reset_index(drop=True)
-            missing_entries_2 = vehghg_file[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS'])].reset_index(drop=True)
-            missing_entries = pd.concat([missing_entries_1, missing_entries_2]).reset_index(drop=True)
+            # missing_entries_2 = vehghg_file[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS'])].reset_index(drop=True)
+            # missing_entries = pd.concat([missing_entries_1, missing_entries_2]).reset_index(drop=True)
+            missing_entries = pd.concat([missing_entries_1]).reset_index(drop=True)
             if len(missing_entries) > 0:
                 try:
                     missing_entries_volumes = missing_entries['FINAL_MODEL_YR_GHG_PROD_UNITS'].replace(np.nan, 0).reset_index(drop=True)
