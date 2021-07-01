@@ -1,5 +1,6 @@
 """
 
+**Routines to load and provide access to GCAM consumer response parameters.**
 
 ----
 
@@ -15,35 +16,38 @@ cache = dict()
 
 
 class DemandedSharesGCAM(SQABase, OMEGABase):
+    """
+    Loads and provides access to GCAM consumer response parameters.
+
+    """
     # --- database table properties ---
     __tablename__ = 'demanded_shares_gcam'
-    index = Column(Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)  #: database table index
 
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    annual_VMT = Column('annual_vmt', Float)
-    calendar_year = Column(Numeric)
-    payback_years = Column(Numeric)
-    price_amortization_period = Column(Numeric)
-    discount_rate = Column(Float)
-    share_weight = Column(Float)
-    demanded_share = Column(Float)
-    consumer_generalized_cost_dollars = Column(Float)
-    o_m_costs = Column(Float)
-    average_occupancy = Column(Float)
-    logit_exponent_mu = Column(Float)
+    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID
+    annual_VMT = Column('annual_vmt', Float)  #: annual vehicle miles travelled
+    calendar_year = Column(Numeric)  #: the calendar year of the parameters
+    payback_years = Column(Numeric)  #: payback period, in years
+    price_amortization_period = Column(Numeric)  #: price amorization period, in years
+    discount_rate = Column(Float)  #: discount rate [0..1], e.g. 0.1
+    share_weight = Column(Float)  #: share weight [0..1]
+    o_m_costs = Column(Float)  #: operating and maintenance costs, in dollars
+    average_occupancy = Column(Float)  #: average vehicle occupancy, number of people
+    logit_exponent_mu = Column(Float)  #: log exponent, mu
 
     @staticmethod
     def get_gcam_params(calendar_year, market_class_id):
         """
+        Get GCAM parameters for the given calendar year and market class.
 
         Args:
-            calendar_year:
-            market_class_id:
+            calendar_year (int): the year to get parameters for
+            market_class_id (str): market class id, e.g. 'non_hauling.BEV'
 
-        Returns: GCAM parameters for the given calendar year and market class
+        Returns:
+            GCAM parameters for the given calendar year and market class
 
         """
-
         start_years = cache[market_class_id]['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -57,6 +61,18 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         cache.clear()

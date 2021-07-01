@@ -1,6 +1,6 @@
 """
 
-this is the consumer module
+**Consumer module top-level definitions.**
 
 ----
 

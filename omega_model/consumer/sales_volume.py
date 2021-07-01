@@ -12,7 +12,7 @@ sales-weighted generalized cost.**
 from omega_model import *
 
 
-def _calc_generalized_cost(cost_factors):
+def calc_generalized_cost(cost_factors):
     """
     Placeholder for consumer generalized cost calculations.
 

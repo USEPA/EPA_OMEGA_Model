@@ -1,5 +1,8 @@
 """
 
+**Routines to load and provide access to annual vehicle miles travelled (VMT) by market class and age.**
+
+The data represents a fixed VMT schedule by age.
 
 ----
 
@@ -13,16 +16,31 @@ cache = dict()
 
 
 class AnnualVMTFixedByAge(SQABase, OMEGABase):
+    """
+    Loads and provides access to VMT by market class and age.
+
+    """
     # --- database table properties ---
     __tablename__ = 'annual_vmt_fixed_by_age'
-    index = Column(Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)  #: database table index
 
-    age = Column(Numeric)
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    annual_vmt = Column(Numeric)
+    age = Column(Numeric)  #: vehicle age
+    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: vehicle market class
+    annual_vmt = Column(Numeric)  #: vehicle miles travelled
 
     @staticmethod
     def get_vmt(market_class_id, age):
+        """
+        Get vehicle miles travelled by market class and age.
+
+        Args:
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            age (int): vehicle age in years
+
+        Returns:
+            (float) Vehicle miles travelled.
+
+        """
         cache_key = '%s_%s' % (market_class_id, age)
 
         if cache_key not in cache:
@@ -34,6 +52,18 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         cache.clear()
 
         if verbose:

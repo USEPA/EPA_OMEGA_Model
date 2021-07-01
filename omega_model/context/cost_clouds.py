@@ -127,7 +127,6 @@ class CostCloud(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
         from policy.offcycle_credits import OffCycleCredits  # offcycle_credits must be initalized first
 
         cache.clear()
