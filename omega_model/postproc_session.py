@@ -790,7 +790,7 @@ def plot_iteration(iteration_log):
                             zip(iteration_log['calendar_year'][iteration_log['pricing_iteration'] == iteration],
                                 iteration_log['iteration'][iteration_log['pricing_iteration'] == iteration])]
 
-        for mc in MarketClass.get_market_class_dict():
+        for mc in MarketClass.market_classes:
             plt.figure()
             plt.plot(year_iter_labels,
                      iteration_log['producer_abs_share_frac_%s' % mc][iteration_log['pricing_iteration'] == iteration])
@@ -809,14 +809,14 @@ def plot_iteration(iteration_log):
 
         plt.figure()
         if iteration == -1:
-            for mc in MarketClass.get_market_class_dict():
+            for mc in MarketClass.market_classes:
                 plt.plot(last_logged['calendar_year'],
                          last_logged['consumer_generalized_cost_dollars_%s' % mc], '.-')
         else:
-            for mc in MarketClass.get_market_class_dict():
+            for mc in MarketClass.market_classes:
                 plt.plot(first_logged['calendar_year'],
                          first_logged['consumer_generalized_cost_dollars_%s' % mc], '.-')
-        plt.legend(['consumer_generalized_cost_dollars_%s' % mc for mc in MarketClass.get_market_class_dict()])
+        plt.legend(['consumer_generalized_cost_dollars_%s' % mc for mc in MarketClass.market_classes])
         plt.ylabel('Cost $ / mi')
         plt.title('Consumer Generalized Cost %d' % iteration)
         plt.grid()
@@ -824,14 +824,14 @@ def plot_iteration(iteration_log):
 
         plt.figure()
         if iteration == -1:
-            for mc in MarketClass.get_market_class_dict():
+            for mc in MarketClass.market_classes:
                 plt.plot(last_logged['calendar_year'],
                          last_logged['cost_multiplier_%s' % mc], '.-')
         else:
-            for mc in MarketClass.get_market_class_dict():
+            for mc in MarketClass.market_classes:
                 plt.plot(first_logged['calendar_year'],
                          first_logged['cost_multiplier_%s' % mc], '.-')
-        plt.legend(['cost_multiplier_%s' % mc for mc in MarketClass.get_market_class_dict()])
+        plt.legend(['cost_multiplier_%s' % mc for mc in MarketClass.market_classes])
         plt.ylabel('Cost Multiplier')
         plt.title('Producer Cost Multipliers %d' % iteration)
         plt.grid()
@@ -845,17 +845,17 @@ def plot_iteration(iteration_log):
 
     # plot producer initial share and g/mi decisions
     plt.figure()
-    for mc in MarketClass.get_market_class_dict():
+    for mc in MarketClass.market_classes:
         plt.plot(first_logged['calendar_year'], first_logged['producer_abs_share_frac_%s' % mc], '.-')
     plt.title('Producer Initial Absolute Market Shares')
     plt.grid()
-    plt.legend(['producer_abs_share_frac_%s' % mc for mc in MarketClass.get_market_class_dict()])
+    plt.legend(['producer_abs_share_frac_%s' % mc for mc in MarketClass.market_classes])
     plt.savefig('%s%s Producer Initial Abs Shares.png' % (omega_globals.options.output_folder, omega_globals.options.session_unique_name))
 
     plt.figure()
-    for mc in MarketClass.get_market_class_dict():
+    for mc in MarketClass.market_classes:
         plt.plot(first_logged['calendar_year'], first_logged['average_co2_gpmi_%s' % mc], '.-')
     plt.title('Producer Initial CO2 g/mi')
     plt.grid()
-    plt.legend(['average_co2_gpmi_%s' % mc for mc in MarketClass.get_market_class_dict()])
+    plt.legend(['average_co2_gpmi_%s' % mc for mc in MarketClass.market_classes])
     plt.savefig('%s%s Producer Initial CO2 gpmi.png' % (omega_globals.options.output_folder, omega_globals.options.session_unique_name))

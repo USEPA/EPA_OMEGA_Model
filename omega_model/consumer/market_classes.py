@@ -1,5 +1,6 @@
 """
 
+**Routines to implement market-class related functionality.**
 
 ----
 
@@ -12,16 +13,18 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-def populate_market_classes(market_class_dict, market_class, obj):
+def populate_market_classes(market_class_dict, market_class_id, obj):
     """
+    Populate the leaves of a market class tree implemented as a dict (or dict of dicts) where the keys represent market
+    categories and the leaves are lists of objects grouped by market class.
 
-    :param market_class_dict: dict of dicts of market classes
-    :param market_class: dot separated market class name e.g. 'hauling.BEV',
-        possibly with reg class suffix e.g. 'non_hauling.ICE.car' depending on the market_class_dict
-    :param obj: object to place in a set in the appropriate leaf
-    :return: modifies market_class_dict
+    Args:
+        market_class_dict (dict): dict of dicts of market classes
+        market_class_id (str): dot separated market class name e.g. 'hauling.BEV', possibly with reg class suffix e.g. 'non_hauling.ICE.car' depending on the market_class_dict
+        obj (object): object to place in a set in the appropriate leaf
+
     """
-    substrs = market_class.split('.', maxsplit=1)
+    substrs = market_class_id.split('.', maxsplit=1)
     prefix = substrs[0]
     suffix = substrs[1:]
     if not suffix:
@@ -39,11 +42,16 @@ def populate_market_classes(market_class_dict, market_class, obj):
 
 def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class=False):
     """
-    Returns a nested dictionary of market classes from a dot-formatted list of market class names
-    :param market_class_list: list of dot-separted market class names e.g. ['hauling.BEV', 'hauling.ICE'] etc
-    :param market_class_dict: recursive input and also the output data structure
-    :param by_reg_class: if true then leaves are sets in reg class dicts, otherwise leaves are sets by market segment
-    :return: market_class_dict of dicts
+    Returns a nested dictionary of market classes from a dot-formatted list of market class names.
+
+    Args:
+        market_class_list ([strs]): list of dot-separted market class names e.g. ['hauling.BEV', 'hauling.ICE'] etc
+        market_class_dict (dict, dict of dicts): recursive input and also the output data structure
+        by_reg_class (bool): if true then leaves are lists in reg class dicts, otherwise leaves are lists by market segment
+
+    Returns:
+        market_class_dict
+
     """
     if market_class_dict is None:
         market_class_dict = dict()
@@ -85,27 +93,49 @@ cache = dict()
 
 
 class MarketClass(SQABase, OMEGABase):
+    """
+    Loads market class definition data and provides market-class-related functionality.
+
+    """
     # --- database table properties ---
     __tablename__ = 'market_classes'
-    market_class_ID = Column('market_class_id', String, primary_key=True)
-    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
-    hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
-    ownership_class = Column(Enum(*ownership_classes, validate_strings=True))
-    producer_generalized_cost_fuel_years = Column(Float)
-    producer_generalized_cost_annual_vmt = Column(Float)
+    market_class_ID = Column('market_class_id', String, primary_key=True)  #: market class id, e.g. 'non_hauling.ICE'
+    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'ICE', 'BEV'
+    hauling_class = Column(Enum(*hauling_classes, validate_strings=True))  #: hauling class, e.g. 'hauling'
+    ownership_class = Column(Enum(*ownership_classes, validate_strings=True))  #: ownership class, e.g. 'private'
+    producer_generalized_cost_fuel_years = Column(Float)  #: years of fuel consumption, for producer generalized cost calcs
+    producer_generalized_cost_annual_vmt = Column(Float)  #: annual vehicle miles travelled, for producer generalized cost calcs
 
-    market_classes = ()  # tuple of market classes
+    market_classes = ()  #: tuple of market classes
     _market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
     _market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()
     _market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
     @staticmethod
     def get_market_class_dict():
+        """
+        Get a copy of the market class dict with empty lists for each market class.
+
+        Returns:
+            A copy of the market class dict.
+
+        """
         import copy
         return copy.deepcopy(MarketClass._market_class_dict)
 
     @staticmethod
     def get_market_class_tree(by_reg_class=False):
+        """
+        Get a copy of a hierarchical market class dict with empty lists for each market class or by regulatory
+        class within the market class.
+
+        Args:
+            by_reg_class (bool): if True then return a tree by reg class within market class.
+
+        Returns:
+            A copy of the appropriate hierarchical market class dict.
+
+        """
         import copy
         if by_reg_class:
             return copy.deepcopy(MarketClass._market_class_tree_dict_rc)
@@ -138,6 +168,15 @@ class MarketClass(SQABase, OMEGABase):
 
     @staticmethod
     def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
+        """
+
+        Args:
+            market_class_id:
+            attribute_types:
+
+        Returns:
+
+        """
         cache_key = '%s_%s' % (market_class_id, attribute_types)
 
         if cache_key not in cache:
@@ -158,6 +197,18 @@ class MarketClass(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         cache.clear()
 
         if verbose:
@@ -198,7 +249,7 @@ class MarketClass(SQABase, OMEGABase):
                 MarketClass.market_classes = list(df['market_class_id'].unique())
                 MarketClass.market_classes.sort()
                 for mc in MarketClass.market_classes:
-                    MarketClass._market_class_dict[mc] = set()
+                    MarketClass._market_class_dict[mc] = []
 
                 MarketClass._market_class_tree_dict = parse_market_classes(df['market_class_id'])
                 MarketClass._market_class_tree_dict_rc = parse_market_classes(df['market_class_id'], by_reg_class=True)

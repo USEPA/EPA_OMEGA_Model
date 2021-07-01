@@ -495,7 +495,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
     # group vehicles by market class
     market_class_vehicle_dict = MarketClass.get_market_class_dict()
     for new_veh in candidate_mfr_composite_vehicles:
-        market_class_vehicle_dict[new_veh.market_class_ID].add(new_veh)
+        market_class_vehicle_dict[new_veh.market_class_ID].append(new_veh)
 
     # calculate sales-weighted co2 g/mi and cost by market class
     for mc in MarketClass.market_classes:
