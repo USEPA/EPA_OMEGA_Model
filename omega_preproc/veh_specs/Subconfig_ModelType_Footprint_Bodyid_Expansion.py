@@ -33,7 +33,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
 
     footprint_file = footprint_file[footprint_file['MODEL_YEAR'] == year].reset_index(drop=True)
     lineage_file = lineage_file[lineage_file['MODEL_YEAR'] == year].reset_index(drop=True)
-    date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
+    date_and_time = str(datetime.datetime.now())[:19].replace(':', '') .replace('-', '_').replace(' ', '_')
     CAFE_ID_not_matched = []
     for i in range(len(footprint_file['FOOTPRINT_DIVISION_NM'])):
         for j in range(len(lineage_file['FOOTPRINT_DIVISION_NM'])):
@@ -88,8 +88,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
     footprint_filter_table = footprint_file[
         list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC']].merge(
         lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
-    footprint_file_with_lineage = footprint_file.merge(lineage_file[list(footprint_id_categories) + ['LineageID']],
-                                                       how='left', on=footprint_id_categories)
+    footprint_file_with_lineage = footprint_file.merge(lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
+    footprint_file_with_lineage_volumes = footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].replace(np.nan, 0).reset_index(drop=True)
+
     full_expanded_footprint_filter_table = footprint_filter_table.merge(body_id_table, how='left', on='LineageID')
     full_expanded_footprint_file = footprint_file_with_lineage.merge(body_id_table, how='left', on='LineageID')
     try:
@@ -99,30 +100,27 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
     except OSError:
         # New BodyID table to be made, no previous data
         full_filter_table_save_name = manual_filter_name.replace('.csv', '') + ' ' + date_and_time + '.csv'
-        full_expanded_footprint_filter_table.to_csv(
-            output_path.replace('\VehghgID', '\intermediate files') + '\\' + full_filter_table_save_name, index=False)
+        full_expanded_footprint_filter_table.to_csv(output_path.replace('\VehghgID', '\intermediate files') + '\\' + full_filter_table_save_name, index=False)
     else:
         if bool_run_new_manual_filter == 'n':
             import math
             from Unit_Conversion import hp2lbfmph, kgpm32slugpft3, mph2ftps, in2m, n2lbf, mph2mps, btu2mj, kg2lbm, \
                 ftps2mph, lbfmph2hp, in2mm
-            full_expanded_footprint_file = full_expanded_footprint_file.merge(
-                previous_filter_table[list(footprint_id_categories) + ['BodyID'] + ['POSSIBLE_BODYID']], \
+            full_expanded_footprint_file = full_expanded_footprint_file.merge(previous_filter_table[list(footprint_id_categories) + ['BodyID'] + ['POSSIBLE_BODYID']], \
                 how='left', on=list(footprint_id_categories) + ['BodyID'])
-            full_expanded_footprint_file = full_expanded_footprint_file[
-                full_expanded_footprint_file['POSSIBLE_BODYID'] == 'y'].reset_index(drop=True)
 
-            subconfig_file = pd.read_csv(input_path + '\\' + subconfig_filename, encoding="ISO-8859-1", na_values=[
-                '-'])  # subconfig_sales # EVCIS Qlik Sense query results contain hyphens for nan
+            # full_expanded_footprint_file_bodyIDn = full_expanded_footprint_file.loc[full_expanded_footprint_file['POSSIBLE_BODYID'] != 'y', :].reset_index(drop=True)
+            full_expanded_footprint_file = full_expanded_footprint_file[full_expanded_footprint_file['POSSIBLE_BODYID'] == 'y'].reset_index(drop=True)
+            full_expanded_footprint_file_volumes = full_expanded_footprint_file['PROD_VOL_GHG_STD_50_STATE'].replace(np.nan, 0).reset_index(drop=True).sum()
+
+            subconfig_file = pd.read_csv(input_path + '\\' + subconfig_filename, encoding="ISO-8859-1", na_values=['-'])  # subconfig_sales # EVCIS Qlik Sense query results contain hyphens for nan
             subconfig_file = subconfig_file[subconfig_file['MODEL_YEAR'] == year].reset_index(drop=True)
-            model_type_file = pd.read_csv(input_path + '\\' + model_type_filename, encoding="ISO-8859-1",
-                                          na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan)
+            model_type_file = pd.read_csv(input_path + '\\' + model_type_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan)
             model_type_file = model_type_file[model_type_file['CAFE_MODEL_YEAR'] == year].reset_index(drop=True)
             footprint_indexing_categories = ['FOOTPRINT_DIVISION_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_INDEX']
-            subconfig_indexing_categories = ['MFR_DIVISION_NM', 'MODEL_TYPE_INDEX', 'SS_ENGINE_FAMILY', 'CARLINE_CODE', \
-                                             'LDFE_CAFE_ID', 'BASE_LEVEL_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX']
-            modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CARLINE_MFR_CODE',
-                                             'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME']
+            subconfig_indexing_categories = ['MFR_DIVISION_NM', 'MODEL_TYPE_INDEX', 'SS_ENGINE_FAMILY', 'CARLINE_CODE', 'LDFE_CAFE_ID', 'BASE_LEVEL_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX']
+            modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CARLINE_MFR_CODE', 'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME']
+
             if type(modeltype_exceptions_table) != str:
                 for error_check_count in range(0, len(modeltype_exceptions_table)):
                     if modeltype_exceptions_table['Numeric (y/n)'][error_check_count] == 'y':
@@ -151,26 +149,42 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                         left_on=['MODEL_YEAR', 'CARLINE_CODE', 'CAFE_MFR_CD', 'MFR_DIVISION_NM'], \
                                                         right_on=['MODEL_YEAR', 'FOOTPRINT_CARLINE_CD', 'CAFE_MFR_CD', 'FOOTPRINT_DIVISION_NM'])
 
-            vehghg_file_full_merged_data = vehghg_file_data_pt1.merge(model_type_file, how='left', \
-                                                                      left_on=['MODEL_TYPE_INDEX', 'CARLINE_CODE',
-                                                                               'MODEL_YEAR', 'CAFE_MFR_CD',
-                                                                               'MFR_DIVISION_NM', \
-                                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID',
-                                                                               'CAFE_ID', 'CARLINE_NAME'],
-                                                                      right_on=modeltype_indexing_categories)
+            vehghg_file_full_merged_data = vehghg_file_data_pt1.merge(model_type_file, how='left', left_on=['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'MODEL_YEAR', 'CAFE_MFR_CD', 'MFR_DIVISION_NM', \
+                                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'CAFE_ID', 'CARLINE_NAME'], right_on=modeltype_indexing_categories)
 
-            vehghg_file_data = vehghg_file_full_merged_data[
-                vehghg_file_full_merged_data['SS_LD_CARLINE_HEADER_ID'] == vehghg_file_full_merged_data['LD_CARLINE_HEADER_ID']].reset_index(drop=True)
-            vehghg_file = vehghg_file_data.dropna(
-                subset=list(footprint_indexing_categories) + list(subconfig_indexing_categories),
-                how='any').reset_index(drop=True)
+            vehghg_file_data = vehghg_file_full_merged_data[vehghg_file_full_merged_data['SS_LD_CARLINE_HEADER_ID'] == vehghg_file_full_merged_data['LD_CARLINE_HEADER_ID']].reset_index(drop=True)
+            vehghg_file = vehghg_file_data.dropna(subset=list(footprint_indexing_categories) + list(subconfig_indexing_categories), how='any').reset_index(drop=True)
+            # vehghg_file.to_csv(output_path + '\\' + 'vehghg_file_bodyIDy.csv', index=False)
+            vehghg_file_volumes = vehghg_file['FINAL_MODEL_YR_GHG_PROD_UNITS'].replace(np.nan, 0).reset_index(drop=True)
+            distributed_volumes_vehghg_file = pd.Series(vehghg_file_volumes / vehghg_file.groupby(subconfig_indexing_categories)[
+                    'FINAL_MODEL_YR_GHG_PROD_UNITS'].transform(len), name='Distributed vehghg_file Volumes')
+
+            if distributed_volumes_vehghg_file.sum().astype(int) != footprint_file_with_lineage_volumes.sum().astype(int) :
+                vehghg_file['Distributed vehghg_file Volumes'] = pd.Series(np.zeros(len(vehghg_file)))
+                vehghg_file['Distributed vehghg_file Volumes'] = distributed_volumes_vehghg_file
+                grp_volumes_vehghg_file = vehghg_file.groupby(['FOOTPRINT_MFR_CD']).sum()
+                grp_volumes_vehghg_file = grp_volumes_vehghg_file['Distributed vehghg_file Volumes']
+
+                grp_volumes_footprint_file_with_lineage = footprint_file_with_lineage.groupby(['FOOTPRINT_MFR_CD']).sum()
+                grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].sum()
+                grp_volumes_footprint_file_with_lineage = grp_volumes_footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE']
+
+                print('total volumes = ', grp_volumes_footprint_file_with_lineage.sum(), ' volumes @ merging = ', grp_volumes_vehghg_file.sum().round(0))
+                for i in range(min(len(grp_volumes_vehghg_file), len(grp_volumes_footprint_file_with_lineage))):
+                    if grp_volumes_vehghg_file[i].round(0) != grp_volumes_footprint_file_with_lineage[i].round(0):
+                        print(grp_volumes_vehghg_file.index[i], grp_volumes_footprint_file_with_lineage[i], grp_volumes_vehghg_file[i])
+
+            vehghg_file.loc[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS']), 'TOTAL_NUM_TRANS_GEARS'] = 1
             missing_entries_1 = vehghg_file[pd.isnull(vehghg_file['LineageID'])].reset_index(drop=True)
             missing_entries_2 = vehghg_file[pd.isnull(vehghg_file['TOTAL_NUM_TRANS_GEARS'])].reset_index(drop=True)
             missing_entries = pd.concat([missing_entries_1, missing_entries_2]).reset_index(drop=True)
             if len(missing_entries) > 0:
                 try:
-                    missing_entries.to_csv(
-                        output_path + '\\' + vehghg_filename.replace('.csv', '') + '_Missing Entries.csv', index=False)
+                    missing_entries_volumes = missing_entries['FINAL_MODEL_YR_GHG_PROD_UNITS'].replace(np.nan, 0).reset_index(drop=True)
+                    distributed_volumes_missing_entries = pd.Series(
+                        missing_entries_volumes / missing_entries.groupby(subconfig_indexing_categories)['FINAL_MODEL_YR_GHG_PROD_UNITS'].transform(len), name='Distributed missing_entries Volumes')
+                    print('volumes_query_output = ', distributed_volumes_vehghg_file.sum() - distributed_volumes_missing_entries.sum())
+                    missing_entries.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + '_Missing Entries.csv', index=False)
                 except OSError:
                     pass
             vehghg_file = vehghg_file[(~pd.isnull(vehghg_file['LineageID'])) \
@@ -223,12 +237,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             matching_fuel_category[vehghg_file['FUEL_USAGE'] == 'E'] = 'Eth'
             matching_electrification = pd.Series(np.zeros(len(vehghg_file)), name='Electrification Category').replace(0,
                                                                                                                       'N')
-            matching_electrification[
-                (vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'PHEV'
-            matching_electrification[
-                (vehghg_file['HYBRID_YN'] == 'N') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'EV'
-            matching_electrification[
-                (vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'N')] = 'HEV'
+            matching_electrification[(vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'PHEV'
+            matching_electrification[(vehghg_file['HYBRID_YN'] == 'N') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'Y')] = 'EV'
+            matching_electrification[(vehghg_file['HYBRID_YN'] == 'Y') & (vehghg_file['OFF_BOARD_CHARGE_CAPABLE_YN'] == 'N')] = 'HEV'
             matching_electrification[vehghg_file['FUEL_USAGE'] == 'H'] = 'FCV'
 
             vehghg_file = pd.concat([vehghg_file, matching_cyl_layout, matching_cyl_num, \
@@ -243,8 +254,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             model_type_volumes = model_type_file[
                 ['CALC_ID', 'PRODUCTION_VOLUME_FE_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE']].groupby('CALC_ID').sum().reset_index()
             vehghg_file_nonflexfuel = pd.merge_ordered(vehghg_file_nonflexfuel.drop( \
-                ['PRODUCTION_VOLUME_FE_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE'], axis=1), model_type_volumes,
-                how='left', on='CALC_ID').reset_index(drop=True)
+                ['PRODUCTION_VOLUME_FE_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE'], axis=1), model_type_volumes, how='left', on='CALC_ID').reset_index(drop=True)
             merging_columns = list(vehghg_file_nonflexfuel.drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', \
                                                                  'PROD_VOL_GHG_TOTAL_50_STATE',
                                                                  'PRODUCTION_VOLUME_GHG_50_STATE', \
@@ -271,9 +281,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             # roadload_coefficient_table__nonflexfuel = roadload_coefficient_table__nonflexfuel.rename({'SUBCFG_FUEL_USAGE':'FUEL_USAGE'}, axis=1)
             vehghg_file_flexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] == 'E'].reset_index(drop=True)
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] != 'E'].reset_index(drop=True)
-
-            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(roadload_coefficient_table__nonflexfuel, how='left',
-                                                                    on=list(roadload_coefficient_table_indexing_categories))
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(roadload_coefficient_table__nonflexfuel, how='left', on=list(roadload_coefficient_table_indexing_categories))
             vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(
                 vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE'].astype(float) * vehghg_file_nonflexfuel['FUEL_GRAVITY'].astype(float) * btu2mj * kg2lbm)
             set_roadload_coefficient_table_indexing_categories = ['Model Year', 'Veh Mfr Code', 'Represented Test Veh Model', 'Test Number', \
@@ -282,7 +290,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                   'Target Coef A (lbf)', 'Target Coef B (lbf/mph)', 'Target Coef C (lbf/mph**2)', \
                                                                   'Set Coef A (lbf)', 'Set Coef B (lbf/mph)', 'Set Coef C (lbf/mph**2)']
             set_roadload_coefficient_table = pd.read_csv(test_car_filename_path + '\\' + set_roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])
-            # EVCIS Qlik Sense query results contain hyphens for nan
             set_roadload_coefficient_table = set_roadload_coefficient_table[set_roadload_coefficient_table_indexing_categories]
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(set_roadload_coefficient_table, how='left',
                                                                     left_on=['CAFE_MFR_CD', 'TEST_NUMBER', 'TEST_PROC_CATEGORY'],
@@ -391,73 +398,44 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                on=['TEMP_ID', 'TEST_PROC_CATEGORY']).reset_index(drop=True).rename( \
                 columns={'Powertrain Efficiency (%)': 'PTEFF_FROM_RLCOEFFS', 'City Powertrain Efficiency (%)': 'City PTEFF_FROM_RLCOEFFS', 'Hwy Powertrain Efficiency (%)': 'Hwy PTEFF_FROM_RLCOEFFS'}).drop('TEMP_ID', axis=1)
 
-            total_allocated_volumes_to_footprint = pd.DataFrame(
-                vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)[
-                    'FINAL_MODEL_YR_GHG_PROD_UNITS'].sum().reset_index()) \
+            total_allocated_volumes_to_footprint = pd.DataFrame(vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)['FINAL_MODEL_YR_GHG_PROD_UNITS'].sum().reset_index()) \
                 .rename(columns={'FINAL_MODEL_YR_GHG_PROD_UNITS': 'Total Subconfig Volume Allocated to Footprint'})
-            total_allocated_volumes_to_subconfig = pd.DataFrame(
-                vehghg_file_nonflexfuel.groupby(subconfig_indexing_categories)[
-                    'PROD_VOL_GHG_TOTAL_50_STATE'].sum().reset_index()) \
+            total_allocated_volumes_to_subconfig = pd.DataFrame(vehghg_file_nonflexfuel.groupby(subconfig_indexing_categories)['PROD_VOL_GHG_TOTAL_50_STATE'].sum().reset_index()) \
                 .rename(columns={'PROD_VOL_GHG_TOTAL_50_STATE': 'Total Footprint Volume Allocated to Subconfig'})
-            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(total_allocated_volumes_to_footprint, how='left',
-                                                                    on=footprint_indexing_categories) \
+            vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(total_allocated_volumes_to_footprint, how='left', on=footprint_indexing_categories) \
                 .merge(total_allocated_volumes_to_subconfig, how='left', on=subconfig_indexing_categories).reset_index(drop=True)
+
             # vehghg_file_nonflexfuel.to_csv(output_path+'\\'+'Test File.csv', index=False)
             footprint_volumes = vehghg_file_nonflexfuel['PROD_VOL_GHG_TOTAL_50_STATE'].replace(np.nan, 0).reset_index(drop=True)
             footprint_tlaas_volumes = vehghg_file_nonflexfuel['PROD_VOL_GHG_TLAAS_50_STATE'].replace(np.nan, 0).reset_index(drop=True)
             footprint_std_volumes = vehghg_file_nonflexfuel['PROD_VOL_GHG_STD_50_STATE'].replace(np.nan, 0).reset_index(drop=True)
             modeltype_ghg_volumes = pd.to_numeric(vehghg_file_nonflexfuel['PRODUCTION_VOLUME_GHG_50_STATE'].replace(np.nan, 0).reset_index(drop=True))
             modeltype_fe_volumes = pd.to_numeric(vehghg_file_nonflexfuel['PRODUCTION_VOLUME_FE_50_STATE'].replace(np.nan, 0).reset_index(drop=True))
-
             subconfig_volumes = vehghg_file_nonflexfuel['FINAL_MODEL_YR_GHG_PROD_UNITS'].replace(np.nan, 0).reset_index(drop=True)
-            # total_footprint_volumes = pd.Series(footprint_volumes.replace(np.nan,0).unique()).sum()
-            # total_subconfig_volumes = pd.Series(subconfig_volumes[vehghg_file_nonflexfuel['SS_LD_CARLINE_HEADER_ID'] == \
-            #      vehghg_file_nonflexfuel['LD_CARLINE_HEADER_ID']].replace(np.nan,0).unique()).sum()
-            distributed_volumes_footprint = pd.Series(
-                footprint_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)[
-                    'PROD_VOL_GHG_TOTAL_50_STATE'].transform(len), name='Distributed Footprint Volumes')
-            distributed_tlaas_volumes_footprint = pd.Series(
-                footprint_tlaas_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)[
-                    'PROD_VOL_GHG_TLAAS_50_STATE'].transform(len), name='Distributed Footprint TLAAS Volumes')
-            distributed_std_volumes_footprint = pd.Series(
-                footprint_std_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)[
-                    'PROD_VOL_GHG_STD_50_STATE'].transform(len), name='Distributed Footprint Standard Volumes')
-            distributed_ghg_volumes_modeltype = pd.Series(
-                modeltype_ghg_volumes / vehghg_file_nonflexfuel.groupby(modeltype_indexing_categories)[
-                    'PRODUCTION_VOLUME_GHG_50_STATE'].transform(len), name='Distributed Model Type GHG Volumes')
-            distributed_fe_volumes_modeltype = pd.Series(
-                modeltype_fe_volumes / vehghg_file_nonflexfuel.groupby(modeltype_indexing_categories)[
-                    'PRODUCTION_VOLUME_FE_50_STATE'].transform(len), name='Distributed Model Type FE Volumes')
-            distributed_volumes_subconfig = pd.Series(
-                subconfig_volumes / vehghg_file_nonflexfuel.groupby(subconfig_indexing_categories)[
-                    'FINAL_MODEL_YR_GHG_PROD_UNITS'].transform(len), name='Distributed Subconfig Volumes')
+
+            distributed_volumes_footprint = pd.Series(footprint_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)['PROD_VOL_GHG_TOTAL_50_STATE'].transform(len), name='Distributed Footprint Volumes')
+            distributed_tlaas_volumes_footprint = pd.Series(footprint_tlaas_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)['PROD_VOL_GHG_TLAAS_50_STATE'].transform(len), name='Distributed Footprint TLAAS Volumes')
+            distributed_std_volumes_footprint = pd.Series(footprint_std_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)['PROD_VOL_GHG_STD_50_STATE'].transform(len), name='Distributed Footprint Standard Volumes')
+            # distributed_ghg_volumes_modeltype = pd.Series(modeltype_ghg_volumes / vehghg_file_nonflexfuel.groupby(footprint_indexing_categories)['PRODUCTION_VOLUME_GHG_50_STATE'].transform(len), name='Distributed Model Type GHG Volumes')
+            # distributed_fe_volumes_modeltype = pd.Series(modeltype_fe_volumes / vehghg_file_nonflexfuel.groupby(modeltype_indexing_categories)['PRODUCTION_VOLUME_FE_50_STATE'].transform(len), name='Distributed Model Type FE Volumes')
+            distributed_volumes_subconfig = pd.Series(subconfig_volumes / vehghg_file_nonflexfuel.groupby(subconfig_indexing_categories)['FINAL_MODEL_YR_GHG_PROD_UNITS'].transform(len), name='Distributed Subconfig Volumes')
             distributed_volumes = pd.concat([distributed_volumes_footprint, distributed_volumes_subconfig, \
-                                             distributed_tlaas_volumes_footprint, distributed_std_volumes_footprint,
-                                             distributed_ghg_volumes_modeltype, \
-                                             distributed_fe_volumes_modeltype], axis=1).reset_index(drop=True)
-            mixed_volumes_footprint = pd.Series((footprint_volumes * subconfig_volumes / vehghg_file_nonflexfuel[
-                'Total Subconfig Volume Allocated to Footprint']), name='FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES')
-            mixed_volumes_subconfig = pd.Series((footprint_volumes * subconfig_volumes / vehghg_file_nonflexfuel[
-                'Total Footprint Volume Allocated to Subconfig']), name='SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES')
+                                             distributed_tlaas_volumes_footprint, distributed_std_volumes_footprint], axis = 1).reset_index(drop=True)
+                                             # distributed_ghg_volumes_modeltype, distributed_fe_volumes_modeltype], axis = 1).reset_index(drop=True)
+            mixed_volumes_footprint = pd.Series((footprint_volumes * subconfig_volumes / vehghg_file_nonflexfuel['Total Subconfig Volume Allocated to Footprint']), name='FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES')
+            mixed_volumes_subconfig = pd.Series((footprint_volumes * subconfig_volumes / vehghg_file_nonflexfuel['Total Footprint Volume Allocated to Subconfig']), name='SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES')
             mixed_volumes = pd.concat([mixed_volumes_footprint, mixed_volumes_subconfig], axis=1).reset_index(drop=True)
-            mixed_volumes['FOOTPRINT_SUBCONFIG_VOLUMES'] = mixed_volumes[
-                ['FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES', 'SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES']].mean(axis=1)
+            mixed_volumes['FOOTPRINT_SUBCONFIG_VOLUMES'] = mixed_volumes[['FOOTPRINT_ALLOCATED_SUBCONFIG_VOLUMES', 'SUBCONFIG_ALLOCATED_FOOTPRINT_VOLUMES']].mean(axis=1)
             vehghg_file_nonflexfuel = pd.concat([vehghg_file_nonflexfuel, distributed_volumes, mixed_volumes], axis=1)
-            vehghg_file_nonflexfuel = pd.concat(
-                [pd.Series(range(len(vehghg_file_nonflexfuel)), name='Vehghg_ID') + 1, vehghg_file_nonflexfuel], axis=1)
+            vehghg_file_nonflexfuel = pd.concat([pd.Series(range(len(vehghg_file_nonflexfuel)), name='Vehghg_ID') + 1, vehghg_file_nonflexfuel], axis=1)
 
-            vehghg_file_flexfuel = vehghg_file[vehghg_file['FUEL_USAGE'] == 'E'].reset_index(drop=True) \
-                .drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', 'PROD_VOL_GHG_TOTAL_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE', \
-                       'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'], axis=1)
+            vehghg_file_flexfuel = vehghg_file[vehghg_file['FUEL_USAGE'] == 'E'].reset_index(drop=True).drop(['FINAL_MODEL_YR_GHG_PROD_UNITS', 'PROD_VOL_GHG_TOTAL_50_STATE', 'PRODUCTION_VOLUME_GHG_50_STATE', 'PRODUCTION_VOLUME_FE_50_STATE', 'PROD_VOL_GHG_TLAAS_50_STATE', 'PROD_VOL_GHG_STD_50_STATE'], axis=1)
 
-            vehghg_file_flexfuel = pd.merge(vehghg_file_flexfuel, \
-                                            vehghg_file_nonflexfuel[
-                                                ['Vehghg_ID', 'BodyID', 'FOOTPRINT_INDEX', 'CONFIG_INDEX',
+            vehghg_file_flexfuel = pd.merge(vehghg_file_flexfuel, vehghg_file_nonflexfuel[['Vehghg_ID', 'BodyID', 'FOOTPRINT_INDEX', 'CONFIG_INDEX', \
                                                  'SUBCONFIG_INDEX', 'SS_ENGINE_FAMILY']], how='left', \
-                                            on=['BodyID', 'FOOTPRINT_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX',
-                                                'SS_ENGINE_FAMILY']).sort_values('Vehghg_ID').reset_index(drop=True)
+                                            on=['BodyID', 'FOOTPRINT_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX', 'SS_ENGINE_FAMILY']).sort_values('Vehghg_ID').reset_index(drop=True)
 
-            vehghg_file_nonflexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()]\
+            # vehghg_file_nonflexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()]\
             #     = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()].replace(np.nan,'none')
             # vehghg_file_flexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()]\
             #     = vehghg_file_flexfuel[vehghg_file_nonflexfuel.columns[vehghg_file_nonflexfuel.isnull().all()].tolist()].replace(np.nan,'none')
@@ -467,8 +445,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
 
             # only output non flex fuel
             vehghg_file_output = vehghg_file_nonflexfuel
-            # vehghg_file_output = pd.merge_ordered(vehghg_file_nonflexfuel, vehghg_file_flexfuel, how='outer', on=merging_columns + ['Vehghg_ID']).sort_values('Vehghg_ID').reset_index(drop=True)
-            # vehghg_file_output = vehghg_file_output.replace('none', np.nan)
             del vehghg_file
 
             vehghg_file_output = vehghg_file_output.loc[:, ~vehghg_file_output.columns.duplicated()]
@@ -489,42 +465,33 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 (vehghg_file_output['TARGET_COEF_B'] + 2 * vehghg_file_output['TARGET_COEF_C'] * v_aero_mph) \
                 * ftps2mph / (air_density * v_aero_mph * mph2ftps)).replace(0, np.nan)
             vehghg_file_output['TOTAL_ROAD_LOAD_FORCE_50MPH'] = vehghg_file_output['RLHP_FROM_RLCOEFFS'] * hp2lbfmph * (1 / 50)
-            vehghg_file_output['AERO_FORCE_50MPH'] = 0.5 * air_density * vehghg_file_output['CDA_FROM_RLCOEFFS'] * (
-                        (50 * mph2ftps) ** 2)
+            vehghg_file_output['AERO_FORCE_50MPH'] = 0.5 * air_density * vehghg_file_output['CDA_FROM_RLCOEFFS'] * ((50 * mph2ftps) ** 2)
             vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] = (vehghg_file_output['TOTAL_ROAD_LOAD_FORCE_50MPH'] - vehghg_file_output[
                     'AERO_FORCE_50MPH']).replace(0, np.nan)
             vehghg_file_output = vehghg_file_output.drop(['TOTAL_ROAD_LOAD_FORCE_50MPH', 'AERO_FORCE_50MPH'], axis=1)
 
             vehghg_file_output['FRONT_TIRE_RADIUS_IN'] = pd.Series(
                 vehghg_file_output['FRONT_BASE_TIRE_CODE']).str.split('R').str.get(1).str.extract('(\d+)').astype(float) * 0.5
-            vehghg_file_output['REAR_TIRE_RADIUS_IN'] = pd.Series(vehghg_file_output['REAR_BASE_TIRE_CODE']).str.split( \
-                'R').str.get(1).str.extract('(\d+)').astype(float) * 0.5
+            vehghg_file_output['REAR_TIRE_RADIUS_IN'] = pd.Series(vehghg_file_output['REAR_BASE_TIRE_CODE']).str.split('R').str.get(1).str.extract('(\d+)').astype(float) * 0.5
             vehghg_file_output['TIRE_WIDTH_INS'] = pd.Series(vehghg_file_output['FRONT_BASE_TIRE_CODE']).str.split(
                 '/').str.get(0).str.extract('(\d+)').astype(float) / in2mm
 
-            F_brake = 2 * (0.4 / (vehghg_file_output['FRONT_TIRE_RADIUS_IN'] * in2m)) * n2lbf + 2 * ( \
-                        0.4 / (vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * n2lbf
+            F_brake = 2 * (0.4 / (vehghg_file_output['FRONT_TIRE_RADIUS_IN'] * in2m)) * n2lbf + 2 * (0.4 / (vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * n2lbf
             rpm_front = 50 * mph2mps * (1 / (vehghg_file_output['FRONT_TIRE_RADIUS_IN'] * in2m)) * (60 / (2 * math.pi))
             rpm_rear = 50 * mph2mps * (1 / (vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * (60 / (2 * math.pi))
-            F_hub = 2 * (((-2e-6 * rpm_front ** 2) + (.0023 * rpm_front + 1.2157) / (
-                        vehghg_file_output['FRONT_TIRE_RADIUS_IN'] * in2m)) * n2lbf) \
-                    + 2 * (((-2e-6 * rpm_rear ** 2) + (.0023 * rpm_rear + 1.2157) / (
-                        vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * n2lbf)
+            F_hub = 2 * (((-2e-6 * rpm_front ** 2) + (.0023 * rpm_front + 1.2157) / (vehghg_file_output['FRONT_TIRE_RADIUS_IN'] * in2m)) * n2lbf) \
+                    + 2 * (((-2e-6 * rpm_rear ** 2) + (.0023 * rpm_rear + 1.2157) / (vehghg_file_output['REAR_TIRE_RADIUS_IN'] * in2m)) * n2lbf)
             F_drivetrain = 20 * n2lbf
-            vehghg_file_output['ROLLING_FORCE_50MPH'] = vehghg_file_output[
-                                                            'NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] - F_hub - F_brake - F_drivetrain
-            vehghg_file_output['RRC_FROM_RLCOEFFS'] = (
-                        1000 * vehghg_file_output['ROLLING_FORCE_50MPH'] / vehghg_file_output['ETW']).replace(0, np.nan)
+            vehghg_file_output['ROLLING_FORCE_50MPH'] = vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] - F_hub - F_brake - F_drivetrain
+            vehghg_file_output['RRC_FROM_RLCOEFFS'] = (1000 * vehghg_file_output['ROLLING_FORCE_50MPH'] / vehghg_file_output['ETW']).replace(0, np.nan)
             vehghg_file_output = vehghg_file_output.drop(['ROLLING_FORCE_50MPH'], axis=1)
-            vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS_NORMALIZED_BY_ETW'] = \
-                vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] / vehghg_file_output['ETW']
+            vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS_NORMALIZED_BY_ETW'] = vehghg_file_output['NON_AERO_DRAG_FORCE_FROM_RLCOEFFS'] / vehghg_file_output['ETW']
             vehghg_file_output['Transmission Short Name'] = pd.Series(vehghg_file_output['TRANS_TYPE'] + \
                                                                       vehghg_file_output['TOTAL_NUM_TRANS_GEARS'].astype(str)).replace('CVT1', 'CVT')
-            vehghg_file_output['ROAD_LOAD_LABEL'] = pd.Series(
-                vehghg_file_output['CALC_ID'].astype(float).astype(int).astype(str) + '_' \
+            vehghg_file_output.loc[:,'CALC_ID'] = vehghg_file_output.loc[:, 'CALC_ID'][~pd.isnull(vehghg_file_output['CALC_ID'])].astype(float).astype(int)
+            vehghg_file_output['ROAD_LOAD_LABEL'] = pd.Series(vehghg_file_output['CALC_ID'].astype(str) + '_' \
                 + vehghg_file_output['FOOTPRINT_CARLINE_NM'] + '_' + vehghg_file_output['BodyID'].astype(str) + '_' \
-                + vehghg_file_output['ENG_DISPL'].astype(str) + '_' + vehghg_file_output[
-                    'Transmission Short Name'] + '_' + \
+                + vehghg_file_output['ENG_DISPL'].astype(str) + '_' + vehghg_file_output['Transmission Short Name'] + '_' + \
                 'Axle Ratio:(' + vehghg_file_output['AXLE_RATIO'].round(2).astype(str) + ')' + '_' + \
                 'RLHP:(' + vehghg_file_output['RLHP_FROM_RLCOEFFS'].round(2).astype(str) + ')' + '_' + \
                 'CDA:(' + vehghg_file_output['CDA_FROM_RLCOEFFS'].round(2).astype(str) + ')' + '_' + \
@@ -533,7 +500,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                 vehghg_file_output['FRONT_BASE_TIRE_CODE'] + '_' + \
                 vehghg_file_output['ETW'].replace(np.nan, 0).astype(float).round(0).astype(int).replace(0, 'na').astype(str))
             vehghg_file_output.drop_duplicates(keep=False, inplace=True)
-            vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + date_and_time + '.csv', index=False)
+            vehghg_file_output.to_csv(output_path + '\\' + vehghg_filename.replace('.csv', '') + '_' + date_and_time + '.csv', index=False)
         else:
             # New BodyID table sought, previous data included
             full_expanded_footprint_filter_table = full_expanded_footprint_filter_table.merge \
