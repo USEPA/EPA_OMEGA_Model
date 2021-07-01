@@ -1,7 +1,7 @@
 """
 
-Consumer module stub (for now)
-
+**Routines to retrieve overall sales from the context and total consumer sales response as a function of total
+sales-weighted generalized cost.**
 
 ----
 
@@ -12,32 +12,46 @@ Consumer module stub (for now)
 from omega_model import *
 
 
-# placeholder for consumer generalized vehicle cost:
-def calc_generalized_cost(cost_factors):
+def _calc_generalized_cost(cost_factors):
+    """
+    Placeholder for consumer generalized cost calculations.
+
+    Args:
+        cost_factors: data to base costs on
+
+    Returns:
+        nothing yet
+
+    """
     pass
 
 
-def context_new_vehicle_sales(model_year):
+def context_new_vehicle_sales(calendar_year):
     """
-    :param model_year: not used, for now
-    :return: dict of sales by consumer (market) categories
-    """
+    Get new vehicle sales from the context.
 
+    Args:
+        calendar_year (int): the year to get sales for
+
+    Returns:
+        dict of vehicle sales
+
+    """
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
     from context.new_vehicle_market import NewVehicleMarket
 
     sales_dict = dict()
 
     if omega_globals.options.flat_context:
-        model_year = omega_globals.options.flat_context_year
+        calendar_year = omega_globals.options.flat_context_year
 
     # get total sales from context
-    total_sales = NewVehicleMarket.new_vehicle_sales(model_year)
+    total_sales = NewVehicleMarket.new_vehicle_sales(calendar_year)
 
     # pulling in hauling sales, non_hauling = total minus hauling
     hauling_sales = 0
     for hsc in NewVehicleMarket.hauling_context_size_class_info:
-        hauling_sales += NewVehicleMarket.new_vehicle_sales(model_year, context_size_class=hsc) * \
+        hauling_sales += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=hsc) * \
                          NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
 
     sales_dict['hauling'] = hauling_sales
@@ -49,9 +63,17 @@ def context_new_vehicle_sales(model_year):
 
 def new_vehicle_sales_response(calendar_year, P):
     """
-    Calculate new vehicle sales, relative to a reference sales volume and average new vehicle price
-    :param P: a single price or a list-like of prices
-    :return: total new vehicle sales volume at each price
+    Calculate new vehicle sales, relative to a reference sales volume and average new vehicle price.
+    Updates generalized cost table associated with the reference session so those costs can become the reference
+    costs for subsequent sessions.
+
+    Args:
+        calendar_year (int):
+        P ($, [$]): a single price or a list/vector of prices
+
+    Returns:
+        Total new vehicle sales volume at each price.
+
     """
     from context.new_vehicle_market import NewVehicleMarket
 
