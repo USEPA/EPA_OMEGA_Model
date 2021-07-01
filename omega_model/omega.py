@@ -743,27 +743,29 @@ def init_omega(o2_options):
         
         omega_globals.options.stock_vmt = AnnualVMTFixedByAge
 
-        init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                 omega_globals.options.cpi_deflators_file,
-                                                                 verbose=omega_globals.options.verbose)
-
-        init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
-                                                            verbose=omega_globals.options.verbose)
-
-        init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
-                                                                       verbose=omega_globals.options.verbose)
-
-        init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                        verbose=omega_globals.options.verbose)
-
-        init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                        verbose=omega_globals.options.verbose)
-
-        init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
+        if omega_globals.options.calc_criteria_emission_costs:
+            init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
+                                                                     omega_globals.options.cpi_deflators_file,
                                                                      verbose=omega_globals.options.verbose)
 
-        init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                     verbose=omega_globals.options.verbose)
+            init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
+                                                                verbose=omega_globals.options.verbose)
+
+            init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
+                                                                           verbose=omega_globals.options.verbose)
+
+            init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
+                                                                            verbose=omega_globals.options.verbose)
+
+        if omega_globals.options.calc_effects:
+            init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                                            verbose=omega_globals.options.verbose)
+
+            init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                                         verbose=omega_globals.options.verbose)
+
+            init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                                         verbose=omega_globals.options.verbose)
 
         init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file, verbose=omega_globals.options.verbose)
 
