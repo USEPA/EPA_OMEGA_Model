@@ -24,7 +24,6 @@ def context_new_vehicle_sales(model_year):
     """
 
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
-    from producer.vehicle_annual_data import VehicleAnnualData
     from context.new_vehicle_market import NewVehicleMarket
 
     sales_dict = dict()
@@ -35,10 +34,6 @@ def context_new_vehicle_sales(model_year):
     # get total sales from context
     total_sales = NewVehicleMarket.new_vehicle_sales(model_year)
 
-    total_sales_initial = VehicleAnnualData.get_initial_registered_count()
-    ICE_share = VehicleAnnualData.get_initial_fueling_class_registered_count('ICE') / total_sales_initial
-    BEV_share = VehicleAnnualData.get_initial_fueling_class_registered_count('BEV') / total_sales_initial
-
     # pulling in hauling sales, non_hauling = total minus hauling
     hauling_sales = 0
     for hsc in NewVehicleMarket.hauling_context_size_class_info:
@@ -47,8 +42,6 @@ def context_new_vehicle_sales(model_year):
 
     sales_dict['hauling'] = hauling_sales
     sales_dict['non_hauling'] = total_sales - hauling_sales
-    sales_dict['ICE'] = total_sales * ICE_share
-    sales_dict['BEV'] = total_sales * BEV_share
     sales_dict['total'] = total_sales
 
     return sales_dict
