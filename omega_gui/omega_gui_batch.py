@@ -11,6 +11,9 @@ import os
 import sys
 # import subprocess
 
+if 'darwin' in sys.platform:
+    os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for Qt on MacOS
+
 # import pandas
 import psutil
 
@@ -535,7 +538,8 @@ class Form(QObject):
             now = datetime.now()
             date_time = now.strftime("%m/%d/%Y %H:%M:%S")
             text = date_time + "  " + text
-        self.window.event_monitor_result.setTextColor(QColor(color))
+        if color != 'black':
+            self.window.event_monitor_result.setTextColor(QColor(color))
         self.window.event_monitor_result.append(text)
 
     def clear_event_monitor(self):
