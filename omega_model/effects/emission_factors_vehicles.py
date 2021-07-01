@@ -91,7 +91,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
                 cost_factors = [emission_factors]
             attrs = EmissionFactorsVehicles.get_class_attributes(emission_factors)
 
-            result = common.omega_globals.session.query(*attrs) \
+            result = omega_globals.session.query(*attrs) \
                 .filter(EmissionFactorsVehicles.model_year == model_year) \
                 .filter(EmissionFactorsVehicles.age == age) \
                 .filter(EmissionFactorsVehicles.reg_class_ID == reg_class_id) \
@@ -152,8 +152,8 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
                         ch4_grams_per_mile=df.loc[i, 'ch4_grams_per_mile'],
                         n2o_grams_per_mile=df.loc[i, 'n2o_grams_per_mile'],
                     ))
-                common.omega_globals.session.add_all(obj_list)
-                common.omega_globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
         return template_errors
 
@@ -164,23 +164,23 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        common.omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         from omega_model.consumer.market_classes import MarketClass  # needed for market class ID
 
-        SQABase.metadata.create_all(common.omega_globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
         # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
         #                                                             verbose=o2.options.verbose)
 
-        init_fail += EmissionFactorsVehicles.init_database_from_file(common.omega_globals.options.emission_factors_vehicles_file,
-                                                                     verbose=common.omega_globals.options.verbose)
+        init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(common.omega_globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

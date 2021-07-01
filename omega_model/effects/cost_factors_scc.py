@@ -81,7 +81,7 @@ class CostFactorsSCC(SQABase, OMEGABase):
                 cost_factors = [cost_factors]
             attrs = CostFactorsSCC.get_class_attributes(cost_factors)
 
-            result = common.omega_globals.session.query(*attrs).filter(CostFactorsSCC.calendar_year == calendar_year).all()[0]
+            result = omega_globals.session.query(*attrs).filter(CostFactorsSCC.calendar_year == calendar_year).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]
@@ -127,7 +127,7 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = pd.read_csv(common.omega_globals.options.ip_deflators_file, skiprows=1, index_col=0)
+            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0)
             df = gen_fxns.adjust_dollars(df, deflators, 
                                          'co2_global_5.0_USD_per_metricton',
                                          'co2_global_3.0_USD_per_metricton',
@@ -163,8 +163,8 @@ class CostFactorsSCC(SQABase, OMEGABase):
                         n2o_global_25 = df.loc[i, 'n2o_global_2.5_USD_per_metricton'],
                         n2o_global_395 = df.loc[i, 'n2o_global_3.95_USD_per_metricton'],
                     ))
-                common.omega_globals.session.add_all(obj_list)
-                common.omega_globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
         return template_errors
 
@@ -175,20 +175,20 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        common.omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(common.omega_globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
-        init_fail += CostFactorsSCC.init_database_from_file(common.omega_globals.options.scc_cost_factors_file,
-                                                            verbose=common.omega_globals.options.verbose)
+        init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
+                                                            verbose=omega_globals.options.verbose)
 
 
         if not init_fail:
-            dump_omega_db_to_csv(common.omega_globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
