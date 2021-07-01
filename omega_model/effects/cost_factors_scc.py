@@ -1,5 +1,35 @@
 """
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents $/ton benefits estimates associated with GHG pollutants by calendar year for all sources.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,context_cost_factors-scc,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        calendar_year,dollar_basis,co2_global_5.0_USD_per_metricton,co2_global_3.0_USD_per_metricton,co2_global_2.5_USD_per_metricton,co2_global_3.95_USD_per_metricton,ch4_global_5.0_USD_per_metricton,ch4_global_3.0_USD_per_metricton,ch4_global_2.5_USD_per_metricton,ch4_global_3.95_USD_per_metricton,n2o_global_5.0_USD_per_metricton,n2o_global_3.0_USD_per_metricton,n2o_global_2.5_USD_per_metricton,n2o_global_3.95_USD_per_metricton
+        2020,2018,14.0514,49.5852,74.181,147.1651,646.1792,1441.555,1895.9669,3791.8882,5610.0501,17865.8998,26335.6921,46841.7517
+
+
+Data Column Name and Description
+    :calendar_year:
+        The calendar year for which $/ton values are applicable.
+
+    :dollar_basis:
+        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+
 
 ----
 
@@ -20,24 +50,18 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
     calendar_year = Column(Numeric)
     dollar_basis = Column(Numeric)
-    co2_domestic_cost_factor_25 = Column('co2_interimdomestic_2.5_USD_per_metricton', Float)
-    co2_domestic_cost_factor_30 = Column('co2_interimdomestic_3.0_USD_per_metricton', Float)
-    co2_domestic_cost_factor_70 = Column('co2_interimdomestic_7.0_USD_per_metricton', Float)
-    ch4_domestic_cost_factor_25 = Column('ch4_interimdomestic_2.5_USD_per_metricton', Float)
-    ch4_domestic_cost_factor_30 = Column('ch4_interimdomestic_3.0_USD_per_metricton', Float)
-    ch4_domestic_cost_factor_70 = Column('ch4_interimdomestic_7.0_USD_per_metricton', Float)
-    n2o_domestic_cost_factor_25 = Column('n2o_interimdomestic_2.5_USD_per_metricton', Float)
-    n2o_domestic_cost_factor_30 = Column('n2o_interimdomestic_3.0_USD_per_metricton', Float)
-    n2o_domestic_cost_factor_70 = Column('n2o_interimdomestic_7.0_USD_per_metricton', Float)
-    co2_global_cost_factor_25 = Column('co2_global_2.5_USD_per_metricton', Float)
-    co2_global_cost_factor_30 = Column('co2_global_3.0_USD_per_metricton', Float)
-    co2_global_cost_factor_70 = Column('co2_global_7.0_USD_per_metricton', Float)
-    ch4_global_cost_factor_25 = Column('ch4_global_2.5_USD_per_metricton', Float)
-    ch4_global_cost_factor_30 = Column('ch4_global_3.0_USD_per_metricton', Float)
-    ch4_global_cost_factor_70 = Column('ch4_global_7.0_USD_per_metricton', Float)
-    n2o_global_cost_factor_25 = Column('n2o_global_2.5_USD_per_metricton', Float)
-    n2o_global_cost_factor_30 = Column('n2o_global_3.0_USD_per_metricton', Float)
-    n2o_global_cost_factor_70 = Column('n2o_global_7.0_USD_per_metricton', Float)
+    co2_global_5 = Column('co2_global_5.0_USD_per_metricton', Float)
+    co2_global_3 = Column('co2_global_3.0_USD_per_metricton', Float)
+    co2_global_25 = Column('co2_global_2.5_USD_per_metricton', Float)
+    co2_global_395 = Column('co2_global_3.95_USD_per_metricton', Float)
+    ch4_global_5 = Column('ch4_global_5.0_USD_per_metricton', Float)
+    ch4_global_3 = Column('ch4_global_3.0_USD_per_metricton', Float)
+    ch4_global_25 = Column('ch4_global_2.5_USD_per_metricton', Float)
+    ch4_global_395 = Column('ch4_global_3.95_USD_per_metricton', Float)
+    n2o_global_5 = Column('n2o_global_5.0_USD_per_metricton', Float)
+    n2o_global_3 = Column('n2o_global_3.0_USD_per_metricton', Float)
+    n2o_global_25 = Column('n2o_global_2.5_USD_per_metricton', Float)
+    n2o_global_395 = Column('n2o_global_3.95_USD_per_metricton', Float)
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
@@ -57,7 +81,7 @@ class CostFactorsSCC(SQABase, OMEGABase):
                 cost_factors = [cost_factors]
             attrs = CostFactorsSCC.get_class_attributes(cost_factors)
 
-            result = omega_globals.session.query(*attrs).filter(CostFactorsSCC.calendar_year == calendar_year).all()[0]
+            result = common.omega_globals.session.query(*attrs).filter(CostFactorsSCC.calendar_year == calendar_year).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]
@@ -78,25 +102,19 @@ class CostFactorsSCC(SQABase, OMEGABase):
         input_template_name = 'context_cost_factors-scc'
         input_template_version = 0.2
         input_template_columns = {'calendar_year', 
-                                  'dollar_basis', 
-                                  'co2_interimdomestic_2.5_USD_per_metricton', 
-                                  'co2_interimdomestic_3.0_USD_per_metricton',
-                                  'co2_interimdomestic_7.0_USD_per_metricton',
-                                  'ch4_interimdomestic_2.5_USD_per_metricton',
-                                  'ch4_interimdomestic_3.0_USD_per_metricton',
-                                  'ch4_interimdomestic_7.0_USD_per_metricton',
-                                  'n2o_interimdomestic_2.5_USD_per_metricton',
-                                  'n2o_interimdomestic_3.0_USD_per_metricton',
-                                  'n2o_interimdomestic_7.0_USD_per_metricton',
-                                  'co2_global_2.5_USD_per_metricton',
+                                  'dollar_basis',
+                                  'co2_global_5.0_USD_per_metricton',
                                   'co2_global_3.0_USD_per_metricton',
-                                  'co2_global_7.0_USD_per_metricton',
-                                  'ch4_global_2.5_USD_per_metricton',
+                                  'co2_global_2.5_USD_per_metricton',
+                                  'co2_global_3.95_USD_per_metricton',
+                                  'ch4_global_5.0_USD_per_metricton',
                                   'ch4_global_3.0_USD_per_metricton',
-                                  'ch4_global_7.0_USD_per_metricton',
-                                  'n2o_global_2.5_USD_per_metricton',
+                                  'ch4_global_2.5_USD_per_metricton',
+                                  'ch4_global_3.95_USD_per_metricton',
+                                  'n2o_global_5.0_USD_per_metricton',
                                   'n2o_global_3.0_USD_per_metricton',
-                                  'n2o_global_7.0_USD_per_metricton',
+                                  'n2o_global_2.5_USD_per_metricton',
+                                  'n2o_global_3.95_USD_per_metricton',
                                   }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -109,25 +127,20 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0)
-            df = gen_fxns.adjust_dollars(df, deflators, 'co2_interimdomestic_2.5_USD_per_metricton', 
-                                                        'co2_interimdomestic_3.0_USD_per_metricton',
-                                                        'co2_interimdomestic_7.0_USD_per_metricton',
-                                                        'ch4_interimdomestic_2.5_USD_per_metricton',
-                                                        'ch4_interimdomestic_3.0_USD_per_metricton',
-                                                        'ch4_interimdomestic_7.0_USD_per_metricton',
-                                                        'n2o_interimdomestic_2.5_USD_per_metricton',
-                                                        'n2o_interimdomestic_3.0_USD_per_metricton',
-                                                        'n2o_interimdomestic_7.0_USD_per_metricton',
-                                                        'co2_global_2.5_USD_per_metricton',
-                                                        'co2_global_3.0_USD_per_metricton',
-                                                        'co2_global_7.0_USD_per_metricton',
-                                                        'ch4_global_2.5_USD_per_metricton',
-                                                        'ch4_global_3.0_USD_per_metricton',
-                                                        'ch4_global_7.0_USD_per_metricton',
-                                                        'n2o_global_2.5_USD_per_metricton',
-                                                        'n2o_global_3.0_USD_per_metricton',
-                                                        'n2o_global_7.0_USD_per_metricton',
+            deflators = pd.read_csv(common.omega_globals.options.ip_deflators_file, skiprows=1, index_col=0)
+            df = gen_fxns.adjust_dollars(df, deflators, 
+                                         'co2_global_5.0_USD_per_metricton',
+                                         'co2_global_3.0_USD_per_metricton',
+                                         'co2_global_2.5_USD_per_metricton',
+                                         'co2_global_3.95_USD_per_metricton',
+                                         'ch4_global_5.0_USD_per_metricton',
+                                         'ch4_global_3.0_USD_per_metricton',
+                                         'ch4_global_2.5_USD_per_metricton',
+                                         'ch4_global_3.95_USD_per_metricton',
+                                         'n2o_global_5.0_USD_per_metricton',
+                                         'n2o_global_3.0_USD_per_metricton',
+                                         'n2o_global_2.5_USD_per_metricton',
+                                         'n2o_global_3.95_USD_per_metricton',
                                          )
 
             if not template_errors:
@@ -137,27 +150,21 @@ class CostFactorsSCC(SQABase, OMEGABase):
                     obj_list.append(CostFactorsSCC(
                         calendar_year = df.loc[i, 'calendar_year'],
                         dollar_basis = df.loc[i, 'dollar_basis'],
-                        co2_domestic_cost_factor_25 = df.loc[i, 'co2_interimdomestic_2.5_USD_per_metricton'],
-                        co2_domestic_cost_factor_30 = df.loc[i, 'co2_interimdomestic_3.0_USD_per_metricton'],
-                        co2_domestic_cost_factor_70 = df.loc[i, 'co2_interimdomestic_7.0_USD_per_metricton'],
-                        ch4_domestic_cost_factor_25 = df.loc[i, 'ch4_interimdomestic_2.5_USD_per_metricton'],
-                        ch4_domestic_cost_factor_30 = df.loc[i, 'ch4_interimdomestic_3.0_USD_per_metricton'],
-                        ch4_domestic_cost_factor_70 = df.loc[i, 'ch4_interimdomestic_7.0_USD_per_metricton'],
-                        n2o_domestic_cost_factor_25 = df.loc[i, 'n2o_interimdomestic_2.5_USD_per_metricton'],
-                        n2o_domestic_cost_factor_30 = df.loc[i, 'n2o_interimdomestic_3.0_USD_per_metricton'],
-                        n2o_domestic_cost_factor_70 = df.loc[i, 'n2o_interimdomestic_7.0_USD_per_metricton'],
-                        co2_global_cost_factor_25 = df.loc[i, 'co2_global_2.5_USD_per_metricton'],
-                        co2_global_cost_factor_30 = df.loc[i, 'co2_global_3.0_USD_per_metricton'],
-                        co2_global_cost_factor_70 = df.loc[i, 'co2_global_7.0_USD_per_metricton'],
-                        ch4_global_cost_factor_25 = df.loc[i, 'ch4_global_2.5_USD_per_metricton'],
-                        ch4_global_cost_factor_30 = df.loc[i, 'ch4_global_3.0_USD_per_metricton'],
-                        ch4_global_cost_factor_70 = df.loc[i, 'ch4_global_7.0_USD_per_metricton'],
-                        n2o_global_cost_factor_25 = df.loc[i, 'n2o_global_2.5_USD_per_metricton'],
-                        n2o_global_cost_factor_30 = df.loc[i, 'n2o_global_3.0_USD_per_metricton'],
-                        n2o_global_cost_factor_70 = df.loc[i, 'n2o_global_7.0_USD_per_metricton'],
+                        co2_global_5 = df.loc[i, 'co2_global_5.0_USD_per_metricton'],
+                        co2_global_3 = df.loc[i, 'co2_global_3.0_USD_per_metricton'],
+                        co2_global_25 = df.loc[i, 'co2_global_2.5_USD_per_metricton'],
+                        co2_global_395 = df.loc[i, 'co2_global_3.95_USD_per_metricton'],
+                        ch4_global_5 = df.loc[i, 'ch4_global_5.0_USD_per_metricton'],
+                        ch4_global_3 = df.loc[i, 'ch4_global_3.0_USD_per_metricton'],
+                        ch4_global_25 = df.loc[i, 'ch4_global_2.5_USD_per_metricton'],
+                        ch4_global_395 = df.loc[i, 'ch4_global_3.95_USD_per_metricton'],
+                        n2o_global_5 = df.loc[i, 'n2o_global_5.0_USD_per_metricton'],
+                        n2o_global_3 = df.loc[i, 'n2o_global_3.0_USD_per_metricton'],
+                        n2o_global_25 = df.loc[i, 'n2o_global_2.5_USD_per_metricton'],
+                        n2o_global_395 = df.loc[i, 'n2o_global_3.95_USD_per_metricton'],
                     ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                common.omega_globals.session.add_all(obj_list)
+                common.omega_globals.session.flush()
 
         return template_errors
 
@@ -168,20 +175,20 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
+        common.omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        SQABase.metadata.create_all(common.omega_globals.engine)
 
         init_fail = []
 
-        init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
-                                                            verbose=omega_globals.options.verbose)
+        init_fail += CostFactorsSCC.init_database_from_file(common.omega_globals.options.scc_cost_factors_file,
+                                                            verbose=common.omega_globals.options.verbose)
 
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            dump_omega_db_to_csv(common.omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

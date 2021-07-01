@@ -14,6 +14,7 @@ main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gatherin
 # working_directory = 'C:/Users/slee02/Documents/Python/outputs/'
 
 run_folder = str(input('Enter Run Folder Name: '))
+os.listdir(main_path + '\\' + run_folder)
 run_controller = pd.read_csv(main_path + '\\' + run_folder + '\\' + 'VehghgID Run Controller.csv')
 # run_controller = pd.read_csv('VehghgID Run Controller.csv')
 for run_count in range (0,len(run_controller)):
@@ -48,19 +49,6 @@ for run_count in range (0,len(run_controller)):
     for i in range (len(drivecycle_filename)):
         tmp_drivecycle_filename = drivecycle_filename[i].strip(" '")
         drivecycle_filenames.append(tmp_drivecycle_filename)
-
-        # tmp_drivecycle = pd.read_csv(dynamometer_drive_schedules + tmp_drivecycle_filename, encoding="ISO-8859-1", skiprows=1)  # EVCIS Qlik Sense query results contain hyphens for nan
-        # if 'ftp' in tmp_drivecycle_filename:
-        #     ftp_drivecycle = tmp_drivecycle
-        #     drivecycles['cycle'].append(tmp_drivecycle_filename)
-        #     drivecycles['time_s'].append(ftp_drivecycle['seconds'])
-        #     drivecycles['mph'].append(ftp_drivecycle['mph'])
-        # elif 'hwy' in tmp_drivecycle_filename:
-        #     hwfet_drivecycle = tmp_drivecycle
-        # elif 'us06' in tmp_drivecycle_filename:
-        #     us06_drivecycle = tmp_drivecycle
-        # elif 'udds' in tmp_drivecycle_filename:
-        #     udds_drivecycle = tmp_drivecycle
 
     drivecycle_input_filenames = str(run_controller['Drive Cycle Input Names'][run_count])
     drivecycle_input_filenames = drivecycle_input_filenames.strip('{ }')

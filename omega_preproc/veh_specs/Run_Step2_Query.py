@@ -158,10 +158,33 @@ for model_year in model_years:
     master_index_filename = data_sources_df['SourceFile'][data_sources_df['SourceFile'][ \
         (data_sources_df['SourceName'] == master_index_source) & \
         (data_sources_df['MY'] == model_year)].index[0]]
-    master_index_file = pd.read_csv(master_index_filepath + '\\' + master_index_filename, \
-        encoding="ISO-8859-1", converters={'LineageID': int, 'BodyID': int, 'MODEL_YEAR': int,'Vehghg_ID': int, 'CabinID': float}).astype(str)
+    master_index_file = pd.read_csv(master_index_filepath + '\\' + master_index_filename, encoding="ISO-8859-1", \
+                                    converters={'LineageID': int, 'BodyID': int, 'MODEL_YEAR': int,'Vehghg_ID': int, 'CabinID': float}).astype(str)
     try:
         master_index_file['CabinID'] = master_index_file['CabinID'].astype(float).astype(int).astype(str)
+        SS_LD_CARLINE_HEADER_ID = master_index_file['SS_LD_CARLINE_HEADER_ID']
+        LD_CARLINE_HEADER_ID = master_index_file['LD_CARLINE_HEADER_ID']
+        PRODUCTION_VOLUME_GHG_50_STATE = master_index_file['PRODUCTION_VOLUME_GHG_50_STATE']
+        FINAL_MODEL_YR_GHG_PROD_UNITS = master_index_file.FINAL_MODEL_YR_GHG_PROD_UNITS
+        CAFE_MFR_CD = master_index_file.CAFE_MFR_CD
+        ghg_index_categories = ['CAFE_MFR_CD', 'FINAL_MODEL_YR_GHG_PROD_UNITS', 'PRODUCTION_VOLUME_GHG_50_STATE']
+        model_yr_ghg_prod_unit = master_index_file[['CAFE_MFR_CD', 'LD_CARLINE_HEADER_ID', 'SS_LD_CARLINE_HEADER_ID', 'FINAL_MODEL_YR_GHG_PROD_UNITS', 'PRODUCTION_VOLUME_GHG_50_STATE']] \
+            .groupby(list(ghg_index_categories)).sum().reset_index()
+        asx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'ASX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        bmx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'BMX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        crx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'CRX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        fmx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'FMX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        gmx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'GMX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        max_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'MAX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        mbx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'MBX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        nsx_vol = model_yr_ghg_prod_unit.loc[(model_yr_ghg_prod_unit['CAFE_MFR_CD'] == 'NSX') & (model_yr_ghg_prod_unit['LD_CARLINE_HEADER_ID'] == model_yr_ghg_prod_unit['SS_LD_CARLINE_HEADER_ID']), 'FINAL_MODEL_YR_GHG_PROD_UNITS'].astype(float).sum()
+        maker_model_yr_ghg_prod_unit['PRODUCTION_VOLUME_GHG_50_STATE'] = maker_model_yr_ghg_prod_unit['PRODUCTION_VOLUME_GHG_50_STATE'].astype(float)
+        maker_model_yr_ghg_prod_unit = master_index_file[['CAFE_MFR_CD',  'FINAL_MODEL_YR_GHG_PROD_UNITS', 'PRODUCTION_VOLUME_GHG_50_STATE']] \
+            .groupby(['CAFE_MFR_CD']).sum().reset_index()
+        maker_model_yr_ghg_prod_unit = master_index_file.loc[
+                                       master_index_file['LD_CARLINE_HEADER_ID'] == master_index_file[
+                                           'SS_LD_CARLINE_HEADER_ID'], :]
+        grp_model_yr_ghg_prod_unit = maker_model_yr_ghg_prod_unit[list(ghg_index_categories)].groupby(['CAFE_MFR_CD']).sum().reset_index()
     except KeyError:
         pass
     try:
