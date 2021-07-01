@@ -59,18 +59,11 @@ def get_demanded_shares(market_class_data, calendar_year):
                 recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
                                                                     'refuel_efficiency')
 
-                if market_class_id == 'non_hauling.BEV':
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
-                    annual_o_m_costs = gcam_data_cy.o_m_costs
-                elif market_class_id == 'hauling.BEV':
-                    fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
-                    annual_o_m_costs = gcam_data_cy.o_m_costs
-                elif market_class_id == 'non_hauling.ICE':
-                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline / refuel_efficiency
-                    annual_o_m_costs = gcam_data_cy.o_m_costs
-                elif market_class_id == 'hauling.ICE':
-                    fuel_cost_per_VMT = fuel_cost * average_co2_gpmi / carbon_intensity_gasoline / refuel_efficiency
-                    annual_o_m_costs = gcam_data_cy.o_m_costs
+                annual_o_m_costs = gcam_data_cy.o_m_costs
+
+                # TODO: will eventually need utility factor for PHEVs here
+                fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
+                fuel_cost_per_VMT += fuel_cost * average_co2_gpmi / carbon_intensity_gasoline / refuel_efficiency
 
                 # consumer_generalized_cost_dollars = total_capital_costs
                 annualized_capital_costs = annualization_factor * total_capital_costs
@@ -83,10 +76,6 @@ def get_demanded_shares(market_class_data, calendar_year):
                         total_cost_w_fuel_per_PMT ** logit_exponent_mu)
 
                 market_class_data['consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
-
-                # plt.figure()
-                # plt.plot(total_cost_w_fuel_per_PMT)
-                # plt.title('%s total_cost_w_fuel_per_PMT' % market_class_id)
 
                 if 'non_hauling' in market_class_id.split('.'):
                     sales_share_denominator_all_nonhauling += sales_share_numerator[market_class_id]
