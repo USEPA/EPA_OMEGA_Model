@@ -36,6 +36,8 @@ for run_count in range (0,len(run_controller)):
     vehghg_filename = str(run_controller['VehghgID Filename'][run_count])
     model_type_filename = str(run_controller['Model Type Filename'][run_count])
     model_type_exceptions_table_filename = str(run_controller['Model Type File Exceptions Table filename'][run_count])
+    subconfig_MY_exceptions_table_filename = str(run_controller['Subconfig Model Year File Exceptions Table filename'][run_count])
+    subconfig_sales_exceptions_table_filename = str(run_controller['Subconfig Sales File Exceptions Table filename'][run_count])
     footprint_exceptions_table_filename = str(run_controller['Footprint File Exceptions Table filename'][run_count])
     roadload_coefficient_table_filename = str(run_controller['Roadload Coefficient Table Filename'][run_count])
     test_car_filename_path = str(run_controller['Test Car File Path'][run_count])
@@ -66,18 +68,23 @@ for run_count in range (0,len(run_controller)):
         if 'HWY' in drivecycle_output_filenames[i].strip("'"): drivecycle_output_filenames[i] = 'HWY'
         if 'US06' in drivecycle_output_filenames[i].strip("'"): drivecycle_output_filenames[i] = 'US06'
 
-    footprint_exceptions_table = pd.read_csv(input_path+'\\'+footprint_exceptions_table_filename)
+    footprint_exceptions_table = pd.read_csv(input_path+'\\'+ footprint_exceptions_table_filename) #, converters={'Column Name': eval, 'Old Value': eval, 'New Value': eval})
     print(model_year)
     if bool_run_new_manual_filter == 'n' and model_type_exceptions_table_filename != 'N':
-        modeltype_exceptions_table = pd.read_csv(input_path+'\\'+model_type_exceptions_table_filename)
+        modeltype_exceptions_table = pd.read_csv(input_path+'\\'+ model_type_exceptions_table_filename)
+        subconfig_MY_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_MY_exceptions_table_filename)
+        subconfig_sales_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_sales_exceptions_table_filename)
     else:
         modeltype_exceptions_table = 'N'
+        subconfig_MY_exceptions_table = 'N'
+        subconfig_sales_exceptions_table = 'N'
+
     if bool_run_new_vehghgid == 'y':
         import Subconfig_ModelType_Footprint_Bodyid_Expansion
         Subconfig_ModelType_Footprint_Bodyid_Expansion.Subconfig_ModelType_Footprint_Bodyid_Expansion\
             (input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
-             bool_run_new_manual_filter, manual_filter_filename, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path_vehghgid, \
-             footprint_exceptions_table, modeltype_exceptions_table, model_year, roadload_coefficient_table_filename, set_bodyid_to_lineageid,  \
+             bool_run_new_manual_filter, manual_filter_filename, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path_vehghgid, footprint_exceptions_table, \
+             modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, model_year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
              drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, test_car_filename_path, set_roadload_coefficient_table_filename)
         # import Subconfig_Expansion
         # Subconfig_Expansion.Subconfig_Expansion(input_path, subconfig_filename, output_path_intermediate, \

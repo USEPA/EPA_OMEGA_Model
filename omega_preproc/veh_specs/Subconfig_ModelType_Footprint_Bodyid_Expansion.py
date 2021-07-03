@@ -2,18 +2,60 @@ import pandas as pd
 import datetime
 import numpy as np
 
+def file_errta_update(footprintSubconfigMY_file, errta_table, Column_Name, Old_Value, New_Value, MODEL_YEAR, CAFE_ID, MFR_DIVISION_NM, MFR_DIVISION_CD, MFR_CARLINE_CD, footprintSubconfig_INDEX):
+    errta_table.loc[pd.isnull(errta_table[Old_Value]), Old_Value] = ''
+    errta_table.loc[pd.isnull(errta_table[New_Value]), New_Value] = ''
+    for error_check_count in range(0, len(errta_table)):
+        if error_check_count == 35:
+            print(error_check_count)
+        if ('[' and ']') in errta_table[Column_Name][error_check_count]:
+            _column_name_list = eval(errta_table[Column_Name][error_check_count])
+            _old_value_list = eval(errta_table[Old_Value][error_check_count])
+            _new_value_list = eval(errta_table[New_Value][error_check_count])
+        else:
+            _column_name_list = _column_name = errta_table[Column_Name][error_check_count]
+            # _old_value_list = errta_table[Old_Value][error_check_count]
+            # _new_value_list = errta_table[New_Value][error_check_count]
+        _num_column_name_list = 1
+        if isinstance(_column_name_list, list): _num_column_name_list = len(_column_name_list)
+            # _column_name_list = [elem.strip().split("',") for elem in _column_name_list]
+        for i in range(_num_column_name_list):
+            if _num_column_name_list > 1:
+                errta_table.loc[error_check_count, Column_Name] = _column_name = _column_name_list[i]
+                errta_table.loc[error_check_count, Old_Value] = _old_value_list[i]
+                errta_table.loc[error_check_count, New_Value] = _new_value_list[i]
+                # _column_name = str(_column_name_list[i]).strip("[]'")
+            _column_name_isnull_list = pd.Series(pd.isnull(footprintSubconfigMY_file[errta_table.loc[error_check_count, Column_Name]]), name = _column_name)
+            if sum(_column_name_isnull_list) > 0: footprintSubconfigMY_file.loc[_column_name_isnull_list, _column_name] = ''
 
-def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filename, footprint_lineage_filename,
-                                                      bodyid_filename, \
-                                                      bool_run_new_manual_filter, manual_filter_name,
-                                                      expanded_footprint_filename, \
-                                                      subconfig_filename, model_type_filename, vehghg_filename,
-                                                      output_path, \
-                                                      footprint_exceptions_table, modeltype_exceptions_table, year,
-                                                      roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
-                                                      drivecycle_filenames, drivecycle_input_filenames,
-                                                      drivecycle_output_filenames, test_car_filename_path,
-                                                      set_roadload_coefficient_table_filename):
+            if errta_table['Numeric (y/n)'][error_check_count] == 'y':
+                footprintSubconfigMY_file.loc[
+                    (footprintSubconfigMY_file[MODEL_YEAR] == errta_table[MODEL_YEAR][error_check_count]) & \
+                    (footprintSubconfigMY_file[CAFE_ID] == errta_table[CAFE_ID][error_check_count]) & \
+                    (footprintSubconfigMY_file[MFR_DIVISION_NM] == errta_table[MFR_DIVISION_NM][ error_check_count]) & \
+                    (footprintSubconfigMY_file[MFR_DIVISION_CD] == errta_table[MFR_DIVISION_CD][error_check_count]) & \
+                    (footprintSubconfigMY_file[MFR_CARLINE_CD] == errta_table[MFR_CARLINE_CD][error_check_count]) & \
+                    (footprintSubconfigMY_file[footprintSubconfig_INDEX] == errta_table[footprintSubconfig_INDEX][error_check_count]) & \
+                    (footprintSubconfigMY_file[errta_table.loc[error_check_count, Column_Name]] == float(errta_table[Old_Value][error_check_count])), \
+                    errta_table.loc[error_check_count, Column_Name]] = errta_table[New_Value][error_check_count]
+            else:
+                footprintSubconfigMY_file.loc[
+                    (footprintSubconfigMY_file[MODEL_YEAR] == errta_table[MODEL_YEAR][error_check_count]) & \
+                    (footprintSubconfigMY_file[CAFE_ID] == errta_table[CAFE_ID][error_check_count]) & \
+                    (footprintSubconfigMY_file[MFR_DIVISION_NM] == errta_table[MFR_DIVISION_NM][error_check_count]) & \
+                    (footprintSubconfigMY_file[MFR_DIVISION_CD] == errta_table[MFR_DIVISION_CD][error_check_count]) & \
+                    (footprintSubconfigMY_file[MFR_CARLINE_CD] == errta_table[MFR_CARLINE_CD][error_check_count]) & \
+                    (footprintSubconfigMY_file[footprintSubconfig_INDEX] == errta_table[footprintSubconfig_INDEX][error_check_count]) & \
+                    (footprintSubconfigMY_file[errta_table.loc[error_check_count, Column_Name]] == errta_table[Old_Value][error_check_count]), \
+                    errta_table.loc[error_check_count, Column_Name]] = errta_table[New_Value][error_check_count]
+
+    return footprintSubconfigMY_file
+
+def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filename, footprint_lineage_filename, bodyid_filename, \
+                                                   bool_run_new_manual_filter, manual_filter_name, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path, \
+                                                   footprint_exceptions_table, modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, \
+                                                   year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
+                                                   drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, test_car_filename_path, set_roadload_coefficient_table_filename):
     footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
     lineage_file = pd.read_csv(input_path + '\\' + footprint_lineage_filename, encoding="ISO-8859-1")
     # body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
@@ -26,8 +68,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
         ~body_id_table_int['BodyID EndYear'].astype(str).str.contains('null')].reset_index(drop=True)
     body_id_int_not_null_endyear['BodyID EndYear'] = body_id_int_not_null_endyear['BodyID EndYear'].astype(float)
     body_id_table = pd.concat([body_id_int_not_null_endyear[body_id_int_not_null_endyear['BodyID EndYear'] >= year], \
-                               body_id_table_int[
-                                   body_id_table_int['BodyID EndYear'].astype(str).str.contains('null')]]).reset_index(drop=True)
+                               body_id_table_int[body_id_table_int['BodyID EndYear'].astype(str).str.contains('null')]]).reset_index(drop=True)
     body_id_table['LineageID'] = body_id_table['LineageID'].astype(int)
     body_id_table['BodyID'] = body_id_table['BodyID'].astype(int)
 
@@ -37,52 +78,19 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
     CAFE_ID_not_matched = []
     for i in range(len(footprint_file['FOOTPRINT_DIVISION_NM'])):
         for j in range(len(lineage_file['FOOTPRINT_DIVISION_NM'])):
-            if (footprint_file['FOOTPRINT_DIVISION_NM'][i] == lineage_file['FOOTPRINT_DIVISION_NM'][j]) and (
-                    footprint_file['FOOTPRINT_CARLINE_NM'][i] == lineage_file['FOOTPRINT_CARLINE_NM'][j]) and \
-                    (footprint_file['CAFE_ID'][i] != lineage_file['CAFE_ID'][j]):
-                CAFE_ID_not_matched.append(
-                    [footprint_file['FOOTPRINT_DIVISION_NM'][i], footprint_file['FOOTPRINT_CARLINE_NM'][i],
-                     footprint_file['CAFE_ID'][i], lineage_file['CAFE_ID'][j]])
-                # lineage_file['CAFE_ID'][j] = footprint_file['CAFE_ID'][i]
+            if (footprint_file['FOOTPRINT_DIVISION_NM'][i] == lineage_file['FOOTPRINT_DIVISION_NM'][j]) and \
+                    (footprint_file['FOOTPRINT_CARLINE_NM'][i] == lineage_file['FOOTPRINT_CARLINE_NM'][j]) and (footprint_file['CAFE_ID'][i] != lineage_file['CAFE_ID'][j]):
+                CAFE_ID_not_matched.append([footprint_file.loc[i, 'MODEL_YEAR'], footprint_file.loc[i, 'FOOTPRINT_DIVISION_NM'], footprint_file.loc[i, 'FOOTPRINT_CARLINE_NM'], footprint_file.loc[i, 'FOOTPRINT_INDEX'], \
+                     footprint_file.loc[i, 'CAFE_ID'], lineage_file.loc[j, 'CAFE_ID']])
+                lineage_file.loc[j, 'CAFE_ID'] = footprint_file.loc[i, 'CAFE_ID']
     if len(CAFE_ID_not_matched) > 0:
-        df_CAFE_ID_not_matched = pd.DataFrame(CAFE_ID_not_matched,
-                                              columns=['FOOTPRINT_DIVISION_NM', 'FOOTPRINT_CARLINE_NM',
-                                                       'footprint_file_CAFE_ID', 'lineage_file_CAFE_ID'])
-        df_CAFE_ID_not_matched.to_csv(output_path + '\\' + 'CAFE_ID_not_matched.csv', index=False)
+        df_CAFE_ID_not_matched = pd.DataFrame(CAFE_ID_not_matched, columns=['MODEL_YEAR', 'FOOTPRINT_DIVISION_NM', 'FOOTPRINT_CARLINE_NM', 'FOOTPRINT_INDEX', 'Footprint_MY_CAFE_ID', 'footprint-lineageid_CAFE_ID'])
+        df_CAFE_ID_not_matched.to_csv(output_path + '\\' + 'CAFE_ID_lineageid_not_eq_Footprint_MY.csv', index=False)
 
-    for error_check_count in range(0, len(footprint_exceptions_table)):
-        if footprint_exceptions_table['Numeric (y/n)'][error_check_count] == 'y':
-            footprint_file.loc[
-                (footprint_file['MODEL_YEAR'] == footprint_exceptions_table['MODEL_YEAR'][error_check_count]) & \
-                (footprint_file['CAFE_ID'] == footprint_exceptions_table['CAFE_ID'][error_check_count]) & \
-                (footprint_file['FOOTPRINT_DIVISION_NM'] == footprint_exceptions_table['FOOTPRINT_DIVISION_NM'][
-                    error_check_count]) & \
-                (footprint_file['FOOTPRINT_DIVISION_CD'] == footprint_exceptions_table['FOOTPRINT_DIVISION_CD'][
-                    error_check_count]) & \
-                (footprint_file['FOOTPRINT_CARLINE_CD'] == footprint_exceptions_table['FOOTPRINT_CARLINE_CD'][
-                    error_check_count]) & \
-                (footprint_file['FOOTPRINT_INDEX'] == footprint_exceptions_table['FOOTPRINT_INDEX'][
-                    error_check_count]) & \
-                (footprint_file[footprint_exceptions_table['Column Name'][error_check_count]] == float(
-                    footprint_exceptions_table['Old Value'][error_check_count])), \
-                footprint_exceptions_table['Column Name'][error_check_count]] = \
-                footprint_exceptions_table['New Value'][error_check_count]
-        else:
-            footprint_file.loc[
-                (footprint_file['MODEL_YEAR'] == footprint_exceptions_table['MODEL_YEAR'][error_check_count]) & \
-                (footprint_file['CAFE_ID'] == footprint_exceptions_table['CAFE_ID'][error_check_count]) & \
-                (footprint_file['FOOTPRINT_DIVISION_NM'] == footprint_exceptions_table['FOOTPRINT_DIVISION_NM'][
-                    error_check_count]) & \
-                (footprint_file['FOOTPRINT_DIVISION_CD'] == footprint_exceptions_table['FOOTPRINT_DIVISION_CD'][
-                    error_check_count]) & \
-                (footprint_file['FOOTPRINT_CARLINE_CD'] == footprint_exceptions_table['FOOTPRINT_CARLINE_CD'][
-                    error_check_count]) & \
-                (footprint_file['FOOTPRINT_INDEX'] == footprint_exceptions_table['FOOTPRINT_INDEX'][
-                    error_check_count]) & \
-                (footprint_file[footprint_exceptions_table['Column Name'][error_check_count]] ==
-                 footprint_exceptions_table['Old Value'][error_check_count]), \
-                footprint_exceptions_table['Column Name'][error_check_count]] = \
-                footprint_exceptions_table['New Value'][error_check_count]
+    if len(footprint_exceptions_table) > 0:
+        footprint_file = file_errta_update(footprint_file, footprint_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR', 'CAFE_ID', 'FOOTPRINT_DIVISION_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_INDEX')
+        footprint_file.to_csv(output_path+'\\'+'Corrected_Footprint_MY_file.csv', index=False)
+
     footprint_id_categories = ['MODEL_YEAR', 'FOOTPRINT_INDEX', 'CAFE_ID', 'FOOTPRINT_CARLINE_CD',
                                'FOOTPRINT_CARLINE_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_DIVISION_NM']
     footprint_filter_table = footprint_file[
@@ -90,7 +98,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
         lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
     footprint_file_with_lineage = footprint_file.merge(lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
     footprint_file_with_lineage_volumes = footprint_file_with_lineage['PROD_VOL_GHG_STD_50_STATE'].replace(np.nan, 0).reset_index(drop=True)
-
+    footprint_file_with_lineage.to_csv(output_path + '\\' + 'footprint_file_with_lineage.csv', index=False)
     full_expanded_footprint_filter_table = footprint_filter_table.merge(body_id_table, how='left', on='LineageID')
     full_expanded_footprint_file = footprint_file_with_lineage.merge(body_id_table, how='left', on='LineageID')
     try:
@@ -121,30 +129,19 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
             subconfig_indexing_categories = ['MFR_DIVISION_NM', 'MODEL_TYPE_INDEX', 'SS_ENGINE_FAMILY', 'CARLINE_CODE', 'LDFE_CAFE_ID', 'BASE_LEVEL_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX']
             modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CARLINE_MFR_CODE', 'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME']
 
-            if type(modeltype_exceptions_table) != str:
-                for error_check_count in range(0, len(modeltype_exceptions_table)):
-                    if modeltype_exceptions_table['Numeric (y/n)'][error_check_count] == 'y':
-                        model_type_file.loc[(model_type_file['CARLINE_NAME'] ==
-                                             modeltype_exceptions_table['CARLINE_NAME'][error_check_count]) & \
-                                            (model_type_file['MODEL_TYPE_INDEX'] ==
-                                             modeltype_exceptions_table['MODEL_TYPE_INDEX'][error_check_count]) & \
-                                            (model_type_file[
-                                                 modeltype_exceptions_table['Column Name'][error_check_count]] == float(
-                                                modeltype_exceptions_table['Old Value'][error_check_count])), \
-                                            modeltype_exceptions_table['Column Name'][error_check_count]] = \
-                            modeltype_exceptions_table['New Value'][error_check_count]
-                    else:
-                        model_type_file.loc[(model_type_file['CARLINE_NAME'] ==
-                                             modeltype_exceptions_table['CARLINE_NAME'][error_check_count]) & \
-                                            (model_type_file['MODEL_TYPE_INDEX'] ==
-                                             modeltype_exceptions_table['MODEL_TYPE_INDEX'][error_check_count]) & \
-                                            (model_type_file[
-                                                 modeltype_exceptions_table['Column Name'][error_check_count]] ==
-                                             modeltype_exceptions_table['Old Value'][error_check_count]), \
-                                            modeltype_exceptions_table['Column Name'][error_check_count]] = \
-                            modeltype_exceptions_table['New Value'][error_check_count]
-            model_type_file['CALC_ID'] = model_type_file['CALC_ID'].astype(int)
-            # model_type_file.to_csv(output_path+'\\'+'Corrected Model Type File.csv', index=False)
+            if len(modeltype_exceptions_table) > 0:
+                model_type_file = file_errta_update(model_type_file, modeltype_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'CAFE_MODEL_YEAR', 'CAFE_ID', 'MODEL_TYPE_INDEX', \
+                                                    'MFR_DIVISION_NM', 'CARLINE_NAME', 'CAFE_MODEL_YEAR')
+                model_type_file['CALC_ID'] = model_type_file['CALC_ID'].astype(int)
+                model_type_file.to_csv(output_path+'\\'+'Corrected_CAFE_Model_Type_MY_file.csv', index=False)
+
+            if len(subconfig_sales_exceptions_table) > 0:
+                subconfig_file = file_errta_update(subconfig_file, subconfig_sales_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR', 'LDFE_CAFE_ID', 'MODEL_TYPE_INDEX', \
+                                                   'MFR_DIVISION_SHORT_NM', 'CARLINE_NAME', 'MODEL_YEAR')
+
+            subconfig_file['LDFE_CAFE_MODEL_TYPE_CALC_ID'] = subconfig_file['LDFE_CAFE_MODEL_TYPE_CALC_ID'].astype(int)
+            subconfig_file.to_csv(output_path+'\\'+'Corrected_CAFE_Subconfig_Sales_MY_file.csv', index=False)
+
             vehghg_file_data_pt1 = subconfig_file.merge(full_expanded_footprint_file, how='left', \
                                                         left_on=['MODEL_YEAR', 'CARLINE_CODE', 'CAFE_MFR_CD', 'MFR_DIVISION_NM'], \
                                                         right_on=['MODEL_YEAR', 'FOOTPRINT_CARLINE_CD', 'CAFE_MFR_CD', 'FOOTPRINT_DIVISION_NM'])
@@ -264,10 +261,15 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                  'PROD_VOL_GHG_STD_50_STATE'], axis=1).columns)
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
 
-            roadload_coefficient_table = pd.read_csv(input_path + '\\' + roadload_coefficient_table_filename,
-                                                     encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
-            roadload_coefficient_table = roadload_coefficient_table[roadload_coefficient_table['MODEL_YEAR'] == year] \
-                .groupby(['LDFE_CAFE_SUBCONFIG_INFO_ID', 'TARGET_COEF_A', 'TARGET_COEF_B', 'TARGET_COEF_C', \
+            roadload_coefficient_table = pd.read_csv(input_path + '\\' + roadload_coefficient_table_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
+
+            if len(subconfig_MY_exceptions_table) > 0:
+                roadload_coefficient_table = file_errta_update(roadload_coefficient_table, subconfig_MY_exceptions_table, 'Column Name', 'Old Value', 'New Value', 'MODEL_YEAR', 'LDFE_CAFE_ID', 'MODEL_TYPE_INDEX', \
+                                                               'MFR_DIVISION_SHORT_NM', 'CARLINE_NAME', 'MODEL_YEAR')
+                roadload_coefficient_table['LDFE_CAFE_MODEL_TYPE_CALC_ID'] = roadload_coefficient_table['LDFE_CAFE_MODEL_TYPE_CALC_ID'].astype(int)
+                roadload_coefficient_table.to_csv(output_path+'\\'+'Corrected_CAFE_Subconfig_MY_file.csv', index=False)
+
+            roadload_coefficient_table = roadload_coefficient_table[roadload_coefficient_table['MODEL_YEAR'] == year].groupby(['LDFE_CAFE_SUBCONFIG_INFO_ID', 'TARGET_COEF_A', 'TARGET_COEF_B', 'TARGET_COEF_C', \
                           'FUEL_NET_HEATING_VALUE', 'FUEL_GRAVITY']).first().reset_index().drop('MODEL_YEAR', axis=1).reset_index(drop=True)
             roadload_coefficient_table_indexing_categories = ['LDFE_CAFE_SUBCONFIG_INFO_ID', 'LDFE_CAFE_ID',
                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'CAFE_MFR_CD', \
@@ -296,6 +298,8 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(input_path, footprint_filenam
                                                                     left_on=['CAFE_MFR_CD', 'TEST_NUMBER', 'TEST_PROC_CATEGORY'],
                                                                     right_on=['Veh Mfr Code', 'Test Number', 'Test Category'])
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.loc[:, ~vehghg_file_nonflexfuel.columns.duplicated()]
+            vehghg_file_nonflexfuel.loc[(vehghg_file_nonflexfuel['CO2 (g/mi)'] > 0) & ((vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_GHG_1'] == 0) | \
+               (~pd.isnull(vehghg_file_nonflexfuel['EPA_CAFE_MT_CALC_COMB_GHG_1']))), 'EPA_CAFE_MT_CALC_COMB_GHG_1'] = vehghg_file_nonflexfuel['CO2 (g/mi)']
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
 
             vehghg_file_nonflexfuel['NV_RATIO'].replace(['nan', np.nan, ''], 0, inplace=True)
