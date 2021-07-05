@@ -6,10 +6,44 @@ Model Architecture and Algorithms
 
 Modules
 ^^^^^^^
+[add footnote about terminology, that in the implementation, these are called packages]
+Policy Module
+----------------------
+As primarily a tool for regulatory analyses, OMEGA is designed to have the flexibility to model a range of policy structures. Policy inputs define the alternatives being evaluated, as well as any policies that are not being evaluated directly, but are nevertheless important to include in the analysis context, such as any significant state-level policies which might influence producer and/or consumer decisions. Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards and rules for the accounting of compliance credits, and those that specify a required share of a specific technology. Other policies that are not applied directly to the producer as a regulated entity would be reflected in the analysis context. 
+•	Policy Alternatives Involving Fleet Average Emissions Standards
+The modeling of producer decisions to meet fleet average emissions standards requires the determination of an emissions target and the achieved compliance emissions for each vehicle produced. The difference between the target and achieved compliance emissions in absolute terms (e.g. Mg CO2) is referred to as a ‘credit’, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy. OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the total achieved compliance value. When emissions values are presented on a per-vehicle basis, this is known as ‘averaging.’ The transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a single producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers. 
+
+Emissions standards are defined in OMEGA using a range of policy elements, including:
+	* rules for the accounting of upstream emissions
+	* definition of compliance incentives, like multipliers
+	* definition of regulatory classes
+	* definition of attribute-based target function
+	* definition of the vehicles’ assumed lifetime miles
+
+* Policy Alternatives Requiring Specific Technologies 
+This type of policy requires all, or a portion, of producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with an fleet averaging emissions standard; for example, a minimum ZEV share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
+* Policy Representation in the Analysis Context
+Some policies are not modeled in OMEGA as policy alternatives, either because the policy is not aimed directly at the producer as a regulated entity, or because the particular OMEGA analysis is not attempting to evaluate the impact of that policy relative to other alternatives. Still, it is important that the Analysis Context inputs are able to reflect any policies that might significantly influence the producer or consumer decisions. Some examples include:
+	* Fuel tax policy
+	* State and local ZEV policies
+	* Vehicle purchase incentives
+	* Investment in refueling and charging infrastructure
+	* Accelerated vehicle retirement incentives
+
+
 
 Producer Module
 ------------------------
-Algorithm descriptions, code snippets, equations, etc
+The modeling of producer decisions is a core function of OMEGA, and is based on minimizing their generalized costs, subject to the constraints of regulatory compliance and consumer demand. The ‘producer’ defined in the OMEGA encompasses both the broader meaning as a supplier of a transportation good or service to the market, and in the narrower sense as the regulated entity subject to EPA policies.
+
+* Inputs and Outputs of the Producer Module
+    * Policy Alternative inputs are used to calculate a compliance target for the producer, in Mg CO2 for a given analysis year, using the provided attribute-based standards curve, vehicle regulatory class definitions, and assumed VMT for compliance. Other policy inputs may define, for example, the credit lifetime for carry-forward and carry-back, or a floor on the minimum share of ZEV vehicles produced.
+    * Context inputs and assumptions that the Producer Module uses define all factors, apart from the policies under evaluation, that influence the modeled producer decisions. Key factors include the vehicle costs and emissions for the technologies and vehicle attributes considered, and the producer constraints on pricing strategy and cross-subsidization.
+
+* Inside the Producer Module
+    * OMEGA incorporates our assumption that producers make strategic decisions, looking beyond the immediate present to minimize generalized costs over a longer time horizon. The efficient management of compliance credits from year-to-year, in particular, involves a degree of look-ahead, both in terms of expected changes in regulatory stringency and other policies, and expected changes in generalized costs over time.
+    * The producer’s generalized cost is made up of both the monetary expenses of bringing a product to the consumer, and also the value that the producer expects can be recovered from consumers at the time of purchase. The assumption in OMEGA that producers will attempt to minimize their generalized costs is consistent with a producer goal of profit maximization, subject to any modeling constraints defined in the Consumer Module, such as limiting changes in sales volumes, sales mixes, or select vehicle attributes.
+
 
 Consumer Module
 ------------------------
@@ -94,11 +128,6 @@ Overall Model Equilibrium
    *  Cross subsidization logic keeps total new vehicle sales constant
    *  Cross subsidization clears the market for EV and ICE hauling and non-hauling shares
    *  There are 2 ways of doing the cross subsidization
-
-
-Policy Module
-----------------------
-Algorithm descriptions, code snippets, equations, etc
 
 Effects Module
 --------------
