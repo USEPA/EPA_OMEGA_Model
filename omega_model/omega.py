@@ -651,18 +651,9 @@ def init_omega(o2_options):
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
 
-    from policy.targets_flat import input_template_name as flat_template_name
-    from policy.targets_footprint import input_template_name as footprint_template_name
-    ghg_template_name = get_template_name(omega_globals.options.ghg_standards_file)
-
-    if ghg_template_name == flat_template_name:
-        from policy.targets_flat import TargetsFlat
-        omega_globals.options.GHG_standard = TargetsFlat
-    elif ghg_template_name == footprint_template_name:
-        from policy.targets_footprint import TargetsFootprint
-        omega_globals.options.GHG_standard = TargetsFootprint
-    else:
-        init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
+    import importlib
+    policy_module_name = get_template_name(omega_globals.options.policy_targets_input_file)
+    omega_globals.options.PolicyTargets = importlib.import_module(policy_module_name).Targets
 
     from policy.incentives import Incentives
     from policy.policy_fuels import PolicyFuel
@@ -712,8 +703,8 @@ def init_omega(o2_options):
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.GHG_standard.init_database_from_file(omega_globals.options.ghg_standards_file,
-                                                                                verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_input_file,
+                                                                        verbose=omega_globals.options.verbose)
 
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)

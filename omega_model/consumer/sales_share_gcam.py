@@ -109,11 +109,11 @@ if __name__ == '__main__':
         from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from consumer.demanded_shares_gcam import DemandedSharesGCAM
-        from policy.targets_footprint import TargetsFootprint
+        from policy.targets_footprint import Targets
         from context.cost_clouds import CostCloud
 
-        omega_globals.options.GHG_standard = TargetsFootprint
-        omega_globals.options.ghg_standards_file = 'test_inputs/ghg_standards-footprint.csv'
+        omega_globals.options.PolicyTargets = Targets
+        omega_globals.options.policy_targets_input_file = 'test_inputs/ghg_standards-footprint.csv'
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
 
@@ -128,8 +128,8 @@ if __name__ == '__main__':
                                                                 verbose=omega_globals.options.verbose)
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += TargetsFootprint.init_database_from_file(omega_globals.options.ghg_standards_file,
-                                                              verbose=omega_globals.options.verbose)
+        init_fail += Targets.init_from_file(omega_globals.options.policy_targets_input_file,
+                                            verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,

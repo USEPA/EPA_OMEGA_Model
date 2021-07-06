@@ -358,7 +358,7 @@ class CompositeVehicle(OMEGABase):
         self.normalized_cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                             'normalized_cert_target_co2_Mg')
 
-        self.normalized_cert_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(self, 1, 1)
+        self.normalized_cert_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(self, 1, 1)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -720,7 +720,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_grams_per_mile = omega_globals.options.GHG_standard.calc_target_co2_gpmi(self)
+        self.cert_target_co2_grams_per_mile = omega_globals.options.PolicyTargets.calc_target_co2_gpmi(self)
 
     def set_cert_target_co2_Mg(self):
         """
@@ -728,7 +728,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_Mg = omega_globals.options.GHG_standard.calc_target_co2_Mg(self)
+        self.cert_target_co2_Mg = omega_globals.options.PolicyTargets.calc_target_co2_Mg(self)
 
     def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
         """
@@ -783,7 +783,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_co2_Mg = omega_globals.options.GHG_standard.calc_cert_co2_Mg(self)
+        self.cert_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
         """
@@ -1137,7 +1137,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.reg_class_ID = omega_globals.options.GHG_standard.get_vehicle_reg_class(veh)
+                    veh.reg_class_ID = omega_globals.options.PolicyTargets.get_vehicle_reg_class(veh)
                     veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.cert_direct_co2_grams_per_mile = veh.cert_direct_oncycle_co2_grams_per_mile  # TODO: minus any credits??
@@ -1253,18 +1253,18 @@ if __name__ == '__main__':
         # from producer.vehicles import Vehicle
         from producer.vehicle_annual_data import VehicleAnnualData
 
-        from policy.targets_flat import input_template_name as flat_template_name
+        from policy.targets_alternative import input_template_name as flat_template_name
         from policy.targets_footprint import input_template_name as footprint_template_name
-        ghg_template_name = get_template_name(omega_globals.options.ghg_standards_file)
+        ghg_template_name = get_template_name(omega_globals.options.policy_targets_input_file)
 
         if ghg_template_name == flat_template_name:
-            from policy.targets_flat import TargetsFlat
+            from policy.targets_alternative import Targets
 
-            omega_globals.options.GHG_standard = TargetsFlat
+            omega_globals.options.PolicyTargets = Targets
         elif ghg_template_name == footprint_template_name:
-            from policy.targets_footprint import TargetsFootprint
+            from policy.targets_footprint import Targets
 
-            omega_globals.options.GHG_standard = TargetsFootprint
+            omega_globals.options.PolicyTargets = Targets
         else:
             init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
@@ -1285,8 +1285,8 @@ if __name__ == '__main__':
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.GHG_standard.init_database_from_file(omega_globals.options.ghg_standards_file,
-                                                                                verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_input_file,
+                                                                        verbose=omega_globals.options.verbose)
 
         init_fail += PolicyFuel.init_database_from_file(omega_globals.options.policy_fuels_file,
                                                         verbose=omega_globals.options.verbose)

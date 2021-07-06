@@ -1,4 +1,4 @@
-input_template_name:,ghg_standards-flat,input_template_version:,0.1
+input_template_name:,policy.targets_alternative,input_template_version:,0.11
 reg_class_id,start_year,ghg_target_co2_grams_per_mile,lifetime_vmt
 car,2020,210,195264
 car,2021,203.7,195264

@@ -311,7 +311,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.cost_file = self.read_parameter('Cost File')
-        self.settings.ghg_standards_file = self.read_parameter('GHG Standards File')
+        self.settings.policy_targets_input_file = self.read_parameter('GHG Standards File')
         self.settings.policy_fuels_file = self.read_parameter('GHG Standards Fuels File')
         self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
         self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')

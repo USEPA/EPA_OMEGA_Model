@@ -106,7 +106,8 @@ try:
             self.logfilename = ''
             self.producer_calc_generalized_cost = None
             self.consumer_calc_generalized_cost = None
-            self.ghg_standards_file = path + 'test_inputs/ghg_standards-footprint.csv'
+            self.policy_targets_input_file = path + 'test_inputs/ghg_standards-footprint.csv'
+            self.PolicyTargets = None
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
             self.ghg_credits_file = path + 'test_inputs/ghg_credits.csv'

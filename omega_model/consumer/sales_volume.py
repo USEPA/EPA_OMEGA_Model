@@ -116,18 +116,18 @@ if __name__ == '__main__':
         from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2
         from context.new_vehicle_market import NewVehicleMarket
 
-        from policy.targets_flat import input_template_name as flat_template_name
+        from policy.targets_alternative import input_template_name as flat_template_name
         from policy.targets_footprint import input_template_name as footprint_template_name
-        ghg_template_name = get_template_name(omega_globals.options.ghg_standards_file)
+        ghg_template_name = get_template_name(omega_globals.options.policy_targets_input_file)
 
         if ghg_template_name == flat_template_name:
-            from policy.targets_flat import TargetsFlat
+            from policy.targets_alternative import Targets
 
-            omega_globals.options.GHG_standard = TargetsFlat
+            omega_globals.options.PolicyTargets = Targets
         elif ghg_template_name == footprint_template_name:
-            from policy.targets_footprint import TargetsFootprint
+            from policy.targets_footprint import Targets
 
-            omega_globals.options.GHG_standard = TargetsFootprint
+            omega_globals.options.PolicyTargets = Targets
         else:
             init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
 
@@ -141,8 +141,8 @@ if __name__ == '__main__':
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.GHG_standard.init_database_from_file(omega_globals.options.ghg_standards_file,
-                                                                                verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_input_file,
+                                                                        verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.vehicle_onroad_calculations_file,
