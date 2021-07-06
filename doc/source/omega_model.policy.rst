@@ -65,10 +65,10 @@ omega\_model.policy.required\_zev\_share module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.policy.targets\_flat module
-----------------------------------------
+omega\_model.policy.targets\_alternative module
+-----------------------------------------------
 
-.. automodule:: omega_model.policy.targets_flat
+.. automodule:: omega_model.policy.targets_alternative
    :members:
    :undoc-members:
    :show-inheritance:

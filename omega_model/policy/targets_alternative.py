@@ -12,7 +12,7 @@ Primarily used for testing.
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.
+rows.  The header uses a dynamic format.
 
 The data represents a simple set of GHG standards (CO2 g/mi) by regulatory class and model year.
 
@@ -20,6 +20,9 @@ File Type
     comma-separated values (CSV)
 
 Template Header
+    input_template_name:, ``[module_name]``, input_template_version:, ``[template_version]``
+
+Sample Header
     .. csv-table::
 
        input_template_name:,policy.targets_alternative,input_template_version:,0.11
@@ -241,7 +244,7 @@ class Targets(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'policy.targets_alternative'
+        input_template_name = __name__
         input_template_version = 0.11
         input_template_columns = {'start_year', 'reg_class_id', 'ghg_target_co2_grams_per_mile', 'lifetime_vmt'}
 
