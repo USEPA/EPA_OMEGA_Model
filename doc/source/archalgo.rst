@@ -7,20 +7,32 @@ Model Architecture and Algorithms
 Modules
 ^^^^^^^
 [add footnote about terminology, that in the implementation, these are called packages]
+
+
+
 Policy Module
 ----------------------
-As primarily a tool for regulatory analyses, OMEGA is designed to have the flexibility to model a range of policy structures. Policy inputs define the alternatives being evaluated, as well as any policies that are not being evaluated directly, but are nevertheless important to include in the analysis context, such as any significant state-level policies which might influence producer and/or consumer decisions. Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards and rules for the accounting of compliance credits, and those that specify a required share of a specific technology. Other policies that are not applied directly to the producer as a regulated entity would be reflected in the analysis context. 
-•	Policy Alternatives Involving Fleet Average Emissions Standards
-The modeling of producer decisions to meet fleet average emissions standards requires the determination of an emissions target and the achieved compliance emissions for each vehicle produced. The difference between the target and achieved compliance emissions in absolute terms (e.g. Mg CO2) is referred to as a ‘credit’, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy. OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the total achieved compliance value. When emissions values are presented on a per-vehicle basis, this is known as ‘averaging.’ The transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a single producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers. 
+OMEGA's primary function is to help evaluate and compare policy alternatives. Because the alternatives to be considered may vary widely, and we cannot anticipate all possible policy elements in advance, OMEGA is designed to have the flexibility to model not only regulatory programs over a range of stringencies but also over structures. To the extent possible, the code within the module has been made generic, and the complete definition of a policy must be provided by the user as an input the model. Much like the definitions recorded in the Code of Federal Regulations (CFR), these inputs must unambiguously describe the methodologies for determining vehicle-level emissions targets and certification values, as well as the accounting rules for determining how individual vehicles contribute to a manufacturer's overall compliance determination. 
 
-Emissions standards are defined in OMEGA using a range of policy elements, including:
-	* rules for the accounting of upstream emissions
-	* definition of compliance incentives, like multipliers
-	* definition of regulatory classes
-	* definition of attribute-based target function
-	* definition of the vehicles’ assumed lifetime miles
+In this documentation, *policy alternatives* refer only to what is being evaluated in a particular model run. There will also be relevant inputs and assumptions which are technically policies, but are assumed to be fixed (i.e. exogenous) for a given comparison of alternatives. Such assumptions are defined by the user in the *analysis context*, and may reflect a combination of local, state, and federal programs that influnce the transpoprtation sector through regulatory and market-based mechanisms. [add examples, and links] A comparison of policy alternatives requires the user to specificy a no-action, or baseline policy, and one or more action alternatives. 
 
-* Policy Alternatives Requiring Specific Technologies 
+Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards and rules for the accounting of compliance credits, and those that specify a required share of a specific technology. OMEGA can model either one of these types as an independent alternative, or both together; for example, in the case of a policy which requires a minimum share of a technology while still satisfying fleet averaging requirements.
+
+**Policy Alternatives Involving Fleet Average Emissions Standards:**
+In this type of policy, the key principal is that the compliance status of a manufacturer is a result of the combined performance of all of the vehicles, and not the result of every vehicle achieving compliance individually. The policy module's fleet averaging is based on CO2 *credits* as the fungible accounting currency. Each vehicle has an emissions target and an achieved certification emissions value. The difference between the target and certification emissions in absolute terms (Mg CO2) is referred to as a *credit*, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy. The user-defined policy inputs can be sued to specify restrictions on credit averaging and banking, including limits on credit lifetime or the ability to carry a negative balance into the future. The analogy of a financial bank is useful here, and OMEGA has adopted data strucutures and names that mirror the familiar bank account balance and transaction logs. [insert example transaction and balance tables]
+  
+OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the producer's credit bank. This program feature is known as *fleet averaging*, where vehicles with positive credits may contribute to offset other vehicles with negative credits. The OMEGA model calculates overall credits earned in an analysis year as the difference between the aggregate certification emissions minus the aggregate target emissions. An alternative approach of calculating overall credits as the sum of individual vehicle credits might seem more straightforward, and while technically possible, it is not used for several reasons. First, some credits, such as those generated by advanced technology incentive multipliers, are not easily accounted for on a per-vehicle basis. 
+
+, the he transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a single producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers. 
+
+	Emissions standards are defined in OMEGA using a range of policy elements, including:
+		* rules for the accounting of upstream emissions
+		* definition of compliance incentives, like multipliers
+		* definition of regulatory classes
+		* definition of attribute-based target function
+		* definition of the vehicles’ assumed lifetime miles
+
+**Policy Alternatives Requiring Specific Technologies:**
 This type of policy requires all, or a portion, of producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with an fleet averaging emissions standard; for example, a minimum ZEV share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
 * Policy Representation in the Analysis Context
 Some policies are not modeled in OMEGA as policy alternatives, either because the policy is not aimed directly at the producer as a regulated entity, or because the particular OMEGA analysis is not attempting to evaluate the impact of that policy relative to other alternatives. Still, it is important that the Analysis Context inputs are able to reflect any policies that might significantly influence the producer or consumer decisions. Some examples include:
