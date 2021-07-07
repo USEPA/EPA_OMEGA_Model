@@ -7,9 +7,6 @@ Model Architecture and Algorithms
 Modules
 ^^^^^^^
 [add footnote about terminology, that in the implementation, these are called packages]
-
-
-
 Policy Module
 ----------------------
 OMEGA's primary function is to help evaluate and compare policy alternatives. Because the alternatives to be considered may vary widely, and we cannot anticipate all possible policy elements in advance, OMEGA is designed to have the flexibility to model not only regulatory programs over a range of stringencies but also over structures. To the extent possible, the code within the module has been made generic, and the complete definition of a policy must be provided by the user as an input the model. Much like the definitions recorded in the Code of Federal Regulations (CFR), these inputs must unambiguously describe the methodologies for determining vehicle-level emissions targets and certification values, as well as the accounting rules for determining how individual vehicles contribute to a manufacturer's overall compliance determination. 
@@ -59,87 +56,52 @@ The modeling of producer decisions is a core function of OMEGA, and is based on 
 
 Consumer Module
 ------------------------
-Algorithm descriptions, code snippets, equations, etc
-
-Module Overview
-+++++++++++++++
-
 The Consumer Module’s purpose is to estimate how light duty vehicle ownership and use respond to key vehicle characteristics within a given analysis context. An important part of the model is that it allows different endogenous consumer responses to EVs and ICEs. The module estimates total new sales volumes, the EV share of new vehicle demand, used vehicle market responses (including reregistration/scrappage), and the use of both new and used vehicles in the market measured using vehicle miles traveled (VMT).
 
-Inputs from the analysis context are exogenous to the model and include fuel prices, on-road stock assumptions, and demographics. The Consumer Module also uses endogenous inputs from the Producer Module, including vehicle prices and attributes. After the Consumer Module estimates total new vehicle demand, including the EV share of new vehicle demand, the Consumer and Producer Modules iterate to achieve convergence on the vehicles produced and demanded. Once that convergence is achieved, the Consumer Module outputs total vehicle stock (new and used vehicles and their attributes) and use (VMT) to the Effects Module.
+The Consumer Module uses exogenous inputs from the analysis context and endogenous inputs from the Producer Module to estimate total new vehicle demand, including the EV share of new vehicle demand. Then, the Consumer and Producer Modules iterate to achieve convergence on the estimates of new vehicles produced and demanded. Once that convergence is achieved, the Consumer Module outputs total vehicle stock (new and used vehicles and their attributes) and use (VMT) to the Effects Module.
 
-Inputs to the Consumer Module
+Inputs and Outputs of the Consumer Module
 +++++++++++++++++++++++++++++
-*  Average vehicle cost, fuel consumption rate, vehicle prices.
+The exogenous inputs from the analysis context include fuel prices, on-road stock assumptions, and demographics.
+The endogenous inputs from the Producer Module include vehicle prices, average vehicle cost, and vehicle attributes, such as fuel consumption rate.
 
-*  In principle, the CM can handle other vehicle characteristics that are fed in from the Producer Module (PM), such as vehicle class.
+*  In principle, the Consumer Module can handle other vehicle characteristics that are fed in from the Producer Module (PM), such as vehicle class, or EV range.
 
-   *  Other vehicle characteristics may be needed for EV/ICE shares calculation.
+Interim outputs of the Consumer Module, new vehicle sales and the share of EVs, go to the Producer Module for iteration. Final outputs of the Consumer Module go into the Effects Module, and include new vehicle sales broken down by market class, the total stock, and VMT.
 
-Outputs from the Consumer Module
-+++++++++++++++++++++++++++++++++
-*  New vehicle purchases
+*  Market classes in the Consumer Module are currently EV-hauling, EV-nonhauling, ICE-hauling, and ICE-nonhauling. The Consumer Module has the capability to handle other market classes. The choice of market classes is led by the model used to estimate EV share, which is currently based on GCAM-USA.
 
-   *  Broken down by market class. Currently, those classes are EV/ICE/hauling/nonhauling
-*  We also estimate the total on-road registered fleet (aka stock), which will go into the Effects Module
-*  VMT
+*  The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age.
+*  These scrappage rates are from *WHERE?*
+*  VMT is estimated using fixed VMT schedules based on vehicle age and market class.
 
 New Vehicle Sales
 +++++++++++++++++
 *  Total new vehicle sales are calculated at the aggregate level
-
-   *  The ability of models to estimate effects on market classes is as yet unproven
-*  Explain role of market classes and their relationship to vehicle classes
+*  Market classes
 *  The full cost pass through assumption
 *  Role of fuel consumption in the vehicle purchase decision
-*  The share of light duty vehicles that are classifies as hauling and nonhauling is constant. The shares of hauling and non-hauling vehicles comes from the projections published in the Annual Energy Outlook from the U.S. Energy Information Administration.
+*  The share of light duty vehicles that are classified as hauling and nonhauling is constant. The shares of hauling and non-hauling vehicles comes from the projections published in the Annual Energy Outlook from the U.S. Energy Information Administration.
 
    * Hauling vehicles are classified as body-on-frame, while nonhauling vehicles are classified as uni-body. The vehicles are assumed to be used differently, with hauling vehicles expected to to be used more for hauling goods (including for towing), which nonhauling vehicles are expected to be used for moving people from one place to another.
 
 *  How the EV/ICE share is calculated
 
-   *  Why do we use the logit equation (a diffusion curve)?
-
-      *  We are currently using GCAM’s logit equation and parameters.
-*  Documentation on the GCAM parameters used
-
-   *  Can we get Michael Shell and/or Chris Ramig’s help here?
-   *  Results from Margaret Taylor’s research
-
-Re-registrations (scrappage)
-++++++++++++++++++++++++++++
-*  We are currently using static scrappage rates based on the age of the vehicle
-*  Where do the current, static, scrappage rates come from
-*  Explain the RTI work and how that may update our results
+    *  We are currently using GCAM’s logit equation and parameters.
+       *  What are these parameters
 
 VMT estimations
 ++++++++++++++++
-*  We are using static VMT schedules based on age
+*  The baseline projection for VMT is from AEO *2020?*
+*  VMT estimates are based static VMT schedules for each and market class.
 *  We currently hold total VMT constant except for rebound
-*  The baseline projection for VMT is from AEO
-
-   *  Explain a little about the AEO VMT projections
-*  ICE rebound
-
-   *  Can we get help from Michael Shelby for this?
-*  EV rebound
-
-   *  Does TCD, Lisa Snapp, CARB have info to help us here?
-   *  Burlig et al. EV NBER paper
-   *  Other papers?
+   *  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.” The Proposed Revised 2023 and Later Model Year Light-Duty Vehicle GHG Emissions Standards – Regulatory Impact Analysis contains a full discussion of ICEV VMT rebound including a review of the recent literature. Based on existing literature, EPA uses a value of 10 percent for the long-term direct rebound effect. In OMEGA, we are following that precedent and setting the rebound effect to 10 percent. Currently, we treat rebound driving for ICE vehicles and EVs the same.
 
 Consumer Benefits Measures
 +++++++++++++++++++++++++++
 *  Previous estimates of effects on consumers were based on holding sales constant and the benefits were estimated as fuel savings minus tech costs
 *  We know sales change (and we are allowing for that). We are working on a way to estimate not only the benefits consumers are considering in their purchase of a new vehicle, but also the ‘surprise’ or ‘bonus’ savings associated with the vehicle that are not considered.
 
-Overall Model Equilibrium
-++++++++++++++++++++++++++
-*  Logic for convergence of producer & consumer module results
-
-   *  Cross subsidization logic keeps total new vehicle sales constant
-   *  Cross subsidization clears the market for EV and ICE hauling and non-hauling shares
-   *  There are 2 ways of doing the cross subsidization
 
 Effects Module
 --------------

@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -489,7 +489,7 @@ EPA Science Advisory Board - 2020</string>
         <x>480</x>
         <y>200</y>
         <width>211</width>
-        <height>41</height>
+        <height>61</height>
        </rect>
       </property>
       <property name="font">

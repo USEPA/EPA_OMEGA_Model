@@ -2,20 +2,22 @@
 
 Getting Started
 ===================
-Including downloading PyCharm, sample inputs
+(most basic bare-bones explanation)
 
-Text1
-^^^^^
+Downloading the executable
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Text2
-^^^^^
+Setting up a run directory
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Text3
-^^^^^
+Running the executable
+^^^^^^^^^^^^^^^^^^^^^^
 
-Text4
-^^^^^
+Viewing the results
+^^^^^^^^^^^^^^^^^^^
 
-Text5
-^^^^^
+Customizing runs
+^^^^^^^^^^^^^^^^
+Point to the users guide.
+
 
