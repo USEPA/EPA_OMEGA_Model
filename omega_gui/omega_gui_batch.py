@@ -753,6 +753,8 @@ class Form(QObject):
         # status_bar()
         self.window.repaint()
 
+        model_error_count = 0
+
         # This call works but gui freezes until new process ends
         # os.system("python omega_model/__main__.py")
         # Open batch definition
@@ -825,7 +827,7 @@ class Form(QObject):
             elapsed_time = sec_to_hours(elapsed_time.seconds)
             # elapsed_time = str(elapsed_time)
             # elapsed_time = "Model Running\n" + elapsed_time[:-7]
-            elapsed_time = "Model Running\n" + elapsed_time[:-4]
+            elapsed_time = "Model Running\n" + elapsed_time[:-4] + "\nError Count = " + str(model_error_count)
             self.window.model_status_label.setText(elapsed_time)
 
             # Look for new log files
@@ -889,6 +891,9 @@ class Form(QObject):
                         g = '[' + log_ident_array[log_loop] + '] ' + g
                         # Select output color
                         color = status_output_color(g)
+                        if color == "red":
+                            model_error_count = model_error_count + 1
+                            print('***', model_error_count)
                         # Output to event monitor
                         self.event_monitor(g, color, 'dt')
                         # Increment total number of read lines in log file counter
@@ -913,7 +918,7 @@ class Form(QObject):
         # elapsed_end = datetime.now()
         elapsed_time1 = elapsed_end - elapsed_start
         elapsed_time1 = str(elapsed_time)
-        elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-4]
+        elapsed_time1 = "Model Run Completed\n" + elapsed_time1[:-4] + "\nError Count = " + str(model_error_count)
         self.window.model_status_label.setText(elapsed_time1)
         # self.window.model_status_label.setText("Model Run Completed")
         # Enable selected gui functions disabled during model run
