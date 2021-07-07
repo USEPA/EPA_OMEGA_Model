@@ -42,6 +42,7 @@ try:
     from common import file_io, omega_log
     from common.input_validation import *
     from common.omega_functions import *
+    from policy.policy_base_classes import *
 
     import scipy.interpolate
 

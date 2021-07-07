@@ -62,7 +62,7 @@ from omega_model import *
 cache = dict()
 
 
-class Targets(SQABase, OMEGABase):
+class Targets(OMEGABase, SQABase, TargetsBase):
     """
     **Implements a simple non-attribute-based GHG standard.**
 

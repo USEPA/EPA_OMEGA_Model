@@ -49,6 +49,14 @@ omega\_model.policy.offcycle\_credits module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.policy.policy\_base\_classes module
+------------------------------------------------
+
+.. automodule:: omega_model.policy.policy_base_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.policy.policy\_fuels module
 ----------------------------------------
 

@@ -77,8 +77,9 @@ from omega_model import *
 cache = dict()
 
 
-class Targets(SQABase, OMEGABase):
+class Targets(OMEGABase, SQABase, TargetsBase):
     """
+    Implement vehicle footprint-based GHG targets (CO2 g/mi)
 
     """
     # --- database table properties ---
