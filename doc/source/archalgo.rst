@@ -7,41 +7,28 @@ Model Architecture and Algorithms
 Modules
 ^^^^^^^
 [add footnote about terminology, that in the implementation, these are called packages]
-
-
-
 Policy Module
 ----------------------
-OMEGA's primary function is to help evaluate and compare policy alternatives. Because the alternatives to be considered may vary widely, and we cannot anticipate all possible policy elements in advance, OMEGA is designed to have the flexibility to model not only regulatory programs over a range of stringencies but also over structures. To the extent possible, the code within the module has been made generic, and the complete definition of a policy must be provided by the user as an input the model. Much like the definitions recorded in the Code of Federal Regulations (CFR), these inputs must unambiguously describe the methodologies for determining vehicle-level emissions targets and certification values, as well as the accounting rules for determining how individual vehicles contribute to a manufacturer's overall compliance determination. 
+As primarily a tool for regulatory analyses, OMEGA is designed to have the flexibility to model a range of policy structures. Policy inputs define the alternatives being evaluated, as well as any policies that are not being evaluated directly, but are nevertheless important to include in the analysis context, such as any significant state-level policies which might influence producer and/or consumer decisions. Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards and rules for the accounting of compliance credits, and those that specify a required share of a specific technology. Other policies that are not applied directly to the producer as a regulated entity would be reflected in the analysis context. 
+•	Policy Alternatives Involving Fleet Average Emissions Standards
+The modeling of producer decisions to meet fleet average emissions standards requires the determination of an emissions target and the achieved compliance emissions for each vehicle produced. The difference between the target and achieved compliance emissions in absolute terms (e.g. Mg CO2) is referred to as a ‘credit’, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy. OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the total achieved compliance value. When emissions values are presented on a per-vehicle basis, this is known as ‘averaging.’ The transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a single producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers. 
 
-In this documentation, *policy alternatives* refer only to what is being evaluated in a particular model run. There will also be relevant inputs and assumptions which are technically policies, but are assumed to be fixed (i.e. exogenous) for a given comparison of alternatives. Such assumptions are defined by the user in the *analysis context*, and may reflect a combination of local, state, and federal programs that influnce the transpoprtation sector through regulatory and market-based mechanisms. [add examples, and links] A comparison of policy alternatives requires the user to specificy a no-action, or baseline policy, and one or more action alternatives. 
+Emissions standards are defined in OMEGA using a range of policy elements, including:
+    * rules for the accounting of upstream emissions
+    * definition of compliance incentives, like multipliers
+    * definition of regulatory classes
+    * definition of attribute-based target function
+    * definition of the vehicles’ assumed lifetime miles
 
-Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards and rules for the accounting of compliance credits, and those that specify a required share of a specific technology. OMEGA can model either one of these types as an independent alternative, or both together; for example, in the case of a policy which requires a minimum share of a technology while still satisfying fleet averaging requirements.
-
-**Policy Alternatives Involving Fleet Average Emissions Standards:**
-In this type of policy, the key principal is that the compliance status of a manufacturer is a result of the combined performance of all of the vehicles, and not the result of every vehicle achieving compliance individually. The policy module's fleet averaging is based on CO2 *credits* as the fungible accounting currency. Each vehicle has an emissions target and an achieved certification emissions value. The difference between the target and certification emissions in absolute terms (Mg CO2) is referred to as a *credit*, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy. The user-defined policy inputs can be sued to specify restrictions on credit averaging and banking, including limits on credit lifetime or the ability to carry a negative balance into the future. The analogy of a financial bank is useful here, and OMEGA has adopted data strucutures and names that mirror the familiar bank account balance and transaction logs. [insert example transaction and balance tables]
-  
-OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the producer's credit bank. This program feature is known as *fleet averaging*, where vehicles with positive credits may contribute to offset other vehicles with negative credits. The OMEGA model calculates overall credits earned in an analysis year as the difference between the aggregate certification emissions minus the aggregate target emissions. An alternative approach of calculating overall credits as the sum of individual vehicle credits might seem more straightforward, and while technically possible, it is not used for several reasons. First, some credits, such as those generated by advanced technology incentive multipliers, are not easily accounted for on a per-vehicle basis. 
-
-, the he transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a single producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers. 
-
-	Emissions standards are defined in OMEGA using a range of policy elements, including:
-		* rules for the accounting of upstream emissions
-		* definition of compliance incentives, like multipliers
-		* definition of regulatory classes
-		* definition of attribute-based target function
-		* definition of the vehicles’ assumed lifetime miles
-
-**Policy Alternatives Requiring Specific Technologies:**
+* Policy Alternatives Requiring Specific Technologies 
 This type of policy requires all, or a portion, of producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with an fleet averaging emissions standard; for example, a minimum ZEV share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
 * Policy Representation in the Analysis Context
 Some policies are not modeled in OMEGA as policy alternatives, either because the policy is not aimed directly at the producer as a regulated entity, or because the particular OMEGA analysis is not attempting to evaluate the impact of that policy relative to other alternatives. Still, it is important that the Analysis Context inputs are able to reflect any policies that might significantly influence the producer or consumer decisions. Some examples include:
-	* Fuel tax policy
-	* State and local ZEV policies
-	* Vehicle purchase incentives
-	* Investment in refueling and charging infrastructure
-	* Accelerated vehicle retirement incentives
-
+    * Fuel tax policy
+    * State and local ZEV policies
+    * Vehicle purchase incentives
+    * Investment in refueling and charging infrastructure
+    * Accelerated vehicle retirement incentives
 
 
 Producer Module
@@ -59,103 +46,68 @@ The modeling of producer decisions is a core function of OMEGA, and is based on 
 
 Consumer Module
 ------------------------
-Algorithm descriptions, code snippets, equations, etc
-
-Module Overview
-+++++++++++++++
-
 The Consumer Module’s purpose is to estimate how light duty vehicle ownership and use respond to key vehicle characteristics within a given analysis context. An important part of the model is that it allows different endogenous consumer responses to EVs and ICEs. The module estimates total new sales volumes, the EV share of new vehicle demand, used vehicle market responses (including reregistration/scrappage), and the use of both new and used vehicles in the market measured using vehicle miles traveled (VMT).
 
-Inputs from the analysis context are exogenous to the model and include fuel prices, on-road stock assumptions, and demographics. The Consumer Module also uses endogenous inputs from the Producer Module, including vehicle prices and attributes. After the Consumer Module estimates total new vehicle demand, including the EV share of new vehicle demand, the Consumer and Producer Modules iterate to achieve convergence on the vehicles produced and demanded. Once that convergence is achieved, the Consumer Module outputs total vehicle stock (new and used vehicles and their attributes) and use (VMT) to the Effects Module.
+The Consumer Module uses exogenous inputs from the analysis context and endogenous inputs from the Producer Module to estimate total new vehicle demand, including the EV share of new vehicle demand. Then, the Consumer and Producer Modules iterate to achieve convergence on the estimates of new vehicles produced and demanded. Once that convergence is achieved, the Consumer Module outputs total vehicle stock (new and used vehicles and their attributes) and use (VMT) to the Effects Module.
 
-Inputs to the Consumer Module
+Inputs and Outputs of the Consumer Module
 +++++++++++++++++++++++++++++
-*  Average vehicle cost, fuel consumption rate, vehicle prices.
+The exogenous inputs from the analysis context include fuel prices, on-road stock assumptions, and demographics.
+The endogenous inputs from the Producer Module include vehicle prices, average vehicle cost, and vehicle attributes, such as fuel consumption rate.
 
-*  In principle, the CM can handle other vehicle characteristics that are fed in from the Producer Module (PM), such as vehicle class.
+*  In principle, the Consumer Module can handle other vehicle characteristics that are fed in from the Producer Module (PM), such as vehicle class, or EV range.
 
-   *  Other vehicle characteristics may be needed for EV/ICE shares calculation.
+Interim outputs of the Consumer Module, new vehicle sales and the share of EVs, go to the Producer Module for iteration. Final outputs of the Consumer Module go into the Effects Module, and include new vehicle sales broken down by market class, the total stock, and VMT.
 
-Outputs from the Consumer Module
-+++++++++++++++++++++++++++++++++
-*  New vehicle purchases
+*  Market classes in the Consumer Module are currently EV-hauling, EV-nonhauling, ICE-hauling, and ICE-nonhauling. The Consumer Module has the capability to handle other market classes. The choice of market classes is led by the model used to estimate EV share, which is currently based on GCAM-USA.
 
-   *  Broken down by market class. Currently, those classes are EV/ICE/hauling/nonhauling
-*  We also estimate the total on-road registered fleet (aka stock), which will go into the Effects Module
-*  VMT
+*  The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age.
+*  These scrappage rates are from *WHERE?*
+*  VMT is estimated using fixed VMT schedules based on vehicle age and market class.
 
 New Vehicle Sales
 +++++++++++++++++
 *  Total new vehicle sales are calculated at the aggregate level
-
-   *  The ability of models to estimate effects on market classes is as yet unproven
-*  Explain role of market classes and their relationship to vehicle classes
+*  Market classes
 *  The full cost pass through assumption
 *  Role of fuel consumption in the vehicle purchase decision
-*  The share of light duty vehicles that are classifies as hauling and nonhauling is constant. The shares of hauling and non-hauling vehicles comes from the projections published in the Annual Energy Outlook from the U.S. Energy Information Administration.
+*  The share of light duty vehicles that are classified as hauling and nonhauling is constant. The shares of hauling and non-hauling vehicles comes from the projections published in the Annual Energy Outlook from the U.S. Energy Information Administration.
 
    * Hauling vehicles are classified as body-on-frame, while nonhauling vehicles are classified as uni-body. The vehicles are assumed to be used differently, with hauling vehicles expected to to be used more for hauling goods (including for towing), which nonhauling vehicles are expected to be used for moving people from one place to another.
 
 *  How the EV/ICE share is calculated
 
-   *  Why do we use the logit equation (a diffusion curve)?
-
-      *  We are currently using GCAM’s logit equation and parameters.
-*  Documentation on the GCAM parameters used
-
-   *  Can we get Michael Shell and/or Chris Ramig’s help here?
-   *  Results from Margaret Taylor’s research
-
-Re-registrations (scrappage)
-++++++++++++++++++++++++++++
-*  We are currently using static scrappage rates based on the age of the vehicle
-*  Where do the current, static, scrappage rates come from
-*  Explain the RTI work and how that may update our results
+    *  We are currently using GCAM’s logit equation and parameters.
+       *  What are these parameters
 
 VMT estimations
 ++++++++++++++++
-*  We are using static VMT schedules based on age
+*  The baseline projection for VMT is from AEO *2020?*
+*  VMT estimates are based static VMT schedules for each and market class.
 *  We currently hold total VMT constant except for rebound
-*  The baseline projection for VMT is from AEO
-
-   *  Explain a little about the AEO VMT projections
-*  ICE rebound
-
-   *  Can we get help from Michael Shelby for this?
-*  EV rebound
-
-   *  Does TCD, Lisa Snapp, CARB have info to help us here?
-   *  Burlig et al. EV NBER paper
-   *  Other papers?
+   *  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.” The Proposed Revised 2023 and Later Model Year Light-Duty Vehicle GHG Emissions Standards – Regulatory Impact Analysis contains a full discussion of ICEV VMT rebound including a review of the recent literature. Based on existing literature, EPA uses a value of 10 percent for the long-term direct rebound effect. In OMEGA, we are following that precedent and setting the rebound effect to 10 percent. Currently, we treat rebound driving for ICE vehicles and EVs the same.
 
 Consumer Benefits Measures
 +++++++++++++++++++++++++++
 *  Previous estimates of effects on consumers were based on holding sales constant and the benefits were estimated as fuel savings minus tech costs
 *  We know sales change (and we are allowing for that). We are working on a way to estimate not only the benefits consumers are considering in their purchase of a new vehicle, but also the ‘surprise’ or ‘bonus’ savings associated with the vehicle that are not considered.
 
-Overall Model Equilibrium
-++++++++++++++++++++++++++
-*  Logic for convergence of producer & consumer module results
-
-   *  Cross subsidization logic keeps total new vehicle sales constant
-   *  Cross subsidization clears the market for EV and ICE hauling and non-hauling shares
-   *  There are 2 ways of doing the cross subsidization
 
 Effects Module
 --------------
 In its primary function as a regulatory support tool, OMEGA’s modeled outputs are intended to inform the type of benefit-cost analyses used in EPA rulemakings. We would likely use many of OMEGA’s outputs directly in the analysis for a regulatory action. In other cases, OMEGA produces values that might help inform other models like MOVES. The scope of OMEGA’s effects modeling includes estimating both monetized effects and physical effects.
 
 * Key examples of monetized effects that OMEGA will estimate:
-	* Vehicle production costs
-	* Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
-	* Impacts of criteria air pollutants
-	* Impacts of greenhouse gas pollutants
-	* Congestion, noise, and safety costs
+    * Vehicle production costs
+    * Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
+    * Impacts of criteria air pollutants
+    * Impacts of greenhouse gas pollutants
+    * Congestion, noise, and safety costs
 * Key examples of physical effects that OMEGA will estimate:
-	* Stock of registered vehicles, along with key attributes
-	* VMT of registered vehicles
-	* Tailpipe GHG and criteria pollutant emissions
-	* Upstream (refinery, power sector) GHG and criteria pollutant emissions
+    * Stock of registered vehicles, along with key attributes
+    * VMT of registered vehicles
+    * Tailpipe GHG and criteria pollutant emissions
+    * Upstream (refinery, power sector) GHG and criteria pollutant emissions
 
 Note that the calculation of criteria and GHG emission impacts is done using the $/ton estimates included in the cost_factors-criteria.csv and cost_factors-scc.csv input files. The $/ton estimates
 provided in those files are best understood to be the marginal costs associated with the reduction of the individual pollutants as opposed to the absolute costs associated with a ton of each pollutant.
