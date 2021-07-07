@@ -12,6 +12,9 @@ Runs a single session.
 
 print('importing %s' % __file__)
 
+import sys
+sys.path.extend('..')
+
 from omega_model import *
 import os
 from omega_model.consumer import stock
