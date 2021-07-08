@@ -23,8 +23,7 @@ for run_count in range (0,len(run_controller)):
     input_path = main_path + '\\' + run_folder + '\\' + 'inputs'
     output_path_vehghgid = main_path + '\\' + run_folder + '\\' + 'outputs'
     output_path_intermediate = main_path + '\\' + run_folder + '\\' + 'intermediate files'
-    output_path_datasources_matched_to_configid = main_path + '\\' + run_folder + '\\' \
-                                                  + 'Datasources Matched to ConfigID'
+    output_path_datasources_matched_to_configid = main_path + '\\' + run_folder + '\\' + 'Datasources Matched to ConfigID'
     bool_run_new_manual_filter = str(run_controller['New Manual Filter?'][run_count])
     bool_run_new_vehghgid = str(run_controller['New Config ID?'][run_count])
     model_year = int(run_controller['Model Year'][run_count])
