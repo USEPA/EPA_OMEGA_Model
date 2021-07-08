@@ -65,6 +65,14 @@ omega\_model.policy.policy\_fuels module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.policy.regulatory\_classes module
+----------------------------------------------
+
+.. automodule:: omega_model.policy.regulatory_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.policy.required\_zev\_share module
 -----------------------------------------------
 

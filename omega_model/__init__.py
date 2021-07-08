@@ -53,14 +53,14 @@ try:
     hauling_classes = OMEGAEnum(['hauling', 'non_hauling'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
     legacy_reg_classes = OMEGAEnum(['car', 'truck'])
-    reg_classes = OMEGAEnum(['car', 'truck'])
+    reg_classes = None  # reg class names are loaded during init from policy.regulatory_classes
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
     class OMEGARuntimeOptions(OMEGABase):
         """
         An OMEGARuntimeOptions object defines the settings required for a simulation session
-        """
 
+        """
         def __init__(self):
             """
             Create an OMEGARuntimeOptions object with default settings used for testing and development.
@@ -108,6 +108,7 @@ try:
             self.producer_calc_generalized_cost = None
             self.consumer_calc_generalized_cost = None
             self.policy_targets_input_file = path + 'test_inputs/ghg_standards-footprint.csv'
+            self.policy_reg_classes_input_file = path + 'test_inputs/regulatory_classes.csv'
             self.PolicyTargets = None
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'

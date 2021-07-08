@@ -114,7 +114,7 @@ class OMEGABase:
         return s
 
 
-class OMEGAEnum:
+class OMEGAEnum(OMEGABase):
     """
     Simple enumerated value class, which acts like a list of strings, has named attributes which contain the
     attribute name as a string, also acts like a dictionary.

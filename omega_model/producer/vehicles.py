@@ -932,7 +932,7 @@ class VehicleFinal(SQABase, Vehicle):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
-    legacy_reg_class_ID = Column('legacy_reg_class_id', Enum(*reg_classes, validate_strings=True))
+    legacy_reg_class_ID = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
     reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
@@ -1137,7 +1137,7 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.reg_class_ID = omega_globals.options.PolicyTargets.get_vehicle_reg_class(veh)
+                    veh.reg_class_ID = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
                     veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2_grams_per_mile = df.loc[i, 'cert_co2_grams_per_mile']
                     veh.cert_direct_co2_grams_per_mile = veh.cert_direct_oncycle_co2_grams_per_mile  # TODO: minus any credits??

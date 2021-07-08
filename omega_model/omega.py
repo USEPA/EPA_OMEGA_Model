@@ -111,6 +111,7 @@ def run_producer_consumer():
     the consumer module, possibly with iteration between the two
 
     :return: iteration log dataframe, updated omega database with final vehicle technology and market share data
+
     """
 
     from producer.manufacturers import Manufacturer
@@ -607,6 +608,8 @@ def init_omega(o2_options):
     Returns:
 
     """
+
+    import importlib
     from common.omega_log import OMEGABatchLog
 
     # set up global variables:
@@ -622,6 +625,14 @@ def init_omega(o2_options):
     omega_globals.engine.echo = omega_globals.options.verbose
 
     init_fail = []
+
+    # pull in reg classes before building database tables (declaring classes) that check reg class validity
+    module_name = get_template_name(omega_globals.options.policy_reg_classes_input_file)
+    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+        omega_globals.options.policy_reg_classes_input_file)
+    # override reg_classes from __init__.py:
+    importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
     # import database modules to populate ORM context
     from context.onroad_fuels import OnroadFuel
@@ -654,9 +665,8 @@ def init_omega(o2_options):
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
 
-    import importlib
-    policy_module_name = get_template_name(omega_globals.options.policy_targets_input_file)
-    omega_globals.options.PolicyTargets = importlib.import_module(policy_module_name).Targets
+    module_name = get_template_name(omega_globals.options.policy_targets_input_file)
+    omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
 
     from policy.incentives import Incentives
     from policy.policy_fuels import PolicyFuel
@@ -782,16 +792,8 @@ def init_omega(o2_options):
         stock.update_stock(omega_globals.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
 
     except Exception as e:
-        if init_fail:
-            omega_log.logwrite("\n#INIT FAIL")
-            omega_log.logwrite(init_fail)
-        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        print("### Check OMEGA log for error messages ###")
-        omega_log.logwrite("### Check OMEGA log for error messages ###")
-        omega_log.logwrite("### RUNTIME FAIL ###")
-        omega_log.end_logfile("\nSession Fail")
-        dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+        if not init_fail:
+            init_fail = "\n#INIT FAIL\n%s\n" % traceback.format_exc()
 
     return init_fail
 
@@ -822,9 +824,10 @@ def run_omega(o2_options, standalone_run=False):
     try:
         init_fail = init_omega(o2_options)
 
-        omega_log.logwrite("Running %s: OMEGA 2 Version %s" % (omega_globals.options.session_unique_name, code_version))
-
         if not init_fail:
+            omega_log.logwrite(
+                "Running %s: OMEGA 2 Version %s" % (omega_globals.options.session_unique_name, code_version))
+
             if omega_globals.options.run_profiler:
                 # run with profiler
                 import cProfile
@@ -859,20 +862,13 @@ def run_omega(o2_options, standalone_run=False):
             omega_globals.session = None
             omega_globals.options = None
         else:
-            omega_log.logwrite("\n#INIT FAIL")
-            omega_log.logwrite(init_fail)
+            omega_log.logwrite(init_fail, echo_console=True)
             omega_log.end_logfile("\nSession Fail")
-            return init_fail
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
     except Exception as e:
-        if init_fail:
-            omega_log.logwrite("\n#INIT FAIL")
-            omega_log.logwrite(init_fail)
-        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
         print("### Check OMEGA log for error messages ###")
-        omega_log.logwrite("### Check OMEGA log for error messages ###")
-        omega_log.logwrite("### RUNTIME FAIL ###")
         omega_log.end_logfile("\nSession Fail")
         dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 

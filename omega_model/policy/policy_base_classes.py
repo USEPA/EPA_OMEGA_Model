@@ -10,11 +10,12 @@ one of the required methods, the class will throw a runtime Exception or return 
 import inspect
 
 
-class TargetsBase:
+class RegulatoryClassesBase:
     """
-    A base class representing the program interface for calculating vehicle CO g/mi targets.
+    **Load and provides routines to access to regulatory class descriptive data**
 
     """
+
     @staticmethod
     def get_vehicle_reg_class(vehicle):
         """
@@ -28,9 +29,32 @@ class TargetsBase:
             Vehicle reg class based on vehicle characteristics.
 
         """
-        raise Exception('**Attempt to call abstract method TargetsBase.%s() without child class override**' %
+        raise Exception('**Attempt to call abstract method RegulatoryClassesBase.%s() without child class override**' %
                         inspect.currentframe().f_code.co_name)
 
+    @staticmethod
+    def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        return ['**Attempt to call abstract method RegulatoryClassesBase.%s() without child class override**' %
+                inspect.currentframe().f_code.co_name]
+
+
+class TargetsBase:
+    """
+    A base class representing the program interface for calculating vehicle CO g/mi targets.
+
+    """
     @staticmethod
     def calc_target_co2_gpmi(vehicle):
         """

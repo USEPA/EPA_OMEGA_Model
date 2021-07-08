@@ -127,7 +127,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
     case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
     context_size_class = Column(String)   #: str: e.g. 'Small Crossover'
     calendar_year = Column(Numeric)  #: numeric: calendar year of the market data
-    context_reg_class_ID = Column('context_reg_class_ID', Enum(*reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
+    context_reg_class_ID = Column('context_reg_class_ID', Enum(*legacy_reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
     # sales_share_of_regclass = Column(Float)   #: float: percent of reg class represented by the context size class
     # sales_share_of_total = Column(Float)  #: float: percent of total sales represented by the context size class
     sales = Column(Float)  #: float:  size class new vehicle sales

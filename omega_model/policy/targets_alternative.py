@@ -76,22 +76,6 @@ class Targets(OMEGABase, SQABase, TargetsBase):
     lifetime_VMT = Column('lifetime_vmt', Float)  #: regulatory lifetime VMT (in miles) of the given reg class
 
     @staticmethod
-    def get_vehicle_reg_class(vehicle):
-        """
-        Get vehicle regulatory class based on vehicle characteristics.
-
-        Args:
-            vehicle (VehicleFinal): the vehicle to determine the reg class of
-
-        Returns:
-
-            Vehicle reg class based on vehicle characteristics.
-
-        """
-        reg_class_ID = vehicle.reg_class_ID
-        return reg_class_ID
-
-    @staticmethod
     def calc_target_co2_gpmi(vehicle):
         """
         Calculate vehicle target CO2 g/mi.

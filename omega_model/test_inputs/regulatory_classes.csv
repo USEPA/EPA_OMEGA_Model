@@ -1,0 +1,4 @@
+input_template_name:,policy.regulatory_classes,input_template_version:,0.1
+reg_class_id,description,,
+car,“cars” as defined by the regulations,,
+truck,“trucks” as defined by the regulations,,
