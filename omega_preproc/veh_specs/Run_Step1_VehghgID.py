@@ -7,7 +7,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 home = str(Path.home())
 
-main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
+root_drive_letter = 'C:'
+main_path = root_drive_letter + '\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
             +'\\'+'techspecconsolidator\VehGHG Runs'
 
 # input_path = 'C:/Users/slee02/Documents/Python/inputs/'
@@ -22,8 +23,7 @@ for run_count in range (0,len(run_controller)):
     input_path = main_path + '\\' + run_folder + '\\' + 'inputs'
     output_path_vehghgid = main_path + '\\' + run_folder + '\\' + 'outputs'
     output_path_intermediate = main_path + '\\' + run_folder + '\\' + 'intermediate files'
-    output_path_datasources_matched_to_configid = main_path + '\\' + run_folder + '\\' \
-                                                  + 'Datasources Matched to ConfigID'
+    output_path_datasources_matched_to_configid = main_path + '\\' + run_folder + '\\' + 'Datasources Matched to ConfigID'
     bool_run_new_manual_filter = str(run_controller['New Manual Filter?'][run_count])
     bool_run_new_vehghgid = str(run_controller['New Config ID?'][run_count])
     model_year = int(run_controller['Model Year'][run_count])
@@ -36,37 +36,45 @@ for run_count in range (0,len(run_controller)):
     vehghg_filename = str(run_controller['VehghgID Filename'][run_count])
     model_type_filename = str(run_controller['Model Type Filename'][run_count])
     model_type_exceptions_table_filename = str(run_controller['Model Type File Exceptions Table filename'][run_count])
-    subconfig_MY_exceptions_table_filename = str(run_controller['Subconfig Model Year File Exceptions Table filename'][run_count])
+    subconfig_MY_exceptions_table_filename = str(run_controller['Model Year File Exceptions Table filename'][run_count])
     subconfig_sales_exceptions_table_filename = str(run_controller['Subconfig Sales File Exceptions Table filename'][run_count])
     footprint_exceptions_table_filename = str(run_controller['Footprint File Exceptions Table filename'][run_count])
     roadload_coefficient_table_filename = str(run_controller['Roadload Coefficient Table Filename'][run_count])
     test_car_filename_path = str(run_controller['Test Car File Path'][run_count])
     set_roadload_coefficient_table_filename = str(run_controller['Fuel Economy Test Filename'][run_count])
     set_bodyid_to_lineageid = int(run_controller['SetBodyIDtoLineageID'][run_count])
-    drivecycle_filename = str(run_controller['Drive Cycle Filenames'][run_count])
-    drivecycle_filename = drivecycle_filename.strip('{ }')
-    drivecycle_filename = drivecycle_filename.split(',')
+    drivecycle_filenames = str(run_controller['Drive Cycle Filenames'][run_count])
+    if ('[' and ']') in drivecycle_filenames:
+        drivecycle_filenames = eval(drivecycle_filenames)
+
+    # drivecycle_filename = drivecycle_filename.strip('{ }')
+    # drivecycle_filename = drivecycle_filename.split(',')
     # drivecycle_filename = {'cycle':[], 'time_s': [], 'mph': []}
-    drivecycle_filenames = []
-    for i in range (len(drivecycle_filename)):
-        tmp_drivecycle_filename = drivecycle_filename[i].strip(" '")
-        drivecycle_filenames.append(tmp_drivecycle_filename)
+    # drivecycle_filenames = []
+    # for i in range (len(drivecycle_filename)):
+    #     tmp_drivecycle_filename = drivecycle_filename[i].strip(" '")
+    #     drivecycle_filenames.append(tmp_drivecycle_filename)
 
     drivecycle_input_filenames = str(run_controller['Drive Cycle Input Names'][run_count])
-    drivecycle_input_filenames = drivecycle_input_filenames.strip('{ }')
-    drivecycle_input_filenames = drivecycle_input_filenames.split(',')
+    if ('[' and ']') in drivecycle_input_filenames:
+        drivecycle_input_filenames = eval(drivecycle_input_filenames)
+
+    # drivecycle_input_filenames = drivecycle_input_filenames.strip('{ }')
+    # drivecycle_input_filenames = drivecycle_input_filenames.split(',')
     for i in range (len(drivecycle_input_filenames)):
-        if 'FTP' in drivecycle_input_filenames[i].strip("'"): drivecycle_input_filenames[i] = 'FTP'
-        if 'HWY' in drivecycle_input_filenames[i].strip("'"): drivecycle_input_filenames[i] = 'HWY'
-        if 'US06' in drivecycle_input_filenames[i].strip("'"): drivecycle_input_filenames[i] = 'US06'
+        if 'FTP' in drivecycle_input_filenames[i]: drivecycle_input_filenames[i] = 'FTP'
+        if 'HWY' in drivecycle_input_filenames[i]: drivecycle_input_filenames[i] = 'HWY'
+        if 'US06' in drivecycle_input_filenames[i]: drivecycle_input_filenames[i] = 'US06'
 
     drivecycle_output_filenames = str(run_controller['Drive Cycle Output Names'][run_count])
-    drivecycle_output_filenames = drivecycle_output_filenames.strip('{ }')
-    drivecycle_output_filenames = drivecycle_output_filenames.split(',')
+    if ('[' and ']') in drivecycle_output_filenames:
+        drivecycle_output_filenames = eval(drivecycle_output_filenames)
+    # drivecycle_output_filenames = drivecycle_output_filenames.strip('{ }')
+    # drivecycle_output_filenames = drivecycle_output_filenames.split(',')
     for i in range (len(drivecycle_output_filenames)):
-        if 'FTP' in drivecycle_output_filenames[i].strip("'"): drivecycle_output_filenames[i] = 'FTP'
-        if 'HWY' in drivecycle_output_filenames[i].strip("'"): drivecycle_output_filenames[i] = 'HWY'
-        if 'US06' in drivecycle_output_filenames[i].strip("'"): drivecycle_output_filenames[i] = 'US06'
+        if 'FTP' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'FTP'
+        if 'HWY' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'HWY'
+        if 'US06' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'US06'
 
     footprint_exceptions_table = pd.read_csv(input_path+'\\'+ footprint_exceptions_table_filename) #, converters={'Column Name': eval, 'Old Value': eval, 'New Value': eval})
     print(model_year)
@@ -82,7 +90,7 @@ for run_count in range (0,len(run_controller)):
     if bool_run_new_vehghgid == 'y':
         import Subconfig_ModelType_Footprint_Bodyid_Expansion
         Subconfig_ModelType_Footprint_Bodyid_Expansion.Subconfig_ModelType_Footprint_Bodyid_Expansion\
-            (input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
+            (root_drive_letter, input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
              bool_run_new_manual_filter, manual_filter_filename, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path_vehghgid, footprint_exceptions_table, \
              modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, model_year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
              drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, test_car_filename_path, set_roadload_coefficient_table_filename)

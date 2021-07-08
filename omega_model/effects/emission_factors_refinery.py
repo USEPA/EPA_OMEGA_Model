@@ -19,7 +19,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,in_use_fuel_id,co_grams_per_gallon,voc_grams_per_gallon,nox_grams_per_gallon,so2_grams_per_gallon,pm25_grams_per_gallon,co2_grams_per_gallon,ch4_grams_per_gallon,n2o_grams_per_gallon,acetaldehyde_grams_per_gallon,acrolein_grams_per_gallon,benzene_grams_per_gallon,butadiene13_grams_per_gallon,formaldehyde_grams_per_gallon
+        calendar_year,in_use_fuel_id,co_grams_per_gallon,voc_grams_per_gallon,nox_grams_per_gallon,sox_grams_per_gallon,pm25_grams_per_gallon,co2_grams_per_gallon,ch4_grams_per_gallon,n2o_grams_per_gallon,acetaldehyde_grams_per_gallon,acrolein_grams_per_gallon,benzene_grams_per_gallon,butadiene13_grams_per_gallon,formaldehyde_grams_per_gallon
         2017,pump gasoline,7.154547169,24.70656765,15.02737679,10.97287624,1.077573535,20321.29509,129.3687687,2.633447789,0.004753979,0.000652611,0.096633686,0.001043598,0.035749195
 
 Data Column Name and Description
@@ -58,12 +58,12 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
     formaldehyde_grams_per_gallon = Column('formaldehyde_grams_per_gallon', Float)
     acetaldehyde_grams_per_gallon = Column('acetaldehyde_grams_per_gallon', Float)
     acrolein_grams_per_gallon = Column('acrolein_grams_per_gallon', Float)
+    co2_grams_per_gallon = Column('co2_grams_per_gallon', Float)
     ch4_grams_per_gallon = Column('ch4_grams_per_gallon', Float)
     n2o_grams_per_gallon = Column('n2o_grams_per_gallon', Float)
-    co2_grams_per_gallon = Column('co2_grams_per_gallon', Float)
 
     @staticmethod
-    def get_emission_factors(calendar_year, in_use_fuel_id, emission_factors):
+    def get_emission_factors(calendar_year, fuel, emission_factors):
         """
 
         Args:
@@ -73,16 +73,19 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
         Returns: emission factor or list of emission factors
 
         """
-        cache_key = '%s_%s' % (calendar_year, emission_factors)
+        calendar_years = pd.Series(sql_unpack_result(omega_globals.session.query(EmissionFactorsRefinery.calendar_year).all())).unique()
+        year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+        cache_key = '%s_%s_%s' % (year, fuel, emission_factors)
 
         if cache_key not in cache:
             if type(emission_factors) is not list:
-                cost_factors = [emission_factors]
+                emission_factors = [emission_factors]
             attrs = EmissionFactorsRefinery.get_class_attributes(emission_factors)
 
-            result = common.omega_globals.session.query(*attrs) \
-                .filter(EmissionFactorsRefinery.calendar_year == calendar_year) \
-                .filter(EmissionFactorsRefinery.in_use_fuel_id == in_use_fuel_id).all()[0]
+            result = omega_globals.session.query(*attrs) \
+                .filter(EmissionFactorsRefinery.calendar_year == year) \
+                .filter(EmissionFactorsRefinery.in_use_fuel_id == fuel).all()[0]
 
             if len(emission_factors) == 1:
                 cache[cache_key] = result[0]
@@ -132,12 +135,12 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
                         formaldehyde_grams_per_gallon=df.loc[i, 'formaldehyde_grams_per_gallon'],
                         acetaldehyde_grams_per_gallon=df.loc[i, 'acetaldehyde_grams_per_gallon'],
                         acrolein_grams_per_gallon=df.loc[i, 'acrolein_grams_per_gallon'],
+                        co2_grams_per_gallon=df.loc[i, 'co2_grams_per_gallon'],
                         ch4_grams_per_gallon=df.loc[i, 'ch4_grams_per_gallon'],
                         n2o_grams_per_gallon=df.loc[i, 'n2o_grams_per_gallon'],
-                        co2_grams_per_gallon=df.loc[i, 'co2_grams_per_gallon'],
                     ))
-                common.omega_globals.session.add_all(obj_list)
-                common.omega_globals.session.flush()
+                omega_globals.session.add_all(obj_list)
+                omega_globals.session.flush()
 
         return template_errors
 
@@ -148,23 +151,23 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        common.omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         from omega_model.consumer.market_classes import MarketClass  # needed for market class ID
 
-        SQABase.metadata.create_all(common.omega_globals.engine)
+        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
         # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
         #                                                             verbose=o2.options.verbose)
 
-        init_fail += EmissionFactorsRefinery.init_database_from_file(common.omega_globals.options.emission_factors_refinery_file,
-                                                                     verbose=common.omega_globals.options.verbose)
+        init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(common.omega_globals.options.database_dump_folder)
+            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

@@ -2119,7 +2119,7 @@ BodyID,BodyDescription,LineageID,CabinID,BodyID StartYear,BodyID EndYear,Last Ob
 2158,null,506,1648,2019,null,2021,2019,null,2021,,BMW,X7,,,,,,,,,updated20210321KB,,https://media.ed.edmunds-media.com/bmw/x7/2019/oem/2019_bmw_x7_4dr-suv_xdrive40i_fq_oem_1_815.jpg,,https://media.ed.edmunds-media.com/bmw/x7/2019/oem/2019_bmw_x7_4dr-suv_xdrive40i_rq_oem_6_815.jpg,,,,
 2159,null,507,1649,2019,null,2021,2019,null,2021,,Cadillac,XT4,,,,,,,,,updated20210321KB,,https://media.ed.edmunds-media.com/cadillac/xt4/2019/oem/2019_cadillac_xt4_4dr-suv_sport_fq_oem_3_815.jpg,,https://media.ed.edmunds-media.com/cadillac/xt4/2019/oem/2019_cadillac_xt4_4dr-suv_premium-luxury_rq_oem_2_815.jpg,,,,
 2160,null,508,1650,2019,null,2021,2019,null,2021,,Audi,E-Tron,,,,,,,,,updated20210321KB,,https://media.ed.edmunds-media.com/audi/e-tron/2019/oem/2019_audi_e-tron_4dr-suv_prestige-quattro_fq_oem_5_815.jpg,,https://media.ed.edmunds-media.com/audi/e-tron/2019/oem/2019_audi_e-tron_4dr-suv_prestige-quattro_rq_oem_1_815.jpg,,,,
-99999,null,9999,99999,1,null,,1,null,,,dummyMake,dummyModel,,1,null,,1,null,,N,,,,,,,,,
+99999,null,9999,999999,1,null,,1,null,,,dummyMake,dummyModel,,1,null,,1,null,,N,,,,,,,,,
 2161,null,305,1651,2018,2020,2020,2018,null,2020,,Nissan,Kicks,,,,,,,,,replaces Nissan Juke; updated20210321KB,,https://media.ed.edmunds-media.com/nissan/kicks/2018/oem/2018_nissan_kicks_4dr-hatchback_sr_fq_oem_6_815.jpg,,https://media.ed.edmunds-media.com/nissan/kicks/2018/oem/2018_nissan_kicks_4dr-hatchback_sr_rq_oem_1_815.jpg,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
