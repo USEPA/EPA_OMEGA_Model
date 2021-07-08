@@ -13,10 +13,12 @@ Runs a single session.
 print('importing %s' % __file__)
 
 import sys
-sys.path.extend('..')
+import os
+
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(path, '..'))  # picks up omega_model sub-packages
 
 from omega_model import *
-import os
 from omega_model.consumer import stock
 import postproc_session
 
