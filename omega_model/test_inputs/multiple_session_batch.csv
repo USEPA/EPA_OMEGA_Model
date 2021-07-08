@@ -20,14 +20,15 @@ Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
 Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
-Cost File,String,simulated_vehicles.csv,simulated_vehicles.csv
 Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
+Cost File,String,simulated_vehicles.csv,simulated_vehicles.csv
+Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
 GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
-Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
-Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
 GHG Standards Fuels File,String,policy_fuels.csv,policy_fuels.csv
+Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
+Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
 ZEV Requirement File,String,required_zev_share.csv,required_zev_share.csv
 Price Modifications File,String,price_modifications.csv,price_modifications.csv
 Production Constraints File,String,production_constraints.csv,production_constraints.csv

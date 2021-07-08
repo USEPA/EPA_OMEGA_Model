@@ -631,7 +631,7 @@ def plot_market_shares(calendar_years, total_sales):
         market_share_results['abs_share_frac_%s' % csc] = market_category_abs_share_frac
 
     # tally up reg class sales
-    for rc in reg_classes:
+    for rc in omega_globals.options.RegulatoryClasses.reg_classes:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             market_category_abs_share_frac.append(float(omega_globals.session.query(func.sum(VehicleAnnualData.registered_count))
@@ -670,11 +670,11 @@ def plot_market_shares(calendar_years, total_sales):
 
     # plot reg class results
     fig, ax1 = figure()
-    for rc in reg_classes:
+    for rc in omega_globals.options.RegulatoryClasses.reg_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % rc], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nReg Class Absolute Market Shares' % omega_globals.options.session_unique_name)
-    ax1.legend(reg_classes, ncol=2, loc='upper center')
+    ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s RC Shares.png' % omega_globals.options.session_unique_name)
 
     return market_share_results

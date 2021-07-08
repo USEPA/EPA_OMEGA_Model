@@ -23,6 +23,7 @@ Drive Cycle Weights File,String,drive_cycle_weights.csv
 Context Fuel Prices File,String,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv
 Cost File,String,simulated_vehicles.csv
+Regulatory Classes File,String,regulatory_classes.csv
 GHG Standards File,String,ghg_standards-footprint.csv
 GHG Standards Fuels File,String,policy_fuels.csv
 Production Multipliers File,String,production_multipliers.csv
