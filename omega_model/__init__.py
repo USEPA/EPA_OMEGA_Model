@@ -53,7 +53,7 @@ try:
     hauling_classes = OMEGAEnum(['hauling', 'non_hauling'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
     legacy_reg_classes = OMEGAEnum(['car', 'truck'])
-    reg_classes = None  # reg class names are loaded during init from policy.regulatory_classes
+    reg_classes = []  # reg class names are loaded during init from policy.regulatory_classes
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
     class OMEGARuntimeOptions(OMEGABase):
