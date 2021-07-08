@@ -73,14 +73,17 @@ class CostFactorsCriteria(SQABase, OMEGABase):
         Returns: cost factor or list of cost factors
 
         """
-        cache_key = '%s_%s' % (calendar_year, cost_factors)
+        calendar_years = pd.Series(sql_unpack_result(omega_globals.session.query(CostFactorsCriteria.calendar_year).all())).unique()
+        year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+        cache_key = '%s_%s' % (year, cost_factors)
 
         if cache_key not in cache:
             if type(cost_factors) is not list:
                 cost_factors = [cost_factors]
             attrs = CostFactorsCriteria.get_class_attributes(cost_factors)
 
-            result = omega_globals.session.query(*attrs).filter(CostFactorsCriteria.calendar_year == calendar_year).all()[0]
+            result = omega_globals.session.query(*attrs).filter(CostFactorsCriteria.calendar_year == year).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]

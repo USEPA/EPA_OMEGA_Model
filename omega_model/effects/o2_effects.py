@@ -15,33 +15,33 @@ vehicle_annual_data table and included in the vehicle_annual_data.csv output fil
 """
 
 from omega_model import *
-from inventory import calc_inventory
-from social_costs import calc_carbon_emission_costs, calc_criteria_emission_costs, calc_non_emission_costs
+from omega_model.effects.inventory import calc_inventory
+from omega_model.effects.social_costs import calc_carbon_emission_costs, calc_criteria_emission_costs, calc_non_emission_costs
 
 
 def run_effects_calcs():
-    from omega_model.producer.vehicle_annual_data import VehicleAnnualData
+    from producer.vehicle_annual_data import VehicleAnnualData
 
-    calendar_years = VehicleAnnualData.get_calendar_years()
-    calendar_years = pd.Series(calendar_years).unique()
+    calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
+    calendar_years = [year for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
     for calendar_year in calendar_years:
         print(f'Calculating inventories for {int(calendar_year)}')
         omega_log.logwrite(f'Calculating inventories for {int(calendar_year)}')
         calc_inventory(calendar_year)
 
-    for calendar_year in calendar_years:
-        print(f'Calculating non-emission-related costs for {int(calendar_year)}')
-        omega_log.logwrite(f'Calculating non-emission-related costs for {int(calendar_year)}')
-        calc_non_emission_costs(calendar_year)
-
-    for calendar_year in calendar_years:
-        print(f'Calculating costs of carbon emissions for {int(calendar_year)}')
-        omega_log.logwrite(f'Calculating costs of carbon emissions for {int(calendar_year)}')
-        calc_carbon_emission_costs(calendar_year)
-
-    if common.omega_globals.options.calc_criteria_emission_costs:
-        for calendar_year in calendar_years:
-            print(f'Calculating costs of criteria emissions for {int(calendar_year)}')
-            omega_log.logwrite(f'Calculating costs of criteria emissions for {int(calendar_year)}')
-            calc_criteria_emission_costs(calendar_year)
+    # for calendar_year in calendar_years:
+    #     print(f'Calculating non-emission-related costs for {int(calendar_year)}')
+    #     omega_log.logwrite(f'Calculating non-emission-related costs for {int(calendar_year)}')
+    #     calc_non_emission_costs(calendar_year)
+    #
+    # for calendar_year in calendar_years:
+    #     print(f'Calculating costs of carbon emissions for {int(calendar_year)}')
+    #     omega_log.logwrite(f'Calculating costs of carbon emissions for {int(calendar_year)}')
+    #     calc_carbon_emission_costs(calendar_year)
+    #
+    # if omega_globals.options.calc_criteria_emission_costs:
+    #     for calendar_year in calendar_years:
+    #         print(f'Calculating costs of criteria emissions for {int(calendar_year)}')
+    #         omega_log.logwrite(f'Calculating costs of criteria emissions for {int(calendar_year)}')
+    #         calc_criteria_emission_costs(calendar_year)

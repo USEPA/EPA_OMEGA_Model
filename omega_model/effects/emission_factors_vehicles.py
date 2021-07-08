@@ -19,7 +19,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        model_year,age,reg_class_id,in_use_fuel_id,voc_grams_per_mile,co_grams_per_mile,nox_grams_per_mile,pm25_grams_per_mile,so2_grams_per_gallon,benzene_grams_per_mile,butadiene13_grams_per_mile,formaldehyde_grams_per_mile,acetaldehyde_grams_per_mile,acrolein_grams_per_mile,co2_grams_per_mile,n2o_grams_per_mile,ch4_grams_per_mile
+        model_year,age,reg_class_id,in_use_fuel_id,voc_grams_per_mile,co_grams_per_mile,nox_grams_per_mile,pm25_grams_per_mile,sox_grams_per_gallon,benzene_grams_per_mile,butadiene13_grams_per_mile,formaldehyde_grams_per_mile,acetaldehyde_grams_per_mile,acrolein_grams_per_mile,co2_grams_per_mile,n2o_grams_per_mile,ch4_grams_per_mile
         2020,0,car,pump gasoline,0.038838978,0.934237929,0.041727278,0.001925829,0.001648851,0.001641638,0.0003004,0.000441563,0.000767683,4.91E-05,,0.004052681,0.005520596
         2020,0,truck,pump gasoline,0.035665375,1.068022441,0.054597497,0.002444363,0.002240974,0.001499163,0.000262733,0.000411881,0.000764069,4.45E-05,,0.005146965,0.007103921
 
@@ -64,7 +64,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
     co_grams_per_mile = Column('co_grams_per_mile', Float)
     nox_grams_per_mile = Column('nox_grams_per_mile', Float)
     pm25_grams_per_mile = Column('pm25_grams_per_mile', Float)
-    so2_grams_per_gallon = Column('so2_grams_per_gallon', Float)
+    sox_grams_per_gallon = Column('sox_grams_per_gallon', Float)
     benzene_grams_per_mile = Column('benzene_grams_per_mile', Float)
     butadiene13_grams_per_mile = Column('butadiene13_grams_per_mile', Float)
     formaldehyde_grams_per_mile = Column('formaldehyde_grams_per_mile', Float)
@@ -74,7 +74,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
     n2o_grams_per_mile = Column('n2o_grams_per_mile', Float)
 
     @staticmethod
-    def get_emission_factors(model_year, age, reg_class_id, in_use_fuel_id, emission_factors):
+    def get_emission_factors(model_year, age, reg_class_id, fuel, emission_factors):
         """
 
         Args:
@@ -84,18 +84,18 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
         Returns: emission factor or list of emission factors
 
         """
-        cache_key = '%s_%s_%s_%s_%s' % (model_year, age, reg_class_id, in_use_fuel_id, emission_factors)
+        cache_key = '%s_%s_%s_%s_%s' % (model_year, age, reg_class_id, fuel, emission_factors)
 
         if cache_key not in cache:
             if type(emission_factors) is not list:
-                cost_factors = [emission_factors]
+                emission_factors = [emission_factors]
             attrs = EmissionFactorsVehicles.get_class_attributes(emission_factors)
 
             result = omega_globals.session.query(*attrs) \
                 .filter(EmissionFactorsVehicles.model_year == model_year) \
                 .filter(EmissionFactorsVehicles.age == age) \
                 .filter(EmissionFactorsVehicles.reg_class_ID == reg_class_id) \
-                .filter(EmissionFactorsVehicles.in_use_fuel_id == in_use_fuel_id) \
+                .filter(EmissionFactorsVehicles.in_use_fuel_id == fuel) \
                 .all()[0]
 
             if len(emission_factors) == 1:
@@ -116,7 +116,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
         input_template_name = 'context_emission_factors-vehicles'
         input_template_version = 0.1
         input_template_columns = {'model_year', 'age', 'reg_class_id', 'in_use_fuel_id',
-                                  'voc_grams_per_mile', 'co_grams_per_mile', 'nox_grams_per_mile', 'pm25_grams_per_mile', 'so2_grams_per_gallon',
+                                  'voc_grams_per_mile', 'co_grams_per_mile', 'nox_grams_per_mile', 'pm25_grams_per_mile', 'sox_grams_per_gallon',
                                   'benzene_grams_per_mile', 'butadiene13_grams_per_mile', 'formaldehyde_grams_per_mile',
                                   'acetaldehyde_grams_per_mile', 'acrolein_grams_per_mile',
                                   'ch4_grams_per_mile', 'n2o_grams_per_mile'}
@@ -143,7 +143,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
                         co_grams_per_mile=df.loc[i, 'co_grams_per_mile'],
                         nox_grams_per_mile=df.loc[i, 'nox_grams_per_mile'],
                         pm25_grams_per_mile=df.loc[i, 'pm25_grams_per_mile'],
-                        so2_grams_per_gallon=df.loc[i, 'so2_grams_per_gallon'],
+                        sox_grams_per_gallon=df.loc[i, 'sox_grams_per_gallon'],
                         benzene_grams_per_mile=df.loc[i, 'benzene_grams_per_mile'],
                         butadiene13_grams_per_mile=df.loc[i, 'butadiene13_grams_per_mile'],
                         formaldehyde_grams_per_mile=df.loc[i, 'formaldehyde_grams_per_mile'],
