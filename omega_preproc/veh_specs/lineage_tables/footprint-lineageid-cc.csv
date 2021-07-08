@@ -396,30 +396,30 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Atlas 4Motion,185,1,Atlas 4Motion,445
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan,170,1,Tiguan  215/65 R17,400
 2019,3137,"Volkswagen Group of America, Inc.",VGA,Volkswagen,1,Tiguan 4Motion,175,1,Tiguan 4Motion 215/65 R17,400
-2017,2217,Computer Science,CSC,Verify Manager Division,3,CAMARO,970,1,CAMARO PV,99999
-2017,2217,Computer Science,CSC,Verify Manager Division,3,EQUINOX AWD Truck,950,1,EQUINOX AWD PV,99999
-2017,2217,Computer Science,CSC,Verify Manager Division,3,EQUINOX FWD,42,1,EQUINOX FWD PV,99999
-2017,3218,Computer Science,CSC,Verify Manager Division,3,CAMARO,970,2,CAMARO LT,99999
-2017,3218,Computer Science,CSC,Verify Manager Division,3,EQUINOX AWD Truck,950,2,EQUINOX AWD LT,99999
-2017,3218,Computer Science,CSC,Verify Manager Division,3,EQUINOX FWD,42,2,EQUINOX FWD LT,99999
-2017,2217,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN AWD Truck,935,1,TERRAIN AWD PV,99999
-2017,2217,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN FWD,90,1,TERRAIN FWD PV,99999
-2017,3218,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN AWD Truck,935,2,TERRAIN AWD LT,99999
-2017,3218,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN FWD,90,2,TERRAIN FWD LT,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,ATS AWD,545,1,ATS AWD PV,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,ATS,542,1,ATS PV,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,CT6 AWD,560,1,CT6 AWD PV,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,CTS AWD,549,1,CTS SEDAN AWD PV,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,CTS,548,1,CTS SEDAN PV,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,XTS AWD,544,1,XTS AWD PV,99999
-2017,2217,Computer Science,CSC,Verify Developers Division,2,XTS,543,1,XTS PV,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,ATS AWD,545,2,ATS AWD LT,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,ATS,542,2,ATS LT,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,CT6 AWD,560,2,CT6 AWD LT,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,CTS AWD,549,2,CTS SEDAN AWD LT,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,CTS,548,2,CTS SEDAN LT,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,XTS AWD,544,2,XTS AWD LT,99999
-2017,3218,Computer Science,CSC,Verify Developers Division,2,XTS,543,2,XTS LT,99999
+2017,2217,Computer Science,CSC,Verify Manager Division,3,CAMARO,970,1,CAMARO PV,
+2017,2217,Computer Science,CSC,Verify Manager Division,3,EQUINOX AWD Truck,950,1,EQUINOX AWD PV,
+2017,2217,Computer Science,CSC,Verify Manager Division,3,EQUINOX FWD,42,1,EQUINOX FWD PV,
+2017,3218,Computer Science,CSC,Verify Manager Division,3,CAMARO,970,2,CAMARO LT,
+2017,3218,Computer Science,CSC,Verify Manager Division,3,EQUINOX AWD Truck,950,2,EQUINOX AWD LT,
+2017,3218,Computer Science,CSC,Verify Manager Division,3,EQUINOX FWD,42,2,EQUINOX FWD LT,
+2017,2217,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN AWD Truck,935,1,TERRAIN AWD PV,
+2017,2217,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN FWD,90,1,TERRAIN FWD PV,
+2017,3218,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN AWD Truck,935,2,TERRAIN AWD LT,
+2017,3218,Computer Science,CSC,Verify Help Desk Division,4,TERRAIN FWD,90,2,TERRAIN FWD LT,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,ATS AWD,545,1,ATS AWD PV,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,ATS,542,1,ATS PV,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,CT6 AWD,560,1,CT6 AWD PV,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,CTS AWD,549,1,CTS SEDAN AWD PV,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,CTS,548,1,CTS SEDAN PV,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,XTS AWD,544,1,XTS AWD PV,
+2017,2217,Computer Science,CSC,Verify Developers Division,2,XTS,543,1,XTS PV,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,ATS AWD,545,2,ATS AWD LT,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,ATS,542,2,ATS LT,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,CT6 AWD,560,2,CT6 AWD LT,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,CTS AWD,549,2,CTS SEDAN AWD LT,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,CTS,548,2,CTS SEDAN LT,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,XTS AWD,544,2,XTS AWD LT,
+2017,3218,Computer Science,CSC,Verify Developers Division,2,XTS,543,2,XTS LT,
 2012,894,Toyota Motor Corporation,TYX,TOYOTA,1,4RUNNER 2WD,101,1,4RUNNER 2WD (GRN280L-GKAGKA),374
 2012,894,Toyota Motor Corporation,TYX,TOYOTA,1,4RUNNER 4WD,102,1,4RUNNER 4WD (GRN285L-GKAGKA),374
 2012,894,Toyota Motor Corporation,TYX,TOYOTA,1,FJ CRUISER 4WD,195,1,"FJ CRUISER 4WD (GSJ15L-GKASKA,GSJ15L-GKFSKA)",379
@@ -1056,7 +1056,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2013,913,Suzuki Motor Corporation,SKX,Suzuki,1,SX4 Sport,47,2,SX4 Sport CVT,369
 2013,913,Suzuki Motor Corporation,SKX,Suzuki,1,SX4 Sport,47,1,SX4 Sport M6,369
 2013,913,Suzuki Motor Corporation,SKX,Suzuki,1,SX4 AWD,40,2,SX4AWD CVT,369
-2019,2868,Subaru Corporation,FJX,Subaru,1,S209,200,1,S209,99999
+2019,2868,SUBARU TECNICA INTERNATIONAL INC.,SUB,SUBARU TECNICA INTERNATIONAL,1,S209,200,1,S209,0
 2012,693,Subaru Corporation,FJX,Subaru,1,LEGACY AWD,65,1,SEDAN,360
 2012,693,Subaru Corporation,FJX,Subaru,1,IMPREZA AWD,45,1,SEDAN - Natural Aspiration,359
 2012,693,Subaru Corporation,FJX,Subaru,1,IMPREZA AWD,45,2,SEDAN - Turbocharger,359
@@ -1849,10 +1849,10 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2014,1647,Pagani Automobili S.p.A.,PGN,Pagani Automobili S.p.A.,3,Huayra Coupe,1,1,Huayra,438
 2017,2789,Pagani Automobili S.p.A.,PGN,Pagani Automobili S.p.A.,3,Huayra,1,1,Huayra,438
 2018,3215,Pagani Automobili S.p.A.,PGN,Pagani Automobili S.p.A.,3,Huayra,1,1,Huayra,438
-2017,2217,Computer Science,CSC,North American Public Sector,1,LACROSSE,25,1,LACROSSE PV,99999
-2017,2217,Computer Science,CSC,North American Public Sector,1,LACROSSE AWD,26,1,LACROSSE PV,99999
-2017,3218,Computer Science,CSC,North American Public Sector,1,LACROSSE,25,2,LACROSSE LT,99999
-2017,3218,Computer Science,CSC,North American Public Sector,1,LACROSSE AWD,26,2,LACROSSE LT,99999
+2017,2217,Computer Science,CSC,North American Public Sector,1,LACROSSE,25,1,LACROSSE PV,
+2017,2217,Computer Science,CSC,North American Public Sector,1,LACROSSE AWD,26,1,LACROSSE PV,
+2017,3218,Computer Science,CSC,North American Public Sector,1,LACROSSE,25,2,LACROSSE LT,
+2017,3218,Computer Science,CSC,North American Public Sector,1,LACROSSE AWD,26,2,LACROSSE LT,
 2012,449,"Nissan Motor Co., Ltd.",NSX,NISSAN,1,ARMADA 2WD,125,1,ARMADA 2WD FFV_P265/70R18,301
 2012,449,"Nissan Motor Co., Ltd.",NSX,NISSAN,1,ARMADA 2WD,125,2,ARMADA 2WD FFV_P275/60R20,301
 2012,449,"Nissan Motor Co., Ltd.",NSX,NISSAN,1,ARMADA 2WD,116,1,ARMADA 2WD_P265/70R18,301
@@ -5279,7 +5279,7 @@ MODEL_YEAR,CAFE_ID,FOOTPRINT_MFR_NM,FOOTPRINT_MFR_CD,FOOTPRINT_DIVISION_NM,FOOTP
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Huracan 2WD,408,1,Huracan Coupe 2WD  F:245/35 ZR19 R:305/35 ZR19,214
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Huracan Spyder,427,1,Huracan Spyder  F:245/30 ZR20 R:305/30 ZR20,214
 2019,3136,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Huracan Spyder 2WD,428,1,Huracan Spyder 2WD  F:245/30 ZR20 R:305/30 ZR20,214
-2019,3137,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Urus,410,1,Urus 4.0L  F 285/45 ZR21 R 315/40 ZR21,99999
+2019,3137,"Volkswagen Group of America, Inc.",VGA,Lamborghini,4,Urus,410,1,Urus 4.0L  F 285/45 ZR21 R 315/40 ZR21,0
 2015,1922,Koenigsegg Automotive AB,KGG,Koenigsegg Automotive AG,1,One:1,100,1,Manufacturer Calculated Target GHG and Breakover Angle to be confirmed.,461
 2019,3421,Koenigsegg Automotive AB,KGG,Koenigsegg Automotive AG,1,REGERA,1,1,Regera 2-Seater,461
 2012,1610,Kia Motors Corporation,KMX,KIA MOTORS CORPORATION,1,SEDONA,618,1,SEDONA,207
