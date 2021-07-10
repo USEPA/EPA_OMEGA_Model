@@ -13,10 +13,12 @@ vehicle_annual_data table and included in the vehicle_annual_data.csv output fil
 **CODE**
 
 """
-
+from pathlib import Path
 from omega_model import *
 from omega_model.effects.inventory import calc_inventory
-from omega_model.effects.social_costs import calc_carbon_emission_costs, calc_criteria_emission_costs, calc_non_emission_costs
+from omega_model.effects.social_costs import calc_carbon_emission_costs, calc_criteria_emission_costs, calc_non_emission_costs, calc_cost_effects
+from omega_model.effects.general_functions import save_dict_to_csv
+from omega_model.effects.discounting import discount_values
 
 
 def run_effects_calcs():
@@ -25,23 +27,41 @@ def run_effects_calcs():
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
     calendar_years = [year for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
+    physical_effects_dict = dict()
     for calendar_year in calendar_years:
         print(f'Calculating inventories for {int(calendar_year)}')
         omega_log.logwrite(f'Calculating inventories for {int(calendar_year)}')
-        calc_inventory(calendar_year)
+        physical_effects_dict.update(calc_inventory(calendar_year))
 
+    cost_effects_dict = dict()
+    print('Calculating costs')
+    omega_log.logwrite('Calculating costs')
+    cost_effects_dict.update(calc_cost_effects(physical_effects_dict))
+
+    print('Discounting costs')
+    omega_log.logwrite('Discounting costs')
+    cost_effects_dict = discount_values(cost_effects_dict)
+
+    path_parent = Path(__file__).parent
+    path_model = path_parent.parent
+    path_project = path_model.parent
+    path_out = path_project / 'out'
+    save_dict_to_csv(physical_effects_dict, path_out / 'physical_effects', list(), 'vehicle_ID', 'calendar_year', 'age')
+    save_dict_to_csv(cost_effects_dict, path_out / 'cost_effects', list(), 'vehicle_ID', 'calendar_year', 'age', 'discount_rate')
+
+    # # cost_effects_dict = dict()
     # for calendar_year in calendar_years:
     #     print(f'Calculating non-emission-related costs for {int(calendar_year)}')
     #     omega_log.logwrite(f'Calculating non-emission-related costs for {int(calendar_year)}')
-    #     calc_non_emission_costs(calendar_year)
-    #
+    #     cost_effects_dict = calc_non_emission_costs(calendar_year)
+
     # for calendar_year in calendar_years:
     #     print(f'Calculating costs of carbon emissions for {int(calendar_year)}')
     #     omega_log.logwrite(f'Calculating costs of carbon emissions for {int(calendar_year)}')
-    #     calc_carbon_emission_costs(calendar_year)
+    #     cost_effects_dict = calc_carbon_emission_costs(calendar_year, cost_effects_dict)
     #
     # if omega_globals.options.calc_criteria_emission_costs:
     #     for calendar_year in calendar_years:
     #         print(f'Calculating costs of criteria emissions for {int(calendar_year)}')
     #         omega_log.logwrite(f'Calculating costs of criteria emissions for {int(calendar_year)}')
-    #         calc_criteria_emission_costs(calendar_year)
+    #         cost_effects_dict = calc_criteria_emission_costs(calendar_year, cost_effects_dict)

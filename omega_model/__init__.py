@@ -140,8 +140,8 @@ try:
             self.new_vehicle_sales_response_elasticity = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
-            self.calc_effects = False
-            self.calc_criteria_emission_costs = False
+            self.calc_effects = True
+            self.calc_criteria_emission_costs = True
             # effects modeling files
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
             self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
@@ -161,7 +161,7 @@ try:
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
-            self.num_analysis_years = None  # number of years to run, if not all (None = run all)
+            self.num_analysis_years = 2  # number of years to run, if not all (None = run all)
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
