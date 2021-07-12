@@ -100,10 +100,22 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        import importlib
+
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
+
+        init_fail = []
+
+        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+        # override reg_classes from __init__.py:
+        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
@@ -113,13 +125,12 @@ if __name__ == '__main__':
         from context.cost_clouds import CostCloud
 
         omega_globals.options.PolicyTargets = Targets
-        omega_globals.options.policy_targets_input_file = 'test_inputs/ghg_standards-footprint.csv'
+
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail = []
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
@@ -128,7 +139,7 @@ if __name__ == '__main__':
                                                                 verbose=omega_globals.options.verbose)
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += Targets.init_from_file(omega_globals.options.policy_targets_input_file,
+        init_fail += Targets.init_from_file(omega_globals.options.policy_targets_file,
                                             verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
@@ -146,11 +157,12 @@ if __name__ == '__main__':
             # test market shares at different CO2 and price levels
             mcd = pd.DataFrame()
             for mc in MarketClass.market_classes:
-                mcd['average_%s_cost' % mc] = [35000, 25000]
-                mcd['average_%s_co2_gpmi' % mc] = [125, 150]
-                mcd['average_%s_fuel_price' % mc] = [2.75, 3.25]
-                mcd['producer_non_hauling_share_frac'] = [0.8, 0.85]
-                mcd['producer_hauling_share_frac'] = [0.2, 0.15]
+                mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
+                mcd['average_kwh_pmi_%s' % mc] = [0, 0]
+                mcd['average_co2_gpmi_%s' % mc] = [125, 150]
+                mcd['average_fuel_price_%s' % mc] = [2.75, 3.25]
+                mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
+                mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
             share_demand = get_demanded_shares(mcd, omega_globals.options.analysis_initial_year)
 

@@ -101,12 +101,22 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        import importlib
+
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
 
         init_fail = []
+
+        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+        # override reg_classes from __init__.py:
+        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
@@ -116,20 +126,8 @@ if __name__ == '__main__':
         from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2
         from context.new_vehicle_market import NewVehicleMarket
 
-        from policy.targets_alternative import input_template_name as flat_template_name
-        from policy.targets_footprint import input_template_name as footprint_template_name
-        ghg_template_name = get_template_name(omega_globals.options.policy_targets_input_file)
-
-        if ghg_template_name == flat_template_name:
-            from policy.targets_alternative import Targets
-
-            omega_globals.options.PolicyTargets = Targets
-        elif ghg_template_name == footprint_template_name:
-            from policy.targets_footprint import Targets
-
-            omega_globals.options.PolicyTargets = Targets
-        else:
-            init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
+        module_name = get_template_name(omega_globals.options.policy_targets_file)
+        omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
 
         SQABase.metadata.create_all(omega_globals.engine)
 
@@ -141,7 +139,7 @@ if __name__ == '__main__':
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_input_file,
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                         verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,

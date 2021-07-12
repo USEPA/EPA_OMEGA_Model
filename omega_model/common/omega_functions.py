@@ -664,12 +664,19 @@ def HighwayFUF(miles):
 
 
 if __name__ == '__main__':
-    import pandas as pd
+    try:
+        import pandas as pd
 
-    # partition test
-    part = partition(['a', 'b'], increment=0.1, min_level=0.01)
+        # partition test
+        part = partition(['a', 'b'], verbose=True)
 
-    # nearby shares test
-    share_combo = pd.Series({'a': 0.5, 'b': 0.2, 'c': 0.3})
-    column_names = ['a', 'b', 'c']
-    dfx = _generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)
+        # nearby shares test
+        share_combo = pd.DataFrame({'a':[0.5], 'b': [0.2], 'c': [0.3]})
+        column_names = ['a', 'b', 'c']
+        dfx = _generate_nearby_shares(column_names, share_combo, half_range_frac=0.02, num_steps=5, min_level=0.001, verbose=True)
+
+    except:
+        import os
+        import traceback
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

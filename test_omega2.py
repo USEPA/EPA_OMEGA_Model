@@ -50,28 +50,49 @@ if __name__ == "__main__":
     import traceback
 
     validate_folder(test_omega2_output_folder)
-    os.system('del %s\\*.* /Q' % test_omega2_output_folder)
+    if 'darwin' in sys.platform:
+        os.system('rm %s/*.*' % test_omega2_output_folder)
+    else:
+        os.system('del %s\\*.* /Q' % test_omega2_output_folder)
 
     try:
         init_logfile()
 
-        pythonpathstr = 'set PYTHONPATH=.;.\\omega_model'
+        path = os.path.dirname(os.path.abspath(__file__))
+
+        if 'darwin' in sys.platform:
+            pythonpathstr = 'export PYTHONPATH=%s:%s/omega_model' % (path, path)
+        else:
+            pythonpathstr = 'set PYTHONPATH=.;.\\omega_model'
         pythoncommand = 'python -u'
 
-        results = {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}
+        results = dict() # {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}
 
-        for source_folder in ['omega_model', 'omega_model\\consumer', 'omega_model\\effects']:
+        package_folder = '%s/omega_model' % path
+        subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
+                           if os.path.isdir(package_folder + os.sep + d)
+                           and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
+
+        for source_folder in subpackage_list:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
 
-                console_file_pathname = test_omega2_output_folder + os.sep + f.replace('.py', '') + '.txt'
-                cmd_str = '%s & %s %s' % (pythonpathstr, pythoncommand, os.path.join(source_folder, f))
+                console_file_pathname = test_omega2_output_folder + os.sep + os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'
+
+                if 'darwin' in sys.platform:
+                    cmd_str = '%s; %s %s' % (pythonpathstr, pythoncommand, os.path.join(source_folder, f))
+                else:
+                    cmd_str = '%s & %s %s' % (pythonpathstr, pythoncommand, os.path.join(source_folder, f))
+
                 cmd_opts = ''
 
                 if f == 'omega_batch.py':
-                    cmd_opts = '--batch_file omega_model\\test_inputs\\single_session_batch.xlsx --verbose'
+                    cmd_opts = '--batch_file omega_model\\test_inputs\\single_session_batch.csv --verbose'
 
-                cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
+                if 'darwin' in sys.platform:
+                    cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
+                else:
+                    cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 
                 logwrite('TRYING %s' % cmd_str)
                 r = os.system(cmd_str)
@@ -81,11 +102,18 @@ if __name__ == "__main__":
                 elif r == -1:
                     result_status = 'FAILED'
                 else:
-                    result_status = 'UNKNOWN'
+                    result_status = 'UNKNOWN_%s' % r
+
+                if result_status not in results:
+                    results[result_status] = []
 
                 results[result_status].append(cmd_str)
                 logwrite('%s %s' % (cmd_str, result_status))
-                os.system('RENAME %s %s_%s' % (console_file_pathname, result_status, f.replace('.py', '') + '.txt'))
+
+                if 'darwin' in sys.platform:
+                    os.system('mv %s %s/%s_%s' % (console_file_pathname, test_omega2_output_folder, result_status, os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'))
+                else:
+                    os.system('RENAME %s %s_%s' % (console_file_pathname, result_status, os.path.split(source_folder)[1] + '_' + f.replace('.py', '') + '.txt'))
 
                 logwrite('')
 

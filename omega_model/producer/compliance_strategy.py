@@ -346,6 +346,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     """
     from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle
     from consumer.market_classes import MarketClass, populate_market_classes
+    from consumer.sales_volume import context_new_vehicle_sales
     from context.new_vehicle_market import NewVehicleMarket
 
     cache_key = calendar_year
@@ -364,7 +365,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
             manufacturer_vehicles.append(new_veh)
             new_veh.initial_registered_count = new_veh.market_share
 
-        total_sales = consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']
+        total_sales = context_new_vehicle_sales(calendar_year)['total']
 
         # group by non responsive market group
         from consumer import non_responsive_market_categories
@@ -377,7 +378,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
 
         # distribute non responsive market class sales to manufacturer_vehicles by relative market share
         for nrmc in non_responsive_market_categories:
-            nrmc_initial_registered_count = consumer.sales_volume.context_new_vehicle_sales(calendar_year)[nrmc]
+            nrmc_initial_registered_count = context_new_vehicle_sales(calendar_year)[nrmc]
             distribute_by_attribute(nrmc_dict[nrmc], nrmc_initial_registered_count,
                                     weight_by='market_share',
                                     distribute_to='initial_registered_count')

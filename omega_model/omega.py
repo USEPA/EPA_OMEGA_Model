@@ -12,8 +12,7 @@ Runs a single session.
 
 print('importing %s' % __file__)
 
-import sys
-import os
+import sys, os
 
 path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(path, '..'))  # picks up omega_model sub-packages
@@ -601,11 +600,11 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
 
 
 # noinspection PyUnresolvedReferences
-def init_omega(o2_options):
+def init_omega(session_runtime_options):
     """
 
     Args:
-        o2_options:
+        session_runtime_options (OMEGARuntimeOptions):
 
     Returns:
 
@@ -615,7 +614,7 @@ def init_omega(o2_options):
     from common.omega_log import OMEGABatchLog
 
     # set up global variables:
-    omega_globals.options = o2_options
+    omega_globals.options = session_runtime_options
 
     if omega_globals.options.auto_close_figures:
         import matplotlib
@@ -623,34 +622,48 @@ def init_omega(o2_options):
 
     omega_log.init_logfile()
 
+    omega_log.logwrite("Initializing %s:" % omega_globals.options.session_unique_name, echo_console=True)
+
     init_omega_db()
     omega_globals.engine.echo = omega_globals.options.verbose
 
     init_fail = []
 
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
-    module_name = get_template_name(omega_globals.options.policy_reg_classes_input_file)
+    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
     omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-        omega_globals.options.policy_reg_classes_input_file)
+        omega_globals.options.policy_reg_classes_file)
     # override reg_classes from __init__.py:
     importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
+    module_name = get_template_name(omega_globals.options.policy_targets_file)
+    omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
+
     # import database modules to populate ORM context
     from context.onroad_fuels import OnroadFuel
-    from policy.upstream_methods import UpstreamMethods
-    from policy.offcycle_credits import OffCycleCredits
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
+    from context.price_modifications import PriceModifications
+    from context.production_constraints import ProductionConstraints
+
+    from policy.upstream_methods import UpstreamMethods
+    from policy.offcycle_credits import OffCycleCredits
+
     from consumer.market_classes import MarketClass
+
     from context.cost_clouds import CostCloud
+
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
+
     from producer.manufacturers import Manufacturer
     from producer.manufacturer_annual_data import ManufacturerAnnualData
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
+
     from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
+
     from effects.cost_factors_criteria import CostFactorsCriteria
     from effects.cost_factors_scc import CostFactorsSCC
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
@@ -661,26 +674,19 @@ def init_omega(o2_options):
     from effects.cost_effects_scc import CostEffectsSCC
     from effects.cost_effects_criteria import CostEffectsCriteria
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
+
     from policy.required_zev_share import RequiredZevShare
-    from context.price_modifications import PriceModifications
-    from context.production_constraints import ProductionConstraints
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
-
-    module_name = get_template_name(omega_globals.options.policy_targets_input_file)
-    omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
-
     from policy.incentives import Incentives
     from policy.policy_fuels import PolicyFuel
     from policy.credit_banking import CreditBank
 
-    import consumer.sales_volume as consumer
     from producer import compliance_strategy
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
     omega_globals.options.producer_calc_generalized_cost = compliance_strategy.calc_generalized_cost
-    omega_globals.options.consumer_calc_generalized_cost = consumer.calc_generalized_cost
 
     try:
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
@@ -718,7 +724,7 @@ def init_omega(o2_options):
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_input_file,
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                         verbose=omega_globals.options.verbose)
 
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
@@ -804,8 +810,8 @@ def run_omega(o2_options, standalone_run=False):
     """
 
     Args:
-        o2_options:
-        standalone_run:
+        o2_options (OMEGARuntimeOptions):
+        standalone_run (bool):
 
     Returns:
 
@@ -815,20 +821,14 @@ def run_omega(o2_options, standalone_run=False):
 
     o2_options.start_time = time.time()
 
-    print('OMEGA2 greets you, version %s' % code_version)
-    if '__file__' in locals():
-        print('from %s with love' % file_io.get_filenameext(__file__))
-
-    print('run_omega(%s)' % o2_options.session_name)
-
     init_fail = None
 
     try:
+
         init_fail = init_omega(o2_options)
 
         if not init_fail:
-            omega_log.logwrite(
-                "Running %s: OMEGA 2 Version %s" % (omega_globals.options.session_unique_name, code_version))
+            omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name, echo_console=True)
 
             if omega_globals.options.run_profiler:
                 # run with profiler

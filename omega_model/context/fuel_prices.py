@@ -192,6 +192,8 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        from context.onroad_fuels import OnroadFuel
+
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
@@ -200,18 +202,18 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
+                                               verbose=omega_globals.options.verbose)
+
         init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            print(FuelPrice.get_retail_fuel_price(2020, 'pump gasoline'))
-            print(FuelPrice.get_pretax_fuel_price(2020, 'pump gasoline'))
-
-            print(FuelPrice.get_fuel_price(2020, 'retail_dollars_per_unit', 'pump gasoline'))
-            print(FuelPrice.get_fuel_price(2020, 'pretax_dollars_per_unit', 'pump gasoline'))
-            print(FuelPrice.get_fuel_price(2020, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline'))
+            print(FuelPrice.get_fuel_prices(2020, 'retail_dollars_per_unit', 'pump gasoline'))
+            print(FuelPrice.get_fuel_prices(2020, 'pretax_dollars_per_unit', 'pump gasoline'))
+            print(FuelPrice.get_fuel_prices(2020, ['retail_dollars_per_unit', 'pretax_dollars_per_unit'], 'pump gasoline'))
 
         else:
             print(init_fail)

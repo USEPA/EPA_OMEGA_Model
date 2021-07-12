@@ -65,13 +65,15 @@ class OMEGABatchLog(OMEGABase):
 
         """
         import datetime, time
+        from omega_model import code_version
 
         self.logfilename = o2_options.logfilename
         self.verbose = verbose
         self.start_time = time.time()
 
         with open(self.logfilename, 'w') as log:
-            log.write('OMEGA batch log started at %s %s\n\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
+            log.write('OMEGA %s batch log started at %s %s\n\n' %
+                      (code_version, datetime.date.today(), time.strftime('%H:%M:%S')))
 
     def logwrite(self, message, terminator='\n'):
         """
@@ -122,10 +124,13 @@ def init_logfile():
     from omega_model import code_version
 
     file_io.validate_folder(omega_globals.options.output_folder)
+
     omega_globals.options.logfilename = '%s%s.txt' % (
-        omega_globals.options.output_folder + omega_globals.options.logfile_prefix, omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + omega_globals.options.logfile_prefix,
+        omega_globals.options.session_unique_name)
+
     with open(omega_globals.options.logfilename, 'w') as log:
-        log.write('OMEGA2 %s session %s started at %s %s\n\n' % (
+        log.write('OMEGA %s session %s started at %s %s\n\n' % (
             code_version, omega_globals.options.session_name, datetime.date.today(), time.strftime('%H:%M:%S')))
 
 

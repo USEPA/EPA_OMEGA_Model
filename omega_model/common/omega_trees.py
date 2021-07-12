@@ -228,3 +228,11 @@ class WeightedTree(OMEGABase):
 
         """
         self.tree.show(idhidden=False, data_property='identifier')
+
+
+if __name__ == "__main__":
+    try:
+        pass  # TODO: write module test here
+    except:
+        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+        os._exit(-1)

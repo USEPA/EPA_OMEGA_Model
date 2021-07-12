@@ -262,19 +262,22 @@ class Targets(OMEGABase, SQABase, TargetsBase):
 
 if __name__ == '__main__':
     try:
+
+        __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
+
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
-        omega_globals.options.policy_targets_input_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/ghg_standards-flat.csv'
+        omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/ghg_standards-alternative.csv'
         init_omega_db()
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += Targets.init_from_file(omega_globals.options.policy_targets_input_file,
+        init_fail += Targets.init_from_file(omega_globals.options.policy_targets_file,
                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:

@@ -914,6 +914,22 @@ class Vehicle(OMEGABase):
         return cost_curve
 
 
+if __name__ == '__main__':
+    import importlib
+
+    init_fail = []
+
+    omega_globals.options = OMEGARuntimeOptions()
+
+    # pull in reg classes before building database tables (declaring classes) that check reg class validity
+    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+        omega_globals.options.policy_reg_classes_file)
+    # override reg_classes from __init__.py:
+    reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
+
+
 class VehicleFinal(SQABase, Vehicle):
     """
     ****
@@ -1235,6 +1251,8 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        import importlib
+
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
@@ -1242,6 +1260,14 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
+
+        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+        # override reg_classes from __init__.py:
+        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from common.omega_functions import weighted_value
 
@@ -1253,20 +1279,8 @@ if __name__ == '__main__':
         # from producer.vehicles import Vehicle
         from producer.vehicle_annual_data import VehicleAnnualData
 
-        from policy.targets_alternative import input_template_name as flat_template_name
-        from policy.targets_footprint import input_template_name as footprint_template_name
-        ghg_template_name = get_template_name(omega_globals.options.policy_targets_input_file)
-
-        if ghg_template_name == flat_template_name:
-            from policy.targets_alternative import Targets
-
-            omega_globals.options.PolicyTargets = Targets
-        elif ghg_template_name == footprint_template_name:
-            from policy.targets_footprint import Targets
-
-            omega_globals.options.PolicyTargets = Targets
-        else:
-            init_fail.append('UNKNOWN GHG STANDARD "%s"' % ghg_template_name)
+        module_name = get_template_name(omega_globals.options.policy_targets_file)
+        omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
 
         from policy.policy_fuels import PolicyFuel
 
@@ -1285,11 +1299,11 @@ if __name__ == '__main__':
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_input_file,
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                         verbose=omega_globals.options.verbose)
 
-        init_fail += PolicyFuel.init_database_from_file(omega_globals.options.policy_fuels_file,
-                                                        verbose=omega_globals.options.verbose)
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.vehicle_onroad_calculations_file,
@@ -1308,11 +1322,6 @@ if __name__ == '__main__':
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
-
-            print(vehicles_list[0].retail_fuel_price_dollars_per_unit())
-            print(vehicles_list[1].retail_fuel_price_dollars_per_unit())
-            print(vehicles_list[0].retail_fuel_price_dollars_per_unit(2030))
-            print(vehicles_list[1].retail_fuel_price_dollars_per_unit(2030))
 
             # v = vehicles_list[0]
             # v.model_year = 2020

@@ -107,8 +107,8 @@ try:
             self.logfilename = ''
             self.producer_calc_generalized_cost = None
             self.consumer_calc_generalized_cost = None
-            self.policy_targets_input_file = path + 'test_inputs/ghg_standards-footprint.csv'
-            self.policy_reg_classes_input_file = path + 'test_inputs/regulatory_classes.csv'
+            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint.csv'
+            self.policy_reg_classes_file = path + 'test_inputs/regulatory_classes.csv'
             self.PolicyTargets = None
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
@@ -166,7 +166,7 @@ try:
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
 
-    from omega import run_omega
+    # from omega import run_omega
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

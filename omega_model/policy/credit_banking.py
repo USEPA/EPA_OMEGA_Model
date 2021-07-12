@@ -421,11 +421,43 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'USA Motors')
-        credit_bank.update_credit_age(2020)
-        credit_bank.handle_credit(2020, 'USA Motors', 0.55)
-        credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
-        credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
+        import importlib
+
+        omega_globals.options = OMEGARuntimeOptions()
+        init_omega_db()
+        omega_log.init_logfile()
+
+        init_fail = []
+
+        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+        # override reg_classes from __init__.py:
+        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
+
+        from producer.manufacturers import Manufacturer
+        from producer.manufacturer_annual_data import ManufacturerAnnualData
+        from producer.vehicles import VehicleFinal
+        from producer.vehicle_annual_data import VehicleAnnualData
+        from consumer.market_classes import MarketClass
+
+        SQABase.metadata.create_all(omega_globals.engine)
+
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file, verbose=omega_globals.options.verbose)
+
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, verbose=omega_globals.options.verbose)
+
+        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
+                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          verbose=omega_globals.options.verbose)
+
+        # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'USA Motors')
+        # credit_bank.update_credit_age(2020)
+        # credit_bank.handle_credit(2020, 'USA Motors', 0.55)
+        # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
+        # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
         credit_bank = CreditBank('../test_inputs/ghg_credits.csv', 'USA Motors')
         import random
@@ -434,8 +466,8 @@ if __name__ == '__main__':
             print(year)
             credit_bank.update_credit_age(year)
             credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
-        credit_bank.credit_bank.to_csv('../out/__dump/credit_bank.csv', index=False)
-        credit_bank.transaction_log.to_csv('../out/__dump/credit_bank_transactions.csv', index=False)
+        credit_bank.credit_bank.to_csv(omega_globals.options.database_dump_folder + '/credit_bank.csv', index=False)
+        credit_bank.transaction_log.to_csv(omega_globals.options.database_dump_folder + '/credit_bank_transactions.csv', index=False)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

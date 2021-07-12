@@ -203,7 +203,6 @@ if __name__ == '__main__':
         omega_globals.options = OMEGARuntimeOptions()
         init_omega_db()
         omega_log.init_logfile()
-        omega_globals.options.cost_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/cost_clouds.csv'
 
         init_fail = []
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=True)
