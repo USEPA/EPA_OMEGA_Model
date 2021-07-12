@@ -20,6 +20,7 @@ Create a directory that will be used as the main run directory for the OMEGA mod
 
 Running the executable
 ^^^^^^^^^^^^^^^^^^^^^^
+
 The newly created run directory will contain the OMEGA model executable file 'OMEGAXXX.exe'.  Opening this file will bring up the OMEGA graphical user interface.
 
 Viewing the results
