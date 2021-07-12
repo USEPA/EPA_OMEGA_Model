@@ -306,7 +306,7 @@ if __name__ == '__main__':
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
         # omega_globals.options.policy_targets_input_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/ghg_standards-footprint.csv'
-        init_omega_db()
+        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)

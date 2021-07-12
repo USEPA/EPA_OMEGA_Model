@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
-        init_omega_db()
+        init_omega_db(omega_globals.options.verbose)
 
         from manufacturers import Manufacturer  # required by vehicles
 

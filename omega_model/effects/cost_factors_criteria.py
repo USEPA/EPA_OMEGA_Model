@@ -188,7 +188,7 @@ if __name__ == '__main__':
         from omega_model.common import omega_globals
 
         omega_globals.options = OMEGARuntimeOptions()
-        init_omega_db()
+        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)

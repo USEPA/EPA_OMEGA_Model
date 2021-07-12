@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
-        init_omega_db()
+        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         from context.onroad_fuels import OnroadFuel
