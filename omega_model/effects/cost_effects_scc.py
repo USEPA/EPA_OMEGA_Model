@@ -31,7 +31,6 @@ class CostEffectsSCC(SQABase, OMEGABase):
     n2o_global_25_cost_dollars = Column(Float)
     n2o_global_395_cost_dollars = Column(Float)
 
-
     @staticmethod
     def update_undiscounted_monetized_effects_data(med_veh, med_dict):
 

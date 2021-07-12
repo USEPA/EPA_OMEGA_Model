@@ -57,17 +57,19 @@ class _StringNumeric(types.TypeDecorator):
 # Use Numeric a.k.a StringNumeric for integer values stored as strings (e.g. model_year)
 Numeric = _StringNumeric
 
-
 SQABase = declarative_base(name='DeclarativeMeta')  #: base class for SQLAlchemy-based classes
 
 
-def init_omega_db():
+def init_omega_db(verbose):
     """
     Create SQLite database engine (in memory) and associated session, set omega_globals variables (engine, session).
     Set up any necessary database options.
 
+    Args:
+        verbose (bool): if True then echo SQL commands to the console
+
     """
-    omega_globals.engine = create_engine('sqlite:///:memory:', echo=False)
+    omega_globals.engine = create_engine('sqlite:///:memory:', echo=verbose)
     omega_globals.session = Session(bind=omega_globals.engine)
     # !!!SUPER IMPORTANT, OTHERWISE FOREIGN KEYS ARE NOT CHECKED BY SQLITE DEFAULT!!!
     omega_globals.session.execute('pragma foreign_keys=on')

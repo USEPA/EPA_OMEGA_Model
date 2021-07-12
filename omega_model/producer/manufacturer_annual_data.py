@@ -17,9 +17,6 @@ See Also:
 
 print('importing %s' % __file__)
 
-import sys
-print('SYS Path = %s' % sys.path)
-
 from omega_model import *
 
 

@@ -37,7 +37,6 @@ class CostEffectsCriteria(SQABase, OMEGABase):
     criteria_3_cost_dollars = Column(Float)
     criteria_7_cost_dollars = Column(Float)
 
-
     @staticmethod
     def update_undiscounted_cost_effects_criteria(med_veh, med_dict):
 

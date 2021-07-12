@@ -624,10 +624,9 @@ def init_omega(session_runtime_options):
 
     omega_log.logwrite("Initializing %s:" % omega_globals.options.session_unique_name, echo_console=True)
 
-    init_omega_db()
-    omega_globals.engine.echo = omega_globals.options.verbose
-
     init_fail = []
+
+    init_omega_db(omega_globals.options.verbose)
 
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
@@ -641,15 +640,20 @@ def init_omega(session_runtime_options):
     omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
 
     # import database modules to populate ORM context
+    from consumer.market_classes import MarketClass
+    from consumer.demanded_shares_gcam import DemandedSharesGCAM
+    from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
+    from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
+
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
-    from context.price_modifications import PriceModifications
+    from context.price_modifications import PriceModifications # needs market classes
     from context.production_constraints import ProductionConstraints
     from context.cost_clouds import CostCloud
 
-    from policy.upstream_methods import UpstreamMethods
     from policy.offcycle_credits import OffCycleCredits
+    from policy.upstream_methods import UpstreamMethods
     from policy.required_zev_share import RequiredZevShare
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
@@ -662,11 +666,6 @@ def init_omega(session_runtime_options):
     from producer.vehicles import VehicleFinal, DecompositionAttributes
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_strategy
-
-    from consumer.market_classes import MarketClass
-    from consumer.demanded_shares_gcam import DemandedSharesGCAM
-    from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
-    from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
 
     from effects.cost_factors_criteria import CostFactorsCriteria
     from effects.cost_factors_scc import CostFactorsSCC
@@ -683,13 +682,15 @@ def init_omega(session_runtime_options):
 
     omega_globals.options.producer_calc_generalized_cost = compliance_strategy.calc_generalized_cost
 
+    verbose_init = omega_globals.options.verbose
+
     try:
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
-                                                    verbose=omega_globals.options.verbose)
+                                                    verbose=verbose_init)
 
         DecompositionAttributes.init()
 
-        # dynmically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
+        # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
         for attr in DecompositionAttributes.values:
             if attr not in VehicleFinal.__dict__:
                 if int(sqlalchemy.__version__.split('.')[1]) > 3:
@@ -700,89 +701,98 @@ def init_omega(session_runtime_options):
         # instantiate database tables
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
-
-        init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
-                                                    verbose=omega_globals.options.verbose)
-        
-        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
-                                                       verbose=omega_globals.options.verbose)
-
-        init_fail += NewVehicleMarket.init_database_from_file(omega_globals.options.context_new_vehicle_market_file,
-                                                              verbose=omega_globals.options.verbose)
-        
-        NewVehicleMarket.init_context_new_vehicle_generalized_costs(
-            omega_globals.options.context_new_vehicle_generalized_costs_file)
-
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file, verbose=omega_globals.options.verbose)
-
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
-
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
-                                                                        verbose=omega_globals.options.verbose)
-
-        init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
-                                               verbose=omega_globals.options.verbose)
-
-        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
-                                               verbose=omega_globals.options.verbose)
-
-        init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
-                                                              verbose=omega_globals.options.verbose)
+        # load remaining input data
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=verbose_init)
 
         init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
-                                                                verbose=omega_globals.options.verbose)
+                                                                verbose=verbose_init)
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, verbose=omega_globals.options.verbose)
-        
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.vehicle_onroad_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += ReregistrationFixedByAge.init_database_from_file(
+            omega_globals.options.reregistration_fixed_by_age_file,
+            verbose=verbose_init)
 
-        init_fail += ReregistrationFixedByAge.init_database_from_file(omega_globals.options.reregistration_fixed_by_age_file,
-                                                                      verbose=omega_globals.options.verbose)
-        
         omega_globals.options.stock_scrappage = ReregistrationFixedByAge
 
         init_fail += AnnualVMTFixedByAge.init_database_from_file(omega_globals.options.annual_vmt_fixed_by_age_file,
-                                                                 verbose=omega_globals.options.verbose)
-        
+                                                                 verbose=verbose_init)
+
         omega_globals.options.stock_vmt = AnnualVMTFixedByAge
+
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
+                                               verbose=verbose_init)
+
+        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
+                                                       verbose=verbose_init)
+
+        init_fail += NewVehicleMarket.init_database_from_file(omega_globals.options.context_new_vehicle_market_file,
+                                                              verbose=verbose_init)
+
+        NewVehicleMarket.init_context_new_vehicle_generalized_costs(
+            omega_globals.options.context_new_vehicle_generalized_costs_file)
+
+        init_fail += PriceModifications.init_from_file(omega_globals.options.price_modifications_file,
+                                                       verbose=verbose_init)
+
+        init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
+                                                          verbose=verbose_init)
+
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+                                                          verbose=verbose_init)
+
+        init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
+                                                    verbose=verbose_init)
+
+        init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file,
+                                                     verbose=verbose_init)
+
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file, verbose=verbose_init)
+
+        init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file,
+                                                      verbose=verbose_init)
+
+        init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
+                                               verbose=verbose_init)
+
+        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
+                                                                        verbose=verbose_init)
+
+        init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
+                                               verbose=verbose_init)
+
+        init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
+                                                              verbose=verbose_init)
+
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+                                                          verbose=verbose_init)
+        
+        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
+                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          verbose=verbose_init)
 
         if omega_globals.options.calc_criteria_emission_costs:
             init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
                                                                      omega_globals.options.cpi_deflators_file,
-                                                                     verbose=omega_globals.options.verbose)
+                                                                     verbose=verbose_init)
 
             init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
-                                                                verbose=omega_globals.options.verbose)
+                                                                verbose=verbose_init)
 
             init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
-                                                                           verbose=omega_globals.options.verbose)
+                                                                           verbose=verbose_init)
 
             init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                            verbose=omega_globals.options.verbose)
+                                                                            verbose=verbose_init)
 
         if omega_globals.options.calc_effects:
             init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                            verbose=omega_globals.options.verbose)
+                                                                            verbose=verbose_init)
 
             init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                         verbose=omega_globals.options.verbose)
+                                                                         verbose=verbose_init)
 
             init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                         verbose=omega_globals.options.verbose)
-
-        init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file, verbose=omega_globals.options.verbose)
-
-        init_fail += PriceModifications.init_from_file(omega_globals.options.price_modifications_file, verbose=omega_globals.options.verbose)
-
-        init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
-                                                          verbose=omega_globals.options.verbose)
-
-        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file, verbose=omega_globals.options.verbose)
-
-        init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file, verbose=omega_globals.options.verbose)
+                                                                         verbose=verbose_init)
 
         # initial year = initial fleet model year (latest year of data)
         omega_globals.options.analysis_initial_year = int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
