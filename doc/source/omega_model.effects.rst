@@ -65,6 +65,14 @@ omega\_model.effects.cost\_factors\_scc module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.effects.discounting module
+---------------------------------------
+
+.. automodule:: omega_model.effects.discounting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.effects.emission\_factors\_powersector module
 ----------------------------------------------------------
 
