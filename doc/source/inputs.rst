@@ -129,14 +129,6 @@ Final GUI Data:
 * The model status and final model run time are displayed below the 'Run Model' button.
 
 
-Text2
-^^^^^
+Model Outputs
+^^^^^^^^^^^^^
 
-Text3
-^^^^^
-
-Text4
-^^^^^
-
-Text5
-^^^^^

@@ -12,6 +12,7 @@ Setting up a run directory
 
 Running the executable
 ^^^^^^^^^^^^^^^^^^^^^^
+(show the GUI and GUI elements)
 
 Viewing the results
 ^^^^^^^^^^^^^^^^^^^
