@@ -11,6 +11,8 @@ Tips for preparing inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Tips body text
 
+.. _graphical_user_interface_label:
+
 Graphical User Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^
 The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.
@@ -129,14 +131,6 @@ Final GUI Data:
 * The model status and final model run time are displayed below the 'Run Model' button.
 
 
-Text2
-^^^^^
+Model Outputs
+^^^^^^^^^^^^^
 
-Text3
-^^^^^
-
-Text4
-^^^^^
-
-Text5
-^^^^^

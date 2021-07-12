@@ -1,5 +1,7 @@
 .. image:: _static/epa_logo_1.jpg
 
+.. _developer_guide_label:
+
 Developer Guide
 ===============
 

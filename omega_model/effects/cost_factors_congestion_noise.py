@@ -72,7 +72,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
                 cost_factors = [cost_factors]
             attrs = CostFactorsCongestionNoise.get_class_attributes(cost_factors)
 
-            result = common.omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_ID == reg_class_id).all()[0]
+            result = omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_ID == reg_class_id).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]
