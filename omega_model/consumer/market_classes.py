@@ -65,7 +65,7 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
                 # if dict not empty, add new entry
                 if by_reg_class:
                     market_class_dict[prefix] = dict()
-                    for rc in reg_classes:
+                    for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                         market_class_dict[prefix][rc] = []
                 else:
                     market_class_dict[prefix] = []
@@ -73,7 +73,7 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
                 # create new dictionary
                 if by_reg_class:
                     rc_dict = {prefix: dict()}
-                    for rc in reg_classes:
+                    for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                         rc_dict[prefix][rc] = []
                     return rc_dict
                 else:

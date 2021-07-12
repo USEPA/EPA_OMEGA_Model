@@ -628,16 +628,7 @@ def init_omega(session_runtime_options):
 
     init_omega_db(omega_globals.options.verbose)
 
-    # pull in reg classes before building database tables (declaring classes) that check reg class validity
-    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-        omega_globals.options.policy_reg_classes_file)
-    # override reg_classes from __init__.py:
-    importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
-
-    module_name = get_template_name(omega_globals.options.policy_targets_file)
-    omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
+    init_fail += import_dynamic_modules()
 
     # import database modules to populate ORM context
     from consumer.market_classes import MarketClass
@@ -746,7 +737,8 @@ def init_omega(session_runtime_options):
         init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file,
                                                      verbose=verbose_init)
 
-        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file, verbose=verbose_init)
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=verbose_init)
 
         init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file,
                                                       verbose=verbose_init)
@@ -778,34 +770,66 @@ def init_omega(session_runtime_options):
             init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
                                                                 verbose=verbose_init)
 
-            init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
-                                                                           verbose=verbose_init)
+            init_fail += CostFactorsEnergySecurity.init_database_from_file(
+                omega_globals.options.energysecurity_cost_factors_file,
+                verbose=verbose_init)
 
-            init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                            verbose=verbose_init)
+            init_fail += CostFactorsCongestionNoise.init_database_from_file(
+                omega_globals.options.congestion_noise_cost_factors_file,
+                verbose=verbose_init)
 
         if omega_globals.options.calc_effects:
-            init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                            verbose=verbose_init)
+            init_fail += EmissionFactorsPowersector.init_database_from_file(
+                omega_globals.options.emission_factors_powersector_file,
+                verbose=verbose_init)
 
-            init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                         verbose=verbose_init)
+            init_fail += EmissionFactorsRefinery.init_database_from_file(
+                omega_globals.options.emission_factors_refinery_file,
+                verbose=verbose_init)
 
-            init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                         verbose=verbose_init)
+            init_fail += EmissionFactorsVehicles.init_database_from_file(
+                omega_globals.options.emission_factors_vehicles_file,
+                verbose=verbose_init)
 
         # initial year = initial fleet model year (latest year of data)
-        omega_globals.options.analysis_initial_year = int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+        omega_globals.options.analysis_initial_year = \
+            int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
         # final year = last year of cost curve data
         # o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
         # o2.options.analysis_final_year = 2022
         omega_globals.options.analysis_final_year = CostCloud.get_max_year()
 
-        stock.update_stock(omega_globals.options.analysis_initial_year - 1)  # update vehicle annual data for base year fleet
+        # update vehicle annual data for base year fleet
+        stock.update_stock(omega_globals.options.analysis_initial_year - 1)
 
     except Exception as e:
         if not init_fail:
             init_fail = "\n#INIT FAIL\n%s\n" % traceback.format_exc()
+
+    return init_fail
+
+
+def import_dynamic_modules():
+    """
+    Import dynamic modules that are specified by the input file input template name and set the session runtime
+    options appropriately.
+
+    Returns:
+        List of template/input errors, else empty list on success
+
+    """
+    import importlib
+
+    init_fail = []
+
+    # pull in reg classes before building database tables (declaring classes) that check reg class validity
+    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+        omega_globals.options.policy_reg_classes_file)
+
+    module_name = get_template_name(omega_globals.options.policy_targets_file)
+    omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
 
     return init_fail
 

@@ -915,19 +915,13 @@ class Vehicle(OMEGABase):
 
 
 if __name__ == '__main__':
-    import importlib
-
-    init_fail = []
+    # required to set up reg classes list for reg_class_ID validation
+    from omega import import_dynamic_modules
 
     omega_globals.options = OMEGARuntimeOptions()
 
-    # pull in reg classes before building database tables (declaring classes) that check reg class validity
-    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-        omega_globals.options.policy_reg_classes_file)
-    # override reg_classes from __init__.py:
-    reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
+    init_fail = []
+    init_fail += import_dynamic_modules()
 
 
 class VehicleFinal(SQABase, Vehicle):
@@ -949,7 +943,8 @@ class VehicleFinal(SQABase, Vehicle):
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     legacy_reg_class_ID = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))
+    reg_class_ID = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
+                                               validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
     market_share = Column(Float)
@@ -1254,20 +1249,8 @@ if __name__ == '__main__':
         import importlib
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
-        init_omega_db()
-        omega_globals.engine.echo = True
+        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        init_fail = []
-
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
-        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-            omega_globals.options.policy_reg_classes_file)
-        # override reg_classes from __init__.py:
-        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from common.omega_functions import weighted_value
 
@@ -1290,14 +1273,18 @@ if __name__ == '__main__':
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
+
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
-        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
+
+        init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
+                                               verbose=omega_globals.options.verbose)
 
         init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+                                                          verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                         verbose=omega_globals.options.verbose)

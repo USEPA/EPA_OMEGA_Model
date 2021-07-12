@@ -86,7 +86,8 @@ class Targets(OMEGABase, SQABase, TargetsBase):
     __tablename__ = 'targets_footprint'
     index = Column(Integer, primary_key=True)  #: database index
     model_year = Column(Numeric)  #: model year (or start year of the applied parameters)
-    reg_class_ID = Column('reg_class_id', Enum(*reg_classes, validate_strings=True))  #: reg class name, e.g. 'car','truck'
+    reg_class_ID = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
+                                               validate_strings=True))  #: reg class name, e.g. 'car','truck'
     footprint_min_sqft = Column('footprint_min_sqft', Float)  #: minimum footprint (square feet) of curve
     footprint_max_sqft = Column('footprint_max_sqft', Float)  #: maximum footprint (square feet) of curve
     coeff_a = Column('coeff_a', Float)  #: footprint curve A coefficient

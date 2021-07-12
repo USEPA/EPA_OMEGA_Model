@@ -111,7 +111,7 @@ class OffCycleCredits(OMEGABase):
 
                 for cc in OffCycleCredits._values['credit_columns']:
                     reg_class_id = cc.split(':')[1]
-                    if not reg_class_id in reg_classes:
+                    if not reg_class_id in omega_globals.options.RegulatoryClasses.reg_classes:
                         template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
 
         return template_errors

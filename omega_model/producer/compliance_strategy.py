@@ -437,7 +437,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         mctrc = dict()
         for mc in MarketClass.market_classes:
             mctrc[mc] = {'sales': 0}
-            for rc in reg_classes:
+            for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 mctrc[mc][rc] = []
         for new_veh in manufacturer_vehicles:
             mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
@@ -446,7 +446,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
         CompositeVehicle.reset_vehicle_IDs()
         manufacturer_composite_vehicles = []
         for mc in mctrc:
-            for rc in reg_classes:
+            for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 if mctrc[mc][rc]:
                     cv = CompositeVehicle(mctrc[mc][rc], calendar_year, weight_by='market_share')
                     cv.vehicle_ID = mc + '.' + rc
