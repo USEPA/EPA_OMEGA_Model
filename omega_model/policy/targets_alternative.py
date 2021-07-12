@@ -271,7 +271,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
-        omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'test_inputs/ghg_standards-alternative.csv'
+        omega_globals.options.policy_targets_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'demo_inputs/ghg_standards-alternative.csv'
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 

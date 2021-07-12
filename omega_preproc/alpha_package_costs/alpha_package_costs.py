@@ -947,7 +947,7 @@ class SetInputs:
     path_here = path_preproc / 'alpha_package_costs'
     path_outputs = path_here / 'outputs'
     path_alpha_inputs = path_here / 'ALPHA'
-    path_input_templates = path_cwd / 'omega_model/test_inputs'
+    path_input_templates = path_cwd / 'omega_model/demo_inputs'
 
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 

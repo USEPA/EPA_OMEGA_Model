@@ -453,13 +453,13 @@ if __name__ == '__main__':
                                                           omega_globals.options.vehicle_onroad_calculations_file,
                                                           verbose=omega_globals.options.verbose)
 
-        # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'USA Motors')
+        # credit_bank = CreditBank('demo_inputs/ghg_debits.csv', 'USA Motors')
         # credit_bank.update_credit_age(2020)
         # credit_bank.handle_credit(2020, 'USA Motors', 0.55)
         # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
         # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
-        credit_bank = CreditBank('../test_inputs/ghg_credits.csv', 'USA Motors')
+        credit_bank = CreditBank('../demo_inputs/ghg_credits.csv', 'USA Motors')
         import random
 
         for year in range(2020, 2030):

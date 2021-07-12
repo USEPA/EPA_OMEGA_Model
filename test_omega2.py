@@ -87,7 +87,7 @@ if __name__ == "__main__":
                 cmd_opts = ''
 
                 if f == 'omega_batch.py':
-                    cmd_opts = '--batch_file omega_model\\test_inputs\\single_session_batch.csv --verbose'
+                    cmd_opts = '--batch_file omega_model\\demo_inputs\\single_session_batch.csv --verbose'
 
                 if 'darwin' in sys.platform:
                     cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
