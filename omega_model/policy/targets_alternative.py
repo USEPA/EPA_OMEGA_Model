@@ -62,7 +62,7 @@ from omega_model import *
 cache = dict()
 
 
-class Targets(OMEGABase, SQABase, TargetsBase):
+class VehicleVehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     """
     **Implements a simple non-attribute-based GHG standard.**
 
@@ -284,7 +284,7 @@ if __name__ == '__main__':
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            omega_globals.options.PolicyTargets = Targets
+            omega_globals.options.VehicleTargets = Targets
 
             class dummyVehicle:
                 model_year = None
@@ -305,19 +305,19 @@ if __name__ == '__main__':
             truck_vehicle.reg_class_ID = reg_classes.truck
             truck_vehicle.initial_registered_count = 1
 
-            car_target_co2_gpmi = omega_globals.options.PolicyTargets.calc_target_co2_gpmi(car_vehicle)
-            car_target_co2_Mg = omega_globals.options.PolicyTargets.calc_target_co2_Mg(car_vehicle)
-            car_certs_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(car_vehicle,
-                                                                                    co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(car_vehicle,
-                                                                                          co2_gpmi_variants=[0, 50, 100, 150],
-                                                                                          sales_variants=[1, 2, 3, 4])
+            car_target_co2_gpmi = omega_globals.options.VehicleTargets.calc_target_co2_gpmi(car_vehicle)
+            car_target_co2_Mg = omega_globals.options.VehicleTargets.calc_target_co2_Mg(car_vehicle)
+            car_certs_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(car_vehicle,
+                                                                                     co2_gpmi_variants=[0, 50, 100, 150])
+            car_certs_sales_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(car_vehicle,
+                                                                                           co2_gpmi_variants=[0, 50, 100, 150],
+                                                                                           sales_variants=[1, 2, 3, 4])
 
-            truck_target_co2_gpmi = omega_globals.options.PolicyTargets.calc_target_co2_gpmi(truck_vehicle)
-            truck_target_co2_Mg = omega_globals.options.PolicyTargets.calc_target_co2_Mg(truck_vehicle)
-            truck_certs_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
-                                                                                            sales_variants=[1, 2, 3, 4])
+            truck_target_co2_gpmi = omega_globals.options.VehicleTargets.calc_target_co2_gpmi(truck_vehicle)
+            truck_target_co2_Mg = omega_globals.options.VehicleTargets.calc_target_co2_Mg(truck_vehicle)
+            truck_certs_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
+            truck_certs_sales_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
+                                                                                             sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

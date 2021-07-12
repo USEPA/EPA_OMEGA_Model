@@ -599,19 +599,73 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     return converged, convergence_error
 
 
-# noinspection PyUnresolvedReferences
+def init_user_definable_modules():
+    """
+    Import dynamic modules that are specified by the input file input template name and set the session runtime
+    options appropriately.
+
+    Returns:
+        List of template/input errors, else empty list on success
+
+    """
+    import importlib
+
+    init_fail = []
+
+    # pull in reg classes before building database tables (declaring classes) that check reg class validity
+    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+        omega_globals.options.policy_reg_classes_file)
+
+    module_name = get_template_name(omega_globals.options.policy_targets_file)
+    omega_globals.options.VehicleVehicleTargets = importlib.import_module(module_name).VehicleTargets
+
+    return init_fail
+
+
+def init_user_definable_decomposition_attributes(verbose_init):
+    """
+
+
+    Args:
+        verbose_init (bool): if True enable additional init output to console
+
+    Returns:
+        List of template/input errors, else empty list on success
+
+    """
+
+    from policy.offcycle_credits import OffCycleCredits
+    from producer.vehicles import VehicleFinal, DecompositionAttributes
+
+    init_fail = []
+
+    init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
+                                                verbose=verbose_init)
+    DecompositionAttributes.init()
+    # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
+    for attr in DecompositionAttributes.values:
+        if attr not in VehicleFinal.__dict__:
+            if int(sqlalchemy.__version__.split('.')[1]) > 3:
+                sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+            else:
+                sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+
+    return init_fail
+
+
 def init_omega(session_runtime_options):
     """
+    Initialize OMEGA data structures.
 
     Args:
         session_runtime_options (OMEGARuntimeOptions):
 
     Returns:
+        List of template/input errors, else empty list on success
 
     """
-
-    import importlib
-    from common.omega_log import OMEGABatchLog
 
     # set up global variables:
     omega_globals.options = session_runtime_options
@@ -628,7 +682,7 @@ def init_omega(session_runtime_options):
 
     init_omega_db(omega_globals.options.verbose)
 
-    init_fail += import_dynamic_modules()
+    init_fail += init_user_definable_modules()
 
     # import database modules to populate ORM context
     from consumer.market_classes import MarketClass
@@ -676,18 +730,7 @@ def init_omega(session_runtime_options):
     verbose_init = omega_globals.options.verbose
 
     try:
-        init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
-                                                    verbose=verbose_init)
-
-        DecompositionAttributes.init()
-
-        # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
-        for attr in DecompositionAttributes.values:
-            if attr not in VehicleFinal.__dict__:
-                if int(sqlalchemy.__version__.split('.')[1]) > 3:
-                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
-                else:
-                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+        init_fail = init_user_definable_decomposition_attributes(verbose_init)
 
         # instantiate database tables
         SQABase.metadata.create_all(omega_globals.engine)
@@ -746,8 +789,8 @@ def init_omega(session_runtime_options):
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=verbose_init)
 
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
-                                                                        verbose=verbose_init)
+        init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
+                                                                         verbose=verbose_init)
 
         init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
                                                verbose=verbose_init)
@@ -809,51 +852,25 @@ def init_omega(session_runtime_options):
     return init_fail
 
 
-def import_dynamic_modules():
+def run_omega(session_runtime_options, standalone_run=False):
     """
-    Import dynamic modules that are specified by the input file input template name and set the session runtime
-    options appropriately.
-
-    Returns:
-        List of template/input errors, else empty list on success
-
-    """
-    import importlib
-
-    init_fail = []
-
-    # pull in reg classes before building database tables (declaring classes) that check reg class validity
-    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
-        omega_globals.options.policy_reg_classes_file)
-
-    module_name = get_template_name(omega_globals.options.policy_targets_file)
-    omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
-
-    return init_fail
-
-
-def run_omega(o2_options, standalone_run=False):
-    """
+    Run a single OMEGA simulation session and run session postproc.
 
     Args:
-        o2_options (OMEGARuntimeOptions):
-        standalone_run (bool):
-
-    Returns:
+        session_runtime_options (OMEGARuntimeOptions): session runtime options
+        standalone_run (bool): True if session is run outside of the batch process
 
     """
     import traceback
     import time
 
-    o2_options.start_time = time.time()
+    session_runtime_options.start_time = time.time()
 
     init_fail = None
 
     try:
 
-        init_fail = init_omega(o2_options)
+        init_fail = init_omega(session_runtime_options)
 
         if not init_fail:
             omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name, echo_console=True)
@@ -862,20 +879,23 @@ def run_omega(o2_options, standalone_run=False):
                 # run with profiler
                 import cProfile
                 import re
+                # return values of cProfile.run() show up in the globals namespace
                 cProfile.run('iteration_log, credit_history = run_producer_consumer()', filename='omega2_profile.dmp')
-                session_summary_results = postproc_session.run_postproc(omega_globals()['iteration_log', 'credit_history'],
-                                                                        standalone_run)  # return values of cProfile.run() show up in the globals namespace
+                session_summary_results = postproc_session.run_postproc(
+                    omega_globals()['iteration_log', 'credit_history'], standalone_run)
             else:
                 # run without profiler
                 iteration_log, credit_history = run_producer_consumer()
                 session_summary_results = postproc_session.run_postproc(iteration_log, credit_history, standalone_run)
 
             # write output files
-            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_summary_results.csv'
+            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name +\
+                               '_summary_results.csv'
             session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            if omega_globals.options.session_is_reference and omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
+            if omega_globals.options.session_is_reference and \
+                    omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
                 from context.new_vehicle_market import NewVehicleMarket
                 NewVehicleMarket.save_context_new_vehicle_generalized_costs(
                     omega_globals.options.context_new_vehicle_generalized_costs_file)

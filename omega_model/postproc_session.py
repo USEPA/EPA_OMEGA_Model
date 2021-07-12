@@ -19,8 +19,8 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: CreditBank, standa
     Generate charts and output files for a single simulation
 
     Args:
-        iteration_log: dataframe storing information on producer-consumer iteration
-        standalone_run: True if session is run outside of the batch process
+        iteration_log (DataFrame): dataframe storing information on producer-consumer iteration
+        standalone_run (bool): True if session is run outside of the batch process
 
     Returns: results summary dataframe
 

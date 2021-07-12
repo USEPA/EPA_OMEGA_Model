@@ -108,7 +108,6 @@ try:
             self.consumer_calc_generalized_cost = None
             self.policy_targets_file = path + 'demo_inputs/ghg_standards-footprint.csv'
             self.policy_reg_classes_file = path + 'demo_inputs/regulatory_classes.csv'
-            self.PolicyTargets = None
             self.production_multipliers_file = path + 'demo_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'demo_inputs/policy_fuels.csv'
             self.ghg_credits_file = path + 'demo_inputs/ghg_credits.csv'
@@ -165,7 +164,9 @@ try:
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
 
-    # from omega import run_omega
+            # dynamic modules / classes
+            self.RegulatoryClasses = None
+            self.VehicleTargets = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

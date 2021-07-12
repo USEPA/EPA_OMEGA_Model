@@ -50,7 +50,7 @@ class RegulatoryClassesBase:
                 inspect.currentframe().f_code.co_name]
 
 
-class TargetsBase:
+class VehicleTargetsBase:
     """
     A base class representing the program interface for calculating vehicle CO g/mi targets.
 

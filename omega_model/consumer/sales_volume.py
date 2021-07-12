@@ -127,7 +127,7 @@ if __name__ == '__main__':
         from context.new_vehicle_market import NewVehicleMarket
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
-        omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
+        omega_globals.options.VehicleTargets = importlib.import_module(module_name).Targets
 
         SQABase.metadata.create_all(omega_globals.engine)
 
@@ -139,8 +139,8 @@ if __name__ == '__main__':
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
-                                                                        verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
+                                                                         verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.vehicle_onroad_calculations_file,

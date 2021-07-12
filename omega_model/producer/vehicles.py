@@ -358,7 +358,7 @@ class CompositeVehicle(OMEGABase):
         self.normalized_cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                             'normalized_cert_target_co2_Mg')
 
-        self.normalized_cert_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(self, 1, 1)
+        self.normalized_cert_co2_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2_Mg(self, 1, 1)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -720,7 +720,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_grams_per_mile = omega_globals.options.PolicyTargets.calc_target_co2_gpmi(self)
+        self.cert_target_co2_grams_per_mile = omega_globals.options.VehicleVehicleTargets.calc_target_co2_gpmi(self)
 
     def set_cert_target_co2_Mg(self):
         """
@@ -728,7 +728,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_Mg = omega_globals.options.PolicyTargets.calc_target_co2_Mg(self)
+        self.cert_target_co2_Mg = omega_globals.options.VehicleVehicleTargets.calc_target_co2_Mg(self)
 
     def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
         """
@@ -783,7 +783,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_co2_Mg = omega_globals.options.PolicyTargets.calc_cert_co2_Mg(self)
+        self.cert_co2_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
         """
@@ -916,12 +916,12 @@ class Vehicle(OMEGABase):
 
 if __name__ == '__main__':
     # required to set up reg classes list for reg_class_ID validation
-    from omega import import_dynamic_modules
+    from omega import init_user_definable_modules
 
     omega_globals.options = OMEGARuntimeOptions()
 
     init_fail = []
-    init_fail += import_dynamic_modules()
+    init_fail += init_user_definable_modules()
 
 
 class VehicleFinal(SQABase, Vehicle):
@@ -1257,13 +1257,12 @@ if __name__ == '__main__':
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from context.fuel_prices import FuelPrice # needed for retail fuel price
-        from context.new_vehicle_market import NewVehicleMarket # needed for context size class hauling info
-        # from producer.vehicles import Vehicle
+        from context.fuel_prices import FuelPrice  # needed for retail fuel price
+        from context.new_vehicle_market import NewVehicleMarket  # needed for context size class hauling info
         from producer.vehicle_annual_data import VehicleAnnualData
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
-        omega_globals.options.PolicyTargets = importlib.import_module(module_name).Targets
+        omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
         from policy.policy_fuels import PolicyFuel
 
@@ -1286,8 +1285,8 @@ if __name__ == '__main__':
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.PolicyTargets.init_from_file(omega_globals.options.policy_targets_file,
-                                                                        verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
+                                                                         verbose=omega_globals.options.verbose)
 
         init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
                                                verbose=omega_globals.options.verbose)
