@@ -619,7 +619,7 @@ def init_user_definable_modules():
         omega_globals.options.policy_reg_classes_file)
 
     module_name = get_template_name(omega_globals.options.policy_targets_file)
-    omega_globals.options.VehicleVehicleTargets = importlib.import_module(module_name).VehicleTargets
+    omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
     return init_fail
 

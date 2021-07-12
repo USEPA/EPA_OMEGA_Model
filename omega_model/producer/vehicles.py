@@ -358,7 +358,7 @@ class CompositeVehicle(OMEGABase):
         self.normalized_cert_target_co2_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                             'normalized_cert_target_co2_Mg')
 
-        self.normalized_cert_co2_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2_Mg(self, 1, 1)
+        self.normalized_cert_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(self, 1, 1)
 
     @staticmethod
     def reset_vehicle_IDs():
@@ -720,7 +720,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_grams_per_mile = omega_globals.options.VehicleVehicleTargets.calc_target_co2_gpmi(self)
+        self.cert_target_co2_grams_per_mile = omega_globals.options.VehicleTargets.calc_target_co2_gpmi(self)
 
     def set_cert_target_co2_Mg(self):
         """
@@ -728,7 +728,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_target_co2_Mg = omega_globals.options.VehicleVehicleTargets.calc_target_co2_Mg(self)
+        self.cert_target_co2_Mg = omega_globals.options.VehicleTargets.calc_target_co2_Mg(self)
 
     def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
         """
@@ -783,7 +783,7 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        self.cert_co2_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2_Mg(self)
+        self.cert_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(self)
 
     def inherit_vehicle(self, vehicle, model_year=None):
         """
