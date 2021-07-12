@@ -2,13 +2,36 @@
 
 Model Overview
 ==============
-OMEGA is a modeling tool that has been developed by EPA to evaluate policies for reducing greenhouse gas emissions from light duty vehicles. Like the prior releases, this latest version is intended primarily as a regulatory support tool that provides estimates of the effects and costs of policy alternatives under consideration. These include the costs associated with emissions-reducing technologies themselves and the items normally included in a societal benefit-cost analysis, as well as physical effects that would be reported in an emissions inventory. Other potential uses for OMEGA may be valuable to stakeholders elsewhere -- including other parts of EPA, other agencies, NGOs, states, academia, and industry. We have attempted to emphasize modularity, transparency, and flexibility so that these stakeholders might design and develop modules that they may design for their own needs. 
+OMEGA is a modeling tool that has been developed by EPA to evaluate policies for reducing greenhouse gas emissions (GHG) from light duty vehicles. Like the prior releases, this latest version is a regulatory support tool that provides estimates of the effects and costs of policy alternatives under consideration. These include the costs associated with emissions-reducing technologies themselves and the items normally included in a societal benefit-cost analysis, as well as physical effects that are often reported in emissions inventories. Other potential uses for OMEGA may be valuable to stakeholders elsewhere -- including other parts of EPA, other agencies, NGOs, states, academia, and industry. We have attempted to emphasize modularity, transparency, and flexibility so that these stakeholders might design and develop modules that they may design for their own needs. 
 
 What's New in This Version 2.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Fundamentally, OMEGA is structured around modeling the interactions between vehicle producers responding to a policy and consumers who own and use those vehicles. This interaction between decisions by producers and consumers is a central function of the model, and was a topic of particular focus in the development of this latest version. Without this expanded capability it would not be possible to fully model policy alternatives which influence ownership and use patterns through changes in vehicle attributes.
+EPA created the inital release version of the OMEGA model to analyze new GHG standards for light-duty vehicles proposed in 2011. The 'core' model executable performed the function of identifying a manufacturer's cost-minimizing compliance pathway to meet a footprint-based fleet emissions standard specified by the user. A preprocessing step involved ranking the technology packages to be considered by the model based on cost-effectiveness. Postprocessing of outputs was performed separately using a spreadsheet tool, and later a scripted process which generated table summaries of modeled effects. 
 
-The EPA first created an OMEGA model over ten years ago to estimate producer responses to greenhouse gas emission reducing policies. This model evaluated relative costs and effectiveness of available technology packages, applied them to a defined fleet to meet a specified footprint-based fleet emissions standard. The model generated cost-minimizing compliance pathways for individual manufacturers in five year time steps assuming fleet averaging and unlimited car-truck transfers within each company. A high-level overview of the structure of the original OMEGA model can be seen in :numref:`mo_label1`. The existing stock and footprint-based policy alternatives were fed into the model, producers decided the level and types of vehicles to produce while meetings the requirements, and the societal costs and environmental effects were estimated for the resulting estimated stock.
+With the release of Version 2.0, we aim to improve usability and flexibility while retaining the primary functions of the original version of OMEGA. :numref:`mo_label_compare` shows the overall model flow and highlights four of the main areas of difference between Versions 1.0 and 2.0. 
+
+.. _mo_label_compare:
+.. figure:: _static/mo_figures/model_overview_compare_ver1_ver2.png
+    :align: center
+
+    Comparison to prior version of OMEGA
+
+The first difference is the expanded boundaries. All models need a well-defined boundary, and it's unavoidable that users will be asked to make decisions and put effort into preparing inputs and synthesizing outputs. With version 2.0 we have attempted to reduce extraneous user interventions, and the model now has automated some of the pre- and post-processing that had previously been performed manually. When deciding the appropriate boundary, we considered whether parameters are assumed to be independent from policy alternatives, and whether they can be quantified using data for observable characteristics and phenomona. By placing parameters that meet both these criteria outside of the model boundary, we are aiming to achieve trasparency of our inputs and assumptions by maintaining the connection to the underlying data. For the assumptions and algorithms within the model boundary, and the endogenous parameters with values that are responsive to policy alternatives, we aim for transparency through well-organized model code and complete documentation.
+
+The second difference is the addition of a consumer response component. 
+
+The third difference is the modeling of strategic producer decisions over the entire analysis period.
+
+The fourth difference is the addition of a feedback loop between the consumer and producer decision modules. This version of OMEGA is structured around modeling the interactions between vehicle producers responding to a policy and consumers who own and use those vehicles. In building upon the earlier version's capability to model producer compliance decisions, OMEGA now has the necessary structure to model not only changes in vehicle emissions rates, but also responses to changes in vehicle attributes that are more directly observable to consumers. 
+
+Finally, the fifth key difference is an independent policy module. The previous version of the OMEGA model was desiged to analyze a very specific fleet averaging program structure, in which the emissions targets are assigned based on vehicle footprint and other attributes used to define a 'car' or 'truck' regulatory classes. In the devlopement of OMEGA version 2.0, we could not anticipate in advance all of the program structures that future users might wish to evaluate. The producer decision algorithms in this version have been designed to function on the most general rules of a program defined by fleet emissions averaging or required technology shares. Program details regarding how targets are determined and how compliance credits are treated over time are now confined to an independent policy module and associated policy inputs. This allows the developer to incorporate new policy structures without requiring revisions to other code modules. 
+
+
+2) 
+
+
+
+
 
 .. _mo_label1:
 .. figure:: _static/mo_figures/original_omega_model_overview.jpg
