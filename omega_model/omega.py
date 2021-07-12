@@ -646,21 +646,25 @@ def init_omega(session_runtime_options):
     from context.new_vehicle_market import NewVehicleMarket
     from context.price_modifications import PriceModifications
     from context.production_constraints import ProductionConstraints
+    from context.cost_clouds import CostCloud
 
     from policy.upstream_methods import UpstreamMethods
     from policy.offcycle_credits import OffCycleCredits
-
-    from consumer.market_classes import MarketClass
-
-    from context.cost_clouds import CostCloud
-
-    from consumer.demanded_shares_gcam import DemandedSharesGCAM
+    from policy.required_zev_share import RequiredZevShare
+    from policy.drive_cycles import DriveCycles
+    from policy.drive_cycle_weights import DriveCycleWeights
+    from policy.incentives import Incentives
+    from policy.policy_fuels import PolicyFuel
+    from policy.credit_banking import CreditBank
 
     from producer.manufacturers import Manufacturer
     from producer.manufacturer_annual_data import ManufacturerAnnualData
-    from producer.vehicles import VehicleFinal
+    from producer.vehicles import VehicleFinal, DecompositionAttributes
     from producer.vehicle_annual_data import VehicleAnnualData
+    from producer import compliance_strategy
 
+    from consumer.market_classes import MarketClass
+    from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from consumer.reregistration_fixed_by_age import ReregistrationFixedByAge
     from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
 
@@ -675,15 +679,6 @@ def init_omega(session_runtime_options):
     from effects.cost_effects_criteria import CostEffectsCriteria
     from effects.cost_effects_non_emissions import CostEffectsNonEmissions
 
-    from policy.required_zev_share import RequiredZevShare
-    from policy.drive_cycles import DriveCycles
-    from policy.drive_cycle_weights import DriveCycleWeights
-    from policy.incentives import Incentives
-    from policy.policy_fuels import PolicyFuel
-    from policy.credit_banking import CreditBank
-
-    from producer import compliance_strategy
-
     file_io.validate_folder(omega_globals.options.output_folder)
 
     omega_globals.options.producer_calc_generalized_cost = compliance_strategy.calc_generalized_cost
@@ -692,7 +687,6 @@ def init_omega(session_runtime_options):
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                     verbose=omega_globals.options.verbose)
 
-        from producer.vehicles import DecompositionAttributes
         DecompositionAttributes.init()
 
         # dynmically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
