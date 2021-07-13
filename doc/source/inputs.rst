@@ -133,4 +133,36 @@ Final GUI Data:
 
 Model Outputs
 ^^^^^^^^^^^^^
+Selecting the 'Results' tab brings up the GUI results page as shown in :numref:`ug_label8` below.
+
+.. _ug_label8:
+.. figure:: _static/ug_figures/gui_results_1.jpg
+    :align: center
+
+    Model Results Page
+
+'Select Current Run' will bring up the plotting options for the current model run as shown in :numref:`ug_label9` below.
+
+.. _ug_label9:
+.. figure:: _static/ug_figures/gui_results_2.jpg
+    :align: center
+
+    Current Run Plotting Options
+
+'Select Previous Run' will bring up a dialog box to select a previous run.
+
+To plot data:
+
+* Select an available scenario
+* Select an available plot
+* Select 'Plot'
+
+The desired plot will appear as shown in :numref:`ug_label10` below.
+
+.. _ug_label10:
+.. figure:: _static/ug_figures/gui_results_3.jpg
+    :align: center
+
+    Plot Output
+
 

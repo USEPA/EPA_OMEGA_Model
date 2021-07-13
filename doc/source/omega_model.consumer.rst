@@ -57,14 +57,6 @@ omega\_model.consumer.sales\_share\_gcam module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.consumer.sales\_share\_ma3t module
------------------------------------------------
-
-.. automodule:: omega_model.consumer.sales_share_ma3t
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.consumer.sales\_volume module
 ------------------------------------------
 
