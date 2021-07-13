@@ -94,9 +94,9 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         cache_key = '%s_%s_target_co2e_gpmi' % (vehicle.model_year, vehicle.reg_class_ID)
         if cache_key not in cache:
-            cache[cache_key] = omega_globals.session.query(Targets.GHG_target_co2e_grams_per_mile). \
-                filter(Targets.reg_class_ID == vehicle.reg_class_ID). \
-                filter(Targets.model_year == vehicle_model_year).scalar()
+            cache[cache_key] = omega_globals.session.query(VehicleTargets.GHG_target_co2e_grams_per_mile). \
+                filter(VehicleTargets.reg_class_ID == vehicle.reg_class_ID). \
+                filter(VehicleTargets.model_year == vehicle_model_year).scalar()
         return cache[cache_key]
 
     @staticmethod
@@ -118,9 +118,9 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
         if cache_key not in cache:
-            cache[cache_key] = omega_globals.session.query(Targets.lifetime_VMT). \
-                filter(Targets.reg_class_ID == reg_class_id). \
-                filter(Targets.model_year == model_year).scalar()
+            cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
+                filter(VehicleTargets.reg_class_ID == reg_class_id). \
+                filter(VehicleTargets.model_year == model_year).scalar()
         return cache[cache_key]
 
     @staticmethod
@@ -149,9 +149,9 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = Targets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
-        co2_gpmi = Targets.calc_target_co2e_gpmi(vehicle)
+        co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
         if sales_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -190,7 +190,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         start_years = cache[vehicle.reg_class_ID]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = Targets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
         if co2_gpmi_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -278,13 +278,13 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += Targets.init_from_file(omega_globals.options.policy_targets_file,
+        init_fail += VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            omega_globals.options.VehicleTargets = Targets
+            omega_globals.options.VehicleTargets = VehicleTargets
 
             class dummyVehicle:
                 model_year = None
@@ -297,26 +297,26 @@ if __name__ == '__main__':
 
             car_vehicle = dummyVehicle()
             car_vehicle.model_year = 2021
-            car_vehicle.reg_class_ID = reg_classes.car
+            car_vehicle.reg_class_ID = omega_globals.options.RegulatoryClasses.reg_classes.car
             car_vehicle.initial_registered_count = 1
 
             truck_vehicle = dummyVehicle()
             truck_vehicle.model_year = 2021
-            truck_vehicle.reg_class_ID = reg_classes.truck
+            truck_vehicle.reg_class_ID = omega_globals.options.RegulatoryClasses.reg_classes.truck
             truck_vehicle.initial_registered_count = 1
 
-            car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
-            car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
-            car_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
+            car_target_co2e_gpmi = omega_globals.options.VehicleVehicleTargets.calc_target_co2e_gpmi(car_vehicle)
+            car_target_co2e_Mg = omega_globals.options.VehicleVehicleTargets.calc_target_co2e_Mg(car_vehicle)
+            car_certs_co2e_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2e_Mg(car_vehicle,
                                                                                      co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
+            car_certs_sales_co2e_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2e_Mg(car_vehicle,
                                                                                            co2_gpmi_variants=[0, 50, 100, 150],
                                                                                            sales_variants=[1, 2, 3, 4])
 
-            truck_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(truck_vehicle)
-            truck_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(truck_vehicle)
-            truck_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
+            truck_target_co2e_gpmi = omega_globals.options.VehicleVehicleTargets.calc_target_co2e_gpmi(truck_vehicle)
+            truck_target_co2e_Mg = omega_globals.options.VehicleVehicleTargets.calc_target_co2e_Mg(truck_vehicle)
+            truck_certs_co2e_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
+            truck_certs_sales_co2e_Mg = omega_globals.options.VehicleVehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
                                                                                              sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
