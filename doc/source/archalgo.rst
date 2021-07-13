@@ -4,6 +4,14 @@
 Model Architecture and Algorithms
 =================================
 
+Overview of Model Inputs
+^^^^^^^
+(Intro para on the model inputs.  Pull the inputs out from the module sections and incorporate here.)
+
+(add table with key inputs, modules used, and example .csv)
+
+
+
 Modules
 ^^^^^^^
 .. todo: [[add footnote about terminology, that in the implementation, these are called packages]]

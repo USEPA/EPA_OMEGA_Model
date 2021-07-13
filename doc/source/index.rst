@@ -1,8 +1,8 @@
 .. image:: _static/epa_logo_1.jpg
 
-====================
-OMEGA2 Documentation
-====================
+===================
+OMEGA Documentation
+===================
 
 Is in process...
 
