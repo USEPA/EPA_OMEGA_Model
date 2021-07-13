@@ -675,8 +675,13 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                 expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
                                                   "Sessions")
 
+            if options.session_num is None:
+                session_list = range(0, batch.num_sessions())
+            else:
+                session_list = [options.session_num]
+
             # copy session inputs to session folder(s) for active session(s)
-            for s in range(0, batch.num_sessions()):
+            for s in session_list:
                 if batch.sessions[s].enabled:
                     batch.batch_log.logwrite('Bundling Session %d Files...' % s)
                     session = batch.sessions[s]
