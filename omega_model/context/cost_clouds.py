@@ -41,7 +41,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        simulated_vehicle_id,model_year,cost_curve_class,cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_4:cert_direct_oncycle_kwh_per_mile,cd_hwfet:cert_direct_oncycle_kwh_per_mile,new_vehicle_mfr_cost_dollars,cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile,cs_hwfet:cert_direct_oncycle_co2_grams_per_mile,ac_efficiency,ac_leakage,high_eff_alternator,start_stop
+        simulated_vehicle_id,model_year,cost_curve_class,cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_4:cert_direct_oncycle_kwh_per_mile,cd_hwfet:cert_direct_oncycle_kwh_per_mile,new_vehicle_mfr_cost_dollars,cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,ac_efficiency,ac_leakage,high_eff_alternator,start_stop
         1_bev,2020,bev_LPW_LRL,0.12992078,0.10534883,0.1247339,0.10534883,0.13151191,30837.9095774431,0,0,0,0,0,1,0,0,0
         9086_ice,2031,ice_MPW_HRL,0,0,0,0,0,28995.8504073507,285.798112,269.100823,246.852389,269.100823,191.235952,1,1,1,1
 
@@ -70,11 +70,11 @@ Data Column Name and Description
     CHARGE-SUSTAINING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
 
-        :cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_hwfet:cert_direct_oncycle_co2_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
 
     :ac_efficiency:
         = 1 if vehicle qualifies for the AC efficiency off-cycle credit, = 0 otherwise

@@ -393,7 +393,7 @@ class CreditBank(OMEGABase):
 
         See Also:
 
-            ``manufacturer_annual_data.ManufacturerAnnualData.update_model_year_cert_co2_Mg()``
+            ``manufacturer_annual_data.ManufacturerAnnualData.update_model_year_cert_co2e_Mg()``
 
         Args:
             credit (Series): source credit to pay from
@@ -412,8 +412,8 @@ class CreditBank(OMEGABase):
         self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
-        ManufacturerAnnualData.update_model_year_cert_co2_Mg(debit['model_year'], debit['manufacturer'], -transaction_amount_Mg)
-        ManufacturerAnnualData.update_model_year_cert_co2_Mg(credit['model_year'], credit['manufacturer'], +transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['manufacturer'], -transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['manufacturer'], +transaction_amount_Mg)
 
 
 if __name__ == '__main__':

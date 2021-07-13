@@ -26,8 +26,8 @@ Sample Data Columns
         :widths: auto
 
         drive_cycle_id,drive_cycle_distance_miles,description,
-        cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2 g/mi,
-        cs_hwfet:cert_direct_oncycle_co2_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2 g/mi,
+        cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2 g/mi,
+        cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2 g/mi,
 
 Data Column Name and Description
 
@@ -65,7 +65,7 @@ class DriveCycles(OMEGABase):
         Validate drive cycle name.
 
         Args:
-            drive_cycle_id(str): drive cycle name to validate e.g. 'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile'
+            drive_cycle_id(str): drive cycle name to validate e.g. 'cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile'
 
         Returns:
             True if drive cycle name is in the list of known drive cycles.
@@ -160,9 +160,9 @@ if __name__ == '__main__':
             DriveCycles._data.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
-            print(DriveCycles.validate_drive_cycle_ID('cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile'))
+            print(DriveCycles.validate_drive_cycle_ID('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
             print(DriveCycles.validate_drive_cycle_ID('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
-            print(DriveCycles.get_drive_cycle_distance_miles('cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile'))
+            print(DriveCycles.get_drive_cycle_distance_miles('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
 
             print(DriveCycles.get_drive_cycles())
 

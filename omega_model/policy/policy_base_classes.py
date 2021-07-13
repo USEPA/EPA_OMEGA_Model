@@ -56,7 +56,7 @@ class VehicleTargetsBase:
 
     """
     @staticmethod
-    def calc_target_co2_gpmi(vehicle):
+    def calc_target_co2e_gpmi(vehicle):
         """
         Calculate vehicle target CO2 g/mi.
 
@@ -89,7 +89,7 @@ class VehicleTargetsBase:
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
-    def calc_target_co2_Mg(vehicle, sales_variants=None):
+    def calc_target_co2e_Mg(vehicle, sales_variants=None):
         """
         Calculate vehicle target CO2 Mg as a function of the vehicle, the standards and optional sales options.
 
@@ -112,7 +112,7 @@ class VehicleTargetsBase:
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
-    def calc_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         """
         Calculate vehicle cert CO2 Mg as a function of the vehicle, the standards, CO2 g/mi options and optional sales
         options.

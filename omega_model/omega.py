@@ -136,6 +136,8 @@ def run_producer_consumer():
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
             credit_bank.update_credit_age(calendar_year)
+
+            # TODO: make credit strategy modular, like upstream methods?
             # strategy: use expiring credits, pay any expiring debits in one shot:
             # expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
             # expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
@@ -204,7 +206,7 @@ def run_producer_consumer():
                                                     producer_decision_and_response)
 
             credit_bank.handle_credit(calendar_year, manufacturer_ID,
-                                      producer_decision_and_response['total_credits_co2_megagrams'])
+                                      producer_decision_and_response['total_credits_co2e_megagrams'])
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
@@ -284,8 +286,8 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         ###############################################################################################################
 
         producer_decision_and_response['compliance_ratio'] = \
-            (producer_decision_and_response['total_cert_co2_megagrams'] - credit_offset_Mg) / \
-            producer_decision_and_response['total_target_co2_megagrams']
+            (producer_decision_and_response['total_cert_co2e_megagrams'] - credit_offset_Mg) / \
+            producer_decision_and_response['total_target_co2e_megagrams']
 
         # calculate "distance to origin" (minimal price and market share errors):
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**1
@@ -513,9 +515,9 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
     for mc in MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
-            winning_combo['average_co2_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
+            winning_combo['average_co2e_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
                                                                        'initial_registered_count',
-                                                                       'onroad_direct_co2_grams_per_mile')
+                                                                       'onroad_direct_co2e_grams_per_mile')
 
             winning_combo['average_kwh_pmi_%s' % mc] = weighted_value(market_class_vehicles,
                                                                        'initial_registered_count',
@@ -537,7 +539,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
             for v in market_class_vehicles:
                 winning_combo['sales_%s' % mc] += winning_combo['veh_%s_sales' % v.vehicle_ID]  # was v.initial_registered_count
         else:
-            winning_combo['average_co2_gpmi_%s' % mc] = 0
+            winning_combo['average_co2e_gpmi_%s' % mc] = 0
             winning_combo['average_kwh_pmi_%s' % mc] = 0
             winning_combo['average_cost_%s' % mc] = 0
             winning_combo['average_generalized_cost_%s' % mc] = 0

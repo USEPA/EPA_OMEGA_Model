@@ -114,13 +114,13 @@ def calc_inventory(calendar_year):
     for vad in vads:
 
         attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID',
-                          'onroad_direct_co2_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        model_year, reg_class_ID, in_use_fuel_ID, onroad_direct_co2_grams_per_mile, onroad_direct_kwh_per_mile \
+                          'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        model_year, reg_class_ID, in_use_fuel_ID, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vad.vehicle_ID, attribute_list)
 
         vehicle_effects_dict = dict()
         flag = None
-        if onroad_direct_co2_grams_per_mile is not None and onroad_direct_kwh_per_mile is not None:
+        if onroad_direct_co2e_grams_per_mile is not None and onroad_direct_kwh_per_mile is not None:
 
             liquid_fuel = None
             electric_fuel = None
@@ -154,17 +154,17 @@ def calc_inventory(calendar_year):
             for fuel, fuel_share in fuel_dict.items():
                 refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                 transmission_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
-                co2_emissions_grams_per_unit = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'direct_co2_grams_per_unit') / refuel_efficiency
+                co2_emissions_grams_per_unit = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'direct_co2e_grams_per_unit') / refuel_efficiency
 
                 # fuel consumption
                 if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
                     electric_fuel = fuel
                     vmt_electricity = vad.vmt * fuel_share
                     fuel_consumption_kWh += vmt_electricity * onroad_direct_kwh_per_mile / transmission_efficiency
-                elif fuel != 'US electricity' and onroad_direct_co2_grams_per_mile:
+                elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
                     liquid_fuel = fuel
                     vmt_liquid_fuel = vad.vmt * fuel_share
-                    onroad_gallons_per_mile += fuel_share * onroad_direct_co2_grams_per_mile / co2_emissions_grams_per_unit
+                    onroad_gallons_per_mile += fuel_share * onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                     fuel_consumption_gallons = vad.vmt * onroad_gallons_per_mile / transmission_efficiency
 
                     # vehicle tailpipe emissions for liquid fuel operation
@@ -185,7 +185,7 @@ def calc_inventory(calendar_year):
 
                     ch4_tailpipe_metrictons += vmt_liquid_fuel * ch4 / grams_per_metric_ton
                     n2o_tailpipe_metrictons += vmt_liquid_fuel * n2o / grams_per_metric_ton
-                    co2_tailpipe_metrictons += vmt_liquid_fuel * onroad_direct_co2_grams_per_mile / grams_per_metric_ton
+                    co2_tailpipe_metrictons += vmt_liquid_fuel * onroad_direct_co2e_grams_per_mile / grams_per_metric_ton
 
             # upstream inventory
             if electric_fuel:
@@ -236,7 +236,7 @@ def calc_inventory(calendar_year):
                                          'vmt': vad.vmt,
                                          'vmt_liquid_fuel': vmt_liquid_fuel,
                                          'vmt_electricity': vmt_electricity,
-                                         'onroad_direct_co2_grams_per_mile': onroad_direct_co2_grams_per_mile,
+                                         'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
                                          'onroad_direct_kwh_per_mile': onroad_direct_kwh_per_mile,
                                          'onroad_gallons_per_mile': onroad_gallons_per_mile,
                                          'fuel_consumption_gallons': fuel_consumption_gallons,

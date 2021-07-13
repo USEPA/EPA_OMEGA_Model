@@ -97,7 +97,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     lifetime_VMT = Column('lifetime_vmt', Float)  #: regulatory lifetime VMT (in miles) of the given reg class
 
     @staticmethod
-    def calc_target_co2_gpmi(vehicle):
+    def calc_target_co2e_gpmi(vehicle):
         """
         Calculate vehicle target CO2 g/mi.
 
@@ -120,13 +120,13 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         coefficients = cache[cache_key]
 
         if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
-            target_co2_gpmi = coefficients.coeff_a
+            target_co2e_gpmi = coefficients.coeff_a
         elif vehicle.footprint_ft2 > coefficients.footprint_max_sqft:
-            target_co2_gpmi = coefficients.coeff_b
+            target_co2e_gpmi = coefficients.coeff_b
         else:
-            target_co2_gpmi = vehicle.footprint_ft2 * coefficients.coeff_c + coefficients.coeff_d
+            target_co2e_gpmi = vehicle.footprint_ft2 * coefficients.coeff_c + coefficients.coeff_d
 
-        return target_co2_gpmi
+        return target_co2e_gpmi
 
     @staticmethod
     def calc_cert_lifetime_vmt(reg_class_id, model_year):
@@ -153,7 +153,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         return cache[cache_key]
 
     @staticmethod
-    def calc_target_co2_Mg(vehicle, sales_variants=None):
+    def calc_target_co2e_Mg(vehicle, sales_variants=None):
         """
         Calculate vehicle target CO2 Mg as a function of the vehicle, the standards and optional sales options.
 
@@ -180,7 +180,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
 
-        co2_gpmi = VehicleTargets.calc_target_co2_gpmi(vehicle)
+        co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
         if sales_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -193,7 +193,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
 
     @staticmethod
-    def calc_cert_co2_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         """
         Calculate vehicle cert CO2 Mg as a function of the vehicle, the standards, CO2 g/mi options and optional sales
         options.
@@ -233,7 +233,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
                 co2_gpmi = co2_gpmi_variants
         else:
             sales = vehicle.initial_registered_count
-            co2_gpmi = vehicle.cert_co2_grams_per_mile
+            co2_gpmi = vehicle.cert_co2e_grams_per_mile
 
         return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
 
@@ -344,18 +344,18 @@ if __name__ == '__main__':
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
 
-            car_target_co2_gpmi = omega_globals.options.VehicleTargets.calc_target_co2_gpmi(car_vehicle)
-            car_target_co2_Mg = omega_globals.options.VehicleTargets.calc_target_co2_Mg(car_vehicle)
-            car_certs_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(car_vehicle,
+            car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
+            car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
+            car_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
                                                                                      co2_gpmi_variants=[0, 50, 100, 150])
-            car_certs_sales_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(car_vehicle,
+            car_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(car_vehicle,
                                                                                            co2_gpmi_variants=[0, 50, 100, 150],
                                                                                            sales_variants=[1, 2, 3, 4])
 
-            truck_target_co2_gpmi = omega_globals.options.VehicleTargets.calc_target_co2_gpmi(truck_vehicle)
-            truck_target_co2_Mg = omega_globals.options.VehicleTargets.calc_target_co2_Mg(truck_vehicle)
-            truck_certs_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150])
-            truck_certs_sales_co2_Mg = omega_globals.options.VehicleTargets.calc_cert_co2_Mg(truck_vehicle, [0, 50, 100, 150],
+            truck_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(truck_vehicle)
+            truck_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(truck_vehicle)
+            truck_certs_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150])
+            truck_certs_sales_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(truck_vehicle, [0, 50, 100, 150],
                                                                                              sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)

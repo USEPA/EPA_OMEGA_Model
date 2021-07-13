@@ -44,7 +44,7 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: CreditBank, standa
 
     plot_iteration(iteration_log)
 
-    calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = \
+    calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, cert_target_co2e_Mg, total_cost_billions = \
         plot_manufacturer_compliance(calendar_years, credit_history)
 
     vehicle_calendar_years = \
@@ -66,20 +66,20 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: CreditBank, standa
 
     megagrams_data = plot_vehicle_megagrams(calendar_years)
 
-    average_cert_co2_gpmi_data = plot_cert_co2_gpmi(calendar_years)
+    average_cert_co2e_gpmi_data = plot_cert_co2e_gpmi(calendar_years)
 
     average_cert_direct_kwh_pmi_data = plot_cert_direct_kwh_pmi(calendar_years)
 
-    average_target_co2_gpmi_data = plot_target_co2_gpmi(calendar_years)
+    average_target_co2e_gpmi_data = plot_target_co2e_gpmi(calendar_years)
 
     session_results = pd.DataFrame()
     session_results['calendar_year'] = calendar_years
     session_results['sales_total'] = total_sales
     session_results['sales_context'] = context_sales
     session_results['session_name'] = omega_globals.options.session_name
-    session_results['cert_target_co2_Mg'] = cert_target_co2_Mg
-    session_results['calendar_year_cert_co2_Mg'] = calendar_year_cert_co2_Mg
-    session_results['model_year_cert_co2_Mg'] = model_year_cert_co2_Mg
+    session_results['cert_target_co2e_Mg'] = cert_target_co2e_Mg
+    session_results['calendar_year_cert_co2e_Mg'] = calendar_year_cert_co2e_Mg
+    session_results['model_year_cert_co2e_Mg'] = model_year_cert_co2e_Mg
     session_results['total_cost_billions'] = total_cost_billions
 
     for k in market_share_results:
@@ -88,15 +88,15 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: CreditBank, standa
     for cat in consumer.market_categories + MarketClass.market_classes + ['total']:
         session_results['average_%s_cost' % cat] = average_cost_data[cat]
         session_results['average_%s_generalized_cost' % cat] = average_generalized_cost_data[cat]
-        session_results['average_%s_cert_co2_gpmi' % cat] = average_cert_co2_gpmi_data[cat]
+        session_results['average_%s_cert_co2e_gpmi' % cat] = average_cert_co2e_gpmi_data[cat]
         session_results['average_%s_cert_direct_kwh_pmi' % cat] = average_cert_direct_kwh_pmi_data[cat]
-        session_results['average_%s_target_co2_gpmi' % cat] = average_target_co2_gpmi_data[cat]
-        session_results['%s_co2_Mg' % cat] = megagrams_data[cat]
+        session_results['average_%s_target_co2e_gpmi' % cat] = average_target_co2e_gpmi_data[cat]
+        session_results['%s_co2e_Mg' % cat] = megagrams_data[cat]
 
     return session_results
 
 
-def plot_cert_co2_gpmi(calendar_years):
+def plot_cert_co2e_gpmi(calendar_years):
     """
 
     Args:
@@ -110,13 +110,13 @@ def plot_cert_co2_gpmi(calendar_years):
     from consumer.market_classes import MarketClass
     import consumer
 
-    average_cert_co2_data = dict()
+    average_cert_co2e_data = dict()
 
     # tally up total sales weighted co2
-    average_cert_co2_data['total'] = []
+    average_cert_co2e_data['total'] = []
     for cy in calendar_years:
-        average_cert_co2_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.cert_co2_grams_per_mile * VehicleAnnualData.registered_count) /
+        average_cert_co2e_data['total'].append(omega_globals.session.query(
+            func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
                                               filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                               filter(VehicleFinal.model_year == cy).
@@ -128,7 +128,7 @@ def plot_cert_co2_gpmi(calendar_years):
         for idx, cy in enumerate(calendar_years):
             registered_count_and_market_ID_and_co2 = omega_globals.session.query(VehicleAnnualData.registered_count,
                                                                                  VehicleFinal.market_class_ID,
-                                                                                 VehicleFinal.cert_co2_grams_per_mile) \
+                                                                                 VehicleFinal.cert_co2e_grams_per_mile) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -137,16 +137,16 @@ def plot_cert_co2_gpmi(calendar_years):
             for result in registered_count_and_market_ID_and_co2:
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_co2_grams_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(result.cert_co2e_grams_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
-        average_cert_co2_data[mcat] = market_category_cost
+        average_cert_co2e_data[mcat] = market_category_cost
 
     # cost/market category chart
     fig, ax1 = figure()
     for mcat in consumer.market_categories:
-        ax1.plot(calendar_years, average_cert_co2_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cert_co2_data['total'], '.-')
+        ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
+    ax1.plot(calendar_years, average_cert_co2e_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Cert CO2 g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -155,25 +155,25 @@ def plot_cert_co2_gpmi(calendar_years):
     # cost/market class chart
     fig, ax1 = figure()
     for mc in MarketClass.market_classes:
-        average_cert_co2_data[mc] = []
+        average_cert_co2e_data[mc] = []
         for cy in calendar_years:
-            average_cert_co2_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_co2_grams_per_mile * VehicleAnnualData.registered_count) /
+            average_cert_co2e_data[mc].append(omega_globals.session.query(
+                func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
                                              filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                              filter(VehicleFinal.model_year == cy).
                                              filter(VehicleFinal.market_class_ID == mc).
                                              filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cert_co2_data[mc], '.-')
+            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_cert_co2_data[mc], '.--')
+            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Cert CO2 g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2 gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return average_cert_co2_data
+    return average_cert_co2e_data
 
 
 def plot_cert_direct_kwh_pmi(calendar_years):
@@ -256,7 +256,7 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     return average_cert_direct_kwh_data
 
 
-def plot_target_co2_gpmi(calendar_years):
+def plot_target_co2e_gpmi(calendar_years):
     """
 
     Args:
@@ -270,13 +270,13 @@ def plot_target_co2_gpmi(calendar_years):
     from consumer.market_classes import MarketClass
     import consumer
 
-    average_cert_co2_data = dict()
+    average_cert_co2e_data = dict()
 
     # tally up total sales weighted co2
-    average_cert_co2_data['total'] = []
+    average_cert_co2e_data['total'] = []
     for cy in calendar_years:
-        average_cert_co2_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.cert_target_co2_grams_per_mile * VehicleAnnualData.registered_count) /
+        average_cert_co2e_data['total'].append(omega_globals.session.query(
+            func.sum(VehicleFinal.cert_target_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
                                               filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                               filter(VehicleFinal.model_year == cy).
@@ -288,7 +288,7 @@ def plot_target_co2_gpmi(calendar_years):
         for idx, cy in enumerate(calendar_years):
             registered_count_and_market_ID_and_co2 = omega_globals.session.query(VehicleAnnualData.registered_count,
                                                                                  VehicleFinal.market_class_ID,
-                                                                                 VehicleFinal.cert_target_co2_grams_per_mile) \
+                                                                                 VehicleFinal.cert_target_co2e_grams_per_mile) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -297,16 +297,16 @@ def plot_target_co2_gpmi(calendar_years):
             for result in registered_count_and_market_ID_and_co2:
                 if mcat in result.market_class_ID.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_target_co2_grams_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(result.cert_target_co2e_grams_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
-        average_cert_co2_data[mcat] = market_category_cost
+        average_cert_co2e_data[mcat] = market_category_cost
 
     # cost/market category chart
     fig, ax1 = figure()
     for mcat in consumer.market_categories:
-        ax1.plot(calendar_years, average_cert_co2_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cert_co2_data['total'], '.-')
+        ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
+    ax1.plot(calendar_years, average_cert_co2e_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Target CO2 g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -315,25 +315,25 @@ def plot_target_co2_gpmi(calendar_years):
     # cost/market class chart
     fig, ax1 = figure()
     for mc in MarketClass.market_classes:
-        average_cert_co2_data[mc] = []
+        average_cert_co2e_data[mc] = []
         for cy in calendar_years:
-            average_cert_co2_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_target_co2_grams_per_mile * VehicleAnnualData.registered_count) /
+            average_cert_co2e_data[mc].append(omega_globals.session.query(
+                func.sum(VehicleFinal.cert_target_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
                                              filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                              filter(VehicleFinal.model_year == cy).
                                              filter(VehicleFinal.market_class_ID == mc).
                                              filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cert_co2_data[mc], '.-')
+            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_cert_co2_data[mc], '.--')
+            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'CO2 [g/mi]',
               '%s\nAverage Vehicle Target CO2 g/mi by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
     fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2 gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return average_cert_co2_data
+    return average_cert_co2e_data
 
 
 def plot_vehicle_cost(calendar_years):
@@ -518,7 +518,7 @@ def plot_vehicle_megagrams(calendar_years):
     Mg_data['total'] = []
     for cy in calendar_years:
         Mg_data['total'].append(
-            omega_globals.session.query(func.sum(VehicleFinal.cert_co2_Mg)).
+            omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)).
                                           filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                           filter(VehicleFinal.model_year == cy).
                                           filter(VehicleAnnualData.age == 0).scalar())
@@ -528,14 +528,14 @@ def plot_vehicle_megagrams(calendar_years):
         market_category_Mg = []
         for idx, cy in enumerate(calendar_years):
             market_ID_and_Mg = omega_globals.session.query(VehicleFinal.market_class_ID,
-                                                           VehicleFinal.cert_co2_Mg) \
+                                                           VehicleFinal.cert_co2e_Mg) \
                 .filter(VehicleAnnualData.vehicle_ID == VehicleFinal.vehicle_ID) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
             sales_weighted_Mg = 0
             for result in market_ID_and_Mg:
                 if mcat in result.market_class_ID.split('.'):
-                    sales_weighted_Mg += float(result.cert_co2_Mg)
+                    sales_weighted_Mg += float(result.cert_co2e_Mg)
             market_category_Mg.append(sales_weighted_Mg)
 
         Mg_data[mcat] = market_category_Mg
@@ -556,7 +556,7 @@ def plot_vehicle_megagrams(calendar_years):
         Mg_data[mc] = []
         for cy in calendar_years:
             Mg_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_co2_Mg)).
+                func.sum(VehicleFinal.cert_co2e_Mg)).
                                filter(VehicleFinal.vehicle_ID == VehicleAnnualData.vehicle_ID).
                                filter(VehicleFinal.model_year == cy).
                                filter(VehicleFinal.market_class_ID == mc).
@@ -735,44 +735,44 @@ def plot_manufacturer_compliance(calendar_years, credit_history):
 
     from producer.manufacturer_annual_data import ManufacturerAnnualData
 
-    cert_target_co2_Mg = ManufacturerAnnualData.get_cert_target_co2_Mg()
-    calendar_year_cert_co2_Mg = ManufacturerAnnualData.get_calendar_year_cert_co2_Mg()
-    model_year_cert_co2_Mg = ManufacturerAnnualData.get_model_year_cert_co2_Mg()
+    cert_target_co2e_Mg = ManufacturerAnnualData.get_cert_target_co2e_Mg()
+    calendar_year_cert_co2e_Mg = ManufacturerAnnualData.get_calendar_year_cert_co2e_Mg()
+    model_year_cert_co2e_Mg = ManufacturerAnnualData.get_model_year_cert_co2e_Mg()
     total_cost_billions = ManufacturerAnnualData.get_total_cost_billions()
     # compliance chart
-    fig, ax1 = fplothg(calendar_years, cert_target_co2_Mg, 'o-')
-    ax1.plot(calendar_years, calendar_year_cert_co2_Mg, 'r.-')
-    ax1.plot(calendar_years, model_year_cert_co2_Mg, '-')
-    ax1.legend(['cert_target_co2_Mg', 'calendar_year_cert_co2_Mg', 'model_year_cert_co2_Mg'])
+    fig, ax1 = fplothg(calendar_years, cert_target_co2e_Mg, 'o-')
+    ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
+    ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
+    ax1.legend(['cert_target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
     label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         omega_globals.options.session_unique_name, total_cost_billions))
 
-    cert_target_co2_Mg_dict = dict(zip(calendar_years, cert_target_co2_Mg))
-    calendar_year_cert_co2_Mg_dict = dict(zip(calendar_years, calendar_year_cert_co2_Mg))
-    model_year_cert_co2_Mg_dict = dict(zip(calendar_years, model_year_cert_co2_Mg))
+    cert_target_co2e_Mg_dict = dict(zip(calendar_years, cert_target_co2e_Mg))
+    calendar_year_cert_co2e_Mg_dict = dict(zip(calendar_years, calendar_year_cert_co2e_Mg))
+    model_year_cert_co2e_Mg_dict = dict(zip(calendar_years, model_year_cert_co2e_Mg))
 
     for _, t in credit_history.transaction_log.iterrows():
-        if type(t.credit_destination) is not str and t.model_year in calendar_year_cert_co2_Mg_dict:
-            draw_transfer_arrow(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year],
-                                t.credit_destination, cert_target_co2_Mg_dict[t.credit_destination])
-        elif type(t.credit_destination) is not str and t.model_year not in calendar_year_cert_co2_Mg_dict:
-            ax1.plot(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]], 'o', color='orange')
-            draw_transfer_arrow(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]],
-                                t.credit_destination, model_year_cert_co2_Mg_dict[t.credit_destination])
+        if type(t.credit_destination) is not str and t.model_year in calendar_year_cert_co2e_Mg_dict:
+            draw_transfer_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year],
+                                t.credit_destination, cert_target_co2e_Mg_dict[t.credit_destination])
+        elif type(t.credit_destination) is not str and t.model_year not in calendar_year_cert_co2e_Mg_dict:
+            ax1.plot(t.model_year, cert_target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
+            draw_transfer_arrow(t.model_year, cert_target_co2e_Mg_dict[calendar_years[0]],
+                                t.credit_destination, model_year_cert_co2e_Mg_dict[t.credit_destination])
             ax1.set_xlim(calendar_years[0]-5, ax1.get_xlim()[1])
-        elif t.credit_destination == 'EXPIRATION' and t.model_year in calendar_year_cert_co2_Mg_dict:
-            draw_expiration_arrow(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year])
-        elif t.credit_destination == 'EXPIRATION' and t.model_year not in calendar_year_cert_co2_Mg_dict:
-            ax1.plot(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]], 'o', color='orange')
-            draw_expiration_arrow(t.model_year, cert_target_co2_Mg_dict[calendar_years[0]])
+        elif t.credit_destination == 'EXPIRATION' and t.model_year in calendar_year_cert_co2e_Mg_dict:
+            draw_expiration_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year])
+        elif t.credit_destination == 'EXPIRATION' and t.model_year not in calendar_year_cert_co2e_Mg_dict:
+            ax1.plot(t.model_year, cert_target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
+            draw_expiration_arrow(t.model_year, cert_target_co2e_Mg_dict[calendar_years[0]])
         else:  # "PAST_DUE"
-            ax1.plot(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year], 'x', color='red')
-            plt.scatter(t.model_year, calendar_year_cert_co2_Mg_dict[t.model_year], s=80, facecolors='none',
+            ax1.plot(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], 'x', color='red')
+            plt.scatter(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year], s=80, facecolors='none',
                         edgecolors='r')
 
     fig.savefig(omega_globals.options.output_folder + '%s Cert Mg v Year.png' % omega_globals.options.session_unique_name)
 
-    return calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions
+    return calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, cert_target_co2e_Mg, total_cost_billions
 
 
 def plot_iteration(iteration_log):
@@ -855,8 +855,8 @@ def plot_iteration(iteration_log):
 
     plt.figure()
     for mc in MarketClass.market_classes:
-        plt.plot(first_logged['calendar_year'], first_logged['average_co2_gpmi_%s' % mc], '.-')
+        plt.plot(first_logged['calendar_year'], first_logged['average_co2e_gpmi_%s' % mc], '.-')
     plt.title('Producer Initial CO2 g/mi')
     plt.grid()
-    plt.legend(['average_co2_gpmi_%s' % mc for mc in MarketClass.market_classes])
+    plt.legend(['average_co2e_gpmi_%s' % mc for mc in MarketClass.market_classes])
     plt.savefig('%s%s Producer Initial CO2 gpmi.png' % (omega_globals.options.output_folder, omega_globals.options.session_unique_name))

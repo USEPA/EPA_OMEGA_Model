@@ -13,7 +13,7 @@ from omega_model import *
 def get_demanded_shares(market_class_data, calendar_year):
     """
 
-    :param market_class_data: dict-like data structure with 'average_MC_cost' and 'average_MC_co2_gpmi' keys
+    :param market_class_data: dict-like data structure with 'average_MC_cost' and 'average_MC_co2e_gpmi' keys
                                 where MC = market class ID
     :param calendar_year: calendar year to calculate market shares in
     :return: dict of demanded ICE/BEV share by hauling / non_hauling market segments
@@ -47,11 +47,11 @@ def get_demanded_shares(market_class_data, calendar_year):
                         ((1 + discount_rate) ** price_amortization_period) - 1)
 
                 total_capital_costs = market_class_data['average_modified_cross_subsidized_price_%s' % market_class_id]
-                average_co2_gpmi = market_class_data['average_co2_gpmi_%s' % market_class_id]
+                average_co2e_gpmi = market_class_data['average_co2e_gpmi_%s' % market_class_id]
                 average_kwh_pmi = market_class_data['average_kwh_pmi_%s' % market_class_id]
 
                 carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
-                                                                          'direct_co2_grams_per_unit')
+                                                                          'direct_co2e_grams_per_unit')
 
                 refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
                                                                   'refuel_efficiency')
@@ -63,7 +63,7 @@ def get_demanded_shares(market_class_data, calendar_year):
 
                 # TODO: will eventually need utility factor for PHEVs here
                 fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
-                fuel_cost_per_VMT += fuel_cost * average_co2_gpmi / carbon_intensity_gasoline / refuel_efficiency
+                fuel_cost_per_VMT += fuel_cost * average_co2e_gpmi / carbon_intensity_gasoline / refuel_efficiency
 
                 # consumer_generalized_cost_dollars = total_capital_costs
                 annualized_capital_costs = annualization_factor * total_capital_costs
@@ -159,7 +159,7 @@ if __name__ == '__main__':
             for mc in MarketClass.market_classes:
                 mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
                 mcd['average_kwh_pmi_%s' % mc] = [0, 0]
-                mcd['average_co2_gpmi_%s' % mc] = [125, 150]
+                mcd['average_co2e_gpmi_%s' % mc] = [125, 150]
                 mcd['average_fuel_price_%s' % mc] = [2.75, 3.25]
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]

@@ -26,7 +26,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        fuel_id,start_year,unit,direct_co2_grams_per_unit,upstream_co2_grams_per_unit,transmission_efficiency
+        fuel_id,start_year,unit,direct_co2e_grams_per_unit,upstream_co2e_grams_per_unit,transmission_efficiency
         electricity,2020,kWh,0,534,0.935
         gasoline,2020,gallon,8887,2478,0
         diesel,2020,gallon,10180,2839,0
@@ -42,10 +42,10 @@ Data Column Name and Description
 :unit:
     Fuel unit, e.g. 'gallon', 'kWh'
 
-:direct_co2_grams_per_unit:
+:direct_co2e_grams_per_unit:
     CO2 emissions per unit when consumed
 
-:upstream_co2_grams_per_unit:
+:upstream_co2e_grams_per_unit:
     Upstream CO2 emissions per unit when consumed
 
 :transmission_efficiency:
@@ -87,7 +87,7 @@ class PolicyFuel(OMEGABase):
             ::
 
                 carbon_intensity_gasoline =
-                    OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2_grams_per_unit')
+                    OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
         start_years = cache['start_year']
@@ -133,8 +133,8 @@ class PolicyFuel(OMEGABase):
 
         input_template_name = 'policy-fuels'
         input_template_version = 0.1
-        input_template_columns = {'fuel_id', 'start_year', 'unit', 'direct_co2_grams_per_unit',
-                                  'upstream_co2_grams_per_unit', 'transmission_efficiency'}
+        input_template_columns = {'fuel_id', 'start_year', 'unit', 'direct_co2e_grams_per_unit',
+                                  'upstream_co2e_grams_per_unit', 'transmission_efficiency'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -177,7 +177,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             print(PolicyFuel.validate_fuel_ID('gasoline'))
-            print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2_grams_per_unit'))
+            print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2e_grams_per_unit'))
             print(PolicyFuel.get_fuel_attribute(2020, 'electricity', 'transmission_efficiency'))
         else:
             print(init_fail)

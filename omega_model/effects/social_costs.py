@@ -105,7 +105,7 @@ def calc_carbon_emission_costs(calendar_year, cost_effects_dict):
     for vad in vads:
 
         veh_cost_effects_dict = dict()
-        if vad.onroad_direct_co2_grams_per_mile or vad.onroad_direct_kwh_per_mile:
+        if vad.onroad_direct_co2e_grams_per_mile or vad.onroad_direct_kwh_per_mile:
 
             co2_tons = vad.co2_total_metrictons
             ch4_tons = vad.ch4_total_metrictons
@@ -187,7 +187,7 @@ def calc_criteria_emission_costs(calendar_year, cost_effects_dict):
     for vad in vads:
 
         veh_cost_effects_dict = dict()
-        if vad.onroad_direct_co2_grams_per_mile or vad.onroad_direct_kwh_per_mile:
+        if vad.onroad_direct_co2e_grams_per_mile or vad.onroad_direct_kwh_per_mile:
 
             pm25_tp_tons = vad.pm25_tailpipe_ustons
             pm25_up_tons = vad.pm25_upstream_ustons
@@ -301,7 +301,7 @@ def calc_non_emission_costs(calendar_year):
     for vad in vads:
 
         veh_cost_effects_dict = dict()
-        if vad.onroad_direct_co2_grams_per_mile or vad.onroad_direct_kwh_per_mile:
+        if vad.onroad_direct_co2e_grams_per_mile or vad.onroad_direct_kwh_per_mile:
 
             attribute_list = ['reg_class_ID', 'in_use_fuel_ID']
             reg_class_ID, in_use_fuel_ID = get_vehicle_info(vad.vehicle_ID, attribute_list)
@@ -416,13 +416,13 @@ def calc_cost_effects(physical_effects_dict):
         vehicle_ID, calendar_year, age = key
         physical = physical_effects_dict[key]
 
-        attribute_list = ['reg_class_ID', 'in_use_fuel_ID', 'onroad_direct_co2_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        reg_class_ID, in_use_fuel_ID, onroad_direct_co2_grams_per_mile, onroad_direct_kwh_per_mile \
+        attribute_list = ['reg_class_ID', 'in_use_fuel_ID', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        reg_class_ID, in_use_fuel_ID, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vehicle_ID, attribute_list)
 
         veh_effects_dict = dict()
         flag = None
-        if onroad_direct_co2_grams_per_mile or onroad_direct_kwh_per_mile:
+        if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
             fuel_retail_cost_dollars = 0

@@ -29,7 +29,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        fuel_id,start_year,unit,direct_co2_grams_per_unit,refuel_efficiency,transmission_efficiency
+        fuel_id,start_year,unit,direct_co2e_grams_per_unit,refuel_efficiency,transmission_efficiency
         pump gasoline,2020,gallon,8887,1,1
         US electricity,2020,kWh,0,0.9,0.935
 
@@ -44,7 +44,7 @@ Data Column Name and Description
 :unit:
     Fuel unit, e.g. 'gallon', 'kWh'
 
-:direct_co2_grams_per_unit:
+:direct_co2e_grams_per_unit:
     CO2 emissions per unit when consumed
 
 :refuel_efficiency:
@@ -89,7 +89,7 @@ class OnroadFuel(OMEGABase):
             ::
 
                 carbon_intensity_gasoline =
-                    OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2_grams_per_unit')
+                    OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
         start_years = cache['start_year']
@@ -135,7 +135,7 @@ class OnroadFuel(OMEGABase):
 
         input_template_name = 'onroad-fuels'
         input_template_version = 0.1
-        input_template_columns = {'fuel_id', 'start_year', 'unit', 'direct_co2_grams_per_unit',
+        input_template_columns = {'fuel_id', 'start_year', 'unit', 'direct_co2e_grams_per_unit',
                                   'refuel_efficiency', 'transmission_efficiency'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             print(OnroadFuel.validate_fuel_ID('pump gasoline'))
-            print(OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2_grams_per_unit'))
+            print(OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit'))
         else:
             print(init_fail)
 

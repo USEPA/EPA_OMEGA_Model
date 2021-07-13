@@ -25,19 +25,19 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
 
     if vehicle.fueling_class == 'BEV':
         upstream_gco2_per_kwh = \
-            PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2_grams_per_unit')
+            PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2e_grams_per_unit')
 
         upstream_efficiency = \
             PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'transmission_efficiency')
 
         upstream_gco2_per_gal = \
-            PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'upstream_co2_grams_per_unit')
+            PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'upstream_co2e_grams_per_unit')
 
         fuel_gco2_per_gal = \
-            PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'direct_co2_grams_per_unit')
+            PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'direct_co2e_grams_per_unit')
 
         upstream = np.maximum(0, kwh_per_mile * upstream_gco2_per_kwh / upstream_efficiency -
-                              vehicle.cert_target_co2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
+                              vehicle.cert_target_co2e_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
     else:
         upstream = 0
 
@@ -48,16 +48,16 @@ def upstream_actual(vehicle, co2_grams_per_mile, kwh_per_mile):
     from policy.policy_fuels import PolicyFuel
 
     upstream_gco2_per_kwh = \
-        PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2_grams_per_unit')
+        PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2e_grams_per_unit')
 
     upstream_efficiency = \
         PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'transmission_efficiency')
 
     upstream_gco2_per_gal = \
-        PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'upstream_co2_grams_per_unit')
+        PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'upstream_co2e_grams_per_unit')
 
     fuel_gco2_per_gal = \
-        PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'direct_co2_grams_per_unit')
+        PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'direct_co2e_grams_per_unit')
 
     # TODO: need "utility factor" or percentage of electric and gas miles to weight these terms
     upstream = kwh_per_mile * upstream_gco2_per_kwh / upstream_efficiency + \

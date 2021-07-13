@@ -56,9 +56,9 @@ class OffCycleCredits(OMEGABase):
         for ocg in offcycle_groups:
             group_totals[ocg] = 0
 
-        vehicle.cost_cloud['cert_direct_offcycle_co2_grams_per_mile'] = 0
+        vehicle.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile'] = 0
         vehicle.cost_cloud['cert_direct_offcycle_kwh_per_mile'] = 0
-        vehicle.cost_cloud['cert_indirect_offcycle_co2_grams_per_mile'] = 0
+        vehicle.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile'] = 0
 
         for cc in OffCycleCredits._values['credit_columns']:
             attribute, value = cc.split(':')

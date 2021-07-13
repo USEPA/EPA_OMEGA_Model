@@ -28,7 +28,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
     vmt = Column(Float)
     # vmt_liquid_fuel = Column(Float)
     # vmt_electricity = Column(Float)
-    # onroad_direct_co2_grams_per_mile = Column(Float)
+    # onroad_direct_co2e_grams_per_mile = Column(Float)
     # onroad_direct_kwh_per_mile = Column(Float)
     # onroad_gallons_per_mile = Column(Float)
     # fuel_consumption_gallons = Column(Float)

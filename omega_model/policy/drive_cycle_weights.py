@@ -29,13 +29,13 @@ Sample Drive Cycle Weight Tree
         │   │   ├── 0.2747476510067114[cd_ftp_3:cert_direct_oncycle_kwh_per_mile]
         │   │   └── None[cd_ftp_4:cert_direct_oncycle_kwh_per_mile]
         │   └── 0.45[cd_hwfet:cert_direct_oncycle_kwh_per_mile]
-        └── 0[cs_cert_direct_oncycle_co2_grams_per_mile]
+        └── 0[cs_cert_direct_oncycle_co2e_grams_per_mile]
             ├── 0.55[cs_ftp_co2]
-            │   ├── 0.20726577181208053[cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile]
-            │   ├── 0.517986577181208[cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile]
-            │   ├── 0.2747476510067114[cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile]
-            │   └── None[cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile]
-            └── 0.45[cs_hwfet:cert_direct_oncycle_co2_grams_per_mile]
+            │   ├── 0.20726577181208053[cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile]
+            │   ├── 0.517986577181208[cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile]
+            │   ├── 0.2747476510067114[cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile]
+            │   └── None[cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile]
+            └── 0.45[cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile]
 
 ----
 
@@ -59,7 +59,7 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,share_id,fueling_class,weighted_combined->cs_cert_direct_oncycle_co2_grams_per_mile,weighted_combined->cd_cert_direct_oncycle_kwh_per_mile,cs_cert_direct_oncycle_co2_grams_per_mile->cs_ftp_co2,cs_cert_direct_oncycle_co2_grams_per_mile->cs_hwfet:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile,cs_ftp_co2->cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile,cd_cert_direct_oncycle_kwh_per_mile->cd_ftp_kwh,cd_cert_direct_oncycle_kwh_per_mile->cd_hwfet:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_4:cert_direct_oncycle_kwh_per_mile
+        start_year,share_id,fueling_class,weighted_combined->cs_cert_direct_oncycle_co2e_grams_per_mile,weighted_combined->cd_cert_direct_oncycle_kwh_per_mile,cs_cert_direct_oncycle_co2e_grams_per_mile->cs_ftp_co2,cs_cert_direct_oncycle_co2e_grams_per_mile->cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_co2->cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_co2->cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_co2->cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_co2->cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,cd_cert_direct_oncycle_kwh_per_mile->cd_ftp_kwh,cd_cert_direct_oncycle_kwh_per_mile->cd_hwfet:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_kwh->cd_ftp_4:cert_direct_oncycle_kwh_per_mile
         2020,cert,ICE,1,0,0.55,0.45,0.43*3.591/7.45,3.859/7.45,0.57*3.591/7.45,None,0.55,0.45,0.43*3.591/7.45,3.859/7.45,0.57*3.591/7.45,None
 
 Data Column Name and Description
@@ -188,7 +188,7 @@ class DriveCycleWeights(OMEGABase):
             calendar_year (numeric): calendar year to calculated weighted value in
             fueling_class (str): e.g. 'ICE', 'BEV', etc
             cycle_values (DataFrame): contains cycle values to be weighted (e.g. the simulated vehicles input data with results (columns) for each drive cycle phase)
-            node_id (str): name of tree node at which to calculated weighted value, e.g. 'cs_cert_direct_oncycle_co2_grams_per_mile'
+            node_id (str): name of tree node at which to calculated weighted value, e.g. 'cs_cert_direct_oncycle_co2e_grams_per_mile'
             weighted (bool): if True, return weighted value at node (node value * weight), else return node value (e.g. cycle result)
 
         Returns:
@@ -201,7 +201,7 @@ class DriveCycleWeights(OMEGABase):
                                                               weighted=weighted)
 
     @staticmethod
-    def calc_cert_direct_oncycle_co2_grams_per_mile(calendar_year, fueling_class, cycle_values):
+    def calc_cert_direct_oncycle_co2e_grams_per_mile(calendar_year, fueling_class, cycle_values):
         """
         Calculate cert direct on-cycle CO2 g/mi
 
@@ -215,7 +215,7 @@ class DriveCycleWeights(OMEGABase):
 
         """
         return DriveCycleWeights.calc_weighted_value(calendar_year, fueling_class, cycle_values,
-                                                     'cs_cert_direct_oncycle_co2_grams_per_mile', weighted=False)
+                                                     'cs_cert_direct_oncycle_co2e_grams_per_mile', weighted=False)
 
     @staticmethod
     def calc_cert_direct_oncycle_kwh_per_mile(calendar_year, fueling_class, cycle_values):
@@ -260,18 +260,18 @@ if __name__ == '__main__':
         if not init_fail:
 
             sample_cycle_results = {
-                            'cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile': 277.853416,
-                            'cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile': 272.779239,
-                            'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile': 242.292152,
-                            'cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile': 272.779239,
-                            'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile': 182.916104,
+                            'cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile': 277.853416,
+                            'cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile': 272.779239,
+                            'cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile': 242.292152,
+                            'cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile': 272.779239,
+                            'cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile': 182.916104,
                             'cd_ftp_1:cert_direct_oncycle_kwh_per_mile': 0.26559971,
                             'cd_ftp_2:cert_direct_oncycle_kwh_per_mile': 0.2332757,
                             'cd_ftp_3:cert_direct_oncycle_kwh_per_mile': 0.25938633,
                             'cd_ftp_4:cert_direct_oncycle_kwh_per_mile': 0.2332757,
                             'cd_hwfet:cert_direct_oncycle_kwh_per_mile': 0.22907605,
             }
-            print(DriveCycleWeights.calc_cert_direct_oncycle_co2_grams_per_mile(2020, 'ICE', sample_cycle_results))
+            print(DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(2020, 'ICE', sample_cycle_results))
             print(DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, 'BEV', sample_cycle_results))
 
         else:

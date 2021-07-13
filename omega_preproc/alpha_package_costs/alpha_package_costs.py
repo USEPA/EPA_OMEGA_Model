@@ -38,7 +38,7 @@ def cost_vs_plot(settings, df, path, *years):
         hev_plot = list()
         hev_legends = list()
         for cost_curve_class in ice_classes:
-            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cs_cert_direct_oncycle_co2_grams_per_mile'],
+            ice_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cs_cert_direct_oncycle_co2e_grams_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             ice_plot.append(ice_data[cost_curve_class])
             ice_legends.append(cost_curve_class)
@@ -48,7 +48,7 @@ def cost_vs_plot(settings, df, path, *years):
             bev_plot.append(bev_data[cost_curve_class])
             bev_legends.append(cost_curve_class)
         for cost_curve_class in hev_classes:
-            hev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cs_cert_direct_oncycle_co2_grams_per_mile'],
+            hev_data[cost_curve_class] = (df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'cs_cert_direct_oncycle_co2e_grams_per_mile'],
                                           df.loc[(df['model_year'] == year) & (df['cost_curve_class'] == cost_curve_class), 'new_vehicle_mfr_cost_dollars'])
             hev_plot.append(hev_data[cost_curve_class])
             hev_legends.append(cost_curve_class)
@@ -488,12 +488,12 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[alpha_key])
 
     package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
-    package_cost_df.insert(0, 'cs_cert_direct_oncycle_co2_grams_per_mile', combined_co2)
-    package_cost_df.insert(0, 'cs_hwfet:cert_direct_oncycle_co2_grams_per_mile', hwy_co2)
-    package_cost_df.insert(0, 'cs_ftp_4:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2) ## FOR NOW ONLY!!! -KNew
-    package_cost_df.insert(0, 'cs_ftp_3:cert_direct_oncycle_co2_grams_per_mile', ftp3_co2)
-    package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2_grams_per_mile', ftp2_co2)
-    package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2_grams_per_mile', ftp1_co2)
+    package_cost_df.insert(0, 'cs_cert_direct_oncycle_co2e_grams_per_mile', combined_co2)
+    package_cost_df.insert(0, 'cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile', hwy_co2)
+    package_cost_df.insert(0, 'cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile', ftp2_co2) ## FOR NOW ONLY!!! -KNew
+    package_cost_df.insert(0, 'cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile', ftp3_co2)
+    package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile', ftp2_co2)
+    package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile', ftp1_co2)
     package_cost_df.insert(0, 'credit_start_stop', startstop)
     package_cost_df.insert(0, 'credit_high_eff_alternator', accessory_key_value)
     package_cost_df.insert(0, 'credit_ac_leakage', 1)
@@ -1149,7 +1149,7 @@ def main():
     hev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_hev_{settings.name_id}.csv', index=False)
 
     if settings.generate_simulated_vehicles_file:
-        cost_cloud = drop_columns(cost_cloud, 'cert_co2_grams_per_mile', 'cert_kWh_per_mile', 'alpha_key', 'alpha_filename')
+        cost_cloud = drop_columns(cost_cloud, 'cert_co2e_grams_per_mile', 'cert_kWh_per_mile', 'alpha_key', 'alpha_filename')
         # open the 'simulated_vehicles.csv' input template into which results will be placed.
         cost_clouds_template_info = pd.read_csv(settings.path_input_templates.joinpath('simulated_vehicles.csv'), 'b', nrows=0)
         temp = ' '.join((item for item in cost_clouds_template_info))

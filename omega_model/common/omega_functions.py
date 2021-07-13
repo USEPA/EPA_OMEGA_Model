@@ -26,7 +26,7 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
         ::
 
             # from create_frontier_df() in vehicles.py
-            CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
+            CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
     """
     import matplotlib.pyplot as plt
@@ -519,7 +519,7 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
             ['producer_share_frac_non_hauling.BEV', 'producer_share_frac_non_hauling.ICE']
 
             >>>combos
-                  veh_non_hauling.BEV.car_co2_gpmi  ...  slope
+                  veh_non_hauling.BEV.car_co2e_gpmi  ...  slope
             1510                          15.91862  ...      0
             2135                          15.91862  ...      0
             [2 rows x 79 columns]
