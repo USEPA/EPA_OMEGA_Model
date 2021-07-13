@@ -42,12 +42,11 @@ def run_effects_calcs():
     omega_log.logwrite('Discounting costs')
     cost_effects_dict = discount_values(cost_effects_dict)
 
-    path_parent = Path(__file__).parent
-    path_model = path_parent.parent
-    path_project = path_model.parent
-    path_out = path_project / 'out'
-    save_dict_to_csv(physical_effects_dict, path_out / 'physical_effects', list(), 'vehicle_ID', 'calendar_year', 'age')
-    save_dict_to_csv(cost_effects_dict, path_out / 'cost_effects', list(), 'vehicle_ID', 'calendar_year', 'age', 'discount_rate')
+    save_dict_to_csv(physical_effects_dict, omega_globals.options.output_folder + '%s_physical_effects' %
+                     omega_globals.options.session_unique_name, list(), 'vehicle_ID', 'calendar_year', 'age')
+
+    save_dict_to_csv(cost_effects_dict, omega_globals.options.output_folder + '%s_cost_effects' %
+                     omega_globals.options.session_unique_name, list(), 'vehicle_ID', 'calendar_year', 'age', 'discount_rate')
 
     # # cost_effects_dict = dict()
     # for calendar_year in calendar_years:
