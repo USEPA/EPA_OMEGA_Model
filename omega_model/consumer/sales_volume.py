@@ -123,7 +123,7 @@ if __name__ == '__main__':
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2
+        from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2e
         from context.new_vehicle_market import NewVehicleMarket
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)

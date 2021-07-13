@@ -2,7 +2,7 @@
 
 **Routines to load and retrieve onroad (in-use) fuel attribute data**
 
-Fuel data includes a name, units (e.g. gallons, kWh), CO2 g/unit, refuel_efficiency and transmission_efficiency.
+Fuel data includes a name, units (e.g. gallons, kWh), CO2e g/unit, refuel_efficiency and transmission_efficiency.
 
 See Also:
 
@@ -45,7 +45,7 @@ Data Column Name and Description
     Fuel unit, e.g. 'gallon', 'kWh'
 
 :direct_co2e_grams_per_unit:
-    CO2 emissions per unit when consumed
+    CO2e emissions per unit when consumed
 
 :refuel_efficiency:
     Refuel efficiency [0..1], e.g. electrical vehicle charging efficiency

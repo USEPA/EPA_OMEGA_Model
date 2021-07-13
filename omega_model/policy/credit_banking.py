@@ -1,6 +1,6 @@
 """
 
-**Routines to load initial GHG credits (in CO2 Mg), provide access to credit banking data, and handle credit
+**Routines to load initial GHG credits (in CO2e Mg), provide access to credit banking data, and handle credit
 transactions, along the lines of Averaging, Bank and Trading (ABT)**
 
 Not all features of ABT are implemented (notably, explicit between-manufacturer Trading).  Credits can be earned,
@@ -45,7 +45,7 @@ Data Column Name and Description
     Identifies the credit owner, consistent with the data loaded by the ``manufacturers`` module
 
 :balance_Mg:
-    Model year credit remaining balance in the calendar year (CO2 Mg)
+    Model year credit remaining balance in the calendar year (CO2e Mg)
 
 ----
 
@@ -77,7 +77,7 @@ class CreditInfo(OMEGABase):
         Create GHG_credit_info object
 
         Args:
-            remaining_balance_Mg (numeric): remaining credit balance, CO2 Mg
+            remaining_balance_Mg (numeric): remaining credit balance, CO2e Mg
             remaining_years (numeric): remaining years of life before expiration
         """
         self.remaining_balance_Mg = remaining_balance_Mg
@@ -149,7 +149,7 @@ class CreditBank(OMEGABase):
         Args:
             calendar_year (numeric): calendar year of credit creation
             manufacturer_id (str): manufacturer name, e.g. 'USA Motors'
-            beginning_balance_Mg (numeric): starting balance of credit in CO2 Mg
+            beginning_balance_Mg (numeric): starting balance of credit in CO2e Mg
 
         Returns:
             DataFrame of new (age zero) credit info
@@ -222,13 +222,13 @@ class CreditBank(OMEGABase):
 
     def get_expiring_credits_Mg(self, calendar_year):
         """
-        Get value of expiring credits in CO2 Mg for the given year.
+        Get value of expiring credits in CO2e Mg for the given year.
 
         Args:
             calendar_year (numeric): calendar year to get expiring credits from
 
         Returns:
-            Value of expiring credits in CO2 Mg
+            Value of expiring credits in CO2e Mg
 
         """
         expiring_credits_Mg = 0
@@ -245,13 +245,13 @@ class CreditBank(OMEGABase):
 
     def get_expiring_debits_Mg(self, calendar_year):
         """
-        Get value of expiring debits in CO2 Mg for the given year.
+        Get value of expiring debits in CO2e Mg for the given year.
 
         Args:
             calendar_year (numeric): calendar year to get expiring debits from
 
         Returns:
-            Value of expiring debits in CO2 Mg
+            Value of expiring debits in CO2e Mg
 
         """
 
@@ -351,7 +351,7 @@ class CreditBank(OMEGABase):
         Args:
             calendar_year (numeric): calendar year of credit creation
             manufacturer_id (str): manufacturer name, e.g. 'USA Motors'
-            beginning_balance_Mg (numeric): starting balance of credit (or debit) in CO2 Mg
+            beginning_balance_Mg (numeric): starting balance of credit (or debit) in CO2e Mg
 
         """
         new_credit = self.create_credit(calendar_year, manufacturer_id, beginning_balance_Mg)
@@ -384,7 +384,7 @@ class CreditBank(OMEGABase):
     def pay_debit(self, credit, debit, this_years_credits):
         """
         Pay a debit with a credit, create a transaction in the ``transaction_log`` and update manufacter model year
-        compliance status (in CO2 Mg).
+        compliance status (in CO2e Mg).
 
         Other than expiration, paying debits is the only way credits can be consumed.
 

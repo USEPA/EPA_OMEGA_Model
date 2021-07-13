@@ -58,14 +58,14 @@ class VehicleTargetsBase:
     @staticmethod
     def calc_target_co2e_gpmi(vehicle):
         """
-        Calculate vehicle target CO2 g/mi.
+        Calculate vehicle target CO2e g/mi.
 
         Args:
             vehicle (Vehicle): the vehicle to get the target for
 
         Returns:
 
-            Vehicle target CO2 in g/mi.
+            Vehicle target CO2e in g/mi.
 
         """
         raise Exception('**Attempt to call abstract method TargetsBase.%s() without child class override**' %
@@ -91,7 +91,7 @@ class VehicleTargetsBase:
     @staticmethod
     def calc_target_co2e_Mg(vehicle, sales_variants=None):
         """
-        Calculate vehicle target CO2 Mg as a function of the vehicle, the standards and optional sales options.
+        Calculate vehicle target CO2e Mg as a function of the vehicle, the standards and optional sales options.
 
         Includes the effect of production multipliers.
 
@@ -105,7 +105,7 @@ class VehicleTargetsBase:
 
         Returns:
 
-            Target CO2 Mg value(s) for the given vehicle and/or sales variants.
+            Target CO2e Mg value(s) for the given vehicle and/or sales variants.
 
         """
         raise Exception('**Attempt to call abstract method TargetsBase.%s() without child class override**' %
@@ -114,7 +114,7 @@ class VehicleTargetsBase:
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         """
-        Calculate vehicle cert CO2 Mg as a function of the vehicle, the standards, CO2 g/mi options and optional sales
+        Calculate vehicle cert CO2e Mg as a function of the vehicle, the standards, CO2e g/mi options and optional sales
         options.
 
         Includes the effect of production multipliers.
@@ -129,7 +129,7 @@ class VehicleTargetsBase:
 
         Returns:
 
-            Cert CO2 Mg value(s) for the given vehicle, CO2 g/mi variants and/or sales variants.
+            Cert CO2e Mg value(s) for the given vehicle, CO2e g/mi variants and/or sales variants.
 
         """
         raise Exception('**Attempt to call abstract method TargetsBase.%s() without child class override**' %

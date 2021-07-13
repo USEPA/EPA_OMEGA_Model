@@ -26,8 +26,8 @@ Sample Data Columns
         :widths: auto
 
         drive_cycle_id,drive_cycle_distance_miles,description,
-        cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2 g/mi,
-        cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2 g/mi,
+        cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2e g/mi,
+        cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2e g/mi,
 
 Data Column Name and Description
 

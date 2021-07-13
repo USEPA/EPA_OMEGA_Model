@@ -2,7 +2,7 @@
 
 **Routines to load and provide access to policy-defined fuel attributes.**
 
-The primary fuel attributes are CO2 grams per unit (i.e. g/gallon, g/kWh) when consumed, by policy year.
+The primary fuel attributes are CO2e grams per unit (i.e. g/gallon, g/kWh) when consumed, by policy year.
 
 
 ----
@@ -43,10 +43,10 @@ Data Column Name and Description
     Fuel unit, e.g. 'gallon', 'kWh'
 
 :direct_co2e_grams_per_unit:
-    CO2 emissions per unit when consumed
+    CO2e emissions per unit when consumed
 
 :upstream_co2e_grams_per_unit:
-    Upstream CO2 emissions per unit when consumed
+    Upstream CO2e emissions per unit when consumed
 
 :transmission_efficiency:
     Fuel transmission efficiency [0..1], e.g. electrical grid efficiency, may also be referred to as "grid loss"

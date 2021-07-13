@@ -69,14 +69,14 @@ Data Column Name and Description
         ``class context_fuel_prices.ContextFuelPrices``
 
     :cert_fuel_id:
-        Certification fuel id, for determining certification upstream CO2 grams/mile, must be in the table loaded by
+        Certification fuel id, for determining certification upstream CO2e grams/mile, must be in the table loaded by
         ``class fuels.Fuel``
 
     :sales:
         Number of vehicles sold in the ``model_year``
 
     :cert_co2e_grams_per_mile:
-        Vehicle certification emissions CO2 grams/mile
+        Vehicle certification emissions CO2e grams/mile
 
     :cert_direct_kwh_per_mile:
         Vehicle certification electricity consumption kWh/mile
@@ -426,7 +426,7 @@ class CompositeVehicle(OMEGABase):
 
         if plot:
             fig, ax1 = figure()
-            label_xy(ax1, 'CO2 g/mi', '$')
+            label_xy(ax1, 'CO2e g/mi', '$')
 
         composite_frontier_df = pd.DataFrame()
         composite_frontier_df['market_share_frac'] = [0]

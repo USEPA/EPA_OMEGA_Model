@@ -203,7 +203,7 @@ class DriveCycleWeights(OMEGABase):
     @staticmethod
     def calc_cert_direct_oncycle_co2e_grams_per_mile(calendar_year, fueling_class, cycle_values):
         """
-        Calculate cert direct on-cycle CO2 g/mi
+        Calculate cert direct on-cycle CO2e g/mi
 
         Args:
             calendar_year (numeric): calendar year to calculated weighted value in

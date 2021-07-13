@@ -358,7 +358,7 @@ def weighted_value(objects, weight_attribute, attribute, attribute_args=None):
     Args:
         objects ([objs]): list of source objects
         weight_attribute (str): the name of the object attribute to weight by (e.g. 'sales')
-        attribute (str): the name of the attribute to calculate the weighted value of, e.g. vehicle CO2 g/mi, etc
+        attribute (str): the name of the attribute to calculate the weighted value of, e.g. vehicle CO2e g/mi, etc
         attribute_args: arguments to the attribute, if the attribute is a method or function, e.g. calendar_year
 
     Returns:
@@ -392,7 +392,7 @@ def _unweighted_value(obj, weighted_value, objects, weight_attribute, attribute)
         weighted_value (numeric): the value to unweight
         objects ([objs]): the list of source objects
         weight_attribute (str): the name of the weight attribute, e.g. 'sales'
-        attribute (str): the name of the weighted attribute, e.g. vehicle CO2 g/mi
+        attribute (str): the name of the weighted attribute, e.g. vehicle CO2e g/mi
 
     Returns:
         The appopriate attribute value of the object

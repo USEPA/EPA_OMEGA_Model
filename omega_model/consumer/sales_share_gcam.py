@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            # test market shares at different CO2 and price levels
+            # test market shares at different CO2e and price levels
             mcd = pd.DataFrame()
             for mc in MarketClass.market_classes:
                 mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]

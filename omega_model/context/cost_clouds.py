@@ -1,13 +1,13 @@
 """
 
-**Routines to load simulated vehicle data (vehicle energy/CO2 consumption, off-cycle tech application, and cost data)
+**Routines to load simulated vehicle data (vehicle energy/CO2e consumption, off-cycle tech application, and cost data)
 and calculate frontiers from "clouds" of points**
 
 Also contains a function to plot frontiers for troubleshooting purposes
 
 Cost cloud frontiers are at the heart of OMEGA's optimization and compliance processes.  For every set of points
-represented in $/CO2_g/mi (or Y versus X in general) there is a set of points that represent the lowest cost for each
-CO2 level, this is referred to as the frontier of the cloud.  Each point in the cloud (and on the frontier) can store
+represented in $/CO2e_g/mi (or Y versus X in general) there is a set of points that represent the lowest cost for each
+CO2e level, this is referred to as the frontier of the cloud.  Each point in the cloud (and on the frontier) can store
 multiple parameters, implemented as rows in a pandas DataFrame where each row can have multiple columns of data.
 
 Each manufacturer vehicle, in each model year, gets its own frontier.  The frontiers are combined in a sales-weighted
@@ -70,11 +70,11 @@ Data Column Name and Description
     CHARGE-SUSTAINING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
 
-        :cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
-        :cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2 grams/mile
+        :cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
+        :cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
+        :cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
+        :cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
+        :cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
 
     :ac_efficiency:
         = 1 if vehicle qualifies for the AC efficiency off-cycle credit, = 0 otherwise

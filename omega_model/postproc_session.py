@@ -148,9 +148,9 @@ def plot_cert_co2e_gpmi(calendar_years):
         ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
     ax1.plot(calendar_years, average_cert_co2e_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
-    label_xyt(ax1, 'Year', 'CO2 [g/mi]',
-              '%s\nAverage Vehicle Cert CO2 g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2 gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'CO2e [g/mi]',
+              '%s\nAverage Vehicle Cert CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # cost/market class chart
     fig, ax1 = figure()
@@ -169,10 +169,10 @@ def plot_cert_co2e_gpmi(calendar_years):
         else:
             ax1.plot(calendar_years, average_cert_co2e_data[mc], '.--')
 
-    label_xyt(ax1, 'Year', 'CO2 [g/mi]',
-              '%s\nAverage Vehicle Cert CO2 g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'CO2e [g/mi]',
+              '%s\nAverage Vehicle Cert CO2e g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2 gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
     return average_cert_co2e_data
 
 
@@ -308,9 +308,9 @@ def plot_target_co2e_gpmi(calendar_years):
         ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
     ax1.plot(calendar_years, average_cert_co2e_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
-    label_xyt(ax1, 'Year', 'CO2 [g/mi]',
-              '%s\nAverage Vehicle Target CO2 g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2 gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'CO2e [g/mi]',
+              '%s\nAverage Vehicle Target CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # cost/market class chart
     fig, ax1 = figure()
@@ -329,10 +329,10 @@ def plot_target_co2e_gpmi(calendar_years):
         else:
             ax1.plot(calendar_years, average_cert_co2e_data[mc], '.--')
 
-    label_xyt(ax1, 'Year', 'CO2 [g/mi]',
-              '%s\nAverage Vehicle Target CO2 g/mi by Market Class v Year' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'CO2e [g/mi]',
+              '%s\nAverage Vehicle Target CO2e g/mi by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(MarketClass.market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2 gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+    fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
     return average_cert_co2e_data
 
 
@@ -546,8 +546,8 @@ def plot_vehicle_megagrams(calendar_years):
         ax1.plot(calendar_years, Mg_data[mcat], '.--')
     ax1.plot(calendar_years, Mg_data['total'], '.-')
     ax1.legend(consumer.market_categories + ['total'])
-    label_xyt(ax1, 'Year', 'CO2 [Mg]',
-              '%s\nVehicle CO2 Megagrams by Market Category v Year' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'CO2e [Mg]',
+              '%s\nVehicle CO2e Megagrams by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # cost/market class chart
@@ -567,8 +567,8 @@ def plot_vehicle_megagrams(calendar_years):
         else:
             ax1.plot(calendar_years, Mg_data[mc], '.--')
     ax1.plot(calendar_years, Mg_data['total'], '.-')
-    label_xyt(ax1, 'Year', 'CO2 [Mg]',
-              '%s\nVehicle CO2 Megagrams  by Market Class v Year' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'CO2e [Mg]',
+              '%s\nVehicle CO2e Megagrams  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(MarketClass.market_classes + ['total'])
     fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cls.png' % omega_globals.options.session_unique_name)
     return Mg_data
@@ -744,7 +744,7 @@ def plot_manufacturer_compliance(calendar_years, credit_history):
     ax1.plot(calendar_years, calendar_year_cert_co2e_Mg, 'r.-')
     ax1.plot(calendar_years, model_year_cert_co2e_Mg, '-')
     ax1.legend(['cert_target_co2e_Mg', 'calendar_year_cert_co2e_Mg', 'model_year_cert_co2e_Mg'])
-    label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
+    label_xyt(ax1, 'Year', 'CO2e [Mg]', '%s\nCert and Compliance Versus Year\n Total Cost $%.2f Billion' % (
         omega_globals.options.session_unique_name, total_cost_billions))
 
     cert_target_co2e_Mg_dict = dict(zip(calendar_years, cert_target_co2e_Mg))
@@ -856,7 +856,7 @@ def plot_iteration(iteration_log):
     plt.figure()
     for mc in MarketClass.market_classes:
         plt.plot(first_logged['calendar_year'], first_logged['average_co2e_gpmi_%s' % mc], '.-')
-    plt.title('Producer Initial CO2 g/mi')
+    plt.title('Producer Initial CO2e g/mi')
     plt.grid()
     plt.legend(['average_co2e_gpmi_%s' % mc for mc in MarketClass.market_classes])
-    plt.savefig('%s%s Producer Initial CO2 gpmi.png' % (omega_globals.options.output_folder, omega_globals.options.session_unique_name))
+    plt.savefig('%s%s Producer Initial CO2e gpmi.png' % (omega_globals.options.output_folder, omega_globals.options.session_unique_name))

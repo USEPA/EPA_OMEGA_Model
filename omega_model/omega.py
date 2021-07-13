@@ -496,10 +496,10 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
         calendar_year:
         candidate_mfr_composite_vehicles: list of candidate composite vehicles that minimize producer compliance cost
         winning_combo: pandas Series that corresponds with candidate_mfr_composite_vehicles, has market shares, costs,
-            compliance data (Mg CO2)
+            compliance data (Mg CO2e)
 
     Returns: dictionary of candidate vehicles binned by market class and reg class, updates producer_decision with
-            sales-weighted average cost and CO2 g/mi by market class
+            sales-weighted average cost and CO2e g/mi by market class
 
     """
 

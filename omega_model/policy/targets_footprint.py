@@ -13,7 +13,7 @@ parameter-based target calculations that define a "footprint curve" based on fou
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The header uses a dynamic format.
 
-The data represents a set of GHG standards (vehicle target CO2 g/mi) by regulatory class and model year as a function
+The data represents a set of GHG standards (vehicle target CO2e g/mi) by regulatory class and model year as a function
 of vehicle footprint in square feet.
 
 File Type
@@ -62,7 +62,7 @@ Data Column Name and Description
     Footprint curve "D" coefficient
 
 :lifetime_vmt:
-    Lifetime Vehicle Miles Travelled for computing CO2 Mg
+    Lifetime Vehicle Miles Travelled for computing CO2e Mg
 
 ----
 
@@ -79,7 +79,7 @@ cache = dict()
 
 class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     """
-    Implement vehicle footprint-based GHG targets (CO2 g/mi)
+    Implement vehicle footprint-based GHG targets (CO2e g/mi)
 
     """
     # --- database table properties ---
@@ -99,14 +99,14 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     @staticmethod
     def calc_target_co2e_gpmi(vehicle):
         """
-        Calculate vehicle target CO2 g/mi.
+        Calculate vehicle target CO2e g/mi.
 
         Args:
             vehicle (Vehicle): the vehicle to get the target for
 
         Returns:
 
-            Vehicle target CO2 in g/mi.
+            Vehicle target CO2e in g/mi.
 
         """
         start_years = cache[vehicle.reg_class_ID]['start_year']
@@ -155,7 +155,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     @staticmethod
     def calc_target_co2e_Mg(vehicle, sales_variants=None):
         """
-        Calculate vehicle target CO2 Mg as a function of the vehicle, the standards and optional sales options.
+        Calculate vehicle target CO2e Mg as a function of the vehicle, the standards and optional sales options.
 
         Includes the effect of production multipliers.
 
@@ -169,7 +169,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         Returns:
 
-            Target CO2 Mg value(s) for the given vehicle and/or sales variants.
+            Target CO2e Mg value(s) for the given vehicle and/or sales variants.
 
         """
         import numpy as np
@@ -195,7 +195,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
         """
-        Calculate vehicle cert CO2 Mg as a function of the vehicle, the standards, CO2 g/mi options and optional sales
+        Calculate vehicle cert CO2e Mg as a function of the vehicle, the standards, CO2e g/mi options and optional sales
         options.
 
         Includes the effect of production multipliers.
@@ -210,7 +210,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         Returns:
 
-            Cert CO2 Mg value(s) for the given vehicle, CO2 g/mi variants and/or sales variants.
+            Cert CO2e Mg value(s) for the given vehicle, CO2e g/mi variants and/or sales variants.
 
         """
         import numpy as np

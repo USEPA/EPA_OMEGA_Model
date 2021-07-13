@@ -97,7 +97,7 @@ def get_refinery_ef(calendar_year, fuel):
 # TODO when calculating refinery inventory, we need to consider where fuel is refined so we'll need a new input file for that
 def calc_inventory(calendar_year):
     """
-    Calculate onroad CO2 grams/mile, kWh/mile, fuel consumption, vehicle and upstream emission inventories
+    Calculate onroad CO2e grams/mile, kWh/mile, fuel consumption, vehicle and upstream emission inventories
     by calendar year for vehicles in the vehicle_annual_data table.
     :param calendar_year: calendar year
     :return: Fills data in the vehicle_annual_data table that has not been filled to this point.

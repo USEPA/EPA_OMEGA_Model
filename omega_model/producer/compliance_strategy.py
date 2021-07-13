@@ -625,7 +625,7 @@ def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
              tech_share_combos_total['total_cost_dollars'], '.')
     plt.plot(tech_share_combos_total['total_target_co2e_megagrams'],
              tech_share_combos_total['total_cost_dollars'], 'r.')
-    plt.xlabel('CO2 WITHOUT Offset [Mg]')
+    plt.xlabel('CO2e WITHOUT Offset [Mg]')
     plt.ylabel('Cost [$]')
     plt.title('%s' % calendar_year)
     plt.grid()
@@ -635,7 +635,7 @@ def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
              tech_share_combos_total['total_cost_dollars'], '.')
     plt.plot(tech_share_combos_total['total_target_co2e_megagrams'],
              tech_share_combos_total['total_cost_dollars'], 'r.')
-    plt.xlabel('CO2 WITH Offset [Mg]')
+    plt.xlabel('CO2e WITH Offset [Mg]')
     plt.ylabel('Cost [$]')
     plt.title('%s' % calendar_year)
     plt.grid()
