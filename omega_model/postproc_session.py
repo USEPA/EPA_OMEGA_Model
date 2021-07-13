@@ -47,7 +47,8 @@ def run_postproc(iteration_log: pd.DataFrame, credit_history: CreditBank, standa
     calendar_year_cert_co2_Mg, model_year_cert_co2_Mg, cert_target_co2_Mg, total_cost_billions = \
         plot_manufacturer_compliance(calendar_years, credit_history)
 
-    vehicle_calendar_years = np.unique(sql_unpack_result(omega_globals.session.query(VehicleAnnualData.calendar_year).all()))
+    vehicle_calendar_years = \
+        np.unique(sql_unpack_result(omega_globals.session.query(VehicleAnnualData.calendar_year).all()))
 
     context_sales, total_sales = plot_total_sales(vehicle_calendar_years)
 

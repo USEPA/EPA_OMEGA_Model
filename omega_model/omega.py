@@ -121,7 +121,8 @@ def run_producer_consumer():
 
     for manufacturer in omega_globals.session.query(Manufacturer.manufacturer_ID).all():
         manufacturer_ID = manufacturer[0]
-        omega_log.logwrite("Running %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, manufacturer_ID), echo_console=True)
+        omega_log.logwrite("Running %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, manufacturer_ID),
+                           echo_console=True)
 
         iteration_log = pd.DataFrame()
 
@@ -135,18 +136,22 @@ def run_producer_consumer():
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
             credit_bank.update_credit_age(calendar_year)
-            expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
-            expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
-            credits_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
+            # strategy: use expiring credits, pay any expiring debits in one shot:
+            # expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
+            # expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
+            # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
-            credits_offset_Mg = 0
+            # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
             # current_credits, current_debits = credit_bank.get_credit_info(calendar_year)
             # for c in current_credits + current_debits:
-            #     credits_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
+            #     strategic_target_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
 
+            # strategy: try to hit the target and make up for minor previous compliance discrepancies
+            #           (ignoring base year banked credits):
+            strategic_target_offset_Mg = 0
             current_credits, current_debits = credit_bank.get_credit_info(calendar_year)
             for c in current_debits:
-                credits_offset_Mg += c.remaining_balance_Mg
+                strategic_target_offset_Mg += c.remaining_balance_Mg
 
             producer_decision_and_response = None
             best_winning_combo_with_sales_response = None
@@ -160,8 +165,8 @@ def run_producer_consumer():
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    compliance_strategy.run_compliance_model(manufacturer_ID, calendar_year, producer_decision_and_response,
-                                                             iteration_num, credits_offset_Mg)
+                    compliance_strategy.search_manufacturing_options(manufacturer_ID, calendar_year, producer_decision_and_response,
+                                                                     iteration_num, strategic_target_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                    winning_combo)
@@ -170,7 +175,7 @@ def run_producer_consumer():
                     iterate_producer_cross_subsidy(calendar_year, best_winning_combo_with_sales_response,
                                                    candidate_mfr_composite_vehicles, iteration_log,
                                                    iteration_num, market_class_vehicle_dict, winning_combo,
-                                                   credits_offset_Mg)
+                                                   strategic_target_offset_Mg)
 
                 producer_consumer_iteration = -1  # flag end of pricing subiteration
 
@@ -191,14 +196,15 @@ def run_producer_consumer():
                     iteration_num += 1
                 else:
                     if iteration_num >= omega_globals.options.producer_consumer_max_iterations:
-                        omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION', echo_console=True)
+                        omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
+                                           echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
             compliance_strategy.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
                                                     producer_decision_and_response)
 
             credit_bank.handle_credit(calendar_year, manufacturer_ID,
-                                      producer_decision_and_response['total_combo_credits_co2_megagrams'])
+                                      producer_decision_and_response['total_credits_co2_megagrams'])
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
@@ -208,11 +214,12 @@ def run_producer_consumer():
             iteration_log.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                                  '_producer_consumer_iteration_log.csv', index=False)
 
-        credit_bank.credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_credit_bank.csv',
-                                       index=False)
+        credit_bank.credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+                                       '_credit_bank.csv', index=False)
 
         credit_bank.transaction_log.to_csv(
-            omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_credit_bank_transactions.csv', index=False)
+            omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+            '_credit_bank_transactions.csv', index=False)
 
     return iteration_log, credit_bank
 
@@ -270,15 +277,15 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
-        compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-                                                         total_sales=producer_decision_and_response['new_vehicle_sales'])
+        compliance_strategy.calc_sales_and_certification_outcomes(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+                                                                  total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################
 
         producer_decision_and_response['compliance_ratio'] = \
-            (producer_decision_and_response['total_combo_cert_co2_megagrams'] - credit_offset_Mg) / \
-            producer_decision_and_response['total_combo_target_co2_megagrams']
+            (producer_decision_and_response['total_cert_co2_megagrams'] - credit_offset_Mg) / \
+            producer_decision_and_response['total_target_co2_megagrams']
 
         # calculate "distance to origin" (minimal price and market share errors):
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**1
@@ -846,8 +853,7 @@ def init_omega(session_runtime_options):
         stock.update_stock(omega_globals.options.analysis_initial_year - 1)
 
     except Exception as e:
-        if not init_fail:
-            init_fail = "\n#INIT FAIL\n%s\n" % traceback.format_exc()
+        init_fail += ["\n#INIT FAIL\n%s\n" % traceback.format_exc()]
 
     return init_fail
 
