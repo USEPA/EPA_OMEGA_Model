@@ -167,8 +167,8 @@ def run_producer_consumer():
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    compliance_strategy.search_manufacturing_options(manufacturer_ID, calendar_year, producer_decision_and_response,
-                                                                     iteration_num, strategic_target_offset_Mg)
+                    compliance_strategy.search_production_options(manufacturer_ID, calendar_year, producer_decision_and_response,
+                                                                  iteration_num, strategic_target_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                    winning_combo)
@@ -279,13 +279,13 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
-        compliance_strategy.calc_sales_and_certification_outcomes(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-                                                                  total_sales=producer_decision_and_response['new_vehicle_sales'])
+        compliance_strategy.calc_production_options(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+                                                    total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################
 
-        producer_decision_and_response['compliance_ratio'] = \
+        producer_decision_and_response['strategic_compliance_ratio'] = \
             (producer_decision_and_response['total_cert_co2e_megagrams'] - credit_offset_Mg) / \
             producer_decision_and_response['total_target_co2e_megagrams']
 
