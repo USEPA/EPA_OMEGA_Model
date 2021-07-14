@@ -67,6 +67,7 @@ class OMEGABatchObject(OMEGABase):
         self.context_case_id = ''
         self.context_new_vehicle_generalized_costs_file = ''
         self.generate_context_new_vehicle_generalized_costs_file = False
+        self.analysis_final_year = None
         self.output_path = "." + os.sep
         self.sessions = []
         self.dataframe = pd.DataFrame()
@@ -214,7 +215,8 @@ class OMEGABatchObject(OMEGABase):
         self.context_folder = self.read_parameter('Context Folder Name')
         self.context_id = self.read_parameter('Context Name')
         self.context_case_id = self.read_parameter('Context Case')
-        self.context_new_vehicle_generalized_costs_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
+        self.context_new_vehicle_generalized_costs_file = \
+            self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
         # context_new_vehicle_prices_file can be one of:
         # relative path, absolute path, 'GENERATE' or 'GENERATE filename' where filename can be an absolute or relative path
         # if 'GENERATE' then the default file name will be batch_definition_path + 'context_new_vehicle_prices.csv'
@@ -224,6 +226,7 @@ class OMEGABatchObject(OMEGABase):
                 self.context_new_vehicle_generalized_costs_file.replace('GENERATE', '').strip()
             if not self.context_new_vehicle_generalized_costs_file:
                 self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
+        self.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
 
     def num_sessions(self):
         return len(self.dataframe.columns)
@@ -288,16 +291,20 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_folder = self.parent.context_folder
         self.settings.context_id = self.parent.context_id
         self.settings.context_case_id = self.parent.context_case_id
+        self.settings.analysis_final_year = self.parent.analysis_final_year
 
         if self.num > 0:
             self.settings.generate_context_new_vehicle_generalized_costs_file = False
         else:
-            self.settings.generate_context_new_vehicle_generalized_costs_file = self.parent.generate_context_new_vehicle_generalized_costs_file
+            self.settings.generate_context_new_vehicle_generalized_costs_file = \
+                self.parent.generate_context_new_vehicle_generalized_costs_file
 
         if remote and self.num > 0:
-            self.settings.context_new_vehicle_generalized_costs_file = self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
+            self.settings.context_new_vehicle_generalized_costs_file = \
+                self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
         else: # local or self.num==0 (reference case)
-            self.settings.context_new_vehicle_generalized_costs_file = self.parent.context_new_vehicle_generalized_costs_file
+            self.settings.context_new_vehicle_generalized_costs_file = \
+                self.parent.context_new_vehicle_generalized_costs_file
 
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')

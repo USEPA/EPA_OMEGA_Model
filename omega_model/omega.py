@@ -126,10 +126,7 @@ def run_producer_consumer():
 
         iteration_log = pd.DataFrame()
 
-        if omega_globals.options.num_analysis_years is None:
-            analysis_end_year = omega_globals.options.analysis_final_year + 1
-        else:
-            analysis_end_year = omega_globals.options.analysis_initial_year + omega_globals.options.num_analysis_years
+        analysis_end_year = omega_globals.options.analysis_final_year + 1
 
         credit_bank = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_ID)
 
@@ -846,10 +843,6 @@ def init_omega(session_runtime_options):
         # initial year = initial fleet model year (latest year of data)
         omega_globals.options.analysis_initial_year = \
             int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
-        # final year = last year of cost curve data
-        # o2.options.analysis_final_year = int(o2.session.query(func.max(CostCurve.model_year)).scalar())
-        # o2.options.analysis_final_year = 2022
-        omega_globals.options.analysis_final_year = CostCloud.get_max_year()
 
         # update vehicle annual data for base year fleet
         stock.update_stock(omega_globals.options.analysis_initial_year - 1)
