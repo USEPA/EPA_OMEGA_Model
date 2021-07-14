@@ -164,7 +164,8 @@ def run_producer_consumer():
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    compliance_strategy.search_production_options(manufacturer_ID, calendar_year, producer_decision_and_response,
+                    compliance_strategy.search_production_options(manufacturer_ID, calendar_year,
+                                                                  producer_decision_and_response,
                                                                   iteration_num, strategic_target_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,

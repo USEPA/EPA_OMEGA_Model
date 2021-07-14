@@ -262,8 +262,8 @@ def search_production_options(manufacturer_ID, calendar_year, producer_decision_
         manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
 
         tech_and_share_sweeps = create_tech_and_share_options(calendar_year, market_class_tree,
-                                                               candidate_production_decisions, share_range,
-                                                               producer_decision_and_response)
+                                                              candidate_production_decisions, share_range,
+                                                              producer_decision_and_response)
 
         production_options = calc_production_options(calendar_year, manufacturer_composite_vehicles,
                                                      tech_and_share_sweeps)
