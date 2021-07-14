@@ -17,6 +17,14 @@ omega\_model.consumer.annual\_vmt\_fixed\_by\_age module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.consumer.consumer\_base\_classes module
+----------------------------------------------------
+
+.. automodule:: omega_model.consumer.consumer_base_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.consumer.demanded\_shares\_gcam module
 ---------------------------------------------------
 

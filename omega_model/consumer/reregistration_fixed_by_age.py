@@ -2,7 +2,48 @@
 
 Vehicle re-registration, fixed by age.
 
+**INPUT FILE FORMAT**
 
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The header uses a dynamic format.
+
+The data represents the re-registered proportion of vehicles by age and market class.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,``[module_name]``,input_template_version:,0.1
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:, consumer.reregistration_fixed_by_age, input_template_version:, 0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        age,market_class_id,reregistered_proportion,
+        0,non_hauling.BEV,1,
+        1,non_hauling.BEV,0.987841531,
+        2,non_hauling.BEV,0.976587217,
+        0,hauling.ICE,1,
+        1,hauling.ICE,0.977597055,
+        2,hauling.ICE,0.962974697,
+
+Data Column Name and Description
+
+:age:
+    Vehicle age, in years
+
+:market_class_id:
+    Vehicle market class ID, e.g. 'hauling.ICE'
+
+:reregistered_proportion:
+    The fraction of vehicles re-registered, [0..1]
 
 ----
 
