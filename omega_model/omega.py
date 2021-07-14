@@ -277,8 +277,8 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
-        compliance_strategy.calc_production_options(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-                                                    total_sales=producer_decision_and_response['new_vehicle_sales'])
+        compliance_strategy.create_production_options(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+                                                      total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################

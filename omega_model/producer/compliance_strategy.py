@@ -1,7 +1,7 @@
 """
 
-Producer module, could potentially be part of the manufacturers.py, but maybe it's best if it's separate and
-the manufacturers.py is primarily related to the schema and class methods...
+Compliance strategy implements the producer search algorithm to find a low-cost combination of technologies (via
+vehicle CO2e g/mi) and market shares that achieve a targeted certification outcome.
 
 
 ----
@@ -76,8 +76,8 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     return cost_cloud
 
 
-def create_tech_and_share_options(calendar_year, market_class_dict, winning_combos, share_range, consumer_response,
-                                  node_name='', verbose=False):
+def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combos, share_range, consumer_response,
+                                 node_name='', verbose=False):
     """
 
     Args:
@@ -103,10 +103,10 @@ def create_tech_and_share_options(calendar_year, market_class_dict, winning_comb
         if type(market_class_dict[k]) is dict:
             # process subtree
             child_df_list.append(
-                create_tech_and_share_options(calendar_year, market_class_dict[k],
-                                              winning_combos, share_range,
-                                              consumer_response,
-                                              node_name=k))
+                create_tech_and_share_sweeps(calendar_year, market_class_dict[k],
+                                             winning_combos, share_range,
+                                             consumer_response,
+                                             node_name=k))
         else:
             # process leaf
             for new_veh in market_class_dict[k]:
@@ -229,12 +229,41 @@ def create_tech_and_share_options(calendar_year, market_class_dict, winning_comb
     return tech_share_combos_df
 
 
-def search_production_options(manufacturer_ID, calendar_year, producer_decision_and_response, iteration_num,
+def apply_production_decision_to_composite_vehicles(composite_vehicles, selected_production_decision):
+    """
+
+    Args:
+        composite_vehicles:
+        selected_production_decision:
+
+    Returns:
+
+    """
+    import copy
+
+    composite_vehicles = copy.deepcopy(composite_vehicles)
+    from producer.vehicles import VehicleAttributeCalculations
+
+    # assign co2 values and sales to vehicles...
+    for new_veh in composite_vehicles:
+        new_veh.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_gpmi' % new_veh.vehicle_ID]
+        new_veh.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
+        new_veh.initial_registered_count = selected_production_decision['veh_%s_sales' % new_veh.vehicle_ID]
+        VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
+        new_veh.decompose()
+        new_veh.set_new_vehicle_mfr_cost_dollars()
+        new_veh.set_cert_target_co2e_Mg()
+        new_veh.set_cert_co2e_Mg()
+
+    return composite_vehicles
+
+
+def search_production_options(manufacturer_id, calendar_year, producer_decision_and_response, iteration_num,
                               strategic_target_offset_Mg):
     """
 
     Args:
-        manufacturer_ID:
+        manufacturer_id:
         calendar_year:
         producer_decision_and_response:
         iteration_num:
@@ -254,19 +283,18 @@ def search_production_options(manufacturer_ID, calendar_year, producer_decision_
 
     continue_search = True
     search_iteration = 0
-    best_candidate_manufacturing_decision = None
+    best_candidate_production_decision = None
 
     while continue_search and search_iteration < omega_globals.options.producer_max_iterations:
         share_range = omega_globals.options.producer_convergence_factor ** search_iteration
 
-        manufacturer_composite_vehicles, market_class_tree = get_initial_vehicle_data(calendar_year, manufacturer_ID)
+        composite_vehicles, market_class_tree = create_composite_vehicles(calendar_year, manufacturer_id)
 
-        tech_and_share_sweeps = create_tech_and_share_options(calendar_year, market_class_tree,
-                                                              candidate_production_decisions, share_range,
-                                                              producer_decision_and_response)
+        tech_and_share_sweeps = create_tech_and_share_sweeps(calendar_year, market_class_tree,
+                                                             candidate_production_decisions, share_range,
+                                                             producer_decision_and_response)
 
-        production_options = calc_production_options(calendar_year, manufacturer_composite_vehicles,
-                                                     tech_and_share_sweeps)
+        production_options = create_production_options(calendar_year, composite_vehicles, tech_and_share_sweeps)
 
         production_options['share_range'] = share_range
 
@@ -282,75 +310,62 @@ def search_production_options(manufacturer_ID, calendar_year, producer_decision_
 
         producer_compliance_possible |= compliance_possible
 
-        if (best_candidate_manufacturing_decision is None) or \
+        if (best_candidate_production_decision is None) or \
                 (candidate_production_decisions['strategic_compliance_error'].min() <
-                 best_candidate_manufacturing_decision['strategic_compliance_error'].min()):
-            best_candidate_manufacturing_decision = \
+                 best_candidate_production_decision['strategic_compliance_error'].min()):
+            best_candidate_production_decision = \
                 candidate_production_decisions.loc[candidate_production_decisions['strategic_compliance_error'].idxmin()]
 
         if 'producer' in omega_globals.options.verbose_console:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, iteration_num,
                                               search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
-                                    best_candidate_manufacturing_decision['strategic_compliance_ratio']), echo_console=True)
+                                    best_candidate_production_decision['strategic_compliance_ratio']), echo_console=True)
 
         search_iteration += 1
 
-        continue_search = abs(1 - best_candidate_manufacturing_decision['strategic_compliance_ratio']) > \
+        continue_search = abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) > \
                            omega_globals.options.producer_iteration_tolerance
 
     if 'producer' in omega_globals.options.verbose_console:
-        omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_manufacturing_decision['strategic_compliance_ratio']),
+        omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
                            echo_console=True)
 
-        omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' % (-best_candidate_manufacturing_decision['strategic_target_offset_Mg'], best_candidate_manufacturing_decision['total_credits_co2e_megagrams']),
+        omega_log.logwrite('Target GHG Offset Mg %.0f, Actual GHG Offset Mg %.0f' % (-best_candidate_production_decision['strategic_target_offset_Mg'], best_candidate_production_decision['total_credits_co2e_megagrams']),
                            echo_console=True)
 
         omega_log.logwrite('Target Compliance Ratio %3.3f, Actual Compliance Ratio %3.3f' %
-                           ((best_candidate_manufacturing_decision['total_cert_co2e_megagrams']-best_candidate_manufacturing_decision['strategic_target_offset_Mg'])/max(1, best_candidate_manufacturing_decision['total_target_co2e_megagrams']),
-                            best_candidate_manufacturing_decision['strategic_compliance_ratio']),
+                           ((best_candidate_production_decision['total_cert_co2e_megagrams']-best_candidate_production_decision['strategic_target_offset_Mg'])/max(1, best_candidate_production_decision['total_target_co2e_megagrams']),
+                            best_candidate_production_decision['strategic_compliance_ratio']),
                            echo_console=True)
 
-    selected_manufacturing_decision = pd.to_numeric(best_candidate_manufacturing_decision)
+    selected_production_decision = pd.to_numeric(best_candidate_production_decision)
 
-    selected_manufacturing_decision = \
-        selected_manufacturing_decision.rename({'strategic_compliance_ratio': 'compliance_ratio_producer'})
+    selected_production_decision = \
+        selected_production_decision.rename({'strategic_compliance_ratio': 'initial_strategic_compliance_ratio'})
 
     # log the final iteration, as opposed to the winning iteration:
-    selected_manufacturing_decision['producer_search_iteration'] = search_iteration - 1
+    selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
     if 'producer' in omega_globals.options.verbose_console:
         from consumer.market_classes import MarketClass
         for mc in MarketClass.market_classes:
             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' %
-                               (selected_manufacturing_decision['producer_abs_share_frac_%s' % mc]), echo_console=True)
+                               (selected_production_decision['producer_abs_share_frac_%s' % mc]), echo_console=True)
         omega_log.logwrite('', echo_console=True)
 
-    import copy
-    manufacturer_composite_vehicles = copy.deepcopy(manufacturer_composite_vehicles)
+    composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
+                                                                         selected_production_decision)
 
-    from producer.vehicles import VehicleAttributeCalculations
-
-    # assign co2 values and sales to vehicles...
-    for new_veh in manufacturer_composite_vehicles:
-        new_veh.cert_co2e_grams_per_mile = selected_manufacturing_decision['veh_%s_co2e_gpmi' % new_veh.vehicle_ID]
-        new_veh.cert_direct_kwh_per_mile = selected_manufacturing_decision['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
-        new_veh.initial_registered_count = selected_manufacturing_decision['veh_%s_sales' % new_veh.vehicle_ID]
-        VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
-        new_veh.decompose()
-        new_veh.set_new_vehicle_mfr_cost_dollars()
-        new_veh.set_cert_target_co2e_Mg()
-        new_veh.set_cert_co2e_Mg()
-
-    return manufacturer_composite_vehicles, selected_manufacturing_decision, market_class_tree, \
+    return composite_vehicles, selected_production_decision, market_class_tree, \
            producer_compliance_possible
 
 
-def get_initial_vehicle_data(calendar_year, manufacturer_ID):
+def create_composite_vehicles(calendar_year, manufacturer_id):
     """
 
     Args:
         calendar_year:
-        manufacturer_ID:
+        manufacturer_id:
 
     Returns:
 
@@ -363,8 +378,7 @@ def get_initial_vehicle_data(calendar_year, manufacturer_ID):
     cache_key = calendar_year
     if cache_key not in cache:
         # pull in last year's vehicles:
-        manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_ID)
-        # manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(2019, manufacturer_ID)
+        manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_id)
 
         Vehicle.reset_vehicle_IDs()
 
@@ -529,8 +543,8 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     omega_globals.session.flush()
 
 
-def calc_production_options(calendar_year, manufacturer_composite_vehicles, tech_and_share_combinations,
-                            total_sales=None):
+def create_production_options(calendar_year, manufacturer_composite_vehicles, tech_and_share_combinations,
+                              total_sales=None):
     """
     on the first time through, from the producer module, total_sales = None => use context sales, market shares
     come from the producer desired market shares
