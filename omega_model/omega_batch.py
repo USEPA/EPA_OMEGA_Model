@@ -328,7 +328,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.required_zev_share_file = self.read_parameter('ZEV Requirement File')
         self.settings.price_modifications_file = self.read_parameter('Price Modifications File')
         self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
-        self.settings.reregistration_fixed_by_age_file = self.read_parameter('Stock Deregistration File')
+        self.settings.reregistration_file = self.read_parameter('Stock Deregistration File')
         self.settings.annual_vmt_fixed_by_age_file = self.read_parameter('Stock VMT File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(

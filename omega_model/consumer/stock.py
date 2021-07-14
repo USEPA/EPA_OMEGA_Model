@@ -41,11 +41,11 @@ def update_stock(calendar_year):
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
         age = calendar_year - model_year
 
-        scrappage_factor = omega_globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
+        reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
 
         annual_vmt = omega_globals.options.stock_vmt.get_vmt(market_class_id, age)
 
-        registered_count = initial_registered_count * scrappage_factor
+        registered_count = initial_registered_count * reregistration_factor
 
         vad.annual_vmt = annual_vmt
         vad.vmt = annual_vmt * registered_count
@@ -60,11 +60,11 @@ def update_stock(calendar_year):
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_ID)
             age = calendar_year - model_year
 
-            scrappage_factor = omega_globals.options.stock_scrappage.get_reregistered_proportion(market_class_id, age)
+            reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
 
             annual_vmt = omega_globals.options.stock_vmt.get_vmt(market_class_id, age)
 
-            registered_count = initial_registered_count * scrappage_factor
+            registered_count = initial_registered_count * reregistration_factor
 
             vad_list.append(VehicleAnnualData(vehicle_ID=vehicle_ID,
                                               calendar_year=calendar_year,
