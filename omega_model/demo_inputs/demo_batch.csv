@@ -6,7 +6,7 @@ Context Name,String,AEO2021,
 Context Case,String,Reference case,
 Context New Vehicle Prices File,GENERATE {X.Y} / String,GENERATE context_new_vehicle_prices.csv,
 Analysis Final Year,#,2050,
-Run Effects Calculations,TRUE / FALSE,TRUE,
+Run Effects Calculations,TRUE / FALSE,FALSE,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
