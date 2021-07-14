@@ -113,7 +113,7 @@ As the model is running, the 'Run Model' page will look similar to :numref:`ug_l
 The GUI provides real time information during the model run:
 
 * The model starting information is detailed in the event monitor.  This includes the time and Input Batch File used.
-* The model status and elapsed time from model start is continuously updated below the 'Run Model' button.
+* The model status, error count, and elapsed time from model start are continuously updated below the 'Run Model' button.
 * The load on the system CPU and system Memory is monitored in the Windows Status Bar at the bottom of the GUI window.
 * The Event Monitor provides a continuous stream of information gathered from the simultaneous OMEGA processes.
 

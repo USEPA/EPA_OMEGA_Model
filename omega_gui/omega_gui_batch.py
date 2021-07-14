@@ -4,6 +4,7 @@ omega_gui_batch.py
 
 This code launches and controls the OMEGA GUI.
 The GUI uses QT Designer for the layout and PySide2 as the Python interface.
+The GUI has been tested to display properly up to 125% text size based on Windows 10 display settings.
 
 """
 
