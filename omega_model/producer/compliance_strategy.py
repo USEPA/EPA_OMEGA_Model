@@ -386,7 +386,7 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
         # update each vehicle and calculate compliance target for each vehicle
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
-            new_veh.inherit_vehicle(prior_veh, model_year=calendar_year)
+            new_veh.convert_vehicle(prior_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
             new_veh.initial_registered_count = new_veh.market_share
 
@@ -524,7 +524,7 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
             # if 'producer' in o2.options.verbose_console:
             #     v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_ID))
             new_veh = VehicleFinal()
-            new_veh.inherit_vehicle(v)
+            new_veh.convert_vehicle(v)
             manufacturer_new_vehicles.append(new_veh)
 
     omega_globals.session.add_all(manufacturer_new_vehicles)

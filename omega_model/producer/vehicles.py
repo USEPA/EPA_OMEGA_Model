@@ -776,7 +776,6 @@ class Vehicle(OMEGABase):
                                                 target_co2e_gpmi,
                                                 self, 'new_vehicle_mfr_generalized_cost_dollars')
 
-
     def set_cert_co2e_Mg(self):
         """
 
@@ -785,14 +784,16 @@ class Vehicle(OMEGABase):
         """
         self.cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self)
 
-    def inherit_vehicle(self, vehicle, model_year=None):
+    def convert_vehicle(self, vehicle, model_year=None):
         """
 
-        Args:
-            vehicle:
-            model_year:
+        Convert a vehicle object from VehicleFinal to Vehicle, or vice versa.  Conversion from VehicleFinal to Vehicle
+        creats a new cost curve, based on the simulated vehicles data and policy factors for the model year.
 
-        Returns:
+        Args:
+            self (Vehicle, VehicleFinal)
+            vehicle (VehicleFinal, Vehicle):
+            model_year (int): vehicle model year
 
         """
         base_properties = {'name', 'manufacturer_ID', 'model_year',
