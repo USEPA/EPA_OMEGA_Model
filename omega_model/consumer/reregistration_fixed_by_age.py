@@ -64,11 +64,11 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
 
     # --- database table properties ---
     __tablename__ = 'reregistration_fixed_by_age'
-    index = Column(Integer, primary_key=True)
+    index = Column(Integer, primary_key=True)  #: database table index
 
-    age = Column(Numeric)
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    reregistered_proportion = Column(Float)
+    age = Column(Numeric)  #: vehicle age
+    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, e.g. 'hauling.ICE'
+    reregistered_proportion = Column(Float)  #: re-registered proportion, [0..1]
 
     @staticmethod
     def get_reregistered_proportion(market_class_id, age):
