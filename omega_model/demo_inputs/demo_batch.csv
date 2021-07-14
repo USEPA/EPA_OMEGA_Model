@@ -6,6 +6,7 @@ Context Name,String,AEO2021,
 Context Case,String,Reference case,
 Context New Vehicle Prices File,GENERATE {X.Y} / String,GENERATE context_new_vehicle_prices.csv,
 Analysis Final Year,#,2050,
+Run Effects Calculations,TRUE / FALSE,TRUE,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -42,7 +43,7 @@ Runtime Settings,,,
 Num Market Share Options,#,5,5
 Num Tech Options per ICE Vehicle,#,5,5
 Num Tech Options per BEV Vehicle,#,1,1
-Allow Backsliding,TRUE / FALSE,FALSE,"TRUE, FALSE"
+Allow Backsliding,TRUE / FALSE,TRUE,"TRUE, FALSE"
 Cost Curve Frontier Affinity Factor,#,0.75,0.75
 Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
 New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5

@@ -227,6 +227,7 @@ class OMEGABatchObject(OMEGABase):
             if not self.context_new_vehicle_generalized_costs_file:
                 self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
         self.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
+        self.calc_effects = self.read_parameter('Run Effects Calculations')
 
     def num_sessions(self):
         return len(self.dataframe.columns)
@@ -375,6 +376,8 @@ class OMEGASessionObject(OMEGABase):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
         self.parent.batch_log.logwrite('Getting Postproc Settings...')
+        self.settings.calc_effects = self.parent.calc_effects
+        self.settings.calc_criteria_emission_costs = self.parent.calc_effects
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
         self.settings.energysecurity_cost_factors_file = self.read_parameter('Context Energy Security Cost Factors File')
