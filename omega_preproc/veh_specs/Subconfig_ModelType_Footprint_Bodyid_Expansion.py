@@ -121,7 +121,6 @@ def tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, 
         if _carline_name == 'FUSION HYBRID TAXI': _carline_name = 'Fusion (HEV)'.upper()
         if _carline_name == 'MUSTANG PERFORMANCE PACKAGE': _carline_name = 'Explorer AWD'.upper()
         if _carline_name == 'ESCAPE FWD FFV': _carline_name = 'Mustang'.upper()
-
         if _carline_name == 'Navigator 4WD'.upper(): _carline_name = 'Navigator'.upper()
         if _carline_name == 'V90 FWD': _carline_name = 'XC90 T6 AWD'
         if _carline_name == 'S90 FWD': _carline_name = 'XC90 T6 AWD'
