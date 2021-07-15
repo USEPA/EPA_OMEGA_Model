@@ -4,8 +4,6 @@
 OMEGA Documentation
 ===================
 
-Is in process...
-
 .. toctree::
     :maxdepth: 4
     :caption: Contents:
