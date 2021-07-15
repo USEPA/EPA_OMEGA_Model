@@ -46,3 +46,43 @@ class ReregistrationBase:
         """
         return ['**Attempt to call abstract method ReregistrationBase.%s() without child class override**' %
                 inspect.currentframe().f_code.co_name]
+
+
+class AnnualVMTBase:
+    """
+    Loads and provides access to annual Vehicle Miles Travelled by market class, age and potentially other factors.
+
+    """
+
+    @staticmethod
+    def get_vmt(market_class_id, age, **kwargs):
+        """
+        Get vehicle miles travelled by market class and age.
+
+        Args:
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+            age (int): vehicle age in years
+
+        Returns:
+            (float) Vehicle miles travelled.
+
+        """
+        raise Exception('**Attempt to call abstract method AnnualVMT.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
+    def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        return ['**Attempt to call abstract method AnnualVMT.%s() without child class override**' %
+                inspect.currentframe().f_code.co_name]

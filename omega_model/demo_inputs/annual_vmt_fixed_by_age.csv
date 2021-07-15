@@ -1,4 +1,4 @@
-input_template_name:,annual_vmt_fixed_by_age,input_template_version:,0.0001
+input_template_name:,consumer.annual_vmt_fixed_by_age,input_template_version:,0.1
 age,market_class_id,annual_vmt,
 0,non_hauling.BEV,14699.55515,
 1,non_hauling.BEV,14251.70373,

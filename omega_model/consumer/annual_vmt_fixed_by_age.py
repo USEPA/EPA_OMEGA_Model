@@ -15,7 +15,7 @@ from omega_model import *
 cache = dict()
 
 
-class AnnualVMTFixedByAge(SQABase, OMEGABase):
+class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
     """
     Loads and provides access to VMT by market class and age.
 
@@ -29,11 +29,12 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
     annual_vmt = Column(Numeric)  #: vehicle miles travelled
 
     @staticmethod
-    def get_vmt(market_class_id, age):
+    def get_vmt(market_class_id, age, **kwargs):
         """
         Get vehicle miles travelled by market class and age.
 
         Args:
+            **kwargs:
             market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age in years
 
@@ -44,9 +45,9 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
         cache_key = '%s_%s' % (market_class_id, age)
 
         if cache_key not in cache:
-            cache[cache_key] = float(omega_globals.session.query(AnnualVMTFixedByAge.annual_vmt).
-                                     filter(AnnualVMTFixedByAge.market_class_ID == market_class_id).
-                                     filter(AnnualVMTFixedByAge.age == age).scalar())
+            cache[cache_key] = float(omega_globals.session.query(AnnualVMT.annual_vmt).
+                                     filter(AnnualVMT.market_class_ID == market_class_id).
+                                     filter(AnnualVMT.age == age).scalar())
 
         return cache[cache_key]
 
@@ -69,8 +70,8 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'annual_vmt_fixed_by_age'
-        input_template_version = 0.0001
+        input_template_name = __name__
+        input_template_version = 0.1
         input_template_columns = {'age', 'market_class_id', 'annual_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -86,7 +87,7 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(AnnualVMTFixedByAge(
+                    obj_list.append(AnnualVMT(
                         age=df.loc[i, 'age'],
                         market_class_ID=df.loc[i, 'market_class_id'],
                         annual_vmt=df.loc[i, 'annual_vmt'],
@@ -98,6 +99,9 @@ class AnnualVMTFixedByAge(SQABase, OMEGABase):
 
 
 if __name__ == '__main__':
+
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
+
     try:
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
@@ -115,8 +119,8 @@ if __name__ == '__main__':
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += AnnualVMTFixedByAge.init_database_from_file(omega_globals.options.annual_vmt_fixed_by_age_file,
-                                                                 verbose=omega_globals.options.verbose)
+        init_fail += AnnualVMT.init_database_from_file(omega_globals.options.annual_vmt_file,
+                                                       verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)

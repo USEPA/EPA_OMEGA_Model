@@ -114,8 +114,6 @@ if __name__ == '__main__':
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
-        # override reg_classes from __init__.py:
-        importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from consumer.market_classes import MarketClass  # needed for market class ID

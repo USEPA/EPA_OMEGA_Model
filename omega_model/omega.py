@@ -631,6 +631,9 @@ def init_user_definable_modules():
     module_name = get_template_name(omega_globals.options.reregistration_file)
     omega_globals.options.Reregistration = importlib.import_module(module_name).Reregistration
 
+    module_name = get_template_name(omega_globals.options.annual_vmt_file)
+    omega_globals.options.AnnualVMT = importlib.import_module(module_name).AnnualVMT
+
     return init_fail
 
 
@@ -697,8 +700,6 @@ def init_omega(session_runtime_options):
     # import database modules to populate ORM context
     from consumer.market_classes import MarketClass
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
-    from consumer.reregistration_fixed_by_age import Reregistration
-    from consumer.annual_vmt_fixed_by_age import AnnualVMTFixedByAge
 
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
@@ -752,13 +753,11 @@ def init_omega(session_runtime_options):
         init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
                                                                 verbose=verbose_init)
 
-        init_fail += Reregistration.init_from_file(omega_globals.options.reregistration_file,
+        init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.reregistration_file,
                                                    verbose=verbose_init)
 
-        init_fail += AnnualVMTFixedByAge.init_database_from_file(omega_globals.options.annual_vmt_fixed_by_age_file,
+        init_fail += omega_globals.options.AnnualVMT.init_database_from_file(omega_globals.options.annual_vmt_file,
                                                                  verbose=verbose_init)
-
-        omega_globals.options.stock_vmt = AnnualVMTFixedByAge
 
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=verbose_init)

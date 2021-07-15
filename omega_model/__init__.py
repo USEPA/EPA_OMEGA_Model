@@ -102,7 +102,7 @@ try:
             self.cost_file = path + 'demo_inputs/simulated_vehicles.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
-            self.analysis_final_year = None
+            self.analysis_final_year = 2020
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.producer_calc_generalized_cost = None
@@ -115,7 +115,7 @@ try:
             self.required_zev_share_file = path + 'demo_inputs/required_zev_share.csv'
             self.production_constraints_file = path + 'demo_inputs/production_constraints.csv'
             self.reregistration_file = path + 'demo_inputs/reregistration_fixed_by_age.csv'
-            self.annual_vmt_fixed_by_age_file = path + 'demo_inputs/annual_vmt_fixed_by_age.csv'
+            self.annual_vmt_file = path + 'demo_inputs/annual_vmt_fixed_by_age.csv'
             self.slice_tech_combo_cloud_tables = True
             self.offcycle_credits_file = path + 'demo_inputs/offcycle_credits.csv'
 
@@ -168,6 +168,7 @@ try:
             self.RegulatoryClasses = None
             self.VehicleTargets = None
             self.Reregistration = None
+            self.AnnualVMT = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
