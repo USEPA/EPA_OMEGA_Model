@@ -80,35 +80,30 @@ Interim outputs of the Consumer Module, new vehicle sales and the share of EVs, 
 *  Market classes in the Consumer Module are currently EV-hauling, EV-nonhauling, ICE-hauling, and ICE-nonhauling. The Consumer Module has the capability to handle other market classes. The choice of market classes is led by the model used to estimate EV share, which is currently based on GCAM-USA.
 
 *  The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age.
-*  These scrappage rates are from *WHERE?*
 *  VMT is estimated using fixed VMT schedules based on vehicle age and market class.
 
 New Vehicle Sales
 +++++++++++++++++
 *  Total new vehicle sales are calculated at the aggregate level
-*  Market classes
+*  Market classes: ICE, BEV, Hauling, Non-Hauling
+*  Hauling vehicles are classified as body-on-frame, while nonhauling vehicles are classified as uni-body. The vehicles are assumed to be used differently, with hauling vehicles expected to to be used more for hauling goods (including for towing), which nonhauling vehicles are expected to be used for moving people from one place to another.
+*  The share of light duty vehicles that are classified as hauling and nonhauling is constant. The shares of hauling and non-hauling vehicles comes from the projections published in the Annual Energy Outlook from the U.S. Energy Information Administration.
 *  The full cost pass through assumption
 *  Role of fuel consumption in the vehicle purchase decision
-*  The share of light duty vehicles that are classified as hauling and nonhauling is constant. The shares of hauling and non-hauling vehicles comes from the projections published in the Annual Energy Outlook from the U.S. Energy Information Administration.
-
-   * Hauling vehicles are classified as body-on-frame, while nonhauling vehicles are classified as uni-body. The vehicles are assumed to be used differently, with hauling vehicles expected to to be used more for hauling goods (including for towing), which nonhauling vehicles are expected to be used for moving people from one place to another.
 
 *  How the EV/ICE share is calculated
-
-    *  We are currently using GCAM’s logit equation and parameters.
+    *  Our share estimation is informed by GCAM’s logit equation and parameters.
+    * EQUATION
        *  What are these parameters
 
-VMT estimations
+Vehicle Stock and Use
 ++++++++++++++++
-*  The baseline projection for VMT is from AEO *2020?*
-*  VMT estimates are based static VMT schedules for each and market class.
-*  We currently hold total VMT constant except for rebound
-   *  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.” The Proposed Revised 2023 and Later Model Year Light-Duty Vehicle GHG Emissions Standards – Regulatory Impact Analysis contains a full discussion of ICEV VMT rebound including a review of the recent literature. Based on existing literature, EPA uses a value of 10 percent for the long-term direct rebound effect. In OMEGA, we are following that precedent and setting the rebound effect to 10 percent. Currently, we treat rebound driving for ICE vehicles and EVs the same.
-
-Consumer Benefits Measures
-+++++++++++++++++++++++++++
-*  Previous estimates of effects on consumers were based on holding sales constant and the benefits were estimated as fuel savings minus tech costs
-*  We know sales change (and we are allowing for that). We are working on a way to estimate not only the benefits consumers are considering in their purchase of a new vehicle, but also the ‘surprise’ or ‘bonus’ savings associated with the vehicle that are not considered.
+*  We are working to keep internal consistency within the number of vehicles demanded, and the use of those vehicles
+*  Vehicle Stock
+*  Vehicle Reregistration
+*  VMT
+*  We use the overall VMT demand from Analysis context, the stock of vehicles (new and used), and relationship of the proportion of VMT at each age and market class to allocate VMT across the stock vehicles. This maintains an overall  demand for mobility. By holding total VMT constant, outside of rebound driving, we maintain a logical relationship between mobility and available vehicles.
+*  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.”
 
 
 Effects Module
@@ -118,6 +113,7 @@ In its primary function as a regulatory support tool, OMEGA’s modeled outputs 
 * Key examples of monetized effects that OMEGA will estimate:
 	* Vehicle production costs
 	* Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
+        *Consumer Benefits Measures: Previous estimates of effects on consumers were based on holding sales constant and the benefits were estimated as fuel savings minus tech costs. We know sales change (and we are allowing for that). We are working on a way to estimate not only the benefits consumers are considering in their purchase of a new vehicle, but also the ‘surprise’ or ‘bonus’ savings associated with the vehicle that are not considered.
 	* Impacts of criteria air pollutants
 	* Impacts of greenhouse gas pollutants
 	* Congestion, noise, and safety costs
