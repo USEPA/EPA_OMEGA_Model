@@ -57,7 +57,7 @@ def is_absolute_path(source_file_path):
 
 
 class OMEGABatchObject(OMEGABase):
-    def __init__(self, name='', **kwargs):
+    def __init__(self, name='', analysis_final_year=None, **kwargs):
         import pandas as pd
 
         self.batch_definition_path = ''
@@ -67,7 +67,7 @@ class OMEGABatchObject(OMEGABase):
         self.context_case_id = ''
         self.context_new_vehicle_generalized_costs_file = ''
         self.generate_context_new_vehicle_generalized_costs_file = False
-        self.analysis_final_year = None
+        self.analysis_final_year = analysis_final_year
         self.output_path = "." + os.sep
         self.sessions = []
         self.dataframe = pd.DataFrame()
@@ -226,6 +226,10 @@ class OMEGABatchObject(OMEGABase):
                 self.context_new_vehicle_generalized_costs_file.replace('GENERATE', '').strip()
             if not self.context_new_vehicle_generalized_costs_file:
                 self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
+
+        if self.analysis_final_year is not None:
+            self.dataframe.loc['Analysis Final Year'][0] = self.analysis_final_year
+
         self.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
         self.calc_effects = self.read_parameter('Run Effects Calculations')
 
@@ -450,6 +454,7 @@ class OMEGABatchOptions(OMEGABase):
         self.dispy_scheduler = ip_address  # local ip_address by default
         self.local = True
         self.network = False
+        self.analysis_final_year = None
 
 
 def run_bundled_sessions(batch, options, remote_batchfile, session_list):
@@ -525,7 +530,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
 def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + os.sep + 'bundle', batch_file='',
                     session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
-                    network=False):
+                    network=False, analysis_final_year=None):
 
     import sys
 
@@ -549,6 +554,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         options.dispy_scheduler = dispy_scheduler
     options.local = local
     options.network = network
+    options.analysis_final_year = analysis_final_year
 
     omega_globals.options = options
 
@@ -564,7 +570,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         dispycluster.find_nodes()
         print("*** ping complete ***")
     else:
-        batch = OMEGABatchObject()
+        batch = OMEGABatchObject(analysis_final_year=options.analysis_final_year)
         batch.batch_definition_path = os.path.dirname(os.path.abspath(options.batch_file)) + os.sep
 
         if '.csv' in options.batch_file:
@@ -815,6 +821,7 @@ if __name__ == '__main__':
                             default=os.getcwd() + os.sep + 'bundle')
         parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
         parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
+        parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
         parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
         parser.add_argument('--timestamp', type=str,
                             help='Timestamp string, overrides creating timestamp from system clock', default=None)
@@ -837,7 +844,7 @@ if __name__ == '__main__':
                         verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
                         dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
                         dispy_exclusive=args.dispy_exclusive, dispy_scheduler=args.dispy_scheduler, local=args.local,
-                        network=args.network)
+                        network=args.network, analysis_final_year=args.analysis_final_year)
 
     except:
         import traceback

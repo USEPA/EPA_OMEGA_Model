@@ -69,14 +69,13 @@ class Incentives(OMEGABase):
             vehicle (Vehicle): the vehicle to get the multiplier for
 
         Returns:
-
             The production multiplier, if applicable, or 1.0
 
         """
         production_multiplier = 1
 
         start_years = cache['start_year']
-        if start_years[start_years <= vehicle.model_year]:
+        if start_years.size > 0 and start_years[start_years <= vehicle.model_year]:
             cache_key = max(start_years[start_years <= vehicle.model_year])
 
             if cache_key in cache:
@@ -158,7 +157,7 @@ if __name__ == '__main__':
                 fueling_class = 'BEV'
 
             v = dummyVehicle()
-            print(Incentives.get_production_multipliers(v, 1.0))
+            print(Incentives.get_production_multiplier(v))
 
         else:
             print(init_fail)

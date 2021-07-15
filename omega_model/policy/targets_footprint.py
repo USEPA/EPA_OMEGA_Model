@@ -76,6 +76,19 @@ from omega_model import *
 
 cache = dict()
 
+if __name__ == '__main__':
+    import importlib
+
+    omega_globals.options = OMEGARuntimeOptions()
+
+    init_fail = []
+
+    # pull in reg classes before building database tables (declaring classes) that check reg class validity
+    module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+    init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+        omega_globals.options.policy_reg_classes_file)
+
 
 class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     """
@@ -304,17 +317,18 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
-        # omega_globals.options.policy_targets_input_file = os.path.dirname(os.path.abspath(__file__)) + os.sep + 'demo_inputs/ghg_standards-footprint.csv'
+        from policy.incentives import Incentives
+
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail = []
+        init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
+                                               verbose=omega_globals.options.verbose)
+
         init_fail += VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
-                                                          verbose=omega_globals.options.verbose)
+                                                   verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
@@ -334,13 +348,13 @@ if __name__ == '__main__':
 
             car_vehicle = dummyVehicle()
             car_vehicle.model_year = 2021
-            car_vehicle.reg_class_ID = reg_classes.car
+            car_vehicle.reg_class_ID = omega_globals.options.RegulatoryClasses.reg_classes.car
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
 
             truck_vehicle = dummyVehicle()
             truck_vehicle.model_year = 2021
-            truck_vehicle.reg_class_ID = reg_classes.truck
+            truck_vehicle.reg_class_ID = omega_globals.options.RegulatoryClasses.reg_classes.truck
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
 
@@ -361,6 +375,8 @@ if __name__ == '__main__':
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
+
     except:
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

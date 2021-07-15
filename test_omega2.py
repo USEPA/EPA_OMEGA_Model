@@ -73,6 +73,8 @@ if __name__ == "__main__":
                            if os.path.isdir(package_folder + os.sep + d)
                            and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
 
+        subpackage_list.append(package_folder)
+
         for source_folder in subpackage_list:
             source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
             for f in source_files:
@@ -87,12 +89,9 @@ if __name__ == "__main__":
                 cmd_opts = ''
 
                 if f == 'omega_batch.py':
-                    cmd_opts = '--batch_file omega_model\\demo_inputs\\single_session_batch.csv --verbose'
+                    cmd_opts = '--batch_file omega_model/demo_inputs/demo_batch.csv --verbose --session_num 0 --analysis_final_year 2020'
 
-                if 'darwin' in sys.platform:
-                    cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
-                else:
-                    cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
+                cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 
                 logwrite('TRYING %s' % cmd_str)
                 r = os.system(cmd_str)

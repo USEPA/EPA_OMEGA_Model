@@ -122,14 +122,28 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        import importlib
+        from context.cost_clouds import CostCloud
+
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
+
+        init_fail = []
+
+        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail = []
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+                                                          verbose=omega_globals.options.verbose)
+
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                     verbose=omega_globals.options.verbose)
 
@@ -140,7 +154,9 @@ if __name__ == '__main__':
 
             class dummyVehicle:
                 model_year = 2020
-                cost_cloud = pd.DataFrame()
+                reg_class_ID = 'car'
+                cost_curve_class = 'ice_MPW_LRL'
+                cost_cloud = CostCloud.get_cloud(model_year, cost_curve_class)
 
             vehicle = dummyVehicle()
 

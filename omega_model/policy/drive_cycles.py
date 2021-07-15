@@ -57,6 +57,7 @@ class DriveCycles(OMEGABase):
     **Load and provides routines to access drive cycle descriptive data**
 
     """
+
     _data = pd.DataFrame()
 
     @staticmethod

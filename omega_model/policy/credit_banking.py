@@ -445,9 +445,11 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file, verbose=omega_globals.options.verbose)
+        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
+                                                         verbose=omega_globals.options.verbose)
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, verbose=omega_globals.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
+                                                          verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.vehicle_onroad_calculations_file,
@@ -459,13 +461,20 @@ if __name__ == '__main__':
         # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
         # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
-        credit_bank = CreditBank('../demo_inputs/ghg_credits.csv', 'USA Motors')
+        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, 'USA Motors')
+
         import random
 
         for year in range(2020, 2030):
             print(year)
             credit_bank.update_credit_age(year)
             credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
+
+        import common.file_io as file_io
+
+        # validate output folder
+        file_io.validate_folder(omega_globals.options.database_dump_folder)
+
         credit_bank.credit_bank.to_csv(omega_globals.options.database_dump_folder + '/credit_bank.csv', index=False)
         credit_bank.transaction_log.to_csv(omega_globals.options.database_dump_folder + '/credit_bank_transactions.csv', index=False)
 

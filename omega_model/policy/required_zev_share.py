@@ -13,6 +13,7 @@ from omega_model import *
 
 min_share_units = 'minimum_share'
 
+
 class RequiredZevShare(OMEGABase):
     values = pd.DataFrame()
 
@@ -70,18 +71,28 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        import importlib
         from consumer.market_classes import MarketClass
 
         # set up global variables:
         omega_globals.options = OMEGARuntimeOptions()
+
+        init_fail = []
+
+        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
+        omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+        init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
+            omega_globals.options.policy_reg_classes_file)
+
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail = []
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
+
         init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file,
                                                      verbose=omega_globals.options.verbose)
 

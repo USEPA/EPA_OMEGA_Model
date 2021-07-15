@@ -917,7 +917,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             omega_log.end_logfile("\nSession Fail")
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-    except Exception as e:
+    except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
         print("### Check OMEGA log for error messages ###")
         omega_log.end_logfile("\nSession Fail")

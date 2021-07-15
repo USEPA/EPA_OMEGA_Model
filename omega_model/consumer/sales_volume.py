@@ -127,7 +127,7 @@ if __name__ == '__main__':
         from context.new_vehicle_market import NewVehicleMarket
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
-        omega_globals.options.VehicleTargets = importlib.import_module(module_name).Targets
+        omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
         SQABase.metadata.create_all(omega_globals.engine)
 

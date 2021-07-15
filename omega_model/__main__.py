@@ -16,7 +16,8 @@ print('importing %s' % __file__)
 import os
 import traceback
 
-from omega_model import run_omega, OMEGARuntimeOptions
+from omega_model import OMEGARuntimeOptions
+from omega_model.omega import run_omega
 
 if __name__ == "__main__":
     try:

@@ -76,6 +76,7 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
+from policy.drive_cycles import DriveCycles
 
 cache = dict()
 
@@ -85,9 +86,7 @@ class DriveCycleWeights(OMEGABase):
     **Loads a drive cycle share tree, validates cycle/phase names and provides methods to calculate weighted drive
     cycle results.**
 
-
     """
-
     @staticmethod
     def validate_drive_cycle_names(tree, filename):
         """
@@ -101,8 +100,6 @@ class DriveCycleWeights(OMEGABase):
             List of cycle name errors, or empty list on success.
 
         """
-
-        from policy.drive_cycles import DriveCycles
 
         cycle_name_errors = []
 

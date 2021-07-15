@@ -56,6 +56,7 @@ try:
     legacy_reg_classes = OMEGAEnum(['car', 'truck'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
+
     class OMEGARuntimeOptions(OMEGABase):
         """
         An OMEGARuntimeOptions object defines the settings required for a simulation session
