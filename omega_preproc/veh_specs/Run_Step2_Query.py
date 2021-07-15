@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import datetime
+import os
+
 pd.options.mode.chained_assignment = None  # default='warn'
 
 def weighted_average(grp):
@@ -25,6 +27,7 @@ def mode(df, key_cols, value_col, count_col):
         .sort_values(count_col, ascending=False) \
         .drop_duplicates(subset=key_cols)
 
+print(os.getcwd())
 main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications' \
             + '\\' + 'techspecconsolidator\Query Runs'
 run_folder = str(input('Enter Run Folder Name: '))
@@ -59,7 +62,6 @@ for _row in range (_rows):
 field_mapping_filename = run_controller['database_definition_files'][0]
 data_sources_filename = run_controller['database_definition_files'][1]
 main_mapping_category_key_filename = run_controller['database_definition_files'][2]
-
 
 if ',' in aggregating_fields_input:
     aggregating_fields = pd.Series(aggregating_fields_input.split(','), name='Category').str.strip()
