@@ -6,10 +6,27 @@ Model Architecture and Algorithms
 
 Overview of Model Inputs
 ^^^^^^^
-(Intro para on the model inputs.  Pull the inputs out from the module sections and incorporate here.)
+As described in the overview, OMEGA model inputs are grouped into two categories:  1) assumptions about the structure and the stringency of the policies being evaluated within the model (these are the policy alternatives) and 2) external assumptions that apply to all policies under analysis (collectively referred to as the analysis context).  The policy alternatives define the policy being evaluated in each OMEGA run and are described in the Policy Module section.  The analysis context inputs (which include more traditional inputs like fuel prices, technology assumptions, etc) are discussed within the descriptions of the associated modules that use them. 
 
-(add table with key inputs, modules used, and example .csv)
+The lists of policy alternatives and analysis context inputs are provided below.  Each input is described in more detail in each of the module descriptions listed later in this section.
 
+Policy Alternatives Inputs:
+	* Emissions targets
+	* Rules on banking/trading of credits
+	* Technology multipliers
+	* Reg class definitions
+	* VMT assumption
+	
+
+Analysis Context Inputs:
+	* Vehicle costs
+	* Vehicle prices
+	* Vehicle energy consumption
+	* Off-cycle credit tech values
+	* Starting credit balances
+	* Fuel Costs (gas and electricity)
+	* Vehicle Fleet
+	* Vehicle VMT distribution
 
 
 Modules
@@ -53,7 +70,8 @@ Producer Module
 ------------------------
 The modeling of producer decisions is a core function of OMEGA, and is based on minimizing their generalized costs, subject to the constraints of regulatory compliance and consumer demand. The ‘producer’ defined in the OMEGA encompasses both the broader meaning as a supplier of a transportation good or service to the market, and in the narrower sense as the regulated entity subject to EPA policies.
 
-* Inputs and Outputs of the Producer Module
+Inputs and Outputs of the Producer Module
++++++++++++++++++++++++++++++++++++++++++
     * Policy Alternative inputs are used to calculate a compliance target for the producer, in Mg CO2 for a given analysis year, using the provided attribute-based standards curve, vehicle regulatory class definitions, and assumed VMT for compliance. Other policy inputs may define, for example, the credit lifetime for carry-forward and carry-back, or a floor on the minimum share of ZEV vehicles produced.
     * Context inputs and assumptions that the Producer Module uses define all factors, apart from the policies under evaluation, that influence the modeled producer decisions. Key factors include the vehicle costs and emissions for the technologies and vehicle attributes considered, and the producer constraints on pricing strategy and cross-subsidization.
 
