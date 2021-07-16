@@ -126,7 +126,7 @@ if __name__ == '__main__':
         from context.cost_clouds import CostCloud
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGASessionSettings()
 
         init_fail = []
 

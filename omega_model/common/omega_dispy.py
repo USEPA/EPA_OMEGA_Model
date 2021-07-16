@@ -32,8 +32,8 @@ Since this is an advanced use case, EPA can provide limited support for its use.
 
 from common import omega_log
 
-from omega_model import OMEGARuntimeOptions
-bundle_output_folder_name = OMEGARuntimeOptions().output_folder
+from omega_model import OMEGASessionSettings
+bundle_output_folder_name = OMEGASessionSettings().output_folder
 
 print('importing %s' % __file__)
 

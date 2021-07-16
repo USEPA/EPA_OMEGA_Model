@@ -130,7 +130,7 @@ if __name__ == '__main__':
         from consumer.market_classes import MarketClass  # needed for market class ID
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGASessionSettings()
 
         init_fail = []
 

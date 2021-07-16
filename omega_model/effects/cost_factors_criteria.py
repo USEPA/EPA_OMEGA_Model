@@ -183,7 +183,7 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGASessionSettings()
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 

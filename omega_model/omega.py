@@ -673,7 +673,7 @@ def init_omega(session_runtime_options):
     Initialize OMEGA data structures.
 
     Args:
-        session_runtime_options (OMEGARuntimeOptions):
+        session_runtime_options (OMEGASessionSettings):
 
     Returns:
         List of template/input errors, else empty list on success
@@ -858,7 +858,7 @@ def run_omega(session_runtime_options, standalone_run=False):
     Run a single OMEGA simulation session and run session postproc.
 
     Args:
-        session_runtime_options (OMEGARuntimeOptions): session runtime options
+        session_runtime_options (OMEGASessionSettings): session runtime options
         standalone_run (bool): True if session is run outside of the batch process
 
     """
@@ -927,7 +927,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGARuntimeOptions(), standalone_run=True)  # to view in terminal: snakeviz omega2_profile.dmp
+        run_omega(OMEGASessionSettings(), standalone_run=True)  # to view in terminal: snakeviz omega2_profile.dmp
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -66,7 +66,7 @@ if __name__ == '__main__':
         import importlib
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGASessionSettings()
 
         init_fail = []
 

@@ -57,9 +57,9 @@ try:
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
 
 
-    class OMEGARuntimeOptions(OMEGABase):
+    class OMEGASessionSettings(OMEGABase):
         """
-        An OMEGARuntimeOptions object defines the settings required for a simulation session
+        Define the settings required for a simulation session
 
         """
         def __init__(self):

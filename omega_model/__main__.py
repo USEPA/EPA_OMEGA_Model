@@ -16,12 +16,12 @@ print('importing %s' % __file__)
 import os
 import traceback
 
-from omega_model import OMEGARuntimeOptions
+from omega_model import OMEGASessionSettings
 from omega_model.omega import run_omega
 
 if __name__ == "__main__":
     try:
-        run_omega(OMEGARuntimeOptions(), standalone_run=True)
+        run_omega(OMEGASessionSettings(), standalone_run=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

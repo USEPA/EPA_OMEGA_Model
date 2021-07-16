@@ -22,11 +22,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # print('SYS Path = %s' % sys.path)
 
 from common.omega_types import OMEGABase
-from omega_model import OMEGARuntimeOptions
+from omega_model import OMEGASessionSettings
 from common.file_io import validate_file, relocate_file, get_filenameext
 
 bundle_input_folder_name = 'in'
-bundle_output_folder_name = OMEGARuntimeOptions().output_folder
+bundle_output_folder_name = OMEGASessionSettings().output_folder
 
 
 def validate_predefined_input(input_str, valid_inputs):
@@ -252,14 +252,14 @@ class OMEGABatchObject(OMEGABase):
 
 class OMEGASessionObject(OMEGABase):
     def __init__(self, name, **kwargs):
-        from omega import OMEGARuntimeOptions
+        from omega import OMEGASessionSettings
 
         self.parent = []
         self.name = name
         self.num = 0
         self.output_path = "." + os.sep
         self.enabled = False
-        self.settings = OMEGARuntimeOptions()
+        self.settings = OMEGASessionSettings()
         self.result = []
 
     def read_parameter(self, index_str, default_value=None):
@@ -275,14 +275,14 @@ class OMEGASessionObject(OMEGABase):
             return param
 
     def get_session_settings(self, session_num):
-        from omega import OMEGARuntimeOptions
+        from omega import OMEGASessionSettings
 
         self.num = session_num
         self.settings.session_is_reference = self.num == 0
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
         self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
-        self.output_path = OMEGARuntimeOptions().output_folder  # self.read_parameter('Session Output Folder Name')
+        self.output_path = OMEGASessionSettings().output_folder  # self.read_parameter('Session Output Folder Name')
 
     def get_io_settings(self, remote=False):
         true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})

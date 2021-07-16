@@ -175,7 +175,7 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         # set up global variables:
-        omega_globals.options = OMEGARuntimeOptions()
+        omega_globals.options = OMEGASessionSettings()
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
