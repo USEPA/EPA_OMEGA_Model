@@ -79,165 +79,110 @@ def check_final_model_yr_ghg_prod_units(data_chk_filename, vehghg_file_full_merg
 
     return delta_final_model_yr_ghg_prod_units
 
-def tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, _model_year, _cafe_mfr_cd, _label_mfr_cd, _carline_name, _mfr_divsion_short_nm, _displ, _num_trans_gears):
+def tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, tstcar_MY_errta_table, _model_year, _cafe_mfr_cd, _label_mfr_cd, _carline_name, _mfr_divsion_short_nm, _displ, _num_trans_gears):
+    # df_carline_name = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name, :]
     _num_models = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name, 'Represented Test Veh Model'].shape[0]
-    _carline_name0 = _carline_name
-    if _num_models == 0:
-        if _carline_name == 'MKC  AWD': _carline_name = 'MKC'
-        if _carline_name == 'MKT AWD': _carline_name = 'MKT'
-        if _carline_name == 'MKZ FWD': _carline_name = 'MKZ'
-        if _carline_name == 'NAUTILUS AWD': _carline_name = 'Nautilus'.upper()
-        if _carline_name == 'MUSTANG CONVERTIBLE': _carline_name = 'Mustang'.upper()
-        if _carline_name == 'CHALLENGER GT'.upper(): _carline_name = 'Challenger'.upper()
-        if _carline_name == 'JOURNEY AWD'.upper(): _carline_name = 'Journey'.upper()
-        if _carline_name == '1500 Classic 4x4'.upper(): _carline_name = '1500 4x4'.upper()
-        if _carline_name == 'F150 PICKUP 2WD FFV': _carline_name = 'F150 4x2'.upper()
-        if _carline_name == 'F150 PICKUP 4WD FFV': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 PICKUP 4WD': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 PICKUP 4WD': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 PICKUP 4WD LIMITED': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 2WD FFV BASE PAYLOAD LT': _carline_name = 'F150 4x2'.upper()
-        if _carline_name == 'F150 4WD FFV BASE PAYLOAD LT': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 2WD BASE PAYLOAD LT TIRE': _carline_name = 'F150 4x2'.upper()
-        if _carline_name == 'F150 4WD BASE PAYLOAD LT TIRE': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 2.7L 4WD GVWR>6799 LBS': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'F150 PICKUP 2WD': _carline_name = 'F150 4x2'.upper()
-        if _carline_name == 'F150 PICKUP 4WD XL/XLT': _carline_name = 'F150 4x4'.upper()
-        if _carline_name == 'FIESTA FWD': _carline_name = 'FIESTA'
-        if _carline_name == 'CIVIC 4DR': _carline_name = 'CIVIC 4DR SEDAN 1.5L'
-        if _carline_name == 'CRUZE HATCHBACK': _carline_name = 'CRUZE'
-        if _carline_name == 'CRUZE PREMIER HATCHBACK': _carline_name = 'CRUZE'
-        if _carline_name == 'CRUZE PREMIER': _carline_name = 'CRUZE'
-        if _carline_name == 'RANGER 2WD': _carline_name = 'Ranger - Chassis Cab'.upper()
-        if _carline_name == 'FLEX FWD': _carline_name = 'FLEX'
-        if _carline_name == 'FLEX AWD': _carline_name = 'FLEX'
-        if _carline_name == 'FUSION AWD': _carline_name = 'Fusion'.upper()
-        if _carline_name == 'EXPLORER AWD': _carline_name = 'Explorer AWD'.upper()
-        if _carline_name == 'EXPLORER FFV AWD': _carline_name = 'Explorer AWD'.upper()
-        if _carline_name == 'EXPEDITION 2WD': _carline_name = 'Expedition'.upper()
-        if _carline_name == 'EXPEDITION MAX 2WD': _carline_name = 'Expedition'.upper()
-        if _carline_name == 'ECOSPORT AWD': _carline_name = 'EcoSport'.upper()
-        if _carline_name == 'F150 2.7L 2WD GVWR>6649 LBS': _carline_name = 'F150 4X2'.upper()
-        if _carline_name == 'FUSION HYBRID TAXI': _carline_name = 'Fusion (HEV)'.upper()
-        if _carline_name == 'MUSTANG PERFORMANCE PACKAGE': _carline_name = 'Explorer AWD'.upper()
-        if _carline_name == 'ESCAPE FWD FFV': _carline_name = 'Mustang'.upper()
-        if _carline_name == 'Navigator 4WD'.upper(): _carline_name = 'Navigator'.upper()
-        if _carline_name == 'V90 FWD': _carline_name = 'XC90 T6 AWD'
-        if _carline_name == 'S90 FWD': _carline_name = 'XC90 T6 AWD'
-        if _carline_name == 'S90 AWD': _carline_name = 'XC90 T6 AWD'
-        if _carline_name == 'V60 FWD': _carline_name = 'XC90 T6 AWD'
-        if _carline_name == 'XC90 AWD': _carline_name = 'XC90 T6 AWD'
-        if _carline_name == 'C1500 YUKON 2WD': _carline_name = 'YUKON 2WD'
-        if _carline_name == 'C1500 YUKON XL 2WD': _carline_name = 'YUKON XL 2WD'
-        if _carline_name == 'K1500 YUKON 4WD': _carline_name = 'K1500 YUKON XL 4WD'
-        if _carline_name == 'K10 SILVERADO 4WD CAB CHASSIS': _carline_name = 'K10 SILVERADO 4WD'
-        if _carline_name == 'K1500 YUKON XL 4WD': _carline_name = 'K1500 YUKON XL 4WD'
-        if _carline_name == 'C15 SILVERADO LD 2WD': _carline_name = 'C15 SILVERADO 2WD'
-        if _carline_name == 'K15 SILVERADO LD 4WD': _carline_name = 'K10 SILVERADO 4WD'
-        if _carline_name == 'C1500 SUBURBAN 2WD': _carline_name = 'C1500 SUBURBAN 2WD'
-        if _carline_name == 'C15 SIERRA LTD 2WD': _carline_name = 'SIERRA 2WD'
-        if _carline_name == 'K15 SIERRA LTD 4WD': _carline_name = 'K15 SIERRA 4WD'
-        if _carline_name == 'ENCLAVE': _carline_name = 'ENCLAVE AWD'
-        if _carline_name == 'GS 300': _carline_name = 'IS 300'
-        if _carline_name == 'RC 300': _carline_name = 'RC 350'
-        if _carline_name == 'RX 350L': _carline_name = 'RX 350'
-        if _carline_name == 'RX 350L AWD': _carline_name = 'RX 350 AWD'
-        if _carline_name == 'RX 450hL AWD'.upper(): _carline_name = 'RX 450h AWD'.upper()
-        if _carline_name == 'GHIBLI  S RWD': _carline_name = 'Ghibli S RWD 405HP'.upper()
-        if _carline_name == 'CROSSTREK HYBRID AWD': _carline_name = 'CROSSTREK'
-        if _carline_name == 'MODEL3 LONGRANGE AWD PERFORMANCE': _carline_name = 'Model 3 Long Range AWD'.upper()
-        if _carline_name == 'E-TRON': _carline_name = 'e-tron 55 quattro'.upper()
-        if _carline_name == 'SMART EQ FORTWO (CONVERTIBLE)': _carline_name = 'Smart Fortwo Electric Drive (convertible)'.upper()
-        if _carline_name == 'SMART EQ FORTWO (COUPE)': _carline_name = 'Smart Fortwo Electric Drive (coupe)'.upper()
-        if _carline_name == 'F-TYPE S CONVERTIBLE': _carline_name = 'F-Type Convertible'.upper()
-        if _carline_name == 'F-TYPE CONVERTIBLE MANUAL': _carline_name = 'F-Type Manual'.upper()
-        if _carline_name == 'F-TYPE S COUPE': _carline_name = 'F-TYPE'
-        if _carline_name == 'F-TYPE COUPE MANUAL': _carline_name = 'F-Type Manual'.upper()
-        if _carline_name == 'NEXO BLUE': _carline_name = 'NEXO'.upper()
-        if _carline_name == 'ATLAS 4MOTION': _carline_name = 'Atlas'.upper()
-
-        if _carline_name == '911 CARRERA GTS': _carline_name = '911 Carrera GTS'.upper()
-        if _carline_name == '911 CARRERA': _carline_name = '911 Carrera'.upper()
-        if _carline_name == '911 CARRERA S': _carline_name = '911 Carrera S'.upper()
-        if _carline_name == '911 CARRERA T': _carline_name = '911 Carrera T'.upper()
-        if _carline_name == '911 CARRERA 4S': _carline_name = '911 Carrera 4S'.upper()
-        if _carline_name == '911 CARRERA 4 GTS CABRIOLET': _carline_name = '911 Carrera 4 GTS Cabriolet'.upper()
-        if _carline_name == '911 CARRERA GTS CABRIOLET': _carline_name = '911 Carrera GTS Cabriolet'.upper()
-        if _carline_name == '911 CARRERA 4': _carline_name = '911 Carrera 4'.upper()
-        if _carline_name == '911 CARRERA 4 CABRIOLET': _carline_name = '911 Carrera 4 Cabriolet'.upper()
-        if _carline_name == '911 CARRERA 4S CABRIOLET': _carline_name = '911 Carrera 4S Cabriolet'.upper()
-        if _carline_name == '911 CARRERA S CABRIOLET': _carline_name = '911 Carrera S Cabriolet'.upper()
-
-        if _carline_name == 'I3': _carline_name = 'I3s'.upper()
-        if _carline_name == 'AMG E 63 S 4MATIC (STATION WAGON': _carline_name = 'AMG E 63 S 4MATIC'.upper()
-        if _carline_name == 'MODEL 3 STANDARD RANGE': _carline_name = 'Model 3 Standard Range RWD'.upper()
-        if _carline_name == '911 GT3 TOURING': _carline_name = '911 GT3R'.upper()
-        if _carline_name == '911 GT3 RS': _carline_name = '911 GT3RS'.upper()
-        if _carline_name == '911 GT2 RS': _carline_name = '911 GT2RS'.upper()
-        if _carline_name == '911 TURBO S EXCLUSIVE CABRIOLET': _carline_name = '911 Turbo S Exclusive'.upper()
-        if _carline_name == 'PANAMERA 4 E-HYBRID': _carline_name = 'Panamera 4 e-Hybrid ST'.upper()
-        if _carline_name == 'PANAMERA 4 E-HYBRID EXECUTIVE': _carline_name = 'Panamera 4 e-Hybrid ST'.upper()
-        if _carline_name == 'PANAMERA TURBO S E-HYBRID': _carline_name = 'Panamera Turbo S e-Hybrid ST'.upper()
-        if _carline_name == 'PANAMERA TURBO S E-HYBRID EXEC': _carline_name = 'Panamera Turbo S e-Hybrid ST'.upper()
-
-        if _carline_name == 'GHOST BLACK BADGE': _carline_name = 'Ghost'.upper()
-        if _carline_name == 'WRAITH BLACK BADGE': _carline_name = 'Wraith'.upper()
-        if _carline_name == 'DAWN BLACK BADGE': _carline_name = 'Dawn'.upper()
-        if _carline_name == 'ROUSH STAGE 3 MUSTANG': _carline_name = 'Stage 3 Mustang'.upper()
-
     _veh_mfr_code = 'Veh Mfr Code'
-    if (_num_models == 0) and (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
-                           (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Represented Test Veh Model'].shape[0] > 0):
-        pass
-    elif (_num_models >= 0) and (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table[_veh_mfr_code] == _label_mfr_cd) & \
-                                (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Represented Test Veh Model'].shape[0] > 0):
-        _cafe_mfr_cd = _label_mfr_cd
-    elif (_num_models == 0) and (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Represented Test Veh Make'] == _mfr_divsion_short_nm) & \
-                                                                    (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Represented Test Veh Model'].shape[0] > 0):
-        _cafe_mfr_cd = _mfr_divsion_short_nm
-        _veh_mfr_code = 'Represented Test Veh Make'
+    _tstcar_displ = _tstcar_drive_system_code = df_tstcar_table = _tstcar_cafe_mfr_cd_carline_name = np.nan
+    _trims = ['XSE', 'XLE', 'FFV', 'FWD', 'RWD', '4WD', '2WD', 'AWD', 'BLUE', 'XL', 'LBS', 'PICKUP', 'EXCLUSIVE', 'PERFORMANCE', 'PACKAGE', 'GT', 'MAX', 'CLASSIC', 'LD', 'BASE', 'PAYLOAD', 'LT', 'TIRE']
+    if _num_models == 0:
+        df_carline_name = tstcar_MY_errta_table.loc[tstcar_MY_errta_table['CARLINE_NAME'] == _carline_name, :]
+        if df_carline_name.shape[0] == 0:
+            # print(_carline_name)
+            if ('2WD' and 'F150') in _carline_name: _carline_name.replace('2WD', '4X2')
+            if ('4WD' and 'F150') in _carline_name: _carline_name.replace('4WD', '4X4')
+            _carline_name = _carline_name.split(' ')
+            if len(_carline_name) > 1:
+                tmp = []
+                for i in range (len(_carline_name)):
+                    if (_carline_name[i] not in _trims) and ('GVWR>' not in _carline_name[i]) and ('.5L' not in _carline_name[i]) and ('.0L' not in _carline_name[i]): tmp.append(_carline_name[i])
+                _carline_name = ' '.join(tmp)
+                _num_models = set_roadload_coefficient_table.loc[set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name, 'Represented Test Veh Model'].shape[0]
 
-    if (~pd.isnull(_displ)) and (~pd.isnull(_num_trans_gears)):
-        df_tstcar_table = set_roadload_coefficient_table.loc[
-                          (set_roadload_coefficient_table['Model Year'] == _model_year) & \
-                          (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
-                          (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
-                          (set_roadload_coefficient_table['Test Veh Displacement (L)'].round(1) == _displ.round(1)) & \
-                          (set_roadload_coefficient_table['# of Gears'] == _num_trans_gears) & \
-                          (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :]
-    if (~pd.isnull(_displ)) and (~pd.isnull(_num_trans_gears)) and (len(df_tstcar_table) == 0):
-        df_tstcar_table = set_roadload_coefficient_table.loc[
-                          (set_roadload_coefficient_table['Model Year'] == _model_year) & \
-                          (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
-                          (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
-                          (set_roadload_coefficient_table['Test Veh Displacement (L)'].round(1) == _displ.round(1)) & \
-                          (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :]
-    if pd.isnull(_displ) or pd.isnull(_num_trans_gears) or ((~pd.isnull(_displ)) and (~pd.isnull(_num_trans_gears)) and (len(df_tstcar_table) == 0)):
-        df_tstcar_table = set_roadload_coefficient_table.loc[
-                          (set_roadload_coefficient_table['Model Year'] == _model_year) & \
-                          (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
-                          (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
-                          (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :]
-    if (pd.isnull(_displ) or pd.isnull(_num_trans_gears)) and (len(df_tstcar_table) == 0):
-        df_tstcar_table = set_roadload_coefficient_table.loc[
-                          (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
-                          (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
-                          (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :]
-        if len(df_tstcar_table) > 0:
-            _tstcar_year = max(df_tstcar_table['Model Year'])
-            if _tstcar_year > _model_year: _tstcar_year = min(df_tstcar_table['Model Year'])
-            df_tstcar_table = set_roadload_coefficient_table.loc[
-                              (set_roadload_coefficient_table['Model Year'] == _tstcar_year) & \
-                              (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
-                              (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+            if _num_models == 0: return df_carline_name
+        if (df_carline_name.shape[0] > 0):
+            _index = df_carline_name.index[0]
+            _carline_name = df_carline_name.loc[_index, 'Represented Test Veh Model']
+            _tstcar_displ = df_carline_name.loc[_index, 'Test Veh Displacement (L)']
+            _tstcar_drive_system_code = df_carline_name.loc[_index, 'Drive System Code']
+        elif (_num_models > 0):
+            _index = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+                                                        (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+                                                        (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :].index[0]
+            _tstcar_displ = set_roadload_coefficient_table.loc[_index, 'Test Veh Displacement (L)']
+            _tstcar_drive_system_code = set_roadload_coefficient_table.loc[_index, 'Drive System Code']
+
+        if (pd.isnull(_tstcar_displ)) and (~pd.isnull(_tstcar_drive_system_code)):
+            _tstcar_cafe_mfr_cd_carline_name = (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+            (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+            (set_roadload_coefficient_table['Drive System Code'] == _tstcar_drive_system_code) & \
+            (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']))
+        elif (~pd.isnull(_tstcar_drive_system_code)):
+            _tstcar_cafe_mfr_cd_carline_name = (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+            (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+            (set_roadload_coefficient_table['Test Veh Displacement (L)'].round(1) == _tstcar_displ.round(1)) & \
+            (set_roadload_coefficient_table['Drive System Code'] == _tstcar_drive_system_code) & \
+            (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']))
+    elif (~pd.isnull(_displ)) and (~pd.isnull(_num_trans_gears)) and (set_roadload_coefficient_table.loc[ \
+            (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Test Veh Displacement (L)'].shape[0] > 0) and \
+            (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), '# of Gears'].shape[0] > 0):
+        _tstcar_cafe_mfr_cd_carline_name = (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+                                           (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+                                           (set_roadload_coefficient_table['Test Veh Displacement (L)'].round(1) == _displ.round(1)) & \
+                                           (set_roadload_coefficient_table['# of Gears'] == _num_trans_gears) & \
+                                           (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']))
+    elif (~pd.isnull(_displ)) and (pd.isnull(_num_trans_gears)) and (set_roadload_coefficient_table.loc[ \
+            (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Test Veh Displacement (L)'].shape[0] > 0):
+        _tstcar_cafe_mfr_cd_carline_name = (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+                                           (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+                                           (set_roadload_coefficient_table['Test Veh Displacement (L)'].round(1) == _displ.round(1)) & \
+                                           (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']))
+    else:
+        _tstcar_cafe_mfr_cd_carline_name = (set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+                                       (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+                                       (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']))
+
+    if _num_models == 0:
+        if (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+                                               (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Represented Test Veh Model'].shape[0] > 0):
+            pass
+        elif (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table[_veh_mfr_code] == _label_mfr_cd) & \
+                                                 (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Represented Test Veh Model'].shape[0] > 0):
+            _cafe_mfr_cd = _label_mfr_cd
+    if _num_models > 0 and (set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Represented Test Veh Make'] == _mfr_divsion_short_nm) & \
+                                                               (set_roadload_coefficient_table[_veh_mfr_code] != _cafe_mfr_cd) & \
+                                                               (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name), 'Represented Test Veh Model'].shape[0] > 0):
+            _cafe_mfr_cd = _mfr_divsion_short_nm
+            _veh_mfr_code = 'Represented Test Veh Make'
+
+    df_tstcar_table = set_roadload_coefficient_table.loc[_tstcar_cafe_mfr_cd_carline_name, :]
+    if df_tstcar_table.shape[0] == 0:
+        df_tstcar_table = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table[_veh_mfr_code] == _cafe_mfr_cd) & \
+                                       (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
+                                       (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :]
+        if (df_tstcar_table.shape[0] == 0) or (_num_models > 0):
+            df_tstcar_table = set_roadload_coefficient_table.loc[(set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name) & \
                               (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)'])), :]
+
+    if df_tstcar_table.shape[0] > 0:
+        _tstcar_year = ''
+        if df_tstcar_table.loc[df_tstcar_table['Model Year'] == _model_year, 'Model Year'].shape[0] > 0:
+            _tstcar_year = _model_year
+        elif max(df_tstcar_table['Model Year']) < _model_year:
+            _tstcar_year = max(df_tstcar_table['Model Year'])
+        elif min(df_tstcar_table['Model Year']) > _model_year:
+            _tstcar_year = min(df_tstcar_table['Model Year'])
+
+        if _tstcar_year != '': df_tstcar_table = df_tstcar_table.loc[(df_tstcar_table['Model Year'] == _tstcar_year), :]
+
     return df_tstcar_table
 
 def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path, footprint_filename, footprint_lineage_filename, bodyid_filename, \
                                                    bool_run_new_manual_filter, manual_filter_name, expanded_footprint_filename, subconfig_filename, model_type_filename, vehghg_filename, output_path, \
                                                    footprint_exceptions_table, modeltype_exceptions_table, subconfig_MY_exceptions_table, subconfig_sales_exceptions_table, \
                                                    year, roadload_coefficient_table_filename, set_bodyid_to_lineageid, \
-                                                   drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, test_car_filename_path, set_roadload_coefficient_table_filename):
+                                                   drivecycle_filenames, drivecycle_input_filenames, drivecycle_output_filenames, test_car_filename_path, set_roadload_coefficient_table_filename, \
+                                                   tstcar_MY_errta_filename):
     footprint_file = pd.read_csv(input_path + '\\' + footprint_filename, encoding="ISO-8859-1", na_values=['-'])  # EVCIS Qlik Sense query results contain hyphens for nan
     lineage_file = pd.read_csv(input_path + '\\' + footprint_lineage_filename, encoding="ISO-8859-1")
     # body_id_table_readin = pd.read_excel(input_path + '\\' + bodyid_filename, converters={'LineageID': int, 'BodyID': int})
@@ -623,6 +568,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
             print('# of TARGET_COEF_A_BEST (', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'])).sum(), ')')
             del df_target_coef_corr, df_target_coef_corr_index
 
+            tstcar_MY_errta_table = pd.read_csv(root_drive_letter + test_car_filename_path + '\\' + tstcar_MY_errta_filename, encoding="ISO-8859-1", na_values=['-'])
+            tstcar_MY_errta_table['CARLINE_NAME'] = tstcar_MY_errta_table['CARLINE_NAME'].astype(str).str.upper()
+            tstcar_MY_errta_table['Represented Test Veh Model'] = tstcar_MY_errta_table['Represented Test Veh Model'].astype(str).str.upper()
             df_target_coef_null = vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['SET_COEF_A_BEST'])), :]
             df_target_coef_null_index = list(df_target_coef_null.index)
             df_target_coef_null.reset_index(drop=True, inplace=True)
@@ -633,14 +581,16 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                 _label_mfr_cd = df_target_coef_null.loc[i, 'LABEL_MFR_CD']
                 _carline_name = df_target_coef_null.loc[i, 'CARLINE_NAME']
                 _mfr_divsion_short_nm = df_target_coef_null.loc[i, 'MFR_DIVISION_SHORT_NM']
-                # if (_carline_name == 'GHOST BLACK BADGE') or (_carline_name == 'GS 300'):
+                # if (_carline_name == '4C'):
                 #     print(_cafe_mfr_cd, _carline_name)
                 _etw = df_target_coef_null.loc[i, 'ETW']
                 if pd.isnull(_etw): _etw = df_target_coef_null.loc[i, 'INERTIA_WT_CLASS']
                 _displ = df_target_coef_null.loc[i, 'DISPLACEMENT']
                 _num_trans_gears =  df_target_coef_null.loc[i, 'NUM_TRANS_ON_GEAR']
-                df_tstcar_table = tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, _model_year, _cafe_mfr_cd, _label_mfr_cd, _carline_name, _mfr_divsion_short_nm, _displ, _num_trans_gears)
-                if len(df_tstcar_table) == 0: continue
+                df_tstcar_table = tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, tstcar_MY_errta_table, _model_year, _cafe_mfr_cd, _label_mfr_cd, _carline_name, _mfr_divsion_short_nm, _displ, _num_trans_gears)
+                if len(df_tstcar_table) == 0:
+                    print(_cafe_mfr_cd, _label_mfr_cd, _mfr_divsion_short_nm, _carline_name, 'not found in the tstcar database')
+                    continue
                 df_sort = df_tstcar_table.iloc[(df_tstcar_table['Equivalent Test Weight (lbs.)'] - _etw).abs().argsort()[:1]]
                 _index_df_sort = df_sort.index.tolist()[0]
                 vehghg_file_nonflexfuel.loc[_index, 'TARGET_COEF_BEST_MTH'] = 3
