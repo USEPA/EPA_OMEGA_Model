@@ -24,7 +24,7 @@ class ManufacturerAnnualData(SQABase):
     # --- database table properties ---
     __tablename__ = 'manufacturer_annual_data'  # database table name
     index = Column('index', Integer, primary_key=True)  #: database table index
-    manufacturer_ID = Column('manufacturer_id', Integer, ForeignKey('manufacturers.manufacturer_id'))  #: manufacturer id, e..g 'USA Motors'
+    manufacturer_id = Column('manufacturer_id', Integer, ForeignKey('manufacturers.manufacturer_id'))  #: manufacturer id, e..g 'USA Motors'
     model_year = Column(Numeric)  #: model year of the data
     calendar_year_cert_co2e_Mg = Column('calendar_year_cert_co2e_megagrams', Float)  #: certification CO2e (Mg) achieved in the given calendar year (initial compliance state)
     model_year_cert_co2e_Mg = Column('model_year_cert_co2e_megagrams', Float)  #: certificaiton CO2e (Mg) achieved, including credits transferred to/from other model years
@@ -32,7 +32,7 @@ class ManufacturerAnnualData(SQABase):
     manufacturer_vehicle_cost_dollars = Column('manufacturer_vehicle_cost_dollars', Float)  #: total manufacturer vehicle cost for the model year (sum of vehicle sales X vehicle cost)
 
     @staticmethod
-    def create_manufacturer_annual_data(model_year, manufacturer_ID, cert_target_co2e_Mg,
+    def create_manufacturer_annual_data(model_year, manufacturer_id, cert_target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg, manufacturer_vehicle_cost_dollars):
         """
         Create initial manufacturer compliance database entry for the given year.
@@ -40,13 +40,13 @@ class ManufacturerAnnualData(SQABase):
 
         Args:
             model_year (numeric): the compliance model year
-            manufacturer_ID (str): manufacturer id, e.g. 'USA Motors'
+            manufacturer_id (str): manufacturer id, e.g. 'USA Motors'
             cert_target_co2e_Mg (numeric): target CO2e Mg for the model year
             calendar_year_cert_co2e_Mg (numeric): initial compliance state (CO2e Mg) of the vehicles produced in the model year
             manufacturer_vehicle_cost_dollars (numeric): total manufacturer vehicle cost (sum of vehicle sales X vehicle cost)
 
         """
-        omega_globals.session.add(ManufacturerAnnualData(manufacturer_ID=manufacturer_ID,
+        omega_globals.session.add(ManufacturerAnnualData(manufacturer_id=manufacturer_id,
                                                          model_year=model_year,
                                                          cert_target_co2e_Mg=cert_target_co2e_Mg,
                                                          calendar_year_cert_co2e_Mg=calendar_year_cert_co2e_Mg,
@@ -116,7 +116,7 @@ class ManufacturerAnnualData(SQABase):
         """
         mad = omega_globals.session.query(ManufacturerAnnualData)\
             .filter(ManufacturerAnnualData.model_year == model_year)\
-            .filter(ManufacturerAnnualData.manufacturer_ID == manufacturer_id).one_or_none()
+            .filter(ManufacturerAnnualData.manufacturer_id == manufacturer_id).one_or_none()
 
         if mad is not None:
             mad.model_year_cert_co2e_Mg += transaction_amount_Mg

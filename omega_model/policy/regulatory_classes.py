@@ -72,8 +72,8 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             Vehicle reg class based on vehicle characteristics.
 
         """
-        reg_class_ID = vehicle.reg_class_ID
-        return reg_class_ID
+        reg_class_id = vehicle.reg_class_id
+        return reg_class_id
 
     @staticmethod
     def init_from_file(filename, verbose=False):

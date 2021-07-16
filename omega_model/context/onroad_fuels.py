@@ -99,7 +99,7 @@ class OnroadFuel(OMEGABase):
         return cache[cache_key][fuel_id][attribute]
 
     @staticmethod
-    def validate_fuel_ID(fuel_id):
+    def validate_fuel_id(fuel_id):
         """
         Validate fuel ID
 
@@ -178,7 +178,7 @@ if __name__ == '__main__':
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(OnroadFuel.validate_fuel_ID('pump gasoline'))
+            print(OnroadFuel.validate_fuel_id('pump gasoline'))
             print(OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit'))
         else:
             print(init_fail)

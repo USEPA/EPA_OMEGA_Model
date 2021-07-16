@@ -14,7 +14,7 @@ class CostEffectsSCC(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_effects_scc'
     index = Column('index', Integer, primary_key=True)
-    vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
+    vehicle_id = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
     calendar_year = Column(Numeric)
     age = Column(Numeric)
     discount_rate = Column(Float)

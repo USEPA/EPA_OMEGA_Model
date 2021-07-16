@@ -71,9 +71,9 @@ class FuelPrice(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'context_fuel_prices'  # database table name
     index = Column('index', Integer, primary_key=True)  #: database table index
-    context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
-    case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
-    fuel_ID = Column('fuel_id', String)  #: str: e.g. 'pump gasoline'
+    context_id = Column('context_id', String)  #: str: e.g. 'AEO2020'
+    case_id = Column('case_id', String)  #: str: e.g. 'Reference case'
+    fuel_id = Column('fuel_id', String)  #: str: e.g. 'pump gasoline'
     calendar_year = Column(Numeric)  #: numeric: calendar year of the price values
     retail_dollars_per_unit = Column(Float)  #: float: e.g. retail dollars per gallon, dollars per kWh
     pretax_dollars_per_unit = Column(Float)  #: float: e.g. pre-tax dollars per gallon, dollars per kWh
@@ -115,10 +115,10 @@ class FuelPrice(SQABase, OMEGABase):
             attrs = FuelPrice.get_class_attributes(price_types)
 
             result = omega_globals.session.query(*attrs).\
-                filter(FuelPrice.context_ID == omega_globals.options.context_id).\
-                filter(FuelPrice.case_ID == omega_globals.options.context_case_id).\
+                filter(FuelPrice.context_id == omega_globals.options.context_id).\
+                filter(FuelPrice.case_id == omega_globals.options.context_case_id).\
                 filter(FuelPrice.calendar_year == calendar_year).\
-                filter(FuelPrice.fuel_ID == fuel_id).all()[0]
+                filter(FuelPrice.fuel_id == fuel_id).all()[0]
 
             if len(price_types) == 1:
                 cache[cache_key] = result[0]
@@ -168,11 +168,11 @@ class FuelPrice(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     fuel_id = df.loc[i, 'fuel_id']
-                    if OnroadFuel.validate_fuel_ID(fuel_id):
+                    if OnroadFuel.validate_fuel_id(fuel_id):
                         obj_list.append(FuelPrice(
-                            context_ID=df.loc[i, 'context_id'],
-                            case_ID=df.loc[i, 'case_id'],
-                            fuel_ID=fuel_id,
+                            context_id=df.loc[i, 'context_id'],
+                            case_id=df.loc[i, 'case_id'],
+                            fuel_id=fuel_id,
                             calendar_year=df.loc[i, 'calendar_year'],
                             retail_dollars_per_unit=df.loc[i, 'retail_dollars_per_unit'],
                             pretax_dollars_per_unit=df.loc[i, 'pretax_dollars_per_unit'],

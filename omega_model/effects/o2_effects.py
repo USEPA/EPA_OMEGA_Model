@@ -43,10 +43,10 @@ def run_effects_calcs():
     cost_effects_dict = discount_values(cost_effects_dict)
 
     save_dict_to_csv(physical_effects_dict, omega_globals.options.output_folder + '%s_physical_effects' %
-                     omega_globals.options.session_unique_name, list(), 'vehicle_ID', 'calendar_year', 'age')
+                     omega_globals.options.session_unique_name, list(), 'vehicle_id', 'calendar_year', 'age')
 
     save_dict_to_csv(cost_effects_dict, omega_globals.options.output_folder + '%s_cost_effects' %
-                     omega_globals.options.session_unique_name, list(), 'vehicle_ID', 'calendar_year', 'age', 'discount_rate')
+                     omega_globals.options.session_unique_name, list(), 'vehicle_id', 'calendar_year', 'age', 'discount_rate')
 
     # # cost_effects_dict = dict()
     # for calendar_year in calendar_years:

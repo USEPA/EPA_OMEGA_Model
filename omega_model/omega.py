@@ -119,16 +119,16 @@ def run_producer_consumer():
     from producer import compliance_strategy
     from policy.credit_banking import CreditBank
 
-    for manufacturer in omega_globals.session.query(Manufacturer.manufacturer_ID).all():
-        manufacturer_ID = manufacturer[0]
-        omega_log.logwrite("Running %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, manufacturer_ID),
+    for manufacturer in omega_globals.session.query(Manufacturer.manufacturer_id).all():
+        manufacturer_id = manufacturer[0]
+        omega_log.logwrite("Running %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, manufacturer_id),
                            echo_console=True)
 
         iteration_log = pd.DataFrame()
 
         analysis_end_year = omega_globals.options.analysis_final_year + 1
 
-        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_ID)
+        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_id)
 
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
@@ -164,7 +164,7 @@ def run_producer_consumer():
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    compliance_strategy.search_production_options(manufacturer_ID, calendar_year,
+                    compliance_strategy.search_production_options(manufacturer_id, calendar_year,
                                                                   producer_decision_and_response,
                                                                   iteration_num, strategic_target_offset_Mg)
 
@@ -200,10 +200,10 @@ def run_producer_consumer():
                                            echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
-            compliance_strategy.finalize_production(calendar_year, manufacturer_ID, candidate_mfr_composite_vehicles,
+            compliance_strategy.finalize_production(calendar_year, manufacturer_id, candidate_mfr_composite_vehicles,
                                                     producer_decision_and_response)
 
-            credit_bank.handle_credit(calendar_year, manufacturer_ID,
+            credit_bank.handle_credit(calendar_year, manufacturer_id,
                                       producer_decision_and_response['total_credits_co2e_megagrams'])
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
@@ -507,7 +507,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
     # group vehicles by market class
     market_class_vehicle_dict = MarketClass.get_market_class_dict()
     for new_veh in candidate_mfr_composite_vehicles:
-        market_class_vehicle_dict[new_veh.market_class_ID].append(new_veh)
+        market_class_vehicle_dict[new_veh.market_class_id].append(new_veh)
 
     # calculate sales-weighted co2 g/mi and cost by market class
     for mc in MarketClass.market_classes:
@@ -535,7 +535,7 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
 
             winning_combo['sales_%s' % mc] = 0
             for v in market_class_vehicles:
-                winning_combo['sales_%s' % mc] += winning_combo['veh_%s_sales' % v.vehicle_ID]  # was v.initial_registered_count
+                winning_combo['sales_%s' % mc] += winning_combo['veh_%s_sales' % v.vehicle_id]  # was v.initial_registered_count
         else:
             winning_combo['average_co2e_gpmi_%s' % mc] = 0
             winning_combo['average_kwh_pmi_%s' % mc] = 0

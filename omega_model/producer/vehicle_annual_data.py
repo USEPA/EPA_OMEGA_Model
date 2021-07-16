@@ -18,11 +18,11 @@ class VehicleAnnualData(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'vehicle_annual_data'
     index = Column('index', Integer, primary_key=True)
-    vehicle_ID = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
+    vehicle_id = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
     calendar_year = Column(Numeric)
     age = Column(Numeric)
-    # reg_class_ID = Column(String)
-    # in_use_fuel_ID = Column(String)
+    # reg_class_id = Column(String)
+    # in_use_fuel_id = Column(String)
     registered_count = Column(Float)
     annual_vmt = Column(Float)
     vmt = Column(Float)
@@ -85,14 +85,14 @@ class VehicleAnnualData(SQABase, OMEGABase):
         age = calendar_year - vehicle.model_year
 
         vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_ID == vehicle.vehicle_ID). \
+            filter(VehicleAnnualData.vehicle_id == vehicle.vehicle_id). \
             filter(VehicleAnnualData.calendar_year == calendar_year). \
             filter(VehicleAnnualData.age == age).one_or_none()
 
         if vad:
             vad.registered_count = registered_count
         else:
-            omega_globals.session.add(VehicleAnnualData(vehicle_ID=vehicle.vehicle_ID,
+            omega_globals.session.add(VehicleAnnualData(vehicle_id=vehicle.vehicle_id,
                                                         calendar_year=calendar_year,
                                                         registered_count=registered_count,
                                                         age=age))
@@ -103,7 +103,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
         age = calendar_year - vehicle.model_year
 
         vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_ID == vehicle.vehicle_ID). \
+            filter(VehicleAnnualData.vehicle_id == vehicle.vehicle_id). \
             filter(VehicleAnnualData.calendar_year == calendar_year). \
             filter(VehicleAnnualData.age == age).one()
 
@@ -152,12 +152,12 @@ class VehicleAnnualData(SQABase, OMEGABase):
         return cache[cache_key]
 
     @staticmethod
-    def insert_vmt(vehicle_ID, calendar_year, annual_vmt):
+    def insert_vmt(vehicle_id, calendar_year, annual_vmt):
         vmt = omega_globals.session.query(VehicleAnnualData.registered_count). \
-                  filter(VehicleAnnualData.vehicle_ID == vehicle_ID). \
+                  filter(VehicleAnnualData.vehicle_id == vehicle_id). \
                   filter(VehicleAnnualData.calendar_year == calendar_year).scalar() * annual_vmt
         vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_ID == vehicle_ID). \
+            filter(VehicleAnnualData.vehicle_id == vehicle_id). \
             filter(VehicleAnnualData.calendar_year == calendar_year).all()
         vad[0].annual_vmt = annual_vmt
         vad[0].vmt = vmt
@@ -199,7 +199,7 @@ if __name__ == '__main__':
         from producer.manufacturers import Manufacturer  # required by vehicles
         from context.onroad_fuels import OnroadFuel  # required by vehicles
         from consumer.market_classes import MarketClass  # required by vehicles
-        from producer.vehicles import VehicleFinal  # for foreign key vehicle_ID
+        from producer.vehicles import VehicleFinal  # for foreign key vehicle_id
 
         SQABase.metadata.create_all(omega_globals.engine)
 

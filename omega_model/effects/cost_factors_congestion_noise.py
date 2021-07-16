@@ -49,7 +49,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'cost_factors_congestion_noise'
     index = Column('index', Integer, primary_key=True)
-    reg_class_ID = Column(String)
+    reg_class_id = Column(String)
     dollar_basis = Column(Float)
     congestion_cost_dollars_per_mile = Column(Float)
     noise_cost_dollars_per_mile = Column(Float)
@@ -72,7 +72,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
                 cost_factors = [cost_factors]
             attrs = CostFactorsCongestionNoise.get_class_attributes(cost_factors)
 
-            result = omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_ID == reg_class_id).all()[0]
+            result = omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_id == reg_class_id).all()[0]
 
             if len(cost_factors) == 1:
                 cache[cache_key] = result[0]
@@ -114,7 +114,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(CostFactorsCongestionNoise(
-                        reg_class_ID = df.loc[i, 'reg_class_id'],
+                        reg_class_id = df.loc[i, 'reg_class_id'],
                         dollar_basis = df.loc[i, 'dollar_basis'],
                         congestion_cost_dollars_per_mile = df.loc[i, 'congestion_cost_dollars_per_mile'],
                         noise_cost_dollars_per_mile = df.loc[i, 'noise_cost_dollars_per_mile'],

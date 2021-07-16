@@ -99,7 +99,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     __tablename__ = 'targets_footprint'
     index = Column(Integer, primary_key=True)  #: database index
     model_year = Column(Numeric)  #: model year (or start year of the applied parameters)
-    reg_class_ID = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
+    reg_class_id = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
                                                validate_strings=True))  #: reg class name, e.g. 'car','truck'
     footprint_min_sqft = Column('footprint_min_sqft', Float)  #: minimum footprint (square feet) of curve
     footprint_max_sqft = Column('footprint_max_sqft', Float)  #: maximum footprint (square feet) of curve
@@ -122,13 +122,13 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             Vehicle target CO2e in g/mi.
 
         """
-        start_years = cache[vehicle.reg_class_ID]['start_year']
+        start_years = cache[vehicle.reg_class_id]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_ID)
+        cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_id)
         if cache_key not in cache:
             cache[cache_key] = omega_globals.session.query(VehicleTargets). \
-                filter(VehicleTargets.reg_class_ID == vehicle.reg_class_ID). \
+                filter(VehicleTargets.reg_class_id == vehicle.reg_class_id). \
                 filter(VehicleTargets.model_year == vehicle_model_year).one()
         coefficients = cache[cache_key]
 
@@ -161,7 +161,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
         if cache_key not in cache:
             cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
-                filter(VehicleTargets.reg_class_ID == reg_class_id). \
+                filter(VehicleTargets.reg_class_id == reg_class_id). \
                 filter(VehicleTargets.model_year == model_year).scalar()
         return cache[cache_key]
 
@@ -188,10 +188,10 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         import numpy as np
         from policy.incentives import Incentives
 
-        start_years = cache[vehicle.reg_class_ID]['start_year']
+        start_years = cache[vehicle.reg_class_id]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
         co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
@@ -229,10 +229,10 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         import numpy as np
         from policy.incentives import Incentives
 
-        start_years = cache[vehicle.reg_class_ID]['start_year']
+        start_years = cache[vehicle.reg_class_id]['start_year']
         vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_ID, vehicle_model_year)
+        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
         if co2_gpmi_variants is not None:
             if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -291,7 +291,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
                 for i in df.index:
                     obj_list.append(VehicleTargets(
                         model_year=df.loc[i, 'start_year'],
-                        reg_class_ID=df.loc[i, 'reg_class_id'],
+                        reg_class_id=df.loc[i, 'reg_class_id'],
                         footprint_min_sqft=df.loc[i, 'fp_min'],
                         footprint_max_sqft=df.loc[i, 'fp_max'],
                         coeff_a=df.loc[i, 'a_coeff'],
@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
             class dummyVehicle:
                 model_year = None
-                reg_class_ID = None
+                reg_class_id = None
                 footprint_ft2 = None
                 initial_registered_count = None
 
@@ -348,13 +348,13 @@ if __name__ == '__main__':
 
             car_vehicle = dummyVehicle()
             car_vehicle.model_year = 2021
-            car_vehicle.reg_class_ID = omega_globals.options.RegulatoryClasses.reg_classes.car
+            car_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.reg_classes.car
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
 
             truck_vehicle = dummyVehicle()
             truck_vehicle.model_year = 2021
-            truck_vehicle.reg_class_ID = omega_globals.options.RegulatoryClasses.reg_classes.truck
+            truck_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.reg_classes.truck
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
 

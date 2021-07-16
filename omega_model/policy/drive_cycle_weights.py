@@ -105,7 +105,7 @@ class DriveCycleWeights(OMEGABase):
 
         for leaf in tree.leaves():
             drive_cycle_id = leaf.identifier
-            if not DriveCycles.validate_drive_cycle_ID(drive_cycle_id):
+            if not DriveCycles.validate_drive_cycle_id(drive_cycle_id):
                 cycle_name_errors.append(
                     '*** Invalid Policy Drive Cycle ID "%s" in %s ***' % (drive_cycle_id, filename))
 

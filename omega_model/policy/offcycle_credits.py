@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
             class dummyVehicle:
                 model_year = 2020
-                reg_class_ID = 'car'
+                reg_class_id = 'car'
                 cost_curve_class = 'ice_MPW_LRL'
                 cost_cloud = CostCloud.get_cloud(model_year, cost_curve_class)
 

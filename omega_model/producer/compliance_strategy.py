@@ -39,7 +39,7 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
     producer_generalized_cost_fuel_years, \
     producer_generalized_cost_annual_vmt = \
         MarketClass.get_producer_generalized_cost_attributes(
-            vehicle.market_class_ID,
+            vehicle.market_class_id,
             ['producer_generalized_cost_fuel_years',
              'producer_generalized_cost_annual_vmt',
              ])
@@ -51,7 +51,7 @@ def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
                                                                                             'US electricity',
                                                                                             'refuel_efficiency')
 
-    price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_ID)
+    price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_id)
 
     grams_co2e_per_unit = vehicle.onroad_co2e_emissions_grams_per_unit()
     liquid_generalized_fuel_cost = 0
@@ -131,11 +131,11 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                     co2_gpmi_options = np.array([])
                     for idx, combo in winning_combos.iterrows():
 
-                        if (combo['veh_%s_sales' % new_veh.vehicle_ID] > 0) or (new_veh.tech_option_iteration_num > 0):
+                        if (combo['veh_%s_sales' % new_veh.vehicle_id] > 0) or (new_veh.tech_option_iteration_num > 0):
                             new_veh.tech_option_iteration_num += 1
 
                         tech_share_range = omega_globals.options.producer_convergence_factor ** new_veh.tech_option_iteration_num
-                        veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % new_veh.vehicle_ID]
+                        veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % new_veh.vehicle_id]
                         min_co2e_gpmi = max(veh_min_co2e_gpmi, veh_co2e_gpmi * (1 - tech_share_range))
                         max_co2e_gpmi = min(veh_max_co2e_gpmi, veh_co2e_gpmi * (1 + tech_share_range))
                         co2_gpmi_options = \
@@ -156,10 +156,10 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                 tech_generalized_cost_options = new_veh.get_generalized_cost_from_cost_curve(co2_gpmi_options)
                 tech_kwh_options = new_veh.get_kwh_pmi(co2_gpmi_options)
 
-                df['veh_%s_co2e_gpmi' % new_veh.vehicle_ID] = co2_gpmi_options
-                df['veh_%s_kwh_pmi' % new_veh.vehicle_ID] = tech_kwh_options
-                df['veh_%s_cost_dollars' % new_veh.vehicle_ID] = tech_cost_options
-                df['veh_%s_generalized_cost_dollars' % new_veh.vehicle_ID] = tech_generalized_cost_options
+                df['veh_%s_co2e_gpmi' % new_veh.vehicle_id] = co2_gpmi_options
+                df['veh_%s_kwh_pmi' % new_veh.vehicle_id] = tech_kwh_options
+                df['veh_%s_cost_dollars' % new_veh.vehicle_id] = tech_cost_options
+                df['veh_%s_generalized_cost_dollars' % new_veh.vehicle_id] = tech_generalized_cost_options
 
                 child_df_list.append(df)
 
@@ -246,9 +246,9 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
 
     # assign co2 values and sales to vehicles...
     for new_veh in composite_vehicles:
-        new_veh.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_gpmi' % new_veh.vehicle_ID]
-        new_veh.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % new_veh.vehicle_ID]
-        new_veh.initial_registered_count = selected_production_decision['veh_%s_sales' % new_veh.vehicle_ID]
+        new_veh.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_gpmi' % new_veh.vehicle_id]
+        new_veh.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % new_veh.vehicle_id]
+        new_veh.initial_registered_count = selected_production_decision['veh_%s_sales' % new_veh.vehicle_id]
         VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
@@ -380,7 +380,7 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_id)
 
-        Vehicle.reset_vehicle_IDs()
+        Vehicle.reset_vehicle_ids()
 
         manufacturer_vehicles = []
         # update each vehicle and calculate compliance target for each vehicle
@@ -419,9 +419,9 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
         # for new_veh in manufacturer_vehicles:
         #     if new_veh.context_size_class not in csc_dict:
         #         csc_dict[new_veh.context_size_class] = dict()
-        #     if new_veh.legacy_reg_class_ID not in csc_dict[new_veh.context_size_class]:
-        #         csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_ID] = []
-        #     csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_ID].append(new_veh)
+        #     if new_veh.legacy_reg_class_id not in csc_dict[new_veh.context_size_class]:
+        #         csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_id] = []
+        #     csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_id].append(new_veh)
         #
         # # distribute context size class sales to manufacturer_vehicles by relative market share
         # for csc in csc_dict: # for each context size class
@@ -465,16 +465,16 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 mctrc[mc][rc] = []
         for new_veh in manufacturer_vehicles:
-            mctrc[new_veh.market_class_ID][new_veh.reg_class_ID].append(new_veh)
-            mctrc[new_veh.market_class_ID]['sales'] += new_veh.initial_registered_count
+            mctrc[new_veh.market_class_id][new_veh.reg_class_id].append(new_veh)
+            mctrc[new_veh.market_class_id]['sales'] += new_veh.initial_registered_count
 
-        CompositeVehicle.reset_vehicle_IDs()
+        CompositeVehicle.reset_vehicle_ids()
         manufacturer_composite_vehicles = []
         for mc in mctrc:
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 if mctrc[mc][rc]:
                     cv = CompositeVehicle(mctrc[mc][rc], calendar_year, weight_by='market_share')
-                    cv.vehicle_ID = mc + '.' + rc
+                    cv.vehicle_id = mc + '.' + rc
                     cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 
@@ -483,7 +483,7 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
 
         # populate tree with vehicle objects
         for new_veh in manufacturer_composite_vehicles:
-            populate_market_classes(market_class_tree, new_veh.market_class_ID, new_veh)
+            populate_market_classes(market_class_tree, new_veh.market_class_id, new_veh)
 
         cache[cache_key] = {'manufacturer_composite_vehicles': manufacturer_composite_vehicles,
                             'market_class_tree': market_class_tree}
@@ -495,12 +495,12 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
     return manufacturer_composite_vehicles, market_class_tree
 
 
-def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_vehicles, winning_combo):
+def finalize_production(calendar_year, manufacturer_id, manufacturer_composite_vehicles, winning_combo):
     """
 
     Args:
         calendar_year:
-        manufacturer_ID:
+        manufacturer_id:
         manufacturer_composite_vehicles:
         winning_combo:
 
@@ -515,27 +515,27 @@ def finalize_production(calendar_year, manufacturer_ID, manufacturer_composite_v
     # pull final vehicles from composite vehicles
     for cv in manufacturer_composite_vehicles:
         # update sales, which may have changed due to consumer response and iteration
-        cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_ID]
+        cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_id]
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
             (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console:
-            cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_ID))
+            cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
-            #     v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_ID))
+            #     v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_id))
             new_veh = VehicleFinal()
             new_veh.convert_vehicle(v)
             manufacturer_new_vehicles.append(new_veh)
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 
-    cert_target_co2e_Mg = VehicleFinal.calc_cert_target_co2e_Mg(calendar_year, manufacturer_ID)
+    cert_target_co2e_Mg = VehicleFinal.calc_cert_target_co2e_Mg(calendar_year, manufacturer_id)
 
-    cert_co2e_Mg = VehicleFinal.calc_cert_co2e_Mg(calendar_year, manufacturer_ID)
+    cert_co2e_Mg = VehicleFinal.calc_cert_co2e_Mg(calendar_year, manufacturer_id)
 
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(model_year=calendar_year,
-                                        manufacturer_ID=manufacturer_ID,
+                                        manufacturer_id=manufacturer_id,
                                         cert_target_co2e_Mg=cert_target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_cost_dollars'],
@@ -575,7 +575,7 @@ def create_production_options(calendar_year, manufacturer_composite_vehicles, te
 
     for composite_veh in manufacturer_composite_vehicles:
         # assign sales to vehicle based on market share fractions and reg class share fractions
-        market_class = composite_veh.market_class_ID
+        market_class = composite_veh.market_class_id
 
         if ('consumer_abs_share_frac_%s' % market_class) in production_options:
             composite_veh_sales = total_sales * production_options['consumer_abs_share_frac_%s' % market_class]
@@ -604,28 +604,28 @@ def create_production_options(calendar_year, manufacturer_composite_vehicles, te
                 production_options['producer_abs_share_frac_%s' % market_class] += composite_veh_sales / total_sales
 
         composite_veh_sales = composite_veh_sales * composite_veh.composite_vehicle_share_frac
-        production_options['veh_%s_sales' % composite_veh.vehicle_ID] = composite_veh_sales
+        production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
 
         # calculate vehicle total cost
         composite_veh_total_cost_dollars = composite_veh_sales * \
-                                           production_options['veh_%s_cost_dollars' % composite_veh.vehicle_ID]
+                                           production_options['veh_%s_cost_dollars' % composite_veh.vehicle_id]
 
-        production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_ID] = composite_veh_total_cost_dollars
+        production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
 
         composite_veh_total_generalized_cost_dollars = composite_veh_sales * \
                                                        production_options['veh_%s_generalized_cost_dollars' %
-                                                                          composite_veh.vehicle_ID]
+                                                                          composite_veh.vehicle_id]
 
         # calculate cert and target Mg for the vehicle
-        composite_veh_cert_co2_gpmi = production_options['veh_%s_co2e_gpmi' % composite_veh.vehicle_ID]
+        composite_veh_cert_co2_gpmi = production_options['veh_%s_co2e_gpmi' % composite_veh.vehicle_id]
 
         composite_veh_cert_co2e_Mg = composite_veh.normalized_cert_co2e_Mg * composite_veh_cert_co2_gpmi * \
                                      composite_veh_sales
 
         composite_veh_target_co2e_Mg = composite_veh.normalized_cert_target_co2e_Mg * composite_veh_sales
 
-        production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_ID] = composite_veh_cert_co2e_Mg
-        production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_ID] = composite_veh_target_co2e_Mg
+        production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+        production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
 
         # update totals
         total_target_co2e_Mg += composite_veh_target_co2e_Mg

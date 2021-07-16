@@ -13,10 +13,11 @@ from omega_model import *
 
 initial_credit_bank = dict()
 
+
 class Manufacturer(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'manufacturers'
-    manufacturer_ID = Column('manufacturer_id', String, primary_key=True)
+    manufacturer_id = Column('manufacturer_id', String, primary_key=True)
     vehicles = relationship('VehicleFinal', back_populates='manufacturer')
 
     # --- static properties ---
@@ -42,9 +43,9 @@ class Manufacturer(SQABase, OMEGABase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    manufacturer_ID = df.loc[i, 'manufacturer_id']
+                    manufacturer_id = df.loc[i, 'manufacturer_id']
                     obj_list.append(Manufacturer(
-                        manufacturer_ID=manufacturer_ID,
+                        manufacturer_id=manufacturer_id,
                     ))
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
@@ -52,7 +53,7 @@ class Manufacturer(SQABase, OMEGABase):
                 template_errors = CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file, verbose)
 
                 if not template_errors:
-                    initial_credit_bank[manufacturer_ID] = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_ID)
+                    initial_credit_bank[manufacturer_id] = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_id)
 
         return template_errors
 

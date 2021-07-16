@@ -113,10 +113,10 @@ def calc_inventory(calendar_year):
 
     for vad in vads:
 
-        attribute_list = ['model_year', 'reg_class_ID', 'in_use_fuel_ID',
+        attribute_list = ['model_year', 'reg_class_id', 'in_use_fuel_id',
                           'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        model_year, reg_class_ID, in_use_fuel_ID, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-            = get_vehicle_info(vad.vehicle_ID, attribute_list)
+        model_year, reg_class_id, in_use_fuel_id, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+            = get_vehicle_info(vad.vehicle_id, attribute_list)
 
         vehicle_effects_dict = dict()
         flag = None
@@ -150,7 +150,7 @@ def calc_inventory(calendar_year):
             voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
                 = 26 * [0]
 
-            fuel_dict = eval(in_use_fuel_ID, {'__builtins__': None}, {})
+            fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
                 refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                 transmission_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
@@ -169,7 +169,7 @@ def calc_inventory(calendar_year):
 
                     # vehicle tailpipe emissions for liquid fuel operation
                     voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
-                        = get_vehicle_ef(calendar_year, model_year, reg_class_ID, liquid_fuel)
+                        = get_vehicle_ef(calendar_year, model_year, reg_class_id, liquid_fuel)
 
                     voc_tailpipe_ustons += vmt_liquid_fuel * voc / grams_per_us_ton
                     co_tailpipe_ustons += vmt_liquid_fuel * co / grams_per_us_ton
@@ -229,8 +229,8 @@ def calc_inventory(calendar_year):
                 flag = 1
 
             vehicle_effects_dict.update({'model_year': calendar_year - vad.age,
-                                         'reg_class_ID': reg_class_ID,
-                                         'in_use_fuel_ID': in_use_fuel_ID,
+                                         'reg_class_id': reg_class_id,
+                                         'in_use_fuel_id': in_use_fuel_id,
                                          'registered_count': vad.registered_count,
                                          'annual_vmt': vad.annual_vmt,
                                          'vmt': vad.vmt,
@@ -288,6 +288,6 @@ def calc_inventory(calendar_year):
                                          }
                                         )
         if flag:
-            key = (int(vad.vehicle_ID), int(calendar_year), int(vad.age))
+            key = (int(vad.vehicle_id), int(calendar_year), int(vad.age))
             calendar_year_effects_dict[key] = vehicle_effects_dict
     return calendar_year_effects_dict

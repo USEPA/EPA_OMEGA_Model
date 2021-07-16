@@ -191,7 +191,7 @@ class DecompositionAttributes(OMEGABase):
         """
 
         if type(vehicle) != CompositeVehicle:
-            prefix = 'veh_%s_' % vehicle.vehicle_ID
+            prefix = 'veh_%s_' % vehicle.vehicle_id
         else:
             prefix = ''
 
@@ -219,7 +219,7 @@ class DecompositionAttributes(OMEGABase):
         rename_dict = dict()
 
         for ccv in cls.values:
-            rename_dict[ccv] = 'veh_%s_%s' % (vehicle.vehicle_ID, ccv)
+            rename_dict[ccv] = 'veh_%s_%s' % (vehicle.vehicle_id, ccv)
 
         return cost_cloud.rename(columns=rename_dict)
 
@@ -300,7 +300,7 @@ class CompositeVehicle(OMEGABase):
     """
     ****
     """
-    next_vehicle_ID = -1
+    next_vehicle_id = -1
 
     def __init__(self, vehicle_list, calendar_year, verbose=False, calc_composite_cost_curve=True,
                  weight_by='initial_registered_count'):
@@ -312,17 +312,17 @@ class CompositeVehicle(OMEGABase):
         from common.omega_functions import weighted_value
 
         self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
-        self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_ID, self.vehicle_list[0].reg_class_ID)
+        self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
 
-        self.vehicle_ID = CompositeVehicle.next_vehicle_ID
-        CompositeVehicle.set_next_vehicle_ID()
+        self.vehicle_id = CompositeVehicle.next_vehicle_id
+        CompositeVehicle.set_next_vehicle_id()
 
         self.weight_by = weight_by
 
         self.model_year = self.vehicle_list[0].model_year # calendar_year?
-        self.reg_class_ID = self.vehicle_list[0].reg_class_ID
+        self.reg_class_id = self.vehicle_list[0].reg_class_id
         self.fueling_class = self.vehicle_list[0].fueling_class
-        self.market_class_ID = self.vehicle_list[0].market_class_ID
+        self.market_class_id = self.vehicle_list[0].market_class_id
 
         self.weighted_values = ['cert_co2e_grams_per_mile',
                                 'cert_direct_co2e_grams_per_mile',
@@ -361,22 +361,22 @@ class CompositeVehicle(OMEGABase):
         self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
 
     @staticmethod
-    def reset_vehicle_IDs():
+    def reset_vehicle_ids():
         """
 
         Returns:
 
         """
-        CompositeVehicle.next_vehicle_ID = -1
+        CompositeVehicle.next_vehicle_id = -1
 
     @staticmethod
-    def set_next_vehicle_ID():
+    def set_next_vehicle_id():
         """
 
         Returns:
 
         """
-        CompositeVehicle.next_vehicle_ID = CompositeVehicle.next_vehicle_ID - 1
+        CompositeVehicle.next_vehicle_id = CompositeVehicle.next_vehicle_id - 1
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
@@ -437,17 +437,17 @@ class CompositeVehicle(OMEGABase):
 
         for v in self.vehicle_list:
             vehicle_frontier = v.cost_curve
-            vehicle_frontier['veh_%s_market_share' % v.vehicle_ID] = v.composite_vehicle_share_frac
+            vehicle_frontier['veh_%s_market_share' % v.vehicle_id] = v.composite_vehicle_share_frac
 
             composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier, drop=False)
 
             prior_market_share_frac = composite_frontier_df['market_share_frac']
-            veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_ID]
+            veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_id]
 
             for wv in self.weighted_values:
                 composite_frontier_df[wv] = \
                     (composite_frontier_df[wv] * prior_market_share_frac +
-                     composite_frontier_df['veh_%s_%s' % (v.vehicle_ID, wv)] * veh_market_share_frac) / \
+                     composite_frontier_df['veh_%s_%s' % (v.vehicle_id, wv)] * veh_market_share_frac) / \
                     (prior_market_share_frac + veh_market_share_frac)
 
             # update running total market share
@@ -583,18 +583,18 @@ class Vehicle(OMEGABase):
     """
     ****
     """
-    next_vehicle_ID = 0
+    next_vehicle_id = 0
 
     def __init__(self):
-        self.vehicle_ID = Vehicle.next_vehicle_ID
+        self.vehicle_id = Vehicle.next_vehicle_id
         self.name = ''
-        self.manufacturer_ID = None
+        self.manufacturer_id = None
         self.model_year = None
         self.fueling_class = None
         self.hauling_class = None
         self.cost_curve_class = None
-        self.legacy_reg_class_ID = None
-        self.reg_class_ID = None
+        self.legacy_reg_class_id = None
+        self.reg_class_id = None
         self.reg_class_market_share_frac = 1.0
         self.epa_size_class = None
         self.context_size_class = None
@@ -604,12 +604,12 @@ class Vehicle(OMEGABase):
         self.cert_target_co2e_grams_per_mile = 0
         self.cert_co2e_Mg = 0
         self.cert_target_co2e_Mg = 0
-        self.in_use_fuel_ID = None
-        self.cert_fuel_ID = None
-        self.market_class_ID = None
+        self.in_use_fuel_id = None
+        self.cert_fuel_id = None
+        self.market_class_id = None
         self.footprint_ft2 = 0
         self._initial_registered_count = 0
-        Vehicle.set_next_vehicle_ID()
+        Vehicle.set_next_vehicle_id()
         self.cost_cloud = None
         self.cost_curve = None
 
@@ -618,22 +618,22 @@ class Vehicle(OMEGABase):
             self.__setattr__(ccv, 0)
 
     @staticmethod
-    def reset_vehicle_IDs():
+    def reset_vehicle_ids():
         """
 
         Returns:
 
         """
-        Vehicle.next_vehicle_ID = 0
+        Vehicle.next_vehicle_id = 0
 
     @staticmethod
-    def set_next_vehicle_ID():
+    def set_next_vehicle_id():
         """
 
         Returns:
 
         """
-        Vehicle.next_vehicle_ID = Vehicle.next_vehicle_ID + 1
+        Vehicle.next_vehicle_id = Vehicle.next_vehicle_id + 1
 
     @property
     def initial_registered_count(self):
@@ -658,7 +658,7 @@ class Vehicle(OMEGABase):
             calendar_year = self.model_year
 
         price = 0
-        fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
+        fuel_dict = eval(self.in_use_fuel_id, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
 
@@ -678,7 +678,7 @@ class Vehicle(OMEGABase):
             calendar_year = self.model_year
 
         price = 0
-        fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
+        fuel_dict = eval(self.in_use_fuel_id, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             price += FuelPrice.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel) * fuel_share
 
@@ -693,7 +693,7 @@ class Vehicle(OMEGABase):
         from context.onroad_fuels import OnroadFuel
 
         co2_emissions_grams_per_unit = 0
-        fuel_dict = eval(self.in_use_fuel_ID, {'__builtins__': None}, {})
+        fuel_dict = eval(self.in_use_fuel_id, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             co2_emissions_grams_per_unit += \
                 (OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'direct_co2e_grams_per_unit') /
@@ -757,7 +757,7 @@ class Vehicle(OMEGABase):
         """
         # get cost from cost curve for target_co2e_gpmi(s)
         return DecompositionAttributes.interp1d(self.cost_curve,
-                                                'veh_%s_cert_co2e_grams_per_mile' % self.vehicle_ID,
+                                                'veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id,
                                                 target_co2e_gpmi,
                                                 self, 'new_vehicle_mfr_cost_dollars')
 
@@ -772,7 +772,7 @@ class Vehicle(OMEGABase):
         """
         # get cost from cost curve for target_co2e_gpmi(s)
         return DecompositionAttributes.interp1d(self.cost_curve,
-                                                'veh_%s_cert_co2e_grams_per_mile' % self.vehicle_ID,
+                                                'veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id,
                                                 target_co2e_gpmi,
                                                 self, 'new_vehicle_mfr_generalized_cost_dollars')
 
@@ -796,10 +796,10 @@ class Vehicle(OMEGABase):
             model_year (int): vehicle model year
 
         """
-        base_properties = {'name', 'manufacturer_ID', 'model_year',
+        base_properties = {'name', 'manufacturer_id', 'model_year',
                            'fueling_class', 'hauling_class',
-                           'cost_curve_class', 'legacy_reg_class_ID', 'reg_class_ID', 'in_use_fuel_ID',
-                           'cert_fuel_ID', 'market_class_ID', 'footprint_ft2', 'epa_size_class',
+                           'cost_curve_class', 'legacy_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
+                           'cert_fuel_id', 'market_class_id', 'footprint_ft2', 'epa_size_class',
                            'context_size_class', 'market_share', 'non_responsive_market_group',
                            'electrification_class'}
 
@@ -916,7 +916,7 @@ class Vehicle(OMEGABase):
 
 
 if __name__ == '__main__':
-    # required to set up reg classes list for reg_class_ID validation
+    # required to set up reg classes list for reg_class_id validation
     from omega import init_user_definable_modules
 
     omega_globals.options = OMEGARuntimeOptions()
@@ -931,9 +931,9 @@ class VehicleFinal(SQABase, Vehicle):
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    vehicle_ID = Column('vehicle_id', Integer, primary_key=True)
+    vehicle_id = Column('vehicle_id', Integer, primary_key=True)
     name = Column('name', String)
-    manufacturer_ID = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
+    manufacturer_id = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
     manufacturer = relationship('Manufacturer', back_populates='vehicles')
     annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')
 
@@ -943,8 +943,8 @@ class VehicleFinal(SQABase, Vehicle):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
-    legacy_reg_class_ID = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
-    reg_class_ID = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
+    legacy_reg_class_id = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
+    reg_class_id = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
                                                validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
@@ -954,9 +954,9 @@ class VehicleFinal(SQABase, Vehicle):
     cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)
     cert_target_co2e_Mg = Column('cert_target_co2e_megagrams', Float)
-    in_use_fuel_ID = Column('in_use_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
-    cert_fuel_ID = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
+    in_use_fuel_id = Column('in_use_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
+    cert_fuel_id = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
+    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
     footprint_ft2 = Column(Float)
 
     _initial_registered_count = Column('_initial_registered_count', Float)
@@ -1014,7 +1014,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         return omega_globals.session.query(VehicleFinal). \
-            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.manufacturer_id == manufacturer_id). \
             filter(VehicleFinal.model_year == calendar_year).all()
 
     @staticmethod
@@ -1031,7 +1031,7 @@ class VehicleFinal(SQABase, Vehicle):
         if type(attributes) is not list:
             attributes = [attributes]
         attrs = VehicleFinal.get_class_attributes(attributes)
-        return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_ID == vehicle_id).one()
+        return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_id == vehicle_id).one()
 
     @staticmethod
     def calc_cert_target_co2e_Mg(model_year, manufacturer_id):
@@ -1045,7 +1045,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         return omega_globals.session.query(func.sum(VehicleFinal.cert_target_co2e_Mg)). \
-            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.manufacturer_id == manufacturer_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
     @staticmethod
@@ -1060,7 +1060,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         return omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)). \
-            filter(VehicleFinal.manufacturer_ID == manufacturer_id). \
+            filter(VehicleFinal.manufacturer_id == manufacturer_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
     @staticmethod
@@ -1073,8 +1073,8 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        inherit_properties = {'name', 'manufacturer_ID', 'hauling_class', 'legacy_reg_class_ID',
-                              'reg_class_ID', 'epa_size_class', 'context_size_class',
+        inherit_properties = {'name', 'manufacturer_id', 'hauling_class', 'legacy_reg_class_id',
+                              'reg_class_id', 'epa_size_class', 'context_size_class',
                               'market_share', 'non_responsive_market_group', 'footprint_ft2'}
 
         # model year and registered count are required to make a full-blown VehicleFinal object
@@ -1130,17 +1130,17 @@ class VehicleFinal(SQABase, Vehicle):
                 for i in df.index:
                     veh = VehicleFinal(
                         name=df.loc[i, 'vehicle_id'],
-                        manufacturer_ID=df.loc[i, 'manufacturer_id'],
+                        manufacturer_id=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
-                        legacy_reg_class_ID=df.loc[i, 'reg_class_id'],
-                        reg_class_ID=df.loc[i, 'reg_class_id'],
+                        legacy_reg_class_id=df.loc[i, 'reg_class_id'],
+                        reg_class_id=df.loc[i, 'reg_class_id'],
                         epa_size_class=df.loc[i, 'epa_size_class'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         electrification_class=df.loc[i, 'electrification_class'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
-                        in_use_fuel_ID=df.loc[i, 'in_use_fuel_id'],
-                        cert_fuel_ID=df.loc[i, 'cert_fuel_id'],
+                        in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
+                        cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
 
@@ -1149,8 +1149,8 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.reg_class_ID = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
-                    veh.market_class_ID, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
+                    veh.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
+                    veh.market_class_id, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
                     veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
 
@@ -1197,16 +1197,16 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.fueling_class = 'BEV'
                         alt_veh.name = 'BEV of ' + v.name
                         alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
-                        alt_veh.in_use_fuel_ID = "{'US electricity':1.0}"
-                        alt_veh.cert_fuel_ID = "{'MTE US electricity':1.0}"
-                        alt_veh.market_class_ID = v.market_class_ID.replace('ICE', 'BEV')
+                        alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
+                        alt_veh.cert_fuel_id = "{'MTE US electricity':1.0}"
+                        alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
                     else:
                         alt_veh.fueling_class = 'ICE'
                         alt_veh.name = 'ICE of ' + v.name
                         alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
-                        alt_veh.in_use_fuel_ID = "{'pump gasoline':1.0}"
-                        alt_veh.cert_fuel_ID = "{'MTE Gasoline':1.0}"
-                        alt_veh.market_class_ID = v.market_class_ID.replace('BEV', 'ICE')
+                        alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+                        alt_veh.cert_fuel_id = "{'MTE Gasoline':1.0}"
+                        alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
                     alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
                     alt_veh.cert_direct_co2e_grams_per_mile = 0
                     alt_veh.cert_direct_kwh_per_mile = 0

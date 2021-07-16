@@ -67,7 +67,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
     index = Column(Integer, primary_key=True)  #: database table index
 
     age = Column(Numeric)  #: vehicle age
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, e.g. 'hauling.ICE'
+    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, e.g. 'hauling.ICE'
     reregistered_proportion = Column(Float)  #: re-registered proportion, [0..1]
 
     @staticmethod
@@ -87,7 +87,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
 
         if cache_key not in cache:
             cache[cache_key] = float(omega_globals.session.query(Reregistration.reregistered_proportion).
-                                     filter(Reregistration.market_class_ID == market_class_id).
+                                     filter(Reregistration.market_class_id == market_class_id).
                                      filter(Reregistration.age == age).scalar())
         return cache[cache_key]
 
@@ -128,7 +128,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
                 for i in df.index:
                     obj_list.append(Reregistration(
                         age=df.loc[i, 'age'],
-                        market_class_ID=df.loc[i, 'market_class_id'],
+                        market_class_id=df.loc[i, 'market_class_id'],
                         reregistered_proportion=df.loc[i, 'reregistered_proportion'],
                     ))
                 omega_globals.session.add_all(obj_list)

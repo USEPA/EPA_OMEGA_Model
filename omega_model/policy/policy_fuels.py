@@ -97,7 +97,7 @@ class PolicyFuel(OMEGABase):
         return cache[cache_key][fuel_id][attribute]
 
     @staticmethod
-    def validate_fuel_ID(fuel_id):
+    def validate_fuel_id(fuel_id):
         """
         Validate fuel ID
 
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(PolicyFuel.validate_fuel_ID('gasoline'))
+            print(PolicyFuel.validate_fuel_id('gasoline'))
             print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2e_grams_per_unit'))
             print(PolicyFuel.get_fuel_attribute(2020, 'electricity', 'transmission_efficiency'))
         else:

@@ -12,14 +12,14 @@ from omega_model import *
 vehicles_cache = dict()
 
 
-def get_vehicle_info(vehicle_ID):
+def get_vehicle_info(vehicle_id):
     from producer.vehicles import VehicleFinal
 
-    if vehicle_ID not in vehicles_cache:
-        vehicles_cache[vehicle_ID] = VehicleFinal.get_vehicle_attributes(vehicle_ID, ['market_class_ID', 'model_year',
+    if vehicle_id not in vehicles_cache:
+        vehicles_cache[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, ['market_class_id', 'model_year',
                                                                                       '_initial_registered_count'])
 
-    return vehicles_cache[vehicle_ID]
+    return vehicles_cache[vehicle_id]
 
 
 def update_stock(calendar_year):
@@ -38,7 +38,7 @@ def update_stock(calendar_year):
     omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
-        market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_ID)
+        market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_id)
         age = calendar_year - model_year
 
         reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
@@ -50,14 +50,14 @@ def update_stock(calendar_year):
         vad.annual_vmt = annual_vmt
         vad.vmt = annual_vmt * registered_count
 
-    prior_year_vehicle_ids = sql_unpack_result(VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, 'vehicle_ID'))
+    prior_year_vehicle_ids = sql_unpack_result(VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, 'vehicle_id'))
 
     vad_list = []
 
     # CREATE vehicle annual data for last year's stock, now one year older:
     if prior_year_vehicle_ids:
-        for vehicle_ID in prior_year_vehicle_ids:
-            market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_ID)
+        for vehicle_id in prior_year_vehicle_ids:
+            market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
             age = calendar_year - model_year
 
             reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
@@ -66,7 +66,7 @@ def update_stock(calendar_year):
 
             registered_count = initial_registered_count * reregistration_factor
 
-            vad_list.append(VehicleAnnualData(vehicle_ID=vehicle_ID,
+            vad_list.append(VehicleAnnualData(vehicle_id=vehicle_id,
                                               calendar_year=calendar_year,
                                               registered_count=registered_count,
                                               age=calendar_year-model_year,

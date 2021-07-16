@@ -24,7 +24,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
     __tablename__ = 'demanded_shares_gcam'
     index = Column(Integer, primary_key=True)  #: database table index
 
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID
+    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID
     annual_VMT = Column('annual_vmt', Float)  #: annual vehicle miles travelled
     calendar_year = Column(Numeric)  #: the calendar year of the parameters
     payback_years = Column(Numeric)  #: payback period, in years
@@ -55,7 +55,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
         if not key in cache:
             cache[key] = omega_globals.session.query(DemandedSharesGCAM). \
                 filter(DemandedSharesGCAM.calendar_year == calendar_year). \
-                filter(DemandedSharesGCAM.market_class_ID == market_class_id).one()
+                filter(DemandedSharesGCAM.market_class_id == market_class_id).one()
 
         return cache[key]
 
@@ -101,7 +101,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(DemandedSharesGCAM(
-                        market_class_ID=df.loc[i, 'market_class_id'],
+                        market_class_id=df.loc[i, 'market_class_id'],
                         calendar_year=df.loc[i, 'start_year'],
                         annual_VMT=df.loc[i, 'annual_vmt'],
                         payback_years=df.loc[i, 'payback_years'],

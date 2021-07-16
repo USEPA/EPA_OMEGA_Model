@@ -25,7 +25,7 @@ class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
     index = Column(Integer, primary_key=True)  #: database table index
 
     age = Column(Numeric)  #: vehicle age
-    market_class_ID = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: vehicle market class
+    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: vehicle market class
     annual_vmt = Column(Numeric)  #: vehicle miles travelled
 
     @staticmethod
@@ -46,7 +46,7 @@ class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
 
         if cache_key not in cache:
             cache[cache_key] = float(omega_globals.session.query(AnnualVMT.annual_vmt).
-                                     filter(AnnualVMT.market_class_ID == market_class_id).
+                                     filter(AnnualVMT.market_class_id == market_class_id).
                                      filter(AnnualVMT.age == age).scalar())
 
         return cache[cache_key]
@@ -89,7 +89,7 @@ class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
                 for i in df.index:
                     obj_list.append(AnnualVMT(
                         age=df.loc[i, 'age'],
-                        market_class_ID=df.loc[i, 'market_class_id'],
+                        market_class_id=df.loc[i, 'market_class_id'],
                         annual_vmt=df.loc[i, 'annual_vmt'],
                     ))
                 omega_globals.session.add_all(obj_list)

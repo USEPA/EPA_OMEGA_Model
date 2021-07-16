@@ -61,7 +61,7 @@ class DriveCycles(OMEGABase):
     _data = pd.DataFrame()
 
     @staticmethod
-    def validate_drive_cycle_ID(drive_cycle_id):
+    def validate_drive_cycle_id(drive_cycle_id):
         """
         Validate drive cycle name.
 
@@ -161,8 +161,8 @@ if __name__ == '__main__':
             DriveCycles._data.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
 
-            print(DriveCycles.validate_drive_cycle_ID('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
-            print(DriveCycles.validate_drive_cycle_ID('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
+            print(DriveCycles.validate_drive_cycle_id('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
+            print(DriveCycles.validate_drive_cycle_id('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
             print(DriveCycles.get_drive_cycle_distance_miles('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
 
             print(DriveCycles.get_drive_cycles())

@@ -148,10 +148,10 @@ def calc_carbon_emission_costs(calendar_year, cost_effects_dict):
                                           }
                                          )
         discount_rate = 0
-        key = (vad.vehicle_ID, calendar_year, vad.age, discount_rate)
+        key = (vad.vehicle_id, calendar_year, vad.age, discount_rate)
         cost_effects_dict[key].update(veh_cost_effects_dict)
     return cost_effects_dict
-            # cost_effects_list.append(CostEffectsSCC(vehicle_ID = vad.vehicle_ID,
+            # cost_effects_list.append(CostEffectsSCC(vehicle_id = vad.vehicle_id,
             #                                         calendar_year = calendar_year,
             #                                         age = vad.age,
             #                                         discount_rate = 0,
@@ -251,11 +251,11 @@ def calc_criteria_emission_costs(calendar_year, cost_effects_dict):
                                           }
                                          )
         discount_rate = 0
-        key = (vad.vehicle_ID, calendar_year, vad.age, discount_rate)
+        key = (vad.vehicle_id, calendar_year, vad.age, discount_rate)
         cost_effects_dict[key].update(veh_cost_effects_dict)
     return cost_effects_dict
             
-            # cost_effects_list.append(CostEffectsCriteria(vehicle_ID = vad.vehicle_ID,
+            # cost_effects_list.append(CostEffectsCriteria(vehicle_id = vad.vehicle_id,
             #                                              calendar_year = calendar_year,
             #                                              age = vad.age,
             #                                              discount_rate = 0,
@@ -303,8 +303,8 @@ def calc_non_emission_costs(calendar_year):
         veh_cost_effects_dict = dict()
         if vad.onroad_direct_co2e_grams_per_mile or vad.onroad_direct_kwh_per_mile:
 
-            attribute_list = ['reg_class_ID', 'in_use_fuel_ID']
-            reg_class_ID, in_use_fuel_ID = get_vehicle_info(vad.vehicle_ID, attribute_list)
+            attribute_list = ['reg_class_id', 'in_use_fuel_id']
+            reg_class_id, in_use_fuel_id = get_vehicle_info(vad.vehicle_id, attribute_list)
             #
             # cost_args = ['fuel_retail_cost_dollars',
             #              'fuel_pretax_cost_dollars',
@@ -329,7 +329,7 @@ def calc_non_emission_costs(calendar_year):
             driving_cost_dollars = 0
 
             # fuel costs
-            fuel_dict = eval(in_use_fuel_ID, {'__builtins__': None}, {})
+            fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
                 price = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel)
                 if fuel == 'US electricity' and vad.fuel_consumption_kWh:
@@ -354,7 +354,7 @@ def calc_non_emission_costs(calendar_year):
                 energy_security_cost_dollars += vad.fuel_consumption_gallons * energy_security_cf
 
             # get congestion and noise cost factors
-            congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_ID)
+            congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_id)
 
             # congestion and noise costs
             if vad.vmt_electricity:
@@ -365,8 +365,8 @@ def calc_non_emission_costs(calendar_year):
                 noise_cost_dollars += vad.vmt_liquid_fuel * noise_cf
 
             veh_cost_effects_dict.update({'model_year': calendar_year - vad.age,
-                                          'reg_class_ID': reg_class_ID,
-                                          'in_use_fuel_ID': in_use_fuel_ID,
+                                          'reg_class_id': reg_class_id,
+                                          'in_use_fuel_id': in_use_fuel_id,
                                           'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                                           'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                                           'energy_security_cost_dollars': energy_security_cost_dollars,
@@ -378,12 +378,12 @@ def calc_non_emission_costs(calendar_year):
                                           }
                                          )
         discount_rate = 0
-        key = (vad.vehicle_ID, calendar_year, vad.age, discount_rate)
+        key = (vad.vehicle_id, calendar_year, vad.age, discount_rate)
         calendar_year_cost_effects_dict[key] = veh_cost_effects_dict
 
     return calendar_year_cost_effects_dict
         # return calendar_year_cost_effects_dict
-        #     cost_effects_list.append(CostEffectsNonEmissions(vehicle_ID=vad.vehicle_ID,
+        #     cost_effects_list.append(CostEffectsNonEmissions(vehicle_id=vad.vehicle_id,
         #                                                      calendar_year=calendar_year,
         #                                                      age=vad.age,
         #                                                      discount_rate=0,
@@ -413,12 +413,12 @@ def calc_cost_effects(physical_effects_dict):
     fuel = None
     for key in physical_effects_dict.keys():
 
-        vehicle_ID, calendar_year, age = key
+        vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
 
-        attribute_list = ['reg_class_ID', 'in_use_fuel_ID', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        reg_class_ID, in_use_fuel_ID, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-            = get_vehicle_info(vehicle_ID, attribute_list)
+        attribute_list = ['reg_class_id', 'in_use_fuel_id', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        reg_class_id, in_use_fuel_id, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+            = get_vehicle_info(vehicle_id, attribute_list)
 
         veh_effects_dict = dict()
         flag = None
@@ -437,7 +437,7 @@ def calc_cost_effects(physical_effects_dict):
             pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, so2_tailpipe_7, so2_upstream_7 = 12 * [0]
 
             # fuel costs
-            fuel_dict = eval(in_use_fuel_ID, {'__builtins__': None}, {})
+            fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
                 price = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel)
                 if fuel == 'US electricity' and physical['fuel_consumption_kWh']:
@@ -462,7 +462,7 @@ def calc_cost_effects(physical_effects_dict):
                 energy_security_cost_dollars += physical['fuel_consumption_gallons'] * energy_security_cf
 
             # get congestion and noise cost factors
-            congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_ID)
+            congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_id)
 
             # congestion and noise costs (maybe congestion and noise cost factors will differ one day?)
             if physical['vmt_electricity']:
@@ -548,8 +548,8 @@ def calc_cost_effects(physical_effects_dict):
                 criteria_7_cost_dollars = criteria_tailpipe_7_cost_dollars + criteria_upstream_7_cost_dollars
 
             veh_effects_dict.update({'model_year': calendar_year - age,
-                                     'reg_class_ID': reg_class_ID,
-                                     'in_use_fuel_ID': in_use_fuel_ID,
+                                     'reg_class_id': reg_class_id,
+                                     'in_use_fuel_id': in_use_fuel_id,
                                      'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                                      'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                                      'energy_security_cost_dollars': energy_security_cost_dollars,
@@ -598,7 +598,7 @@ def calc_cost_effects(physical_effects_dict):
                                     )
         if flag:
             discount_rate = 0
-            key = (vehicle_ID, calendar_year, age, discount_rate)
+            key = (vehicle_id, calendar_year, age, discount_rate)
             costs_dict[key] = veh_effects_dict
 
     return costs_dict

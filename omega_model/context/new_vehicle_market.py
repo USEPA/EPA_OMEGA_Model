@@ -123,11 +123,11 @@ class NewVehicleMarket(SQABase, OMEGABase):
     # --- database table properties ---
     __tablename__ = 'context_new_vehicle_market'  # database table name
     index = Column(Integer, primary_key=True)  #: database table index
-    context_ID = Column('context_id', String)  #: str: e.g. 'AEO2020'
-    case_ID = Column('case_id', String)  #: str: e.g. 'Reference case'
+    context_id = Column('context_id', String)  #: str: e.g. 'AEO2020'
+    case_id = Column('case_id', String)  #: str: e.g. 'Reference case'
     context_size_class = Column(String)   #: str: e.g. 'Small Crossover'
     calendar_year = Column(Numeric)  #: numeric: calendar year of the market data
-    context_reg_class_ID = Column('context_reg_class_ID', Enum(*legacy_reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
+    context_reg_class_id = Column('context_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
     # sales_share_of_regclass = Column(Float)   #: float: percent of reg class represented by the context size class
     # sales_share_of_total = Column(Float)  #: float: percent of total sales represented by the context size class
     sales = Column(Float)  #: float:  size class new vehicle sales
@@ -253,10 +253,10 @@ class NewVehicleMarket(SQABase, OMEGABase):
         if cache_key not in cache:
             if context_size_class and context_reg_class:
                 projection_sales = (omega_globals.session.query(func.sum(NewVehicleMarket.sales))
-                                    .filter(NewVehicleMarket.context_ID == omega_globals.options.context_id)
-                                    .filter(NewVehicleMarket.case_ID == omega_globals.options.context_case_id)
+                                    .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
+                                    .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
                                     .filter(NewVehicleMarket.context_size_class == context_size_class)
-                                    .filter(NewVehicleMarket.context_reg_class_ID == context_reg_class)
+                                    .filter(NewVehicleMarket.context_reg_class_id == context_reg_class)
                                     .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
                 if projection_sales is None:
                     cache[cache_key] = 0
@@ -264,14 +264,14 @@ class NewVehicleMarket(SQABase, OMEGABase):
                     cache[cache_key] = float(projection_sales)
             elif context_size_class:
                 cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
-                                         .filter(NewVehicleMarket.context_ID == omega_globals.options.context_id)
-                                         .filter(NewVehicleMarket.case_ID == omega_globals.options.context_case_id)
+                                         .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
+                                         .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
                                          .filter(NewVehicleMarket.context_size_class == context_size_class)
                                          .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
             else:
                 cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
-                                         .filter(NewVehicleMarket.context_ID == omega_globals.options.context_id)
-                                         .filter(NewVehicleMarket.case_ID == omega_globals.options.context_case_id)
+                                         .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
+                                         .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
                                          .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
 
         return cache[cache_key]
@@ -320,11 +320,11 @@ class NewVehicleMarket(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(NewVehicleMarket(
-                        context_ID=df.loc[i, 'context_id'],
-                        case_ID=df.loc[i, 'case_id'],
+                        context_id=df.loc[i, 'context_id'],
+                        case_id=df.loc[i, 'case_id'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         calendar_year=df.loc[i, 'calendar_year'],
-                        context_reg_class_ID=df.loc[i, 'reg_class_id'],
+                        context_reg_class_id=df.loc[i, 'reg_class_id'],
                         # sales_share_of_regclass=df.loc[i, 'sales_share_of_regclass'],
                         # sales_share_of_total=df.loc[i, 'sales_share_of_total'],
                         sales=df.loc[i, 'sales'],

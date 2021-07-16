@@ -6,7 +6,7 @@ def discount_values(dict_of_values):
     calculation to a given year and point within that year.
 
     Parameters:
-        dict_of_values: A dictionary of values to be discounted with keys consisting of vehicle_ID, calendar_year, age and discount rate.\n
+        dict_of_values: A dictionary of values to be discounted with keys consisting of vehicle_id, calendar_year, age and discount rate.\n
 
     Returns:
         The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values are discounted at that rate.
@@ -28,7 +28,7 @@ def discount_values(dict_of_values):
     update_dict = dict()
     for key in dict_of_values.keys():
 
-        vehicle_ID, calendar_year, age, discount_rate = key
+        vehicle_id, calendar_year, age, discount_rate = key
 
         args = [k for k, v in dict_of_values[key].items()]
         emission_costs_dr25 = [arg for arg in args if 'cost' in arg and f'{str(emission_dr25)}' in arg]
@@ -75,7 +75,7 @@ def discount_values(dict_of_values):
                 arg_value = dict_of_values[key][arg]
                 rate_dict.update({arg: arg_value})
 
-            update_dict[(vehicle_ID, calendar_year, age, social_discrate)] = rate_dict
+            update_dict[(vehicle_id, calendar_year, age, social_discrate)] = rate_dict
 
     dict_of_values.update(update_dict)
     return dict_of_values

@@ -59,7 +59,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
     model_year = Column(Numeric)
     age = Column('age', Numeric)
     in_use_fuel_id = Column('in_use_fuel_id', String)
-    reg_class_ID = Column('reg_class_id', String)
+    reg_class_id = Column('reg_class_id', String)
     voc_grams_per_mile = Column('voc_grams_per_mile', Float)
     co_grams_per_mile = Column('co_grams_per_mile', Float)
     nox_grams_per_mile = Column('nox_grams_per_mile', Float)
@@ -94,7 +94,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
             result = omega_globals.session.query(*attrs) \
                 .filter(EmissionFactorsVehicles.model_year == model_year) \
                 .filter(EmissionFactorsVehicles.age == age) \
-                .filter(EmissionFactorsVehicles.reg_class_ID == reg_class_id) \
+                .filter(EmissionFactorsVehicles.reg_class_id == reg_class_id) \
                 .filter(EmissionFactorsVehicles.in_use_fuel_id == fuel) \
                 .all()[0]
 
@@ -137,7 +137,7 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
                     obj_list.append(EmissionFactorsVehicles(
                         model_year=df.loc[i, 'model_year'],
                         age=df.loc[i, 'age'],
-                        reg_class_ID=df.loc[i, 'reg_class_id'],
+                        reg_class_id=df.loc[i, 'reg_class_id'],
                         in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                         voc_grams_per_mile=df.loc[i, 'voc_grams_per_mile'],
                         co_grams_per_mile=df.loc[i, 'co_grams_per_mile'],

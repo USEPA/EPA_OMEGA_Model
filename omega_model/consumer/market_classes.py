@@ -99,7 +99,7 @@ class MarketClass(SQABase, OMEGABase):
     """
     # --- database table properties ---
     __tablename__ = 'market_classes'
-    market_class_ID = Column('market_class_id', String, primary_key=True)  #: market class id, e.g. 'non_hauling.ICE'
+    market_class_id = Column('market_class_id', String, primary_key=True)  #: market class id, e.g. 'non_hauling.ICE'
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'ICE', 'BEV'
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))  #: hauling class, e.g. 'hauling'
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))  #: ownership class, e.g. 'private'
@@ -152,19 +152,19 @@ class MarketClass(SQABase, OMEGABase):
         """
 
         if vehicle.hauling_class == 'hauling' and vehicle.electrification_class == 'EV':
-            market_class_ID = 'hauling.BEV'
+            market_class_id = 'hauling.BEV'
             non_responsive_market_group = 'hauling'
         elif vehicle.hauling_class == 'hauling' and vehicle.electrification_class != 'EV':
-            market_class_ID = 'hauling.ICE'
+            market_class_id = 'hauling.ICE'
             non_responsive_market_group = 'hauling'
         elif vehicle.electrification_class == 'EV':
-            market_class_ID = 'non_hauling.BEV'
+            market_class_id = 'non_hauling.BEV'
             non_responsive_market_group = 'non_hauling'
         else:
-            market_class_ID = 'non_hauling.ICE'
+            market_class_id = 'non_hauling.ICE'
             non_responsive_market_group = 'non_hauling'
 
-        return market_class_ID, non_responsive_market_group
+        return market_class_id, non_responsive_market_group
 
     @staticmethod
     def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
@@ -186,7 +186,7 @@ class MarketClass(SQABase, OMEGABase):
             attrs = MarketClass.get_class_attributes(attribute_types)
 
             result = omega_globals.session.query(*attrs). \
-                filter(MarketClass.market_class_ID == market_class_id).all()[0]
+                filter(MarketClass.market_class_id == market_class_id).all()[0]
 
             if len(attribute_types) == 1:
                 cache[cache_key] = result[0]
@@ -236,7 +236,7 @@ class MarketClass(SQABase, OMEGABase):
                 # load data into database
                 for i in df.index:
                     obj_list.append(MarketClass(
-                        market_class_ID=df.loc[i, 'market_class_id'],
+                        market_class_id=df.loc[i, 'market_class_id'],
                         fueling_class=df.loc[i, 'fueling_class'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         ownership_class=df.loc[i, 'ownership_class'],
