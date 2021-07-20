@@ -910,16 +910,20 @@ def run_omega(session_runtime_options, standalone_run=False):
                 session_summary_results = postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
 
             # write output files
-            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name +\
+            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name + \
                                '_summary_results.csv'
             session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
+            from context.new_vehicle_market import NewVehicleMarket
             if omega_globals.options.session_is_reference and \
                     omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
-                from context.new_vehicle_market import NewVehicleMarket
                 NewVehicleMarket.save_context_new_vehicle_generalized_costs(
                     omega_globals.options.context_new_vehicle_generalized_costs_file)
+
+            NewVehicleMarket.save_session_new_vehicle_generalized_costs(
+                omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+                '_new_vehicle_prices.csv')
 
             omega_log.end_logfile("\nSession Complete")
 
