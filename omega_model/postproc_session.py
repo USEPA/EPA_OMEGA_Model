@@ -55,21 +55,30 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
     for manufacturer in manufacturer_sales:
         session_results['%s_sales_total' % manufacturer] = manufacturer_sales[manufacturer][1:]
 
-    for compliance_id in VehicleFinal.compliance_ids:
+    # generate manufacturer-specific plots and data if not consolidating
+        for compliance_id in VehicleFinal.compliance_ids:
 
-        # plot_iteration(iteration_log, compliance_id)
+            calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, cert_target_co2e_Mg, total_cost_billions = \
+                plot_manufacturer_compliance(analysis_years, compliance_id, credit_banks[compliance_id])
 
-        calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, cert_target_co2e_Mg, total_cost_billions = \
-            plot_manufacturer_compliance(analysis_years, compliance_id, credit_banks[compliance_id])
+            session_results['%s_cert_target_co2e_Mg' % compliance_id] = cert_target_co2e_Mg
+            session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
+            session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
+            session_results['%s_total_cost_billions' % compliance_id] = total_cost_billions
 
-        session_results['%s_cert_target_co2e_Mg' % compliance_id] = cert_target_co2e_Mg
-        session_results['%s_calendar_year_cert_co2e_Mg' % compliance_id] = calendar_year_cert_co2e_Mg
-        session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
-        session_results['%s_total_cost_billions' % compliance_id] = total_cost_billions
+            if not omega_globals.options.consolidate_manufacturers:
+                # plot_iteration(iteration_log, compliance_id)
 
-        mfr_market_share_results = plot_manufacturer_market_shares(vehicle_years, compliance_id, manufacturer_sales[compliance_id])
+                mfr_market_share_results = plot_manufacturer_market_shares(vehicle_years, compliance_id, manufacturer_sales[compliance_id])
 
-        mfr_average_cost_data = plot_manufacturer_vehicle_cost(analysis_years, compliance_id)
+                mfr_average_cost_data = plot_manufacturer_vehicle_cost(analysis_years, compliance_id)
+
+        if not omega_globals.options.consolidate_manufacturers:
+            for msr in mfr_market_share_results:
+                session_results[msr] = mfr_market_share_results[msr] = mfr_market_share_results[msr][1:]
+
+            for macd in mfr_average_cost_data:
+                session_results['average_%s_cost' % macd] = mfr_average_cost_data[macd]
 
     market_share_results = plot_market_shares(vehicle_years, total_sales)
 
@@ -87,14 +96,9 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
 
     # market share results include base year data, but the rest of the data doesn't, so drop the
     # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
-    for msr in mfr_market_share_results:
-        session_results[msr] = mfr_market_share_results[msr] = mfr_market_share_results[msr][1:]
 
     for msr in market_share_results:
         session_results[msr] = market_share_results[msr] = market_share_results[msr][1:]
-
-    for macd in mfr_average_cost_data:
-        session_results['average_%s_cost' % macd] = mfr_average_cost_data[macd]
 
     for cat in consumer.market_categories + MarketClass.market_classes + ['total']:
         session_results['average_%s_cost' % cat] = average_cost_data[cat]
