@@ -218,11 +218,11 @@ def run_producer_consumer():
                                  '_producer_consumer_iteration_log.csv', index=False)
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-                                                      '%s_credit_bank.csv' % compliance_id, index=False)
+                                                      '_credit_bank %s.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            '%s_credit_bank_transactions.csv' % compliance_id, index=False)
+            '_credit_bank_transactions %s.csv' % compliance_id, index=False)
 
     return iteration_log, credit_banks
 
