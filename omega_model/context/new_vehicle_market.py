@@ -143,7 +143,8 @@ class NewVehicleMarket(SQABase, OMEGABase):
     # bev_price_dollars = Column(Float)  #: float: sales-weighted average price of an battery-electric vehicle (BEV) in the size class
 
     hauling_context_size_class_info = dict()  #: dict: information about which context size classes are considered hauling and non-hauling as well as what share of the size class is hauling or not.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
-    context_size_classes = dict()  #: dict: lists for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    context_size_classes = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    manufacturer_context_size_classes = dict()  #: dict: sales totals for each context size class by manufacturer represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
     _new_vehicle_generalized_costs = dict()  # private dict,  stores total sales-weighted new vehicle generalized costs for use in determining overall sales response as a function of new vehicle generalized cost
 
     @classmethod
@@ -182,18 +183,19 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         # you shouldn't have to do this either... but somehow pandas (or maybe the OS) rounds the numbers when they get
         # written out to the file... this is the workaround: write the file yourself!
-        with open(filename, 'w') as price_file:
+        with open(filename, 'a') as price_file:
             price_file.write(',new_vehicle_price_dollars\n')
             for k, v in NewVehicleMarket._new_vehicle_generalized_costs.items():
-                price_file.write('%d, %.38f\n' % (k, v))
+                price_file.write('%s, %.38f\n' % (k, v))
 
     @classmethod
-    def new_vehicle_generalized_cost(cls, calendar_year):
+    def new_vehicle_generalized_cost(cls, calendar_year, compliance_id):
         """
         Get sales-weighted new vehicle generalized cost for a given year, in OMEGA-centric dollars
 
         Args:
             calendar_year (numeric): calendar year
+            compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
 
         Returns:
             OMEGA-centric context new vehicle generalized cost for the given calendar year
@@ -201,20 +203,21 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         """
 
-        return cls._new_vehicle_generalized_costs[calendar_year]
+        return cls._new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)]
 
     @classmethod
-    def set_new_vehicle_generalized_cost(cls, calendar_year, generalized_cost):
+    def set_new_vehicle_generalized_cost(cls, calendar_year, compliance_id, generalized_cost):
         """
         Store new vehicle generalized cost for the given calendar year
 
         Args:
             calendar_year (numeric): calendar year
+            compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
             generalized_cost (float): total sales-weighted OMEGA-centric generalized cost for the calendar year
 
         """
 
-        cls._new_vehicle_generalized_costs[calendar_year] = generalized_cost
+        cls._new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)] = generalized_cost
 
     @staticmethod
     def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):

@@ -258,12 +258,12 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
     return composite_vehicles
 
 
-def search_production_options(manufacturer_id, calendar_year, producer_decision_and_response, iteration_num,
+def search_production_options(compliance_id, calendar_year, producer_decision_and_response, iteration_num,
                               strategic_target_offset_Mg):
     """
 
     Args:
-        manufacturer_id:
+        compliance_id:
         calendar_year:
         producer_decision_and_response:
         iteration_num:
@@ -288,13 +288,15 @@ def search_production_options(manufacturer_id, calendar_year, producer_decision_
     while continue_search and search_iteration < omega_globals.options.producer_max_iterations:
         share_range = omega_globals.options.producer_convergence_factor ** search_iteration
 
-        composite_vehicles, market_class_tree = create_composite_vehicles(calendar_year, manufacturer_id)
+        composite_vehicles, market_class_tree, context_based_total_sales = \
+            create_composite_vehicles(calendar_year, compliance_id)
 
         tech_and_share_sweeps = create_tech_and_share_sweeps(calendar_year, market_class_tree,
                                                              candidate_production_decisions, share_range,
                                                              producer_decision_and_response)
 
-        production_options = create_production_options(calendar_year, composite_vehicles, tech_and_share_sweeps)
+        production_options = create_production_options(calendar_year, composite_vehicles, tech_and_share_sweeps,
+                                                       context_based_total_sales)
 
         production_options['share_range'] = share_range
 
@@ -360,12 +362,12 @@ def search_production_options(manufacturer_id, calendar_year, producer_decision_
            producer_compliance_possible
 
 
-def create_composite_vehicles(calendar_year, manufacturer_id):
+def create_composite_vehicles(calendar_year, compliance_id):
     """
 
     Args:
         calendar_year:
-        manufacturer_id:
+        compliance_id:
 
     Returns:
 
@@ -378,7 +380,7 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
     cache_key = calendar_year
     if cache_key not in cache:
         # pull in last year's vehicles:
-        manufacturer_prior_vehicles = VehicleFinal.get_manufacturer_vehicles(calendar_year - 1, manufacturer_id)
+        manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
 
         Vehicle.reset_vehicle_ids()
 
@@ -390,7 +392,14 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
             manufacturer_vehicles.append(new_veh)
             new_veh.initial_registered_count = new_veh.market_share
 
-        total_sales = context_new_vehicle_sales(calendar_year)['total']
+        # sum([new_veh.market_share for new_veh in manufacturer_vehicles]) == 2.0 at this point due to intentional
+        # duplicate entries for "alternative" powertrain vehicles, but "market_share" is used for relative proportions
+
+        total_sales = 0  # sales total by compliance id size class share
+        for csc in NewVehicleMarket.context_size_classes: # for each context size class
+            total_sales += \
+                NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) \
+                * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
 
         # group by non responsive market group
         from consumer import non_responsive_market_categories
@@ -410,9 +419,12 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
 
             # print('%s:%s' % (nrmc, nrmc_initial_registered_count))
 
-        # calculate new vehicle market share based on vehicle size mix from context
+        # calculate new vehicle absolute market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
-            new_veh.market_share = new_veh.initial_registered_count / total_sales
+            new_veh.market_share = \
+                new_veh.initial_registered_count * \
+                VehicleFinal.mfr_base_year_size_class_share[compliance_id][new_veh.context_size_class] / \
+                total_sales
 
         # # group by context size class and legacy reg class
         # csc_dict = dict()
@@ -446,17 +458,19 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
         # distribute context size class sales to manufacturer_vehicles by relative market share
         for csc in csc_dict: # for each context size class
             projection_initial_registered_count = \
-                NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc)
-
-            # print('%s:%s:%s' % (csc, projection_initial_registered_count))
+                NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) \
+                * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
 
             distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
-                                weight_by='market_share',
-                                distribute_to='initial_registered_count')
+                                    weight_by='market_share',
+                                    distribute_to='initial_registered_count')
 
         # calculate new vehicle market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
             new_veh.market_share = new_veh.initial_registered_count / total_sales
+
+        # sum([new_veh.market_share for new_veh in manufacturer_vehicles]) == 1.0 at this point,
+        # sum([new_veh.initial_registered_count for new_veh in manufacturer_vehicles]) = total_sales
 
         # group by market class / reg class
         mctrc = dict()
@@ -486,21 +500,23 @@ def create_composite_vehicles(calendar_year, manufacturer_id):
             populate_market_classes(market_class_tree, new_veh.market_class_id, new_veh)
 
         cache[cache_key] = {'manufacturer_composite_vehicles': manufacturer_composite_vehicles,
-                            'market_class_tree': market_class_tree}
+                            'market_class_tree': market_class_tree,
+                            'total_sales': total_sales}
     else:
         # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
         manufacturer_composite_vehicles = cache[cache_key]['manufacturer_composite_vehicles']
         market_class_tree = cache[cache_key]['market_class_tree']
+        total_sales = cache[cache_key]['total_sales']
 
-    return manufacturer_composite_vehicles, market_class_tree
+    return manufacturer_composite_vehicles, market_class_tree, total_sales
 
 
-def finalize_production(calendar_year, manufacturer_id, manufacturer_composite_vehicles, winning_combo):
+def finalize_production(calendar_year, compliance_id, manufacturer_composite_vehicles, winning_combo):
     """
 
     Args:
         calendar_year:
-        manufacturer_id:
+        compliance_id:
         manufacturer_composite_vehicles:
         winning_combo:
 
@@ -529,13 +545,13 @@ def finalize_production(calendar_year, manufacturer_id, manufacturer_composite_v
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 
-    cert_target_co2e_Mg = VehicleFinal.calc_cert_target_co2e_Mg(calendar_year, manufacturer_id)
+    cert_target_co2e_Mg = VehicleFinal.calc_cert_target_co2e_Mg(calendar_year, compliance_id)
 
-    cert_co2e_Mg = VehicleFinal.calc_cert_co2e_Mg(calendar_year, manufacturer_id)
+    cert_co2e_Mg = VehicleFinal.calc_cert_co2e_Mg(calendar_year, compliance_id)
 
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(model_year=calendar_year,
-                                        manufacturer_id=manufacturer_id,
+                                        compliance_id=compliance_id,
                                         cert_target_co2e_Mg=cert_target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
                                         manufacturer_vehicle_cost_dollars=winning_combo['total_cost_dollars'],
@@ -544,9 +560,9 @@ def finalize_production(calendar_year, manufacturer_id, manufacturer_composite_v
 
 
 def create_production_options(calendar_year, manufacturer_composite_vehicles, tech_and_share_combinations,
-                              total_sales=None):
+                              total_sales):
     """
-    on the first time through, from the producer module, total_sales = None => use context sales, market shares
+    on the first time through, from the producer module, total_sales is based on context, market shares
     come from the producer desired market shares
     on the second time through, from the omega2 module, total_sales is determined by sales response, market shares
     come from the consumer demanded market shares...
@@ -563,10 +579,6 @@ def create_production_options(calendar_year, manufacturer_composite_vehicles, te
     """
 
     production_options = tech_and_share_combinations
-
-    if total_sales is None:
-        total_sales = consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']
-        production_options['context_sales'] = total_sales
 
     total_target_co2e_Mg = 0
     total_cert_co2e_Mg = 0

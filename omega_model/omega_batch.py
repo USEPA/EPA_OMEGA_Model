@@ -68,6 +68,7 @@ class OMEGABatchObject(OMEGABase):
         self.context_new_vehicle_generalized_costs_file = ''
         self.generate_context_new_vehicle_generalized_costs_file = False
         self.analysis_final_year = analysis_final_year
+        self.consolidate_manufacturers = False
         self.output_path = "." + os.sep
         self.sessions = []
         self.dataframe = pd.DataFrame()
@@ -231,6 +232,7 @@ class OMEGABatchObject(OMEGABase):
             self.dataframe.loc['Analysis Final Year'][0] = self.analysis_final_year
 
         self.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
+        self.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
         self.calc_effects = self.read_parameter('Run Effects Calculations')
 
     def num_sessions(self):
@@ -297,6 +299,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_id = self.parent.context_id
         self.settings.context_case_id = self.parent.context_case_id
         self.settings.analysis_final_year = self.parent.analysis_final_year
+        self.settings.consolidate_manufacturers = self.parent.consolidate_manufacturers
 
         if self.num > 0:
             self.settings.generate_context_new_vehicle_generalized_costs_file = False
@@ -371,6 +374,7 @@ class OMEGASessionObject(OMEGABase):
 
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)
+
         self.settings.cost_curve_frontier_affinity_factor = self.read_parameter('Cost Curve Frontier Affinity Factor')
         self.settings.iterate_producer_consumer = validate_predefined_input(
             self.read_parameter('Iterate Producer-Consumer'),
@@ -439,6 +443,7 @@ class OMEGABatchOptions(OMEGABase):
         self.validate_batch = True
         self.no_sim = False
         self.bundle_path_root = ''
+        self.no_bundle = False
         self.batch_file = ''
         self.batch_path = ''
         self.session_path = ''
@@ -527,8 +532,8 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
     return batch
 
 
-def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + os.sep + 'bundle', batch_file='',
-                    session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
+def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + os.sep + 'bundle', no_bundle=False,
+                    batch_file='', session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
                     network=False, analysis_final_year=None):
 
@@ -541,6 +546,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     options.validate_batch = not no_validate
     options.no_sim = no_sim
     options.bundle_path_root = bundle_path
+    options.no_bundle = no_bundle
     options.batch_file = batch_file
     options.session_num = session_num
     options.verbose = verbose
@@ -555,6 +561,17 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     options.local = local
     options.network = network
     options.analysis_final_year = analysis_final_year
+
+    if options.no_bundle:
+        batchfile_path = os.path.split(args.batch_file)[0]
+
+        package_folder = batchfile_path + os.sep + 'omega_model'
+
+        subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
+                           if os.path.isdir(package_folder + os.sep + d)
+                           and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
+
+        sys.path.extend([batchfile_path, batchfile_path + os.sep + package_folder] + subpackage_list)
 
     omega_globals.options = options
 
@@ -587,10 +604,10 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         batch.force_numeric_params()
         batch.get_batch_settings()
 
-        if not options.timestamp:
-            options.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-
-        batch.dataframe.loc['Batch Name'][0] = batch.name = options.timestamp + '_' + batch.name
+        if not options.no_bundle:
+            if not options.timestamp:
+                options.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+            batch.dataframe.loc['Batch Name'][0] = batch.name = options.timestamp + '_' + batch.name
 
         # validate session files
         validate_folder(options.bundle_path_root)
@@ -650,99 +667,100 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         batch.batch_log.logwrite("\n*** validation complete ***")
 
-        # copy files to network_batch_path
-        batch.batch_log.logwrite('Bundling Source Files...')
+        if not options.no_bundle:
+            # copy files to network_batch_path
+            batch.batch_log.logwrite('Bundling Source Files...')
 
-        # go to project top level so we can copy source files
-        os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            # go to project top level so we can copy source files
+            os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-        package_folder = 'omega_model'
-        subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
-                           if os.path.isdir(package_folder + os.sep + d)
-                           and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
+            package_folder = 'omega_model'
+            subpackage_list = [package_folder + os.sep + d for d in os.listdir(package_folder)
+                               if os.path.isdir(package_folder + os.sep + d)
+                               and '__init__.py' in os.listdir('%s%s%s' % (package_folder, os.sep, d))]
 
-        for source_folder in [package_folder] + subpackage_list:
-            source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
-            validate_folder(options.batch_path + source_folder)
-            for f in source_files:
-                relocate_file(options.batch_path + source_folder, source_folder + os.sep + f)
+            for source_folder in [package_folder] + subpackage_list:
+                source_files = [fn for fn in os.listdir(source_folder) if '.py' in fn]
+                validate_folder(options.batch_path + source_folder)
+                for f in source_files:
+                    relocate_file(options.batch_path + source_folder, source_folder + os.sep + f)
 
-        # write a copy of the original batch definition file to the bundle
-        relocate_file(options.batch_path, options.batch_file)
+            # write a copy of the original batch definition file to the bundle
+            relocate_file(options.batch_path, options.batch_file)
 
-        # write a copy of the expanded, validated batch to the source batch_file directory:
-        if '.csv' in options.batch_file:
-            expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
-        else:
-            expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
-                                              "Sessions")
+            # write a copy of the expanded, validated batch to the source batch_file directory:
+            if '.csv' in options.batch_file:
+                expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
+            else:
+                expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
+                                                  "Sessions")
 
-        if options.session_num is None:
-            session_list = range(0, batch.num_sessions())
-        else:
-            session_list = [options.session_num]
+            if options.session_num is None:
+                session_list = range(0, batch.num_sessions())
+            else:
+                session_list = [options.session_num]
 
-        # copy session inputs to session folder(s) for active session(s)
-        for s in session_list:
-            if batch.sessions[s].enabled:
-                batch.batch_log.logwrite('Bundling Session %d Files...' % s)
-                session = batch.sessions[s]
-                options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
-                                                       session_name=session.name)
-                validate_folder(options.bundle_path_root, batch_name=batch.name,
-                                session_name=session.name + os.sep + bundle_input_folder_name)
-                # indicate source batch
-                if is_absolute_path(options.batch_file):
-                    # batch file path is absolute
-                    batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % options.batch_file
-                else:
-                    # batch file path is relative
-                    batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (
-                            os.getcwd() + os.sep + options.batch_file)
+            # copy session inputs to session folder(s) for active session(s)
+            for s in session_list:
+                if batch.sessions[s].enabled:
+                    batch.batch_log.logwrite('Bundling Session %d Files...' % s)
+                    session = batch.sessions[s]
+                    options.session_path = validate_folder(options.bundle_path_root, batch_name=batch.name,
+                                                           session_name=session.name)
+                    validate_folder(options.bundle_path_root, batch_name=batch.name,
+                                    session_name=session.name + os.sep + bundle_input_folder_name)
+                    # indicate source batch
+                    if is_absolute_path(options.batch_file):
+                        # batch file path is absolute
+                        batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % options.batch_file
+                    else:
+                        # batch file path is relative
+                        batch.dataframe.loc['Batch Settings'][0] = 'FROM %s' % (
+                                os.getcwd() + os.sep + options.batch_file)
 
-                # automatically rename and relocate source files
-                for i in batch.dataframe.index:
-                    # if str(i).endswith(' Folder Name'):
-                    #     if options.verbose:
-                    #         batch.batch_log.logwrite('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
-                    #                                      session.name + os.sep + batch.dataframe.loc[i][
-                    #                                          session.num]))
-                    #     batch.dataframe.loc[i][session.num] = \
-                    #         session.name + os.sep + batch.dataframe.loc[i][session.num]
-                    if str(i).endswith(' File'):
-                        if (i != 'Context New Vehicle Prices File') or \
-                                ((i == 'Context New Vehicle Prices File') and
-                                 not batch.generate_context_new_vehicle_generalized_costs_file):
-                            if i != 'Context New Vehicle Prices File':
-                                source_file_path = batch.dataframe.loc[i][session.num]
+                    # automatically rename and relocate source files
+                    for i in batch.dataframe.index:
+                        # if str(i).endswith(' Folder Name'):
+                        #     if options.verbose:
+                        #         batch.batch_log.logwrite('renaming %s to %s' % (batch.dataframe.loc[i][session.num],
+                        #                                      session.name + os.sep + batch.dataframe.loc[i][
+                        #                                          session.num]))
+                        #     batch.dataframe.loc[i][session.num] = \
+                        #         session.name + os.sep + batch.dataframe.loc[i][session.num]
+                        if str(i).endswith(' File'):
+                            if (i != 'Context New Vehicle Prices File') or \
+                                    ((i == 'Context New Vehicle Prices File') and
+                                     not batch.generate_context_new_vehicle_generalized_costs_file):
+                                if i != 'Context New Vehicle Prices File':
+                                    source_file_path = batch.dataframe.loc[i][session.num]
+                                else:
+                                    source_file_path = batch.context_new_vehicle_generalized_costs_file
+
+                                if type(source_file_path) is str:
+                                    # fix path separators, if necessary
+                                    source_file_path = source_file_path.replace('\\', os.sep)
+
+                                if is_absolute_path(source_file_path):
+                                    # file_path is absolute path
+                                    if options.verbose:
+                                        batch.batch_log.logwrite('relocating %s to %s' % (
+                                        source_file_path, options.session_path + get_filenameext(source_file_path)))
+                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
+                                        options.session_path + bundle_input_folder_name, source_file_path)
+                                else:
+                                    # file_path is relative path
+                                    if options.verbose:
+                                        batch.batch_log.logwrite('relocating %s to %s' % (
+                                            batch.batch_definition_path + batch.dataframe.loc[i][session.num],
+                                            options.session_path + source_file_path))
+                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
+                                        options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
                             else:
-                                source_file_path = batch.context_new_vehicle_generalized_costs_file
-
-                            if type(source_file_path) is str:
-                                # fix path separators, if necessary
-                                source_file_path = source_file_path.replace('\\', os.sep)
-
-                            if is_absolute_path(source_file_path):
-                                # file_path is absolute path
-                                if options.verbose:
-                                    batch.batch_log.logwrite('relocating %s to %s' % (
-                                    source_file_path, options.session_path + get_filenameext(source_file_path)))
-                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                    options.session_path + bundle_input_folder_name, source_file_path)
-                            else:
-                                # file_path is relative path
-                                if options.verbose:
-                                    batch.batch_log.logwrite('relocating %s to %s' % (
-                                        batch.batch_definition_path + batch.dataframe.loc[i][session.num],
-                                        options.session_path + source_file_path))
-                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                    options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
-                        else:
-                            # handle 'Context New Vehicle Prices File' when generating
-                            if session.num == 0:
-                                batch.dataframe.loc[i][session.num] = batch.dataframe.loc[i][session.num]
-                            else:
-                                batch.dataframe.loc[i][session.num] = batch.context_new_vehicle_generalized_costs_file
+                                # handle 'Context New Vehicle Prices File' when generating
+                                if session.num == 0:
+                                    batch.dataframe.loc[i][session.num] = batch.dataframe.loc[i][session.num]
+                                else:
+                                    batch.dataframe.loc[i][session.num] = batch.context_new_vehicle_generalized_costs_file
 
         import time
 
@@ -819,6 +837,8 @@ if __name__ == '__main__':
         parser.add_argument('--no_sim', action='store_true', help='Skip running simulations')
         parser.add_argument('--bundle_path', type=str, help='Path to folder visible to all nodes',
                             default=os.getcwd() + os.sep + 'bundle')
+        parser.add_argument('--no_bundle', action='store_true',
+                            help='Do NOT gather and copy all source files to bundle_path')
         parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
         parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
         parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
@@ -840,7 +860,7 @@ if __name__ == '__main__':
         args = parser.parse_args()
 
         run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
-                        batch_file=args.batch_file, session_num=args.session_num,
+                        no_bundle=args.no_bundle, batch_file=args.batch_file, session_num=args.session_num,
                         verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
                         dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
                         dispy_exclusive=args.dispy_exclusive, dispy_scheduler=args.dispy_scheduler, local=args.local,

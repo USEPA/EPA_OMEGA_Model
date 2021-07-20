@@ -76,13 +76,14 @@ try:
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
-            self.session_name = 'OMEGA2 Demo'
-            self.session_unique_name = 'OMEGA2 Demo'
+            self.session_name = 'OMEGA Demo'
+            self.session_unique_name = 'OMEGA Demo'
             self.session_is_reference = True
             self.verbose = False
             self.auto_close_figures = False
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
+            self.consolidate_manufacturers = False
             self.manufacturers_file = path + 'demo_inputs/manufacturers.csv'
             self.market_classes_file = path + 'demo_inputs/market_classes.csv'
             self.vehicles_file = path + 'demo_inputs/vehicles.csv'
@@ -103,7 +104,7 @@ try:
             self.cost_file = path + 'demo_inputs/simulated_vehicles.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
-            self.analysis_final_year = 2020
+            self.analysis_final_year = 2021
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.producer_calc_generalized_cost = None

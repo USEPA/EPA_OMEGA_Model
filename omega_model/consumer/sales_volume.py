@@ -61,7 +61,7 @@ def context_new_vehicle_sales(calendar_year):
     return sales_dict
 
 
-def new_vehicle_sales_response(calendar_year, P):
+def new_vehicle_sales_response(calendar_year, compliance_id, P):
     """
     Calculate new vehicle sales, relative to a reference sales volume and average new vehicle price.
     Updates generalized cost table associated with the reference session so those costs can become the reference
@@ -69,6 +69,7 @@ def new_vehicle_sales_response(calendar_year, P):
 
     Args:
         calendar_year (int):
+        compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
         P ($, [$]): a single price or a list/vector of prices
 
     Returns:
@@ -82,10 +83,10 @@ def new_vehicle_sales_response(calendar_year, P):
         P = np.array(P)
 
     if omega_globals.options.session_is_reference and isinstance(P, float):
-        NewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, P)
+        NewVehicleMarket.set_new_vehicle_generalized_cost(calendar_year, compliance_id, P)
 
-    Q0 = NewVehicleMarket.new_vehicle_sales(calendar_year)
-    P0 = NewVehicleMarket.new_vehicle_generalized_cost(calendar_year)
+    Q0 = 1
+    P0 = NewVehicleMarket.new_vehicle_generalized_cost(calendar_year, compliance_id)
 
     E = omega_globals.options.new_vehicle_sales_response_elasticity
 
@@ -93,7 +94,7 @@ def new_vehicle_sales_response(calendar_year, P):
 
     Q = Q0 + M * (P-P0)  # point-slope equation of a line
 
-    return Q
+    return Q/Q0
 
 
 if __name__ == '__main__':

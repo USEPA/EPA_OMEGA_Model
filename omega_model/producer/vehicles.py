@@ -589,6 +589,7 @@ class Vehicle(OMEGABase):
         self.vehicle_id = Vehicle.next_vehicle_id
         self.name = ''
         self.manufacturer_id = None
+        self.compliance_id = None
         self.model_year = None
         self.fueling_class = None
         self.hauling_class = None
@@ -796,7 +797,7 @@ class Vehicle(OMEGABase):
             model_year (int): vehicle model year
 
         """
-        base_properties = {'name', 'manufacturer_id', 'model_year',
+        base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year',
                            'fueling_class', 'hauling_class',
                            'cost_curve_class', 'legacy_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
                            'cert_fuel_id', 'market_class_id', 'footprint_ft2', 'epa_size_class',
@@ -931,14 +932,13 @@ class VehicleFinal(SQABase, Vehicle):
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    vehicle_id = Column('vehicle_id', Integer, primary_key=True)
+    vehicle_id = Column(Integer, primary_key=True)
     name = Column('name', String)
-    manufacturer_id = Column('manufacturer_id', String, ForeignKey('manufacturers.manufacturer_id'))
+    manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))
+    compliance_id = Column(String)
     manufacturer = relationship('Manufacturer', back_populates='vehicles')
     annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')
 
-    # --- static properties ---
-    # vehicle_nameplate = Column(String, default='USALDV')
     model_year = Column(Numeric)
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
@@ -960,6 +960,10 @@ class VehicleFinal(SQABase, Vehicle):
     footprint_ft2 = Column(Float)
 
     _initial_registered_count = Column('_initial_registered_count', Float)
+
+    # --- static properties ---
+    compliance_ids = set()
+    mfr_base_year_size_class_share = None
 
     #: **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
 
@@ -1003,18 +1007,18 @@ class VehicleFinal(SQABase, Vehicle):
         return omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()
 
     @staticmethod
-    def get_manufacturer_vehicles(calendar_year, manufacturer_id):
+    def get_compliance_vehicles(calendar_year, compliance_id):
         """
 
         Args:
             calendar_year:
-            manufacturer_id:
+            compliance_id:
 
         Returns:
 
         """
         return omega_globals.session.query(VehicleFinal). \
-            filter(VehicleFinal.manufacturer_id == manufacturer_id). \
+            filter(VehicleFinal.compliance_id == compliance_id). \
             filter(VehicleFinal.model_year == calendar_year).all()
 
     @staticmethod
@@ -1034,33 +1038,33 @@ class VehicleFinal(SQABase, Vehicle):
         return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_id == vehicle_id).one()
 
     @staticmethod
-    def calc_cert_target_co2e_Mg(model_year, manufacturer_id):
+    def calc_cert_target_co2e_Mg(model_year, compliance_id):
         """
 
         Args:
             model_year:
-            manufacturer_id:
+            compliance_id:
 
         Returns:
 
         """
         return omega_globals.session.query(func.sum(VehicleFinal.cert_target_co2e_Mg)). \
-            filter(VehicleFinal.manufacturer_id == manufacturer_id). \
+            filter(VehicleFinal.compliance_id == compliance_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
     @staticmethod
-    def calc_cert_co2e_Mg(model_year, manufacturer_id):
+    def calc_cert_co2e_Mg(model_year, compliance_id):
         """
 
         Args:
             model_year:
-            manufacturer_id:
+            compliance_id:
 
         Returns:
 
         """
         return omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)). \
-            filter(VehicleFinal.manufacturer_id == manufacturer_id). \
+            filter(VehicleFinal.compliance_id == compliance_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
     @staticmethod
@@ -1073,7 +1077,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        inherit_properties = {'name', 'manufacturer_id', 'hauling_class', 'legacy_reg_class_id',
+        inherit_properties = {'name', 'manufacturer_id', 'compliance_id', 'hauling_class', 'legacy_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
                               'market_share', 'non_responsive_market_group', 'footprint_ft2'}
 
@@ -1111,8 +1115,8 @@ class VehicleFinal(SQABase, Vehicle):
         input_template_version = 0.41
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
                                   'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
-                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id',
-                                  'sales', 'cert_direct_oncycle_co2e_grams_per_mile', 'cert_direct_oncycle_kwh_per_mile',
+                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales',
+                                  'cert_direct_oncycle_co2e_grams_per_mile', 'cert_direct_oncycle_kwh_per_mile',
                                   'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in',
                                   'width_in', 'height_in','ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft',
                                   'msrp_dollars', 'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs'}
@@ -1143,6 +1147,13 @@ class VehicleFinal(SQABase, Vehicle):
                         cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                         footprint_ft2=df.loc[i, 'footprint_ft2'],
                     )
+
+                    if omega_globals.options.consolidate_manufacturers:
+                        veh.compliance_id = 'consolidated_OEM'
+                    else:
+                        veh.compliance_id = veh.manufacturer_id
+
+                    VehicleFinal.compliance_ids.add(veh.compliance_id)
 
                     if veh.electrification_class == 'EV':
                         veh.fueling_class = 'BEV'
@@ -1180,7 +1191,15 @@ class VehicleFinal(SQABase, Vehicle):
                                     'total'] + veh.initial_registered_count
 
                     if veh.context_size_class not in NewVehicleMarket.context_size_classes:
-                        NewVehicleMarket.context_size_classes[veh.context_size_class] = []
+                        NewVehicleMarket.context_size_classes[veh.context_size_class] = veh.initial_registered_count
+                    else:
+                        NewVehicleMarket.context_size_classes[veh.context_size_class] += veh.initial_registered_count
+
+                    size_key = veh.compliance_id + '_' + veh.context_size_class
+                    if size_key not in NewVehicleMarket.manufacturer_context_size_classes:
+                        NewVehicleMarket.manufacturer_context_size_classes[size_key] = veh.initial_registered_count
+                    else:
+                        NewVehicleMarket.manufacturer_context_size_classes[size_key] += veh.initial_registered_count
 
                     if verbose:
                         print(veh)
@@ -1215,6 +1234,31 @@ class VehicleFinal(SQABase, Vehicle):
                     NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
                         NewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
                         vehicle_shares_dict[hsc]
+
+                # calculate manufacturer base year context size class shares
+                from producer.manufacturers import Manufacturer
+
+                VehicleFinal.mfr_base_year_size_class_share = dict()
+                for compliance_id in VehicleFinal.compliance_ids:
+                    for size_class in NewVehicleMarket.context_size_classes:
+                        if compliance_id not in VehicleFinal.mfr_base_year_size_class_share:
+                            VehicleFinal.mfr_base_year_size_class_share[compliance_id] = dict()
+
+                        size_key = compliance_id + '_' + size_class
+
+                        if size_key not in NewVehicleMarket.manufacturer_context_size_classes:
+                            NewVehicleMarket.manufacturer_context_size_classes[size_key] = 0
+
+                        if verbose:
+                            print('%s: %s / %s: %.2f' % (size_key,
+                                                     NewVehicleMarket.manufacturer_context_size_classes[size_key],
+                                                     NewVehicleMarket.context_size_classes[size_class],
+                                                     NewVehicleMarket.manufacturer_context_size_classes[size_key] /
+                                                     NewVehicleMarket.context_size_classes[size_class]))
+
+                        VehicleFinal.mfr_base_year_size_class_share[compliance_id][size_class] = \
+                            NewVehicleMarket.manufacturer_context_size_classes[size_key] / \
+                            NewVehicleMarket.context_size_classes[size_class]
 
         return template_errors
 
@@ -1298,7 +1342,7 @@ if __name__ == '__main__':
 
         if not init_fail:
 
-            vehicles_list = VehicleFinal.get_manufacturer_vehicles(2019, 'USA Motors')
+            vehicles_list = VehicleFinal.get_compliance_vehicles(2019, 'consolidated_OEM')
 
             # update vehicle annual data, registered count must be update first:
             VehicleAnnualData.update_registered_count(vehicles_list[0], 2020, 54321)

@@ -24,13 +24,13 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,ghg_credit_history,input_template_version:,0.2
+       input_template_name:,ghg_credit_history,input_template_version:,0.21
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,model_year,manufacturer_id,balance_Mg
+        calendar_year,model_year,compliance_id,balance_Mg
         2019,2016,USA Motors,151139573
 
 Data Column Name and Description
@@ -41,7 +41,7 @@ Data Column Name and Description
 :model_year:
     The model year of the available credits, determines remaining credit life
 
-:manufacturer_id:
+:compliance_id:
     Identifies the credit owner, consistent with the data loaded by the ``manufacturers`` module
 
 :balance_Mg:
@@ -61,8 +61,8 @@ credit_max_life_years = 5  #: credit max life, in years, a.k.a. credit carry-fow
 debit_max_life_years = 3  #: debit max life, in years, a.k.a. credit carry-back
 
 _input_template_name = 'ghg_credit_history'
-_input_template_version = 0.2
-_input_template_columns = {'calendar_year', 'model_year', 'manufacturer_id', 'balance_Mg'}
+_input_template_version = 0.21
+_input_template_columns = {'calendar_year', 'model_year', 'compliance_id', 'balance_Mg'}
 
 
 class CreditInfo(OMEGABase):
@@ -91,14 +91,14 @@ class CreditBank(OMEGABase):
     Each manufacturer will use its own unique credit bank object.
 
     """
-    def __init__(self, filename, manufacturer_id, verbose=False):
+    def __init__(self, filename, compliance_id, verbose=False):
         """
 
         Initialize credit bank data from input file, call after validating ghg_credits template.
 
         Args:
             filename (str): name of input file containing pre-existing credit info
-            manufacturer_id (str): name of manufacturer, e.g. 'USA Motors'
+            compliance_id (str): name of manufacturer, e.g. 'consolidated_OEM'
             verbose (bool): enable additional console and logfile output if True
 
         Returns:
@@ -110,9 +110,10 @@ class CreditBank(OMEGABase):
             omega_log.logwrite('\nInitializing credit bank from %s...' % filename)
 
         # read in the data portion of the input file
-        self.credit_bank = pd.read_csv(filename, skiprows=1)
+        self.compliance_id = compliance_id
 
-        self.credit_bank[self.credit_bank['manufacturer_id'] == manufacturer_id]
+        self.credit_bank = pd.read_csv(filename, skiprows=1)
+        self.credit_bank = self.credit_bank.loc[self.credit_bank['compliance_id'] == self.compliance_id]
         self.credit_bank = self.credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
         self.credit_bank['ending_balance_Mg'] = self.credit_bank['beginning_balance_Mg']
         self.credit_bank['age'] = self.credit_bank['calendar_year'] - self.credit_bank['model_year']
@@ -142,13 +143,13 @@ class CreditBank(OMEGABase):
         return template_errors
 
     @staticmethod
-    def create_credit(calendar_year, manufacturer_id, beginning_balance_Mg):
+    def create_credit(calendar_year, compliance_id, beginning_balance_Mg):
         """
         Create a new GHG credit data structure.
 
         Args:
             calendar_year (numeric): calendar year of credit creation
-            manufacturer_id (str): manufacturer name, e.g. 'USA Motors'
+            compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
             beginning_balance_Mg (numeric): starting balance of credit in CO2e Mg
 
         Returns:
@@ -158,7 +159,7 @@ class CreditBank(OMEGABase):
         new_credit = dict()
         new_credit['calendar_year'] = calendar_year
         new_credit['model_year'] = calendar_year
-        new_credit['manufacturer'] = manufacturer_id
+        new_credit['compliance_id'] = compliance_id
         new_credit['beginning_balance_Mg'] = beginning_balance_Mg
         new_credit['ending_balance_Mg'] = beginning_balance_Mg
         new_credit['age'] = 0
@@ -180,7 +181,7 @@ class CreditBank(OMEGABase):
         new_credit_transaction = dict()
         new_credit_transaction['calendar_year'] = credit['calendar_year']
         new_credit_transaction['model_year'] = credit['model_year']
-        new_credit_transaction['manufacturer'] = credit['manufacturer']
+        new_credit_transaction['compliance_id'] = credit['compliance_id']
         new_credit_transaction['credit_value_Mg'] = None
         new_credit_transaction['credit_destination'] = None
         new_credit_transaction = pd.DataFrame(new_credit_transaction, columns=new_credit_transaction.keys(), index=[0])
@@ -323,7 +324,7 @@ class CreditBank(OMEGABase):
 
         self.credit_bank = pd.DataFrame.append(self.credit_bank, last_years_credits)
 
-    def handle_credit(self, calendar_year, manufacturer_id, beginning_balance_Mg):
+    def handle_credit(self, calendar_year, beginning_balance_Mg):
         """
         Handle mandatory credit (and default debit) behavior.
 
@@ -350,11 +351,10 @@ class CreditBank(OMEGABase):
 
         Args:
             calendar_year (numeric): calendar year of credit creation
-            manufacturer_id (str): manufacturer name, e.g. 'USA Motors'
             beginning_balance_Mg (numeric): starting balance of credit (or debit) in CO2e Mg
 
         """
-        new_credit = self.create_credit(calendar_year, manufacturer_id, beginning_balance_Mg)
+        new_credit = self.create_credit(calendar_year, self.compliance_id, beginning_balance_Mg)
         self.credit_bank = pd.DataFrame.append(self.credit_bank, new_credit, ignore_index=True)
         new_credit = self.credit_bank.iloc[-1].copy()  # grab credit as a Series
 
@@ -412,8 +412,8 @@ class CreditBank(OMEGABase):
         self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
-        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['manufacturer'], -transaction_amount_Mg)
-        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['manufacturer'], +transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['compliance_id'], -transaction_amount_Mg)
+        ManufacturerAnnualData.update_model_year_cert_co2e_Mg(credit['model_year'], credit['compliance_id'], +transaction_amount_Mg)
 
 
 if __name__ == '__main__':
@@ -455,20 +455,20 @@ if __name__ == '__main__':
                                                           omega_globals.options.vehicle_onroad_calculations_file,
                                                           verbose=omega_globals.options.verbose)
 
-        # credit_bank = CreditBank('demo_inputs/ghg_debits.csv', 'USA Motors')
+        # credit_bank = CreditBank('demo_inputs/ghg_debits.csv', 'consolidated_OEM')
         # credit_bank.update_credit_age(2020)
-        # credit_bank.handle_credit(2020, 'USA Motors', 0.55)
+        # credit_bank.handle_credit(2020, 'consolidated_OEM', 0.55)
         # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
         # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
-        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, 'USA Motors')
+        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, 'consolidated_OEM')
 
         import random
 
         for year in range(2020, 2030):
             print(year)
             credit_bank.update_credit_age(year)
-            credit_bank.handle_credit(year, 'USA Motors', random.gauss(0, 1))
+            credit_bank.handle_credit(year, random.gauss(0, 1))
 
         import common.file_io as file_io
 

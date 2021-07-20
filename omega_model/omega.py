@@ -82,14 +82,15 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
                                                 producer_decision_and_response['abs_share_delta_total']), echo_console=True)
 
 
-def update_iteration_log(calendar_year, converged, iteration_log, iteration_num, producer_pricing_iteration,
+def update_iteration_log(iteration_log, calendar_year, compliance_id, converged, iteration_num, producer_pricing_iteration,
                          compliant, convergence_error):
     """
 
     Args:
-        calendar_year:
-        converged:
         iteration_log:
+        calendar_year:
+        compliance_id:
+        converged:
         iteration_num:
         producer_pricing_iteration:
         compliant:
@@ -98,10 +99,11 @@ def update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
     Returns:
 
     """
-    iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
-    iteration_log.loc[iteration_log.index[-1], 'pricing_iteration'] = producer_pricing_iteration
     iteration_log.loc[iteration_log.index[-1], 'calendar_year'] = calendar_year
+    iteration_log.loc[iteration_log.index[-1], 'compliance_id'] = compliance_id
     iteration_log.loc[iteration_log.index[-1], 'converged'] = converged
+    iteration_log.loc[iteration_log.index[-1], 'iteration'] = iteration_num
+    iteration_log.loc[iteration_log.index[-1], 'producer_pricing_iteration'] = producer_pricing_iteration
     iteration_log.loc[iteration_log.index[-1], 'compliant'] = compliant
     iteration_log.loc[iteration_log.index[-1], 'convergence_error'] = convergence_error
 
@@ -115,40 +117,41 @@ def run_producer_consumer():
 
     """
 
-    from producer.manufacturers import Manufacturer
+    from producer.vehicles import VehicleFinal
     from producer import compliance_strategy
     from policy.credit_banking import CreditBank
 
-    for manufacturer in omega_globals.session.query(Manufacturer.manufacturer_id).all():
-        manufacturer_id = manufacturer[0]
-        omega_log.logwrite("Running %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, manufacturer_id),
-                           echo_console=True)
+    iteration_log = pd.DataFrame()
 
-        iteration_log = pd.DataFrame()
+    credit_banks = dict()
+
+    for compliance_id in VehicleFinal.compliance_ids:
+        omega_log.logwrite("\nRunning %s: Manufacturer=%s" % (omega_globals.options.session_unique_name, compliance_id),
+                           echo_console=True)
 
         analysis_end_year = omega_globals.options.analysis_final_year + 1
 
-        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_id)
+        credit_banks[compliance_id] = CreditBank(omega_globals.options.ghg_credits_file, compliance_id)
 
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
-            credit_bank.update_credit_age(calendar_year)
+            credit_banks[compliance_id].update_credit_age(calendar_year)
 
             # TODO: make credit strategy modular, like upstream methods?
             # strategy: use expiring credits, pay any expiring debits in one shot:
-            # expiring_credits_Mg = credit_bank.get_expiring_credits_Mg(calendar_year)
-            # expiring_debits_Mg = credit_bank.get_expiring_debits_Mg(calendar_year)
+            # expiring_credits_Mg = credit_banks[compliance_id].get_expiring_credits_Mg(calendar_year)
+            # expiring_debits_Mg = credit_banks[compliance_id].get_expiring_debits_Mg(calendar_year)
             # strategic_target_offset_Mg = expiring_credits_Mg + expiring_debits_Mg
 
             # strategy: use credits and pay debits over their remaining lifetime, instead of all at once:
-            # current_credits, current_debits = credit_bank.get_credit_info(calendar_year)
+            # current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
             # for c in current_credits + current_debits:
             #     strategic_target_offset_Mg += (c.remaining_balance_Mg / c.remaining_years)
 
             # strategy: try to hit the target and make up for minor previous compliance discrepancies
             #           (ignoring base year banked credits):
             strategic_target_offset_Mg = 0
-            current_credits, current_debits = credit_bank.get_credit_info(calendar_year)
+            current_credits, current_debits = credit_banks[compliance_id].get_credit_info(calendar_year)
             for c in current_debits:
                 strategic_target_offset_Mg += c.remaining_balance_Mg
 
@@ -164,7 +167,7 @@ def run_producer_consumer():
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    compliance_strategy.search_production_options(manufacturer_id, calendar_year,
+                    compliance_strategy.search_production_options(compliance_id, calendar_year,
                                                                   producer_decision_and_response,
                                                                   iteration_num, strategic_target_offset_Mg)
 
@@ -172,7 +175,7 @@ def run_producer_consumer():
                                                                    winning_combo)
 
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
-                    iterate_producer_cross_subsidy(calendar_year, best_winning_combo_with_sales_response,
+                    iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
                                                    candidate_mfr_composite_vehicles, iteration_log,
                                                    iteration_num, market_class_vehicle_dict, winning_combo,
                                                    strategic_target_offset_Mg)
@@ -184,7 +187,7 @@ def run_producer_consumer():
 
                 iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
-                update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+                update_iteration_log(iteration_log, calendar_year, compliance_id, converged, iteration_num,
                                      producer_consumer_iteration, producer_compliant, convergence_error)
 
                 # decide whether to continue iterating or not
@@ -200,11 +203,11 @@ def run_producer_consumer():
                                            echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
-            compliance_strategy.finalize_production(calendar_year, manufacturer_id, candidate_mfr_composite_vehicles,
+            compliance_strategy.finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles,
                                                     producer_decision_and_response)
 
-            credit_bank.handle_credit(calendar_year, manufacturer_id,
-                                      producer_decision_and_response['total_credits_co2e_megagrams'])
+            credit_banks[compliance_id].handle_credit(calendar_year,
+                                                     producer_decision_and_response['total_credits_co2e_megagrams'])
 
             stock.update_stock(calendar_year)  # takes about 7.5 seconds
 
@@ -214,23 +217,24 @@ def run_producer_consumer():
             iteration_log.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                                  '_producer_consumer_iteration_log.csv', index=False)
 
-        credit_bank.credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-                                       '_credit_bank.csv', index=False)
+        credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+                                                      '%s_credit_bank.csv' % compliance_id, index=False)
 
-        credit_bank.transaction_log.to_csv(
+        credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            '_credit_bank_transactions.csv', index=False)
+            '%s_credit_bank_transactions.csv' % compliance_id, index=False)
 
-    return iteration_log, credit_bank
+    return iteration_log, credit_banks
 
 
-def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_response, candidate_mfr_composite_vehicles,
-                                   iteration_log, iteration_num, market_class_vehicle_dict,
-                                   producer_decision, credit_offset_Mg):
+def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_decision_and_response,
+                                   candidate_mfr_composite_vehicles, iteration_log, iteration_num,
+                                   market_class_vehicle_dict, producer_decision, credit_offset_Mg):
     """
 
     Args:
         calendar_year:
+        compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
         best_producer_decision_and_response:
         candidate_mfr_composite_vehicles:
         iteration_log:
@@ -251,11 +255,12 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
     for mc in market_class_vehicle_dict:
         producer_decision['winning_combo_share_weighted_cost'] += producer_decision['average_cost_%s' % mc] * \
                                                                   producer_decision['producer_abs_share_frac_%s' % mc]
+
         producer_decision['winning_combo_share_weighted_generalized_cost'] += producer_decision['average_generalized_cost_%s' % mc] * \
                                                                   producer_decision['producer_abs_share_frac_%s' % mc]
 
-    consumer.sales_volume.new_vehicle_sales_response(calendar_year,
-                                                     producer_decision['winning_combo_share_weighted_generalized_cost'])  #, producer_decision['winning_combo_share_weighted_generalized_cost']
+    consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
+                                                     producer_decision['winning_combo_share_weighted_generalized_cost'])
 
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in MarketClass.market_classes]
 
@@ -274,7 +279,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         producer_decision_and_response = get_demanded_shares(price_options_df, calendar_year)
 
         ###############################################################################################################
-        calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
+        calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
         compliance_strategy.create_production_options(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
@@ -308,7 +313,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
         # any slight offset during the convergence process:
         # ###############################################################################################################
         # if o2.options.session_is_reference:
-        #     calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response)
+        #     calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
         #     # propagate total sales down to composite vehicles by market class share and reg class share,
         #     # calculate new compliance status for each producer-technology / consumer response combination
         #     compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
@@ -333,7 +338,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
             logwrite_shares_and_costs(calendar_year, convergence_error, producer_decision_and_response, iteration_num,
                                       producer_pricing_iteration)
 
-        update_iteration_log(calendar_year, converged, iteration_log, iteration_num,
+        update_iteration_log(iteration_log, calendar_year, compliance_id, converged, iteration_num,
                              producer_pricing_iteration, converged, convergence_error)
 
         producer_pricing_iteration += 1
@@ -351,7 +356,7 @@ def iterate_producer_cross_subsidy(calendar_year, best_producer_decision_and_res
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 
 
-def calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decision_and_response):
+def calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response):
     """
 
     Args:
@@ -392,7 +397,8 @@ def calc_sales_totals(calendar_year, market_class_vehicle_dict, producer_decisio
             producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
     producer_decision_and_response['new_vehicle_sales'] = \
-        consumer.sales_volume.new_vehicle_sales_response(calendar_year,
+        producer_decision_and_response['total_sales'] * \
+        consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
                                                          producer_decision_and_response['average_generalized_cost_total'])
 
 
@@ -606,6 +612,18 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     return converged, convergence_error
 
 
+
+# def init_global_modules():
+#     import importlib
+#
+#     init_fail = []
+#
+#     # pull in manufacturers before building database tables (declaring classes) that check manufacturer id
+#     omega_globals.Manufacturer = importlib.import_module('producer.manufacturers').Manufacturer
+#
+#     return init_fail
+
+
 def init_user_definable_modules():
     """
     Import dynamic modules that are specified by the input file input template name and set the session runtime
@@ -694,6 +712,8 @@ def init_omega(session_runtime_options):
     init_fail = []
 
     init_omega_db(omega_globals.options.verbose)
+
+    # init_fail += init_global_modules()
 
     init_fail += init_user_definable_modules()
 
@@ -805,8 +825,8 @@ def init_omega(session_runtime_options):
                                                               verbose=verbose_init)
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
-                                                          verbose=verbose_init)
-        
+                                                                        verbose=verbose_init)
+
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.vehicle_onroad_calculations_file,
                                                           verbose=verbose_init)
@@ -886,8 +906,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                     omega_globals()['iteration_log', 'credit_history'], standalone_run)
             else:
                 # run without profiler
-                iteration_log, credit_history = run_producer_consumer()
-                session_summary_results = postproc_session.run_postproc(iteration_log, credit_history, standalone_run)
+                iteration_log, credit_banks = run_producer_consumer()
+                session_summary_results = postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
 
             # write output files
             summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name +\

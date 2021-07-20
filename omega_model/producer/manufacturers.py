@@ -13,6 +13,8 @@ from omega_model import *
 
 initial_credit_bank = dict()
 
+# cache = dict()
+
 
 class Manufacturer(SQABase, OMEGABase):
     # --- database table properties ---
@@ -20,9 +22,14 @@ class Manufacturer(SQABase, OMEGABase):
     manufacturer_id = Column('manufacturer_id', String, primary_key=True)
     vehicles = relationship('VehicleFinal', back_populates='manufacturer')
 
+    manufacturers = None
+
     # --- static properties ---
+
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        # cache.clear()
+
         from policy.credit_banking import CreditBank
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -49,6 +56,8 @@ class Manufacturer(SQABase, OMEGABase):
                     ))
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
+
+                Manufacturer.manufacturers = list(df['manufacturer_id'].unique())
 
                 template_errors = CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file, verbose)
 
