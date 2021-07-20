@@ -3,12 +3,8 @@
 User Guide
 ==========
 
-Default Inputs and Assumptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Inputs/Assumptions body text
-
-Tips for preparing inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Preparing Inputs and Assumptions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Tips body text
 
 .. _graphical_user_interface_label:
@@ -131,8 +127,8 @@ Final GUI Data:
 * The model status and final model run time are displayed below the 'Run Model' button.
 
 
-Model Outputs
-^^^^^^^^^^^^^
+Navigating Model Outputs
+^^^^^^^^^^^^^^^^^^^^^^^^^
 Selecting the 'Results' tab brings up the GUI results page as shown in :numref:`ug_label8` below.
 
 .. _ug_label8:
