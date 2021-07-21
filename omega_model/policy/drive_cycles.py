@@ -60,7 +60,7 @@ class DriveCycles(OMEGABase):
 
     _data = pd.DataFrame()
 
-    drive_cycle_names = []
+    drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
 
     @staticmethod
     def validate_drive_cycle_id(drive_cycle_id):
