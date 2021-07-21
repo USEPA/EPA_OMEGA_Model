@@ -496,6 +496,7 @@ for model_year in model_years:
     query_output = query_output[list(aggregating_columns) + list(all_array['Output Column'].unique())+list(all_array['Output Column Name'].unique())]
     query_output = query_output.sort_values(list(aggregating_columns)).reset_index(drop=True)
     query_output = query_output.loc[:, ~query_output.columns.duplicated()]
+    query_output['TARGET_COEF_BEST_MTH'].replace('', 0, inplace=True, regex=True)
     query_output.to_csv(output_path + '\\' + str(model_year) + ' Query' + ' ' + date_and_time + '.csv',index=False)
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)
