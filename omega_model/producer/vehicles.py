@@ -158,7 +158,7 @@ class DecompositionAttributes(OMEGABase):
 
                       'new_vehicle_mfr_cost_dollars',
 
-                      'upstream_co2e_grams_per_mile',
+                      'cert_indirect_co2e_grams_per_mile',
 
                       'cert_direct_co2e_grams_per_mile',
                       'cert_direct_kwh_per_mile',
@@ -823,8 +823,8 @@ class Vehicle(OMEGABase):
             # calculate cert co2 g/mi
             upstream = UpstreamMethods.get_upstream_method(self.model_year)
             self.cert_direct_kwh_per_mile = vehicle.cert_direct_kwh_per_mile
-            self.upstream_co2e_grams_per_mile = upstream(self, self.cert_direct_co2e_grams_per_mile, self.cert_direct_kwh_per_mile)
-            self.cert_co2e_grams_per_mile = self.cert_direct_co2e_grams_per_mile + self.upstream_co2e_grams_per_mile
+            self.cert_indirect_co2e_grams_per_mile = upstream(self, self.cert_direct_co2e_grams_per_mile, self.cert_direct_kwh_per_mile)
+            self.cert_co2e_grams_per_mile = self.cert_direct_co2e_grams_per_mile + self.cert_indirect_co2e_grams_per_mile
 
             if omega_globals.options.flat_context:
                 self.cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, self.cost_curve_class)
@@ -840,7 +840,7 @@ class Vehicle(OMEGABase):
             # set dynamic attributes
             for attr in DecompositionAttributes.values:
                 self.__setattr__(attr, vehicle.__getattribute__(attr))
-            self.cert_direct_co2e_grams_per_mile = vehicle.cert_co2e_grams_per_mile - vehicle.upstream_co2e_grams_per_mile
+            self.cert_direct_co2e_grams_per_mile = vehicle.cert_co2e_grams_per_mile - vehicle.cert_indirect_co2e_grams_per_mile
             self.cert_target_co2e_Mg = vehicle.cert_target_co2e_Mg
             self.cert_co2e_Mg = vehicle.cert_co2e_Mg
 
@@ -887,12 +887,12 @@ class Vehicle(OMEGABase):
         # add upstream calcs
         upstream_method = UpstreamMethods.get_upstream_method(self.model_year)
 
-        self.cost_cloud['upstream_co2e_grams_per_mile'] = \
+        self.cost_cloud['cert_indirect_co2e_grams_per_mile'] = \
             upstream_method(self, self.cost_cloud['cert_direct_co2e_grams_per_mile'],
                             self.cost_cloud['cert_direct_kwh_per_mile'])
 
         self.cost_cloud['cert_co2e_grams_per_mile'] = self.cost_cloud['cert_direct_co2e_grams_per_mile'] + \
-                                                     self.cost_cloud['upstream_co2e_grams_per_mile'] - \
+                                                     self.cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
                                                      self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
 
         # calculate producer generalized cost
