@@ -113,6 +113,8 @@ class CostCloud(OMEGABase):
 
     _max_year = 0  # maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
 
+    cost_cloud_columns = []
+
     @staticmethod
     def init_cost_clouds_from_file(filename, verbose=False):
         """
@@ -164,6 +166,8 @@ class CostCloud(OMEGABase):
                     for model_year in cloud_model_years:
                         cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
                         CostCloud._max_year = max(CostCloud._max_year, model_year)
+
+                CostCloud.cost_cloud_columns = df.columns
 
         return template_errors
 

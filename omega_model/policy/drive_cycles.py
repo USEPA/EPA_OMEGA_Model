@@ -60,6 +60,8 @@ class DriveCycles(OMEGABase):
 
     _data = pd.DataFrame()
 
+    drive_cycle_names = []
+
     @staticmethod
     def validate_drive_cycle_id(drive_cycle_id):
         """
@@ -73,17 +75,6 @@ class DriveCycles(OMEGABase):
 
         """
         return drive_cycle_id in DriveCycles._data['drive_cycle_id'].values
-
-    @staticmethod
-    def get_drive_cycles():
-        """
-        Get list of known drive cycle names
-
-        Returns:
-            List of known drive cycle names
-
-        """
-        return DriveCycles._data['drive_cycle_id'].to_list()
 
     @staticmethod
     def get_drive_cycle_distance_miles(drive_cycle_id):
@@ -134,6 +125,8 @@ class DriveCycles(OMEGABase):
                 DriveCycles._data['drive_cycle_id'] = df['drive_cycle_id']
                 DriveCycles._data['drive_cycle_distance_miles'] = df['drive_cycle_distance_miles']
                 DriveCycles._data['description'] = df['description']
+
+            DriveCycles.drive_cycle_names = DriveCycles._data['drive_cycle_id'].to_list()
 
         return template_errors
 

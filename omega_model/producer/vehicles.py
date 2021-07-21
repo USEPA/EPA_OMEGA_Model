@@ -152,6 +152,14 @@ class DecompositionAttributes(OMEGABase):
     @classmethod
     def init(cls):
         from policy.offcycle_credits import OffCycleCredits
+        from policy.drive_cycles import DriveCycles
+        from context.cost_clouds import CostCloud
+
+        simulation_drive_cycles = list(set.intersection(set(CostCloud.cost_cloud_columns),
+                                                        set(DriveCycles.drive_cycle_names)))
+
+        offcycle_credits = list(set.intersection(set(CostCloud.cost_cloud_columns),
+                                                 set(OffCycleCredits.offcycle_credit_names)))
 
         cls.values = ['cert_co2e_grams_per_mile',
                       'new_vehicle_mfr_generalized_cost_dollars',
@@ -173,7 +181,7 @@ class DecompositionAttributes(OMEGABase):
                       'cert_direct_offcycle_co2e_grams_per_mile',
 
                       'cert_indirect_offcycle_co2e_grams_per_mile',
-                      ] + OffCycleCredits.offcycle_credit_names
+                      ] + offcycle_credits + simulation_drive_cycles
 
     @staticmethod
     def interp1d(cost_curve, index_column, index, vehicle, attribute):
@@ -319,7 +327,7 @@ class CompositeVehicle(OMEGABase):
 
         self.weight_by = weight_by
 
-        self.model_year = self.vehicle_list[0].model_year # calendar_year?
+        self.model_year = self.vehicle_list[0].model_year  # calendar_year?
         self.reg_class_id = self.vehicle_list[0].reg_class_id
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_id = self.vehicle_list[0].market_class_id
@@ -356,7 +364,7 @@ class CompositeVehicle(OMEGABase):
         self.tech_option_iteration_num = 0
 
         self.normalized_cert_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
-                                                            'normalized_cert_target_co2e_Mg')
+                                                             'normalized_cert_target_co2e_Mg')
 
         self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
 

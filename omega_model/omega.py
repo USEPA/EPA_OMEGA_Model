@@ -217,7 +217,8 @@ def run_producer_consumer():
             iteration_log.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
                                  '_producer_consumer_iteration_log.csv', index=False)
 
-        credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+        credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
+                                                       omega_globals.options.session_unique_name +
                                                       '_credit_bank %s.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
@@ -256,8 +257,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         producer_decision['winning_combo_share_weighted_cost'] += producer_decision['average_cost_%s' % mc] * \
                                                                   producer_decision['producer_abs_share_frac_%s' % mc]
 
-        producer_decision['winning_combo_share_weighted_generalized_cost'] += producer_decision['average_generalized_cost_%s' % mc] * \
-                                                                  producer_decision['producer_abs_share_frac_%s' % mc]
+        producer_decision['winning_combo_share_weighted_generalized_cost'] += \
+            producer_decision['average_generalized_cost_%s' % mc] * producer_decision['producer_abs_share_frac_%s' % mc]
 
     consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
                                                      producer_decision['winning_combo_share_weighted_generalized_cost'])
@@ -520,20 +521,20 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
             winning_combo['average_co2e_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                       'initial_registered_count',
-                                                                       'onroad_direct_co2e_grams_per_mile')
+                                                                        'initial_registered_count',
+                                                                        'onroad_direct_co2e_grams_per_mile')
 
             winning_combo['average_kwh_pmi_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                       'initial_registered_count',
-                                                                       'onroad_direct_kwh_per_mile')
+                                                                      'initial_registered_count',
+                                                                      'onroad_direct_kwh_per_mile')
 
             winning_combo['average_cost_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
 
             winning_combo['average_generalized_cost_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                   'initial_registered_count',
-                                                                   'new_vehicle_mfr_generalized_cost_dollars')
+                                                                               'initial_registered_count',
+                                                                               'new_vehicle_mfr_generalized_cost_dollars')
 
             winning_combo['average_fuel_price_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
@@ -668,12 +669,21 @@ def init_user_definable_decomposition_attributes(verbose_init):
     """
 
     from policy.offcycle_credits import OffCycleCredits
+    from policy.drive_cycles import DriveCycles
     from producer.vehicles import VehicleFinal, DecompositionAttributes
+    from context.cost_clouds import CostCloud
 
     init_fail = []
 
+    init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+                                                      verbose=verbose_init)
+
     init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                 verbose=verbose_init)
+
+    init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                            verbose=verbose_init)
+
     DecompositionAttributes.init()
     # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
     for attr in DecompositionAttributes.values:
@@ -797,8 +807,8 @@ def init_omega(session_runtime_options):
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=verbose_init)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
-                                                          verbose=verbose_init)
+        # init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+        #                                                   verbose=verbose_init)
 
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=verbose_init)
@@ -806,8 +816,8 @@ def init_omega(session_runtime_options):
         init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file,
                                                      verbose=verbose_init)
 
-        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
-                                                verbose=verbose_init)
+        # init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+        #                                         verbose=verbose_init)
 
         init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file,
                                                       verbose=verbose_init)
