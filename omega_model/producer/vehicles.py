@@ -148,6 +148,8 @@ class DecompositionAttributes(OMEGABase):
     """
 
     values = []
+    base_values = []
+    dynamic_values = []
 
     @classmethod
     def init(cls):
@@ -155,33 +157,40 @@ class DecompositionAttributes(OMEGABase):
         from policy.drive_cycles import DriveCycles
         from context.cost_clouds import CostCloud
 
+        # set base values
+        cls.base_values = ['cert_co2e_grams_per_mile',
+                           'new_vehicle_mfr_generalized_cost_dollars',
+
+                           'new_vehicle_mfr_cost_dollars',
+
+                           'cert_indirect_co2e_grams_per_mile',
+
+                           'cert_direct_co2e_grams_per_mile',
+                           'cert_direct_kwh_per_mile',
+
+                           'onroad_direct_co2e_grams_per_mile',
+                           'onroad_direct_kwh_per_mile',
+
+                           'cert_direct_oncycle_kwh_per_mile',
+                           'cert_direct_offcycle_kwh_per_mile',
+
+                           'cert_direct_oncycle_co2e_grams_per_mile',
+                           'cert_direct_offcycle_co2e_grams_per_mile',
+
+                           'cert_indirect_offcycle_co2e_grams_per_mile',
+                           ]
+
+        # determine dynamic values
         simulation_drive_cycles = list(set.intersection(set(CostCloud.cost_cloud_columns),
                                                         set(DriveCycles.drive_cycle_names)))
 
         offcycle_credits = list(set.intersection(set(CostCloud.cost_cloud_columns),
                                                  set(OffCycleCredits.offcycle_credit_names)))
 
-        cls.values = ['cert_co2e_grams_per_mile',
-                      'new_vehicle_mfr_generalized_cost_dollars',
+        cls.dynamic_values = offcycle_credits + simulation_drive_cycles
 
-                      'new_vehicle_mfr_cost_dollars',
-
-                      'cert_indirect_co2e_grams_per_mile',
-
-                      'cert_direct_co2e_grams_per_mile',
-                      'cert_direct_kwh_per_mile',
-
-                      'onroad_direct_co2e_grams_per_mile',
-                      'onroad_direct_kwh_per_mile',
-
-                      'cert_direct_oncycle_kwh_per_mile',
-                      'cert_direct_offcycle_kwh_per_mile',
-
-                      'cert_direct_oncycle_co2e_grams_per_mile',
-                      'cert_direct_offcycle_co2e_grams_per_mile',
-
-                      'cert_indirect_offcycle_co2e_grams_per_mile',
-                      ] + offcycle_credits + simulation_drive_cycles
+        # combine base and dynamic values
+        cls.values = cls.base_values + cls.dynamic_values
 
     @staticmethod
     def interp1d(cost_curve, index_column, index, vehicle, attribute):
