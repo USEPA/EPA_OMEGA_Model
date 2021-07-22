@@ -2,6 +2,62 @@
 
 **Routines to load and provide access to GCAM consumer response parameters.**
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents GCAM consumer model input parameters.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,demanded_shares_gcam,input_template_version:,0.12
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
+        hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
+        hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
+        hauling.BEV,2022,12000,5,5,0.168,0.1,1600,1.58,-8
+
+Data Column Name and Description
+
+:market_class_id:
+    Vehicle market class ID, e.g. 'hauling.ICE'
+
+:start_year:
+    Start year of parameters, parameters apply until the next available start year
+
+:annual_vmt:
+    Vehicle miles travelled per year
+
+:payback_years:
+    Payback period, in years
+
+:price_amortization_period:
+    Price amorization period, in years
+
+:share_weight:
+    Share weight [0..1]
+
+:discount_rate:
+    Discount rate [0..1]
+
+:o_m_costs:
+    Operating and maintenance costs, dollars per year
+
+:average_occupancy:
+    Average vehicle occupancy, number of people
+
+:logit_exponent_mu:
+    Logit exponent, mu
+
 ----
 
 **CODE**
@@ -33,7 +89,7 @@ class DemandedSharesGCAM(SQABase, OMEGABase):
     share_weight = Column(Float)  #: share weight [0..1]
     o_m_costs = Column(Float)  #: operating and maintenance costs, in dollars
     average_occupancy = Column(Float)  #: average vehicle occupancy, number of people
-    logit_exponent_mu = Column(Float)  #: log exponent, mu
+    logit_exponent_mu = Column(Float)  #: logit exponent, mu
 
     @staticmethod
     def get_gcam_params(calendar_year, market_class_id):
