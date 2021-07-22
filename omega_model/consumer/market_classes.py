@@ -2,6 +2,49 @@
 
 **Routines to implement market-class related functionality.**
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents characteristics of the consumer module's market classes.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,market_classes,input_template_version:,0.2
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        market_class_id,hauling_class,fueling_class,ownership_class,producer_generalized_cost_fuel_years,producer_generalized_cost_annual_vmt
+        non_hauling.BEV,non_hauling,BEV,private,5,15000
+        hauling.ICE,hauling,ICE,private,5,15000
+
+Data Column Name and Description
+
+:market_class_id:
+    Vehicle market class ID, e.g. 'hauling.ICE'
+
+:hauling_class:
+    Market class hauling class, e.g. 'hauling', 'non_hauling'
+
+:fueling_class:
+    Market class fueling class, e.g. 'BEV', 'ICE'
+
+:ownership_class:
+    Market class ownership class, e.g. 'private', 'shared'
+
+:producer_generalized_cost_fuel_years:
+    Number of years of fuel cost to include in producer generalized cost
+
+:producer_generalized_cost_annual_vmt:
+    Annual vehicle miles travelled for calculating producer generalized cost
+
 ----
 
 **CODE**
