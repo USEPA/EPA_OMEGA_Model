@@ -14,6 +14,16 @@ vehicles_cache = dict()
 
 
 def get_vehicle_info(vehicle_id):
+    """
+    Gets vehicle info for the given database vehicle ID
+
+    Args:
+        vehicle_id (int): the database vehicle ID (e.g. 1,2,3...)
+
+    Returns:
+        Vehicle market_class_id, model_year, initial_registered_count
+
+    """
     from producer.vehicles import VehicleFinal
 
     if vehicle_id not in vehicles_cache:
@@ -25,12 +35,16 @@ def get_vehicle_info(vehicle_id):
 
 def update_stock(calendar_year):
     """
-    Reregister vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
-    Update VMT
-    :param calendar_year: calendar year
-    :return: updates vehicle annual data table
-    """
+    Re-register vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
+    Also calculates vehicle miles travelled for each vehilce by market class and age.
 
+    Args:
+        calendar_year (int): calendar year to re-register vehicles in
+
+    Returns:
+        Nothing, updates VehicleAnnualData entries (``age``, ``registered_count``, ``annual_vmt``, ``vmt``).
+
+    """
     from producer.vehicle_annual_data import VehicleAnnualData
 
     # pull in this year's vehicle ids:
