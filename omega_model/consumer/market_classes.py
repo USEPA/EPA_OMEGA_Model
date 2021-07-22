@@ -64,7 +64,10 @@ def populate_market_classes(market_class_dict, market_class_id, obj):
     Args:
         market_class_dict (dict): dict of dicts of market classes
         market_class_id (str): dot separated market class name e.g. 'hauling.BEV', possibly with reg class suffix e.g. 'non_hauling.ICE.car' depending on the market_class_dict
-        obj (object): object to place in a set in the appropriate leaf
+        obj (object): object to place in a list in the appropriate leaf, as in a CompositeVehicle
+
+    Returns:
+        Nothing, modifies ``market_class_dict`` data
 
     """
     substrs = market_class_id.split('.', maxsplit=1)
@@ -93,7 +96,8 @@ def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class
         by_reg_class (bool): if true then leaves are lists in reg class dicts, otherwise leaves are lists by market segment
 
     Returns:
-        market_class_dict
+        Market class tree represented as a dict or dict of dicts, with an empty list at each leaf.
+        e.g. ``{'non_hauling': {'BEV': [], 'ICE': []}, 'hauling': {'BEV': [], 'ICE': []}}``
 
     """
     if market_class_dict is None:
@@ -157,7 +161,7 @@ class MarketClass(SQABase, OMEGABase):
     @staticmethod
     def get_market_class_dict():
         """
-        Get a copy of the market class dict with empty lists for each market class.
+        Get a copy of the market class dict with an empty list for each market class.
 
         Returns:
             A copy of the market class dict.
@@ -190,10 +194,13 @@ class MarketClass(SQABase, OMEGABase):
         """
         Get vehicle market class ID based on vehicle characteristics
 
-        :param vehicle: a vehicles.VehicleFinal object
-        :return: the vehicle's market class ID based on vehicle characteristics
-        """
+        Args:
+            vehicle (VehicleFinal): the vehicle to determine the market class of
 
+        Returns:
+            The vehicle's market class ID based on vehicle characteristics.
+
+        """
         if vehicle.hauling_class == 'hauling' and vehicle.electrification_class == 'EV':
             market_class_id = 'hauling.BEV'
             non_responsive_market_group = 'hauling'
@@ -212,12 +219,14 @@ class MarketClass(SQABase, OMEGABase):
     @staticmethod
     def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
         """
+        Get one or more producer generalized cost attributes associated with the given market class ID.
 
         Args:
-            market_class_id:
-            attribute_types:
+            market_class_id (str): e.g. 'hauling.ICE'
+            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g. ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
 
         Returns:
+            The requested generalized cost attributes.
 
         """
         cache_key = '%s_%s' % (market_class_id, attribute_types)

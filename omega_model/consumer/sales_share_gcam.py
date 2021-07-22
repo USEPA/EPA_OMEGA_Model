@@ -1,5 +1,9 @@
 """
 
+**Implements a portion of the GCAM model related to the relative shares of ICE and BEV vehicles as a function
+of relative generalized costs and assumptions about consumer acceptance over time (the S-shaped adoption curve).**
+
+Relative shares are converted to absolute shares for use in the producer compliance search.
 
 ----
 

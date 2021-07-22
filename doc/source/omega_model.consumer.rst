@@ -49,14 +49,6 @@ omega\_model.consumer.reregistration\_fixed\_by\_age module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.consumer.sales\_effect module
-------------------------------------------
-
-.. automodule:: omega_model.consumer.sales_effect
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.consumer.sales\_share\_gcam module
 -----------------------------------------------
 

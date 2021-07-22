@@ -1,5 +1,6 @@
 """
 
+**Routines to implement vehicle re-registration on an annual basis as a function of vehicle attributes.**
 
 ----
 
@@ -24,7 +25,7 @@ def get_vehicle_info(vehicle_id):
 
 def update_stock(calendar_year):
     """
-    Deregister vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
+    Reregister vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
     Update VMT
     :param calendar_year: calendar year
     :return: updates vehicle annual data table
