@@ -34,7 +34,7 @@ def context_new_vehicle_sales(calendar_year):
         calendar_year (int): the year to get sales for
 
     Returns:
-        dict of vehicle sales
+        dict of vehicle sales by ``hauling``, ``non_hauling``, and ``total``
 
     """
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
@@ -63,17 +63,17 @@ def context_new_vehicle_sales(calendar_year):
 
 def new_vehicle_sales_response(calendar_year, compliance_id, P):
     """
-    Calculate new vehicle sales, relative to a reference sales volume and average new vehicle price.
+    Calculate new vehicle sales fraction relative to a reference sales volume and average new vehicle generalized cost.
     Updates generalized cost table associated with the reference session so those costs can become the reference
     costs for subsequent sessions.
 
     Args:
-        calendar_year (int):
+        calendar_year (int): the calendar year to calculate sales in
         compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
         P ($, [$]): a single price or a list/vector of prices
 
     Returns:
-        Total new vehicle sales volume at each price.
+        Relative new vehicle sales volume at each price, e.g. ``0.97``, ``1.03``, etc
 
     """
     from context.new_vehicle_market import NewVehicleMarket

@@ -16,11 +16,20 @@ from omega_model import *
 
 def get_demanded_shares(market_class_data, calendar_year):
     """
+    Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
+    calculated within non-responsive market categories then converted to absolute shares.
 
-    :param market_class_data: dict-like data structure with 'average_MC_cost' and 'average_MC_co2e_gpmi' keys
-                                where MC = market class ID
-    :param calendar_year: calendar year to calculate market shares in
-    :return: dict of demanded ICE/BEV share by hauling / non_hauling market segments
+    Args:
+        market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
+            'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
+            columns, where MC = market class ID
+        calendar_year (int): calendar year to calculate market shares in
+
+    Returns:
+        A copy of ``market_class_data`` with demanded ICE/BEV share columns by market class, e.g.
+        'consumer_share_frac_MC', 'consumer_abs_share_frac_MC', and 'consumer_generalized_cost_dollars_MC' where
+        MC = market class ID
+
     """
     from consumer.demanded_shares_gcam import DemandedSharesGCAM
     from consumer.market_classes import MarketClass
