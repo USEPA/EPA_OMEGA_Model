@@ -4,6 +4,44 @@
 
 The data represents a fixed VMT schedule by age.
 
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The header uses a dynamic format.
+
+The data represents the re-registered proportion of vehicles by age and market class.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,``[module_name]``,input_template_version:,0.1
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:, consumer.annual_vmt_fixed_by_age, input_template_version:, 0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        age,market_class_id,annual_vmt
+        0,non_hauling.BEV,14699.55515
+        1,non_hauling.BEV,14251.70373
+        2,non_hauling.BEV,14025.35397
+
+:age:
+    Vehicle age, in years
+
+:market_class_id:
+    Vehicle market class ID, e.g. 'hauling.ICE'
+
+:annual_vmt:
+    Vehicle miles travelled per year at the given age
+
 ----
 
 **CODE**
