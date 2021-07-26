@@ -719,7 +719,6 @@ class Form(QObject):
         else:
             self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
 
-
     def clear_entries(self):
         """
         Clears all fields in the gui.
@@ -1051,6 +1050,16 @@ class Form(QObject):
         self.window.run_model_button.setEnabled(enable)
         self.window.multiprocessor_checkbox.setEnabled(enable)
         self.window.select_plot_3.setEnabled(enable)
+
+        if enable == 1:
+            # Check if dispy is running.
+            if is_running("dispynode.py"):
+                self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
+            else:
+                self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
+        else:
+            self.window.multiprocessor_checkbox.setEnabled(0)
+
 
     def select_plot_2(self):
         """
