@@ -13,6 +13,9 @@ import pandas
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
+import psutil
+import os
+
 # import pyqtgraph as pg
 
 
@@ -230,3 +233,24 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name, 
 
             ax.grid()  # Show grid
             plt.show()  # Show plot
+
+
+def is_running(script):
+    """
+        Checks to see if a Python script is running.
+
+        Args:
+            script: Python script to check
+
+        Returns:
+            True if script is running
+            False if script is not running
+        """
+    for q in psutil.process_iter():
+        if q.name().startswith('python'):
+            if len(q.cmdline())>1 and script in q.cmdline()[1] and q.pid !=os.getpid():
+                print("'{}' Process is already running".format(script))
+                return True
+
+    return False
+
