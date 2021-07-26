@@ -65,7 +65,6 @@ class OMEGABatchObject(OMEGABase):
         self.context_folder = ''
         self.context_id = ''
         self.context_case_id = ''
-        self.context_new_vehicle_generalized_costs_file = ''
         self.generate_context_new_vehicle_generalized_costs_file = False
         self.analysis_final_year = analysis_final_year
         self.consolidate_manufacturers = False
@@ -216,17 +215,6 @@ class OMEGABatchObject(OMEGABase):
         self.context_folder = self.read_parameter('Context Folder Name')
         self.context_id = self.read_parameter('Context Name')
         self.context_case_id = self.read_parameter('Context Case')
-        self.context_new_vehicle_generalized_costs_file = \
-            self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
-        # context_new_vehicle_prices_file can be one of:
-        # relative path, absolute path, 'GENERATE' or 'GENERATE filename' where filename can be an absolute or relative path
-        # if 'GENERATE' then the default file name will be batch_definition_path + 'context_new_vehicle_prices.csv'
-        if self.context_new_vehicle_generalized_costs_file.startswith('GENERATE'):
-            self.generate_context_new_vehicle_generalized_costs_file = True
-            self.context_new_vehicle_generalized_costs_file = \
-                self.context_new_vehicle_generalized_costs_file.replace('GENERATE', '').strip()
-            if not self.context_new_vehicle_generalized_costs_file:
-                self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
 
         if self.analysis_final_year is not None:
             self.dataframe.loc['Analysis Final Year'][0] = self.analysis_final_year
@@ -300,20 +288,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_case_id = self.parent.context_case_id
         self.settings.analysis_final_year = self.parent.analysis_final_year
         self.settings.consolidate_manufacturers = self.parent.consolidate_manufacturers
-
-        if self.num > 0:
-            self.settings.generate_context_new_vehicle_generalized_costs_file = False
-        else:
-            self.settings.generate_context_new_vehicle_generalized_costs_file = \
-                self.parent.generate_context_new_vehicle_generalized_costs_file
-
-        if remote and self.num > 0:
-            self.settings.context_new_vehicle_generalized_costs_file = \
-                self.read_parameter('Context New Vehicle Prices File').replace('\\', os.sep)
-        else: # local or self.num==0 (reference case)
-            self.settings.context_new_vehicle_generalized_costs_file = \
-                self.parent.context_new_vehicle_generalized_costs_file
-
+        self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
@@ -651,9 +626,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                         source_file_path = session.read_parameter(i)
                         if type(source_file_path) is str:
                             source_file_path = source_file_path.replace('\\', os.sep)
-                        if (i != 'Context New Vehicle Prices File') or \
-                                ( (s == 0) and (i == 'Context New Vehicle Prices File') and
-                                 not batch.generate_context_new_vehicle_generalized_costs_file):
                             if is_absolute_path(source_file_path):
                                 if options.verbose: batch.batch_log.logwrite('validating %s=%s' % (i, source_file_path))
                                 validate_file(source_file_path)
@@ -728,39 +700,27 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                         #     batch.dataframe.loc[i][session.num] = \
                         #         session.name + os.sep + batch.dataframe.loc[i][session.num]
                         if str(i).endswith(' File'):
-                            if (i != 'Context New Vehicle Prices File') or \
-                                    ((i == 'Context New Vehicle Prices File') and
-                                     not batch.generate_context_new_vehicle_generalized_costs_file):
-                                if i != 'Context New Vehicle Prices File':
-                                    source_file_path = batch.dataframe.loc[i][session.num]
-                                else:
-                                    source_file_path = batch.context_new_vehicle_generalized_costs_file
+                            source_file_path = batch.dataframe.loc[i][session.num]
 
-                                if type(source_file_path) is str:
-                                    # fix path separators, if necessary
-                                    source_file_path = source_file_path.replace('\\', os.sep)
+                            if type(source_file_path) is str:
+                                # fix path separators, if necessary
+                                source_file_path = source_file_path.replace('\\', os.sep)
 
-                                if is_absolute_path(source_file_path):
-                                    # file_path is absolute path
-                                    if options.verbose:
-                                        batch.batch_log.logwrite('relocating %s to %s' % (
-                                        source_file_path, options.session_path + get_filenameext(source_file_path)))
-                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                        options.session_path + bundle_input_folder_name, source_file_path)
-                                else:
-                                    # file_path is relative path
-                                    if options.verbose:
-                                        batch.batch_log.logwrite('relocating %s to %s' % (
-                                            batch.batch_definition_path + batch.dataframe.loc[i][session.num],
-                                            options.session_path + source_file_path))
-                                    batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
-                                        options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
+                            if is_absolute_path(source_file_path):
+                                # file_path is absolute path
+                                if options.verbose:
+                                    batch.batch_log.logwrite('relocating %s to %s' % (
+                                    source_file_path, options.session_path + get_filenameext(source_file_path)))
+                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
+                                    options.session_path + bundle_input_folder_name, source_file_path)
                             else:
-                                # handle 'Context New Vehicle Prices File' when generating
-                                if session.num == 0:
-                                    batch.dataframe.loc[i][session.num] = batch.dataframe.loc[i][session.num]
-                                else:
-                                    batch.dataframe.loc[i][session.num] = batch.context_new_vehicle_generalized_costs_file
+                                # file_path is relative path
+                                if options.verbose:
+                                    batch.batch_log.logwrite('relocating %s to %s' % (
+                                        batch.batch_definition_path + batch.dataframe.loc[i][session.num],
+                                        options.session_path + source_file_path))
+                                batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
+                                    options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
 
         import time
 
@@ -782,11 +742,11 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         if not options.no_sim:
             if options.dispy:  # run remote job on cluster, except for first job if generating context vehicle prices
                 dispy_session_list = session_list
-                if batch.generate_context_new_vehicle_generalized_costs_file:
-                    import copy
-                    # run reference case to generate vehicle prices then dispy the rest
-                    run_bundled_sessions(copy.copy(batch), options, remote_batchfile, [0])
-                    dispy_session_list = dispy_session_list[1:]
+
+                import copy
+                # run reference case to generate vehicle prices then dispy the rest
+                run_bundled_sessions(copy.copy(batch), options, remote_batchfile, [0])
+                dispy_session_list = dispy_session_list[1:]
 
                 if dispy_session_list:
                     retry_count = dict()  # track retry attempts for terminated or abandoned jobs
