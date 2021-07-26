@@ -5,39 +5,42 @@ Context Folder Name,String,,
 Context Name,String,AEO2021,
 Context Case,String,Reference case,
 Analysis Final Year,#,2050,
-Consolidate Manufacturers,TRUE / FALSE,FALSE,
+Consolidate Manufacturers,TRUE / FALSE,TRUE,
 Run Effects Calculations,TRUE / FALSE,FALSE,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
-Session Name,String,ReferencePolicy,ActionAlternative
+Session Name,String,NoActionPolicy,ActionAlternative
 ,,,
-IO Settings,,,
-Manufacturers File,String,manufacturers.csv,manufacturers.csv
-Market Classes File,String,market_classes.csv,market_classes.csv
-Vehicles File,String,vehicles.csv,vehicles.csv
-Vehicle On-road Calculations File,String,vehicle_onroad_calculations.csv,vehicle_onroad_calculations.csv
-Demanded Shares File,String,demanded_shares-gcam.csv,demanded_shares-gcam.csv
-Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
-Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+Policy Alternatives Settings,,,
 Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
+GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
+GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
+GHG Standards Fuels File,String,policy_fuels.csv,policy_fuels.csv
+Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
+Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
+Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
+ZEV Requirement File,String,required_zev_share.csv,required_zev_share.csv
+,,,
+Analysis Context Settings,,,
 Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
 Cost File,String,simulated_vehicles.csv,simulated_vehicles.csv
-Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
-GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
-GHG Standards Fuels File,String,policy_fuels.csv,policy_fuels.csv
-Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
-GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
-Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
-ZEV Requirement File,String,required_zev_share.csv,required_zev_share.csv
+Demanded Shares File,String,demanded_shares-gcam.csv,demanded_shares-gcam.csv
+Manufacturers File,String,manufacturers.csv,manufacturers.csv
+Market Classes File,String,market_classes.csv,market_classes.csv
+Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
 Price Modifications File,String,price_modifications.csv,price_modifications.csv
 Production Constraints File,String,production_constraints.csv,production_constraints.csv
 Stock Deregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
 Stock VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
-Verbose Output,TRUE / FALSE,FALSE,FALSE
-Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
+Vehicles File,String,vehicles.csv,vehicles.csv
+Vehicle On-road Calculations File,String,vehicle_onroad_calculations.csv,vehicle_onroad_calculations.csv
+New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5
+Consumer Pricing Multiplier Min,#,0.95,0.95
+Consumer Pricing Multiplier Max,#,1.05,1.05
 ,,,
 Runtime Settings,,,
 Num Market Share Options,#,5,5
@@ -46,9 +49,8 @@ Num Tech Options per BEV Vehicle,#,1,1
 Allow Backsliding,TRUE / FALSE,TRUE,"TRUE, FALSE"
 Cost Curve Frontier Affinity Factor,#,0.75,0.75
 Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
-New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5
-Consumer Pricing Multiplier Min,#,0.95,0.95
-Consumer Pricing Multiplier Max,#,1.05,1.05
+Verbose Output,TRUE / FALSE,FALSE,FALSE
+Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
 ,,,
 Postproc Settings,,,
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
