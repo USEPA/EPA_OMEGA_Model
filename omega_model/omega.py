@@ -740,7 +740,7 @@ def init_omega(session_runtime_options):
 
     from policy.offcycle_credits import OffCycleCredits
     from policy.upstream_methods import UpstreamMethods
-    from policy.required_zev_share import RequiredSalesShare
+    from policy.required_sales_share import RequiredSalesShare
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
     from policy.incentives import Incentives

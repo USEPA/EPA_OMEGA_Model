@@ -173,7 +173,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
 
         if all(s in consumer.responsive_market_categories for s in children):
             from context.production_constraints import ProductionConstraints
-            from policy.required_zev_share import RequiredSalesShare
+            from policy.required_sales_share import RequiredSalesShare
 
             min_constraints = dict()
             max_constraints = dict()
