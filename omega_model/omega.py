@@ -612,7 +612,6 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     return converged, convergence_error
 
 
-
 # def init_global_modules():
 #     import importlib
 #
@@ -731,7 +730,6 @@ def init_omega(session_runtime_options):
 
     # import database modules to populate ORM context
     from consumer.market_classes import MarketClass
-    # from consumer.sales_share_gcam import SalesShare
 
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
@@ -809,17 +807,11 @@ def init_omega(session_runtime_options):
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=verbose_init)
 
-        # init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
-        #                                                   verbose=verbose_init)
-
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=verbose_init)
 
         init_fail += RequiredSalesShare.init_from_file(omega_globals.options.required_sales_share_file,
                                                        verbose=verbose_init)
-
-        # init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
-        #                                         verbose=verbose_init)
 
         init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file,
                                                       verbose=verbose_init)
