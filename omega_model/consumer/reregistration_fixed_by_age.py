@@ -5,7 +5,7 @@ Vehicle re-registration, fixed by age.
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.  The header uses a dynamic format.
+rows.  The template header uses a dynamic format.
 
 The data represents the re-registered proportion of vehicles by age and market class.
 

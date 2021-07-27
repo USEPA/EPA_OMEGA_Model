@@ -8,7 +8,7 @@ Relative shares are converted to absolute shares for use in the producer complia
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.  The header uses a dynamic format.
+rows.  The template header uses a dynamic format.
 
 The data represents GCAM consumer model input parameters.
 

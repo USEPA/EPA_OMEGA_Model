@@ -11,7 +11,7 @@ parameter-based target calculations that define a "footprint curve" based on fou
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.  The header uses a dynamic format.
+rows.  The template header uses a dynamic format.
 
 The data represents a set of GHG standards (vehicle target CO2e g/mi) by regulatory class and model year as a function
 of vehicle footprint in square feet.

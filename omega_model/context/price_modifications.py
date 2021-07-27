@@ -1,7 +1,45 @@
 """
 
+**Code to implement (non-EPA-policy) price modifications, which may be price reductions or increases.**
+
+An example price modification would be BEV rebates.  Price modifications are by market class ID and year.
 
 ----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents price modifications by market class ID and start year.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,vehicle_price_modifications,input_template_version:,0.2
+
+The data header consists of a ``start_year`` column followed by zero or more price modification columns.
+
+Dynamic Data Header
+    .. csv-table::
+        :widths: auto
+
+        start_year, ``{market_class_id}:price_modification_dollars``, ...
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,hauling.BEV:price_modification_dollars,non_hauling.BEV:price_modification_dollars
+        2020,-7500,-5000
+
+Data Column Name and Description
+
+:start_year:
+    Start year of price modification, modification applies until the next available start year
 
 **CODE**
 
@@ -11,7 +49,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-price_modification = 'price_modification_dollars'
+price_modification_str = 'price_modification_dollars'
 
 
 class PriceModifications(OMEGABase):
@@ -22,9 +60,9 @@ class PriceModifications(OMEGABase):
         start_years = PriceModifications.values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
-        mod_key = '%s:%s' % (market_class_id, price_modification)
+        mod_key = '%s:%s' % (market_class_id, price_modification_str)
         if mod_key in PriceModifications.values:
-            return PriceModifications.values['%s:%s' % (market_class_id, price_modification)].loc[
+            return PriceModifications.values['%s:%s' % (market_class_id, price_modification_str)].loc[
                 PriceModifications.values['start_year'] == calendar_year].item()
         else:
             return 0
@@ -54,7 +92,7 @@ class PriceModifications(OMEGABase):
 
                 PriceModifications.values['start_year'] = np.array(df['start_year'])
 
-                share_columns = [c for c in df.columns if (price_modification in c)]
+                share_columns = [c for c in df.columns if (price_modification_str in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
