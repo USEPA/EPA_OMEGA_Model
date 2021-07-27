@@ -151,8 +151,8 @@ class OMEGABatchObject(OMEGABase):
             'Num Tech Options per ICE Vehicle': 'NITO',
             'Num Tech Options per BEV Vehicle': 'NBTO',
             'New Vehicle Price Elasticity of Demand': 'NVPE',
-            'Consumer Pricing Multiplier Min': 'CPMMIN',
-            'Consumer Pricing Multiplier Max': 'CPMMAX',
+            'Producer Cross Subsidy Multiplier Min': 'PCSMMIN',
+            'Producer Cross Subsidy Multiplier Max': 'PCSMMAX',
             'Allow Backsliding': 'BS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
@@ -339,13 +339,13 @@ class OMEGASessionObject(OMEGABase):
             self.settings.new_vehicle_price_elasticity_of_demand = \
                 self.read_parameter('New Vehicle Price Elasticity of Demand')
 
-        if not pd.isna(self.read_parameter('Consumer Pricing Multiplier Min')):
+        if not pd.isna(self.read_parameter('Producer Cross Subsidy Multiplier Min')):
             self.settings.consumer_pricing_multiplier_min = float(
-                self.read_parameter('Consumer Pricing Multiplier Min'))
+                self.read_parameter('Producer Cross Subsidy Multiplier Min'))
 
-        if not pd.isna(self.read_parameter('Consumer Pricing Multiplier Max')):
+        if not pd.isna(self.read_parameter('Producer Cross Subsidy Multiplier Max')):
             self.settings.consumer_pricing_multiplier_max = float(
-                self.read_parameter('Consumer Pricing Multiplier Max'))
+                self.read_parameter('Producer Cross Subsidy Multiplier Max'))
 
         self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
                                                                     true_false_dict)
