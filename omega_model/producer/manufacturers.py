@@ -1,5 +1,37 @@
 """
 
+**Routines to load manufacturer definition data.**
+
+----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents manufacturer names.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,manufacturers,input_template_version:,0.0003
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        manufacturer_id
+        consolidated_OEM
+        OEM_A
+        OEM_B
+
+Data Column Name and Description
+
+:manufacturer_id:
+    The name of the manufacturer
 
 ----
 
