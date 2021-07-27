@@ -10,8 +10,60 @@ testing (tests are performed with headlights off).
 As another example, engine Stop-Start has an on-cycle benefit but the vehicle idle duration during testing may
 under-represent vehicle idle duration in real-world driving so there may be some additional benefit available.
 
-
 ----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents offcycle credit values (grams CO2e/mile) credit group and regulatory class.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,offcycle_credits,input_template_version:,0.1
+
+The data header consists of ``start_year``, ``credit_name``, ``credit_group``, ``credit_destination`` columns
+followed by zero or more reg class columns, as needed.
+
+Dynamic Data Header
+    .. csv-table::
+        :widths: auto
+
+        start_year, credit_name, credit_group, credit_destination, ``reg_class_id:{reg_class_id}``, ...
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,credit_name,credit_group,credit_destination,reg_class_id:car,reg_class_id:truck
+        2020,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,2.5,4.4
+        2020,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,2.7,2.7
+        2020,ac_leakage,ac,cert_indirect_offcycle_co2e_grams_per_mile,13.8,17.2
+        2020,ac_efficiency,ac,cert_direct_offcycle_co2e_grams_per_mile,5,7.2
+
+Data Column Name and Description
+
+:start_year:
+    Start year of production constraint, constraint applies until the next available start year
+
+:credit_name:
+    Name of the offcycle credit
+
+:credit_group:
+    Group name of the offcycle credit, in case of limits within a group of credits (work in progress)
+
+:credit_destination:
+    Name of the vehicle CO2e attribute to apply the credit to, e.g. ``cert_direct_offcycle_co2e_grams_per_mile``, ``cert_indirect_offcycle_co2e_grams_per_mile``
+
+**Optional Columns**
+
+:``reg_class_id:{reg_class_id}``:
+    The value of the credits.  Credits are specificied as positive numbers and are subtracted from the cert results to determine a compliance result
 
 **CODE**
 

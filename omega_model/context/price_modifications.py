@@ -41,6 +41,11 @@ Data Column Name and Description
 :start_year:
     Start year of price modification, modification applies until the next available start year
 
+**Optional Columns**
+
+:``{market_class_id}:price_modification_dollars``:
+    Contains the price modification.  Value should be negative to reduce price, positive to increase price.
+
 **CODE**
 
 """

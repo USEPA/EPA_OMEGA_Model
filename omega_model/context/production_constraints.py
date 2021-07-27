@@ -43,6 +43,11 @@ Data Column Name and Description
 :start_year:
     Start year of production constraint, constraint applies until the next available start year
 
+**Optional Columns**
+
+:``{market_class_id}:{minimum_share or maximum_share}``:
+    Holds the value of the minimum or maximum production contraint, as required
+
 **CODE**
 
 """
