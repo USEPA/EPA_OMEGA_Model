@@ -167,8 +167,8 @@ if __name__ == '__main__':
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += AnnualVMT.init_from_file(omega_globals.options.annual_vmt_file,
-                                                       verbose=omega_globals.options.verbose)
+        init_fail += AnnualVMT.init_from_file(omega_globals.options.onroad_vmt_file,
+                                              verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)

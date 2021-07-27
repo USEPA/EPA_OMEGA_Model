@@ -311,7 +311,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
         self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
-        self.settings.annual_vmt_file = self.read_parameter('Stock VMT File')
+        self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
             self.read_parameter('Slice Tech Combo Tables'), true_false_dict)
