@@ -138,7 +138,7 @@ try:
             self.consumer_pricing_multiplier_min = 0.95
             self.consumer_pricing_multiplier_max = 1.05
 
-            self.new_vehicle_sales_response_elasticity = -0.5
+            self.new_vehicle_price_elasticity_of_demand = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = False

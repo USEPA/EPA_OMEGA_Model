@@ -38,7 +38,7 @@ Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistratio
 Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
 Vehicles File,String,vehicles.csv,vehicles.csv
 Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,onroad_vehicle_calculations.csv
-New Vehicle Price Sales Response Elasticity,#,-0.5,-0.5
+New Vehicle Price Elasticity of Demand,#,-0.5,-0.5
 Consumer Pricing Multiplier Min,#,0.95,0.95
 Consumer Pricing Multiplier Max,#,1.05,1.05
 ,,,

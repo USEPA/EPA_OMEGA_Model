@@ -82,7 +82,7 @@ class OMEGABatchObject(OMEGABase):
             'Num Market Share Options',
             'Num Tech Options per ICE Vehicle',
             'Num Tech Options per BEV Vehicle',
-            'New Vehicle Price Sales Response Elasticity',
+            'New Vehicle Price Elasticity of Demand',
         }
 
         for p in numeric_params:
@@ -150,7 +150,7 @@ class OMEGABatchObject(OMEGABase):
             'Num Market Share Options': 'NMSO',
             'Num Tech Options per ICE Vehicle': 'NITO',
             'Num Tech Options per BEV Vehicle': 'NBTO',
-            'New Vehicle Price Sales Response Elasticity': 'NVPSRE',
+            'New Vehicle Price Elasticity of Demand': 'NVPE',
             'Consumer Pricing Multiplier Min': 'CPMMIN',
             'Consumer Pricing Multiplier Max': 'CPMMAX',
             'Allow Backsliding': 'BS',
@@ -335,9 +335,9 @@ class OMEGASessionObject(OMEGABase):
             self.settings.producer_num_tech_options_per_bev_vehicle = int(
                 self.read_parameter('Num Tech Options per BEV Vehicle'))
 
-        if not pd.isna(self.read_parameter('New Vehicle Price Sales Response Elasticity')):
-            self.settings.new_vehicle_sales_response_elasticity = \
-                self.read_parameter('New Vehicle Price Sales Response Elasticity')
+        if not pd.isna(self.read_parameter('New Vehicle Price Elasticity of Demand')):
+            self.settings.new_vehicle_price_elasticity_of_demand = \
+                self.read_parameter('New Vehicle Price Elasticity of Demand')
 
         if not pd.isna(self.read_parameter('Consumer Pricing Multiplier Min')):
             self.settings.consumer_pricing_multiplier_min = float(

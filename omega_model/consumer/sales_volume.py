@@ -91,7 +91,7 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
     Q0 = 1
     P0 = NewVehicleMarket.get_context_new_vehicle_generalized_cost(calendar_year, compliance_id)
 
-    E = omega_globals.options.new_vehicle_sales_response_elasticity
+    E = omega_globals.options.new_vehicle_price_elasticity_of_demand
 
     M = -(Q0*E - Q0) / (P0/E - P0)  # slope of linear response
 
