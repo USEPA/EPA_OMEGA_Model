@@ -36,7 +36,7 @@ class PriceModifications(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'policy_price_modifications'
+        input_template_name = 'vehicle_price_modifications'
         input_template_version = 0.2
         input_template_columns = {'start_year'}
 
@@ -92,13 +92,13 @@ if __name__ == '__main__':
 
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
-        init_fail += PriceModifications.init_from_file(omega_globals.options.price_modifications_file,
+        init_fail += PriceModifications.init_from_file(omega_globals.options.vehicle_price_modifications_file,
                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
             PriceModifications.values.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'policy_price_modifications.csv', index=False)
+                omega_globals.options.database_dump_folder + os.sep + 'vehicle_price_modifications.csv', index=False)
 
             print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))
             print(PriceModifications.get_price_modification(2020, 'non_hauling.BEV'))

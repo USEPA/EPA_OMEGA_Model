@@ -308,7 +308,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
         self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
         self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
-        self.settings.price_modifications_file = self.read_parameter('Price Modifications File')
+        self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
         self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
         self.settings.annual_vmt_file = self.read_parameter('Stock VMT File')

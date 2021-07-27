@@ -97,7 +97,7 @@ try:
             self.generate_context_new_vehicle_generalized_costs_file = True
             self.context_fuel_prices_file = path + 'demo_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'demo_inputs/policy_fuel_upstream_methods.csv'
-            self.price_modifications_file = path + 'demo_inputs/price_modifications.csv'
+            self.vehicle_price_modifications_file = path + 'demo_inputs/vehicle_price_modifications.csv'
             self.drive_cycles_file = path + 'demo_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'demo_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'demo_inputs/context_new_vehicle_market.csv'

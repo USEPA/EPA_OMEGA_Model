@@ -803,7 +803,7 @@ def init_omega(session_runtime_options):
         NewVehicleMarket.init_context_new_vehicle_generalized_costs(
             omega_globals.options.context_new_vehicle_generalized_costs_file)
 
-        init_fail += PriceModifications.init_from_file(omega_globals.options.price_modifications_file,
+        init_fail += PriceModifications.init_from_file(omega_globals.options.vehicle_price_modifications_file,
                                                        verbose=verbose_init)
 
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
