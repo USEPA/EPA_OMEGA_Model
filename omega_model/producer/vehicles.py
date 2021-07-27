@@ -28,8 +28,8 @@ Sample Data Columns
         :widths: auto
 
         vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs
-        ICE Small Utility truck,USA Motors,2019,truck,Small SUV 4WD,Small Utility,N,non_hauling,ice_LPW_HRL,{'pump gasoline':1.0},{'GHG cert gasoline':1.0},3204422,312.3688658,0,47.00990646,216.1551053,14.29126821,4090.657984,183.2251956,73.74951226,66.63903079,7.976806551,107.4727695,140.101209,34200.17292,5.29582511,1173.586089,2726.343428
-        BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,non_hauling,bev_LPW_LRL,{'US electricity':1.0},{'GHG cert electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
+        ICE Small Utility truck,USA Motors,2019,truck,Small SUV 4WD,Small Utility,N,non_hauling,ice_LPW_HRL,{'pump gasoline':1.0},{'gasoline':1.0},3204422,312.3688658,0,47.00990646,216.1551053,14.29126821,4090.657984,183.2251956,73.74951226,66.63903079,7.976806551,107.4727695,140.101209,34200.17292,5.29582511,1173.586089,2726.343428
+        BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,non_hauling,bev_LPW_LRL,{'US electricity':1.0},{'electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
 
 Data Column Name and Description
     :vehicle_id:
@@ -1234,14 +1234,14 @@ class VehicleFinal(SQABase, Vehicle):
                         alt_veh.name = 'BEV of ' + v.name
                         alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
                         alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
-                        alt_veh.cert_fuel_id = "{'GHG cert electricity':1.0}"
+                        alt_veh.cert_fuel_id = "{'electricity':1.0}"
                         alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
                     else:
                         alt_veh.fueling_class = 'ICE'
                         alt_veh.name = 'ICE of ' + v.name
                         alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
                         alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                        alt_veh.cert_fuel_id = "{'GHG cert gasoline':1.0}"
+                        alt_veh.cert_fuel_id = "{'gasoline':1.0}"
                         alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
                     alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
                     alt_veh.cert_direct_co2e_grams_per_mile = 0
