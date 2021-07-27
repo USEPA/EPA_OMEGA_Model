@@ -1,13 +1,184 @@
 """
 
-example usage:
+**Routines to load and run a batch of one or more OMEGA simulation sessions.**
 
-    python omega_batch.py --batch_file inputs\phase0_default_batch_file.xlsx
+Sessions are defined by columns of data, some rows support multiple comma-separated values, which are expanded in a
+full-factorial fashion.  All required session data, including source code, is "bundled" to a common folder,
+thereby providing a standalone archive of the batch that can be inspected or re-run at any time.
 
+The batch process supports parallel processing via multi-core and/or multi-machine running of batches via the optional
+``dispy`` package.  Parallel processing requires the machine(s) to have running instances of ``dispynode`` s and
+optionally a ``dispyscheduler``.  Parallel processing is an advanced topic and is not covered in detail here.
 
-----
+Example command-line shell script for launching a dispy node:
 
-**CODE**
+    ::
+
+        #! /bin/zsh
+
+        PYTHONPATH="/Users/omega_user/Code/GitHub/USEPA_OMEGA2/venv3.8/bin"
+        DISPYPATH="/Users/omega_user/Code/GitHub/USEPA_OMEGA2/venv3.8/lib/python3.8/site-packages/dispy"
+
+        $PYTHONPATH/python3 $DISPYPATH/dispynode.py --clean --cpus=8 --client_shutdown --ping_interval=15 --daemon --zombie_interval=5
+
+**INPUT FILE FORMAT**
+
+The file format consists of a two-column header followed by a one or more session definition columns.  Batch settings
+(settings that apply to all sessions) are defined in the first column (at the top, by convention).  The data rows
+do not need to be defined in any particular order.
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        Parameter,Type,Value,
+        Batch Settings,,,
+        Batch Name,String,demo_batch,
+        Context Folder Name,String,,
+        Context Name,String,AEO2021,
+        Context Case,String,Reference case,
+        Analysis Final Year,#,2050,
+        Consolidate Manufacturers,TRUE / FALSE,TRUE,
+        Run Effects Calculations,TRUE / FALSE,FALSE,
+        ,,,
+        Session Settings,,,
+        Enable Session,TRUE / FALSE,TRUE,TRUE
+        Session Name,String,NoActionPolicy,ActionAlternative
+        ,,,
+        Policy Alternatives Settings,,,
+        Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
+        Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
+        GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
+        GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
+        Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
+        Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
+        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+        Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
+        Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
+        Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
+        ,,,
+        Analysis Context Settings,,,
+        Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
+        Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
+        Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,simulated_vehicles.csv
+        Sales Share File,String,sales_share-gcam.csv,sales_share-gcam.csv
+        Manufacturers File,String,manufacturers.csv,manufacturers.csv
+        Market Classes File,String,market_classes.csv,market_classes.csv
+        Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
+        Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
+        Production Constraints File,String,production_constraints.csv,production_constraints.csv
+        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
+        Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
+        Vehicles File,String,vehicles.csv,vehicles.csv
+        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,onroad_vehicle_calculations.csv
+        New Vehicle Price Elasticity of Demand,#,-0.5,-0.5
+        Producer Cross Subsidy Multiplier Min,#,0.95,0.95
+        Producer Cross Subsidy Multiplier Max,#,1.05,1.05
+        ,,,
+        Runtime Settings,,,
+        Num Market Share Options,#,5,5
+        Num Tech Options per ICE Vehicle,#,5,5
+        Num Tech Options per BEV Vehicle,#,1,1
+        Allow Backsliding,TRUE / FALSE,TRUE,"TRUE, FALSE"
+        Cost Curve Frontier Affinity Factor,#,0.75,0.75
+        Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
+        Verbose Output,TRUE / FALSE,FALSE,FALSE
+        Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
+        ,,,
+        Postproc Settings,,,
+        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
+        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
+        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
+        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
+        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
+        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
+        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
+        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
+
+The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
+columns contain the data to define batch settings and session settings.
+
+Data Row Name and Description
+
+:Batch Settings:
+    Decorator, not evaluated
+
+:Batch Name *(str)*:
+    The name of the batch, combined with a timestamp (YYYY_MM_DD_hh_mm_ss) becomes the name of the bundle folder
+
+:Context Folder Name:
+:Context Name:
+:Context Case:
+:Analysis Final Year:
+:Consolidate Manufacturers:
+:Run Effects Calculations:
+
+:Session Settings:
+    Decorator, not evaluated
+
+:Enable Session:
+:Session Name:
+
+:Policy Alternatives Settings:
+    Decorator, not evaluated
+
+:Drive Cycles File:
+:Drive Cycle Weights File:
+:GHG Credits File:
+:GHG Standards File:
+:Policy Fuels File:
+:Off-Cycle Credits File:
+:Policy Fuel Upstream Methods File:
+:Production Multipliers File:
+:Regulatory Classes File:
+:Required Sales Share File:
+
+:Analysis Context Settings:
+    Decorator, not evaluated
+
+:Context Fuel Prices File:
+:Context New Vehicle Market File:
+:Vehicle Simulation Results and Costs File:
+:Sales Share File:
+:Manufacturers File:
+:Market Classes File:
+:Onroad Fuels File:
+:Vehicle Price Modifications File:
+:Production Constraints File:
+:Vehicle Reregistration File:
+:Onroad VMT File:
+:Vehicles File:
+:Onroad Vehicle Calculations File:
+:New Vehicle Price Elasticity of Demand:
+:Producer Cross Subsidy Multiplier Min:
+:Producer Cross Subsidy Multiplier Max:
+
+:Runtime Settings:
+    Decorator, not evaluated
+
+:Num Market Share Options:
+:Num Tech Options per ICE Vehicle:
+:Num Tech Options per BEV Vehicle:
+:Allow Backsliding:
+:Cost Curve Frontier Affinity Factor:
+:Iterate Producer-Consumer:
+:Verbose Output:
+:Slice Tech Combo Tables:
+
+:Postproc Settings:
+    Decorator, not evaluated
+
+:Context Criteria Cost Factors File:
+:Context SCC Cost Factors File:
+:Context Energy Security Cost Factors File:
+:Context Congestion-Noise Cost Factors File:
+:Context Powersector Emission Factors File:
+:Context Refinery Emission Factors File:
+:Context Vehicle Emission Factors File:
+:Context Implicit Price Deflators File:
+:Context Consumer Price Index File:
+
 
 """
 
