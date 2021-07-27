@@ -1,7 +1,47 @@
 """
 
+**Code to load and implement production constraints by market class and year.**
+
+Market classes are assumed to have no minimum or maximum constraint unless specified in the input file, and it
+is only necessary to specify the limiting constraints, i.e. a minimum can be specified without specifying a
+maximum, and vice versa.
 
 ----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents production constraints by market class ID and start year.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,production_constraints,input_template_version:,0.2
+
+The data header consists of a ``start_year`` column followed by zero or more production constraint columns.
+
+Dynamic Data Header
+    .. csv-table::
+        :widths: auto
+
+        start_year, ``{market_class_id}:{minimum_share or maximum_share}``, ...
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,hauling.BEV:minimum_share,non_hauling.BEV:minimum_share,hauling.BEV:maximum_share,non_hauling.BEV:maximum_share
+        2020,0.001,0.001,0.1,0.97
+
+Data Column Name and Description
+
+:start_year:
+    Start year of production constraint, constraint applies until the next available start year
 
 **CODE**
 
