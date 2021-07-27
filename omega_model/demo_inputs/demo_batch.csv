@@ -22,7 +22,7 @@ Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
 Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
 Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
 Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
-ZEV Requirement File,String,required_zev_share.csv,required_zev_share.csv
+Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
 ,,,
 Analysis Context Settings,,,
 Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv

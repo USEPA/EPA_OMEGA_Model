@@ -742,7 +742,7 @@ def init_omega(session_runtime_options):
 
     from policy.offcycle_credits import OffCycleCredits
     from policy.upstream_methods import UpstreamMethods
-    from policy.required_zev_share import RequiredZevShare
+    from policy.required_zev_share import RequiredSalesShare
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
     from policy.incentives import Incentives
@@ -815,8 +815,8 @@ def init_omega(session_runtime_options):
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=verbose_init)
 
-        init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file,
-                                                     verbose=verbose_init)
+        init_fail += RequiredSalesShare.init_from_file(omega_globals.options.required_sales_share_file,
+                                                       verbose=verbose_init)
 
         # init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
         #                                         verbose=verbose_init)

@@ -114,7 +114,7 @@ try:
             self.production_multipliers_file = path + 'demo_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'demo_inputs/policy_fuels.csv'
             self.ghg_credits_file = path + 'demo_inputs/ghg_credits.csv'
-            self.required_zev_share_file = path + 'demo_inputs/required_zev_share.csv'
+            self.required_sales_share_file = path + 'demo_inputs/required_sales_share.csv'
             self.production_constraints_file = path + 'demo_inputs/production_constraints.csv'
             self.vehicle_reregistration_file = path + 'demo_inputs/reregistration_fixed_by_age.csv'
             self.annual_vmt_file = path + 'demo_inputs/annual_vmt_fixed_by_age.csv'

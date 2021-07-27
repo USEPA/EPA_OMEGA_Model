@@ -14,18 +14,18 @@ from omega_model import *
 min_share_units = 'minimum_share'
 
 
-class RequiredZevShare(OMEGABase):
+class RequiredSalesShare(OMEGABase):
     values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
-        start_years = RequiredZevShare.values['start_year']
+        start_years = RequiredSalesShare.values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
         min_key = '%s:%s' % (market_class_id, min_share_units)
-        if min_key in RequiredZevShare.values:
-            return RequiredZevShare.values['%s:%s' % (market_class_id, min_share_units)].loc[
-                RequiredZevShare.values['start_year'] == calendar_year].item()
+        if min_key in RequiredSalesShare.values:
+            return RequiredSalesShare.values['%s:%s' % (market_class_id, min_share_units)].loc[
+                RequiredSalesShare.values['start_year'] == calendar_year].item()
         else:
             return 0
 
@@ -36,7 +36,7 @@ class RequiredZevShare(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'required_zev_share'
+        input_template_name = 'required_sales_share'
         input_template_version = 0.2
         input_template_columns = {'start_year'}
 
@@ -52,14 +52,14 @@ class RequiredZevShare(OMEGABase):
             if not template_errors:
                 from consumer.market_classes import MarketClass
 
-                RequiredZevShare.values['start_year'] = np.array(df['start_year'])
+                RequiredSalesShare.values['start_year'] = np.array(df['start_year'])
 
                 share_columns = [c for c in df.columns if (min_share_units in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in MarketClass.market_classes:
-                        RequiredZevShare.values[sc] = df[sc]
+                        RequiredSalesShare.values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -93,16 +93,16 @@ if __name__ == '__main__':
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += RequiredZevShare.init_from_file(omega_globals.options.required_zev_share_file,
-                                                     verbose=omega_globals.options.verbose)
+        init_fail += RequiredSalesShare.init_from_file(omega_globals.options.required_sales_share_file,
+                                                       verbose=omega_globals.options.verbose)
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            RequiredZevShare.values.to_csv(
+            RequiredSalesShare.values.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
 
-            print(RequiredZevShare.get_minimum_share(2020, 'hauling.BEV'))
-            print(RequiredZevShare.get_minimum_share(2020, 'non_hauling.BEV'))
+            print(RequiredSalesShare.get_minimum_share(2020, 'hauling.BEV'))
+            print(RequiredSalesShare.get_minimum_share(2020, 'non_hauling.BEV'))
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
