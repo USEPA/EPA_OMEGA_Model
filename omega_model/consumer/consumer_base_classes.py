@@ -67,7 +67,7 @@ class AnnualVMTBase:
             (float) Vehicle miles travelled.
 
         """
-        raise Exception('**Attempt to call abstract method AnnualVMT.%s() without child class override**' %
+        raise Exception('**Attempt to call abstract method OnroadVMT.%s() without child class override**' %
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
@@ -84,7 +84,7 @@ class AnnualVMTBase:
             List of template/input errors, else empty list on success
 
         """
-        return ['**Attempt to call abstract method AnnualVMT.%s() without child class override**' %
+        return ['**Attempt to call abstract method OnroadVMT.%s() without child class override**' %
                 inspect.currentframe().f_code.co_name]
 
 

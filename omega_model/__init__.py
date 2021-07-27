@@ -170,7 +170,7 @@ try:
             self.RegulatoryClasses = None
             self.VehicleTargets = None
             self.Reregistration = None
-            self.AnnualVMT = None
+            self.OnroadVMT = None
             self.SalesShare = None
 
 except:

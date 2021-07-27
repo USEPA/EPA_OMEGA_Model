@@ -58,7 +58,7 @@ def update_stock(calendar_year):
 
         reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
 
-        annual_vmt = omega_globals.options.AnnualVMT.get_vmt(market_class_id, age)
+        annual_vmt = omega_globals.options.OnroadVMT.get_vmt(market_class_id, age)
 
         registered_count = initial_registered_count * reregistration_factor
 
@@ -77,7 +77,7 @@ def update_stock(calendar_year):
 
             reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
 
-            annual_vmt = omega_globals.options.AnnualVMT.get_vmt(market_class_id, age)
+            annual_vmt = omega_globals.options.OnroadVMT.get_vmt(market_class_id, age)
 
             registered_count = initial_registered_count * reregistration_factor
 

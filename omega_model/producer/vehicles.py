@@ -917,10 +917,12 @@ class Vehicle(OMEGABase):
                                                                     'onroad_direct_kwh_per_mile',
                                                                     'new_vehicle_mfr_cost_dollars')
 
+        # cull cost_cloud points here, based on producer constraints or whatever #
+
         # calculate frontier from updated cloud
         allow_upslope = True
         cost_curve = calc_frontier(self.cost_cloud, 'cert_co2e_grams_per_mile',
-                                             'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
+                                   'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
         # CostCloud.plot_frontier(self.cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, o2.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 

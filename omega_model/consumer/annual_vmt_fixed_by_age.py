@@ -53,7 +53,7 @@ from omega_model import *
 cache = dict()
 
 
-class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
+class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
     """
     Loads and provides access to VMT by market class and age.
 
@@ -83,9 +83,9 @@ class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
         cache_key = '%s_%s' % (market_class_id, age)
 
         if cache_key not in cache:
-            cache[cache_key] = float(omega_globals.session.query(AnnualVMT.annual_vmt).
-                                     filter(AnnualVMT.market_class_id == market_class_id).
-                                     filter(AnnualVMT.age == age).scalar())
+            cache[cache_key] = float(omega_globals.session.query(OnroadVMT.annual_vmt).
+                                     filter(OnroadVMT.market_class_id == market_class_id).
+                                     filter(OnroadVMT.age == age).scalar())
 
         return cache[cache_key]
 
@@ -125,7 +125,7 @@ class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
                 obj_list = []
                 # load data into database
                 for i in df.index:
-                    obj_list.append(AnnualVMT(
+                    obj_list.append(OnroadVMT(
                         age=df.loc[i, 'age'],
                         market_class_id=df.loc[i, 'market_class_id'],
                         annual_vmt=df.loc[i, 'annual_vmt'],
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += AnnualVMT.init_from_file(omega_globals.options.onroad_vmt_file,
+        init_fail += OnroadVMT.init_from_file(omega_globals.options.onroad_vmt_file,
                                               verbose=omega_globals.options.verbose)
 
         if not init_fail:

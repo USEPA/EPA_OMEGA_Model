@@ -298,6 +298,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         production_options = create_production_options(calendar_year, composite_vehicles, tech_and_share_sweeps,
                                                        context_based_total_sales)
 
+        # insert code to cull production options based on policy here #
+
         production_options['share_range'] = share_range
 
         production_options['strategic_compliance_ratio'] = \
