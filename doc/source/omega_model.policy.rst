@@ -73,10 +73,10 @@ omega\_model.policy.regulatory\_classes module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.policy.required\_zev\_share module
------------------------------------------------
+omega\_model.policy.required\_sales\_share module
+-------------------------------------------------
 
-.. automodule:: omega_model.policy.required_zev_share
+.. automodule:: omega_model.policy.required_sales_share
    :members:
    :undoc-members:
    :show-inheritance:
