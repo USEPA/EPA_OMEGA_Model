@@ -1,7 +1,41 @@
 """
 
+**Routines to load and apply upstream calculation methods.**
+
+Upstream calculation methods calculate cert CO2e g/mi from kWh/mi.
 
 ----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents the calculation method(s) to apply by start year.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,policy_fuel_upstream_methods,input_template_version:,0.2
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,upstream_calculation_method
+        2020,upstream_xev_ice_delta
+        2025,upstream_actual
+
+Data Column Name and Description
+
+:start_year:
+    Start year of the upstream calculation method, method applies until the next available start year
+
+:upstream_calculation_method:
+    The name of the function to call within ``upstream_methods.py``
 
 **CODE**
 
