@@ -90,7 +90,7 @@ class AnnualVMT(OMEGABase, SQABase, AnnualVMTBase):
         return cache[cache_key]
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += AnnualVMT.init_database_from_file(omega_globals.options.annual_vmt_file,
+        init_fail += AnnualVMT.init_from_file(omega_globals.options.annual_vmt_file,
                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:

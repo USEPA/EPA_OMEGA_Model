@@ -1359,7 +1359,7 @@ if __name__ == '__main__':
 
         if not init_fail:
 
-            vehicles_list = VehicleFinal.get_compliance_vehicles(2019, 'consolidated_OEM')
+            vehicles_list = VehicleFinal.get_compliance_vehicles(2019, 'OEM_A')
 
             # update vehicle annual data, registered count must be update first:
             VehicleAnnualData.update_registered_count(vehicles_list[0], 2020, 54321)

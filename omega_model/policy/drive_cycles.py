@@ -158,8 +158,6 @@ if __name__ == '__main__':
             print(DriveCycles.validate_drive_cycle_id('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
             print(DriveCycles.get_drive_cycle_distance_miles('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
 
-            print(DriveCycles.get_drive_cycles())
-
         else:
             print(init_fail)
 
