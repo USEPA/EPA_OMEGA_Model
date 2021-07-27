@@ -293,7 +293,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
         self.settings.vehicle_onroad_calculations_file = self.read_parameter('Vehicle On-road Calculations File')
-        self.settings.demanded_shares_file = self.read_parameter('Demanded Shares File')
+        self.settings.sales_share_file = self.read_parameter('Sales Share File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
         self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
         self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')

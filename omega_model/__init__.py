@@ -88,7 +88,7 @@ try:
             self.market_classes_file = path + 'demo_inputs/market_classes.csv'
             self.vehicles_file = path + 'demo_inputs/vehicles.csv'
             self.vehicle_onroad_calculations_file = path + 'demo_inputs/vehicle_onroad_calculations.csv'
-            self.demanded_shares_file = path + 'demo_inputs/demanded_shares-gcam.csv'
+            self.sales_share_file = path + 'demo_inputs/sales_share-gcam.csv'
             self.onroad_fuels_file = path + 'demo_inputs/onroad_fuels.csv'
             self.context_folder = ''
             self.context_id = 'AEO2021'
@@ -171,6 +171,7 @@ try:
             self.VehicleTargets = None
             self.Reregistration = None
             self.AnnualVMT = None
+            self.SalesShare = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

@@ -28,7 +28,7 @@ Analysis Context Settings,,,
 Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
 Cost File,String,simulated_vehicles.csv,simulated_vehicles.csv
-Demanded Shares File,String,demanded_shares-gcam.csv,demanded_shares-gcam.csv
+Sales Share File,String,sales_share-gcam.csv,sales_share-gcam.csv
 Manufacturers File,String,manufacturers.csv,manufacturers.csv
 Market Classes File,String,market_classes.csv,market_classes.csv
 Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv

@@ -249,7 +249,6 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     from consumer.market_classes import MarketClass
     from producer import compliance_strategy
     import consumer
-    from consumer.sales_share_gcam import get_demanded_shares
 
     producer_decision['winning_combo_share_weighted_cost'] = 0
     producer_decision['winning_combo_share_weighted_generalized_cost'] = 0
@@ -277,7 +276,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                                     prev_multiplier_range, price_options_df,
                                                                     producer_decision_and_response)
 
-        producer_decision_and_response = get_demanded_shares(price_options_df, calendar_year)
+        producer_decision_and_response = omega_globals.options.SalesShare.calc_shares(price_options_df, calendar_year)
 
         ###############################################################################################################
         calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
@@ -653,6 +652,9 @@ def init_user_definable_modules():
     module_name = get_template_name(omega_globals.options.annual_vmt_file)
     omega_globals.options.AnnualVMT = importlib.import_module(module_name).AnnualVMT
 
+    module_name = get_template_name(omega_globals.options.sales_share_file)
+    omega_globals.options.SalesShare = importlib.import_module(module_name).SalesShare
+
     return init_fail
 
 
@@ -729,7 +731,7 @@ def init_omega(session_runtime_options):
 
     # import database modules to populate ORM context
     from consumer.market_classes import MarketClass
-    from consumer.demanded_shares_gcam import DemandedSharesGCAM
+    # from consumer.sales_share_gcam import SalesShare
 
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
@@ -780,14 +782,14 @@ def init_omega(session_runtime_options):
         init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
                                                          verbose=verbose_init)
 
-        init_fail += DemandedSharesGCAM.init_database_from_file(omega_globals.options.demanded_shares_file,
-                                                                verbose=verbose_init)
+        init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
+                                                                     verbose=verbose_init)
 
         init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.reregistration_file,
                                                    verbose=verbose_init)
 
-        init_fail += omega_globals.options.AnnualVMT.init_database_from_file(omega_globals.options.annual_vmt_file,
-                                                                 verbose=verbose_init)
+        init_fail += omega_globals.options.AnnualVMT.init_from_file(omega_globals.options.annual_vmt_file,
+                                                                    verbose=verbose_init)
 
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=verbose_init)

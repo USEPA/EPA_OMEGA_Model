@@ -25,14 +25,6 @@ omega\_model.consumer.consumer\_base\_classes module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.consumer.demanded\_shares\_gcam module
----------------------------------------------------
-
-.. automodule:: omega_model.consumer.demanded_shares_gcam
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.consumer.market\_classes module
 --------------------------------------------
 
