@@ -101,7 +101,7 @@ try:
             self.drive_cycles_file = path + 'demo_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'demo_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'demo_inputs/context_new_vehicle_market.csv'
-            self.cost_file = path + 'demo_inputs/simulated_vehicles.csv'
+            self.vehicle_simulation_results_and_costs_file = path + 'demo_inputs/simulated_vehicles.csv'
             self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = 2021

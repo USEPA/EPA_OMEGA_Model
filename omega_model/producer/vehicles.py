@@ -1344,7 +1344,7 @@ if __name__ == '__main__':
         init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
                                                        verbose=omega_globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,

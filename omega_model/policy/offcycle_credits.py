@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,

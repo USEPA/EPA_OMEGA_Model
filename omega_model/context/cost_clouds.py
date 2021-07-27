@@ -35,7 +35,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,simulated_vehicles,input_template_version:,0.2,``{optional_source_data_comment}``
+       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.2,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -136,7 +136,7 @@ class CostCloud(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'simulated_vehicles'
+        input_template_name = 'simulated_vehicle_results_and_costs'
         input_template_version = 0.2
         input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
                                   'new_vehicle_mfr_cost_dollars'}
@@ -209,7 +209,7 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         init_fail = []
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file, verbose=True)
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=True)
 
         if not init_fail:
             pass

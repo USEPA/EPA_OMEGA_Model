@@ -317,7 +317,7 @@ if __name__ == '__main__':
                                                          verbose=omega_globals.options.verbose)
         init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                verbose=omega_globals.options.verbose)
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
         init_fail += VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                           verbose=omega_globals.options.verbose)

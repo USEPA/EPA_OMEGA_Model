@@ -677,7 +677,7 @@ def init_user_definable_decomposition_attributes(verbose_init):
 
     init_fail = []
 
-    init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+    init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                       verbose=verbose_init)
 
     init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
@@ -809,7 +809,7 @@ def init_omega(session_runtime_options):
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=verbose_init)
 
-        # init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.cost_file,
+        # init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
         #                                                   verbose=verbose_init)
 
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
