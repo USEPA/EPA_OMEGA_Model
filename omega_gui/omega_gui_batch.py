@@ -601,6 +601,8 @@ class Form(QObject):
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
+
+
     def wizard_logic(self):
         """
         Handles the gui logic to enable and disable various controls and launch event monitor messages.
@@ -710,6 +712,12 @@ class Form(QObject):
 
         self.window.model_status_label.setText("Model Idle")
         self.window.select_plot_3.setEnabled(0)
+
+        # Check if dispy is running.
+        if is_running("dispynode.py"):
+            self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
+        else:
+            self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
 
     def clear_entries(self):
         """
@@ -1042,6 +1050,16 @@ class Form(QObject):
         self.window.run_model_button.setEnabled(enable)
         self.window.multiprocessor_checkbox.setEnabled(enable)
         self.window.select_plot_3.setEnabled(enable)
+
+        if enable == 1:
+            # Check if dispy is running.
+            if is_running("dispynode.py"):
+                self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
+            else:
+                self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
+        else:
+            self.window.multiprocessor_checkbox.setEnabled(0)
+
 
     def select_plot_2(self):
         """
