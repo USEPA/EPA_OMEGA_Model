@@ -646,7 +646,7 @@ def init_user_definable_modules():
     module_name = get_template_name(omega_globals.options.policy_targets_file)
     omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
-    module_name = get_template_name(omega_globals.options.reregistration_file)
+    module_name = get_template_name(omega_globals.options.vehicle_reregistration_file)
     omega_globals.options.Reregistration = importlib.import_module(module_name).Reregistration
 
     module_name = get_template_name(omega_globals.options.annual_vmt_file)
@@ -785,8 +785,8 @@ def init_omega(session_runtime_options):
         init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                                      verbose=verbose_init)
 
-        init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.reregistration_file,
-                                                   verbose=verbose_init)
+        init_fail += omega_globals.options.Reregistration.init_from_file(omega_globals.options.vehicle_reregistration_file,
+                                                                         verbose=verbose_init)
 
         init_fail += omega_globals.options.AnnualVMT.init_from_file(omega_globals.options.annual_vmt_file,
                                                                     verbose=verbose_init)

@@ -168,7 +168,7 @@ if __name__ == '__main__':
                                                          verbose=omega_globals.options.verbose)
 
         init_fail += Reregistration.init_from_file(
-            omega_globals.options.reregistration_file, verbose=omega_globals.options.verbose)
+            omega_globals.options.vehicle_reregistration_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)

@@ -34,7 +34,7 @@ Market Classes File,String,market_classes.csv,market_classes.csv
 Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
 Price Modifications File,String,price_modifications.csv,price_modifications.csv
 Production Constraints File,String,production_constraints.csv,production_constraints.csv
-Stock Deregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
+Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
 Stock VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
 Vehicles File,String,vehicles.csv,vehicles.csv
 Vehicle On-road Calculations File,String,vehicle_onroad_calculations.csv,vehicle_onroad_calculations.csv
