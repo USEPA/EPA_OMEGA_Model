@@ -1,7 +1,51 @@
 """
 
+**Routines to load and apply (optional) required sales shares by market class.**
+
+This module could be used to investiage the effect of ZEV mandates, for example.
 
 ----
+
+**INPUT FILE FORMAT**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents required minimum sales shares by by market class ID and start year.  Shares are relative
+to the market category, not absolute.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,required_sales_share,input_template_version:,0.2
+
+The data header consists of a ``start_year`` column followed by zero or more required sales share columns.
+
+Dynamic Data Header
+    .. csv-table::
+        :widths: auto
+
+        start_year, ``{market_class_id}:minimum_share``, ...
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,hauling.BEV:minimum_share,non_hauling.BEV:minimum_share
+        2020,0.05,0.1
+
+Data Column Name and Description
+
+:start_year:
+    Start year of required sales share, sales share applies until the next available start year
+
+**Optional Columns**
+
+:``{market_class_id}:minimum_share``:
+    Holds the value of the minimum sales share,  [0..1]
 
 **CODE**
 
@@ -11,7 +55,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-min_share_units = 'minimum_share'
+min_share_units_str = 'minimum_share'
 
 
 class RequiredSalesShare(OMEGABase):
@@ -22,9 +66,9 @@ class RequiredSalesShare(OMEGABase):
         start_years = RequiredSalesShare.values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
-        min_key = '%s:%s' % (market_class_id, min_share_units)
+        min_key = '%s:%s' % (market_class_id, min_share_units_str)
         if min_key in RequiredSalesShare.values:
-            return RequiredSalesShare.values['%s:%s' % (market_class_id, min_share_units)].loc[
+            return RequiredSalesShare.values['%s:%s' % (market_class_id, min_share_units_str)].loc[
                 RequiredSalesShare.values['start_year'] == calendar_year].item()
         else:
             return 0
@@ -54,7 +98,7 @@ class RequiredSalesShare(OMEGABase):
 
                 RequiredSalesShare.values['start_year'] = np.array(df['start_year'])
 
-                share_columns = [c for c in df.columns if (min_share_units in c)]
+                share_columns = [c for c in df.columns if (min_share_units_str in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]

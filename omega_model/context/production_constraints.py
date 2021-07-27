@@ -13,7 +13,8 @@ maximum, and vice versa.
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The data header uses a dynamic column notation, as detailed below.
 
-The data represents production constraints by market class ID and start year.
+The data represents production constraints (specified as a market share) by market class ID and start year.
+Shares are relative to the market category, not absolute.
 
 File Type
     comma-separated values (CSV)
@@ -46,7 +47,7 @@ Data Column Name and Description
 **Optional Columns**
 
 :``{market_class_id}:{minimum_share or maximum_share}``:
-    Holds the value of the minimum or maximum production contraint, as required
+    Holds the value of the minimum or maximum production contraint, as required, [0..1]
 
 **CODE**
 
