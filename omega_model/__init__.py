@@ -87,7 +87,7 @@ try:
             self.manufacturers_file = path + 'demo_inputs/manufacturers.csv'
             self.market_classes_file = path + 'demo_inputs/market_classes.csv'
             self.vehicles_file = path + 'demo_inputs/vehicles.csv'
-            self.vehicle_onroad_calculations_file = path + 'demo_inputs/vehicle_onroad_calculations.csv'
+            self.onroad_vehicle_calculations_file = path + 'demo_inputs/onroad_vehicle_calculations.csv'
             self.sales_share_file = path + 'demo_inputs/sales_share-gcam.csv'
             self.onroad_fuels_file = path + 'demo_inputs/onroad_fuels.csv'
             self.context_folder = ''

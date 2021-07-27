@@ -452,7 +452,7 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=omega_globals.options.verbose)
 
         # credit_bank = CreditBank('demo_inputs/ghg_debits.csv', 'consolidated_OEM')

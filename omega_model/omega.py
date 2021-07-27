@@ -840,7 +840,7 @@ def init_omega(session_runtime_options):
                                                                         verbose=verbose_init)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.vehicle_onroad_calculations_file,
+                                                          omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=verbose_init)
 
         if omega_globals.options.calc_criteria_emission_costs:
