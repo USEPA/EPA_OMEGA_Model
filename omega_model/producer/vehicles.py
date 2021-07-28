@@ -8,7 +8,7 @@ Classes are also implemented to handle composition and decomposition of vehicle 
 vehicle workflow.  Some vehicle attributes are known and fixed in advance, others are created at runtime (e.g. off-cycle
 credit attributes which may vary by policy).
 
-**INPUT FILE FORMAT**
+**INPUT FILE FORMAT (Vehicles File)**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
@@ -129,6 +129,58 @@ Data Column Name and Description
 
 ----
 
+**INPUT FILE FORMAT (Onroad Vehicle Calculations File)**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.  The data header uses a dynamic column notation, as detailed below.
+
+The data represents the "gap" between on-cycle and onroad GHG performance.
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,vehicle_attribute_calculations,input_template_version:,0.2
+
+The data header consists of a ``start_year`` column followed by zero or more calculation columns.
+
+Dynamic Data Header
+    .. csv-table::
+        :widths: auto
+
+        start_year, ``{vehicle_select_attribute}:{vehicle_select_attribute_value}:{operator}:{vehicle_source_attribute}->{vehicle_destination_attribute}``, ...
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh_per_mile,fueling_class:ICE:/:cert_direct_co2e_grams_per_mile->onroad_direct_co2e_grams_per_mile
+        2020,0.7,0.8
+
+Data Column Name and Description
+
+:start_year:
+    Start year of price modification, modification applies until the next available start year
+
+**Optional Columns**
+
+Subsequent columns have the format
+{vehicle_select_attribute}:{vehicle_select_attribute_value}:{operator}:
+{vehicle_source_attribute}->{vehicle_destination_attribute}, the row value is a numeric value to applied to the source
+attribute to calculate the destination attribute.
+
+For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh_per_mile`` column with a row value of
+``0.7`` would be evaluated as:
+
+    ::
+
+        if vehicle.fueling_class == 'BEV':
+            vehicle.onroad_direct_kwh_per_mile = vehicle.cert_direct_kwh_per_mile / 0.7
+
+----
+
 **CODE**
 
 """
@@ -243,7 +295,7 @@ class DecompositionAttributes(OMEGABase):
 
 class VehicleAttributeCalculations(OMEGABase):
     """
-    ****
+    **VehicleAttributeCalculations**
     """
     cache = dict()
 
@@ -287,7 +339,7 @@ class VehicleAttributeCalculations(OMEGABase):
     @staticmethod
     def perform_attribute_calculations(vehicle, cost_cloud=None):
         """
-        ****
+        **perform_attribute_calculations**
         Args:
             vehicle:
             cost_cloud:
@@ -315,7 +367,7 @@ class VehicleAttributeCalculations(OMEGABase):
 
 class CompositeVehicle(OMEGABase):
     """
-    ****
+    **CompositeVehicle**
     """
     next_vehicle_id = -1
 
@@ -598,7 +650,7 @@ class CompositeVehicle(OMEGABase):
 
 class Vehicle(OMEGABase):
     """
-    ****
+    **Vehicle**
     """
     next_vehicle_id = 0
 
@@ -947,7 +999,7 @@ if __name__ == '__main__':
 
 class VehicleFinal(SQABase, Vehicle):
     """
-    ****
+    **VehicleFinal**
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
@@ -963,8 +1015,7 @@ class VehicleFinal(SQABase, Vehicle):
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     legacy_reg_class_id = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
-    reg_class_id = Column('reg_class_id', Enum(*omega_globals.options.RegulatoryClasses.reg_classes,
-                                               validate_strings=True))
+    reg_class_id = Column(String)  # , Enum(*omega_globals.options.RegulatoryClasses.reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
     market_share = Column(Float)

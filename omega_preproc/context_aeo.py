@@ -189,7 +189,10 @@ class SetInputs:
     path_aeo_inputs = path_cwd / f'omega_preproc/aeo_tables/AEO{aeo_version}'
     path_bea_inputs = path_cwd / f'omega_preproc/bea_tables/BEA{aeo_version}'
     path_outputs = path_cwd / 'omega_preproc/output_context_aeo'
-    path_outputs.mkdir(exist_ok=True)
+    try:
+        path_outputs.mkdir(exist_ok=True)
+    except:
+        pass
     path_input_templates = path_cwd / 'omega_model/demo_inputs'
 
     vehicles_context_template = 'context_new_vehicle_market.csv'

@@ -45,7 +45,7 @@ The file format consists of a one-row template header followed by a one-row data
 rows.  The data header uses a dynamic column notation, as detailed below.
 
 The data represents drive-cycle weighting factors (distance shares) in a hierarchical tree datastructure, by model year
-and fueling class.
+and fueling class.  For details on how the header is parsed into a tree, see ``common.omega_trees.WeightedTree``.
 
 File Type
     comma-separated values (CSV)
