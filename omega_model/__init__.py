@@ -44,6 +44,7 @@ try:
     from common.omega_functions import *
     from policy.policy_base_classes import *
     from consumer.consumer_base_classes import *
+    from producer.producer_base_classes import *
 
     import scipy.interpolate
 
