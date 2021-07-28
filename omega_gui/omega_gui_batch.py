@@ -1,6 +1,4 @@
 """
-omega_gui_batch.py
-==================
 
 This code launches and controls the OMEGA GUI.
 The GUI uses QT Designer for the layout and PySide2 as the Python interface.

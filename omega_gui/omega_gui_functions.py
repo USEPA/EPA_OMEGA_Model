@@ -1,6 +1,4 @@
 """
-omega_gui_functions
-===================
 
 Contains functions used by the GUI.
 
