@@ -133,6 +133,7 @@ class Form(QObject):
         self.window.action_documentation.triggered.connect(self.launch_documentation)
         self.window.epa_button.clicked.connect(self.launch_epa_website)
         self.window.action_about_omega.triggered.connect(self.launch_about)
+        self.window.multiprocessor_help_button.clicked.connect(self.launch_about_multiprocessor)
         self.window.multiprocessor_checkbox.clicked.connect(self.multiprocessor_mode)
         self.window.open_plot_2.clicked.connect(self.open_plot_2)
         self.window.select_plot_2.clicked.connect(self.select_plot_2)
@@ -185,6 +186,7 @@ class Form(QObject):
         self.window.open_plot_2.setStyleSheet(stylesheet)
         self.window.select_plot_2.setStyleSheet(stylesheet)
         self.window.select_plot_3.setStyleSheet(stylesheet)
+        self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
@@ -601,7 +603,25 @@ class Form(QObject):
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
 
+    def launch_about_multiprocessor(self):
+        """
+        Displays help for multiprocessor in a popup box.
 
+        Args:
+            N/A
+
+        Returns:
+            N/A
+        """
+        global omega2_version
+        message_title = "About Multiprocessor Mode"
+        message = "To use Multiprocessor mode, a batch file customized to the configuration\n" \
+                  "of this computer must be executed before the GUI is launched.\n\n" \
+                  "For reference, there are " + str(os.cpu_count()) + " CPUs in this computer.\n\n" \
+                  "Please see the documentation for further details."
+
+        os.cpu_count()
+        self.showbox(message_title, message)
 
     def wizard_logic(self):
         """

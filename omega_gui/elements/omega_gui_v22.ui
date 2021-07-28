@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>3</number>
     </property>
     <property name="iconSize">
      <size>
@@ -385,28 +385,6 @@ EPA Science Advisory Board - 2020</string>
        <string>Project Description</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="multiprocessor_checkbox">
-      <property name="geometry">
-       <rect>
-        <x>530</x>
-        <y>40</y>
-        <width>151</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>OMEGA Multiprocessor Selection</string>
-      </property>
-      <property name="text">
-       <string>Multiprocessor</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="input_batch_file_check_button">
       <property name="geometry">
        <rect>
@@ -645,6 +623,58 @@ EPA Science Advisory Board - 2020</string>
       </property>
       <property name="text">
        <string>Select Current Run</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="options_tab">
+     <attribute name="title">
+      <string>Options</string>
+     </attribute>
+     <widget class="QCheckBox" name="multiprocessor_checkbox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>9</y>
+        <width>221</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>OMEGA Multiprocessor Selection</string>
+      </property>
+      <property name="text">
+       <string>Enable Multiprocessor</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="multiprocessor_help_button">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>10</y>
+        <width>211</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Displays Help for Multiprocessor Mode</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>Multiprocessor Help</string>
       </property>
      </widget>
     </widget>
