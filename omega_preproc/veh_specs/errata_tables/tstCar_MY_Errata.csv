@@ -1,0 +1,79 @@
+Correction Index,Correction Type,Column Name Change?,Column Name,Model Year,Veh Mfr Code,Represented Test Veh Make,Represented Test Veh Model,Old Value,New Value,Numeric (y/n),Source(s),Test Vehicle ID,Test Veh Configuration #,Test Procedure Description
+1,Replace,n,RND_ADJ_FE,2014,BMX,BMW,I8,0,,y,FE Guide,VX64010,0,Charge Depleting UDDS
+2,Replace,n,RND_ADJ_FE,2015,BMX,BMW,I8,0,,y,FE Guide,VX64010,0,Charge Depleting UDDS
+3,Replace,n,RND_ADJ_FE,2016,BMX,BMW,I8,0,,y,FE Guide,VX64010,0,Charge Depleting UDDS
+4,Replace,n,RND_ADJ_FE,2016,GMX,CHEVROLET,IMPALA,10000,22.7993,y,FE Guide,361EGP4200,2,California fuel 3-day exhaust
+5,Replace,n,RND_ADJ_FE,2016,GMX,CHEVROLET,IMPALA,10000,39.1199,y,FE Guide,361EGP4200,2,HWFE
+6,Replace,n,RND_ADJ_FE,2016,VGA,AUDI,Audi A6,10000,31.2269,y,FE Guide,GAAC-CAF,0,Federal fuel 2-day exhaust (w/can load)
+7,Replace,n,RND_ADJ_FE,2016,VGA,AUDI,Audi A6,10000,48.8,y,FE Guide,GAAC-CAF,0,HWFE
+8,Replace,n,RND_ADJ_FE,2016,VGA,AUDI,Audi A6,10000,31.2269,y,FE Guide,GAAC-CAF,0,Federal fuel 2-day exhaust (w/can load)
+9,Replace,n,RND_ADJ_FE,2016,VGA,AUDI,Audi A6,10000,25.6,y,FE Guide,GAAC-CAQ,0,Federal fuel 2-day exhaust (w/can load)
+10,Replace,n,RND_ADJ_FE,2016,VGA,AUDI,Audi A6,10000,25.6,y,FE Guide,GAAC-CAQ,0,Federal fuel 2-day exhaust (w/can load)
+11,Replace,n,RND_ADJ_FE,2016,VGA,AUDI,Audi A6,10000,41.9,y,FE Guide,GAAC-CAQ,0,HWFE
+12,Replace,n,Drive System Code,2016,VGA,AUDI,Audi A6,F,A,n,Edmunds,GAAC-CAQ,0,Federal fuel 2-day exhaust (w/can load)
+13,Replace,n,Drive System Code,2016,VGA,AUDI,Audi A6,F,A,n,Edmunds,GAAC-CAQ,0,Federal fuel 2-day exhaust (w/can load)
+14,Replace,n,Drive System Code,2016,VGA,AUDI,Audi A6,F,A,n,Edmunds,GAAC-CAQ,0,HWFE
+15,Replace,n,Drive System Description,2016,VGA,AUDI,Audi A6,"2-Wheel Drive, Front",All Wheel Drive,n,Edmunds,GAAC-CAQ,0,Federal fuel 2-day exhaust (w/can load)
+16,Replace,n,Drive System Description,2016,VGA,AUDI,Audi A6,"2-Wheel Drive, Front",All Wheel Drive,n,Edmunds,GAAC-CAQ,0,Federal fuel 2-day exhaust (w/can load)
+17,Replace,n,Drive System Description,2016,VGA,AUDI,Audi A6,"2-Wheel Drive, Front",All Wheel Drive,n,Edmunds,GAAC-CAQ,0,HWFE
+18,Replace,n,RND_ADJ_FE,2016,BMX,BMW,I8,0,113.7102,y,FE Guide,VX64010,0,Charge Depleting UDDS
+19,Replace,n,RND_ADJ_FE,2016,BMX,BMW,X5 xDrive40e,0,78.7896,y,FE Guide,0F74534,0,Charge Depleting UDDS
+20,Replace,n,RND_ADJ_FE,2016,HYX,HYUNDAI,SONATA PLUG-IN HYBRID,0,141.3,y,FE Guide,PLF5NAUP11A,0,Charge Depleting UDDS
+21,Replace,n,RND_ADJ_FE,2016,HYX,HYUNDAI,SONATA PLUG-IN HYBRID,0,139.8,y,FE Guide,PLF5NAUP11A,0,Charge Depleting Highway
+22,Replace,n,RND_ADJ_FE,2016,VVX,Volvo,XC90 T8 AWD,0,83.4,y,FE Guide,201621,0,Charge Depleting UDDS
+23,Replace,n,Target Coef A (lbf),2016,FEX,Ferrari,488 GTB,150,33.721,y,Subconfig Data,203350,1,Federal fuel 2-day exhaust (w/can load)
+29,Replace,n,Target Coef B (lbf/mph),2016,FEX,Ferrari,488 GTB,1.08,0.391,y,Subconfig Data,203350,1,Federal fuel 2-day exhaust (w/can load)
+35,Replace,n,Target Coef C (lbf/mph**2),2016,FEX,Ferrari,488 GTB,0.026,0.015,y,Subconfig Data,203350,1,Federal fuel 2-day exhaust (w/can load)
+41,Replace,n,Rated Horsepower,2016,BMX,BMW,I3 REX,11,170,y,CarAndDriver,VX62501,0,Federal fuel 3-day exhaust
+48,Replace,n,RND_ADJ_FE,2016,BMX,BMW,X5 xDrive40e,0,,y,FE Guide,0F74534,0,Charge Depleting UDDS
+49,Replace,n,RND_ADJ_FE,2016,HYX,HYUNDAI,SONATA PLUG-IN HYBRID,0,,y,FE Guide,PLF5NAUP11A,0,Charge Depleting UDDS
+50,Replace,n,RND_ADJ_FE,2016,VVX,Volvo,XC90 T8 AWD,0,,y,FE Guide,201621,0,Charge Depleting UDDS
+51,Replace,n,RND_ADJ_FE,2017,BMX,BMW,I8,0,,y,FE Guide,VX64010,0,Charge Depleting UDDS
+52,Replace,n,RND_ADJ_FE,2017,BMX,BMW,330e,0,,y,FE Guide,K478507,1,Charge Depleting UDDS
+54,Replace,n,RND_ADJ_FE,2017,BMX,BMW,X5 xDrive40e,0,,y,FE Guide,0F74534,0,Charge Depleting UDDS
+55,Replace,n,RND_ADJ_FE,2017,HYX,HYUNDAI,SONATA PLUG-IN HYBRID,0,,y,FE Guide,PLF5NAUP11A,0,Charge Depleting UDDS
+56,Replace,n,RND_ADJ_FE,2017,HYX,KIA,OPTIMA PLUG-IN HYBRID,0,,y,FE Guide,JF7N0WU01AC,0,Charge Depleting UDDS
+57,Replace,n,RND_ADJ_FE,2017,VVX,Volvo,XC90 T8 AWD,0,,y,FE Guide,201621,0,Charge Depleting UDDS
+58,Replace,n,RND_ADJ_FE,2018,BMX,BMW,330e,0,,y,FE Guide,K478507,1,Charge Depleting UDDS
+59,Replace,n,RND_ADJ_FE,2018,BMX,BMW,330e,0,,y,FE Guide,K478507,2,Charge Depleting UDDS
+60,Replace,n,RND_ADJ_FE,2018,BMX,BMW,X5 xDrive40e,0,,y,FE Guide,0F74534,0,Charge Depleting UDDS
+61,Replace,n,RND_ADJ_FE,2018,HYX,HYUNDAI,IONIQ PHEV,0,,y,FE Guide,AE8G6WU01AC,0,Charge Depleting UDDS
+62,Replace,n,RND_ADJ_FE,2018,HYX,HYUNDAI,SONATA PLUG-IN HYBRID,0,,y,FE Guide,LF8N0WU05AC,0,Charge Depleting UDDS
+63,Replace,n,RND_ADJ_FE,2018,HYX,KIA,OPTIMA PLUG-IN HYBRID,0,,y,FE Guide,JF7N0WU01AC,0,Charge Depleting UDDS
+64,Replace,n,RND_ADJ_FE,2018,KMX,KIA,Niro Plug-in,0,,y,FE Guide,DE8G6WU13AC,0,Charge Depleting UDDS
+65,Replace,n,RND_ADJ_FE,2018,VVX,Volvo,S90 T8 AWD,0,,y,FE Guide,201801,0,Charge Depleting UDDS
+66,Replace,n,RND_ADJ_FE,2018,VVX,Volvo,XC60 T8 AWD,0,,y,FE Guide,201811,0,Charge Depleting UDDS
+67,Replace,n,Represented Test Veh Make,2019,SUB,STI,S209,STI,SUBARU,n,Subconfig Data,,,
+68,Replace,n,Veh Mfr Code,2019,SUB,SUBARU,S209,SUB,FJX,n,Subconfig Data,,,
+69,Replace,n,Vehicle Manufacturer Name,2019,FJX,SUBARU,S209,SUBARU TECNICA INTE,Subaru,n,Subconfig Data,,,
+70,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model 3,Long Range,Long Range,Model 3 Long Range,n,Subconfig Data,,,
+71,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model 3,Long Range AWD,Long Range AWD,Model 3 Long Range AWD,n,Subconfig Data,,,
+72,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model 3,Mid Range RWD,Mid Range RWD,Model 3 Mid Range RWD,n,Subconfig Data,,,
+73,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model 3,Standard Range Plus RWD,Standard Range Plus RWD,Model 3 Standard Range Plus RWD,n,Subconfig Data,,,
+74,Replace,n,Represented Test Veh Make,2019,TSL,Tesla Model 3,Tesla Model 3,Tesla Model 3,Tesla,n,Subconfig Data,,,
+75,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model S,100D,100D,MODEL S 100D,n,Subconfig Data,,,
+76,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model S,75D,75D,MODEL S 75D,n,Subconfig Data,,,
+77,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model S,P100D,P100D,MODEL S P100D,n,Subconfig Data,,,
+78,Replace,n,Represented Test Veh Make,2019,TSL,Tesla Model S,Tesla Model S,Tesla Model S,Tesla,n,Subconfig Data,,,
+79,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model X,100D,100D,MODEL X 100D,n,Subconfig Data,,,
+80,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model X,75D,75D,MODEL X 75D,n,Subconfig Data,,,
+81,Replace,n,Represented Test Veh Model,2019,TSL,Tesla Model X,P100D,P100D,MODEL X P100D,n,Subconfig Data,,,
+82,Replace,n,Represented Test Veh Make,2019,TSL,Tesla Model X,Tesla Model X,Tesla Model X,Tesla,n,Subconfig Data,,,
+81,Replace,n,Represented Test Veh Model,2019,TSL,Tesla,MODEL3 LONGRANGE AWD PERFORMANCE,MODEL3 LONGRANGE AWD PERFORMANCE,"Model 3 Long Range AWD Performance (18"" Wheels)",n,Subconfig Data,,3D220-521025,0
+83,Replace,n,Veh Mfr Code,2019,FTG,Fiat,Alfa 4c,FTG,CRX,n,Subconfig Data,,,
+84,Replace,n,Represented Test Veh Make,2019,CRX,Fiat,Alfa 4c,Fiat,Alfa Romeo,n,Subconfig Data,,,
+85,Replace,n,Represented Test Veh Model,2019,CRX,Alfa Romeo,Alfa 4c,Alfa 4c,4C,n,Subconfig Data,,,
+86,Replace,n,Veh Mfr Code,2019,RII,Roush,Stage 3 Mustang,RII,FMX,n,Subconfig Data,,,
+87,Replace,n,Represented Test Veh Model,2019,FMX,Roush,Stage 3 Mustang,Stage 3 Mustang,ROUSH STAGE 3 MUSTANG,n,Subconfig Data,,,
+88,Replace,n,Represented Test Veh Model,2019,FMX,Lincoln,MKZ (HEV),MKZ (HEV),MKZ HYBRID FWD,n,Subconfig Data,,,
+89,Replace,n,RND_ADJ_FE,2019,HYX,HYUNDAI,IONIQ PHEV,0,,y,FE Guide,AE8G6WU01AC,0,Charge Depleting UDDS
+90,Replace,n,RND_ADJ_FE,2019,HYX,HYUNDAI,SONATA PLUG-IN HYBRID,0,,y,FE Guide,LF8N0WU05AC,0,Charge Depleting UDDS
+91,Replace,n,RND_ADJ_FE,2019,HYX,KIA,OPTIMA PLUG-IN HYBRID,0,,y,FE Guide,JF7N0WU01AC,0,Charge Depleting UDDS
+92,Replace,n,RND_ADJ_FE,2019,VVX,Volvo,S90 T8 AWD,0,,y,FE Guide,201801,0,Charge Depleting UDDS
+93,Replace,n,RND_ADJ_FE,2019,VVX,Volvo,XC60 T8 AWD,0,,y,FE Guide,201902,0,Charge Depleting UDDS
+94,Replace,n,RND_ADJ_FE,2019,VVX,Volvo,XC90 T8 AWD,0,,y,FE Guide,201901,0,Charge Depleting UDDS
+40,Replace,n,Represented Test Veh Model,2019,FEX,Ferrari,488 Special Series Coupe,488 Special Series Coupe,488 COUPE,n,Subconfig Data,210284,0,"['Federal fuel 2-day exhaust (w/can load)', 'HWFE']"
+40,Replace,n,Represented Test Veh Model,2019,FEX,Ferrari,488 Special Series Spider,488 Special Series Spider,488 SPIDER,n,Subconfig Data,219471,0,"['Federal fuel 2-day exhaust (w/can load)', 'HWFE']"
+95,Replace,n,RND_ADJ_FE,2020,HYX,HYUNDAI,IONIQ PHEV,0,,y,FE Guide,AE8G6WU01AC,0,Charge Depleting UDDS
+96,Replace,n,RND_ADJ_FE,2020,KMX,KIA,OPTIMA PLUG-IN HYBRID,0,,y,FE Guide,JF0N0WU01AC,0,Charge Depleting UDDS
+97,Replace,n,RND_ADJ_FE,2021,MTX,MITSUBISHI,Outlander PHEV,0,,y,FE Guide,EB21-RH61,7,Charge Depleting UDDS
