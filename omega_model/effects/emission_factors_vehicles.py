@@ -40,6 +40,9 @@ Data Column Name and Description
         In-use fuel id, for use with context fuel prices, must be consistent with the context data read by
         ``class context_fuel_prices.ContextFuelPrices``
 
+    :voc_grams_per_mile:
+        The vehicle emission factors follow the structure pollutant_units where units are grams per mile.
+
 ----
 
 **CODE**

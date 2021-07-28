@@ -9,30 +9,6 @@ omega\_model.effects package
 Submodules
 ----------
 
-omega\_model.effects.cost\_effects\_criteria module
----------------------------------------------------
-
-.. automodule:: omega_model.effects.cost_effects_criteria
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-omega\_model.effects.cost\_effects\_non\_emissions module
----------------------------------------------------------
-
-.. automodule:: omega_model.effects.cost_effects_non_emissions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-omega\_model.effects.cost\_effects\_scc module
-----------------------------------------------
-
-.. automodule:: omega_model.effects.cost_effects_scc
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.effects.cost\_factors\_congestion\_noise module
 ------------------------------------------------------------
 

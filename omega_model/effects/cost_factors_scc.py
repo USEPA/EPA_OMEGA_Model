@@ -5,7 +5,7 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents $/ton benefits estimates associated with GHG pollutants by calendar year for all sources.
+The data represents $/metric ton benefits estimates (i.e., Social Cost of GHG) associated with reductions in GHG pollutants.
 
 File Type
     comma-separated values (CSV)
@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_cost_factors-scc,input_template_version:,0.1
+       input_template_name:,cost_factors-scc,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -21,14 +21,17 @@ Sample Data Columns
 
         calendar_year,dollar_basis,co2_global_5.0_USD_per_metricton,co2_global_3.0_USD_per_metricton,co2_global_2.5_USD_per_metricton,co2_global_3.95_USD_per_metricton,ch4_global_5.0_USD_per_metricton,ch4_global_3.0_USD_per_metricton,ch4_global_2.5_USD_per_metricton,ch4_global_3.95_USD_per_metricton,n2o_global_5.0_USD_per_metricton,n2o_global_3.0_USD_per_metricton,n2o_global_2.5_USD_per_metricton,n2o_global_3.95_USD_per_metricton
         2020,2018,14.0514,49.5852,74.181,147.1651,646.1792,1441.555,1895.9669,3791.8882,5610.0501,17865.8998,26335.6921,46841.7517
-
+        2021,2018,14.5258,50.6221,75.4487,150.5725,672.6103,1487.1167,1949.7824,3916.5329,5806.1046,18290.1717,26876.1028,48014.0752
 
 Data Column Name and Description
     :calendar_year:
-        The calendar year for which $/ton values are applicable.
+        The calendar year for which specific cost factors are applicable.
 
     :dollar_basis:
         The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+
+    :co2_global_5.0_USD_per_metricton:
+        The structure for all cost factors is pollutant_scope_discount-rate_units, where scope is global or domestic and units are in US dollars per metric ton.
 
 
 ----

@@ -760,9 +760,9 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
-    from effects.cost_effects_scc import CostEffectsSCC
-    from effects.cost_effects_criteria import CostEffectsCriteria
-    from effects.cost_effects_non_emissions import CostEffectsNonEmissions
+    # from effects.cost_effects_scc import CostEffectsSCC
+    # from effects.cost_effects_criteria import CostEffectsCriteria
+    # from effects.cost_effects_non_emissions import CostEffectsNonEmissions
 
     file_io.validate_folder(omega_globals.options.output_folder)
 

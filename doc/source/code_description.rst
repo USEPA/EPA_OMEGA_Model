@@ -107,8 +107,8 @@ https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst
 FAQ
 ^^^
 
-Multiprocessor
---------------
+Multiprocessor Mode
+-------------------
 
 Dispy and Pycos Versions
 ++++++++++++++++++++++++
@@ -117,6 +117,5 @@ Some versions of dispy and pycos have proved to be incompatible with each other.
 
 * dispy v4.12.2 and pycos v4.18.15
 * dispy v4.12.4 and pycos v4.11.0
-
 
 

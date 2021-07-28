@@ -21,6 +21,13 @@ vehicles_dict = dict()
 def get_vehicle_info(vehicle_id, attribute_list):
     """
 
+    Args:
+        vehicle_id: The vehicle ID number from the VehicleFinal database table.
+        attribute_list: The list of vehicle attributes for the vehicle_id vehicle for which vehicle information is needed.
+
+    Returns:
+        The attribute values associated with each element of attribute_list.
+
     """
     from producer.vehicles import VehicleFinal
 
@@ -31,6 +38,18 @@ def get_vehicle_info(vehicle_id, attribute_list):
 
 
 def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
+    """
+
+    Args:
+        calendar_year: The calendar year for which a vehicle's emission factors are needed.
+        model_year: The model year of the specific vehicle.
+        reg_class_id: The regulatory class ID of the vehicle.
+        fuel: The fuel ID (i.e., pump_gasoline, pump_diesel)
+
+    Returns:
+        A list of emission factors as specified in the emission_factors list for the given model-year vehicle in a given calendar year.
+
+    """
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
 
     emission_factors = ['voc_grams_per_mile',
@@ -53,6 +72,15 @@ def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
 
 
 def get_powersector_ef(calendar_year):
+    """
+
+    Args:
+        calendar_year: The calendar year for which power sector emission factors are needed.
+
+    Returns:
+        A list of power sector emission factors as specified in the emission_factors list for the given calendar year.
+
+    """
     from effects.emission_factors_powersector import EmissionFactorsPowersector
 
     emission_factors = ['voc_grams_per_kwh',
@@ -74,6 +102,16 @@ def get_powersector_ef(calendar_year):
 
 
 def get_refinery_ef(calendar_year, fuel):
+    """
+
+    Args:
+        calendar_year: The calendar year for which a refinery emission factors are needed.
+        fuel: The fuel ID for which refinery emission factors are needed (i.e., pump_gasoline, pump_diesel).
+
+    Returns:
+        A list of refinery emission factors as specified in the emission_factors list for the given calendar year and liquid fuel.
+
+    """
     from effects.emission_factors_refinery import EmissionFactorsRefinery
 
     emission_factors = ['voc_grams_per_gallon',
@@ -97,10 +135,14 @@ def get_refinery_ef(calendar_year, fuel):
 # TODO when calculating refinery inventory, we need to consider where fuel is refined so we'll need a new input file for that
 def calc_inventory(calendar_year):
     """
-    Calculate onroad CO2e grams/mile, kWh/mile, fuel consumption, vehicle and upstream emission inventories
-    by calendar year for vehicles in the vehicle_annual_data table.
-    :param calendar_year: calendar year
-    :return: Fills data in the vehicle_annual_data table that has not been filled to this point.
+
+    Args:
+        calendar_year: The year for which emission inventories and fuel consumptions will be calculated.
+
+    Returns:
+        A dictionary key, value pair where the key is a tuple (vehicle_id, calendar_year, age) and the value is a dictionary of key, value pairs providing
+        vehicle attributes (model_year, reg_class_id, in_use_fuel_id) and inventory attributes (co2 tons, fuel consumed, etc.) and their attribute values.
+
     """
     from producer.vehicle_annual_data import VehicleAnnualData
     from context.onroad_fuels import OnroadFuel

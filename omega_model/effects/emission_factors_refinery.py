@@ -24,11 +24,14 @@ Sample Data Columns
 
 Data Column Name and Description
     :calendar_year:
-        The calendar year for which $/ton values are applicable.
+        The calendar year for which $/gallon values are applicable.
 
     :in_use_fuel_id:
         In-use fuel id, for use with context fuel prices, must be consistent with the context data read by
         ``class context_fuel_prices.ContextFuelPrices``
+
+    :co_grams_per_gallon:
+        The refinery emission factors follow the structure pollutant_units where units are grams per gallon of liquid fuel.
 
 ----
 

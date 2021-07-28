@@ -11,3 +11,12 @@ Correction Index,Correction Type,Column Name Change?,Column Name,MODEL_YEAR,LDFE
 10,Replace,n,CAFE_MFR_CD,2019,3094,CRX,MASERATI,36,Ghibli V6 Rear Wheel Drive (RWD),CRX,MAX,n
 11,Replace,n,CAFE_MFR_CD,2019,3094,CRX,MASERATI,38,Ghibli  S RWD,CRX,MAX,n
 12,Replace,n,"['LABEL_MFR_CD', 'MFR_DIVISION_SHORT_NM']",2019,2868,FJX,STI,50,S209,"['SUB', 'STI']","['FJX', 'Subaru']",n
+13,Replace,n,TARGET_COEF_A,2019,3176,JLX,Land Rover,561,Range Rover Velar,-25.9,51.582,y
+14,Replace,n,TARGET_COEF_B,2019,3176,JLX,Land Rover,561,Range Rover Velar,-0.526,-0.09027,y
+15,Replace,n,TARGET_COEF_C,2019,3176,JLX,Land Rover,561,Range Rover Velar,0.0479,0.029144,y
+16,Replace,n,TARGET_COEF_A,2019,3373,FEX,Ferrari,143,488 gtb,150,33.721,y
+17,Replace,n,TARGET_COEF_B,2019,3373,FEX,Ferrari,143,488 gtb,1.08,0.391,y
+18,Replace,n,TARGET_COEF_C,2019,3373,FEX,Ferrari,143,488 gtb,0.026,0.015,y
+19,Replace,n,TARGET_COEF_A,2019,3373,FEX,Ferrari,145,488 Spider,150,33.721,y
+20,Replace,n,TARGET_COEF_B,2019,3373,FEX,Ferrari,145,488 Spider,1.08,0.391,y
+21,Replace,n,TARGET_COEF_C,2019,3373,FEX,Ferrari,145,488 Spider,0.026,0.015,y
