@@ -5,7 +5,7 @@ Model Architecture and Algorithms
 =================================
 
 Overview of Model Inputs
-^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 .. todo: [this section should just focus on what type of information is provided by the input files, and not about where the data comes from]
 
 As described in the overview, OMEGA model inputs are grouped into two categories:  1) assumptions about the structure and the stringency of the policies being evaluated within the model (these are the policy alternatives) and 2) external assumptions that apply to all policies under analysis (collectively referred to as the analysis context).  The policy alternatives define the policy being evaluated in each OMEGA run and are described in the Policy Module section.  The analysis context inputs (which include more traditional inputs like fuel prices, technology assumptions, etc) are discussed within the descriptions of the associated modules that use them.
@@ -34,6 +34,7 @@ Analysis Context Inputs:
 Modules
 ^^^^^^^
 .. todo: [[add footnote about terminology, that in the implementation, these are called packages]]
+
 Policy Module
 ----------------------
 OMEGA's primary function is to help evaluate and compare policy alternatives. Because the alternatives to be considered may vary widely, and we cannot anticipate all possible policy elements in advance, OMEGA is designed to have the flexibility to model regulatory programs over a range of stringencies and program structures. To the extent possible, the code within the module has been made generic, and the complete definition of a policy must be provided by the user as an input the model. Much like the definitions recorded in the Code of Federal Regulations (CFR), these inputs must unambiguously describe the methodologies for determining vehicle-level emissions targets and certification values, as well as the accounting rules for determining how individual vehicles contribute to a manufacturer's overall compliance determination. 
@@ -89,13 +90,13 @@ The producer’s generalized cost is made up of both the monetary expenses of br
 
 
 Consumer Module
-------------------------
+---------------
 The Consumer Module’s purpose is to estimate how light duty vehicle ownership and use respond to key vehicle characteristics within a given analysis context. An important part of the model is that it allows different endogenous consumer responses to EVs and ICEs. The module estimates total new sales volumes, the EV share of new vehicle demand, used vehicle market responses (including reregistration/scrappage), and the use of both new and used vehicles in the market measured using vehicle miles traveled (VMT).
 
 The Consumer Module uses exogenous inputs from the analysis context and endogenous inputs from the Producer Module to estimate total new vehicle demand, including the EV share of new vehicle demand. Then, the Consumer and Producer Modules iterate to achieve convergence on the estimates of new vehicles produced and demanded. Once that convergence is achieved, the Consumer Module outputs total vehicle stock (new and used vehicles and their attributes) and use (VMT) to the Effects Module.
 
 Inputs and Outputs of the Consumer Module
-+++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++
 The exogenous inputs from the analysis context include fuel prices, on-road stock assumptions, and demographics.
 The endogenous inputs from the Producer Module include vehicle prices, average vehicle cost, and vehicle attributes, such as fuel consumption rate.
 
@@ -137,17 +138,17 @@ Effects Module
 In its primary function as a regulatory support tool, OMEGA’s modeled outputs are intended to inform the type of benefit-cost analyses used in EPA rulemakings. We would likely use many of OMEGA’s outputs directly in the analysis for a regulatory action. In other cases, OMEGA produces values that might help inform other models like MOVES. The scope of OMEGA’s effects modeling includes estimating both monetized effects and physical effects.
 
 * Key examples of monetized effects that OMEGA will estimate:
-	* Vehicle production costs
-	* Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
-        *Consumer Benefits Measures: Previous estimates of effects on consumers were based on holding sales constant and the benefits were estimated as fuel savings minus tech costs. We know sales change (and we are allowing for that). We are working on a way to estimate not only the benefits consumers are considering in their purchase of a new vehicle, but also the ‘surprise’ or ‘bonus’ savings associated with the vehicle that are not considered.
-	* Impacts of criteria air pollutants
-	* Impacts of greenhouse gas pollutants
-	* Congestion, noise, and safety costs
+    * Vehicle production costs
+    * Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
+    * Consumer Benefits Measures: Previous estimates of effects on consumers were based on holding sales constant and the benefits were estimated as fuel savings minus tech costs. We know sales change (and we are allowing for that). We are working on a way to estimate not only the benefits consumers are considering in their purchase of a new vehicle, but also the ‘surprise’ or ‘bonus’ savings associated with the vehicle that are not considered.
+    * Impacts of criteria air pollutants
+    * Impacts of greenhouse gas pollutants
+    * Congestion, noise, and safety costs
 * Key examples of physical effects that OMEGA will estimate:
-	* Stock of registered vehicles, along with key attributes
-	* VMT of registered vehicles
-	* Tailpipe GHG and criteria pollutant emissions
-	* Upstream (refinery, power sector) GHG and criteria pollutant emissions
+    * Stock of registered vehicles, along with key attributes
+    * VMT of registered vehicles
+    * Tailpipe GHG and criteria pollutant emissions
+    * Upstream (refinery, power sector) GHG and criteria pollutant emissions
 
 Note that the calculation of criteria and GHG emission impacts is done using the $/ton estimates included in the cost_factors-criteria.csv and cost_factors-scc.csv input files. The $/ton estimates
 provided in those files are best understood to be the marginal costs associated with the reduction of the individual pollutants as opposed to the absolute costs associated with a ton of each pollutant.
