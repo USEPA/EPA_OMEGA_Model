@@ -213,14 +213,13 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += ProducerGeneralizedCost.init_database_from_file(
+        init_fail += ProducerGeneralizedCost.init_from_file(
             omega_globals.options.producer_generalized_cost_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:

@@ -342,7 +342,7 @@ if __name__ == '__main__':
 
             # test market shares at different CO2e and price levels
             mcd = pd.DataFrame()
-            for mc in MarketClass.market_classes:
+            for mc in omega_globals.options.MarketClass.market_classes:
                 mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
                 mcd['average_kwh_pmi_%s' % mc] = [0, 0]
                 mcd['average_co2e_gpmi_%s' % mc] = [125, 150]
