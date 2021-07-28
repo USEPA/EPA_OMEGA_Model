@@ -244,41 +244,51 @@ Data Row Name and Description
     The relative or absolute path to the onroad vehicle calculations (onroad gap) file,
     loaded by ``producer.vehicles.VehicleFinal``
 
-:New Vehicle Price Elasticity of Demand *(float)*:
+:New Vehicle Price Elasticity of Demand *(float, ...)*:
     Numeric value of the new vehicle price elastiticy of demand, typically <= 0, e.g. ``-0.5``
+    Supports multiple comma-separated values
 
-:Producer Cross Subsidy Multiplier Min *(float)*:
+:Producer Cross Subsidy Multiplier Min *(float, ...)*:
     Numeric value of the minimum producer cross subsidy multiplier, typically <= 1, e.g. ``0.95``
+    Supports multiple comma-separated values
 
-:Producer Cross Subsidy Multiplier Max *(float)*:
+:Producer Cross Subsidy Multiplier Max *(float, ...)*:
     Numeric value of the minimum producer cross subsidy multiplier, typically >= 1, e.g. ``1.05``
+    Supports multiple comma-separated values
 
 ----
 
 :Runtime Settings:
     Decorator, not evaluated
 
-:Num Market Share Options *(int)*:
-    Number of market share options to generate as part of the producer compliance search, typically ``5``
+:Num Market Share Options *(int, ...)*:
+    Number of market share options to generate as part of the producer compliance search, typically ``5``.
+    Supports multiple comma-separated values
 
-:Num Tech Options per ICE Vehicle *(int)*:
+:Num Tech Options per ICE Vehicle *(int, ...)*:
     Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
+    Supports multiple comma-separated values
 
-:Num Tech Options per BEV Vehicle *(int)*:
+:Num Tech Options per BEV Vehicle *(int, ...)*:
     Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
+    Supports multiple comma-separated values
 
-:Allow Backsliding *(TRUE or FALSE)*:
+:Allow Backsliding *(TRUE or FALSE, ...)*:
     If ``TRUE`` then there is no upper limit to vehicle CO2e g/mi over time, if ``FALSE`` then vehicle CO2e cannot get
     worse year over year
+    Supports multiple comma-separated values
 
-:Cost Curve Frontier Affinity Factor *(float)*:
+:Cost Curve Frontier Affinity Factor *(float, ...)*:
     Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
+    Supports multiple comma-separated values
 
-:Iterate Producer-Consumer *(TRUE or FALSE)*:
+:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
     If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
+    Supports multiple comma-separated values
 
-:Verbose Output *(TRUE or FALSE)*:
+:Verbose Output *(TRUE or FALSE, ...)*:
     Enables detailed console and logfile output if ``TRUE``
+    Supports multiple comma-separated values
 
 :Slice Tech Combo Tables *(TRUE or FALSE)*:
     If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
@@ -471,7 +481,6 @@ class OMEGABatchObject(OMEGABase):
             'Allow Backsliding': 'BS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
-            'GHG Standard Type': 'GHG',
             'Iterate Producer-Consumer': 'IPC',
         }
 
