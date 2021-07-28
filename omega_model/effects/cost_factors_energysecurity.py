@@ -29,6 +29,11 @@ Data Column Name and Description
     :dollar_basis:
         The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
 
+    :dollars_per_gallon:
+        The cost (in US dollars) per gallon of liquid fuel associated with energy security.
+
+    :foreign_oil_fraction:
+        A legacy parameter that is not used currently.
 
 ----
 

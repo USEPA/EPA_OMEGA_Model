@@ -9,7 +9,7 @@ def discount_values(dict_of_values):
         dict_of_values: A dictionary of values to be discounted with keys consisting of vehicle_id, calendar_year, age and discount rate.\n
 
     Returns:
-        The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values are discounted at that rate.
+        The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values are discounted at their internally consistent discount rate.
 
     Note:
         The costs_start entry of the BCA_General_Inputs file should be set to 'start-year' or 'end-year', where start-year represents costs

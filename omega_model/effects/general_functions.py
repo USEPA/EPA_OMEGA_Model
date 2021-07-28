@@ -1,5 +1,6 @@
 """
 
+Some general functions for use in the effects calculations.
 
 ----
 
@@ -11,6 +12,17 @@ from math import log10, floor
 
 
 def adjust_dollars(df, deflators, *args):
+    """
+
+    Args:
+        df: The DataFrame of values to be converted to a consistent dollar basis.
+        deflators: A DataFrame of price deflators.
+        args: The attributes to be converted to a consistent dollar basis.
+
+    Returns:
+        The passed DataFrame with args expressed in a consistent dollar basis.
+
+    """
     basis_years = df['dollar_basis'].unique()
     df_return = df.copy()
     for basis_year in basis_years:
@@ -24,11 +36,17 @@ def adjust_dollars(df, deflators, *args):
 def round_sig(df, divisor=1, sig=0, *args):
     """
 
-    :param df: The DataFrame containing data to be rounded.
-    :param args: The metrics to be rounded.
-    :param divisor: The divisor to use should results be desired in units other than those passed (set divisor=1 to maintain units).
-    :param sig: The number of significant digits.
-    :return: The passed DataFrame with args rounded to 'sig' digits and expressed in 'divisor' units.
+    A function to round values to a certain number of significant digits.
+
+    Args:
+        df: The DataFrame containing data to be rounded.
+        args: Attributes to be rounded.
+        sig: The number of significant digits.
+        divisor: The divisor to apply first prior to rounding (i.e., for values in Millions, pass 1000000).
+
+    Returns:
+        The passed DataFrame with args expressed in divisor units and rounded to sig significant digits.
+
     """
     for arg in args:
         try:
@@ -42,7 +60,7 @@ def round_sig(df, divisor=1, sig=0, *args):
 def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
     """
 
-    Parameters:
+    Args:
         dict_to_save: A dictionary having a tuple of args as keys.\n
         save_path: The path for saving the passed CSV.\n
         row_header: A list of the column names to use a the row header for the preferred structure of the output file.

@@ -22,6 +22,13 @@ Sample Data Columns
         calendar_year,voc_grams_per_kwh,co_grams_per_kwh,nox_grams_per_kwh,pm25_grams_per_kwh,sox_grams_per_kwh,benzene_grams_per_kwh,butadiene13_grams_per_kwh,formaldehyde_grams_per_kwh,acetaldehyde_grams_per_kwh,acrolein_grams_per_kwh,co2_grams_per_kwh,n2o_grams_per_kwh,ch4_grams_per_kwh
         2020,0.055181393,0.338895846,0.240906423,0.070888642,0.236594079,0.001536237,0,3.79E-05,6.40E-05,5.95E-05,479.8,0.007436538,3.322482776
 
+Data Column Name and Description
+    :calendar_year:
+        The calendar year for which $/kWh values are applicable.
+
+    :voc_grams_per_kwh:
+        The electric generating unit emission factors follow the structure pollutant_units where units are grams per kWh of electricity.
+
 ----
 
 **CODE**

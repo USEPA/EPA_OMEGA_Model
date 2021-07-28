@@ -5,7 +5,7 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents $/ton benefits estimates associated with criteria air pollutants by calendar year for both tailpipe and upstream sources.
+The data represents $/uston benefits estimates associated with reductions in criteria air pollutants.
 
 File Type
     comma-separated values (CSV)
@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_cost_factors-criteria,input_template_version:,0.1
+       input_template_name:,cost_factors-criteria,input_template_version:,0.3
 
 Sample Data Columns
     .. csv-table::
@@ -21,13 +21,17 @@ Sample Data Columns
 
         calendar_year,dollar_basis,pm25_tailpipe_3.0_USD_per_uston,pm25_upstream_3.0_USD_per_uston,nox_tailpipe_3.0_USD_per_uston,nox_upstream_3.0_USD_per_uston,so2_tailpipe_3.0_USD_per_uston,so2_upstream_3.0_USD_per_uston,pm25_tailpipe_7.0_USD_per_uston,pm25_upstream_7.0_USD_per_uston,nox_tailpipe_7.0_USD_per_uston,nox_upstream_7.0_USD_per_uston,so2_tailpipe_7.0_USD_per_uston,so2_upstream_7.0_USD_per_uston
         2020,2018,602362.7901,380000,6394.459424,8100,153440.3911,81000,543698.0811,350000,5770.584738,7300,138496.0826,74000
+        2025,2018,662886.8303,420000,6919.989335,8800,168685.8807,90000,598246.6516,380000,6243.868985,7900,152236.6921,80000
 
 Data Column Name and Description
     :calendar_year:
-        The calendar year for which $/ton values are applicable.
+        The calendar year for which specific cost factors are applicable.
 
     :dollar_basis:
         The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+
+    :pm25_tailpipe_3.0_USD_per_uston:
+        The structure for all cost factors is pollutant_source_discount-rate_units, where source is tailpipe or upstream and units are in US dollars per US ton.
 
 
 ----

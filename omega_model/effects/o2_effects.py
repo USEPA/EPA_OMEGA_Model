@@ -16,12 +16,17 @@ vehicle_annual_data table and included in the vehicle_annual_data.csv output fil
 from pathlib import Path
 from omega_model import *
 from omega_model.effects.inventory import calc_inventory
-from omega_model.effects.social_costs import calc_carbon_emission_costs, calc_criteria_emission_costs, calc_non_emission_costs, calc_cost_effects
+from omega_model.effects.social_costs import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
 
 
 def run_effects_calcs():
+    """
+
+    A function to run specific effects calculations such as inventory effects and the costs associated with those inventory attributes.
+
+    """
     from producer.vehicle_annual_data import VehicleAnnualData
 
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
