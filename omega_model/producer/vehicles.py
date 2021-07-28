@@ -965,9 +965,9 @@ class Vehicle(OMEGABase):
                                                      self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
 
         # calculate producer generalized cost
-        self.cost_cloud = omega_globals.options.producer_calc_generalized_cost(self, 'onroad_direct_co2e_grams_per_mile',
-                                                                    'onroad_direct_kwh_per_mile',
-                                                                    'new_vehicle_mfr_cost_dollars')
+        self.cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
+            calc_generalized_cost(self, 'onroad_direct_co2e_grams_per_mile',
+                                  'onroad_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars')
 
         # cull cost_cloud points here, based on producer constraints or whatever #
 

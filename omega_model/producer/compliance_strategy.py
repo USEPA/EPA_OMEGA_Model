@@ -18,64 +18,6 @@ import consumer
 cache = dict()
 
 
-def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
-    """
-
-    Args:
-        vehicle:
-        co2_name:
-        kwh_name:
-        cost_name:
-
-    Returns:
-        A cost curve modified by generalized cost factors
-
-    """
-
-    from consumer.market_classes import MarketClass
-    from context.price_modifications import PriceModifications
-    from context.onroad_fuels import OnroadFuel
-
-    producer_generalized_cost_fuel_years, \
-    producer_generalized_cost_annual_vmt = \
-        MarketClass.get_producer_generalized_cost_attributes(
-            vehicle.market_class_id,
-            ['producer_generalized_cost_fuel_years',
-             'producer_generalized_cost_annual_vmt',
-             ])
-
-    cost_cloud = vehicle.cost_cloud
-    vehicle_cost = cost_cloud[cost_name]
-    vehicle_co2e_grams_per_mile = cost_cloud[co2_name]
-    vehicle_direct_kwh_per_mile = cost_cloud[kwh_name] / OnroadFuel.get_fuel_attribute(vehicle.model_year,
-                                                                                            'US electricity',
-                                                                                            'refuel_efficiency')
-
-    price_modification = PriceModifications.get_price_modification(vehicle.model_year, vehicle.market_class_id)
-
-    grams_co2e_per_unit = vehicle.onroad_co2e_emissions_grams_per_unit()
-    liquid_generalized_fuel_cost = 0
-    electric_generalized_fuel_cost = 0
-
-    if grams_co2e_per_unit > 0:
-        liquid_generalized_fuel_cost = \
-            (vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) / grams_co2e_per_unit *
-             vehicle_co2e_grams_per_mile *
-             producer_generalized_cost_annual_vmt *
-             producer_generalized_cost_fuel_years)
-
-    if any(vehicle_direct_kwh_per_mile > 0):
-        electric_generalized_fuel_cost = (vehicle_direct_kwh_per_mile *
-                                          vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
-                                          producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
-
-    generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
-
-    cost_cloud[cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + price_modification
-
-    return cost_cloud
-
-
 def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combos, share_range, consumer_response,
                                  node_name='', verbose=False):
     """

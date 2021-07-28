@@ -66,6 +66,7 @@ Sample Data Columns
         Market Classes File,String,market_classes.csv,market_classes.csv
         Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
         Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
+        Producer Generalized Cost File,producer_generalized_cost.csv,producer_generalized_cost.csv
         Production Constraints File,String,production_constraints.csv,production_constraints.csv
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
         Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
@@ -221,6 +222,8 @@ Data Row Name and Description
 :Vehicle Price Modifications File *(str)*:
     The relative or absolute path to the vehicle price modifications file,
     loaded by ``context.price_modifications.PriceModifications``
+
+:Producer Generalized Cost File *(str)*:
 
 :Production Constraints File *(str)*:
     The relative or absolute path to the production constraints file,
@@ -634,6 +637,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
         self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
         self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
+        self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
         self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)

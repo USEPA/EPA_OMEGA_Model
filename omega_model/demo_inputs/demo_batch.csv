@@ -33,6 +33,7 @@ Manufacturers File,String,manufacturers.csv,manufacturers.csv
 Market Classes File,String,market_classes.csv,market_classes.csv
 Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
 Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
+Producer Generalized Cost File,String,producer_generalized_cost.csv,producer_generalized_cost.csv
 Production Constraints File,String,production_constraints.csv,production_constraints.csv
 Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
 Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
