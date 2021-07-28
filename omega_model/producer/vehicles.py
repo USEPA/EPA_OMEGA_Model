@@ -1172,7 +1172,6 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         from context.new_vehicle_market import NewVehicleMarket
-        from consumer.market_classes import MarketClass
 
         vehicle_shares_dict = {'total': 0}
 
@@ -1231,7 +1230,7 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.fueling_class = 'ICE'
 
                     veh.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
-                    veh.market_class_id, veh.non_responsive_market_group = MarketClass.get_vehicle_market_class(veh)
+                    veh.market_class_id, veh.non_responsive_market_group = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
                     veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
 
@@ -1370,7 +1369,6 @@ if __name__ == '__main__':
         from common.omega_functions import weighted_value
 
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.fuel_prices import FuelPrice  # needed for retail fuel price
         from context.new_vehicle_market import NewVehicleMarket  # needed for context size class hauling info
@@ -1378,6 +1376,9 @@ if __name__ == '__main__':
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
         omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
+
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
         from policy.policy_fuels import PolicyFuel
 
@@ -1388,8 +1389,8 @@ if __name__ == '__main__':
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
 
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)

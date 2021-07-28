@@ -111,7 +111,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
         from context.onroad_fuels import OnroadFuel
 
         producer_generalized_cost_fuel_years, producer_generalized_cost_annual_vmt = \
-            omega_globals.options.ProducerGeneralizedCost. \
+            ProducerGeneralizedCost. \
                 get_producer_generalized_cost_attributes(vehicle.market_class_id, ['fuel_years', 'annual_vmt'])
 
         cost_cloud = vehicle.cost_cloud

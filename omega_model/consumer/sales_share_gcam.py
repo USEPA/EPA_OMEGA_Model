@@ -140,7 +140,6 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
             MC = market class ID
 
         """
-        from consumer.market_classes import MarketClass
         from context.onroad_fuels import OnroadFuel
 
         if omega_globals.options.flat_context:
@@ -154,7 +153,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
         sales_share_numerator = dict()
 
         for pass_num in [0, 1]:
-            for market_class_id in MarketClass.market_classes:
+            for market_class_id in omega_globals.options.MarketClass.market_classes:
                 if pass_num == 0:
                     fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
@@ -303,13 +302,15 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        from consumer.market_classes import MarketClass  # needed for market class ID
-        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from policy.targets_footprint import VehicleTargets
-        from context.cost_clouds import CostCloud
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
-        omega_globals.options.VehicleTargets = VehicleTargets
+        module_name = get_template_name(omega_globals.options.policy_targets_file)
+        omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
+
+        from producer.manufacturers import Manufacturer  # needed for manufacturers table
+        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
+        from context.cost_clouds import CostCloud
 
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
@@ -318,13 +319,13 @@ if __name__ == '__main__':
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
         init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                verbose=omega_globals.options.verbose)
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
+        init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                           verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)

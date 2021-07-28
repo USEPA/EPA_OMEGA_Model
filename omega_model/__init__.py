@@ -174,6 +174,7 @@ try:
             self.OnroadVMT = None
             self.SalesShare = None
             self.ProducerGeneralizedCost = None
+            self.MarketClass = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

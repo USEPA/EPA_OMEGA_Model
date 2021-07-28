@@ -125,7 +125,6 @@ if __name__ == '__main__':
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2e
         from context.new_vehicle_market import NewVehicleMarket
@@ -133,12 +132,15 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.policy_targets_file)
         omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=omega_globals.options.verbose)

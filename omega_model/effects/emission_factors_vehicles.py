@@ -168,7 +168,8 @@ if __name__ == '__main__':
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        from omega_model.consumer.market_classes import MarketClass  # needed for market class ID
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
         SQABase.metadata.create_all(omega_globals.engine)
 

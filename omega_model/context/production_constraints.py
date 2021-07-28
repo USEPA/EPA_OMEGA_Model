@@ -118,15 +118,13 @@ class ProductionConstraints(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                from consumer.market_classes import MarketClass
-
                 ProductionConstraints.values['start_year'] = df['start_year']
 
                 share_columns = [c for c in df.columns if (min_share_units in c) or (max_share_units in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
-                    if market_class in MarketClass.market_classes:
+                    if market_class in omega_globals.options.MarketClass.market_classes:
                         ProductionConstraints.values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
@@ -143,7 +141,6 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         import importlib
-        from consumer.market_classes import MarketClass
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
@@ -156,13 +153,16 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=omega_globals.options.verbose)
 
