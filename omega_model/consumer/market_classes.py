@@ -15,15 +15,15 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,market_classes,input_template_version:,0.2
+       input_template_name:,market_classes,input_template_version:,0.3
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        market_class_id,hauling_class,fueling_class,ownership_class,producer_generalized_cost_fuel_years,producer_generalized_cost_annual_vmt
-        non_hauling.BEV,non_hauling,BEV,private,5,15000
-        hauling.ICE,hauling,ICE,private,5,15000
+        market_class_id,hauling_class,fueling_class,ownership_class
+        non_hauling.BEV,non_hauling,BEV,private
+        hauling.ICE,hauling,ICE,private
 
 Data Column Name and Description
 
@@ -38,12 +38,6 @@ Data Column Name and Description
 
 :ownership_class:
     Market class ownership class, e.g. 'private', 'shared'
-
-:producer_generalized_cost_fuel_years:
-    Number of years of fuel cost to include in producer generalized cost
-
-:producer_generalized_cost_annual_vmt:
-    Annual vehicle miles travelled for calculating producer generalized cost
 
 ----
 
@@ -150,8 +144,6 @@ class MarketClass(SQABase, OMEGABase):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'ICE', 'BEV'
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))  #: hauling class, e.g. 'hauling'
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))  #: ownership class, e.g. 'private'
-    producer_generalized_cost_fuel_years = Column(Float)  #: years of fuel consumption, for producer generalized cost calcs
-    producer_generalized_cost_annual_vmt = Column(Float)  #: annual vehicle miles travelled, for producer generalized cost calcs
 
     market_classes = ()  #: tuple of market classes
     _market_class_dict = dict()  # empty set market class dict, accessed by get_market_class_dict()
@@ -217,37 +209,6 @@ class MarketClass(SQABase, OMEGABase):
         return market_class_id, non_responsive_market_group
 
     @staticmethod
-    def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
-        """
-        Get one or more producer generalized cost attributes associated with the given market class ID.
-
-        Args:
-            market_class_id (str): e.g. 'hauling.ICE'
-            attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g. ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
-
-        Returns:
-            The requested generalized cost attributes.
-
-        """
-        cache_key = '%s_%s' % (market_class_id, attribute_types)
-
-        if cache_key not in cache:
-            if type(attribute_types) is not list:
-                attribute_types = [attribute_types]
-
-            attrs = MarketClass.get_class_attributes(attribute_types)
-
-            result = omega_globals.session.query(*attrs). \
-                filter(MarketClass.market_class_id == market_class_id).all()[0]
-
-            if len(attribute_types) == 1:
-                cache[cache_key] = result[0]
-            else:
-                cache[cache_key] = result
-
-        return cache[cache_key]
-
-    @staticmethod
     def init_database_from_file(filename, verbose=False):
         """
 
@@ -271,9 +232,8 @@ class MarketClass(SQABase, OMEGABase):
         MarketClass._market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
         input_template_name = 'market_classes'
-        input_template_version = 0.2
-        input_template_columns = {'market_class_id', 'hauling_class', 'fueling_class', 'ownership_class',
-                                  'producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt'}
+        input_template_version = 0.3
+        input_template_columns = {'market_class_id', 'hauling_class', 'fueling_class', 'ownership_class'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -292,8 +252,6 @@ class MarketClass(SQABase, OMEGABase):
                         fueling_class=df.loc[i, 'fueling_class'],
                         hauling_class=df.loc[i, 'hauling_class'],
                         ownership_class=df.loc[i, 'ownership_class'],
-                        producer_generalized_cost_fuel_years=df.loc[i, 'producer_generalized_cost_fuel_years'],
-                        producer_generalized_cost_annual_vmt=df.loc[i, 'producer_generalized_cost_annual_vmt'],
                     ))
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()

@@ -44,6 +44,7 @@ try:
     from common.omega_functions import *
     from policy.policy_base_classes import *
     from consumer.consumer_base_classes import *
+    from producer.producer_base_classes import *
 
     import scipy.interpolate
 
@@ -107,7 +108,6 @@ try:
             self.analysis_final_year = 2021
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
-            self.producer_calc_generalized_cost = None
             self.consumer_calc_generalized_cost = None
             self.policy_targets_file = path + 'demo_inputs/ghg_standards-footprint.csv'
             self.policy_reg_classes_file = path + 'demo_inputs/regulatory_classes.csv'
@@ -115,6 +115,7 @@ try:
             self.policy_fuels_file = path + 'demo_inputs/policy_fuels.csv'
             self.ghg_credits_file = path + 'demo_inputs/ghg_credits.csv'
             self.required_sales_share_file = path + 'demo_inputs/required_sales_share.csv'
+            self.producer_generalized_cost_file = path + 'demo_inputs/producer_generalized_cost.csv'
             self.production_constraints_file = path + 'demo_inputs/production_constraints.csv'
             self.vehicle_reregistration_file = path + 'demo_inputs/reregistration_fixed_by_age.csv'
             self.onroad_vmt_file = path + 'demo_inputs/annual_vmt_fixed_by_age.csv'
@@ -172,6 +173,7 @@ try:
             self.Reregistration = None
             self.OnroadVMT = None
             self.SalesShare = None
+            self.ProducerGeneralizedCost = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

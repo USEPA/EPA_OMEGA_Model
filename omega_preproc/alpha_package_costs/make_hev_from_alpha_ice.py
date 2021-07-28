@@ -1,5 +1,5 @@
 import pandas as pd
-from alpha_package_costs import SetInputs as settings, Engines, clean_alpha_data, add_elements_for_package_key, create_package_dict
+from omega_preproc.alpha_package_costs.alpha_package_costs import SetInputs as settings, Engines, clean_alpha_data, add_elements_for_package_key, create_package_dict
 
 
 class SelectICEforHEV:

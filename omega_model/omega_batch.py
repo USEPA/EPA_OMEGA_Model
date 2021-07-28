@@ -66,6 +66,7 @@ Sample Data Columns
         Market Classes File,String,market_classes.csv,market_classes.csv
         Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
         Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
+        Producer Generalized Cost File,producer_generalized_cost.csv,producer_generalized_cost.csv
         Production Constraints File,String,production_constraints.csv,production_constraints.csv
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
         Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
@@ -99,6 +100,9 @@ Sample Data Columns
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
 
+File names in the batch definition file are relative to the batch file location, unless they are specified as absolute
+paths.
+
 Data Row Name and Description
 
 :Batch Settings:
@@ -107,78 +111,231 @@ Data Row Name and Description
 :Batch Name *(str)*:
     The name of the batch, combined with a timestamp (YYYY_MM_DD_hh_mm_ss) becomes the name of the bundle folder
 
-:Context Folder Name:
-:Context Name:
-:Context Case:
-:Analysis Final Year:
-:Consolidate Manufacturers:
-:Run Effects Calculations:
+:Context Folder Name *(str)*:
+    Unused, for now
+
+:Context Name *(str)*:
+    Context name, e.g. ``AEO2021``
+    
+:Context Case *(str)*:
+    Context case name, e.g. ``Reference case``
+
+:Analysis Final Year *(int)*:
+    Analysis Final Year, e.g. ``2050``
+
+:Consolidate Manufacturers *(TRUE or FALSE)*:
+    If ``TRUE`` then manufacturers will be conslidated into a "consolidated_OEM", otherwise manufacturers will be run independently
+
+:Run Effects Calculations *(TRUE or FALSE)*:
+    If ``TRUE`` then run the emissions and cost effects post-processing
 
 :Session Settings:
     Decorator, not evaluated
 
-:Enable Session:
-:Session Name:
+:Enable Session *(TRUE or FALSE)*:
+    If ``TRUE`` then run the session(s)
+
+:Session Name *(str)*:
+    Session Name
+
+----
 
 :Policy Alternatives Settings:
     Decorator, not evaluated
 
-:Drive Cycles File:
-:Drive Cycle Weights File:
-:GHG Credits File:
-:GHG Standards File:
-:Policy Fuels File:
-:Off-Cycle Credits File:
-:Policy Fuel Upstream Methods File:
-:Production Multipliers File:
-:Regulatory Classes File:
-:Required Sales Share File:
+:Drive Cycles File *(str)*:
+    The relative or absolute path to the drive cycles file,
+    loaded by ``policy.drive_cycles.DriveCycles``
+
+:Drive Cycle Weights File *(str)*:
+    The relative or absolute path to the drive cycle weights file,
+    loaded by ``policy.drive_cycle_weights.DriveCycleWeights``
+
+:GHG Credits File *(str)*:
+    The relative or absolute path to the GHG credits file,
+    loaded by ``policy.credit_banking.CreditBank``
+
+:GHG Standards File *(str)*:
+    The relative or absolute path to the GHG Standards / policy targets file,
+    loaded dynamically by the VehicleTargets class defined in the module specified by the file header,
+    e.g. ``policy.targets_footprint``
+
+:Policy Fuels File *(str)*:
+    The relative or absolute path to the policy fuels file,
+    loaded by ``policy.policy_fuels.PolicyFuel``
+
+:Off-Cycle Credits File *(str)*:
+    The relative or absolute path to the off-cycle credits file,
+    loaded by ``policy.offcycle_credits.OffCycleCredits``
+
+:Policy Fuel Upstream Methods File *(str)*:
+    The relative or absolute path to the policy fuel upstream methods file,
+    loaded by ``policy.upstream_methods.UpstreamMethods``
+
+:Production Multipliers File *(str)*:
+    The relative or absolute path to the production multipliers file,
+    loaded by ``policy.incentives.Incentives``
+
+:Regulatory Classes File *(str)*:
+    The relative or absolute path to the regulatory classes file,
+    loaded dynamically by the RegulatoryClasses class defined in the module specified by the file header,
+    e.g. ``policy.regulatory_classes``
+
+:Required Sales Share File *(str)*:
+    The relative or absolute path to the required sales share file,
+    loaded by ``policy.required_sales_share.RequiredSalesShare``
+
+----
 
 :Analysis Context Settings:
     Decorator, not evaluated
 
-:Context Fuel Prices File:
-:Context New Vehicle Market File:
-:Vehicle Simulation Results and Costs File:
-:Sales Share File:
-:Manufacturers File:
-:Market Classes File:
-:Onroad Fuels File:
-:Vehicle Price Modifications File:
-:Production Constraints File:
-:Vehicle Reregistration File:
-:Onroad VMT File:
-:Vehicles File:
-:Onroad Vehicle Calculations File:
-:New Vehicle Price Elasticity of Demand:
-:Producer Cross Subsidy Multiplier Min:
-:Producer Cross Subsidy Multiplier Max:
+:Context Fuel Prices File *(str)*:
+    The relative or absolute path to the context fuel prices file,
+    loaded by ``context.fuel_prices.FuelPrice``
+
+:Context New Vehicle Market File *(str)*:
+    The relative or absolute path to the context new vehicle market file,
+    loaded by ``context.new_vehicle_market.NewVehicleMarket``
+
+:Vehicle Simulation Results and Costs File *(str)*:
+    The relative or absolute path to the vehicle simulation results and costs file,
+    loaded by ``context.cost_clouds.CostCloud``
+
+:Sales Share File *(str)*:
+    The relative or absolute path to the sales share (consumer sales response) file,
+    loaded dynamically by the SalesShare class defined in the module specified by the file header,
+    e.g. ``consumer.sales_share_gcam``
+
+:Manufacturers File *(str)*:
+    The relative or absolute path to the manufacturers file,
+    loaded by ``producer.manufacturers.Manufacturer``
+
+:Market Classes File *(str)*:
+    The relative or absolute path to the market classes file,
+    loaded by ``consumer.market_classes.MarketClass``
+
+:Onroad Fuels File *(str)*:
+    The relative or absolute path to the onroad fuels file,
+    loaded by ``context.onroad_fuels.OnroadFuel``
+
+:Vehicle Price Modifications File *(str)*:
+    The relative or absolute path to the vehicle price modifications file,
+    loaded by ``context.price_modifications.PriceModifications``
+
+:Producer Generalized Cost File *(str)*:
+
+:Production Constraints File *(str)*:
+    The relative or absolute path to the production constraints file,
+    loaded by ``context.production_constraints.ProductionConstraints``
+
+:Vehicle Reregistration File *(str)*:
+    The relative or absolute path to the vehicle re-registration file,
+    loaded dynamically by the Reregistration class defined in the module specified by the file header,
+    e.g. ``consumer.reregistration_fixed_by_age``
+
+:Onroad VMT File *(str)*:
+    The relative or absolute path to the onroad VMT file,
+    loaded dynamically by the OnroadVMT class defined in the module specified by the file header,
+    e.g. ``consumer.annual_vmt_fixed_by_age``
+
+:Vehicles File *(str)*:
+    The relative or absolute path to the vehicles (base year fleet) file,
+    loaded by ``producer.vehicles.VehicleFinal``
+
+:Onroad Vehicle Calculations File *(str)*:
+    The relative or absolute path to the onroad vehicle calculations (onroad gap) file,
+    loaded by ``producer.vehicles.VehicleFinal``
+
+:New Vehicle Price Elasticity of Demand *(float, ...)*:
+    Numeric value of the new vehicle price elastiticy of demand, typically <= 0, e.g. ``-0.5``
+    Supports multiple comma-separated values
+
+:Producer Cross Subsidy Multiplier Min *(float, ...)*:
+    Numeric value of the minimum producer cross subsidy multiplier, typically <= 1, e.g. ``0.95``
+    Supports multiple comma-separated values
+
+:Producer Cross Subsidy Multiplier Max *(float, ...)*:
+    Numeric value of the minimum producer cross subsidy multiplier, typically >= 1, e.g. ``1.05``
+    Supports multiple comma-separated values
+
+----
 
 :Runtime Settings:
     Decorator, not evaluated
 
-:Num Market Share Options:
-:Num Tech Options per ICE Vehicle:
-:Num Tech Options per BEV Vehicle:
-:Allow Backsliding:
-:Cost Curve Frontier Affinity Factor:
-:Iterate Producer-Consumer:
-:Verbose Output:
-:Slice Tech Combo Tables:
+:Num Market Share Options *(int, ...)*:
+    Number of market share options to generate as part of the producer compliance search, typically ``5``.
+    Supports multiple comma-separated values
+
+:Num Tech Options per ICE Vehicle *(int, ...)*:
+    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
+    Supports multiple comma-separated values
+
+:Num Tech Options per BEV Vehicle *(int, ...)*:
+    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
+    Supports multiple comma-separated values
+
+:Allow Backsliding *(TRUE or FALSE, ...)*:
+    If ``TRUE`` then there is no upper limit to vehicle CO2e g/mi over time, if ``FALSE`` then vehicle CO2e cannot get
+    worse year over year
+    Supports multiple comma-separated values
+
+:Cost Curve Frontier Affinity Factor *(float, ...)*:
+    Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
+    Supports multiple comma-separated values
+
+:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
+    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
+    Supports multiple comma-separated values
+
+:Verbose Output *(TRUE or FALSE, ...)*:
+    Enables detailed console and logfile output if ``TRUE``
+    Supports multiple comma-separated values
+
+:Slice Tech Combo Tables *(TRUE or FALSE)*:
+    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
+
+----
 
 :Postproc Settings:
     Decorator, not evaluated
 
-:Context Criteria Cost Factors File:
-:Context SCC Cost Factors File:
-:Context Energy Security Cost Factors File:
-:Context Congestion-Noise Cost Factors File:
-:Context Powersector Emission Factors File:
-:Context Refinery Emission Factors File:
-:Context Vehicle Emission Factors File:
-:Context Implicit Price Deflators File:
-:Context Consumer Price Index File:
+:Context Criteria Cost Factors File *(str)*:
+    The relative or absolute path to the criteria pollutant costs file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
+:Context SCC Cost Factors File *(str)*:
+    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Energy Security Cost Factors File *(str)*:
+    The relative or absolute path to the energy security cost factors file,
+    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
+
+:Context Congestion-Noise Cost Factors File *(str)*:
+    The relative or absolute path to the congestion and noise cost factors file,
+    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
+
+:Context Powersector Emission Factors File *(str)*:
+    The relative or absolute path to the power sector emission factors file,
+    loaded by ``effects.emission_factors_powersector.EmissionFactorsPowersector``
+
+:Context Refinery Emission Factors File *(str)*:
+    The relative or absolute path to the refinery emission factors file,
+    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
+
+:Context Vehicle Emission Factors File *(str)*:
+    The relative or absolute path to the vehicle emission factors file,
+    loaded by ``effects.emission_factors_vehicles.EmissionFactorsVehicles``
+
+:Context Implicit Price Deflators File *(str)*:
+    The relative or absolute path to the implicit price deflators file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Consumer Price Index File *(str)*:
+    The relative or absolute path to the consumer price index file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
 """
 
@@ -327,7 +484,6 @@ class OMEGABatchObject(OMEGABase):
             'Allow Backsliding': 'BS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
-            'GHG Standard Type': 'GHG',
             'Iterate Producer-Consumer': 'IPC',
         }
 
@@ -481,6 +637,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
         self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
         self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
+        self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
         self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
         self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)

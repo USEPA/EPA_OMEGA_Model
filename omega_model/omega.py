@@ -654,6 +654,9 @@ def init_user_definable_modules():
     module_name = get_template_name(omega_globals.options.sales_share_file)
     omega_globals.options.SalesShare = importlib.import_module(module_name).SalesShare
 
+    module_name = get_template_name(omega_globals.options.producer_generalized_cost_file)
+    omega_globals.options.ProducerGeneralizedCost = importlib.import_module(module_name).ProducerGeneralizedCost
+
     return init_fail
 
 
@@ -766,8 +769,6 @@ def init_omega(session_runtime_options):
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
-    omega_globals.options.producer_calc_generalized_cost = compliance_strategy.calc_generalized_cost
-
     verbose_init = omega_globals.options.verbose
 
     try:
@@ -803,6 +804,9 @@ def init_omega(session_runtime_options):
 
         init_fail += PriceModifications.init_from_file(omega_globals.options.vehicle_price_modifications_file,
                                                        verbose=verbose_init)
+
+        init_fail += omega_globals.options.ProducerGeneralizedCost.init_from_file(
+            omega_globals.options.producer_generalized_cost_file, verbose=verbose_init)
 
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=verbose_init)

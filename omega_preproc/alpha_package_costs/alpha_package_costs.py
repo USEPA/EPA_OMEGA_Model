@@ -961,66 +961,94 @@ class SetInputs:
 
     # get the price deflators
     dollar_basis = int(context_aeo_inputs.aeo_version) - 1
-    gdp_deflators = pd.read_csv(path_preproc / f'bea_tables/implicit_price_deflators_{dollar_basis}.csv', index_col=0)
-    gdp_deflators = gdp_deflators.to_dict('index')
+    try:
+        gdp_deflators = pd.read_csv(path_preproc / f'bea_tables/implicit_price_deflators_{dollar_basis}.csv', index_col=0)
+        gdp_deflators = gdp_deflators.to_dict('index')
+        techcosts_file = pd.ExcelFile(path_here / 'alpha_package_costs_module_inputs.xlsx')
+        price_class_dict = pd.read_excel(techcosts_file, 'price_class', index_col=0).to_dict('index')
+        # read tech costs input file, convert dollar values to dollar basis, and create dictionaries
+        engine_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                     'engine', 'item_cost', 'dmc').to_dict('index')
+        trans_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                    'trans', 'item_cost', 'dmc',
+                                                                    'dmc_increment').to_dict('index')
+        accessories_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                          'accessories', 'item_cost', 'dmc').to_dict(
+            'index')
+        startstop_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                        'start-stop', 'item_cost', 'dmc').to_dict(
+            'index')
+        weight_cost_ice_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                         'weight_ice', 'item_cost',
+                                                                         'dmc_per_pound').to_dict('index')
+        weight_cost_pev_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                         'weight_pev', 'item_cost',
+                                                                         'dmc_per_pound').to_dict('index')
+        aero_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'aero',
+                                                                   'item_cost', 'dmc').to_dict('index')
+        nonaero_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                      'nonaero', 'item_cost', 'dmc').to_dict('index')
+        ac_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'ac',
+                                                                 'item_cost', 'dmc').to_dict('index')
 
-    # read tech costs input file, convert dollar values to dollar basis, and create dictionaries
-    techcosts_file = pd.ExcelFile(path_here / 'alpha_package_costs_module_inputs.xlsx')
-    price_class_dict = pd.read_excel(techcosts_file, 'price_class', index_col=0).to_dict('index')
-    engine_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'engine', 'item_cost', 'dmc').to_dict('index')
-    trans_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'trans', 'item_cost', 'dmc', 'dmc_increment').to_dict('index')
-    accessories_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'accessories', 'item_cost', 'dmc').to_dict('index')
-    startstop_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'start-stop', 'item_cost', 'dmc').to_dict('index')
-    weight_cost_ice_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'weight_ice', 'item_cost', 'dmc_per_pound').to_dict('index')
-    weight_cost_pev_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'weight_pev', 'item_cost', 'dmc_per_pound').to_dict('index')
-    aero_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'aero', 'item_cost', 'dmc').to_dict('index')
-    nonaero_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'nonaero', 'item_cost', 'dmc').to_dict('index')
-    ac_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'ac', 'item_cost', 'dmc').to_dict('index')
+        bev_curves_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                    'bev_curves', 'x_cubed_factor', 'x_squared_factor',
+                                                                    'x_factor', 'constant').to_dict('index')
+        hev_curves_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                    'hev_curves', 'x_cubed_factor', 'x_squared_factor',
+                                                                    'x_factor', 'constant').to_dict('index')
 
-    bev_curves_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'bev_curves', 'x_cubed_factor', 'x_squared_factor', 'x_factor', 'constant').to_dict('index')
-    hev_curves_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'hev_curves', 'x_cubed_factor', 'x_squared_factor', 'x_factor', 'constant').to_dict('index')
+        bev_nonbattery_single_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis,
+                                                                               techcosts_file, 'bev_nonbattery_single',
+                                                                               'slope', 'intercept').to_dict('index')
+        bev_nonbattery_dual_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis,
+                                                                             techcosts_file, 'bev_nonbattery_dual',
+                                                                             'slope', 'intercept').to_dict('index')
+        hev_nonbattery_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
+                                                                        'hev_nonbattery', 'slope', 'intercept').to_dict(
+            'index')
+        # phev_curves_dict = 0
+        pev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
+        hev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
 
-    bev_nonbattery_single_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'bev_nonbattery_single', 'slope', 'intercept').to_dict('index')
-    bev_nonbattery_dual_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'bev_nonbattery_dual', 'slope', 'intercept').to_dict('index')
-    hev_nonbattery_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file, 'hev_nonbattery', 'slope', 'intercept').to_dict('index')
-    # phev_curves_dict = 0
-    pev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
-    hev_metrics_dict = pd.read_excel(techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
+        # set inputs
+        cost_inputs = pd.read_excel(techcosts_file, 'inputs_code', index_col=0).to_dict('index')
+        start_year = int(cost_inputs['start_year']['value'])
+        end_year = int(cost_inputs['end_year']['value'])
+        years = range(start_year, end_year + 1)
+        learning_rate_weight = cost_inputs['learning_rate_weight']['value']
+        learning_rate_ice_powertrain = cost_inputs['learning_rate_ice_powertrain']['value']
+        learning_rate_roadload = cost_inputs['learning_rate_roadload']['value']
+        learning_rate_bev = cost_inputs['learning_rate_bev']['value']
+        boost_multiplier = cost_inputs['boost_multiplier']['value']
+        run_id = cost_inputs['run_ID']['value']
+        if run_id != '':
+            name_id = f'{run_id}_{start_time_readable}'
+        else:
+            name_id = start_time_readable
 
-    # set inputs
-    cost_inputs = pd.read_excel(techcosts_file, 'inputs_code', index_col=0).to_dict('index')
-    start_year = int(cost_inputs['start_year']['value'])
-    end_year = int(cost_inputs['end_year']['value'])
-    years = range(start_year, end_year + 1)
-    learning_rate_weight = cost_inputs['learning_rate_weight']['value']
-    learning_rate_ice_powertrain = cost_inputs['learning_rate_ice_powertrain']['value']
-    learning_rate_roadload = cost_inputs['learning_rate_roadload']['value']
-    learning_rate_bev = cost_inputs['learning_rate_bev']['value']
-    boost_multiplier = cost_inputs['boost_multiplier']['value']
-    run_id = cost_inputs['run_ID']['value']
+        ice_glider_share = 0.85
 
-    if run_id != '': name_id = f'{run_id}_{start_time_readable}'
-    else: name_id = start_time_readable
+        # for now, set a BEV range and motor power here
+        onroad_bev_range_miles = 300
+        bev_motor_power = 150
+        bev_weight_reduction = 0
+        bev_usable_soc = pev_metrics_dict['usable_soc_bev']['value']
+        bev_charging_loss = pev_metrics_dict['charging_loss_bev']['value']
+        bev_gap = pev_metrics_dict['gap_bev']['value']
+        bev_powertrain_markup = pev_metrics_dict['powertrain_markup_bev']['value']
 
-    ice_glider_share = 0.85
+        size_bins = 7
+        # for now, set HEV size bins here
+        hev_size_bins = 7
+        bin_size_scaling_interval = 0.05
+        bin_with_scaler_equal_1 = 3
 
-    # for now, set a BEV range and motor power here
-    onroad_bev_range_miles = 300
-    bev_motor_power = 150
-    bev_weight_reduction = 0
-    bev_usable_soc = pev_metrics_dict['usable_soc_bev']['value']
-    bev_charging_loss = pev_metrics_dict['charging_loss_bev']['value']
-    bev_gap = pev_metrics_dict['gap_bev']['value']
-    bev_powertrain_markup = pev_metrics_dict['powertrain_markup_bev']['value']
+        # set constants
+        lbs_per_kg = 2.2
 
-    size_bins = 7
-    # for now, set HEV size bins here
-    hev_size_bins = 7
-    bin_size_scaling_interval = 0.05
-    bin_with_scaler_equal_1 = 3
-
-    # set constants
-    lbs_per_kg = 2.2
+    except:
+        pass
 
 
 def main():
