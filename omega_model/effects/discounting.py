@@ -1,6 +1,7 @@
 import pandas as pd
 
 
+# TODO we need someplace to set some discounting inputs, at least the time at which costs start (start of year or end of year).
 def discount_values(dict_of_values):
     """The discount function determines metrics appropriate for discounting (those contained in dict_of_values) and does the discounting
     calculation to a given year and point within that year.
@@ -12,7 +13,7 @@ def discount_values(dict_of_values):
         The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values are discounted at their internally consistent discount rate.
 
     Note:
-        The costs_start entry of the BCA_General_Inputs file should be set to 'start-year' or 'end-year', where start-year represents costs
+        The costs_start entry set <somewhere> should be set to 'start-year' or 'end-year', where start-year represents costs
         starting at time t=0 (i.e., first year costs are undiscounted), and end-year represents costs starting at time t=1 (i.e., first year
         costs are discounted).
 

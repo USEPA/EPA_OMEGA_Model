@@ -33,6 +33,14 @@ omega\_model.producer.manufacturers module
    :undoc-members:
    :show-inheritance:
 
+omega\_model.producer.producer\_base\_classes module
+----------------------------------------------------
+
+.. automodule:: omega_model.producer.producer_base_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.producer.producer\_generalized\_cost module
 --------------------------------------------------------
 
