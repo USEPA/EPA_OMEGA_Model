@@ -147,13 +147,18 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
         #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
-        sales_share_denominator_all_hauling = 0
-        sales_share_denominator_all_nonhauling = 0
+        # group by non responsive market group
+        from consumer import non_responsive_market_categories
+
+        sales_share_denominator = dict()
+        for nrmc in non_responsive_market_categories:
+            sales_share_denominator[nrmc] = 0
 
         sales_share_numerator = dict()
 
         for pass_num in [0, 1]:
             for market_class_id in omega_globals.options.MarketClass.market_classes:
+                nrmc = omega_globals.options.MarketClass.get_non_responsive_market_category(market_class_id)
                 if pass_num == 0:
                     fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
@@ -199,18 +204,11 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
                     market_class_data[
                         'consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
-                    if 'non_hauling' in market_class_id.split('.'):
-                        sales_share_denominator_all_nonhauling += sales_share_numerator[market_class_id]
-                    else:
-                        sales_share_denominator_all_hauling += sales_share_numerator[market_class_id]
+                    sales_share_denominator[nrmc] += sales_share_numerator[market_class_id]
+
                 else:
-                    if 'non_hauling' in market_class_id.split('.'):
-                        demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator_all_nonhauling
-                        demanded_absolute_share = demanded_share * market_class_data[
-                            'producer_abs_share_frac_non_hauling']
-                    else:
-                        demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator_all_hauling
-                        demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_hauling']
+                    demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator[nrmc]
+                    demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_%s' % nrmc]
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share

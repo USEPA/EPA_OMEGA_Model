@@ -274,6 +274,22 @@ class MarketClassBase:
 
     @staticmethod
     # override this method in the user-defined MarketClass
+    def get_non_responsive_market_category(market_class_id):
+        """
+        Returns the non-responsive market category of the given market class ID
+
+        Args:
+            market_class_id (str): market class ID, e.g. 'non_hauling.ICE'
+
+        Returns:
+            The non-responsive market category of the given market class ID
+
+        """
+        raise Exception('**Attempt to call abstract method MarketClassBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
+    # override this method in the user-defined MarketClass
     def init_from_file(filename, verbose=False):
         """
 
