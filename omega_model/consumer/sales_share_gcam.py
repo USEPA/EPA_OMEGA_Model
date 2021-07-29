@@ -148,10 +148,8 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
         #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
         # group by non responsive market group
-        from consumer import non_responsive_market_categories
-
         sales_share_denominator = dict()
-        for nrmc in non_responsive_market_categories:
+        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
             sales_share_denominator[nrmc] = 0
 
         sales_share_numerator = dict()

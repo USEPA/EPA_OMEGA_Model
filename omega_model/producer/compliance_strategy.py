@@ -113,7 +113,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
         else:
             share_column_names = [producer_prefix + c for c in children]
 
-        if all(s in consumer.responsive_market_categories for s in children):
+        if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
             from context.production_constraints import ProductionConstraints
             from policy.required_sales_share import RequiredSalesShare
 
@@ -344,16 +344,14 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
 
         # group by non responsive market group
-        from consumer import non_responsive_market_categories
-
         nrmc_dict = dict()
-        for nrmc in non_responsive_market_categories:
+        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
             nrmc_dict[nrmc] = []
         for new_veh in manufacturer_vehicles:
             nrmc_dict[new_veh.non_responsive_market_group].append(new_veh)
 
         # distribute non responsive market class sales to manufacturer_vehicles by relative market share
-        for nrmc in non_responsive_market_categories:
+        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
             nrmc_initial_registered_count = context_new_vehicle_sales(calendar_year)[nrmc]
             distribute_by_attribute(nrmc_dict[nrmc], nrmc_initial_registered_count,
                                     weight_by='market_share',

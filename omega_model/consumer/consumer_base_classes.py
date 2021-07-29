@@ -145,6 +145,10 @@ class MarketClassBase:
     _market_class_tree_dict = dict()  # empty set market class tree dict accessed by get_market_class_tree()
     _market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
+    market_categories = []
+    responsive_market_categories = []
+    non_responsive_market_categories = []
+
     @staticmethod
     def parse_market_classes(market_class_list, market_class_dict=None, by_reg_class=False):
         """

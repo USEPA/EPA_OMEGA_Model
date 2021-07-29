@@ -65,6 +65,10 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
     hauling_class = Column(Enum(*hauling_classes, validate_strings=True))  #: hauling class, e.g. 'hauling'
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))  #: ownership class, e.g. 'private'
 
+    market_categories = ['ICE', 'BEV', 'hauling', 'non_hauling']  #: overall market categories
+    responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
+    non_responsive_market_categories = ['hauling', 'non_hauling']  #: market categories that do not have consumer response
+
     @staticmethod
     def get_vehicle_market_class(vehicle):
         """
