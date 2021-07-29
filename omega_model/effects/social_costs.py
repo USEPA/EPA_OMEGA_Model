@@ -410,7 +410,6 @@ def calc_cost_effects(physical_effects_dict):
     """
     from context.fuel_prices import FuelPrice
 
-# TODO tech costs come from .... where?
     # UPDATE cost effects data
     costs_dict = dict()
     fuel = None
@@ -419,8 +418,8 @@ def calc_cost_effects(physical_effects_dict):
         vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
 
-        attribute_list = ['reg_class_id', 'in_use_fuel_id', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        reg_class_id, in_use_fuel_id, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+        attribute_list = ['reg_class_id', 'in_use_fuel_id', 'new_vehicle_mfr_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        reg_class_id, in_use_fuel_id, new_vehicle_cost, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vehicle_id, attribute_list)
 
         veh_effects_dict = dict()
@@ -428,6 +427,7 @@ def calc_cost_effects(physical_effects_dict):
         if onroad_direct_co2e_grams_per_mile or onroad_direct_kwh_per_mile:
             flag = 1
 
+            tech_cost_dollars = 0
             fuel_retail_cost_dollars = 0
             fuel_pretax_cost_dollars = 0
             energy_security_cost_dollars = 0
@@ -438,6 +438,10 @@ def calc_cost_effects(physical_effects_dict):
             driving_cost_dollars = 0
             pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, so2_tailpipe_3, so2_upstream_3, \
             pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, so2_tailpipe_7, so2_upstream_7 = 12 * [0]
+
+            # tech costs, only for age=0
+            if age == 0:
+                tech_cost_dollars = physical_effects_dict[key]['registered_count'] * new_vehicle_cost
 
             # fuel costs
             fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
@@ -553,6 +557,7 @@ def calc_cost_effects(physical_effects_dict):
             veh_effects_dict.update({'model_year': calendar_year - age,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
+                                     'tech_cost_dollars': tech_cost_dollars,
                                      'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                                      'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
                                      'energy_security_cost_dollars': energy_security_cost_dollars,

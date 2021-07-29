@@ -188,9 +188,14 @@ def reshape_df_for_cloud_file(settings, df_source, *id_args):
     """
     df_return = pd.DataFrame()
     id_variables = [id_arg for id_arg in id_args]
-    credit_args = [col for col in df_source.columns if col.__contains__('credit')]
-    for credit_arg in credit_args:
-        id_variables.append(credit_arg)
+    tech_flag_list = ['ac_leakage', 'ac_efficiency', 'start_stop', 'hev', 'high_eff_alternator',
+                      'weight_reduction', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
+                      ]
+    # credit_args = [col for col in df_source.columns if col.__contains__('credit')]
+    # for credit_arg in credit_args:
+    #     id_variables.append(credit_arg)
+    for tech in tech_flag_list:
+        id_variables.append(tech)
     if settings.run_bev or settings.run_phev:
         for arg in df_source.columns:
             if arg.__contains__('kwh_per_mile'):
@@ -207,9 +212,9 @@ def reshape_df_for_cloud_file(settings, df_source, *id_args):
         temp.insert(1, 'model_year', year)
         temp.drop(columns='variable', inplace=True)
         df_return = pd.concat([df_return, temp], ignore_index=True, axis=0)
-    for arg in df_return.columns:
-        if arg.__contains__('credit'):
-            df_return.rename(columns={arg: arg.rsplit('credit_')[1]}, inplace=True)
+    # for arg in df_return.columns:
+    #     if arg.__contains__('credit'):
+    #         df_return.rename(columns={arg: arg.rsplit('credit_')[1]}, inplace=True)
     return df_return
 
 
@@ -359,7 +364,8 @@ def create_package_dict(settings, input_df, fuel_id):
     price_keys = pd.Series(df['Price Class'])
     alpha_class_keys = pd.Series(df['Vehicle Type'])
     if fuel_id != 'bev':
-        engine_keys = pd.Series(zip(df['Engine'], df['Engine Displacement L'], df['Engine Cylinders'].astype(int), df['DEAC D Cyl.'].astype(int), df['Start Stop']))
+        engine_keys = pd.Series(zip(df['Engine'], df['Engine Displacement L'], df['Engine Cylinders'].astype(int),
+                                    df['DEAC D Cyl.'].astype(int), df['DEAC C Cyl.'].astype(int), df['Start Stop']))
     else: engine_keys = pd.Series([0] * len(df))
     if fuel_id == 'ice':
         hev_keys = pd.Series([0] * len(df))
@@ -440,6 +446,53 @@ def create_package_dict(settings, input_df, fuel_id):
     return df_dict
 
 
+# class CreateTechFlags:
+#     def __init__(self):
+#         self.tech_flag_list = ['ac_leakage', 'ac_efficiency', 'start_stop', 'high_eff_alternator',
+#                                'weight_reduction', 'deac', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
+#                                ]
+#
+#     @staticmethod
+def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, fuel_key):
+    # set techs to 0
+    turb11_value, turb12_value, di_value, atk2_value, cegr_value, deacpd_value, deacfc_value, accessory_value, startstop, hev_value \
+        = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+
+    # set techs to 1 where applicable
+    weight_rdxn = weight_key[3]
+    if accessory_key.__contains__('REGEN'): accessory_value = 1
+    if fuel_key != 'bev':
+        engine_name, disp, cyl, deacpd, deacfc, startstop = engine_key
+        turb, finj, atk, cegr = Engines().get_techs(engine_name)
+        if turb == 'TURB11': turb11_value = 1
+        if turb == 'TURB12': turb12_value = 1
+        if finj == 'DI': di_value = 1
+        if atk == 'ATK2': atk2_value = 1
+        if cegr == 'CEGR': cegr_value = 1
+        if deacpd != 0: deacpd_value = 1
+        if deacfc != 0: deacfc_value = 1
+    if fuel_key == 'bev':
+        startstop = 1
+        accessory_value = 1
+    if fuel_key == 'hev': hev_value = 1
+
+    df.insert(0, 'ac_leakage', 1)
+    df.insert(0, 'ac_efficiency', 1)
+    df.insert(0, 'high_eff_alternator', accessory_value)
+    df.insert(0, 'hev', hev_value)
+    df.insert(0, 'start_stop', startstop)
+    df.insert(0, 'weight_reduction', weight_rdxn / 100)
+    df.insert(0, 'deac_fc', deacfc_value)
+    df.insert(0, 'deac_pd', deacpd_value)
+    df.insert(0, 'cegr', cegr_value)
+    df.insert(0, 'atk2', atk2_value)
+    df.insert(0, 'gdi', di_value)
+    df.insert(0, 'turb12', turb12_value)
+    df.insert(0, 'turb11', turb11_value)
+
+    return df
+
+
 def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     """
 
@@ -459,15 +512,16 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
     print(cost_key)
 
-    fuel_key, alpha_class_key, engine_key, accessory_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'engine_key', 'accessory_key'])
-    startstop = engine_key[4]
-    if accessory_key.__contains__('REGEN'): accessory_key_value = 1
-    else: accessory_key_value = 0
-    ftp1_co2, ftp2_co2, ftp3_co2, hwy_co2, combined_co2 = alpha_file_dict[key]['EPA_FTP_1 gCO2/mi'], \
-                                                          alpha_file_dict[key]['EPA_FTP_2 gCO2/mi'], \
-                                                          alpha_file_dict[key]['EPA_FTP_3 gCO2/mi'], \
-                                                          alpha_file_dict[key]['EPA_HWFET gCO2/mi'], \
-                                                          alpha_file_dict[key]['Combined GHG gCO2/mi']
+    fuel_key, alpha_class_key, engine_key, accessory_key, weight_key \
+        = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'engine_key', 'accessory_key', 'weight_key'])
+    # startstop = engine_key[5]
+    # if accessory_key.__contains__('REGEN'): accessory_key_value = 1
+    # else: accessory_key_value = 0
+    ftp1_co2, ftp2_co2, ftp3_co2, hwy_co2, combined_co2 = alpha_file_dict[key]['EPA_FTP_1 gCO2e/mi'], \
+                                                          alpha_file_dict[key]['EPA_FTP_2 gCO2e/mi'], \
+                                                          alpha_file_dict[key]['EPA_FTP_3 gCO2e/mi'], \
+                                                          alpha_file_dict[key]['EPA_HWFET gCO2e/mi'], \
+                                                          alpha_file_dict[key]['Combined GHG gCO2e/mi']
     engine_cost = pkg_obj.engine_cost(settings.engine_cost_dict, settings.startstop_cost_dict, settings.boost_multiplier)
     trans_cost = pkg_obj.calc_trans_cost(settings.trans_cost_dict)
     accessories_cost = pkg_obj.calc_accessory_cost(settings.accessories_cost_dict)
@@ -494,10 +548,12 @@ def ice_package_results(settings, key, alpha_file_dict, alpha_file_name):
     package_cost_df.insert(0, 'cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile', ftp3_co2)
     package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile', ftp1_co2)
-    package_cost_df.insert(0, 'credit_start_stop', startstop)
-    package_cost_df.insert(0, 'credit_high_eff_alternator', accessory_key_value)
-    package_cost_df.insert(0, 'credit_ac_leakage', 1)
-    package_cost_df.insert(0, 'credit_ac_efficiency', 1)
+    if settings.set_tech_tracking_flags:
+        package_cost_df = create_tech_flags_from_cost_key(package_cost_df, engine_key, weight_key, accessory_key, fuel_key)
+    # package_cost_df.insert(0, 'credit_start_stop', startstop)
+    # package_cost_df.insert(0, 'credit_high_eff_alternator', accessory_key_value)
+    # package_cost_df.insert(0, 'credit_ac_leakage', 1)
+    # package_cost_df.insert(0, 'credit_ac_efficiency', 1)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
@@ -524,7 +580,8 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     pkg_obj = PackageCost(key)
     alpha_key, cost_key = pkg_obj.get_object_attributes(['alpha_key', 'cost_key'])
     print(cost_key)
-    fuel_key, alpha_class_key, pev_key = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'pev_key'])
+    fuel_key, alpha_class_key, pev_key, engine_key, weight_key, accessory_key \
+        = pkg_obj.get_object_attributes(['fuel_key', 'alpha_class_key', 'pev_key', 'engine_key', 'weight_key', 'accessory_key'])
     onroad_range, oncycle_kwh_per_mile, usable_soc, gap, battery_kwh_gross, motor_power, number_of_motors, onboard_charger_kw, size_scaler = pev_key
     ftp1_kwh, ftp2_kwh, ftp3_kwh, hwy_kwh, combined_kwh = alpha_file_dict[key]['EPA_FTP_1_kWhr/100mi'] / 100, \
                                                           alpha_file_dict[key]['EPA_FTP_2_kWhr/100mi'] / 100, \
@@ -550,10 +607,12 @@ def pev_package_results(settings, key, alpha_file_dict, alpha_file_name):
     package_cost_df.insert(0, 'cd_ftp_3:cert_direct_oncycle_kwh_per_mile', ftp3_kwh)
     package_cost_df.insert(0, 'cd_ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
     package_cost_df.insert(0, 'cd_ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
-    package_cost_df.insert(0, 'credit_start_stop', 1)
-    package_cost_df.insert(0, 'credit_high_eff_alternator', 1)
-    package_cost_df.insert(0, 'credit_ac_leakage', 1)
-    package_cost_df.insert(0, 'credit_ac_efficiency', 1)
+    if settings.set_tech_tracking_flags:
+        package_cost_df = create_tech_flags_from_cost_key(package_cost_df, engine_key, weight_key, accessory_key, fuel_key)
+    # package_cost_df.insert(0, 'credit_start_stop', 1)
+    # package_cost_df.insert(0, 'credit_high_eff_alternator', 1)
+    # package_cost_df.insert(0, 'credit_ac_leakage', 1)
+    # package_cost_df.insert(0, 'credit_ac_efficiency', 1)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
     package_cost_df.insert(0, 'dollar_basis', settings.dollar_basis)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
@@ -581,18 +640,6 @@ def read_and_clean_file(settings, alpha_file, fuel_id):
     df = add_elements_for_package_key(df)
     alpha_file_dict = create_package_dict(settings, df, fuel_id)
     return alpha_file_dict
-#
-#
-# def create_cost_cloud_verbose(df, cols_to_use, cols_to_split, pattern=None, expand=True):
-#     """
-#
-#     Args:
-#         df: A cost_cloud DataFrame
-#     """
-#     df_return = pd.DataFrame(df, columns=cols_to_use)
-#     for col_to_split in cols_to_split:
-#         df_return[col_to_split].str.split(pat=pattern, expand=expand)
-#     return df_return
 
 
 class Engines:
@@ -680,7 +727,7 @@ class EngineCost:
 
     """
     def __init__(self, engine_key, weight_key):
-        self.engine_name, self.disp, self.cyl, self.deac, self.startstop = engine_key
+        self.engine_name, self.disp, self.cyl, self.deacpd, self.deacfc, self.startstop = engine_key
         self.weight_key = weight_key
 
     def calc_engine_cost(self, engine_cost_dict, startstop_cost_dict, boost_multiplier, fuel_id):
@@ -704,7 +751,8 @@ class EngineCost:
         if turb: cost += cost * (boost_multiplier - 1) + engine_cost_dict[f'{turb}_{self.cyl}']['item_cost']
         if cegr: cost += engine_cost_dict['CEGR']['item_cost']
         if finj: cost += engine_cost_dict[f'DI_{self.cyl}']['item_cost']
-        if self.deac != 0: cost += engine_cost_dict[f'DeacPD_{self.cyl}']['item_cost']
+        if self.deacpd != 0: cost += engine_cost_dict[f'DeacPD_{self.cyl}']['item_cost']
+        if self.deacfc != 0: cost += engine_cost_dict[f'DeacFC']['item_cost']
         if atk: cost += engine_cost_dict[f'ATK2_{self.cyl}']['item_cost']
         ss_cost = 0
         if self.startstop == 1 and fuel_id == 'ice':
@@ -791,15 +839,6 @@ class PackageCost:
             onboard_charger_kw = 0
             motor_power_divisor = 1
             dcdc_converter_plus_obc = curves_dict['kW_DCDC_converter']['constant'] + onboard_charger_kw
-
-            # motor_cost = nonbattery_dict['motor']['quantity'] * (motor_power * nonbattery_dict['motor']['slope'] + nonbattery_dict['motor']['intercept'])
-            # inverter_cost = nonbattery_dict['inverter']['quantity'] * (motor_power * nonbattery_dict['inverter']['slope'] + nonbattery_dict['inverter']['intercept'])
-            # dcdc_converter = nonbattery_dict['DCDC_converter']['quantity'] * nonbattery_dict['DCDC_converter']['slope'] * dcdc_converter_plus_obc
-            # hv_orange_cables = size_scaler * nonbattery_dict['HV_orange_cables']['quantity'] * (nonbattery_dict['HV_orange_cables']['slope'] + nonbattery_dict['HV_orange_cables']['intercept'])
-            # lv_battery = size_scaler * nonbattery_dict['LV_battery']['quantity'] * (nonbattery_dict['LV_battery']['slope'] + nonbattery_dict['LV_battery']['intercept'])
-            # hvac = size_scaler * nonbattery_dict['HVAC']['quantity'] * (nonbattery_dict['HVAC']['slope'] + nonbattery_dict['HVAC']['intercept'])
-            # brake_sensors_actuators = nonbattery_dict['brake_sensors_actuators']['quantity'] * nonbattery_dict['brake_sensors_actuators']['intercept']
-            # non_battery_cost = motor_cost + inverter_cost + dcdc_converter + hv_orange_cables + lv_battery + hvac + brake_sensors_actuators
 
         battery_cost = battery_kwh_gross * (curves_dict['dollars_per_kWh_curve']['x_cubed_factor'] * battery_kwh_gross ** 3
                                             + curves_dict['dollars_per_kWh_curve']['x_squared_factor'] * battery_kwh_gross ** 2
@@ -945,6 +984,7 @@ class SetInputs:
     path_cwd = Path.cwd()
     path_preproc = path_cwd / 'omega_preproc'
     path_here = path_preproc / 'alpha_package_costs'
+    path_inputs = path_here / 'inputs'
     path_outputs = path_here / 'outputs'
     path_alpha_inputs = path_here / 'ALPHA'
     path_input_templates = path_cwd / 'omega_model/demo_inputs'
@@ -957,14 +997,17 @@ class SetInputs:
     run_phev = False
     run_hev = True
     generate_simulated_vehicles_file = True
-    generate_simulated_vehicles_verbose_file = True
+    generate_simulated_vehicles_verbose_file = False
+
+    # set tech to track via tech flags
+    set_tech_tracking_flags = True
 
     # get the price deflators
     dollar_basis = int(context_aeo_inputs.aeo_version) - 1
     try:
         gdp_deflators = pd.read_csv(path_preproc / f'bea_tables/implicit_price_deflators_{dollar_basis}.csv', index_col=0)
         gdp_deflators = gdp_deflators.to_dict('index')
-        techcosts_file = pd.ExcelFile(path_here / 'alpha_package_costs_module_inputs.xlsx')
+        techcosts_file = pd.ExcelFile(path_inputs / 'alpha_package_costs_module_inputs.xlsx')
         price_class_dict = pd.read_excel(techcosts_file, 'price_class', index_col=0).to_dict('index')
         # read tech costs input file, convert dollar values to dollar basis, and create dictionaries
         engine_cost_dict = create_cost_df_in_consistent_dollar_basis(gdp_deflators, dollar_basis, techcosts_file,
@@ -1216,7 +1259,7 @@ def main():
     input_files_list = [settings.techcosts_file]
     filename_list = [Path(path).name for path in input_files_list]
     for file in filename_list:
-        path_source = settings.path_here.joinpath(file)
+        path_source = settings.path_inputs.joinpath(file)
         path_destination = settings.path_of_run_folder.joinpath(file)
         shutil.copy2(path_source, path_destination)  # copy2 should maintain date/timestamps
 
