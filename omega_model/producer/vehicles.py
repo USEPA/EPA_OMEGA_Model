@@ -1250,14 +1250,16 @@ class VehicleFinal(SQABase, Vehicle):
 
                     vehicles_list.append(veh)
 
-                    if veh.hauling_class == 'hauling':
-                        if veh.context_size_class not in NewVehicleMarket.hauling_context_size_class_info:
-                            NewVehicleMarket.hauling_context_size_class_info[veh.context_size_class] = \
-                                {'total': veh.initial_registered_count, 'hauling_share': 0}
-                        else:
-                            NewVehicleMarket.hauling_context_size_class_info[veh.context_size_class]['total'] = \
-                                NewVehicleMarket.hauling_context_size_class_info[veh.context_size_class][
-                                    'total'] + veh.initial_registered_count
+                    if veh.non_responsive_market_group not in NewVehicleMarket.context_size_class_info_by_nrmc:
+                        NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group] = dict()
+
+                    if veh.context_size_class not in \
+                            NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group]:
+                        NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group][veh.context_size_class] = \
+                            {'total': veh.initial_registered_count, 'share': 0}
+                    else:
+                        NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group][veh.context_size_class]['total'] += \
+                            veh.initial_registered_count
 
                     if veh.context_size_class not in NewVehicleMarket.context_size_classes:
                         NewVehicleMarket.context_size_classes[veh.context_size_class] = veh.initial_registered_count
@@ -1299,10 +1301,10 @@ class VehicleFinal(SQABase, Vehicle):
                     alt_veh.cert_direct_co2e_grams_per_mile = 0
                     alt_veh.cert_direct_kwh_per_mile = 0
 
-                for hsc in NewVehicleMarket.hauling_context_size_class_info:
-                    NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share'] = \
-                        NewVehicleMarket.hauling_context_size_class_info[hsc]['total'] / \
-                        vehicle_shares_dict[hsc]
+                for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+                    for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+                        NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share'] = \
+                            NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['total'] / vehicle_shares_dict[csc]
 
                 # calculate manufacturer base year context size class shares
                 from producer.manufacturers import Manufacturer

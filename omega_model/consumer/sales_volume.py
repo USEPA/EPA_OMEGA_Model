@@ -34,7 +34,7 @@ def context_new_vehicle_sales(calendar_year):
         calendar_year (int): the year to get sales for
 
     Returns:
-        dict of vehicle sales by ``hauling``, ``non_hauling``, and ``total``
+        dict of vehicle sales by non-responsive market category, and ``total``
 
     """
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
@@ -45,18 +45,16 @@ def context_new_vehicle_sales(calendar_year):
     if omega_globals.options.flat_context:
         calendar_year = omega_globals.options.flat_context_year
 
+    # calculate sales by non-responsive market category as a function of context size class sales and
+    # base year share of those vehicles in the non-responsive market category
+    for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+        sales_dict[nrmc] = 0
+        for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+            sales_dict[nrmc] += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) * \
+                                     NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
+
     # get total sales from context
-    total_sales = NewVehicleMarket.new_vehicle_sales(calendar_year)
-
-    # pulling in hauling sales, non_hauling = total minus hauling
-    hauling_sales = 0
-    for hsc in NewVehicleMarket.hauling_context_size_class_info:
-        hauling_sales += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=hsc) * \
-                         NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
-
-    sales_dict['hauling'] = hauling_sales
-    sales_dict['non_hauling'] = total_sales - hauling_sales
-    sales_dict['total'] = total_sales
+    sales_dict['total'] = NewVehicleMarket.new_vehicle_sales(calendar_year)
 
     return sales_dict
 
