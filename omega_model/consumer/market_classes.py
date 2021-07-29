@@ -5,7 +5,7 @@
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.
+rows.  The template header uses a dynamic format.
 
 The data represents characteristics of the consumer module's market classes.
 
@@ -15,29 +15,31 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,market_classes,input_template_version:,0.3
+       input_template_name:,``[module_name]``,input_template_version:,0.32
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:, consumer.market_classes, input_template_version:, 0.32
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        market_class_id,hauling_class,fueling_class,ownership_class
-        non_hauling.BEV,non_hauling,BEV,private
-        hauling.ICE,hauling,ICE,private
+        market_class_id,fueling_class,ownership_class
+        non_hauling.BEV,BEV,private
+        hauling.ICE,ICE,private
 
 Data Column Name and Description
 
 :market_class_id:
     Vehicle market class ID, e.g. 'hauling.ICE'
 
-:hauling_class:
-    Market class hauling class, e.g. 'hauling', 'non_hauling'
-
 :fueling_class:
     Market class fueling class, e.g. 'BEV', 'ICE'
 
 :ownership_class:
-    Market class ownership class, e.g. 'private', 'shared'
+    Market class ownership class, e.g. 'private', 'shared' (For future development)
 
 ----
 
@@ -62,7 +64,6 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
     __tablename__ = 'market_classes'
     market_class_id = Column('market_class_id', String, primary_key=True)  #: market class id, e.g. 'non_hauling.ICE'
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'ICE', 'BEV'
-    hauling_class = Column(Enum(*hauling_classes, validate_strings=True))  #: hauling class, e.g. 'hauling'
     ownership_class = Column(Enum(*ownership_classes, validate_strings=True))  #: ownership class, e.g. 'private'
 
     market_categories = ['ICE', 'BEV', 'hauling', 'non_hauling']  #: overall market categories
@@ -81,10 +82,10 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
             The vehicle's market class ID based on vehicle characteristics.
 
         """
-        if vehicle.hauling_class == 'hauling' and vehicle.electrification_class == 'EV':
+        if 'Pickup' in vehicle.context_size_class and vehicle.electrification_class == 'EV':
             market_class_id = 'hauling.BEV'
             non_responsive_market_group = 'hauling'
-        elif vehicle.hauling_class == 'hauling' and vehicle.electrification_class != 'EV':
+        elif 'Pickup' in vehicle.context_size_class and vehicle.electrification_class != 'EV':
             market_class_id = 'hauling.ICE'
             non_responsive_market_group = 'hauling'
         elif vehicle.electrification_class == 'EV':
@@ -138,8 +139,8 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
         MarketClassBase._market_class_tree_dict_rc = dict()  # empty set market class tree dict with reg class leaves accessed by get_market_class_tree(by_reg_class=True)
 
         input_template_name = __name__
-        input_template_version = 0.31
-        input_template_columns = {'market_class_id', 'hauling_class', 'fueling_class', 'ownership_class'}
+        input_template_version = 0.32
+        input_template_columns = {'market_class_id', 'fueling_class', 'ownership_class'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -156,7 +157,6 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
                     obj_list.append(MarketClass(
                         market_class_id=df.loc[i, 'market_class_id'],
                         fueling_class=df.loc[i, 'fueling_class'],
-                        hauling_class=df.loc[i, 'hauling_class'],
                         ownership_class=df.loc[i, 'ownership_class'],
                     ))
                 omega_globals.session.add_all(obj_list)
@@ -193,7 +193,6 @@ if __name__ == '__main__':
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
-
 
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()

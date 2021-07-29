@@ -27,9 +27,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,hauling_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs
-        ICE Small Utility truck,USA Motors,2019,truck,Small SUV 4WD,Small Utility,N,non_hauling,ice_LPW_HRL,{'pump gasoline':1.0},{'gasoline':1.0},3204422,312.3688658,0,47.00990646,216.1551053,14.29126821,4090.657984,183.2251956,73.74951226,66.63903079,7.976806551,107.4727695,140.101209,34200.17292,5.29582511,1173.586089,2726.343428
-        BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,non_hauling,bev_LPW_LRL,{'US electricity':1.0},{'electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
+        vehicle_id,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs
+        ICE Small Utility truck,USA Motors,2019,truck,Small SUV 4WD,Small Utility,Nice_LPW_HRL,{'pump gasoline':1.0},{'gasoline':1.0},3204422,312.3688658,0,47.00990646,216.1551053,14.29126821,4090.657984,183.2251956,73.74951226,66.63903079,7.976806551,107.4727695,140.101209,34200.17292,5.29582511,1173.586089,2726.343428
+        BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,bev_LPW_LRL,{'US electricity':1.0},{'electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
 
 Data Column Name and Description
     :vehicle_id:
@@ -55,9 +55,6 @@ Data Column Name and Description
 
     :electrification_class:
         The electrification class of the vehicle, such as 'EV', 'HEV', (or 'N' for none - final format TBD)
-
-    :hauling_class:
-        The hauling class of the vehicle, e.g. 'hauling', 'non_hauling'
 
     :cost_curve_class:
         The name of the cost curve class of the vehicle, used to determine which technology options and associated costs
@@ -661,7 +658,6 @@ class Vehicle(OMEGABase):
         self.compliance_id = None
         self.model_year = None
         self.fueling_class = None
-        self.hauling_class = None
         self.cost_curve_class = None
         self.legacy_reg_class_id = None
         self.reg_class_id = None
@@ -867,7 +863,7 @@ class Vehicle(OMEGABase):
 
         """
         base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year',
-                           'fueling_class', 'hauling_class',
+                           'fueling_class',
                            'cost_curve_class', 'legacy_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
                            'cert_fuel_id', 'market_class_id', 'footprint_ft2', 'epa_size_class',
                            'context_size_class', 'market_share', 'non_responsive_market_group',
@@ -1012,7 +1008,6 @@ class VehicleFinal(SQABase, Vehicle):
 
     model_year = Column(Numeric)
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
-    hauling_class = Column(Enum(*hauling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
     legacy_reg_class_id = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
     reg_class_id = Column(String)  # , Enum(*omega_globals.options.RegulatoryClasses.reg_classes, validate_strings=True))
@@ -1147,7 +1142,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        inherit_properties = {'name', 'manufacturer_id', 'compliance_id', 'hauling_class', 'legacy_reg_class_id',
+        inherit_properties = {'name', 'manufacturer_id', 'compliance_id', 'legacy_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
                               'market_share', 'non_responsive_market_group', 'footprint_ft2'}
 
@@ -1181,9 +1176,9 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.41
+        input_template_version = 0.42
         input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
-                                  'epa_size_class', 'context_size_class', 'electrification_class', 'hauling_class',
+                                  'epa_size_class', 'context_size_class', 'electrification_class',
                                   'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales',
                                   'cert_direct_oncycle_co2e_grams_per_mile', 'cert_direct_oncycle_kwh_per_mile',
                                   'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in',
@@ -1210,7 +1205,6 @@ class VehicleFinal(SQABase, Vehicle):
                         epa_size_class=df.loc[i, 'epa_size_class'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         electrification_class=df.loc[i, 'electrification_class'],
-                        hauling_class=df.loc[i, 'hauling_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                         cert_fuel_id=df.loc[i, 'cert_fuel_id'],

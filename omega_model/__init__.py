@@ -52,7 +52,6 @@ try:
 
     # enumerated values
     fueling_classes = OMEGAEnum(['BEV', 'ICE'])
-    hauling_classes = OMEGAEnum(['hauling', 'non_hauling'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
     legacy_reg_classes = OMEGAEnum(['car', 'truck'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
