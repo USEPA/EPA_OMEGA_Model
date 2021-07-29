@@ -1177,7 +1177,9 @@ def main():
     hev_packages_df.to_csv(settings.path_of_run_folder / f'detailed_costs_hev_{settings.name_id}.csv', index=False)
 
     if settings.generate_simulated_vehicles_file:
-        cost_cloud = drop_columns(cost_cloud, 'cert_co2e_grams_per_mile', 'cert_kWh_per_mile', 'alpha_key', 'alpha_filename')
+        cost_cloud = drop_columns(cost_cloud, 'cert_co2e_grams_per_mile', 'cert_kWh_per_mile', 'alpha_key',
+                                  'alpha_filename', 'cs_cert_direct_oncycle_co2e_grams_per_mile',
+                                  'cd_cert_direct_oncycle_kwh_per_mile')
         # open the 'simulated_vehicles.csv' input template into which results will be placed.
         cost_clouds_template_info = pd.read_csv(settings.path_input_templates.joinpath('simulated_vehicles.csv'), 'b', nrows=0)
         temp = ' '.join((item for item in cost_clouds_template_info))
