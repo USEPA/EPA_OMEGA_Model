@@ -437,16 +437,18 @@ if __name__ == '__main__':
         # override reg_classes from __init__.py:
         importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+
         from producer.manufacturers import Manufacturer
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
-        from consumer.market_classes import MarketClass
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)

@@ -34,7 +34,7 @@ def context_new_vehicle_sales(calendar_year):
         calendar_year (int): the year to get sales for
 
     Returns:
-        dict of vehicle sales by ``hauling``, ``non_hauling``, and ``total``
+        dict of vehicle sales by non-responsive market category, and ``total``
 
     """
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
@@ -45,18 +45,16 @@ def context_new_vehicle_sales(calendar_year):
     if omega_globals.options.flat_context:
         calendar_year = omega_globals.options.flat_context_year
 
+    # calculate sales by non-responsive market category as a function of context size class sales and
+    # base year share of those vehicles in the non-responsive market category
+    for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+        sales_dict[nrmc] = 0
+        for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+            sales_dict[nrmc] += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) * \
+                                     NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
+
     # get total sales from context
-    total_sales = NewVehicleMarket.new_vehicle_sales(calendar_year)
-
-    # pulling in hauling sales, non_hauling = total minus hauling
-    hauling_sales = 0
-    for hsc in NewVehicleMarket.hauling_context_size_class_info:
-        hauling_sales += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=hsc) * \
-                         NewVehicleMarket.hauling_context_size_class_info[hsc]['hauling_share']
-
-    sales_dict['hauling'] = hauling_sales
-    sales_dict['non_hauling'] = total_sales - hauling_sales
-    sales_dict['total'] = total_sales
+    sales_dict['total'] = NewVehicleMarket.new_vehicle_sales(calendar_year)
 
     return sales_dict
 
@@ -125,7 +123,6 @@ if __name__ == '__main__':
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        from consumer.market_classes import MarketClass  # needed for market class ID
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2e
         from context.new_vehicle_market import NewVehicleMarket
@@ -133,12 +130,15 @@ if __name__ == '__main__':
         module_name = get_template_name(omega_globals.options.policy_targets_file)
         omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=omega_globals.options.verbose)

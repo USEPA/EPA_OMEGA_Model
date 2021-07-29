@@ -1,6 +1,4 @@
 """
-omega_gui_stylesheets.py
-==================
 
 This code contains stylesheets for the various graphical elements of the OMEGA GUI.
 The color scheme is set to the standard EPA publication Pantone palette.

@@ -36,10 +36,7 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
     Returns:
 
     """
-    from consumer.market_classes import MarketClass
-    import consumer
-
-    for mc in MarketClass.market_classes:
+    for mc in omega_globals.options.MarketClass.market_classes:
         omega_log.logwrite(('%d producer/consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) +
                            '= %.4f / %.4f (DELTA:%f, CE:%f)' % (
                                producer_decision_and_response['producer_abs_share_frac_%s' % mc],
@@ -61,7 +58,7 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
 
     omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
 
-    for cat in consumer.market_categories:
+    for cat in omega_globals.options.MarketClass.market_categories:
         omega_log.logwrite(
             ('cross subsidized price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
             producer_decision_and_response['average_cross_subsidized_price_%s' % cat],
@@ -246,7 +243,6 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     Returns:
 
     """
-    from consumer.market_classes import MarketClass
     from producer import compliance_strategy
     import consumer
 
@@ -262,7 +258,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
                                                      producer_decision['winning_combo_share_weighted_generalized_cost'])
 
-    multiplier_columns = ['cost_multiplier_%s' % mc for mc in MarketClass.market_classes]
+    multiplier_columns = ['cost_multiplier_%s' % mc for mc in omega_globals.options.MarketClass.market_classes]
 
     producer_pricing_iteration = 0
     producer_decision_and_response = pd.DataFrame()
@@ -295,7 +291,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         # calculate "distance to origin" (minimal price and market share errors):
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**1
         # add terms to maintain prices of non-responsive market categories during convergence:
-        for cat in consumer.non_responsive_market_categories:
+        for cat in omega_globals.options.MarketClass.non_responsive_market_categories:
             pricing_convergence_score += abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
                                         producer_decision_and_response['average_cost_%s' % cat])**1
 
@@ -346,7 +342,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         continue_search = continue_search and not converged
 
     if 'consumer' in omega_globals.options.verbose_console:
-        for mc, cc in zip(MarketClass.market_classes, multiplier_columns):
+        for mc, cc in zip(omega_globals.options.MarketClass.market_classes, multiplier_columns):
             omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc], echo_console=True)
         if converged:
             omega_log.logwrite('PRODUCER-CONSUMER CONVERGED CE:%f' % convergence_error, echo_console=True)
@@ -417,7 +413,6 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
 
     """
     import numpy as np
-    from consumer.market_classes import MarketClass
     from context.price_modifications import PriceModifications
 
     if producer_decision_and_response.empty:
@@ -428,7 +423,7 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
                                             omega_globals.options.consumer_pricing_num_options), 1.0))
 
     search_collapsed = True
-    for mc, mcc in zip(MarketClass.market_classes, multiplier_columns):
+    for mc, mcc in zip(omega_globals.options.MarketClass.market_classes, multiplier_columns):
         if not producer_decision_and_response.empty:
             # subsequent passes, tighten up search range to find convergent multipliers
             multiplier_range, search_collapsed = tighten_multiplier_range(mcc, prev_multiplier_range,
@@ -507,16 +502,15 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
 
     """
 
-    from consumer.market_classes import MarketClass
     from common.omega_functions import weighted_value
 
     # group vehicles by market class
-    market_class_vehicle_dict = MarketClass.get_market_class_dict()
+    market_class_vehicle_dict = omega_globals.options.MarketClass.get_market_class_dict()
     for new_veh in candidate_mfr_composite_vehicles:
         market_class_vehicle_dict[new_veh.market_class_id].append(new_veh)
 
     # calculate sales-weighted co2 g/mi and cost by market class
-    for mc in MarketClass.market_classes:
+    for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
             winning_combo['average_co2e_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
@@ -566,17 +560,15 @@ def calc_market_sector_data(winning_combo):
 
     """
     import numpy as np
-    import consumer
-    from consumer.market_classes import MarketClass
 
-    for mcat in consumer.market_categories:
+    for mcat in omega_globals.options.MarketClass.market_categories:
         winning_combo['average_cost_%s' % mcat] = 0
         winning_combo['average_generalized_cost_%s' % mcat] = 0
         winning_combo['average_cross_subsidized_price_%s' % mcat] = 0
         winning_combo['sales_%s' % mcat] = 0
         winning_combo['producer_abs_share_frac_%s' % mcat] = 0
 
-        for mc in MarketClass.market_classes:
+        for mc in omega_globals.options.MarketClass.market_classes:
             if mcat in mc.split('.'):
                 winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['average_generalized_cost_%s' % mcat] += winning_combo['average_generalized_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
@@ -657,6 +649,9 @@ def init_user_definable_modules():
     module_name = get_template_name(omega_globals.options.producer_generalized_cost_file)
     omega_globals.options.ProducerGeneralizedCost = importlib.import_module(module_name).ProducerGeneralizedCost
 
+    module_name = get_template_name(omega_globals.options.market_classes_file)
+    omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+
     return init_fail
 
 
@@ -732,7 +727,6 @@ def init_omega(session_runtime_options):
     init_fail += init_user_definable_modules()
 
     # import database modules to populate ORM context
-    from consumer.market_classes import MarketClass
 
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
@@ -778,8 +772,8 @@ def init_omega(session_runtime_options):
         SQABase.metadata.create_all(omega_globals.engine)
 
         # load remaining input data
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=verbose_init)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                                      verbose=verbose_init)
 
         init_fail += omega_globals.options.SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                                      verbose=verbose_init)

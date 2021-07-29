@@ -113,7 +113,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
         else:
             share_column_names = [producer_prefix + c for c in children]
 
-        if all(s in consumer.responsive_market_categories for s in children):
+        if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
             from context.production_constraints import ProductionConstraints
             from policy.required_sales_share import RequiredSalesShare
 
@@ -293,8 +293,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
     if 'producer' in omega_globals.options.verbose_console:
-        from consumer.market_classes import MarketClass
-        for mc in MarketClass.market_classes:
+        for mc in omega_globals.options.MarketClass.market_classes:
             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' %
                                (selected_production_decision['producer_abs_share_frac_%s' % mc]), echo_console=True)
         omega_log.logwrite('', echo_console=True)
@@ -317,7 +316,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
     """
     from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle
-    from consumer.market_classes import MarketClass, populate_market_classes
     from consumer.sales_volume import context_new_vehicle_sales
     from context.new_vehicle_market import NewVehicleMarket
 
@@ -346,16 +344,14 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
 
         # group by non responsive market group
-        from consumer import non_responsive_market_categories
-
         nrmc_dict = dict()
-        for nrmc in non_responsive_market_categories:
+        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
             nrmc_dict[nrmc] = []
         for new_veh in manufacturer_vehicles:
             nrmc_dict[new_veh.non_responsive_market_group].append(new_veh)
 
         # distribute non responsive market class sales to manufacturer_vehicles by relative market share
-        for nrmc in non_responsive_market_categories:
+        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
             nrmc_initial_registered_count = context_new_vehicle_sales(calendar_year)[nrmc]
             distribute_by_attribute(nrmc_dict[nrmc], nrmc_initial_registered_count,
                                     weight_by='market_share',
@@ -418,7 +414,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         # group by market class / reg class
         mctrc = dict()
-        for mc in MarketClass.market_classes:
+        for mc in omega_globals.options.MarketClass.market_classes:
             mctrc[mc] = {'sales': 0}
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 mctrc[mc][rc] = []
@@ -437,11 +433,11 @@ def create_composite_vehicles(calendar_year, compliance_id):
                     manufacturer_composite_vehicles.append(cv)
 
         # get empty market class tree
-        market_class_tree = MarketClass.get_market_class_tree()
+        market_class_tree = omega_globals.options.MarketClass.get_market_class_tree()
 
         # populate tree with vehicle objects
         for new_veh in manufacturer_composite_vehicles:
-            populate_market_classes(market_class_tree, new_veh.market_class_id, new_veh)
+            omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id, new_veh)
 
         cache[cache_key] = {'manufacturer_composite_vehicles': manufacturer_composite_vehicles,
                             'market_class_tree': market_class_tree,

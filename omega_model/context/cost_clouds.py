@@ -35,15 +35,15 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.2,``{optional_source_data_comment}``
+       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.21,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        simulated_vehicle_id,model_year,cost_curve_class,cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_4:cert_direct_oncycle_kwh_per_mile,cd_hwfet:cert_direct_oncycle_kwh_per_mile,new_vehicle_mfr_cost_dollars,cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,ac_efficiency,ac_leakage,high_eff_alternator,start_stop
-        1_bev,2020,bev_LPW_LRL,0.12992078,0.10534883,0.1247339,0.10534883,0.13151191,30837.9095774431,0,0,0,0,0,1,0,0,0
-        9086_ice,2031,ice_MPW_HRL,0,0,0,0,0,28995.8504073507,285.798112,269.100823,246.852389,269.100823,191.235952,1,1,1,1
+        simulated_vehicle_id,model_year,cost_curve_class,ac_efficiency,ac_leakage,high_eff_alternator,start_stop,cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_4:cert_direct_oncycle_kwh_per_mile,cd_hwfet:cert_direct_oncycle_kwh_per_mile,new_vehicle_mfr_cost_dollars,cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile
+        bev_1,2020,bev_LPW_LRL,1,1,1,1,0.12992078,0.10534883,0.1247339,0.10534883,0.13151191,29559.4800439885,0,0,0,0,0
+        ice_9086,2021,ice_MPW_HRL,1,1,1,0,0,0,0,0,0,31012.5039133722,285.798112,269.100823,246.852389,269.100823,191.235952
 
 Data Column Name and Description
     :simulated_vehicle_id:
@@ -113,7 +113,7 @@ class CostCloud(OMEGABase):
 
     _max_year = 0  # maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
 
-    cost_cloud_columns = []
+    cost_cloud_data_columns = []
 
     @staticmethod
     def init_cost_clouds_from_file(filename, verbose=False):
@@ -137,7 +137,7 @@ class CostCloud(OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'simulated_vehicle_results_and_costs'
-        input_template_version = 0.2
+        input_template_version = 0.21
         input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
                                   'new_vehicle_mfr_cost_dollars'}
         input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
@@ -167,7 +167,8 @@ class CostCloud(OMEGABase):
                         cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
                         CostCloud._max_year = max(CostCloud._max_year, model_year)
 
-                CostCloud.cost_cloud_columns = df.columns
+                CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
+                                                                     'cost_curve_class'])
 
         return template_errors
 
@@ -185,17 +186,6 @@ class CostCloud(OMEGABase):
 
         """
         return cache[cost_curve_class][model_year].copy()
-
-    @staticmethod
-    def get_max_year():
-        """
-        Get maximum year of cost cloud data.
-
-        Returns:
-            CostCloud.max_year
-
-        """
-        return CostCloud._max_year
 
 
 if __name__ == '__main__':

@@ -1,6 +1,4 @@
 """
-sound_gui.py
-============
 
 MP3 Sound Player
 

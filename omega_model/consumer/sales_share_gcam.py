@@ -140,7 +140,6 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
             MC = market class ID
 
         """
-        from consumer.market_classes import MarketClass
         from context.onroad_fuels import OnroadFuel
 
         if omega_globals.options.flat_context:
@@ -148,13 +147,16 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
         #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
 
-        sales_share_denominator_all_hauling = 0
-        sales_share_denominator_all_nonhauling = 0
+        # group by non responsive market group
+        sales_share_denominator = dict()
+        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
+            sales_share_denominator[nrmc] = 0
 
         sales_share_numerator = dict()
 
         for pass_num in [0, 1]:
-            for market_class_id in MarketClass.market_classes:
+            for market_class_id in omega_globals.options.MarketClass.market_classes:
+                nrmc = omega_globals.options.MarketClass.get_non_responsive_market_category(market_class_id)
                 if pass_num == 0:
                     fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
@@ -200,18 +202,11 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
                     market_class_data[
                         'consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
-                    if 'non_hauling' in market_class_id.split('.'):
-                        sales_share_denominator_all_nonhauling += sales_share_numerator[market_class_id]
-                    else:
-                        sales_share_denominator_all_hauling += sales_share_numerator[market_class_id]
+                    sales_share_denominator[nrmc] += sales_share_numerator[market_class_id]
+
                 else:
-                    if 'non_hauling' in market_class_id.split('.'):
-                        demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator_all_nonhauling
-                        demanded_absolute_share = demanded_share * market_class_data[
-                            'producer_abs_share_frac_non_hauling']
-                    else:
-                        demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator_all_hauling
-                        demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_hauling']
+                    demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator[nrmc]
+                    demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_%s' % nrmc]
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
@@ -303,13 +298,15 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        from consumer.market_classes import MarketClass  # needed for market class ID
-        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from policy.targets_footprint import VehicleTargets
-        from context.cost_clouds import CostCloud
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
 
-        omega_globals.options.VehicleTargets = VehicleTargets
+        module_name = get_template_name(omega_globals.options.policy_targets_file)
+        omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
+
+        from producer.manufacturers import Manufacturer  # needed for manufacturers table
+        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
+        from context.cost_clouds import CostCloud
 
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
@@ -318,13 +315,13 @@ if __name__ == '__main__':
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += MarketClass.init_database_from_file(omega_globals.options.market_classes_file,
-                                                         verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
         init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
                                                verbose=omega_globals.options.verbose)
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
-        init_fail += VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
+        init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                           verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
@@ -341,7 +338,7 @@ if __name__ == '__main__':
 
             # test market shares at different CO2e and price levels
             mcd = pd.DataFrame()
-            for mc in MarketClass.market_classes:
+            for mc in omega_globals.options.MarketClass.market_classes:
                 mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
                 mcd['average_kwh_pmi_%s' % mc] = [0, 0]
                 mcd['average_co2e_gpmi_%s' % mc] = [125, 150]

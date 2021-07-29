@@ -111,7 +111,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
         from context.onroad_fuels import OnroadFuel
 
         producer_generalized_cost_fuel_years, producer_generalized_cost_annual_vmt = \
-            omega_globals.options.ProducerGeneralizedCost. \
+            ProducerGeneralizedCost. \
                 get_producer_generalized_cost_attributes(vehicle.market_class_id, ['fuel_years', 'annual_vmt'])
 
         cost_cloud = vehicle.cost_cloud
@@ -213,14 +213,13 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
-        init_fail += ProducerGeneralizedCost.init_database_from_file(
+        init_fail += ProducerGeneralizedCost.init_from_file(
             omega_globals.options.producer_generalized_cost_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:

@@ -52,7 +52,6 @@ try:
 
     # enumerated values
     fueling_classes = OMEGAEnum(['BEV', 'ICE'])
-    hauling_classes = OMEGAEnum(['hauling', 'non_hauling'])
     ownership_classes = OMEGAEnum(['shared', 'private'])
     legacy_reg_classes = OMEGAEnum(['car', 'truck'])
     fuel_units = OMEGAEnum(['gallon', 'kWh'])
@@ -174,6 +173,7 @@ try:
             self.OnroadVMT = None
             self.SalesShare = None
             self.ProducerGeneralizedCost = None
+            self.MarketClass = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
