@@ -36,8 +36,6 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
     Returns:
 
     """
-    import consumer
-
     for mc in omega_globals.options.MarketClass.market_classes:
         omega_log.logwrite(('%d producer/consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) +
                            '= %.4f / %.4f (DELTA:%f, CE:%f)' % (
@@ -60,7 +58,7 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
 
     omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
 
-    for cat in consumer.market_categories:
+    for cat in omega_globals.options.MarketClass.market_categories:
         omega_log.logwrite(
             ('cross subsidized price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
             producer_decision_and_response['average_cross_subsidized_price_%s' % cat],
@@ -293,7 +291,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         # calculate "distance to origin" (minimal price and market share errors):
         pricing_convergence_score = producer_decision_and_response['abs_share_delta_total']**1
         # add terms to maintain prices of non-responsive market categories during convergence:
-        for cat in consumer.non_responsive_market_categories:
+        for cat in omega_globals.options.MarketClass.non_responsive_market_categories:
             pricing_convergence_score += abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
                                         producer_decision_and_response['average_cost_%s' % cat])**1
 
@@ -562,9 +560,8 @@ def calc_market_sector_data(winning_combo):
 
     """
     import numpy as np
-    import consumer
 
-    for mcat in consumer.market_categories:
+    for mcat in omega_globals.options.MarketClass.market_categories:
         winning_combo['average_cost_%s' % mcat] = 0
         winning_combo['average_generalized_cost_%s' % mcat] = 0
         winning_combo['average_cross_subsidized_price_%s' % mcat] = 0
