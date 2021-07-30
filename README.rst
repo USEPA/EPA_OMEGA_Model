@@ -6,9 +6,28 @@ The OMEGA2 model determines compliance pathways for light-duty vehicle GHG stand
 Installation
 ------------
 
-::
+**Typical Install**
 
-    pip install usepa-omega2
+Install required packages:
+
+    ``pip install -r requirements.txt``
+
+
+Install optional developer packages:
+
+    ``pip install -r requirements-dev.txt``
+
+----
+
+**Conda Install**
+
+    ``conda install --file requirements-conda.txt``
+
+    ``pip install -r requirements.txt``
+
+Install optional developer packages:
+
+    ``pip install -r requirements-dev.txt``
 
 Usage
 -----
