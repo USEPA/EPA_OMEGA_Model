@@ -709,6 +709,19 @@ class Form(QObject):
         message = "OMEGA Version " + omega2_version + " Ready"
         self.event_monitor(message, color, 'dt')
         self.event_monitor(event_separator, color, '')
+
+        # Check if dispy is running.
+        if is_running("dispynode.py"):
+            self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
+            message = "Multiprocessor Mode Available\n" \
+                "----------"
+            self.event_monitor(message, 'black', '')
+        else:
+            self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
+            message = "Multiprocessor Mode Not Available\n" \
+                "----------"
+            self.event_monitor(message, 'black', '')
+
         # Prime the wizard
         # self.clear_wizard()
         self.event_monitor(wizard_init, 'black', '')
@@ -731,11 +744,7 @@ class Form(QObject):
         self.window.model_status_label.setText("Model Idle")
         self.window.select_plot_3.setEnabled(0)
 
-        # Check if dispy is running.
-        if is_running("dispynode.py"):
-            self.window.multiprocessor_checkbox.setEnabled(1)  # Enable multiprocessor checkbox if running
-        else:
-            self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
+
 
     def clear_entries(self):
         """
@@ -1077,7 +1086,6 @@ class Form(QObject):
                 self.window.multiprocessor_checkbox.setEnabled(0)  # Disable multiprocessor checkbox if not running
         else:
             self.window.multiprocessor_checkbox.setEnabled(0)
-
 
     def select_plot_2(self):
         """

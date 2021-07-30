@@ -188,8 +188,8 @@ def reshape_df_for_cloud_file(settings, df_source, *id_args):
     """
     df_return = pd.DataFrame()
     id_variables = [id_arg for id_arg in id_args]
-    tech_flag_list = ['ac_leakage', 'ac_efficiency', 'start_stop', 'hev', 'high_eff_alternator',
-                      'weight_reduction', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
+    tech_flag_list = ['ac_leakage', 'ac_efficiency', 'high_eff_alternator', 'start_stop', 'hev', 'phev', 'bev',
+                      'weight_reduction', 'curb_weight', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
                       ]
     # credit_args = [col for col in df_source.columns if col.__contains__('credit')]
     # for credit_arg in credit_args:
@@ -446,20 +446,13 @@ def create_package_dict(settings, input_df, fuel_id):
     return df_dict
 
 
-# class CreateTechFlags:
-#     def __init__(self):
-#         self.tech_flag_list = ['ac_leakage', 'ac_efficiency', 'start_stop', 'high_eff_alternator',
-#                                'weight_reduction', 'deac', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
-#                                ]
-#
-#     @staticmethod
 def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, fuel_key):
     # set techs to 0
-    turb11_value, turb12_value, di_value, atk2_value, cegr_value, deacpd_value, deacfc_value, accessory_value, startstop, hev_value \
-        = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    turb11_value, turb12_value, di_value, atk2_value, cegr_value, deacpd_value, deacfc_value, accessory_value, startstop, hev_value, bev_value, phev_value \
+        = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
     # set techs to 1 where applicable
-    weight_rdxn = weight_key[3]
+    curb_weight, glider_weight, battery_weight, weight_rdxn = weight_key
     if accessory_key.__contains__('REGEN'): accessory_value = 1
     if fuel_key != 'bev':
         engine_name, disp, cyl, deacpd, deacfc, startstop = engine_key
@@ -474,13 +467,18 @@ def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, f
     if fuel_key == 'bev':
         startstop = 1
         accessory_value = 1
+        bev_value = 1
     if fuel_key == 'hev': hev_value = 1
+    if fuel_key == 'phev': phev_value = 1
 
     df.insert(0, 'ac_leakage', 1)
     df.insert(0, 'ac_efficiency', 1)
     df.insert(0, 'high_eff_alternator', accessory_value)
+    df.insert(0, 'bev', bev_value)
+    df.insert(0, 'phev', phev_value)
     df.insert(0, 'hev', hev_value)
     df.insert(0, 'start_stop', startstop)
+    df.insert(0, 'curb_weight', curb_weight)
     df.insert(0, 'weight_reduction', weight_rdxn / 100)
     df.insert(0, 'deac_fc', deacfc_value)
     df.insert(0, 'deac_pd', deacpd_value)
@@ -754,6 +752,7 @@ class EngineCost:
         if self.deacpd != 0: cost += engine_cost_dict[f'DeacPD_{self.cyl}']['item_cost']
         if self.deacfc != 0: cost += engine_cost_dict[f'DeacFC']['item_cost']
         if atk: cost += engine_cost_dict[f'ATK2_{self.cyl}']['item_cost']
+        # reminder that ss_cost is included in HEV costs so not double counted here (PHEV?)
         ss_cost = 0
         if self.startstop == 1 and fuel_id == 'ice':
             for ss_key in startstop_cost_dict.keys():
@@ -981,13 +980,20 @@ class SetInputs:
     """
     The SetInputs class sets input values for this module as well as reading the input file and creating dictionaries for use throughout the module.
     """
-    path_cwd = Path.cwd()
-    path_preproc = path_cwd / 'omega_preproc'
-    path_here = path_preproc / 'alpha_package_costs'
-    path_inputs = path_here / 'inputs'
-    path_outputs = path_here / 'outputs'
-    path_alpha_inputs = path_here / 'ALPHA'
-    path_input_templates = path_cwd / 'omega_model/demo_inputs'
+    path_to_file = Path(__file__).parent
+    path_preproc = path_to_file.parent
+    path_project = path_preproc.parent
+    path_inputs = path_to_file / 'inputs'
+    path_outputs = path_to_file / 'outputs'
+    path_alpha_inputs = path_to_file / 'ALPHA'
+    path_input_templates = path_project / 'omega_model/demo_inputs'
+    # path_cwd = Path.cwd()
+    # path_preproc = path_to_file / 'omega_preproc'
+    # path_here = path_preproc / 'alpha_package_costs'
+    # path_inputs = path_here / 'inputs'
+    # path_outputs = path_here / 'outputs'
+    # path_alpha_inputs = path_here / 'ALPHA'
+    # path_input_templates = path_cwd / 'omega_model/demo_inputs'
 
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
