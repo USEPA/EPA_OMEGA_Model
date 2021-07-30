@@ -142,7 +142,7 @@ Users can define market classes. In doing so, the user must ensure that all othe
 Within the demo analysis, vehicles are separated into four market classes depending on whether they are EV or ICE, and whether they are for hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do). The hauling/non-hauling market class is defined as non-responsive. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The EV/ICE market class is defined as responsive, and the share of vehicles in that market class is estimated within the Consumer Module.
 
 Phase 1: New Vehicle Sales
-------------------------
+--------------------------
 * The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles. Within that share estimation, the ability to model both EV and ICE vehicle demand and supply separately is a major part
 
 **Sales Volumes**
@@ -159,7 +159,7 @@ Phase 1: New Vehicle Sales
        *  What are these parameters
 
 Phase 2: Vehicle Stock and Use
-------------------------
+------------------------------
 *  We are working to keep internal consistency within the number of vehicles demanded, and the use of those vehicles
 *  Vehicle Stock - total new vehicle sales, plus historical fleet (legacy fleet? historical plus legacy? what is the term for the used vehicle fleet existing at that point in time?), minus vehicle not reregistered.
 *   The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age. Other modules may include feedback between sales and reregistration
