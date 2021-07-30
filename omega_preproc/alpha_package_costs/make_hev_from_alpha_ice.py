@@ -1,5 +1,5 @@
 import pandas as pd
-from omega_preproc.alpha_package_costs.alpha_package_costs import SetInputs as settings, Engines, clean_alpha_data, add_elements_for_package_key, create_package_dict
+from omega_preproc.alpha_package_costs.alpha_package_costs import SetInputs as settings, Engines, clean_alpha_data
 
 
 class SelectICEforHEV:
@@ -55,11 +55,11 @@ def adjust_co2(settings, df):
         A DataFrame of HEV packages with ICE-based CO2 values adjusted to reflect hybridization.
 
     """
-    df['EPA_FTP_1 gCO2/mi'] = df['EPA_FTP_1 gCO2/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
-    df['EPA_FTP_2 gCO2/mi'] = df['EPA_FTP_2 gCO2/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
-    df['EPA_FTP_3 gCO2/mi'] = df['EPA_FTP_3 gCO2/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
-    df['EPA_HWFET gCO2/mi'] = df['EPA_HWFET gCO2/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_hwy_hev']['value'])
-    df['Combined GHG gCO2/mi'] = df['Combined GHG gCO2/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_cycle_hev']['value'])
+    df['EPA_FTP_1 gCO2e/mi'] = df['EPA_FTP_1 gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
+    df['EPA_FTP_2 gCO2e/mi'] = df['EPA_FTP_2 gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
+    df['EPA_FTP_3 gCO2e/mi'] = df['EPA_FTP_3 gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
+    df['EPA_HWFET gCO2e/mi'] = df['EPA_HWFET gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_hwy_hev']['value'])
+    df['Combined GHG gCO2e/mi'] = df['Combined GHG gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_cycle_hev']['value'])
     return df
 
 
@@ -143,12 +143,13 @@ def add_motor(settings, df):
 
 
 def main():
-    alpha_folder = settings.path_alpha_inputs / 'ICE'
+    ice_folder_path = settings.path_alpha_inputs / 'ICE'
     hev_folder_path = settings.path_alpha_inputs / 'HEV'
     hev_folder_path.mkdir(exist_ok=True)
 
     hev_packages_df = pd.DataFrame()
-    alpha_files = [file for file in alpha_folder.iterdir() if file.name.__contains__('.csv')]
+    sub_header = pd.DataFrame()
+    alpha_files = [file for file in ice_folder_path.iterdir() if file.name.__contains__('.csv')]
 
     for idx, alpha_file in enumerate(alpha_files):
         if idx == 0:
