@@ -1,0 +1,38 @@
+# This requirements file can be used with conda to download native binaries for a user's system
+# Some of the requirements are unavailable through conda
+#
+# Install process:
+#
+# conda install --file requirements-conda.txt
+# pip install -r requirements.txt
+#     optionally:
+# pip install -r requirements-dev.txt
+
+# for omega_model:
+numpy
+matplotlib
+pandas<1.3.0
+scipy
+SQLAlchemy<1.4.0
+treelib
+
+# for dispy parallel processing:
+# UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: dispy==4.12.4
+# UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: pycos==4.11.0
+psutil
+netifaces
+
+# for omega batch process:
+pyDOE2
+
+# for reading excel files (omega_preproc):
+openpyxl
+
+# for omega_gui:
+# UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: PySide2
+# UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: multitimer
+# UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: playsound
+PyYAML
+
+# optional, for building docs:
+Sphinx<4.0.0

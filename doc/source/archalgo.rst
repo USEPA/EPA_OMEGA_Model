@@ -150,7 +150,7 @@ Before the Consumer Module can estimate sales and or shares response, all vehicl
 .. todo: [[make text size in figure larger]]
 
 Phase 1: New Vehicle Sales
-------------------------
+--------------------------
 * The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles. Within that share estimation, the ability to model both EV and ICE vehicle demand and supply separately is a major part
 
 **Sales Volumes**
@@ -167,7 +167,7 @@ Phase 1: New Vehicle Sales
        *  What are these parameters
 
 Phase 2: Vehicle Stock and Use
-------------------------
+------------------------------
 *  We are working to keep internal consistency within the number of vehicles demanded, and the use of those vehicles
 *  Vehicle Stock - total new vehicle sales, plus historical fleet (legacy fleet? historical plus legacy? what is the term for the used vehicle fleet existing at that point in time?), minus vehicle not reregistered.
 *   The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age. Other modules may include feedback between sales and reregistration
