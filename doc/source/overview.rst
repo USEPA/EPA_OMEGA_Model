@@ -63,3 +63,7 @@ The outcomes of consumer and producer decision-making in OMEGA are expressed via
 
 * The modeling of consumer decisions requires that the model retains sufficient detail to distinguish market segments between which the consumer is choosing. The definition of these OMEGA ‘market classes’ depends on the requirements of the particular consumer module being used. For this reason, OMEGA assigns market classes to vehicles internally according the attribute definitions of the market classes (e.g. size, interior volume, frame type, AWD, electric range, etc), rather than being hard-coded in the context inputs for fleet projections.
 * The modeling of producer decisions requires that that the model retains sufficient detail to calculate the target and achieved compliance emissions, as well as any details needed to calculate the generalized producer cost.
+
+How to Navigate this Documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+x
