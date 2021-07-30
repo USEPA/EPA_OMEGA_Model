@@ -1,3 +1,5 @@
+# This requirements file can be used to install optional packages for developers
+
 # for building docs from .rst files (optional):
 Sphinx<4.0.0
 sphinx-rtd-theme

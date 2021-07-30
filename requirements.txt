@@ -1,3 +1,5 @@
+# This requirements file indicates packages necessary to run the OMEGA model and the GUI
+
 # for omega_model:
 numpy
 matplotlib
