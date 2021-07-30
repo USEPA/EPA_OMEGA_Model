@@ -29,6 +29,8 @@ Install optional developer packages:
 
     ``pip install -r requirements-dev.txt``
 
+See the requirements files for further information.
+
 Usage
 -----
 
