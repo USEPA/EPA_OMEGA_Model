@@ -4,9 +4,21 @@
 Model Architecture and Algorithms
 =================================
 
-Overview of Model Inputs
-^^^^^^^^^^^^^^^^^^^^^^^^
-.. todo: [this section should just focus on what type of information is provided by the input files, and not about where the data comes from]
+
+Overall Simulation Process
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Process Flow Summary
+--------------------
+x
+
+Simulation Scope and Units of Analysis
+--------------------------------------
+x
+
+Model Inputs
+------------
+.. todo: [section should just focus on what type of information is provided by the input files, and not about where the data comes from]
 
 As described in the overview, OMEGA model inputs are grouped into two categories:  1) assumptions about the structure and the stringency of the policies being evaluated within the model (these are the policy alternatives) and 2) external assumptions that apply to all policies under analysis (collectively referred to as the analysis context).  The policy alternatives define the policy being evaluated in each OMEGA run and are described in the Policy Module section.  The analysis context inputs (which include more traditional inputs like fuel prices, technology assumptions, etc) are discussed within the descriptions of the associated modules that use them.
 
@@ -18,7 +30,7 @@ Policy Alternatives Inputs:
 	* Technology multipliers
 	* Reg class definitions
 	* VMT assumption
-	
+
 
 Analysis Context Inputs:
 	* Vehicle costs
@@ -31,10 +43,16 @@ Analysis Context Inputs:
 	* Vehicle VMT distribution
 
 
+Projections and the Analysis Context
+------------------------------------
+x
+
+
+
 .. todo: [[add footnote about terminology, that in the implementation, these are called packages]]
 
 Policy Module
-^^^^^^^
+^^^^^^^^^^^^^
 OMEGA's primary function is to help evaluate and compare policy alternatives which may vary in terms of regulatory program structure and stringency. Because we cannot anticipate all possible policy elements in advance, the code within this module has been made generic, to the extent possible, leaving most of the policy definition to be defined by the user as inputs to the model. Where regulatory program elements cannot be easily provided as inputs, for example the equations used to calculate GHG target values, the code has been organized as user-definable submodules. Much like the definitions recorded in the Code of Federal Regulations (CFR), the combination of inputs and user-definable submodules must unambiguously describe the methodologies for determining vehicle-level emissions targets and certification values, as well as the accounting rules for determining how individual vehicles contribute to a manufacturer's overall compliance determination.
 
 In this documentation, *policy alternatives* refer only to what is being evaluated in a particular model run. There will also be relevant inputs and assumptions which are technically policies but are assumed to be fixed (i.e. exogenous) for a given comparison of alternatives. Such assumptions are defined by the user in the *analysis context*, and may reflect a combination of local, state, and federal programs that influence the transportation sector through regulatory and market-based mechanisms. .. todo: [[add examples, and links]] A comparison of policy alternatives requires the user to specify a no-action, or baseline policy, and one or more action alternatives.
@@ -71,27 +89,41 @@ Some policies are not modeled in OMEGA as policy alternatives, either because th
 
 
 Producer Module
-^^^^^^^
-
+^^^^^^^^^^^^^^^
+Producer Module Overview
+------------------------
 The modeling of producer decisions is a core function of OMEGA, and is based on minimizing their generalized costs, subject to the constraints of regulatory compliance and consumer demand. The ‘producer’ defined in the OMEGA encompasses both the broader meaning as a supplier of a transportation good or service to the market, and in the narrower sense as the regulated entity subject to EPA policies.
 
-The Producer Module uses exogenous inputs from the analysis context (including xyz) to meet the compliance targets defined in the policy module.   Its outputs of xyz must ultimately reconcile with the outputs from the Consumer module through a series of iterations, described in the Consumer Module section. 
+The Producer Module uses exogenous inputs from the analysis context (including xyz) to meet the compliance targets defined in the policy module.   Its outputs of xyz must ultimately reconcile with the outputs from the Consumer module through a series of iterations, described in the Consumer Module section.
 
-Inputs and Outputs of the Producer Module
-------------------------
+**Inputs to the Producer Module**
 Policy Alternative inputs are used to calculate a compliance target for the producer, in Mg CO2 for a given analysis year, using the provided attribute-based standards curve, vehicle regulatory class definitions, and assumed VMT for compliance. Other policy inputs may define, for example, the credit lifetime for carry-forward and carry-back, or a floor on the minimum share of ZEV vehicles produced.
 
 Context inputs and assumptions that the Producer Module uses define all factors, apart from the policies under evaluation, that influence the modeled producer decisions. Key factors include the vehicle costs and emissions for the technologies and vehicle attributes considered, and the producer constraints on pricing strategy and cross-subsidization.
 
-Inside the Producer Module
-------------------------
+**Outputs of the Producer Module**
+x
+
+Vehicle Definitions
+-------------------
+x
+
+Vehicle Clouds, Frontiers, and Aggregation
+------------------------------------------
+x
+
+
+Producer Compliance Strategy
+----------------------------
 OMEGA incorporates our assumption that producers make strategic decisions, looking beyond the immediate present to minimize generalized costs over a longer time horizon. The efficient management of compliance credits from year-to-year, in particular, involves a degree of look-ahead, both in terms of expected changes in regulatory stringency and other policies, and expected changes in generalized costs over time.
 
 The producer’s generalized cost is made up of both the monetary expenses of bringing a product to the consumer, and also the value that the producer expects can be recovered from consumers at the time of purchase. The assumption in OMEGA that producers will attempt to minimize their generalized costs is consistent with a producer goal of profit maximization, subject to any modeling constraints defined in the Consumer Module, such as limiting changes in sales volumes, sales mixes, or select vehicle attributes.
 
 
 Consumer Module
-^^^^^^^
+^^^^^^^^^^^^^^^
+Consumer Module Overview
+------------------------
 The Consumer Module’s purpose is to estimate how light duty vehicle ownership and use respond to key vehicle characteristics within a given analysis context. The module estimates total new sales volumes, the EV share of new vehicle demand, used vehicle market responses (including reregistration/scrappage), and the use of both new and used vehicles in the market measured using vehicle miles traveled (VMT). An important addition with the Consumer Module, on top of generally incorporating consumer response affects to total new vehicle sales, is that it allows different endogenous consumer responses to EVs and ICEs.
 
 The Consumer Module works in two phases. During the first phase, the Consumer Module and Producer Modules iterate to achieve convergence on the estimates of new vehicles produced and demanded. Once that convergence is achieved, the Consumer Module enters the second phase. In this phase, total vehicle stock (new and used vehicles and their attributes) and use (VMT) are estimated.
@@ -138,8 +170,13 @@ Phase 2: Vehicle Stock and Use
 *  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.”
 *  VMT is estimated using fixed VMT schedules based on vehicle age and market class.
 
+
+Iteration and Convergence
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Algorithm descriptions, code snippets, equations, etc
+
 Effects Module
-^^^^^^^
+^^^^^^^^^^^^^^
 In its primary function as a regulatory support tool, OMEGA’s modeled outputs are intended to inform the type of benefit-cost analyses used in EPA rulemakings. We would likely use many of OMEGA’s outputs directly in the analysis for a regulatory action. In other cases, OMEGA produces values that might help inform other models like MOVES. The scope of OMEGA’s effects modeling includes estimating both monetized effects and physical effects.
 
 * Key examples of monetized effects that OMEGA will estimate:
@@ -161,7 +198,4 @@ As such, the criteria and climate "costs" calculated by the model should not be 
 of those pollutants. For that reason, the user must be careful not to consider those as absolute costs, but once compared to the "costs" of another scenario (presumably via calculation of a difference
 in "costs" between two scenarios) the result can be interpreted as a benefit.
 
-Module Integration and Iteration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Algorithm descriptions, code snippets, equations, etc
 
