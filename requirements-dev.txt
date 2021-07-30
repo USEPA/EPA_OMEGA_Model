@@ -1,4 +1,7 @@
 # This requirements file can be used to install optional packages for developers
+#
+# Install using pip:
+# pip install -r requirements-dev.txt
 
 # for building docs from .rst files (optional):
 Sphinx<4.0.0

@@ -5,6 +5,8 @@
 #
 # conda install --file requirements-conda.txt
 # pip install -r requirements.txt
+#     optionally:
+# pip install -r requirements-dev.txt
 
 # for omega_model:
 numpy

@@ -1,4 +1,7 @@
 # This requirements file indicates packages necessary to run the OMEGA model and the GUI
+#
+# Install using pip:
+# pip install -r requirements.txt
 
 # for omega_model:
 numpy
