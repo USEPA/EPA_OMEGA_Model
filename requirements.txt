@@ -1,0 +1,25 @@
+# for omega_model:
+numpy
+matplotlib
+pandas<1.3.0
+scipy
+SQLAlchemy<1.4.0
+treelib
+
+# for dispy parallel processing:
+dispy==4.12.4
+pycos==4.11.0
+psutil
+netifaces
+
+# for omega batch process:
+pyDOE2
+
+# for reading excel files (omega_preproc):
+openpyxl
+
+# for omega_gui:
+PySide2
+multitimer
+playsound
+PyYAML
