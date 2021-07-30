@@ -33,3 +33,6 @@ openpyxl
 # UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: multitimer
 # UNAVAILABLE THROUGH CONDA, USE PIP and requirements.txt: playsound
 PyYAML
+
+# optional, for building docs:
+Sphinx<4.0.0
