@@ -1091,7 +1091,8 @@ class SetInputs:
         lbs_per_kg = 2.2
 
     except:
-        pass
+        import traceback
+        print(traceback.format_exc())
 
 
 def main():
