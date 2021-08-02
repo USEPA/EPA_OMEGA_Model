@@ -49,12 +49,16 @@ initial_credit_bank = dict()
 
 
 class Manufacturer(SQABase, OMEGABase):
+    """
+    **Stores information regarding manufacturers, such as manufacturer ID.**
+
+    """
     # --- database table properties ---
     __tablename__ = 'manufacturers'
-    manufacturer_id = Column('manufacturer_id', String, primary_key=True)
-    vehicles = relationship('VehicleFinal', back_populates='manufacturer')
+    manufacturer_id = Column('manufacturer_id', String, primary_key=True)  #: manufacturer id / name
+    vehicles = relationship('VehicleFinal', back_populates='manufacturer')  #: schema relationship to VehicleFinal data
 
-    manufacturers = None
+    manufacturers = []  #: stores a list of manufacturer names after init
 
     # --- static properties ---
 
