@@ -1,0 +1,5 @@
+input_template_name:,offcycle_credits,input_template_version:,0.1,,,
+start_year,credit_name,credit_group,credit_destination,reg_class_id:a_reg_class,reg_class_id:b_reg_class,reg_class_id:c_reg_class
+2020,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,5.6,3.4,2.3
+2030,start_stop,menu,cert_direct_offcycle_co2e_grams_per_mile,0,0,0
+2030,high_eff_alternator,menu,cert_direct_offcycle_co2e_grams_per_mile,3.4,1.2,4.5
