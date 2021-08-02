@@ -16,8 +16,9 @@ def run_postproc(batch_log, batch_summary_filename):
     Post-process a batch run.  Create summary delta file (session results minus reference session)
 
     Args:
-        batch_log: batch log writer object
-        batch_summary_filename: filename of batch summary results to post-process
+        batch_log (OMEGABatchLog): batch log writer object
+        batch_summary_filename (str): filename of batch summary results to post-process, e.g.
+        '2021_07_29_12_57_48_demo_batch_summary_results'
 
     Returns:
         Creates a batch summary delta file
