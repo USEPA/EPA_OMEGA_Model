@@ -161,16 +161,23 @@ The Consumer Module estimates the total new vehicles sold at the aggregated mark
 
 **Sales Shares**
 
-Though users can identify market classes within the Consumer Module, one of the significant updates to OMEGA is the ability to specifically model EV shares as responsive to the policy being analyzed. The method used to estimate EV shares is based on a logit curve, commonly used to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module. The relevant vehicle attributes and prices are input into the logit equation
+Though users can identify market classes within the Consumer Module, one of the significant updates to OMEGA is the ability to specifically model EV shares as responsive to the policy being analyzed. The method used to estimate EV shares is based on a logit curve, commonly used to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module. The relevant vehicle attributes, as defined in the user defined submodule, and prices from the Producer Module are input into the logit equation.
 
-The
+The logit curve estimates the share of the technology demanded by consumer, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to prices. These are factors the user can identify within the user defined submodule. The logit equation is:
 
+.. Math::
+    :label: logit_curve
 
-*  How the EV/ICE share is calculated
-    * user defined submodule is where the logit curve is
-    *  Our share estimation is informed by GCAM’s logit equation and parameters.
-    * EQUATION
-       *  What are these parameters
+    s_{i}=\frac{\alpha_{i} * p_{i}^{\gamma}} {\Sigma_{j=1}^{N} \alpha_{j} * p_{j}^{\gamma}}
+
+Where:
+s_{i} is the share of vehicles in market class *i*
+\alpha_{i} is the share weight of market class *i*. This determines how quickly new technology is phased in to consumer acceptance. It is calibrated to observed historical data.
+p_{i} is the generalized cost of each vehicle in market class *i*
+\gamma represents how sensitive the model is to price
+
+The share weight and price sensitivity parameters in the demo analysis are informed by the inputs and assumptions to the passenger transportation section of GCAM-USA.
+
 
 Phase 2: Vehicle Stock and Use
 ------------------------------
