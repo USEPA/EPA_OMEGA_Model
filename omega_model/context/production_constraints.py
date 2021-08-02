@@ -68,7 +68,7 @@ class ProductionConstraints(OMEGABase):
     **Loads and provides access to production constraint data.**
 
     """
-    values = pd.DataFrame()
+    _values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
@@ -92,9 +92,9 @@ class ProductionConstraints(OMEGABase):
 
         min_key = '%s:%s' % (market_class_id, min_share_units)
 
-        if min_key in ProductionConstraints.values:
-            return ProductionConstraints.values[min_key].loc[
-                ProductionConstraints.values['start_year'] == calendar_year].item()
+        if min_key in ProductionConstraints._values:
+            return ProductionConstraints._values[min_key].loc[
+                ProductionConstraints._values['start_year'] == calendar_year].item()
         else:
             return 0
 
@@ -119,9 +119,9 @@ class ProductionConstraints(OMEGABase):
 
         max_key = '%s:%s' % (market_class_id, max_share_units)
 
-        if max_key in ProductionConstraints.values:
-            return ProductionConstraints.values[max_key].loc[
-                ProductionConstraints.values['start_year'] == calendar_year].item()
+        if max_key in ProductionConstraints._values:
+            return ProductionConstraints._values[max_key].loc[
+                ProductionConstraints._values['start_year'] == calendar_year].item()
         else:
             return 1
 
@@ -160,14 +160,14 @@ class ProductionConstraints(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                ProductionConstraints.values['start_year'] = df['start_year']
+                ProductionConstraints._values['start_year'] = df['start_year']
 
                 share_columns = [c for c in df.columns if (min_share_units in c) or (max_share_units in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in omega_globals.options.MarketClass.market_classes:
-                        ProductionConstraints.values[sc] = df[sc]
+                        ProductionConstraints._values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -210,7 +210,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            ProductionConstraints.values.to_csv(
+            ProductionConstraints._values.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'production_constraints.csv', index=False)
 
             print(ProductionConstraints.get_minimum_share(2020, 'hauling.BEV'))
