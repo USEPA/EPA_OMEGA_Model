@@ -664,7 +664,7 @@ class Vehicle(OMEGABase):
         self.model_year = None
         self.fueling_class = None
         self.cost_curve_class = None
-        self.legacy_reg_class_id = None
+        self.base_year_reg_class_id = None
         self.reg_class_id = None
         self.reg_class_market_share_frac = 1.0
         self.epa_size_class = None
@@ -869,7 +869,7 @@ class Vehicle(OMEGABase):
         """
         base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year',
                            'fueling_class',
-                           'cost_curve_class', 'legacy_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
+                           'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
                            'cert_fuel_id', 'market_class_id', 'footprint_ft2', 'epa_size_class',
                            'context_size_class', 'market_share', 'non_responsive_market_group',
                            'electrification_class'}
@@ -1014,7 +1014,7 @@ class VehicleFinal(SQABase, Vehicle):
     model_year = Column(Numeric)
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
-    legacy_reg_class_id = Column('legacy_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
+    base_year_reg_class_id = Column('base_year_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
     reg_class_id = Column(String)  # , Enum(*omega_globals.options.RegulatoryClasses.reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
@@ -1147,7 +1147,7 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        inherit_properties = {'name', 'manufacturer_id', 'compliance_id', 'legacy_reg_class_id',
+        inherit_properties = {'name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
                               'market_share', 'non_responsive_market_group', 'footprint_ft2'}
 
@@ -1205,7 +1205,7 @@ class VehicleFinal(SQABase, Vehicle):
                         name=df.loc[i, 'vehicle_id'],
                         manufacturer_id=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
-                        legacy_reg_class_id=df.loc[i, 'reg_class_id'],
+                        base_year_reg_class_id=df.loc[i, 'reg_class_id'],
                         reg_class_id=df.loc[i, 'reg_class_id'],
                         epa_size_class=df.loc[i, 'epa_size_class'],
                         context_size_class=df.loc[i, 'context_size_class'],
