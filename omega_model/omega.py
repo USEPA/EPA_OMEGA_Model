@@ -115,7 +115,7 @@ def run_producer_consumer():
     """
 
     from producer.vehicles import VehicleFinal
-    from producer import compliance_strategy
+    from producer import compliance_search
     from policy.credit_banking import CreditBank
 
     iteration_log = pd.DataFrame()
@@ -164,9 +164,9 @@ def run_producer_consumer():
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
-                    compliance_strategy.search_production_options(compliance_id, calendar_year,
-                                                                  producer_decision_and_response,
-                                                                  iteration_num, strategic_target_offset_Mg)
+                    compliance_search.search_production_options(compliance_id, calendar_year,
+                                                                producer_decision_and_response,
+                                                                iteration_num, strategic_target_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
                                                                    winning_combo)
@@ -200,8 +200,8 @@ def run_producer_consumer():
                                            echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
-            compliance_strategy.finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles,
-                                                    producer_decision_and_response)
+            compliance_search.finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles,
+                                                  producer_decision_and_response)
 
             credit_banks[compliance_id].handle_credit(calendar_year,
                                                      producer_decision_and_response['total_credits_co2e_megagrams'])
@@ -243,7 +243,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     Returns:
 
     """
-    from producer import compliance_strategy
+    from producer import compliance_search
     import consumer
 
     producer_decision['winning_combo_share_weighted_cost'] = 0
@@ -278,8 +278,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
-        compliance_strategy.create_production_options(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-                                                      total_sales=producer_decision_and_response['new_vehicle_sales'])
+        compliance_search.create_production_options(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+                                                    total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
         calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################
@@ -748,7 +748,7 @@ def init_omega(session_runtime_options):
     from producer.manufacturer_annual_data import ManufacturerAnnualData
     from producer.vehicles import VehicleFinal, DecompositionAttributes
     from producer.vehicle_annual_data import VehicleAnnualData
-    from producer import compliance_strategy
+    from producer import compliance_search
 
     from effects.cost_factors_criteria import CostFactorsCriteria
     from effects.cost_factors_scc import CostFactorsSCC
