@@ -441,7 +441,7 @@ def calc_cost_effects(physical_effects_dict):
 
             # tech costs, only for age=0
             if age == 0:
-                tech_cost_dollars = physical_effects_dict[key]['registered_count'] * new_vehicle_cost
+                tech_cost_dollars = physical['registered_count'] * new_vehicle_cost
 
             # fuel costs
             fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
