@@ -62,7 +62,7 @@ class PriceModifications(OMEGABase):
     **Loads and provides access to price modification data by model year and market class ID.**
 
     """
-    values = pd.DataFrame()
+    _values = pd.DataFrame()  #: holds the price modification data
 
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
@@ -77,13 +77,13 @@ class PriceModifications(OMEGABase):
             The requested price modification, or 0 if there is none.
 
         """
-        start_years = PriceModifications.values['start_year']
+        start_years = PriceModifications._values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
         mod_key = '%s:%s' % (market_class_id, price_modification_str)
-        if mod_key in PriceModifications.values:
-            return PriceModifications.values['%s:%s' % (market_class_id, price_modification_str)].loc[
-                PriceModifications.values['start_year'] == calendar_year].item()
+        if mod_key in PriceModifications._values:
+            return PriceModifications._values['%s:%s' % (market_class_id, price_modification_str)].loc[
+                PriceModifications._values['start_year'] == calendar_year].item()
         else:
             return 0
 
@@ -120,14 +120,14 @@ class PriceModifications(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                PriceModifications.values['start_year'] = np.array(df['start_year'])
+                PriceModifications._values['start_year'] = np.array(df['start_year'])
 
                 share_columns = [c for c in df.columns if (price_modification_str in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in omega_globals.options.MarketClass.market_classes:
-                        PriceModifications.values[sc] = df[sc]
+                        PriceModifications._values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -167,7 +167,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            PriceModifications.values.to_csv(
+            PriceModifications._values.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'vehicle_price_modifications.csv', index=False)
 
             print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))

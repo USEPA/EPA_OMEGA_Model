@@ -64,11 +64,29 @@ cache = dict()
 
 
 class ProductionConstraints(OMEGABase):
+    """
+    **Loads and provides access to production constraint data.**
+
+    """
     values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
+        """
+        Get the minimium possible market share for the given calendar year and market class ID
 
+        Args:
+            calendar_year (int): calendar year to get minimum production constraint for
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+
+        Returns:
+            The minimum production share for the given year and market class ID
+
+
+        See Also:
+            ``producer.compliance_strategy.create_tech_and_share_sweeps()``
+
+        """
         start_years = cache['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -82,7 +100,20 @@ class ProductionConstraints(OMEGABase):
 
     @staticmethod
     def get_maximum_share(calendar_year, market_class_id):
+        """
+        Get the maximium possible market share for the given calendar year and market class ID
 
+        Args:
+            calendar_year (int): calendar year to get maximum production constraint for
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+
+        Returns:
+            The maximum production share for the given year and market class ID
+
+        See Also:
+            ``producer.compliance_strategy.create_tech_and_share_sweeps()``
+
+        """
         start_years = cache['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -96,7 +127,18 @@ class ProductionConstraints(OMEGABase):
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
 
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         cache.clear()
