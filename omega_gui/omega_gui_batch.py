@@ -637,8 +637,8 @@ class Form(QObject):
             self.event_monitor(temp2, 'green', 'dt')
 
             temp1 = "Configuration Loaded.\n"
-            temp1 = temp1 + "Model Run Enabled.\n"
-            temp1 = temp1 + "Punch It Chewie!"
+            temp1 = temp1 + "Model Run Enabled."
+            # temp1 = temp1 + "Punch It Chewie!"
             self.event_monitor(temp1, 'black', '')
 
             self.window.save_configuration_file_button.setEnabled(1)
@@ -743,8 +743,6 @@ class Form(QObject):
 
         self.window.model_status_label.setText("Model Idle")
         self.window.select_plot_3.setEnabled(0)
-
-
 
     def clear_entries(self):
         """

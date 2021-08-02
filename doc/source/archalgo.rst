@@ -161,28 +161,35 @@ The Consumer Module estimates the total new vehicles sold at the aggregated mark
 
 **Sales Shares**
 
-Though users can identify market classes within the Consumer Module, one of the significant updates to OMEGA is the ability to specifically model EV shares as responsive to the policy being analyzed. The method used to estimate EV shares is based on a logit curve, commonly used to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module. The relevant vehicle attributes and prices are input into the logit equation
+Though users can identify market classes within the Consumer Module, one of the significant updates to OMEGA is the ability to specifically model EV shares as responsive to the policy being analyzed. The method used to estimate EV shares is based on a logit curve, commonly used to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module. The relevant vehicle attributes, as defined in the user defined submodule, and prices from the Producer Module are input into the logit equation.
 
-The
+The logit curve estimates the share of the technology demanded by consumer, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to prices. These are factors the user can identify within the user defined submodule. The logit equation is:
 
+.. Math::
+    :label: logit_curve
 
-*  How the EV/ICE share is calculated
-    * user defined submodule is where the logit curve is
-    *  Our share estimation is informed by GCAM’s logit equation and parameters.
-    * EQUATION
-       *  What are these parameters
+    s_{i}=\frac{\alpha_{i} * p_{i}^{\gamma}} {\Sigma_{j=1}^{N} \alpha_{j} * p_{j}^{\gamma}}
+
+Where:
+s_{i} is the share of vehicles in market class *i*
+
+\alpha_{i} is the share weight of market class *i*. This determines how quickly new technology is phased in to consumer acceptance. It is calibrated to observed historical data.
+
+p_{i} is the generalized cost of each vehicle in market class *i*
+
+\gamma represents how sensitive the model is to price
+
+The share weight and price sensitivity parameters in the demo analysis are informed by the inputs and assumptions to the passenger transportation section of GCAM-USA.
+
 
 Phase 2: Vehicle Stock and Use
 ------------------------------
-*  We are working to keep internal consistency within the number of vehicles demanded, and the use of those vehicles
-*  Vehicle Stock - total new vehicle sales, plus historical fleet (legacy fleet? historical plus legacy? what is the term for the used vehicle fleet existing at that point in time?), minus vehicle not reregistered.
-*   The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age. Other modules may include feedback between sales and reregistration
-*  Vehicle Reregistration - user defined submodule.
-*   demo is estimated with age/market class schedule?
-*  VMT - user defined submodule
-*  We use the overall VMT demand from Analysis context, the stock of vehicles (new and used), and relationship of the proportion of VMT at each age and market class to allocate VMT across the stock vehicles. This maintains an overall  demand for mobility. By holding total VMT constant, outside of rebound driving, we maintain a logical relationship between mobility and available vehicles.
-*  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.”
-*  VMT is estimated using fixed VMT schedules based on vehicle age and market class.
+After convergence with the Producer Module with respect to the sales of new vehicles is achieved, the Consumer Module estimates total vehicle stock adn use, keeping internal consistency between the number of vehicles demanded adn the use of those vehicles. Vehicle stock is the total on-road registered fleet, including both new vehicles sales, and the reregistered (used) vehicles. A simple way to determine stock is to estimate the reregistered fleet of vehicles from the total used fleet, and add in the new vehicles sold, as determined in the iteration between the Producer Module and Consumer Module. The method of determining the reregistered fleet is in a user defined submodule. In the demo analysis, this is estimated using fixed reregistration schedules based on vehicle age. If a user updates the reregistration submodule, they need to retain consistency between the submodules estimating new vehicle sales.
+
+The method of estimating total VMT for the stock of vehicles is also in a user defined submodule. In the demo analysis, total VMT demanded is an input from the Analysis Context, and is held constant (not including rebound driving) across Policy Alternatives in order to maintain an overall lodical relationship between demand for mobility and available vehicles. This total VMT is allocated across the stock of vehicles using a fixed relationship between the proportion of VMT at each age and market class.
+
+Rebound driving is estimated as the additional VMT consumers might drive as a function of reduced cost of driving. This value is a user defined value. The demo analysis has set rebound driving to 10%.
+
 
 
 Iteration and Convergence
