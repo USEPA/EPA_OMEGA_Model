@@ -35,15 +35,17 @@ class ProducerGeneralizedCostBase:
     @staticmethod
     def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
         """
+        Calculate generalized cost (vehicle cost plus other costs such as fuel costs) for the given vehicle's
+        cost cloud.
 
         Args:
-            vehicle:
-            co2_name:
-            kwh_name:
-            cost_name:
+            vehicle (Vehicle): the vehicle to calculate generalized costs for
+            co2_name (str): CO2 column name, e.g. 'onroad_direct_co2e_grams_per_mile'
+            kwh_name (str): kWh/mi column name, e.g. 'onroad_direct_kwh_per_mile'
+            cost_name (str): vehicle cost column name, e.g. 'new_vehicle_mfr_cost_dollars'
 
         Returns:
-            A cost curve modified by generalized cost factors
+            The vehicle's cost cloud with generalized cost column, e.g. 'new_vehicle_mfr_generalized_cost_dollars'
 
         """
         raise Exception('**Attempt to call abstract method ProducerGeneralizedCostBase.%s() without child class override**' %
