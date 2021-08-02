@@ -116,7 +116,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
     **Loads, provides access to and saves new vehicle market data from/relative to the analysis context**
 
     For each calendar year, context total vehicle sales are broken down by size class, with one row for each unique
-    combination of size class and reg class
+    combination of size class and reg class.
 
     """
 
@@ -151,7 +151,8 @@ class NewVehicleMarket(SQABase, OMEGABase):
     @classmethod
     def init_context_new_vehicle_generalized_costs(cls, filename):
         """
-        Load context new vehicle prices from file or clear context_new_vehicle_generalized_costs and start from scratch
+        Load context new vehicle prices from file or clear _context_new_vehicle_generalized_costs and start from scratch.
+        Clears _session_new_vehicle_generalized_costs.
 
         Args:
             filename (str): name of file to load new vehicle generalized costs from if not generating a new one

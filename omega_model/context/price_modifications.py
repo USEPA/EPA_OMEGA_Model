@@ -58,10 +58,25 @@ price_modification_str = 'price_modification_dollars'
 
 
 class PriceModifications(OMEGABase):
+    """
+    **Loads and provides access to price modification data by model year and market class ID.**
+
+    """
     values = pd.DataFrame()
 
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
+        """
+        Get the price modification (if any) for the given year and market class ID.
+
+        Args:
+            calendar_year (int): calendar year to get price modification for
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+
+        Returns:
+            The requested price modification, or 0 if there is none.
+
+        """
         start_years = PriceModifications.values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -74,6 +89,18 @@ class PriceModifications(OMEGABase):
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         if verbose:

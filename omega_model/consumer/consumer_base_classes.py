@@ -23,7 +23,7 @@ class ReregistrationBase:
         Get vehicle re-registered proportion [0..1] by market class and age.
 
         Args:
-            market_class_id (str): e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age
 
         Returns:
@@ -283,7 +283,7 @@ class MarketClassBase:
         Returns the non-responsive market category of the given market class ID
 
         Args:
-            market_class_id (str): market class ID, e.g. 'non_hauling.ICE'
+            market_class_id (str): market class ID, e.g. 'hauling.ICE'
 
         Returns:
             The non-responsive market category of the given market class ID

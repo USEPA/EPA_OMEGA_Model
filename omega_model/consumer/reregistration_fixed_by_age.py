@@ -76,7 +76,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
         Get vehicle re-registered proportion [0..1] by market class and age.
 
         Args:
-            market_class_id (str): e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age
 
         Returns:

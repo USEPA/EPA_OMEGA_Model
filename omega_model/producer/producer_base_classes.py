@@ -22,7 +22,7 @@ class ProducerGeneralizedCostBase:
         Get one or more producer generalized cost attributes associated with the given market class ID.
 
         Args:
-            market_class_id (str): e.g. 'hauling.ICE'
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
             attribute_types (str, [strs]): name or list of generalized cost attribute(s), e.g. ``['producer_generalized_cost_fuel_years', 'producer_generalized_cost_annual_vmt']``
 
         Returns:
