@@ -15,6 +15,10 @@ cache = dict()
 
 
 class VehicleAnnualData(SQABase, OMEGABase):
+    """
+    **Stores and retrieves vehicle annual data, which includes age, registered count, vehicle miles travelled, etc.**
+
+    """
     # --- database table properties ---
     __tablename__ = 'vehicle_annual_data'
     index = Column('index', Integer, primary_key=True)
@@ -76,11 +80,16 @@ class VehicleAnnualData(SQABase, OMEGABase):
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
         """
-        Update vehicle registered count and / or create initial vehicle annual data table entry
-        :param vehicle:  VehicleFinal object
-        :param calendar_year: calendar year
-        :param registered_count: number of vehicle that are still in service (registered)
-        :return: updates vehicle annual data table
+        Update vehicle registered count and / or create initial vehicle annual data table entry.
+
+        Args:
+            vehicle (VehicleFinal): the vehicle whose count is being updated
+            calendar_year (int): the calendar year to update registered count it
+            registered_count (float): number of vehicle that are still in service (registered)
+
+        Returns:
+            Nothing, updates vehicle annual data table
+
         """
         age = calendar_year - vehicle.model_year
 
@@ -98,72 +107,30 @@ class VehicleAnnualData(SQABase, OMEGABase):
                                                         age=age))
 
     @staticmethod
-    def update_vehicle_annual_data(vehicle, calendar_year, attribute, attribute_value):
-
-        age = calendar_year - vehicle.model_year
-
-        vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_id == vehicle.vehicle_id). \
-            filter(VehicleAnnualData.calendar_year == calendar_year). \
-            filter(VehicleAnnualData.age == age).one()
-
-        vad.__setattr__(attribute, attribute_value)
-
-        omega_globals.session.flush()
-
-    @staticmethod
     def get_calendar_years():
+        """
+        Get the calendar years that have vehicle annual data.
+
+        Returns:
+            List of calendar years that have vehicle annual data.
+
+        """
         return sql_unpack_result(omega_globals.session.query(VehicleAnnualData.calendar_year).all())
 
     @staticmethod
-    def get_initial_registered_count():
+    def get_vehicle_annual_data(calendar_year, attributes=None):
         """
-
-        Returns: registered count of vehicles prior to initial analysis year
-
-        """
-
-        cache_key = '%s_initial_registered_count' % (omega_globals.options.analysis_initial_year - 1)
-        if cache_key not in cache:
-            cache[cache_key] = float(
-                omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)).filter(
-                    VehicleAnnualData.calendar_year == omega_globals.options.analysis_initial_year - 1).scalar())
-
-        return cache[cache_key]
-
-    @staticmethod
-    def get_initial_fueling_class_registered_count(fueling_class):
-        """
+        Get vehicle annual data for the given calendar year.
 
         Args:
-            fueling_class: fueling class to filter results by
+            calendar_year (int): calendar to get data for
+            attributes (str, [strs]): optional name of attribute(s) to retrieve instead of all data
 
-        Returns: registered count of vehicles of the given ``fueling_class`` prior to initial analysis year
+        Returns:
+            A list of VehicleAnnualData objects, or a list of n-tuples of the requested attribute(s) value(s), e.g.
+            ``[(1,), (2,), (3,), ...`` which can be conveniently unpacked by ``omega_db.sql_unpack_result()``
 
         """
-        cache_key = '%s_%s_initial_registered_count' % (omega_globals.options.analysis_initial_year - 1, fueling_class)
-        if cache_key not in cache:
-            from vehicles import VehicleFinal
-            cache[cache_key] = float(
-                omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)).join(VehicleFinal).filter(
-                    VehicleFinal.fueling_class == fueling_class).filter(
-                    VehicleAnnualData.calendar_year == omega_globals.options.analysis_initial_year - 1).scalar())
-
-        return cache[cache_key]
-
-    @staticmethod
-    def insert_vmt(vehicle_id, calendar_year, annual_vmt):
-        vmt = omega_globals.session.query(VehicleAnnualData.registered_count). \
-                  filter(VehicleAnnualData.vehicle_id == vehicle_id). \
-                  filter(VehicleAnnualData.calendar_year == calendar_year).scalar() * annual_vmt
-        vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_id == vehicle_id). \
-            filter(VehicleAnnualData.calendar_year == calendar_year).all()
-        vad[0].annual_vmt = annual_vmt
-        vad[0].vmt = vmt
-
-    @staticmethod
-    def get_vehicle_annual_data(calendar_year, attributes=None):
         if attributes is None:
             return omega_globals.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
         else:
