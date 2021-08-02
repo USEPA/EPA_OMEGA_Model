@@ -139,9 +139,9 @@ Users can define market classes; in doing so, the user must ensure that all othe
 
 Within the demo analysis, vehicles are separated into four market classes depending on whether they are categorized as hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do), and their fuel type (EV or ICE). The hauling/non-hauling market class is defined as non-responsive. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The EV/ICE market class is defined as responsive, and the share of vehicles in that market class is estimated within the Consumer Module.
 
-Before the Consumer Module can estimate sales and or shares response, all vehicles must be categorized into their market classes. For ease of explanation, the process can be thought of as creating branches of a tree. Using the demo analysis market classes, where hauling/nonhauling is categorized as nonresponsive, vehicles are first separated into the appropriate hauling and nonhauling class. The Consumer Module then uses interim inputs from the Producer Module to determine the share of vehicles in the responsive category, EV/ICE. These steps are identified by the solid lines in the figure below. During Phase 1, if the share of EVs that consumers will accept under the given vehicle attributes, including the relative price of ICE and EV, does not converge with the share that Producer Module estimates, the iterative process continues. Given different interim inputs, for example where the relative price of ICE and EVs change during iteration, the Consumer Module will redistribute vehicles into the EV and ICE classes. However, the relative share of hauling and nonhauling vehicles will not change. This is represented by the dashed lines between each set of EV/ICE class. Note that the dashed lines travel within the hauling and non-hauling classes, but do not travel across them
+Before the Consumer Module can estimate sales and or shares response, all vehicles must be categorized into their market classes. For ease of explanation, the process can be thought of as creating branches of a tree. Using the demo analysis market classes, where hauling/nonhauling is categorized as nonresponsive, vehicles are first separated into the appropriate hauling and nonhauling class. The Consumer Module then uses interim inputs from the Producer Module to determine the share of vehicles in the responsive category, EV/ICE. These steps are identified by the solid lines in the figure below. During Phase 1, if the share of EVs that consumers will accept under the given vehicle attributes, including the relative price of ICE and EV, does not converge with the share that Producer Module estimates, the iterative process continues. Given different interim inputs, for example where the relative price of ICE and EVs change during iteration, the Consumer Module will redistribute vehicles into the EV and ICE classes. However, the relative share of hauling and nonhauling vehicles will not change. This is represented by the dashed lines between each set of EV/ICE class. Note that the dashed lines travel within the hauling and non-hauling classes, but do not travel across them.
 
-:numref:`mo_label_mktree` shows the market class structure in the demo analysis.
+:numref:`mo_label_mktree` Illustration of the Market Class Structure in the Demo Analysis.
 
 .. _mo_label_mktree:
 .. figure:: _static/mo_figures/market_class_tree.png
@@ -151,14 +151,20 @@ Before the Consumer Module can estimate sales and or shares response, all vehicl
 
 Phase 1: New Vehicle Sales
 --------------------------
-* The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles. Within that share estimation, the ability to model both EV and ICE vehicle demand and supply separately is a major part
+The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles. Within that share estimation, the ability to model both EV and ICE vehicle demand and supply separately is a major part.
 
 **Sales Volumes**
-*  The full cost pass through assumption
-*  Role of fuel consumption in the vehicle purchase decision
+
+The Consumer Module estimates the total new vehicles sold at the aggregated market class level. The vehicles the Producer Module estimates will be produced with their relevant attributes, including prices, are sent to the Consumer Module. As vehicles are aggregated into the appropriate market classes as identified by the user, the Consumer Module determines how many of vehicles in each category are demanded, given the Analysis Context assumptions.
+*   The full cost pass through assumption - is this what we assume? Can users change this assumption?
+*  Role of fuel consumption in the vehicle purchase decision - this reduced cost to the consumer, right? But it depends on how many months/years of fuel savings consumers consider in their purchase decision. This is something users can determine, right?
 
 **Sales Shares**
-* The Consumer Module allows the ability to model EV and ICE demand and supply separately.
+
+Though users can identify market classes within the Consumer Module, one of the significant updates to OMEGA is the ability to specifically model EV shares as responsive to the policy being analyzed. The method used to estimate EV shares is based on a logit curve, commonly used to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module. The relevant vehicle attributes and prices are input into the logit equation
+
+The
+
 
 *  How the EV/ICE share is calculated
     * user defined submodule is where the logit curve is
