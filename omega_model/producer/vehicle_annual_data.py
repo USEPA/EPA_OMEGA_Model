@@ -21,15 +21,15 @@ class VehicleAnnualData(SQABase, OMEGABase):
     """
     # --- database table properties ---
     __tablename__ = 'vehicle_annual_data'
-    index = Column('index', Integer, primary_key=True)
-    vehicle_id = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))
-    calendar_year = Column(Numeric)
-    age = Column(Numeric)
+    index = Column('index', Integer, primary_key=True)  #: database table index
+    vehicle_id = Column('vehicle_id', Integer, ForeignKey('vehicles.vehicle_id'))  #: vehicle ID, e.g. ``1``
+    calendar_year = Column(Numeric)  #: calendar year, e.g. ``2030``
+    age = Column(Numeric)  #: vehicle age, new vehicles have age ``0``
     # reg_class_id = Column(String)
     # in_use_fuel_id = Column(String)
-    registered_count = Column(Float)
-    annual_vmt = Column(Float)
-    vmt = Column(Float)
+    registered_count = Column(Float)  #: count of vehicles remaining in service (registered)
+    annual_vmt = Column(Float)  #: vehicle miles travelled in the given year
+    vmt = Column(Float)  #: annual vehicle miles travelled times registered count
     # vmt_liquid_fuel = Column(Float)
     # vmt_electricity = Column(Float)
     # onroad_direct_co2e_grams_per_mile = Column(Float)
