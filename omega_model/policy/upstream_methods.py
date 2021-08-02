@@ -50,10 +50,38 @@ cache = dict()
 
 
 def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
+    """
+    Calculate upstream cert emissions under a "zero-upstream" policy.
+
+    Args:
+        vehicle (Vehicle): *unused*
+        co2_grams_per_mile (numeric value or array-like): *unused*
+        kwh_per_mile (numeric value or array-like): *unused*
+
+    Returns:
+        Returns ``0``
+
+    """
     return 0
 
 
 def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
+    """
+    Calculate upstream cert emissions based on cert direct kWh/mi relative to an ICE vehicle with the same target
+    emissions.  Upstream emissions cannot be negative.
+
+    upstream_co2e_g/mi = max(0, kwh_per_mile * upstream_gco2_per_kwh / upstream_efficiency -
+    vehicle.cert_target_co2e_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
+
+    Args:
+        vehicle (Vehicle): The vehicle to calculate upstream emissions for
+        co2_grams_per_mile (numeric value or array-like): vehicle cert direct CO2e g/mi
+        kwh_per_mile (numeric value or array-like): vehicle cert direct kWh/mi
+
+    Returns:
+        Upstream cert emissions based on kWh/mi relative to an ICE vehicle with the same target emissions
+
+    """
     from policy.policy_fuels import PolicyFuel
     import numpy as np
 
@@ -79,6 +107,21 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
 
 
 def upstream_actual(vehicle, co2_grams_per_mile, kwh_per_mile):
+    """
+    Calculate upstream cert emissions based on cert direct kWh/mi and CO2e g/mi.
+
+    upstream_co2e_g/mi = kwh_per_mile * upstream_gco2_per_kwh / upstream_efficiency +
+    co2_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal
+
+    Args:
+        vehicle (Vehicle): The vehicle to calculate upstream emissions for
+        co2_grams_per_mile (numeric value or array-like): vehicle cert direct CO2e g/mi
+        kwh_per_mile (numeric value or array-like): vehicle cert direct kWh/mi
+
+    Returns:
+        Upstream cert emissions based on cert direct kWh/mi and CO2e g/mi
+
+    """
     from policy.policy_fuels import PolicyFuel
 
     upstream_gco2_per_kwh = \
@@ -105,11 +148,24 @@ upstream_method_dict = {'upstream_zero': upstream_zero, 'upstream_xev_ice_delta'
 
 
 class UpstreamMethods(OMEGABase):
+    """
+    **Loads and provides access to upstream calculation methods by calendar year.**
+
+    """
     methods = pd.DataFrame()
 
     @staticmethod
     def get_upstream_method(calendar_year):
+        """
+        Get the cert upstream calculation function for the given calendar year.
 
+        Args:
+            calendar_year (int): the calendar year to get the function for
+
+        Returns:
+            A callable python function used to calculate upstream cert emissions for the given calendar year
+
+        """
         start_years = cache['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -120,7 +176,18 @@ class UpstreamMethods(OMEGABase):
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
 
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         cache.clear()
