@@ -155,7 +155,7 @@ def calc_inventory(calendar_year):
 
     for vad in vads:
 
-        attribute_list = ['model_year', 'reg_class_id', 'in_use_fuel_id',
+        attribute_list = ['model_year', 'base_year_reg_class_id', 'in_use_fuel_id',
                           'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
         model_year, reg_class_id, in_use_fuel_id, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vad.vehicle_id, attribute_list)
