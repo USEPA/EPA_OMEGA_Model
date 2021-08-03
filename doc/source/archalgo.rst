@@ -139,9 +139,9 @@ Users can define market classes; in doing so, the user must ensure that all othe
 
 Within the demo analysis, vehicles are separated into four market classes depending on whether they are categorized as hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do), and their fuel type (EV or ICE). The hauling/non-hauling market class is defined as non-responsive. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The EV/ICE market class is defined as responsive, and the share of vehicles in that market class is estimated within the Consumer Module.
 
-Before the Consumer Module can estimate sales and or shares response, all vehicles must be categorized into their market classes. For ease of explanation, the process can be thought of as creating branches of a tree. Using the demo analysis market classes, where hauling/nonhauling is categorized as nonresponsive, vehicles are first separated into the appropriate hauling and nonhauling class. The Consumer Module then uses interim inputs from the Producer Module to determine the share of vehicles in the responsive category, EV/ICE. These steps are identified by the solid lines in the figure below. During Phase 1, if the share of EVs that consumers will accept under the given vehicle attributes, including the relative price of ICE and EV, does not converge with the share that Producer Module estimates, the iterative process continues. Given different interim inputs, for example where the relative price of ICE and EVs change during iteration, the Consumer Module will redistribute vehicles into the EV and ICE classes. However, the relative share of hauling and nonhauling vehicles will not change. This is represented by the dashed lines between each set of EV/ICE class. Note that the dashed lines travel within the hauling and non-hauling classes, but do not travel across them
+Before the Consumer Module can estimate sales and or shares response, all vehicles must be categorized into their market classes. For ease of explanation, the process can be thought of as creating branches of a tree. Using the demo analysis market classes, where hauling/nonhauling is categorized as nonresponsive, vehicles are first separated into the appropriate hauling and nonhauling class. The Consumer Module then uses interim inputs from the Producer Module to determine the share of vehicles in the responsive category, EV/ICE. These steps are identified by the solid lines in the figure below. During Phase 1, if the share of EVs that consumers will accept under the given vehicle attributes, including the relative price of ICE and EV, does not converge with the share that Producer Module estimates, the iterative process continues. Given different interim inputs, for example where the relative price of ICE and EVs change during iteration, the Consumer Module will redistribute vehicles into the EV and ICE classes. However, the relative share of hauling and nonhauling vehicles will not change. This is represented by the dashed lines between each set of EV/ICE class. Note that the dashed lines travel within the hauling and non-hauling classes, but do not travel across them.
 
-:numref:`mo_label_mktree` shows the market class structure in the demo analysis.
+:numref:`mo_label_mktree` Illustration of the Market Class Structure in the Demo Analysis.
 
 .. _mo_label_mktree:
 .. figure:: _static/mo_figures/market_class_tree.png
@@ -151,32 +151,45 @@ Before the Consumer Module can estimate sales and or shares response, all vehicl
 
 Phase 1: New Vehicle Sales
 --------------------------
-* The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles. Within that share estimation, the ability to model both EV and ICE vehicle demand and supply separately is a major part
+The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles. Within that share estimation, the ability to model both EV and ICE vehicle demand and supply separately is a major part.
 
 **Sales Volumes**
-*  The full cost pass through assumption
-*  Role of fuel consumption in the vehicle purchase decision
+
+The Consumer Module estimates the total new vehicles sold at the aggregated market class level. The vehicles the Producer Module estimates will be produced with their relevant attributes, including prices, are sent to the Consumer Module. As vehicles are aggregated into the appropriate market classes as identified by the user, the Consumer Module determines how many of vehicles in each category are demanded, given the Analysis Context assumptions.
+*   The full cost pass through assumption - is this what we assume? Can users change this assumption?
+*  Role of fuel consumption in the vehicle purchase decision - this reduced cost to the consumer, right? But it depends on how many months/years of fuel savings consumers consider in their purchase decision. This is something users can determine, right?
 
 **Sales Shares**
-* The Consumer Module allows the ability to model EV and ICE demand and supply separately.
 
-*  How the EV/ICE share is calculated
-    * user defined submodule is where the logit curve is
-    *  Our share estimation is informed by GCAM’s logit equation and parameters.
-    * EQUATION
-       *  What are these parameters
+Though users can identify market classes within the Consumer Module, one of the significant updates to OMEGA is the ability to specifically model EV shares as responsive to the policy being analyzed. The method used to estimate EV shares is based on a logit curve, commonly used to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module. The relevant vehicle attributes, as defined in the user defined submodule, and prices from the Producer Module are input into the logit equation.
+
+The logit curve estimates the share of the technology demanded by consumer, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to prices. These are factors the user can identify within the user defined submodule. The logit equation is:
+
+.. Math::
+    :label: logit_curve
+
+    s_{i}=\frac{\alpha_{i} * p_{i}^{\gamma}} {\Sigma_{j=1}^{N} \alpha_{j} * p_{j}^{\gamma}}
+
+Where:
+s_{i} is the share of vehicles in market class *i*
+
+\alpha_{i} is the share weight of market class *i*. This determines how quickly new technology is phased in to consumer acceptance. It is calibrated to observed historical data.
+
+p_{i} is the generalized cost of each vehicle in market class *i*
+
+\gamma represents how sensitive the model is to price
+
+The share weight and price sensitivity parameters in the demo analysis are informed by the inputs and assumptions to the passenger transportation section of GCAM-USA.
+
 
 Phase 2: Vehicle Stock and Use
 ------------------------------
-*  We are working to keep internal consistency within the number of vehicles demanded, and the use of those vehicles
-*  Vehicle Stock - total new vehicle sales, plus historical fleet (legacy fleet? historical plus legacy? what is the term for the used vehicle fleet existing at that point in time?), minus vehicle not reregistered.
-*   The total on-road registered fleet (aka stock) includes new vehicle sales and re-registered vehicles for each calendar year. Re-registered vehicles are estimated using fixed re-registration schedules based on vehicle age. Other modules may include feedback between sales and reregistration
-*  Vehicle Reregistration - user defined submodule.
-*   demo is estimated with age/market class schedule?
-*  VMT - user defined submodule
-*  We use the overall VMT demand from Analysis context, the stock of vehicles (new and used), and relationship of the proportion of VMT at each age and market class to allocate VMT across the stock vehicles. This maintains an overall  demand for mobility. By holding total VMT constant, outside of rebound driving, we maintain a logical relationship between mobility and available vehicles.
-*  Rebound driving is the additional miles someone might drive due to increased fuel efficiency leading to a lower cost per mile of driving. As fuel efficiency increases, the cost per mile of driving decreases. Economic theory, and results from literature, indicate that as the cost per mile of driving decreasing, VMT increases. This increase is called “VMT rebound.”
-*  VMT is estimated using fixed VMT schedules based on vehicle age and market class.
+After convergence with the Producer Module with respect to the sales of new vehicles is achieved, the Consumer Module estimates total vehicle stock adn use, keeping internal consistency between the number of vehicles demanded adn the use of those vehicles. Vehicle stock is the total on-road registered fleet, including both new vehicles sales, and the reregistered (used) vehicles. A simple way to determine stock is to estimate the reregistered fleet of vehicles from the total used fleet, and add in the new vehicles sold, as determined in the iteration between the Producer Module and Consumer Module. The method of determining the reregistered fleet is in a user defined submodule. In the demo analysis, this is estimated using fixed reregistration schedules based on vehicle age. If a user updates the reregistration submodule, they need to retain consistency between the submodules estimating new vehicle sales.
+
+The method of estimating total VMT for the stock of vehicles is also in a user defined submodule. In the demo analysis, total VMT demanded is an input from the Analysis Context, and is held constant (not including rebound driving) across Policy Alternatives in order to maintain an overall lodical relationship between demand for mobility and available vehicles. This total VMT is allocated across the stock of vehicles using a fixed relationship between the proportion of VMT at each age and market class.
+
+Rebound driving is estimated as the additional VMT consumers might drive as a function of reduced cost of driving. This value is a user defined value. The demo analysis has set rebound driving to 10%.
+
 
 
 Iteration and Convergence

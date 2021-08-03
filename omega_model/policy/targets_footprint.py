@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
 class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
     """
-    Implement vehicle footprint-based GHG targets (CO2e g/mi)
+    **Implements vehicle footprint-based GHG targets (CO2e g/mi).**
 
     """
     # --- database table properties ---

@@ -49,17 +49,33 @@ initial_credit_bank = dict()
 
 
 class Manufacturer(SQABase, OMEGABase):
+    """
+    **Stores information regarding manufacturers, such as manufacturer ID.**
+
+    """
     # --- database table properties ---
     __tablename__ = 'manufacturers'
-    manufacturer_id = Column('manufacturer_id', String, primary_key=True)
-    vehicles = relationship('VehicleFinal', back_populates='manufacturer')
+    manufacturer_id = Column('manufacturer_id', String, primary_key=True)  #: manufacturer id / name
+    vehicles = relationship('VehicleFinal', back_populates='manufacturer')  #: schema relationship to VehicleFinal data
 
-    manufacturers = None
+    manufacturers = []  #: stores a list of manufacturer names after init
 
     # --- static properties ---
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         # cache.clear()
 
         from policy.credit_banking import CreditBank

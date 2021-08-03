@@ -58,22 +58,49 @@ price_modification_str = 'price_modification_dollars'
 
 
 class PriceModifications(OMEGABase):
-    values = pd.DataFrame()
+    """
+    **Loads and provides access to price modification data by model year and market class ID.**
+
+    """
+    _values = pd.DataFrame()  #: holds the price modification data
 
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
-        start_years = PriceModifications.values['start_year']
+        """
+        Get the price modification (if any) for the given year and market class ID.
+
+        Args:
+            calendar_year (int): calendar year to get price modification for
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+
+        Returns:
+            The requested price modification, or 0 if there is none.
+
+        """
+        start_years = PriceModifications._values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
         mod_key = '%s:%s' % (market_class_id, price_modification_str)
-        if mod_key in PriceModifications.values:
-            return PriceModifications.values['%s:%s' % (market_class_id, price_modification_str)].loc[
-                PriceModifications.values['start_year'] == calendar_year].item()
+        if mod_key in PriceModifications._values:
+            return PriceModifications._values['%s:%s' % (market_class_id, price_modification_str)].loc[
+                PriceModifications._values['start_year'] == calendar_year].item()
         else:
             return 0
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         if verbose:
@@ -93,14 +120,14 @@ class PriceModifications(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                PriceModifications.values['start_year'] = np.array(df['start_year'])
+                PriceModifications._values['start_year'] = np.array(df['start_year'])
 
                 share_columns = [c for c in df.columns if (price_modification_str in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in omega_globals.options.MarketClass.market_classes:
-                        PriceModifications.values[sc] = df[sc]
+                        PriceModifications._values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -140,7 +167,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            PriceModifications.values.to_csv(
+            PriceModifications._values.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'vehicle_price_modifications.csv', index=False)
 
             print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))

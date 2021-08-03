@@ -90,7 +90,7 @@ class OffCycleCredits(OMEGABase):
         Calculate vehicle off-cycle credits for the vehicle's cost cloud
 
         Args:
-            vehicle (class Vehicle): the vehicle to apply off-cycle credits to
+            vehicle (Vehicle): the vehicle to apply off-cycle credits to
 
         Returns:
             vehicle.cost_cloud with off-cycle credits calculated

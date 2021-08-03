@@ -27,10 +27,10 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
         credit_banks (dict of CreditBanks): credit banking information per compliance_id
         standalone_run (bool): True if session is run outside of the batch process
 
-    Returns: results summary dataframe
+    Returns:
+        Results summary dataframe
 
     """
-
     from producer.vehicles import VehicleFinal
     import pandas as pd
 

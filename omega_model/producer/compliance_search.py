@@ -371,9 +371,9 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # for new_veh in manufacturer_vehicles:
         #     if new_veh.context_size_class not in csc_dict:
         #         csc_dict[new_veh.context_size_class] = dict()
-        #     if new_veh.legacy_reg_class_id not in csc_dict[new_veh.context_size_class]:
-        #         csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_id] = []
-        #     csc_dict[new_veh.context_size_class][new_veh.legacy_reg_class_id].append(new_veh)
+        #     if new_veh.base_year_reg_class_id not in csc_dict[new_veh.context_size_class]:
+        #         csc_dict[new_veh.context_size_class][new_veh.base_year_reg_class_id] = []
+        #     csc_dict[new_veh.context_size_class][new_veh.base_year_reg_class_id].append(new_veh)
         #
         # # distribute context size class sales to manufacturer_vehicles by relative market share
         # for csc in csc_dict: # for each context size class

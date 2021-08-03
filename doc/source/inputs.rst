@@ -55,10 +55,7 @@ Description of the 'Run Model' page elements:
 *  Element 6 - Event Monitor
     The Event Monitor prompts the user during model run setup (file selection, etc.) and keeps a running record of OMEGA model execution in real time.  This is a standard text field to allow simple copying of text as needed for further study or debugging purposes.
 
-*  Element 7 - Multiprocessor
-    The OMEGA model can be configured to utilize multiple system processors for true multitasking that significantly reduces model completion time.  For example, a typical Intel Core I7(R) has 8 processors total and typically 7 available for OMEGA to utilize.  Checking this box instructs OMEGA to use multiprocessor mode.
-
-*  Element 8 - Run Model
+*  Element 7 - Run Model
     When everything is properly configured, this button will be enabled for initiation of the OMEGA model run.
 
 Loading The Model Requirements
@@ -86,7 +83,7 @@ If a Configuration File is not available, create a new one using these steps:
 * Add an optional Project Description
 * Press 'Save' to store the new Configuration File
 
-The 'Run Model' page should look similar to :numref:`ug_label3` below.
+The 'Run Model' page will look similar to :numref:`ug_label3` below.
 
 .. _ug_label3:
 .. figure:: _static/ug_figures/gui_model_loaded.jpg
@@ -94,9 +91,47 @@ The 'Run Model' page should look similar to :numref:`ug_label3` below.
 
     GUI Configuration File Loaded
 
+Set Model Run Options
++++++++++++++++++++++
+Selecting the 'Options' tab will show a display similar to :numref:`ug_label11` below.
+
+.. _ug_label11:
+.. figure:: _static/ug_figures/gui_options_page.jpg
+    :align: center
+
+    GUI Options Page Display
+
+The OMEGA model can be configured to utilize multiple system processors for true multitasking that significantly reduces model completion time.  For example, a typical Intel Core I7(R) has 8 processors total and typically 7 available for OMEGA to utilize.  Checking the 'Enable Multiprocessor' box instructs OMEGA to use multiprocessor mode.  The 'Multiprocessor Help' button provides additional information.
+
+The Event Monitor will indicate multiprocessor availability during GUI launch as shown in :numref:`ug_label1` above.
+
+To use the Multiprocessor mode, a batch file customized to the configuration
+of this computer must be executed before the GUI is launched.
+
+Example Multiprocessor Batch File:
+
+::
+
+    ECHO OFF
+
+    REM set BASEPATH to the python install on your machine that has dispy installed
+    set BASEPATH=C:\dev\GitHub\EPA_OMEGA_Model\venv\
+
+    REM location of python.exe (in Scripts path for venvs, else in basepath for straight install):
+    set PYTHONPATH=%BASEPATH%Scripts\
+
+    REM location of dispy package:
+    set DISPYPATH=%BASEPATH%Lib\site-packages\dispy\
+
+    REM how many cpus to serve (e.g. number of cores minus one)
+    set NUM_CPUS=7
+
+    ECHO ON
+    "%PYTHONPATH%python" "%DISPYPATH%dispynode.py" --clean --cpus=%NUM_CPUS% --client_shutdown --ping_interval=15 --daemon --zombie_interval=1
+
 Run The Model
 -------------
-With all of the model requirements loaded, the 'Model Run' button will be enabled.  Press the 'Model Run' button to start the model run.
+With all of the model requirements loaded, select the 'Run Model' tab and the 'Model Run' button will be enabled.  Press the 'Model Run' button to start the model run.
 
 As the model is running, the 'Run Model' page will look similar to :numref:`ug_label4` below.
 
@@ -125,34 +160,6 @@ Final GUI Data:
 
 * The model ending information is detailed in the event monitor.  This includes the time and the Output Batch Directory used.
 * The model status and final model run time are displayed below the 'Run Model' button.
-
-Multiprocessor Mode
-^^^^^^^^^^^^^^^^^^^
-
-To use the Multiprocessor mode, a batch file customized to the configuration
-of this computer must be executed before the GUI is launched.
-
-Example Multiprocessor Batch File:
-
-::
-
-    ECHO OFF
-
-    REM set BASEPATH to the python install on your machine that has dispy installed
-    set BASEPATH=C:\dev\GitHub\EPA_OMEGA_Model\venv\
-
-    REM location of python.exe (in Scripts path for venvs, else in basepath for straight install):
-    set PYTHONPATH=%BASEPATH%Scripts\
-
-    REM location of dispy package:
-    set DISPYPATH=%BASEPATH%Lib\site-packages\dispy\
-
-    REM how many cpus to serve (e.g. number of cores minus one)
-    set NUM_CPUS=7
-
-    ECHO ON
-    "%PYTHONPATH%python" "%DISPYPATH%dispynode.py" --clean --cpus=%NUM_CPUS% --client_shutdown --ping_interval=15 --daemon --zombie_interval=1
-
 
 Navigating Model Outputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -186,6 +193,6 @@ The desired plot will appear as shown in :numref:`ug_label10` below.
 .. figure:: _static/ug_figures/gui_results_3.jpg
     :align: center
 
-    Plot Output
+    Typical Plot Output
 
 

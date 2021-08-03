@@ -59,22 +59,53 @@ min_share_units_str = 'minimum_share'
 
 
 class RequiredSalesShare(OMEGABase):
-    values = pd.DataFrame()
+    """
+    **Loads and provides access to minimum required sales shares by year and market class ID.**
+
+    Can be used to investigate the effects of policies like a ZEV mandate.
+
+    """
+    _values = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
-        start_years = RequiredSalesShare.values['start_year']
+        """
+
+        Args:
+            calendar_year (int): calendar year to get minimum production constraint for
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+
+        Returns:
+            The minimum production share for the given year and market class ID
+
+        See Also:
+            ``producer.compliance_strategy.create_tech_and_share_sweeps()``
+
+        """
+        start_years = RequiredSalesShare._values['start_year']
         calendar_year = max(start_years[start_years <= calendar_year])
 
         min_key = '%s:%s' % (market_class_id, min_share_units_str)
-        if min_key in RequiredSalesShare.values:
-            return RequiredSalesShare.values['%s:%s' % (market_class_id, min_share_units_str)].loc[
-                RequiredSalesShare.values['start_year'] == calendar_year].item()
+        if min_key in RequiredSalesShare._values:
+            return RequiredSalesShare._values['%s:%s' % (market_class_id, min_share_units_str)].loc[
+                RequiredSalesShare._values['start_year'] == calendar_year].item()
         else:
             return 0
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         if verbose:
@@ -94,14 +125,14 @@ class RequiredSalesShare(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                RequiredSalesShare.values['start_year'] = np.array(df['start_year'])
+                RequiredSalesShare._values['start_year'] = np.array(df['start_year'])
 
                 share_columns = [c for c in df.columns if (min_share_units_str in c)]
 
                 for sc in share_columns:
                     market_class = sc.split(':')[0]
                     if market_class in omega_globals.options.MarketClass.market_classes:
-                        RequiredSalesShare.values[sc] = df[sc]
+                        RequiredSalesShare._values[sc] = df[sc]
                     else:
                         template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
 
@@ -142,7 +173,7 @@ if __name__ == '__main__':
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            RequiredSalesShare.values.to_csv(
+            RequiredSalesShare._values.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
 
             print(RequiredSalesShare.get_minimum_share(2020, 'hauling.BEV'))

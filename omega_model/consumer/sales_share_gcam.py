@@ -106,7 +106,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
         Args:
             calendar_year (int): the year to get parameters for
-            market_class_id (str): market class id, e.g. 'non_hauling.BEV'
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
 
         Returns:
             GCAM parameters for the given calendar year and market class

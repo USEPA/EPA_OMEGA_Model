@@ -12,20 +12,6 @@ sales-weighted generalized cost.**
 from omega_model import *
 
 
-def calc_generalized_cost(cost_factors):
-    """
-    Placeholder for consumer generalized cost calculations.
-
-    Args:
-        cost_factors: data to base costs on
-
-    Returns:
-        nothing yet
-
-    """
-    pass
-
-
 def context_new_vehicle_sales(calendar_year):
     """
     Get new vehicle sales from the context.

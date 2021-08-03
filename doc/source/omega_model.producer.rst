@@ -9,10 +9,10 @@ omega\_model.producer package
 Submodules
 ----------
 
-omega\_model.producer.compliance\_strategy module
--------------------------------------------------
+omega\_model.producer.compliance\_search module
+-----------------------------------------------
 
-.. automodule:: omega_model.producer.compliance_strategy
+.. automodule:: omega_model.producer.compliance_search
    :members:
    :undoc-members:
    :show-inheritance:

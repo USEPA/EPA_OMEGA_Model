@@ -21,6 +21,10 @@ from omega_model import *
 
 
 class ManufacturerAnnualData(SQABase):
+    """
+    Stores manufacturer annual target / achieved CO2e Mg and total cost data.
+
+    """
     # --- database table properties ---
     __tablename__ = 'manufacturer_annual_data'  # database table name
     index = Column('index', Integer, primary_key=True)  #: database table index
@@ -58,6 +62,10 @@ class ManufacturerAnnualData(SQABase):
     @staticmethod
     def get_cert_target_co2e_Mg(compliance_id):
         """
+        Get cert target CO2e in megagrams for each model year.
+
+        Args:
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns: A list of target CO2e Mg for each model year
 
@@ -68,6 +76,11 @@ class ManufacturerAnnualData(SQABase):
     @staticmethod
     def get_calendar_year_cert_co2e_Mg(compliance_id):
         """
+        Get the initial cert CO2e in megagrams for each calendar year, final certification may be higher or lower
+        depending on credit transfers.
+
+        Args:
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns: A list of initial compliance state data (CO2e Mg) of the vehicles produced by model year
 
@@ -78,6 +91,10 @@ class ManufacturerAnnualData(SQABase):
     @staticmethod
     def get_model_year_cert_co2e_Mg(compliance_id):
         """
+        Get the final cert CO2e in megagrams for each model year, including the effect of credit transfers.
+
+        Args:
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns: A list of final achieved certification CO2e Mg for each model year, including credits transferred
         to/from other model years
@@ -89,6 +106,11 @@ class ManufacturerAnnualData(SQABase):
     @staticmethod
     def get_total_cost_billions(compliance_id):
         """
+        Get total manufacturer new vehicle cost (sum of vehicle prices times vehicle sales) for each model year, in
+        billions of dollars.
+
+        Args:
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns: A list of total manufacturer vehicle costs by model year, in billions of dollars
 
@@ -104,7 +126,7 @@ class ManufacturerAnnualData(SQABase):
 
         Args:
             model_year (numeric): the model year of the transaction
-            compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             transaction_amount_Mg (numeric): the transaction amount, may be positive (receiving credits) or negative (transferring credits)
 
         """

@@ -104,7 +104,7 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
         Returns the non-responsive market category of the given market class ID
 
         Args:
-            market_class_id (str): market class ID, e.g. 'non_hauling.ICE'
+            market_class_id (str): market class ID, e.g. 'hauling.ICE'
 
         Returns:
             The non-responsive market category of the given market class ID
