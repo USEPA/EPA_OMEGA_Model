@@ -106,6 +106,10 @@ Vehicle Definitions
 -------------------
 x
 
+Vehicle Simulation and Cost Inputs
+------------------------------------------
+x
+
 Vehicle Clouds, Frontiers, and Aggregation
 ------------------------------------------
 x
