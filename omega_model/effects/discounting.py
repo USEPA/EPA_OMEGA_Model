@@ -1,7 +1,7 @@
 import pandas as pd
+from omega_model import *
 
 
-# TODO we need someplace to set some discounting inputs, at least the time at which costs start (start of year or end of year).
 def discount_values(dict_of_values):
     """The discount function determines metrics appropriate for discounting (those contained in dict_of_values) and does the discounting
     calculation to a given year and point within that year.
@@ -18,8 +18,8 @@ def discount_values(dict_of_values):
         costs are discounted).
 
     """
-    discount_to_year = 2021
-    costs_start = 'end-year'
+    discount_to_year = omega_globals.options.discount_values_to_year
+    costs_start = omega_globals.options.costs_start
     social_discrates = [0.03, 0.07]
     emission_dr25 = 25
     emission_dr3 = 3

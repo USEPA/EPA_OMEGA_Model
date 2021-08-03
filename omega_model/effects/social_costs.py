@@ -417,10 +417,12 @@ def calc_cost_effects(physical_effects_dict):
 
         vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
+        onroad_direct_co2e_grams_per_mile = physical['onroad_direct_co2e_grams_per_mile']
+        onroad_direct_kwh_per_mile = physical['onroad_direct_kwh_per_mile']
 
-        attribute_list = ['base_year_reg_class_id', 'in_use_fuel_id', 'new_vehicle_mfr_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        reg_class_id, in_use_fuel_id, new_vehicle_cost, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-            = get_vehicle_info(vehicle_id, attribute_list)
+        # attribute_list = ['base_year_reg_class_id', 'in_use_fuel_id', 'new_vehicle_mfr_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        # reg_class_id, in_use_fuel_id, new_vehicle_cost, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+        #     = get_vehicle_info(vehicle_id, attribute_list)
 
         veh_effects_dict = dict()
         flag = None
@@ -436,8 +438,14 @@ def calc_cost_effects(physical_effects_dict):
             maintenance_cost_dollars = 0
             refueling_cost_dollars = 0
             driving_cost_dollars = 0
-            pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, so2_tailpipe_3, so2_upstream_3, \
-            pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, so2_tailpipe_7, so2_upstream_7 = 12 * [0]
+            # pm25_tailpipe_3, pm25_upstream_3, nox_tailpipe_3, nox_upstream_3, so2_tailpipe_3, so2_upstream_3, \
+            # pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, so2_tailpipe_7, so2_upstream_7 = 12 * [0]
+
+            attribute_list = ['new_vehicle_mfr_cost_dollars']
+            new_vehicle_cost = get_vehicle_info(vehicle_id, attribute_list)[0]
+
+            mfr_id, reg_class_id, in_use_fuel_id, market_group = physical['manufacturer_id'], physical['reg_class_id'], \
+                                                                 physical['in_use_fuel_id'], physical['non_responsive_market_group']
 
             # tech costs, only for age=0
             if age == 0:
@@ -554,9 +562,11 @@ def calc_cost_effects(physical_effects_dict):
                 criteria_3_cost_dollars = criteria_tailpipe_3_cost_dollars + criteria_upstream_3_cost_dollars
                 criteria_7_cost_dollars = criteria_tailpipe_7_cost_dollars + criteria_upstream_7_cost_dollars
 
-            veh_effects_dict.update({'model_year': calendar_year - age,
+            veh_effects_dict.update({'manufacturer_id': mfr_id,
+                                     'model_year': calendar_year - age,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
+                                     'non_responsive_market_group': market_group,
                                      'tech_cost_dollars': tech_cost_dollars,
                                      'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                                      'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
