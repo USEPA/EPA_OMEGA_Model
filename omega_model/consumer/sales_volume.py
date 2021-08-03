@@ -53,7 +53,7 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
 
     Args:
         calendar_year (int): the calendar year to calculate sales in
-        compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
         P ($, [$]): a single price or a list/vector of prices
 
     Returns:

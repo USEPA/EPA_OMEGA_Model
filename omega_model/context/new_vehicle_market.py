@@ -218,7 +218,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         Args:
             calendar_year (numeric): calendar year
-            compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns:
             OMEGA-centric context new vehicle generalized cost for the given calendar year
@@ -235,7 +235,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         Args:
             calendar_year (numeric): calendar year
-            compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             generalized_cost (float): total sales-weighted OMEGA-centric generalized cost for the calendar year
 
         """
@@ -249,7 +249,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         Args:
             calendar_year (numeric): calendar year
-            compliance_id (str): compliance_id, e.g. 'consolidated_OEM'
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             generalized_cost (float): total sales-weighted OMEGA-centric generalized cost for the calendar year
 
         """

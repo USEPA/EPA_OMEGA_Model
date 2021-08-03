@@ -200,7 +200,7 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
     return composite_vehicles
 
 
-def search_production_options(compliance_id, calendar_year, producer_decision_and_response, iteration_num,
+def search_production_options(compliance_id, calendar_year, producer_decision_and_response, producer_consumer_iteration_num,
                               strategic_target_offset_Mg):
     """
 
@@ -208,7 +208,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         compliance_id:
         calendar_year:
         producer_decision_and_response:
-        iteration_num:
+        producer_consumer_iteration_num:
 
     Returns:
 
@@ -216,12 +216,12 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     candidate_production_decisions = None
     producer_compliance_possible = False
 
-    if (calendar_year == omega_globals.options.analysis_initial_year) and (iteration_num == 0):
+    if (calendar_year == omega_globals.options.analysis_initial_year) and (producer_consumer_iteration_num == 0):
         cache.clear()
 
     producer_iteration_log = \
         omega_log.IterationLog('%s%d_%d_producer_iteration_log.csv' % (
-            omega_globals.options.output_folder, calendar_year, iteration_num))
+            omega_globals.options.output_folder, calendar_year, producer_consumer_iteration_num))
 
     continue_search = True
     search_iteration = 0
@@ -263,7 +263,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                 candidate_production_decisions.loc[candidate_production_decisions['strategic_compliance_error'].idxmin()]
 
         if 'producer' in omega_globals.options.verbose_console:
-            omega_log.logwrite(('%d_%d_%d' % (calendar_year, iteration_num,
+            omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
                                               search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
                                     best_candidate_production_decision['strategic_compliance_ratio']), echo_console=True)
 

@@ -87,7 +87,7 @@ class PolicyFuel(OMEGABase):
             ::
 
                 carbon_intensity_gasoline =
-                    OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
+                    PolicyFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
         start_years = cache['start_year']

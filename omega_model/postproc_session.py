@@ -454,7 +454,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     Plot vehicle cost v. model year, by market class and market category, for a single manufacturer.
 
     Args:
-        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
         calendar_years ([years]): list of model years
 
     Returns:
@@ -832,7 +832,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
 
     Args:
         calendar_years ([years]): list of model years
-        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
         total_sales ([sales]): list of total sales by model year
 
     Returns:
@@ -966,6 +966,7 @@ def plot_total_sales(calendar_years, compliance_ids):
 
     Returns:
         tuple of context sales, total sales, and manufacturer sales by model year
+        (context_sales, total_sales, manufacturer_sales)
 
     """
     import numpy as np
@@ -1014,14 +1015,14 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
 
     Args:
         credit_history (CreditBank):
-        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
         calendar_years ([years]): list of model years
 
     Returns:
         tuple of calendar year cert co2e Mg, model year cert co2e Mg, cert target co2e Mg, total cost in billions
+        (calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, cert_target_co2e_Mg, total_cost_billions)
 
     """
-
     def draw_transfer_arrow(src_x, src_y, dest_x, dest_y):
         ax1.annotate('', xy=(dest_x, dest_y), xycoords='data',
                      xytext=(src_x, src_y), textcoords='data',
@@ -1082,7 +1083,7 @@ def plot_iteration(iteration_log, compliance_id):
     Plot producer-consumer iteration data.
 
     Args:
-        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
         iteration_log (DataFrame): iteration data
 
     """
@@ -1091,18 +1092,18 @@ def plot_iteration(iteration_log, compliance_id):
     for iteration in [0, -1]:
         year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
                             zip(iteration_log['calendar_year'][
-                                    iteration_log['producer_pricing_iteration'] == iteration],
-                                iteration_log['iteration'][iteration_log['producer_pricing_iteration'] == iteration])]
+                                    iteration_log['cross_subsidy_iteration_num'] == iteration],
+                                iteration_log['producer_consumer_iteration_num'][iteration_log['cross_subsidy_iteration_num'] == iteration])]
 
         for mc in market_classes:
             plt.figure()
             plt.plot(year_iter_labels,
                      iteration_log['producer_abs_share_frac_%s' % mc][
-                         iteration_log['producer_pricing_iteration'] == iteration])
+                         iteration_log['cross_subsidy_iteration_num'] == iteration])
             plt.xticks(rotation=90)
             plt.plot(year_iter_labels,
                      iteration_log['consumer_abs_share_frac_%s' % mc][
-                         iteration_log['producer_pricing_iteration'] == iteration])
+                         iteration_log['cross_subsidy_iteration_num'] == iteration])
             plt.title('%s %s iteration %d' % (compliance_id, mc, iteration))
             plt.grid()
             plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
@@ -1146,8 +1147,8 @@ def plot_iteration(iteration_log, compliance_id):
         plt.savefig('%s%s %s Producer Cost Multipliers %d.png' % (
             omega_globals.options.output_folder, omega_globals.options.session_unique_name, compliance_id, iteration))
 
-    fig, ax1 = fplothg(last_logged['calendar_year'], last_logged['iteration'], '.-')
-    label_xyt(ax1, '', 'Iteration [#]', '%s Iteration mean = %.2f' % (compliance_id, last_logged['iteration'].mean()))
+    fig, ax1 = fplothg(last_logged['calendar_year'], last_logged['producer_consumer_iteration_num'], '.-')
+    label_xyt(ax1, '', 'Iteration [#]', '%s Iteration mean = %.2f' % (compliance_id, last_logged['producer_consumer_iteration_num'].mean()))
 
     fig.savefig('%s%s %s Iter Counts.png' % (omega_globals.options.output_folder,
                                              omega_globals.options.session_unique_name, compliance_id))
