@@ -13,12 +13,11 @@ from omega_model import *
 from common.omega_plot import *
 from policy.credit_banking import CreditBank
 
-
 market_classes = []
 market_categories = []
 
 
-def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalone_run: bool):
+def run_postproc(iteration_log, credit_banks, standalone_run):
     """
     Generate charts and output files for a single simulation
 
@@ -28,7 +27,7 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
         standalone_run (bool): True if session is run outside of the batch process
 
     Returns:
-        Results summary dataframe
+        Results summary DataFrame
 
     """
     from producer.vehicles import VehicleFinal
@@ -45,8 +44,8 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
     if not standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)
 
-    vehicle_years = list(range(omega_globals.options.analysis_initial_year-1,
-                                        omega_globals.options.analysis_final_year+1))
+    vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
+                               omega_globals.options.analysis_final_year + 1))
 
     analysis_years = vehicle_years[1:]
 
@@ -61,7 +60,7 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
     for manufacturer in manufacturer_sales:
         session_results['%s_sales_total' % manufacturer] = manufacturer_sales[manufacturer][1:]
 
-    # generate manufacturer-specific plots and data if not consolidating
+        # generate manufacturer-specific plots and data if not consolidating
         for compliance_id in VehicleFinal.compliance_ids:
 
             calendar_year_cert_co2e_Mg, model_year_cert_co2e_Mg, cert_target_co2e_Mg, total_cost_billions = \
@@ -75,7 +74,8 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
             if not omega_globals.options.consolidate_manufacturers:
                 # plot_iteration(iteration_log, compliance_id)
 
-                mfr_market_share_results = plot_manufacturer_market_shares(vehicle_years, compliance_id, manufacturer_sales[compliance_id])
+                mfr_market_share_results = plot_manufacturer_market_shares(vehicle_years, compliance_id,
+                                                                           manufacturer_sales[compliance_id])
 
                 mfr_average_cost_data = plot_manufacturer_vehicle_cost(analysis_years, compliance_id)
 
@@ -119,16 +119,17 @@ def run_postproc(iteration_log: pd.DataFrame, credit_banks: CreditBank, standalo
 
 def plot_cert_co2e_gpmi(calendar_years):
     """
+    Plot cert CO2e g/mi versus model year, by market class and market category.
 
     Args:
-        calendar_years:
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of average cert co2e g/mi data by total, market class and market category
 
     """
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
 
     average_cert_co2e_data = dict()
 
@@ -138,9 +139,9 @@ def plot_cert_co2e_gpmi(calendar_years):
         average_cert_co2e_data['total'].append(omega_globals.session.query(
             func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                              filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                              filter(VehicleFinal.model_year == cy).
-                                              filter(VehicleAnnualData.age == 0).scalar())
+                                               filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                               filter(VehicleFinal.model_year == cy).
+                                               filter(VehicleAnnualData.age == 0).scalar())
 
     # tally up market_category sales weighted co2
     for mcat in market_categories:
@@ -162,7 +163,7 @@ def plot_cert_co2e_gpmi(calendar_years):
 
         average_cert_co2e_data[mcat] = market_category_cost
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
         ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
@@ -170,9 +171,10 @@ def plot_cert_co2e_gpmi(calendar_years):
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
         average_cert_co2e_data[mc] = []
@@ -180,10 +182,10 @@ def plot_cert_co2e_gpmi(calendar_years):
             average_cert_co2e_data[mc].append(omega_globals.session.query(
                 func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                             filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                             filter(VehicleFinal.model_year == cy).
-                                             filter(VehicleFinal.market_class_id == mc).
-                                             filter(VehicleAnnualData.age == 0).scalar())
+                                              filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                              filter(VehicleFinal.model_year == cy).
+                                              filter(VehicleFinal.market_class_id == mc).
+                                              filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
             ax1.plot(calendar_years, average_cert_co2e_data[mc], '.-')
         else:
@@ -192,17 +194,20 @@ def plot_cert_co2e_gpmi(calendar_years):
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
     return average_cert_co2e_data
 
 
 def plot_cert_direct_kwh_pmi(calendar_years):
     """
+    Plot vehicle cert direct kWh/mi v. model year, by market class and market category.
 
     Args:
-        calendar_years:
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of average cert direct kWh/mi data by total, market class and market category
 
     """
     from producer.vehicles import VehicleFinal
@@ -241,7 +246,7 @@ def plot_cert_direct_kwh_pmi(calendar_years):
 
         average_cert_direct_kwh_data[mcat] = market_category_cost
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
         ax1.plot(calendar_years, average_cert_direct_kwh_data[mcat], '.--')
@@ -249,9 +254,10 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
         average_cert_direct_kwh_data[mc] = []
@@ -271,34 +277,36 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     label_xyt(ax1, 'Year', 'Energy Consumption [kWh/mi]',
               '%s\nAverage Vehicle Cert kWh/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Cert kWh pmi Mkt Cls.png' % omega_globals.options.session_unique_name)
     return average_cert_direct_kwh_data
 
 
 def plot_target_co2e_gpmi(calendar_years):
     """
+    Plot vehicle target CO2e g/mi v. model year, by market class and market category.
 
     Args:
-        calendar_years:
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of average cert target CO2e g/mi data by total, market class and market category
 
     """
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
 
-    average_cert_co2e_data = dict()
+    average_cert_target_co2e_data = dict()
 
     # tally up total sales weighted co2
-    average_cert_co2e_data['total'] = []
+    average_cert_target_co2e_data['total'] = []
     for cy in calendar_years:
-        average_cert_co2e_data['total'].append(omega_globals.session.query(
+        average_cert_target_co2e_data['total'].append(omega_globals.session.query(
             func.sum(VehicleFinal.cert_target_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                              filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                              filter(VehicleFinal.model_year == cy).
-                                              filter(VehicleAnnualData.age == 0).scalar())
+                                                      filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                                      filter(VehicleFinal.model_year == cy).
+                                                      filter(VehicleAnnualData.age == 0).scalar())
 
     # tally up market_category sales weighted co2
     for mcat in market_categories:
@@ -315,57 +323,61 @@ def plot_target_co2e_gpmi(calendar_years):
             for result in registered_count_and_market_id_and_co2:
                 if mcat in result.market_class_id.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_target_co2e_grams_per_mile)
+                    sales_weighted_cost += float(result.registered_count) * float(
+                        result.cert_target_co2e_grams_per_mile)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
-        average_cert_co2e_data[mcat] = market_category_cost
+        average_cert_target_co2e_data[mcat] = market_category_cost
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cert_co2e_data['total'], '.-')
+        ax1.plot(calendar_years, average_cert_target_co2e_data[mcat], '.--')
+    ax1.plot(calendar_years, average_cert_target_co2e_data['total'], '.-')
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Target CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_cert_co2e_data[mc] = []
+        average_cert_target_co2e_data[mc] = []
         for cy in calendar_years:
-            average_cert_co2e_data[mc].append(omega_globals.session.query(
+            average_cert_target_co2e_data[mc].append(omega_globals.session.query(
                 func.sum(VehicleFinal.cert_target_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                             filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                             filter(VehicleFinal.model_year == cy).
-                                             filter(VehicleFinal.market_class_id == mc).
-                                             filter(VehicleAnnualData.age == 0).scalar())
+                                                     filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                                     filter(VehicleFinal.model_year == cy).
+                                                     filter(VehicleFinal.market_class_id == mc).
+                                                     filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.-')
+            ax1.plot(calendar_years, average_cert_target_co2e_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.--')
+            ax1.plot(calendar_years, average_cert_target_co2e_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Target CO2e g/mi by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return average_cert_co2e_data
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+    return average_cert_target_co2e_data
 
 
 def plot_vehicle_cost(calendar_years):
     """
+    Plot average vehicle cost v. model year, by market class and market category, across all manufacturers.
 
     Args:
-        calendar_years:
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of average vehicle cost data by total, market class and market category
 
     """
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
 
     average_cost_data = dict()
 
@@ -399,7 +411,7 @@ def plot_vehicle_cost(calendar_years):
 
         average_cost_data[mcat] = market_category_cost
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
         ax1.plot(calendar_years, average_cost_data[mcat], '.--')
@@ -407,9 +419,10 @@ def plot_vehicle_cost(calendar_years):
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Cost by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cost Mkt Cat.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Cost Mkt Cat.png' % omega_globals.options.session_unique_name)
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
         average_cost_data[mc] = []
@@ -430,23 +443,26 @@ def plot_vehicle_cost(calendar_years):
               '%s\nAverage Vehicle Cost  by Market Class v Year' % omega_globals.options.session_unique_name)
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cost by Mkt Cls.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V Cost by Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return average_cost_data
 
 
 def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     """
+    Plot vehicle cost v. model year, by market class and market category, for a single manufacturer.
 
     Args:
-        calendar_years:
+        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of average vehicle cost data by total, market class and market category for the given manufacturer
 
     """
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
 
     average_cost_data = dict()
 
@@ -456,10 +472,11 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
         average_cost_data['%s_total' % compliance_id].append(omega_globals.session.query(
             func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                          filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                          filter(VehicleFinal.compliance_id == compliance_id).
-                                          filter(VehicleFinal.model_year == cy).
-                                          filter(VehicleAnnualData.age == 0).scalar())
+                                                             filter(
+            VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                                             filter(VehicleFinal.compliance_id == compliance_id).
+                                                             filter(VehicleFinal.model_year == cy).
+                                                             filter(VehicleAnnualData.age == 0).scalar())
 
     # tally up market_category sales
     for mcat in market_categories:
@@ -482,7 +499,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
 
         average_cost_data['%s_%s' % (compliance_id, mcat)] = market_category_cost
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
         ax1.plot(calendar_years, average_cost_data['%s_%s' % (compliance_id, mcat)], '.--')
@@ -494,7 +511,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     fig.savefig(omega_globals.options.output_folder + '%s V Cost Mkt Cat %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
         average_cost_data['%s_%s' % (compliance_id, mc)] = []
@@ -502,11 +519,12 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
             average_cost_data['%s_%s' % (compliance_id, mc)].append(omega_globals.session.query(
                 func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                         filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                         filter(VehicleFinal.compliance_id == compliance_id).
-                                         filter(VehicleFinal.model_year == cy).
-                                         filter(VehicleFinal.market_class_id == mc).
-                                         filter(VehicleAnnualData.age == 0).scalar())
+                                                                    filter(
+                VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                                                    filter(VehicleFinal.compliance_id == compliance_id).
+                                                                    filter(VehicleFinal.model_year == cy).
+                                                                    filter(VehicleFinal.market_class_id == mc).
+                                                                    filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
             ax1.plot(calendar_years, average_cost_data['%s_%s' % (compliance_id, mc)], '.-')
         else:
@@ -525,28 +543,31 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
 
 def plot_vehicle_generalized_cost(calendar_years):
     """
+    Plot manufacturer vehicle generalized cost v. model year, by market class and market category,
+    for a single manufacturer.
 
     Args:
-        calendar_years:
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of average generalized cost data by total, market class and market category
 
     """
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
     import consumer
 
-    average_cost_data = dict()
+    generalized_cost_data = dict()
 
     # tally up total sales weighted cost
-    average_cost_data['total'] = []
+    generalized_cost_data['total'] = []
     for cy in calendar_years:
-        average_cost_data['total'].append(omega_globals.session.query(
+        generalized_cost_data['total'].append(omega_globals.session.query(
             func.sum(VehicleFinal.new_vehicle_mfr_generalized_cost_dollars * VehicleAnnualData.registered_count) /
             func.sum(VehicleAnnualData.registered_count)).
-                                          filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                          filter(VehicleFinal.model_year == cy).
-                                          filter(VehicleAnnualData.age == 0).scalar())
+                                              filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                              filter(VehicleFinal.model_year == cy).
+                                              filter(VehicleAnnualData.age == 0).scalar())
 
     # tally up market_category sales
     for mcat in market_categories:
@@ -563,58 +584,62 @@ def plot_vehicle_generalized_cost(calendar_years):
             for result in registered_count_and_market_id_and_cost:
                 if mcat in result.market_class_id.split('.'):
                     mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.new_vehicle_mfr_generalized_cost_dollars)
+                    sales_weighted_cost += float(result.registered_count) * float(
+                        result.new_vehicle_mfr_generalized_cost_dollars)
             market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
 
-        average_cost_data[mcat] = market_category_cost
+        generalized_cost_data[mcat] = market_category_cost
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_cost_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cost_data['total'], '.-')
+        ax1.plot(calendar_years, generalized_cost_data[mcat], '.--')
+    ax1.plot(calendar_years, generalized_cost_data['total'], '.-')
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized Cost by Market Category v Year' % omega_globals.options.session_unique_name)
-    fig.savefig(omega_globals.options.output_folder + '%s V GenCost Mkt Cat.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V GenCost Mkt Cat.png' % omega_globals.options.session_unique_name)
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_cost_data[mc] = []
+        generalized_cost_data[mc] = []
         for cy in calendar_years:
-            average_cost_data[mc].append(omega_globals.session.query(
+            generalized_cost_data[mc].append(omega_globals.session.query(
                 func.sum(VehicleFinal.new_vehicle_mfr_generalized_cost_dollars * VehicleAnnualData.registered_count) /
                 func.sum(VehicleAnnualData.registered_count)).
-                                         filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                         filter(VehicleFinal.model_year == cy).
-                                         filter(VehicleFinal.market_class_id == mc).
-                                         filter(VehicleAnnualData.age == 0).scalar())
+                                             filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                                             filter(VehicleFinal.model_year == cy).
+                                             filter(VehicleFinal.market_class_id == mc).
+                                             filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cost_data[mc], '.-')
+            ax1.plot(calendar_years, generalized_cost_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_cost_data[mc], '.--')
+            ax1.plot(calendar_years, generalized_cost_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized_Cost  by Market Class v Year' % omega_globals.options.session_unique_name)
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V GenCost Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return average_cost_data
+    fig.savefig(
+        omega_globals.options.output_folder + '%s V GenCost Mkt Cls.png' % omega_globals.options.session_unique_name)
+    return generalized_cost_data
 
 
 def plot_vehicle_megagrams(calendar_years):
     """
+    Plot vehicle cert CO2e Mg v. model year, by market class and market category.
 
     Args:
-        calendar_years:
+        calendar_years ([years]): list of model years
 
     Returns:
+        dict of vehicle cert CO2e Mg data by total, market class and market category
 
     """
     from producer.vehicles import VehicleFinal
     from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
 
     Mg_data = dict()
 
@@ -623,9 +648,9 @@ def plot_vehicle_megagrams(calendar_years):
     for cy in calendar_years:
         Mg_data['total'].append(
             omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)).
-                                          filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                          filter(VehicleFinal.model_year == cy).
-                                          filter(VehicleAnnualData.age == 0).scalar())
+                filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
+                filter(VehicleFinal.model_year == cy).
+                filter(VehicleAnnualData.age == 0).scalar())
 
     # tally up market_category Mg
     for mcat in market_categories:
@@ -644,17 +669,17 @@ def plot_vehicle_megagrams(calendar_years):
 
         Mg_data[mcat] = market_category_Mg
 
-    # cost/market category chart
+    # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
         ax1.plot(calendar_years, Mg_data[mcat], '.--')
     ax1.plot(calendar_years, Mg_data['total'], '.-')
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2e [Mg]',
-              '%s\nVehicle CO2e Megagrams by Market Category v Year' % omega_globals.options.session_unique_name)
+              '%s\nVehicle CO2e Mg by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cat.png' % omega_globals.options.session_unique_name)
 
-    # cost/market class chart
+    # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
         Mg_data[mc] = []
@@ -672,7 +697,7 @@ def plot_vehicle_megagrams(calendar_years):
             ax1.plot(calendar_years, Mg_data[mc], '.--')
     ax1.plot(calendar_years, Mg_data['total'], '.-')
     label_xyt(ax1, 'Year', 'CO2e [Mg]',
-              '%s\nVehicle CO2e Megagrams  by Market Class v Year' % omega_globals.options.session_unique_name)
+              '%s\nVehicle CO2e Mg  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes + ['total'])
     fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cls.png' % omega_globals.options.session_unique_name)
     return Mg_data
@@ -680,18 +705,19 @@ def plot_vehicle_megagrams(calendar_years):
 
 def plot_market_shares(calendar_years, total_sales):
     """
+    Plot absolute market shares v. model year, by market class, market category, context size class and reg class.
 
     Args:
-        calendar_years:
-        total_sales:
+        calendar_years ([years]): list of model years
+        total_sales ([sales]): list of total sales by model year
 
     Returns:
+        dict of market share results, by market class, market category, context size class and reg class.
 
     """
     from context.new_vehicle_market import NewVehicleMarket
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer.vehicles import VehicleFinal
-    import consumer
 
     market_share_results = dict()
 
@@ -699,7 +725,8 @@ def plot_market_shares(calendar_years, total_sales):
     for mcat in market_categories:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id = omega_globals.session.query(VehicleAnnualData.registered_count, VehicleFinal.market_class_id) \
+            registered_count_and_market_id = omega_globals.session.query(VehicleAnnualData.registered_count,
+                                                                         VehicleFinal.market_class_id) \
                 .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
@@ -716,10 +743,10 @@ def plot_market_shares(calendar_years, total_sales):
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             mc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                                                        .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                                                        .filter(VehicleFinal.market_class_id == mc) \
-                                                        .filter(VehicleAnnualData.calendar_year == cy) \
-                                                        .filter(VehicleAnnualData.age == 0).scalar()
+                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
+                .filter(VehicleFinal.market_class_id == mc) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).scalar()
             if not mc_sales:
                 mc_sales = 0
             market_category_abs_share_frac.append(float(mc_sales) / total_sales[idx])
@@ -730,10 +757,10 @@ def plot_market_shares(calendar_years, total_sales):
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             csc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                                                        .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                                                        .filter(VehicleFinal.context_size_class == csc) \
-                                                        .filter(VehicleAnnualData.calendar_year == cy) \
-                                                        .filter(VehicleAnnualData.age == 0).scalar()
+                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
+                .filter(VehicleFinal.context_size_class == csc) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).scalar()
             if not csc_sales:
                 csc_sales = 0
             market_category_abs_share_frac.append(float(csc_sales) / total_sales[idx])
@@ -744,10 +771,10 @@ def plot_market_shares(calendar_years, total_sales):
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             rc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                                                        .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                                                        .filter(VehicleFinal.reg_class_id == rc) \
-                                                        .filter(VehicleAnnualData.calendar_year == cy) \
-                                                        .filter(VehicleAnnualData.age == 0).scalar()
+                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
+                .filter(VehicleFinal.reg_class_id == rc) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).scalar()
             if not rc_sales:
                 rc_sales = 0
             market_category_abs_share_frac.append(float(rc_sales) / total_sales[idx])
@@ -758,25 +785,30 @@ def plot_market_shares(calendar_years, total_sales):
     for mcat in market_categories:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mcat], '.--')
     ax1.set_ylim(-0.05, 1.05)
-    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nMarket Category Absolute Market Shares' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
+              '%s\nMarket Category Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(market_categories)
-    fig.savefig(omega_globals.options.output_folder + '%s Mkt Cat Shares.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s Mkt Cat Shares.png' % omega_globals.options.session_unique_name)
 
     # plot market class results
     fig, ax1 = figure()
     for mc in market_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % mc], '.--')
     ax1.set_ylim(-0.05, 1.05)
-    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nMarket Class Absolute Market Shares' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
+              '%s\nMarket Class Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s Mkt Cls Shares.png' % omega_globals.options.session_unique_name)
+    fig.savefig(
+        omega_globals.options.output_folder + '%s Mkt Cls Shares.png' % omega_globals.options.session_unique_name)
 
     # plot context size class results
     fig, ax1 = figure()
     for csc in NewVehicleMarket.context_size_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % csc], '.--')
     ax1.set_ylim(-0.05, 1.05)
-    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nContext Size Class Absolute Market Shares' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
+              '%s\nContext Size Class Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(NewVehicleMarket.context_size_classes.keys(), ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s CSC Shares.png' % omega_globals.options.session_unique_name)
 
@@ -785,7 +817,8 @@ def plot_market_shares(calendar_years, total_sales):
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % rc], '.--')
     ax1.set_ylim(-0.05, 1.05)
-    label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s\nReg Class Absolute Market Shares' % omega_globals.options.session_unique_name)
+    label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
+              '%s\nReg Class Absolute Market Shares' % omega_globals.options.session_unique_name)
     ax1.legend(omega_globals.options.RegulatoryClasses.reg_classes, ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s RC Shares.png' % omega_globals.options.session_unique_name)
 
@@ -794,19 +827,22 @@ def plot_market_shares(calendar_years, total_sales):
 
 def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     """
+    Plot absolute market shares v. model year, by market class, market category, context size class and reg class,
+    for a single manufacturer.
 
     Args:
-        calendar_years:
-        compliance_id:
-        total_sales:
+        calendar_years ([years]): list of model years
+        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        total_sales ([sales]): list of total sales by model year
 
     Returns:
+        dict of market share results, by market class, market category, context size class and reg class, for the given
+        manufacturer
 
     """
     from context.new_vehicle_market import NewVehicleMarket
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer.vehicles import VehicleFinal
-    import consumer
 
     market_share_results = dict()
 
@@ -833,11 +869,11 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             mc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                                                        .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                                                        .filter(VehicleFinal.compliance_id == compliance_id) \
-                                                        .filter(VehicleFinal.market_class_id == mc) \
-                                                        .filter(VehicleAnnualData.calendar_year == cy) \
-                                                        .filter(VehicleAnnualData.age == 0).scalar()
+                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
+                .filter(VehicleFinal.compliance_id == compliance_id) \
+                .filter(VehicleFinal.market_class_id == mc) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).scalar()
             if not mc_sales:
                 mc_sales = 0
             market_category_abs_share_frac.append(float(mc_sales) / total_sales[idx])
@@ -848,11 +884,11 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             csc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                                                        .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                                                        .filter(VehicleFinal.compliance_id == compliance_id) \
-                                                        .filter(VehicleFinal.context_size_class == csc) \
-                                                        .filter(VehicleAnnualData.calendar_year == cy) \
-                                                        .filter(VehicleAnnualData.age == 0).scalar()
+                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
+                .filter(VehicleFinal.compliance_id == compliance_id) \
+                .filter(VehicleFinal.context_size_class == csc) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).scalar()
             if not csc_sales:
                 csc_sales = 0
             market_category_abs_share_frac.append(float(csc_sales) / total_sales[idx])
@@ -863,11 +899,11 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             rc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                                                        .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                                                        .filter(VehicleFinal.compliance_id == compliance_id) \
-                                                        .filter(VehicleFinal.reg_class_id == rc) \
-                                                        .filter(VehicleAnnualData.calendar_year == cy) \
-                                                        .filter(VehicleAnnualData.age == 0).scalar()
+                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
+                .filter(VehicleFinal.compliance_id == compliance_id) \
+                .filter(VehicleFinal.reg_class_id == rc) \
+                .filter(VehicleAnnualData.calendar_year == cy) \
+                .filter(VehicleAnnualData.age == 0).scalar()
             if not rc_sales:
                 rc_sales = 0
             market_category_abs_share_frac.append(float(rc_sales) / total_sales[idx])
@@ -922,11 +958,14 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
 
 def plot_total_sales(calendar_years, compliance_ids):
     """
+    Plot vehicle sales v. model year, for all manufacturers.
 
     Args:
-        calendar_years:
+        compliance_ids ([strs]): list of manufacturer names, e.g. ['OEM_A', 'OEM_B', ...]
+        calendar_years ([years]): list of model years
 
     Returns:
+        tuple of context sales, total sales, and manufacturer sales by model year
 
     """
     import numpy as np
@@ -945,13 +984,15 @@ def plot_total_sales(calendar_years, compliance_ids):
     for compliance_id in compliance_ids:
         manufacturer_sales[compliance_id] = []
         for cy in calendar_years:
-            manufacturer_sales[compliance_id].append(float(omega_globals.session.query(func.sum(VehicleAnnualData.registered_count))
-                                                           .filter(VehicleFinal.vehicle_id==VehicleAnnualData.vehicle_id)
-                                                           .filter(VehicleFinal.compliance_id==compliance_id)
-                                                           .filter(VehicleAnnualData.calendar_year == cy)
-                                                           .filter(VehicleAnnualData.age == 0).scalar()))
+            manufacturer_sales[compliance_id].append(
+                float(omega_globals.session.query(func.sum(VehicleAnnualData.registered_count))
+                      .filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id)
+                      .filter(VehicleFinal.compliance_id == compliance_id)
+                      .filter(VehicleAnnualData.calendar_year == cy)
+                      .filter(VehicleAnnualData.age == 0).scalar()))
 
-    context_sales = np.array([consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
+    context_sales = np.array(
+        [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
     fig, ax1 = fplothg(calendar_years[1:], context_sales / 1e6, '.-')
     ax1.plot(calendar_years, total_sales / 1e6)
 
@@ -969,13 +1010,18 @@ def plot_total_sales(calendar_years, compliance_ids):
 
 def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
     """
+    Plot manufacturer initial and final cert CO2e Mg, including the effect of credit transfers.
 
     Args:
-        calendar_years:
+        credit_history (CreditBank):
+        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        calendar_years ([years]): list of model years
 
     Returns:
+        tuple of calendar year cert co2e Mg, model year cert co2e Mg, cert target co2e Mg, total cost in billions
 
     """
+
     def draw_transfer_arrow(src_x, src_y, dest_x, dest_y):
         ax1.annotate('', xy=(dest_x, dest_y), xycoords='data',
                      xytext=(src_x, src_y), textcoords='data',
@@ -1014,7 +1060,7 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
             ax1.plot(t.model_year, cert_target_co2e_Mg_dict[calendar_years[0]], 'o', color='orange')
             draw_transfer_arrow(t.model_year, cert_target_co2e_Mg_dict[calendar_years[0]],
                                 t.credit_destination, model_year_cert_co2e_Mg_dict[t.credit_destination])
-            ax1.set_xlim(calendar_years[0]-5, ax1.get_xlim()[1])
+            ax1.set_xlim(calendar_years[0] - 5, ax1.get_xlim()[1])
         elif t.credit_destination == 'EXPIRATION' and t.model_year in calendar_year_cert_co2e_Mg_dict:
             draw_expiration_arrow(t.model_year, calendar_year_cert_co2e_Mg_dict[t.model_year])
         elif t.credit_destination == 'EXPIRATION' and t.model_year not in calendar_year_cert_co2e_Mg_dict:
@@ -1033,27 +1079,30 @@ def plot_manufacturer_compliance(calendar_years, compliance_id, credit_history):
 
 def plot_iteration(iteration_log, compliance_id):
     """
+    Plot producer-consumer iteration data.
 
     Args:
-        iteration_log:
-
-    Returns:
+        compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+        iteration_log (DataFrame): iteration data
 
     """
     iteration_log = iteration_log.loc[iteration_log['compliance_id'] == compliance_id]
 
     for iteration in [0, -1]:
         year_iter_labels = ['%d_%d' % (cy - 2000, it) for cy, it in
-                            zip(iteration_log['calendar_year'][iteration_log['producer_pricing_iteration'] == iteration],
+                            zip(iteration_log['calendar_year'][
+                                    iteration_log['producer_pricing_iteration'] == iteration],
                                 iteration_log['iteration'][iteration_log['producer_pricing_iteration'] == iteration])]
 
         for mc in market_classes:
             plt.figure()
             plt.plot(year_iter_labels,
-                     iteration_log['producer_abs_share_frac_%s' % mc][iteration_log['producer_pricing_iteration'] == iteration])
+                     iteration_log['producer_abs_share_frac_%s' % mc][
+                         iteration_log['producer_pricing_iteration'] == iteration])
             plt.xticks(rotation=90)
             plt.plot(year_iter_labels,
-                     iteration_log['consumer_abs_share_frac_%s' % mc][iteration_log['producer_pricing_iteration'] == iteration])
+                     iteration_log['consumer_abs_share_frac_%s' % mc][
+                         iteration_log['producer_pricing_iteration'] == iteration])
             plt.title('%s %s iteration %d' % (compliance_id, mc, iteration))
             plt.grid()
             plt.legend(['producer_abs_share_frac_%s' % mc, 'consumer_abs_share_frac_%s' % mc])
