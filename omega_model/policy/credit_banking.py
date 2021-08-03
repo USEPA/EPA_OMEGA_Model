@@ -149,7 +149,7 @@ class CreditBank(OMEGABase):
 
         Args:
             calendar_year (numeric): calendar year of credit creation
-            compliance_id (str): manufacturer name, e.g. 'consolidated_OEM'
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
             beginning_balance_Mg (numeric): starting balance of credit in CO2e Mg
 
         Returns:
