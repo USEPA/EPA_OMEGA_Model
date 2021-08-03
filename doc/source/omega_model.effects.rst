@@ -104,3 +104,11 @@ omega\_model.effects.social\_costs module
    :members:
    :undoc-members:
    :show-inheritance:
+
+omega\_model.effects.tech\_tracking module
+------------------------------------------
+
+.. automodule:: omega_model.effects.tech_tracking
+   :members:
+   :undoc-members:
+   :show-inheritance:

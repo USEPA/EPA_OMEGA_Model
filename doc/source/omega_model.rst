@@ -38,14 +38,6 @@ omega\_model.omega\_batch module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.postproc\_batch module
------------------------------------
-
-.. automodule:: omega_model.postproc_batch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.postproc\_session module
 -------------------------------------
 
