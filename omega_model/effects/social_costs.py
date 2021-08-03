@@ -400,7 +400,7 @@ def calc_cost_effects(physical_effects_dict):
     """
 
     Args:
-        physical_effects_dict: A dictionary key, value pairs where the key is a tuple (vehicle_id, calendar_year, age) and the values are a
+        physical_effects_dict: A dictionary of key, value pairs where the key is a tuple (vehicle_id, calendar_year, age) and the values are a
         dictionary of attributes and attribute value pairs.
 
     Returns:
@@ -418,7 +418,7 @@ def calc_cost_effects(physical_effects_dict):
         vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
 
-        attribute_list = ['reg_class_id', 'in_use_fuel_id', 'new_vehicle_mfr_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        attribute_list = ['base_year_reg_class_id', 'in_use_fuel_id', 'new_vehicle_mfr_cost_dollars', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
         reg_class_id, in_use_fuel_id, new_vehicle_cost, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vehicle_id, attribute_list)
 

@@ -1,0 +1,6 @@
+input_template_name:,producer.producer_generalized_cost,input_template_version:,0.1
+market_class_id,fuel_years,annual_vmt,
+non_hauling.BEV,5,15000,
+hauling.BEV,5,15000,
+non_hauling.ICE,5,15000,
+hauling.ICE,5,15000,
