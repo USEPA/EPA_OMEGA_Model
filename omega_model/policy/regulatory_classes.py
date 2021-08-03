@@ -71,6 +71,7 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
 
             Vehicle reg class based on vehicle characteristics.
 
+
         """
         reg_class_id = vehicle.base_year_reg_class_id
         return reg_class_id
