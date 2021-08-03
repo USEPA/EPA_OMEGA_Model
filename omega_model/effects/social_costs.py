@@ -444,8 +444,12 @@ def calc_cost_effects(physical_effects_dict):
             attribute_list = ['new_vehicle_mfr_cost_dollars']
             new_vehicle_cost = get_vehicle_info(vehicle_id, attribute_list)[0]
 
-            mfr_id, reg_class_id, in_use_fuel_id, market_group = physical['manufacturer_id'], physical['reg_class_id'], \
-                                                                 physical['in_use_fuel_id'], physical['non_responsive_market_group']
+            mfr_id, reg_class_id, in_use_fuel_id, market_group, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
+                = physical['manufacturer_id'], physical['reg_class_id'], \
+                  physical['in_use_fuel_id'], physical['non_responsive_market_group'], \
+                  physical['registered_count'], physical['annual_vmt'], physical['vmt'], \
+                  physical['vmt_liquid_fuel'], physical['vmt_electricity']
+
 
             # tech costs, only for age=0
             if age == 0:
@@ -567,6 +571,11 @@ def calc_cost_effects(physical_effects_dict):
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
                                      'non_responsive_market_group': market_group,
+                                     'registered_count': vehicle_count,
+                                     'annual_vmt': annual_vmt,
+                                     'vmt': vmt,
+                                     'vmt_liquid_fuel': vmt_liquid,
+                                     'vmt_electricity': vmt_elec,
                                      'tech_cost_dollars': tech_cost_dollars,
                                      'fuel_retail_cost_dollars': fuel_retail_cost_dollars,
                                      'fuel_pretax_cost_dollars': fuel_pretax_cost_dollars,
