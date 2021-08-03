@@ -683,9 +683,14 @@ def init_user_definable_decomposition_attributes(verbose_init):
     init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
                                             verbose=verbose_init)
 
+    vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
+    VehicleFinal.dynamic_columns = list(set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
+    for dc in VehicleFinal.dynamic_columns:
+        VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
+
     DecompositionAttributes.init()
     # dynamically add decomposition attributes (which may vary based on user inputs, such as off-cycle credits)
-    for attr in DecompositionAttributes.values:
+    for attr in DecompositionAttributes.values + VehicleFinal.dynamic_attributes:
         if attr not in VehicleFinal.__dict__:
             if int(sqlalchemy.__version__.split('.')[1]) > 3:
                 sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))

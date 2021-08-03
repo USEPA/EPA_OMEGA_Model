@@ -680,7 +680,6 @@ class Vehicle(OMEGABase):
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
-        self.footprint_ft2 = 0
         self._initial_registered_count = 0
         Vehicle.set_next_vehicle_id()
         self.cost_cloud = None
@@ -689,6 +688,9 @@ class Vehicle(OMEGABase):
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
             self.__setattr__(ccv, 0)
+
+        for dc in VehicleFinal.dynamic_columns:
+            self.__setattr__(dc, 0)
 
     @staticmethod
     def reset_vehicle_ids():
@@ -869,10 +871,9 @@ class Vehicle(OMEGABase):
             model_year (int): vehicle model year
 
         """
-        base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year',
-                           'fueling_class',
+        base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                            'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                           'cert_fuel_id', 'market_class_id', 'footprint_ft2', 'epa_size_class',
+                           'cert_fuel_id', 'market_class_id', 'epa_size_class',
                            'context_size_class', 'market_share', 'non_responsive_market_group',
                            'electrification_class'}
 
@@ -881,6 +882,10 @@ class Vehicle(OMEGABase):
 
         if model_year:
             self.model_year = model_year
+
+        # transfer dynamic attributes
+        for attr in VehicleFinal.dynamic_attributes:
+            self.__setattr__(attr, vehicle.__getattribute__(attr))
 
         self.set_cert_target_co2e_grams_per_mile()  # varies by model year
         self.initial_registered_count = vehicle.initial_registered_count
@@ -1016,7 +1021,7 @@ class VehicleFinal(SQABase, Vehicle):
     model_year = Column(Numeric)
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
     cost_curve_class = Column(String)  # for now, could be Enum of cost_curve_classes, but those classes would have to be identified and enumerated in the __init.py__...
-    base_year_reg_class_id = Column('base_year_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))
+    base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))
     reg_class_id = Column(String)  # , Enum(*omega_globals.options.RegulatoryClasses.reg_classes, validate_strings=True))
     epa_size_class = Column(String)  # TODO: validate with enum?
     context_size_class = Column(String)  # TODO: validate with enum?
@@ -1026,10 +1031,9 @@ class VehicleFinal(SQABase, Vehicle):
     cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)
     cert_target_co2e_Mg = Column('cert_target_co2e_megagrams', Float)
-    in_use_fuel_id = Column('in_use_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
-    cert_fuel_id = Column('cert_fuel_id', String) # , ForeignKey('fuels.fuel_id'))
+    in_use_fuel_id = Column('in_use_fuel_id', String)
+    cert_fuel_id = Column('cert_fuel_id', String)
     market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
-    footprint_ft2 = Column(Float)
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 
@@ -1037,8 +1041,13 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()
     mfr_base_year_size_class_share = None
 
-    #: **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
+    base_input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class',
+                                   'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
+                                   'cert_fuel_id', 'sales'}  #: mandatory input file columns, the rest can be optional numeric columns
+    dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
+    dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
 
+    #: **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
 
     @property
     def initial_registered_count(self):
@@ -1149,9 +1158,9 @@ class VehicleFinal(SQABase, Vehicle):
         Returns:
 
         """
-        inherit_properties = {'name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
+        inherit_properties = ['name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
-                              'market_share', 'non_responsive_market_group', 'footprint_ft2'}
+                              'market_share', 'non_responsive_market_group'] + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
         veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
@@ -1184,13 +1193,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         input_template_name = 'vehicles'
         input_template_version = 0.42
-        input_template_columns = {'vehicle_id', 'manufacturer_id', 'model_year', 'reg_class_id',
-                                  'epa_size_class', 'context_size_class', 'electrification_class',
-                                  'cost_curve_class', 'in_use_fuel_id', 'cert_fuel_id', 'sales',
-                                  'cert_direct_oncycle_co2e_grams_per_mile', 'cert_direct_oncycle_kwh_per_mile',
-                                  'footprint_ft2', 'eng_rated_hp', 'tot_road_load_hp', 'etw_lbs', 'length_in',
-                                  'width_in', 'height_in','ground_clearance_in', 'wheelbase_in', 'interior_volume_cuft',
-                                  'msrp_dollars', 'passenger_capacity', 'payload_capacity_lbs', 'towing_capacity_lbs'}
+        input_template_columns = VehicleFinal.base_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
 
@@ -1208,15 +1211,17 @@ class VehicleFinal(SQABase, Vehicle):
                         manufacturer_id=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
                         base_year_reg_class_id=df.loc[i, 'reg_class_id'],
-                        reg_class_id=df.loc[i, 'reg_class_id'],
                         epa_size_class=df.loc[i, 'epa_size_class'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         electrification_class=df.loc[i, 'electrification_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
                         in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                         cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                        footprint_ft2=df.loc[i, 'footprint_ft2'],
+                        initial_registered_count=df.loc[i, 'sales'],
                     )
+
+                    for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
+                        veh.__setattr__(attr, df.loc[i, dc])
 
                     if omega_globals.options.consolidate_manufacturers:
                         veh.compliance_id = 'consolidated_OEM'
@@ -1239,8 +1244,6 @@ class VehicleFinal(SQABase, Vehicle):
                     veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # TODO: veh.cert_direct_oncycle_kwh_per_mile?
                     veh.onroad_direct_co2e_grams_per_mile = 0
                     veh.onroad_direct_kwh_per_mile = 0
-
-                    veh.initial_registered_count = df.loc[i, 'sales']
 
                     vehicle_shares_dict['total'] += veh.initial_registered_count
 
@@ -1387,6 +1390,20 @@ if __name__ == '__main__':
 
         from context.cost_clouds import CostCloud
 
+        # setup up dynamic attributes before metadata.create_all()
+        vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
+        VehicleFinal.dynamic_columns = list(
+            set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
+        for dc in VehicleFinal.dynamic_columns:
+            VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
+
+        for attr in VehicleFinal.dynamic_attributes:
+            if attr not in VehicleFinal.__dict__:
+                if int(sqlalchemy.__version__.split('.')[1]) > 3:
+                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                else:
+                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
@@ -1420,8 +1437,6 @@ if __name__ == '__main__':
 
             # update vehicle annual data, registered count must be update first:
             VehicleAnnualData.update_registered_count(vehicles_list[0], 2020, 54321)
-            VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2020, 'vmt', 12345)
-            VehicleAnnualData.update_vehicle_annual_data(vehicles_list[0], 2020, 'annual_vmt', 15000)
 
             # dump database with updated vehicle annual data
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)

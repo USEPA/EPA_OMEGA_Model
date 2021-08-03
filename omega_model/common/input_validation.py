@@ -17,6 +17,19 @@ from omega_model import *
 import pandas as pd
 
 
+def get_template_columns(filename):
+    """
+
+    Args:
+        filename (str): name of the file from which to get the input columns
+
+    Returns:
+
+    """
+    df = pd.read_csv(filename, skiprows=1, nrows=1)
+    return df.columns
+
+
 def get_template_name(filename):
     """
     Get input file template name.  Can be used to identify the type of input file during simulation initialization
