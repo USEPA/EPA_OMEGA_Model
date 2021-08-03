@@ -201,15 +201,13 @@ def run_producer_consumer():
                                                    producer_consumer_iteration_num, market_class_vehicle_dict, winning_combo,
                                                    strategic_target_offset_Mg)
 
-                producer_consumer_iteration_num = -1  # flag end of pricing subiteration
-
                 converged, convergence_error = \
                     detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
                 iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
-                update_iteration_log(iteration_log, calendar_year, compliance_id, converged, producer_consumer_iteration_num,
-                                     producer_consumer_iteration_num, producer_compliant, convergence_error)
+                update_iteration_log(iteration_log, calendar_year, compliance_id, converged,
+                                     producer_consumer_iteration_num, -1, producer_compliant, convergence_error)
 
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
@@ -448,13 +446,14 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
     """
 
     Args:
-        continue_search:
+        continue_search (bool):
         multiplier_columns:
         prev_multiplier_range:
         price_options_df:
         producer_decision_and_response:
 
     Returns:
+        tuple of (continue_search, price_options_df)
 
     """
     import numpy as np
