@@ -75,9 +75,9 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
         omega_log.logwrite(
             ('cross subsidized price / cost %s' % mc).ljust(50) + '$%d / $%d R:%f' % (
             producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
-            producer_decision_and_response['average_cost_%s' % mc],
+            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
             producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
-            producer_decision_and_response['average_cost_%s' % mc]
+            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
             ), echo_console=True)
 
     omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
@@ -93,9 +93,9 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
 
     omega_log.logwrite(
         'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_cross_subsidized_price_total'],
-                                                             producer_decision_and_response['average_cost_total'],
+                                                             producer_decision_and_response['average_new_vehicle_mfr_cost'],
                                                              producer_decision_and_response['average_cross_subsidized_price_total'] /
-                                                             producer_decision_and_response['average_cost_total']
+                                                             producer_decision_and_response['average_new_vehicle_mfr_cost']
                                                              ), echo_console=True)
     omega_log.logwrite(
         '%d_%d_%d  SCORE:%f  SWSD:%f\n' % (calendar_year, producer_consumer_iteration_num, cross_subsidy_iteration_num,
@@ -285,11 +285,11 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     producer_decision['winning_combo_share_weighted_cost'] = 0
     producer_decision['winning_combo_share_weighted_generalized_cost'] = 0
     for mc in market_class_vehicle_dict:
-        producer_decision['winning_combo_share_weighted_cost'] += producer_decision['average_cost_%s' % mc] * \
+        producer_decision['winning_combo_share_weighted_cost'] += producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
                                                                   producer_decision['producer_abs_share_frac_%s' % mc]
 
         producer_decision['winning_combo_share_weighted_generalized_cost'] += \
-            producer_decision['average_generalized_cost_%s' % mc] * producer_decision['producer_abs_share_frac_%s' % mc]
+            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * producer_decision['producer_abs_share_frac_%s' % mc]
 
     consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
                                                      producer_decision['winning_combo_share_weighted_generalized_cost'])
@@ -311,7 +311,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         producer_decision_and_response = omega_globals.options.SalesShare.calc_shares(price_options_df, calendar_year)
 
         ###############################################################################################################
-        calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
+        calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
         # propagate total sales down to composite vehicles by market class share and reg class share,
         # calculate new compliance status for each producer-technology / consumer response combination
         compliance_search.create_production_options(calendar_year, candidate_mfr_composite_vehicles,
@@ -358,7 +358,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
         producer_decision_and_response['price_cost_ratio_total'] = \
             (producer_decision_and_response['average_cross_subsidized_price_total'] /
-             producer_decision_and_response['average_cost_total'])
+             producer_decision_and_response['average_new_vehicle_mfr_cost'])
 
         converged, convergence_error = detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
@@ -389,24 +389,31 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 
 
-def calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response):
+def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response):
     """
+    Calculate sales and cost/price data.  Namely, the absolute share delta between producer and consumer
+    absolute market shares, the share weighted average cross subsidized price by market class, the total share weighted 
+    average cross subsidized price, the average modified cross subsidized price by market class, the average new
+    vehicle manufacturer cost and generalized cost, and total new vehicle sales, including the market response to
+    average new vehicle manufacturer generalized cost.
 
     Args:
-        calendar_year:
-        market_class_vehicle_dict:
-        producer_decision_and_response:
+        calendar_year (int): calendar year of the iteration
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
+        market_class_vehicle_dict (dict): dict of candidate_mfr_composite_vehicles grouped by market class
+        producer_decision_and_response (Series): producer compliance search result with consumer share response
 
     Returns:
-
+        Updates ``producer_decision_and_response`` columns
+        
     """
     import consumer
 
     producer_decision_and_response['abs_share_delta_total'] = 0
     producer_decision_and_response['average_cross_subsidized_price_total'] = 0
     producer_decision_and_response['average_modified_cross_subsidized_price_total'] = 0
-    producer_decision_and_response['average_cost_total'] = 0
-    producer_decision_and_response['average_generalized_cost_total'] = 0
+    producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
+    producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] = 0
 
     for mc in market_class_vehicle_dict:
         producer_decision_and_response['abs_share_delta_total'] += abs(
@@ -421,18 +428,19 @@ def calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, p
             producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] * \
             producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
-        producer_decision_and_response['average_cost_total'] += \
-            producer_decision_and_response['average_cost_%s' % mc] * \
+        producer_decision_and_response['average_new_vehicle_mfr_cost'] += \
+            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
             producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
-        producer_decision_and_response['average_generalized_cost_total'] += \
-            producer_decision_and_response['average_generalized_cost_%s' % mc] * \
+        producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] += \
+            producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
             producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
     producer_decision_and_response['new_vehicle_sales'] = \
         producer_decision_and_response['total_sales'] * \
         consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                                         producer_decision_and_response['average_generalized_cost_total'])
+                                                         producer_decision_and_response[
+                                                             'average_new_vehicle_mfr_generalized_cost'])
 
 
 def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
@@ -469,7 +477,7 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
 
         price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
 
-        price_options_df['average_cross_subsidized_price_%s' % mc] = price_options_df['average_cost_%s' % mc] * price_options_df[mcc]
+        price_options_df['average_cross_subsidized_price_%s' % mc] = price_options_df['average_new_vehicle_mfr_cost_%s' % mc] * price_options_df[mcc]
 
         price_modification = PriceModifications.get_price_modification(calendar_year, mc)
         price_options_df['average_modified_cross_subsidized_price_%s' % mc] = price_options_df['average_cross_subsidized_price_%s' % mc] + price_modification
@@ -558,11 +566,11 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
                                                                       'initial_registered_count',
                                                                       'onroad_direct_kwh_per_mile')
 
-            winning_combo['average_cost_%s' % mc] = weighted_value(market_class_vehicles,
+            winning_combo['average_new_vehicle_mfr_cost_%s' % mc] = weighted_value(market_class_vehicles,
                                                                    'initial_registered_count',
                                                                    'new_vehicle_mfr_cost_dollars')
 
-            winning_combo['average_generalized_cost_%s' % mc] = weighted_value(market_class_vehicles,
+            winning_combo['average_new_vehicle_mfr_generalized_cost_%s' % mc] = weighted_value(market_class_vehicles,
                                                                                'initial_registered_count',
                                                                                'new_vehicle_mfr_generalized_cost_dollars')
 
@@ -576,8 +584,8 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
         else:
             winning_combo['average_co2e_gpmi_%s' % mc] = 0
             winning_combo['average_kwh_pmi_%s' % mc] = 0
-            winning_combo['average_cost_%s' % mc] = 0
-            winning_combo['average_generalized_cost_%s' % mc] = 0
+            winning_combo['average_new_vehicle_mfr_cost_%s' % mc] = 0
+            winning_combo['average_new_vehicle_mfr_generalized_cost_%s' % mc] = 0
             winning_combo['sales_%s' % mc] = 0
 
         # winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
@@ -607,8 +615,8 @@ def calc_market_sector_data(winning_combo):
 
         for mc in omega_globals.options.MarketClass.market_classes:
             if mcat in mc.split('.'):
-                winning_combo['average_cost_%s' % mcat] += winning_combo['average_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
-                winning_combo['average_generalized_cost_%s' % mcat] += winning_combo['average_generalized_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
+                winning_combo['average_cost_%s' % mcat] += winning_combo['average_new_vehicle_mfr_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
+                winning_combo['average_generalized_cost_%s' % mcat] += winning_combo['average_new_vehicle_mfr_generalized_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 if 'average_cross_subsidized_price_%s' % mc in winning_combo:
                     winning_combo['average_cross_subsidized_price_%s' % mcat] += winning_combo['average_cross_subsidized_price_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
                 winning_combo['sales_%s' % mcat] += np.maximum(1, winning_combo['sales_%s' % mc])
