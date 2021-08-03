@@ -198,6 +198,7 @@ class DecompositionAttributes(OMEGABase):
 
     values = []
     base_values = []
+    offcycle_values = []
     dynamic_values = []
     other_values = []
 
@@ -234,15 +235,15 @@ class DecompositionAttributes(OMEGABase):
         simulation_drive_cycles = list(set.intersection(set(CostCloud.cost_cloud_data_columns),
                                                         set(DriveCycles.drive_cycle_names)))
 
-        offcycle_credits = list(set.intersection(set(CostCloud.cost_cloud_data_columns),
+        cls.offcycle_values = list(set.intersection(set(CostCloud.cost_cloud_data_columns),
                                                  set(OffCycleCredits.offcycle_credit_names)))
 
         cls.other_values = list(set(CostCloud.cost_cloud_data_columns).
                                   difference(cls.base_values).
                                   difference(simulation_drive_cycles).
-                                  difference(offcycle_credits))
+                                  difference(cls.offcycle_values))
 
-        cls.dynamic_values = offcycle_credits + simulation_drive_cycles + cls.other_values
+        cls.dynamic_values = cls.offcycle_values + simulation_drive_cycles + cls.other_values
 
         # combine base and dynamic values
         cls.values = cls.base_values + cls.dynamic_values
