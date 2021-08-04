@@ -190,19 +190,18 @@ def run_producer_consumer():
                                    (omega_globals.options.session_unique_name, calendar_year, producer_consumer_iteration_num),
                                    echo_console=True)
 
-                candidate_mfr_composite_vehicles, winning_combo, market_class_tree, producer_compliant = \
+                candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num, strategic_target_offset_Mg)
 
-                market_class_vehicle_dict = calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles,
-                                                                   winning_combo)
+                market_class_vehicle_dict = calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision)
 
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
                     iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
                                                    candidate_mfr_composite_vehicles, iteration_log,
-                                                   producer_consumer_iteration_num, market_class_vehicle_dict, winning_combo,
-                                                   strategic_target_offset_Mg)
+                                                   producer_consumer_iteration_num, market_class_vehicle_dict,
+                                                   producer_decision, strategic_target_offset_Mg)
 
                 converged, convergence_error = \
                     detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
@@ -241,7 +240,7 @@ def run_producer_consumer():
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
-                                                      '_credit_balances %s.csv' % compliance_id, index=False)
+                                                       '_credit_balances %s.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
@@ -321,7 +320,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                     producer_decision_and_response,
                                                     total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
-        calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
+        calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################
 
         producer_decision_and_response['strategic_compliance_ratio'] = \
@@ -520,7 +519,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
         search_collapsed (bool): prior value of search collapsed, gets ANDed with collapse condition
 
     Returns:
-        tuple of multiplier range array (e.g. array([1.01666667, 1.02777778, 1.03888889, 1.05]))and whether search has
+        tuple of multiplier range array (e.g. array([1.01666667, 1.02777778, 1.03888889, 1.05])) and whether search has
         collapsed (multiplier_range, search_collapsed)
 
     """
@@ -554,20 +553,24 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
     return multiplier_range, search_collapsed
 
 
-def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winning_combo):
+def calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision):
     """
+    Calculate market class average CO2e g/mi, kWh/mi, manufacturer new vehicle cost and generalized cost, average fuel
+    price, and sales.  Also calculates market sector data.
 
     Args:
-        calendar_year:
         candidate_mfr_composite_vehicles: list of candidate composite vehicles that minimize producer compliance cost
-        winning_combo: pandas Series that corresponds with candidate_mfr_composite_vehicles, has market shares, costs,
-            compliance data (Mg CO2e)
+        producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
+            shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
-    Returns: dictionary of candidate vehicles binned by market class and reg class, updates producer_decision with
-            sales-weighted average cost and CO2e g/mi by market class
+    Returns:
+        dict of candidate vehicles binned by market class and reg class, updates producer_decision with
+        sales-weighted average cost and CO2e g/mi by market class
+
+    See Also:
+        ``calc_market_sector_data()``
 
     """
-
     from common.omega_functions import weighted_value
 
     # group vehicles by market class
@@ -579,39 +582,33 @@ def calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, winn
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
-            winning_combo['average_co2e_gpmi_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                        'initial_registered_count',
-                                                                        'onroad_direct_co2e_grams_per_mile')
+            producer_decision['average_co2e_gpmi_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count', 'onroad_direct_co2e_grams_per_mile')
 
-            winning_combo['average_kwh_pmi_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                      'initial_registered_count',
-                                                                      'onroad_direct_kwh_per_mile')
+            producer_decision['average_kwh_pmi_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count', 'onroad_direct_kwh_per_mile')
 
-            winning_combo['average_new_vehicle_mfr_cost_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                   'initial_registered_count',
-                                                                   'new_vehicle_mfr_cost_dollars')
+            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count', 'new_vehicle_mfr_cost_dollars')
 
-            winning_combo['average_new_vehicle_mfr_generalized_cost_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                               'initial_registered_count',
-                                                                               'new_vehicle_mfr_generalized_cost_dollars')
+            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count',
+                               'new_vehicle_mfr_generalized_cost_dollars')
 
-            winning_combo['average_fuel_price_%s' % mc] = weighted_value(market_class_vehicles,
-                                                                   'initial_registered_count',
-                                                                   'retail_fuel_price_dollars_per_unit')
+            producer_decision['average_fuel_price_%s' % mc] = \
+                weighted_value(market_class_vehicles, 'initial_registered_count', 'retail_fuel_price_dollars_per_unit')
 
-            winning_combo['sales_%s' % mc] = 0
+            producer_decision['sales_%s' % mc] = 0
             for v in market_class_vehicles:
-                winning_combo['sales_%s' % mc] += winning_combo['veh_%s_sales' % v.vehicle_id]  # was v.initial_registered_count
+                producer_decision['sales_%s' % mc] += producer_decision['veh_%s_sales' % v.vehicle_id]
         else:
-            winning_combo['average_co2e_gpmi_%s' % mc] = 0
-            winning_combo['average_kwh_pmi_%s' % mc] = 0
-            winning_combo['average_new_vehicle_mfr_cost_%s' % mc] = 0
-            winning_combo['average_new_vehicle_mfr_generalized_cost_%s' % mc] = 0
-            winning_combo['sales_%s' % mc] = 0
+            producer_decision['average_co2e_gpmi_%s' % mc] = 0
+            producer_decision['average_kwh_pmi_%s' % mc] = 0
+            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] = 0
+            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] = 0
+            producer_decision['sales_%s' % mc] = 0
 
-        # winning_combo['producer_abs_market_share_frac_%s' % mc] = winning_combo['sales_%s' % mc] / winning_combo['total_sales']
-
-    calc_market_sector_data(winning_combo)
+    calc_market_sector_data(producer_decision)
 
     return market_class_vehicle_dict
 
