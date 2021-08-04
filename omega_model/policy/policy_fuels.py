@@ -90,11 +90,10 @@ class PolicyFuel(OMEGABase):
                     PolicyFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
-        start_years = cache['start_year']
-        if start_years[start_years <= calendar_year]:
-            cache_key = max(start_years[start_years <= calendar_year])
+        start_years = cache[fuel_id]['start_year']
+        year = max(start_years[start_years <= calendar_year])
 
-        return cache[cache_key][fuel_id][attribute]
+        return cache[fuel_id][year][attribute]
 
     @staticmethod
     def validate_fuel_id(fuel_id):
@@ -146,15 +145,11 @@ class PolicyFuel(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                df = df.set_index('start_year')
+                for _, r in df.iterrows():
+                    if r.fuel_id not in cache:
+                        cache[r.fuel_id] = {'start_year': np.array(df['start_year'].loc[df['fuel_id'] == r.fuel_id])}
+                    cache[r.fuel_id][r.start_year] = r.drop('start_year').to_dict()
 
-                for idx, r in df.iterrows():
-                    if idx not in cache:
-                        cache[idx] = dict()
-
-                    cache[idx][r.fuel_id] = r.to_dict()
-
-                cache['start_year'] = np.array(list(cache.keys()))
                 cache['fuel_id'] = np.array(list(df['fuel_id'].unique()))
 
         return template_errors
