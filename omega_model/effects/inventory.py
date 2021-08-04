@@ -155,9 +155,9 @@ def calc_inventory(calendar_year):
 
     for vad in vads:
 
-        attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'in_use_fuel_id', 'non_responsive_market_group',
+        attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id', 'non_responsive_market_group',
                           'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        mfr_id, model_year, reg_class_id, in_use_fuel_id, market_group, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+        mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vad.vehicle_id, attribute_list)
 
         vehicle_effects_dict = dict()
@@ -211,7 +211,7 @@ def calc_inventory(calendar_year):
 
                     # vehicle tailpipe emissions for liquid fuel operation
                     voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
-                        = get_vehicle_ef(calendar_year, model_year, reg_class_id, liquid_fuel)
+                        = get_vehicle_ef(calendar_year, model_year, base_year_reg_class_id, liquid_fuel)
 
                     voc_tailpipe_ustons += vmt_liquid_fuel * voc / grams_per_us_ton
                     co_tailpipe_ustons += vmt_liquid_fuel * co / grams_per_us_ton
@@ -272,6 +272,7 @@ def calc_inventory(calendar_year):
 
             vehicle_effects_dict.update({'manufacturer_id': mfr_id,
                                          'model_year': calendar_year - vad.age,
+                                         'base_year_reg_class_id': base_year_reg_class_id,
                                          'reg_class_id': reg_class_id,
                                          'in_use_fuel_id': in_use_fuel_id,
                                          'non_responsive_market_group': market_group,

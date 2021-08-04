@@ -444,8 +444,8 @@ def calc_cost_effects(physical_effects_dict):
             attribute_list = ['new_vehicle_mfr_cost_dollars']
             new_vehicle_cost = get_vehicle_info(vehicle_id, attribute_list)[0]
 
-            mfr_id, reg_class_id, in_use_fuel_id, market_group, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
-                = physical['manufacturer_id'], physical['reg_class_id'], \
+            mfr_id, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
+                = physical['manufacturer_id'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
                   physical['in_use_fuel_id'], physical['non_responsive_market_group'], \
                   physical['registered_count'], physical['annual_vmt'], physical['vmt'], \
                   physical['vmt_liquid_fuel'], physical['vmt_electricity']
@@ -481,7 +481,7 @@ def calc_cost_effects(physical_effects_dict):
                 energy_security_cost_dollars += physical['fuel_consumption_gallons'] * energy_security_cf
 
             # get congestion and noise cost factors
-            congestion_cf, noise_cf = get_congestion_noise_cf(reg_class_id)
+            congestion_cf, noise_cf = get_congestion_noise_cf(base_year_reg_class_id)
 
             # congestion and noise costs (maybe congestion and noise cost factors will differ one day?)
             if physical['vmt_electricity']:
@@ -568,6 +568,7 @@ def calc_cost_effects(physical_effects_dict):
 
             veh_effects_dict.update({'manufacturer_id': mfr_id,
                                      'model_year': calendar_year - age,
+                                     'base_year_reg_class_id': base_year_reg_class_id,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
                                      'non_responsive_market_group': market_group,
