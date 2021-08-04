@@ -31,7 +31,7 @@ def get_vehicle_info(vehicle_id, attribute_list):
 
     return vehicles_dict[vehicle_id]
 
-
+# TODO need to track both base year reg class and reg class all the time
 def calc_tech_volumes(physical_effects_dict):
 
     """
@@ -56,6 +56,7 @@ def calc_tech_volumes(physical_effects_dict):
 
         tech_volumes_dict[key] = {'manufacturer_id': physical['manufacturer_id'],
                                   'model_year': physical['model_year'],
+                                  'base_year_reg_class_id': physical['base_year_reg_class_id'],
                                   'reg_class_id': physical['reg_class_id'],
                                   'in_use_fuel_id': physical['in_use_fuel_id'],
                                   'non_responsive_market_group': physical['non_responsive_market_group'],

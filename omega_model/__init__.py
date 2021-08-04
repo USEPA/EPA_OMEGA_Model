@@ -143,7 +143,7 @@ try:
 
             self.calc_effects = False
             self.discount_values_to_year = 2021
-            self.costs_start = 'end-year' # end-year will discount 1st year; start-year will not discount first year
+            self.cost_accrual = 'end-of-year' # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = path + 'demo_inputs/implicit_price_deflators.csv'
