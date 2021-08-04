@@ -4,9 +4,9 @@ Batch Name,String,demo_batch_KBo,
 Context Folder Name,String,,
 Context Name,String,AEO2021,
 Context Case,String,Reference case,
-Analysis Final Year,#,2022,
+Analysis Final Year,#,2050,
 Consolidate Manufacturers,TRUE / FALSE,TRUE,
-Run Effects Calculations,TRUE / FALSE,TRUE,
+Run Effects Calculations,TRUE / FALSE,FALSE,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -45,7 +45,7 @@ Producer Cross Subsidy Multiplier Max,#,1.05,1.05
 ,,,
 Runtime Settings,,,
 Num Market Share Options,#,5,5
-Num Tech Options per ICE Vehicle,#,5,5
+Num Tech Options per ICE Vehicle,#,3,3
 Num Tech Options per BEV Vehicle,#,1,1
 Allow Backsliding,TRUE / FALSE,TRUE,TRUE
 Cost Curve Frontier Affinity Factor,#,0.75,0.75
