@@ -28,10 +28,12 @@ def mode(df, key_cols, value_col, count_col):
         .drop_duplicates(subset=key_cols)
 
 print(os.getcwd())
-main_path = 'I:\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications' \
-            + '\\' + 'techspecconsolidator\Query Runs'
+main_path = 'I:/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/Query Runs'
 run_folder = str(input('Enter Run Folder Name: '))
-run_controller = pd.read_csv(main_path + '\\' + run_folder + '\Run Query Controller.csv')
+run_folder_path = os.path.join(main_path, run_folder)
+run_controller_file = os.path.join(run_folder_path, 'Run Query Controller.csv')
+
+run_controller = pd.read_csv(run_controller_file, encoding="ISO-8859-1")
 run_controller = run_controller.replace(np.nan, '', regex=True)
 _rows, _cols = run_controller.shape
 SetBodyIDtoLineageID = int(run_controller.SetBodyIDtoLineageID[0])
@@ -78,11 +80,13 @@ model_years = model_years
 for model_year in model_years:
     run_controller = pd.read_csv(main_path + '\\' + run_folder + '\Run Query Controller.csv')
     run_controller = run_controller[run_controller['USE_YN']=='y'].reset_index(drop=True)
+
     input_path = main_path+'\\'+run_folder+'\\'+'inputs'
     output_path = main_path+'\\'+run_folder+'\\'+'outputs'
     field_mapping_df = pd.read_csv(input_path + '\\' + field_mapping_filename)
     data_sources_df = pd.read_csv(input_path + '\\' + data_sources_filename)
     master_category_check_file = pd.read_csv(input_path + '\\' + main_mapping_category_key_filename)
+
     master_category_check_df = master_category_check_file.set_index(master_category_check_file['Readin Sources'].values)
 
     aggregating_columns = pd.Series(np.zeros(len(aggregating_fields))).replace(0, '')
@@ -232,6 +236,7 @@ for model_year in model_years:
                     converters={'LineageID': int, 'BodyID': int}).astype(str)
             except FileNotFoundError:
                 continue
+
             if SetBodyIDtoLineageID == 1:
                 source_file['BodyID'] = source_file['LineageID']
             if unique_sourcename == 'Edmunds':

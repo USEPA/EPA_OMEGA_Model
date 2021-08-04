@@ -5,9 +5,9 @@ import numpy as np
 eps = 1e-5
 CSV_OUTPUT_DEBUG_MODE = False
 DEBUGGING_CAFE_MFR_CD_MODE = False
-DEBUGGING_CAFE_MFR_CD = 'JLX'
+DEBUGGING_CAFE_MFR_CD = 'FMX'
 ESTIMATE_NV_RATIO_SET_COEF_ABC_BY_ROAD_LOAD_HP = False
-ESTIMATE_TARGET_COEF_BEST_MTH_3_4 = True
+ESTIMATE_TARGET_COEF_BEST_MTH_3_4 = False
 
 def file_errta_update(footprintSubconfigMY_file, errta_table, Column_Name, Old_Value, New_Value, MODEL_YEAR, MFR_DIVISION_NM, MFR_DIVISION_CD, MFR_CARLINE_CD, CAFE_ID, footprintSubconfig_INDEX):
     errta_table.loc[pd.isnull(errta_table[Old_Value]), Old_Value] = ''
@@ -227,10 +227,12 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
     lineage_file = lineage_file[lineage_file['MODEL_YEAR'] == year].reset_index(drop=True)
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '') .replace('-', '_').replace(' ', '_')
 
+    footprint_id_categories = ['MODEL_YEAR', 'FOOTPRINT_INDEX', 'CAFE_ID', 'FOOTPRINT_CARLINE_CD',
+                               'FOOTPRINT_CARLINE_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_DIVISION_NM']
     footprint_indexing_categories = ['FOOTPRINT_DIVISION_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_CARLINE_CD', 'FOOTPRINT_INDEX']
     subconfig_indexing_categories = ['MFR_DIVISION_NM', 'MODEL_TYPE_INDEX', 'SS_ENGINE_FAMILY', 'CARLINE_CODE',
                                      'LDFE_CAFE_ID', 'BASE_LEVEL_INDEX', 'CONFIG_INDEX', 'SUBCONFIG_INDEX']
-    modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CARLINE_MFR_CODE', 'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME']
+    modeltype_indexing_categories = ['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'CAFE_MODEL_YEAR', 'CAFE_MFR_CODE', 'MFR_DIVISION_NM', 'CALC_ID', 'CAFE_ID', 'CARLINE_NAME']
     roadload_coefficient_table_indexing_categories = ['LDFE_CAFE_SUBCONFIG_INFO_ID', 'LDFE_CAFE_ID', 'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'CAFE_MFR_CD', \
                                                       'LABEL_MFR_CD', 'MODEL_TYPE_INDEX', 'MFR_DIVISION_SHORT_NM', 'CARLINE_NAME', \
                                                       'INERTIA_WT_CLASS', 'CONFIG_INDEX', 'SUBCONFIG_INDEX', 'TRANS_TYPE', 'HYBRID_YN']
@@ -253,8 +255,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
         if CSV_OUTPUT_DEBUG_MODE: footprint_file.to_csv(output_path+'\\'+'Corrected_Footprint_MY_file' + '_' + date_and_time + '.csv', index=False)
         print('footprint_file volumes = ', footprint_file['PROD_VOL_GHG_STD_50_STATE'].sum())
 
-    footprint_id_categories = ['MODEL_YEAR', 'FOOTPRINT_INDEX', 'CAFE_ID', 'FOOTPRINT_CARLINE_CD',
-                               'FOOTPRINT_CARLINE_NM', 'FOOTPRINT_MFR_CD', 'FOOTPRINT_MFR_NM', 'FOOTPRINT_DIVISION_CD', 'FOOTPRINT_DIVISION_NM']
     footprint_filter_table = footprint_file[
         list(footprint_id_categories) + ['WHEEL_BASE_INCHES'] + ['FOOTPRINT_DESC'] + ['PROD_VOL_GHG_STD_50_STATE']].merge(
         lineage_file[list(footprint_id_categories) + ['LineageID']], how='left', on=footprint_id_categories)
@@ -323,7 +323,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                                                         right_on=['MODEL_YEAR', 'FOOTPRINT_CARLINE_CD', 'CAFE_MFR_CD', 'FOOTPRINT_DIVISION_NM'])
 
             vehghg_file_full_merged_data = vehghg_file_data_pt1.merge(model_type_file, how='left', left_on=['MODEL_TYPE_INDEX', 'CARLINE_CODE', 'MODEL_YEAR', 'CAFE_MFR_CD', 'MFR_DIVISION_NM', \
-                                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'CAFE_ID', 'CARLINE_NAME'], right_on=modeltype_indexing_categories)
+                                                                               'LDFE_CAFE_MODEL_TYPE_CALC_ID', 'LDFE_CAFE_ID', 'CARLINE_NAME'], right_on=modeltype_indexing_categories)
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_full_merged_data', vehghg_file_full_merged_data, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
 
             vehghg_file_data = vehghg_file_full_merged_data[vehghg_file_full_merged_data['SS_LD_CARLINE_HEADER_ID'] == vehghg_file_full_merged_data['LD_CARLINE_HEADER_ID']].reset_index(drop=True)
@@ -421,12 +421,11 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                           'FUEL_NET_HEATING_VALUE', 'FUEL_GRAVITY']).first().reset_index().drop('MODEL_YEAR', axis=1).reset_index(drop=True)
             # roadload_coefficient_table_flexfuel = roadload_coefficient_table[roadload_coefficient_table['SUBCFG_FUEL_USAGE'] == 'E'].reset_index(drop=True)
             roadload_coefficient_table_nonflexfuel = roadload_coefficient_table[roadload_coefficient_table['SUBCFG_FUEL_USAGE'] != 'E'].reset_index(drop=True)
-            # roadload_coefficient_table_nonflexfuel = roadload_coefficient_table_nonflexfuel.rename({'SUBCFG_FUEL_USAGE':'FUEL_USAGE'}, axis=1)
             vehghg_file_flexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] == 'E'].reset_index(drop=True)
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['FUEL_USAGE'] != 'E'].reset_index(drop=True)
+
             vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.merge(roadload_coefficient_table_nonflexfuel, how='left', on=list(roadload_coefficient_table_indexing_categories))
-            # vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_MJPL'] = pd.Series(
-            #     vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE_BEST'].astype(float) * vehghg_file_nonflexfuel['FUEL_GRAVITY_BEST'].astype(float) * btu2mj * kg2lbm)
+
             if DEBUGGING_CAFE_MFR_CD_MODE != True: check_final_model_yr_ghg_prod_units('vehghg_file_nonflexfuel', vehghg_file_nonflexfuel, footprint_indexing_categories, subconfig_indexing_categories, grp_volumes_footprint_file_with_lineage)
             set_roadload_coefficient_table_indexing_categories = ['Model Year', 'Veh Mfr Code', 'Represented Test Veh Make', 'Represented Test Veh Model', 'Test Vehicle ID', 'Test Veh Configuration #', 'Test Number', \
                                                                   'Test Category', 'Rated Horsepower', 'Equivalent Test Weight (lbs.)', 'Test Veh Displacement (L)', 'Actual Tested Testgroup', '# of Gears', 'Drive System Code', 'N/V Ratio', \
@@ -442,8 +441,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
 
             set_roadload_coefficient_table = set_roadload_coefficient_table[set_roadload_coefficient_table_indexing_categories]
             set_roadload_coefficient_table = set_roadload_coefficient_table.rename({'Set Coef A (lbf)': 'SET_COEF_A', 'Set Coef B (lbf/mph)': 'SET_COEF_B', 'Set Coef C (lbf/mph**2)': 'SET_COEF_C'}, axis=1)
-            set_roadload_coefficient_table['Represented Test Veh Model'] = set_roadload_coefficient_table['Represented Test Veh Model'].astype(str).str.upper()
-            vehghg_file_nonflexfuel['CARLINE_NAME'] = vehghg_file_nonflexfuel['CARLINE_NAME'].astype(str).str.upper()
 
             vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'] = vehghg_file_nonflexfuel['TARGET_COEF_A'].copy()
             vehghg_file_nonflexfuel['TARGET_COEF_B_BEST'] = vehghg_file_nonflexfuel['TARGET_COEF_B'].copy()
@@ -569,20 +566,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                     _target_coef_merging_mth = df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TARGET_COEF_MERGING_MTH']
                     if (_target_coef_merging_mth == 1) or (vehghg_file_nonflexfuel.loc[_index_vehghg_file_nonflexfuel, 'TARGET_COEF_BEST_MTH'] == 0): continue
 
-                    # _rated_hp = df_vehghg_file_nonflexfuel_target_coef.loc[k, 'ENG_RATED_HP']
-                    # if df_vehghg_file_nonflexfuel_target_coef.loc[k, 'CARLINE_NAME'] == 'RANGE ROVER VELAR':
-                    #     print(k, _target_coef_merging_mth, _rated_hp)
-                    # if len(df_vehghg_file_nonflexfuel_target_coef[df_vehghg_file_nonflexfuel_target_coef['TARGET_COEF_MERGING_MTH'] == 1]) > 0 and \
-                    #         len(df_vehghg_file_nonflexfuel_target_coef[df_vehghg_file_nonflexfuel_target_coef['ENG_RATED_HP'] == _rated_hp]) > 0:
-                    #     df_target_coef_carline_name_rated_hp = df_vehghg_file_nonflexfuel_target_coef.loc[(df_vehghg_file_nonflexfuel_target_coef['TARGET_COEF_MERGING_MTH'] == 1) & \
-                    #                                                                                       (df_vehghg_file_nonflexfuel_target_coef['ENG_RATED_HP'] == _rated_hp), :]
-                    #     _index_df_sort = df_target_coef_carline_name_rated_hp.index[0]
-                    # else:
                     _tot_road_load_hp = df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TOT_ROAD_LOAD_HP']
-                    # if ~pd.isnull(_rated_hp):
-                    #     df_sort = df_vehghg_file_nonflexfuel_target_coef.iloc[(df_vehghg_file_nonflexfuel_target_coef['ENG_RATED_HP'] - _rated_hp).abs().argsort()]
-                    #     df_sort = df_sort.iloc[(df_sort['VEH_TOT_ROAD_LOAD_HP'] - _tot_road_load_hp).abs().argsort()[:1]]
-                    # else:
                     df_sort = df_vehghg_file_nonflexfuel_target_coef.iloc[(df_vehghg_file_nonflexfuel_target_coef['VEH_TOT_ROAD_LOAD_HP'] - _tot_road_load_hp).abs().argsort()[:1]]
                     _index_df_sort = df_sort.index.tolist()[0]
                     if df_sort.shape[0] == 0:
@@ -606,13 +590,11 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                               vehghg_file_nonflexfuel.loc[_index_vehghg_file_nonflexfuel, 'TARGET_COEF_A_SURRO'])
 
             vehghg_file_nonflexfuel.loc[(~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO']) == True) & (pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_BEST_MTH'])), 'TARGET_COEF_BEST_MTH'] = 1
-            velar = vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['CARLINE_NAME'] == 'RANGE ROVER VELAR']
             del df_Cafe_MFR_CD_Mode_Type_Index, df_vehghg_file_nonflexfuel_target_coef, df_vehghg_file_nonflexfuel_target_coef_index
             print('# of TARGET_COEF_BEST_MTH = 1 (', len(vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['TARGET_COEF_BEST_MTH'] == 1]), ')')
             print('# of TARGET_COEF_A', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A'])).sum())
             print('# of TARGET_COEF_A_SURRO', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])).sum())
             print('')
-            # print(pd.isnull(vehghg_file_nonflexfuel['FUEL_NET_HEATING_VALUE']).sum())
 
             df_Cafe_MFR_CD_Mode_Type_Index = vehghg_file_nonflexfuel[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A']))].groupby(['CAFE_MFR_CD', 'MODEL_TYPE_INDEX']).mean()
             for i in range(len(df_Cafe_MFR_CD_Mode_Type_Index)):
@@ -650,8 +632,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                                         (((df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TARGET_COEF_BEST_MTH'] == 1) | \
                                           (df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TARGET_COEF_BEST_MTH'] == 1)) & (~pd.isnull(df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TARGET_COEF_A'])) == True):
                                     continue
-                                # _rated_hp = df_vehghg_file_nonflexfuel_target_coef_RL.loc[k, 'ENG_RATED_HP']
-                                # df_sort_all = df_vehghg_file_nonflexfuel_target_coef_RL.iloc[(df_vehghg_file_nonflexfuel_target_coef_RL['VEH_TOT_ROAD_LOAD_HP']-df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TOT_ROAD_LOAD_HP']).abs().argsort()]
                                 df_sort = df_vehghg_file_nonflexfuel_target_coef_RL.iloc[(df_vehghg_file_nonflexfuel_target_coef_RL['VEH_TOT_ROAD_LOAD_HP']-df_vehghg_file_nonflexfuel_target_coef.loc[k, 'TOT_ROAD_LOAD_HP']).abs().argsort()[:1]]
                                 _index_df_sort = df_sort.index.tolist()[0]
                                 _index_vehghg_file_nonflexfuel = df_vehghg_file_nonflexfuel_target_coef_index[k]
@@ -685,8 +665,12 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
 
             if ESTIMATE_TARGET_COEF_BEST_MTH_3_4:
                 tstcar_MY_carline_name_mapping_table = pd.read_csv(root_drive_letter + test_car_filename_path + '\\' + tstcar_MY_carline_name_mapping_filename, encoding="ISO-8859-1", na_values=['-'])
-                tstcar_MY_carline_name_mapping_table['CARLINE_NAME'] = tstcar_MY_carline_name_mapping_table['CARLINE_NAME'].astype(str).str.upper()
-                tstcar_MY_carline_name_mapping_table['Represented Test Veh Model'] = tstcar_MY_carline_name_mapping_table['Represented Test Veh Model'].astype(str).str.upper()
+                # tstcar_MY_carline_name_mapping_table['CARLINE_NAME'] = tstcar_MY_carline_name_mapping_table['CARLINE_NAME'].astype(str).str.upper()
+                # tstcar_MY_carline_name_mapping_table['Represented Test Veh Model'] = tstcar_MY_carline_name_mapping_table['Represented Test Veh Model'].astype(str).str.upper()
+                tstcar_MY_carline_name_mapping_table = tstcar_MY_carline_name_mapping_table.applymap(lambda s: s.upper() if type(s) == str else s)
+                set_roadload_coefficient_table = set_roadload_coefficient_table.applymap(lambda s: s.upper() if type(s) == str else s)
+                vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.applymap(lambda s: s.upper() if type(s) == str else s)
+
                 df_target_coef_null = vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])), :]
                 df_target_coef_null_index = list(df_target_coef_null.index)
                 df_target_coef_null.reset_index(drop=True, inplace=True)
@@ -711,9 +695,15 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                         if len(pd.isnull(df_vehghg_file_nonflexfuel_target_coef['TARGET_COEF_A_SURRO'])) == 0: continue
                         df_vehghg_file_nonflexfuel_target_coef_index = list(df_vehghg_file_nonflexfuel_target_coef.index)
                         df_vehghg_file_nonflexfuel_target_coef.reset_index(drop=True, inplace=True)
-                        tstcar_checks = (set_roadload_coefficient_table['Veh Mfr Code'] == _cafe_mfr_cd) & (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name_j) & \
-                                        (set_roadload_coefficient_table['Test Veh Displacement (L)'] == _engine_displacement_j) & \
-                                        (set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'] == _etw_j) & (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']) == True)
+                        tstcar_checks = (set_roadload_coefficient_table['Veh Mfr Code'] == _cafe_mfr_cd) & (set_roadload_coefficient_table['Represented Test Veh Model'] == _carline_name_j)
+                        if (tstcar_checks & (set_roadload_coefficient_table['Test Veh Displacement (L)'] == _engine_displacement_j)).sum() > 0:
+                            tstcar_checks = tstcar_checks & (set_roadload_coefficient_table['Test Veh Displacement (L)'] == _engine_displacement_j)
+                        if (tstcar_checks & (set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'] == _etw_j)).sum() > 0:
+                            tstcar_checks = tstcar_checks & (set_roadload_coefficient_table['Equivalent Test Weight (lbs.)'] == _etw_j) & \
+                                            (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']) == True)
+                        else:
+                            tstcar_checks = tstcar_checks &  (~pd.isnull(set_roadload_coefficient_table['Target Coef A (lbf)']) == True)
+
                         if tstcar_checks.sum() == 0:
                             _num_trans_gears = df_vehghg_file_nonflexfuel_target_coef.loc[j, 'TOTAL_NUM_TRANS_GEARS']
                             _model_year = df_vehghg_file_nonflexfuel_target_coef.loc[j, 'MODEL_YEAR']
@@ -770,13 +760,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                     _displ = df_target_coef_null.loc[i, 'ENG_DISPL']
                     _num_trans_gears =  df_target_coef_null.loc[i, 'TOTAL_NUM_TRANS_GEARS']
                     _rated_hp = pd.to_numeric(df_target_coef_null.loc[i, 'ENG_RATED_HP'], errors='coerce')
-                    # if (_carline_name == 'RANGE ROVER VELAR') and (_rated_hp == 180) and (_index == 25223):
-                    #     print(_cafe_mfr_cd, _carline_name)
                     df_tstcar_table = tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, tstcar_MY_carline_name_mapping_table, _model_year, _cafe_mfr_cd, \
                                                                                   _label_mfr_cd, _carline_name, _mfr_divsion_short_nm, _displ, _etw, _num_trans_gears, _engine_displacement_check)
-                    if len(df_tstcar_table) == 0:
-                        # print(_cafe_mfr_cd, _label_mfr_cd, _mfr_divsion_short_nm, _carline_name, 'not found in the tstcar database')
-                        continue
+                    if len(df_tstcar_table) == 0: continue
                     df_sort = df_tstcar_table.iloc[(df_tstcar_table['Equivalent Test Weight (lbs.)'] - _etw).abs().argsort()[:1]]
                     _index_df_sort = df_sort.index.tolist()[0]
                     if pd.isnull(df_tstcar_table.loc[_index_df_sort, 'Target Coef A (lbf)']): continue
@@ -799,7 +785,6 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                 print('# of TARGET_COEF_BEST_MTH = 4 (', len(vehghg_file_nonflexfuel[vehghg_file_nonflexfuel['TARGET_COEF_BEST_MTH'] == 4]), ')')
                 print('# of TARGET_COEF_A_BEST (', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_BEST'])).sum(), ')')
                 print('')
-                # print('# of TARGET_COEF_A_SURRO', (~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])).sum())
 
             df_target_coef_corr = vehghg_file_nonflexfuel.loc[(~pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO']) == True) & \
                 (~pd.isnull(vehghg_file_nonflexfuel['TOT_ROAD_LOAD_HP_SURRO']) == True), _target_coef_surro_indexing_category]

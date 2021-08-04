@@ -15,6 +15,7 @@ main_path = root_drive_letter + '\Project\Midterm Review\Trends\Original Trends 
 run_folder = str(input('Enter Run Folder Name: '))
 os.listdir(main_path + '\\' + run_folder)
 run_controller = pd.read_csv(main_path + '\\' + run_folder + '\\' + 'VehghgID Run Controller.csv')
+# run_controller = run_controller.applymap(lambda s: s.upper() if type(s) == str else s)
 for run_count in range (0,len(run_controller)):
     # run_folder = str(run_controller['Run Folder'][run_count])
     input_path = main_path + '\\' + run_folder + '\\' + 'inputs'
@@ -46,20 +47,10 @@ for run_count in range (0,len(run_controller)):
     if ('[' and ']') in drivecycle_filenames:
         drivecycle_filenames = eval(drivecycle_filenames)
 
-    # drivecycle_filename = drivecycle_filename.strip('{ }')
-    # drivecycle_filename = drivecycle_filename.split(',')
-    # drivecycle_filename = {'cycle':[], 'time_s': [], 'mph': []}
-    # drivecycle_filenames = []
-    # for i in range (len(drivecycle_filename)):
-    #     tmp_drivecycle_filename = drivecycle_filename[i].strip(" '")
-    #     drivecycle_filenames.append(tmp_drivecycle_filename)
-
     drivecycle_input_filenames = str(run_controller['Drive Cycle Input Names'][run_count])
     if ('[' and ']') in drivecycle_input_filenames:
         drivecycle_input_filenames = eval(drivecycle_input_filenames)
 
-    # drivecycle_input_filenames = drivecycle_input_filenames.strip('{ }')
-    # drivecycle_input_filenames = drivecycle_input_filenames.split(',')
     for i in range (len(drivecycle_input_filenames)):
         if 'FTP' in drivecycle_input_filenames[i]: drivecycle_input_filenames[i] = 'FTP'
         if 'HWY' in drivecycle_input_filenames[i]: drivecycle_input_filenames[i] = 'HWY'
@@ -68,27 +59,30 @@ for run_count in range (0,len(run_controller)):
     drivecycle_output_filenames = str(run_controller['Drive Cycle Output Names'][run_count])
     if ('[' and ']') in drivecycle_output_filenames:
         drivecycle_output_filenames = eval(drivecycle_output_filenames)
-    # drivecycle_output_filenames = drivecycle_output_filenames.strip('{ }')
-    # drivecycle_output_filenames = drivecycle_output_filenames.split(',')
     for i in range (len(drivecycle_output_filenames)):
         if 'FTP' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'FTP'
         if 'HWY' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'HWY'
         if 'US06' in drivecycle_output_filenames[i]: drivecycle_output_filenames[i] = 'US06'
 
     footprint_exceptions_table = pd.read_csv(input_path+'\\'+ footprint_exceptions_table_filename) #, converters={'Column Name': eval, 'Old Value': eval, 'New Value': eval})
+    # footprint_exceptions_table = footprint_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
     print(model_year)
-    if bool_run_new_manual_filter == 'n' and model_type_exceptions_table_filename != 'N':
+    if (bool_run_new_manual_filter == 'n')and model_type_exceptions_table_filename != 'N':
         modeltype_exceptions_table = pd.read_csv(input_path+'\\'+ model_type_exceptions_table_filename)
         subconfig_MY_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_MY_exceptions_table_filename)
         subconfig_sales_exceptions_table = pd.read_csv(input_path+'\\'+ subconfig_sales_exceptions_table_filename)
         tstcar_MY_exceptions_table = pd.read_csv(test_car_filename_path +'\\'+ tstcar_MY_errta_filename)
+        # modeltype_exceptions_table = modeltype_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
+        # subconfig_MY_exceptions_table = subconfig_MY_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
+        # subconfig_sales_exceptions_table = subconfig_sales_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
+        # tstcar_MY_exceptions_table = tstcar_MY_exceptions_table.applymap(lambda s: s.upper() if type(s) == str else s)
     else:
         modeltype_exceptions_table = 'N'
         subconfig_MY_exceptions_table = 'N'
         subconfig_sales_exceptions_table = 'N'
         tstcar_MY_exceptions_table = 'N'
 
-    if bool_run_new_vehghgid == 'y':
+    if (bool_run_new_vehghgid == 'y'):
         import Subconfig_ModelType_Footprint_Bodyid_Expansion
         Subconfig_ModelType_Footprint_Bodyid_Expansion.Subconfig_ModelType_Footprint_Bodyid_Expansion\
             (root_drive_letter, input_path, footprint_filename, lineageid_mapping_filename, bodyid_filename, \
