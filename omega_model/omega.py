@@ -678,7 +678,7 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
         tuple of convergence bool and convergence error, (converged, convergence_error)
 
     """
-    # TODO: paramaterize the 1e-4?
+    # TODO: parameterize the 1e-4?
     converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= 1e-4
     convergence_error = 0
     for mc in market_class_dict:
