@@ -103,6 +103,8 @@ class PriceModifications(OMEGABase):
         """
         import numpy as np
 
+        PriceModifications._values = pd.DataFrame()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 

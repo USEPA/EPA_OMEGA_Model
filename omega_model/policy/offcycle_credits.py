@@ -137,6 +137,8 @@ class OffCycleCredits(OMEGABase):
         """
         import numpy as np
 
+        OffCycleCredits._values.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 

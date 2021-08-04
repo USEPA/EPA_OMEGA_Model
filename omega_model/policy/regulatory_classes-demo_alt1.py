@@ -92,6 +92,7 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             List of template/input errors, else empty list on success
 
         """
+        RegulatoryClasses._data = pd.DataFrame()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

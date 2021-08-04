@@ -104,6 +104,7 @@ class DriveCycles(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
+        DriveCycles._data = pd.DataFrame()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
