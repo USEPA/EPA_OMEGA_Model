@@ -131,10 +131,13 @@ def update_iteration_log(iteration_log, calendar_year, compliance_id, converged,
 def run_producer_consumer():
     """
     Create producer cost-minimizing technology and market share options, in consideration of market response from
-    the consumer module, possibly with iteration between the two
+    the consumer, possibly with iteration between the two. Iterates across years for each compliance ID.  When
+    consolidating manufacturers, the compliance ID is 'consolidated_OEM', otherwise the compliance ID is the
+    manufacturer name.
 
     Returns:
-         Iteration log dataframe, updated omega database with final vehicle technology and market share data
+         Iteration log dataframe, dict of credit bank information (iteration_log, credit_banks),
+         updates omega database with final vehicle technology and market share data
 
     """
 
@@ -297,16 +300,18 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     cross_subsidy_iteration_num = 0
     producer_decision_and_response = pd.DataFrame()
 
+    producer_decision = producer_decision.to_frame().transpose()
+
     prev_multiplier_range = dict()
     continue_search = True
     while continue_search:
-        price_options_df = producer_decision.to_frame().transpose()
+        continue_search, cross_subsidy_options = create_cross_subsidy_options(calendar_year, continue_search,
+                                                                              multiplier_columns, prev_multiplier_range,
+                                                                              producer_decision,
+                                                                              producer_decision_and_response)
 
-        continue_search, price_options_df = calc_price_options(calendar_year, continue_search, multiplier_columns,
-                                                               prev_multiplier_range, price_options_df,
-                                                               producer_decision_and_response)
-
-        producer_decision_and_response = omega_globals.options.SalesShare.calc_shares(price_options_df, calendar_year)
+        producer_decision_and_response = \
+            omega_globals.options.SalesShare.calc_shares(cross_subsidy_options,calendar_year)
 
         ###############################################################################################################
         calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
@@ -441,23 +446,33 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
                                                              'average_new_vehicle_mfr_generalized_cost'])
 
 
-def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_multiplier_range, price_options_df,
-                            producer_decision_and_response):
+def create_cross_subsidy_options(calendar_year, continue_search, multiplier_columns, prev_multiplier_range,
+                                 producer_decision, producer_decision_and_response):
     """
+    Calculate cross subsidy pricing options based on the allowable multiplier range, within a subsequently smaller
+    range as iteration progresses, until the search collapses (min mutliplier == max multiplier).
 
     Args:
-        continue_search (bool):
-        multiplier_columns:
-        prev_multiplier_range:
-        price_options_df:
-        producer_decision_and_response:
+        calendar_year (int): calendar year of the iteration
+        continue_search (bool): prior value of ``continue_search``, set to ``False`` if search collapses
+        multiplier_columns ([strs]): list of cost multiplier columns,
+            e.g. ['cost_multiplier_hauling.BEV', 'cost_multiplier_hauling.ICE', ...]
+        prev_multiplier_range (dict): empty on first pass then contains a dict of previous multiplier ranges by market
+            class, e.g. {'cost_multiplier_hauling.BEV': array([0.95, 0.98333333, 1.0, 1.01666667, 1.05]), ...}
+        producer_decision (DataFrame): producer production decision dataframe
+        producer_decision_and_response (DataFrame, Series): empty DataFrame on first pass then contains producer
+            compliance search result and most-convergent consumer response to previous cross subsidy options as a
+            Series
 
     Returns:
-        tuple of (continue_search, price_options_df)
+        tuple of whether to continue cross subsidy search, dataframe of producer decision with cross subsidy pricing
+        options (continue_search, price_options_df)
 
     """
     import numpy as np
     from context.price_modifications import PriceModifications
+
+    price_options_df = producer_decision
 
     if producer_decision_and_response.empty:
         # first time through, span full range
@@ -491,43 +506,50 @@ def calc_price_options(calendar_year, continue_search, multiplier_columns, prev_
     return continue_search, price_options_df
 
 
-def tighten_multiplier_range(mcc, prev_multiplier_range, producer_decision_and_response,
+def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_decision_and_response,
                              search_collapsed):
     """
+    Tighten cross subsidy multiplier range.
 
     Args:
-        mcc:
-        prev_multiplier_range:
-        producer_decision_and_response:
-        search_collapsed:
+        multiplier_column (str): name of the multiplier range to tighten, e.g. 'cost_multiplier_hauling.BEV'
+        prev_multiplier_range (dict): empty on first pass then contains a dict of previous multiplier ranges by market
+            class, e.g. {'cost_multiplier_hauling.BEV': array([0.95, 0.98333333, 1.0, 1.01666667, 1.05]), ...}
+        producer_decision_and_response (Series): contains producer compliance search result and most-convergent
+            consumer response to previous cross subsidy options
+        search_collapsed (bool): prior value of search collapsed, gets ANDed with collapse condition
 
     Returns:
+        tuple of multiplier range array (e.g. array([1.01666667, 1.02777778, 1.03888889, 1.05]))and whether search has
+        collapsed (multiplier_range, search_collapsed)
 
     """
     import numpy as np
 
-    prev_multiplier_span_frac = prev_multiplier_range[mcc][-1] / prev_multiplier_range[mcc][0] - 1
-    index = np.nonzero(prev_multiplier_range[mcc] == producer_decision_and_response[mcc])[0][0]
+    prev_multiplier_span_frac = \
+        prev_multiplier_range[multiplier_column][-1] / prev_multiplier_range[multiplier_column][0] - 1
+    index = \
+        np.nonzero(prev_multiplier_range[multiplier_column] == producer_decision_and_response[multiplier_column])[0][0]
     if index == 0:
         min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-                      producer_decision_and_response[mcc] - prev_multiplier_span_frac *
-                      producer_decision_and_response[mcc])
+                      producer_decision_and_response[multiplier_column] - prev_multiplier_span_frac *
+                      producer_decision_and_response[multiplier_column])
     else:
-        min_val = prev_multiplier_range[mcc][index - 1]
-    if index == len(prev_multiplier_range[mcc]) - 1:
+        min_val = prev_multiplier_range[multiplier_column][index - 1]
+    if index == len(prev_multiplier_range[multiplier_column]) - 1:
         max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-                      producer_decision_and_response[mcc] + prev_multiplier_span_frac *
-                      producer_decision_and_response[mcc])
+                      producer_decision_and_response[multiplier_column] + prev_multiplier_span_frac *
+                      producer_decision_and_response[multiplier_column])
     else:
-        max_val = prev_multiplier_range[mcc][index + 1]
+        max_val = prev_multiplier_range[multiplier_column][index + 1]
     # try new range, include prior value in range...
     multiplier_range = np.unique(np.append(
         np.linspace(min_val, max_val, omega_globals.options.consumer_pricing_num_options),
-        producer_decision_and_response[mcc]))
+        producer_decision_and_response[multiplier_column]))
     search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or ((max_val / min_val - 1) <= 1e-3))
     if 'consumer' in omega_globals.options.verbose_console:
-        omega_log.logwrite(('%s' % mcc).ljust(50) + '= %.5f MR:%s R:%f' % (
-            producer_decision_and_response[mcc], multiplier_range, max_val / min_val), echo_console=True)
+        omega_log.logwrite(('%s' % multiplier_column).ljust(50) + '= %.5f MR:%s R:%f' % (
+            producer_decision_and_response[multiplier_column], multiplier_range, max_val / min_val), echo_console=True)
 
     return multiplier_range, search_collapsed
 
