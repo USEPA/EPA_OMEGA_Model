@@ -112,13 +112,14 @@ class OffCycleCredits(OMEGABase):
             if vehicle.__getattribute__(attribute) == value:
                 for offcycle_credit in OffCycleCredits.offcycle_credit_names:
                     start_years = OffCycleCredits._values[offcycle_credit]['start_year']
-                    credit_start_year = max(start_years[start_years <= vehicle.model_year])
+                    if start_years[start_years <= vehicle.model_year]:
+                        credit_start_year = max(start_years[start_years <= vehicle.model_year])
 
-                    credit_value = OffCycleCredits._values[offcycle_credit][credit_start_year][credit_column]
-                    credit_destination = \
-                        OffCycleCredits._values[offcycle_credit][credit_start_year]['credit_destination']
+                        credit_value = OffCycleCredits._values[offcycle_credit][credit_start_year][credit_column]
+                        credit_destination = \
+                            OffCycleCredits._values[offcycle_credit][credit_start_year]['credit_destination']
 
-                    vehicle.cost_cloud[credit_destination] += credit_value * vehicle.cost_cloud[offcycle_credit]
+                        vehicle.cost_cloud[credit_destination] += credit_value * vehicle.cost_cloud[offcycle_credit]
 
         return vehicle.cost_cloud
 
