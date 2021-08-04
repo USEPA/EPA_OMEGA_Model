@@ -82,7 +82,9 @@ class OffCycleCredits(OMEGABase):
 
     _values = dict()
 
-    offcycle_credit_names = []  #: List of cycle names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
+    offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
+    offcycle_credit_groups = []  #: list of credit groups, populated during init
+    offcycle_credit_value_columns = [] #: list of columns that contain credit values, of the format ``vehicle_attribute:attribute_value``
 
     @staticmethod
     def calc_off_cycle_credits(vehicle):
@@ -96,28 +98,27 @@ class OffCycleCredits(OMEGABase):
             vehicle.cost_cloud with off-cycle credits calculated
 
         """
-        start_years = OffCycleCredits._values['start_year']
-        calendar_year = max(start_years[start_years <= vehicle.model_year])
-
-        df = OffCycleCredits._values['data']
-        offcycle_credits = df.loc[df['start_year'] == calendar_year]
-
         # TODO: off cycle groups can be used to apply credit limits by credit group
-        offcycle_groups = df['credit_group'].unique()
         group_totals = dict()
-        for ocg in offcycle_groups:
+        for ocg in OffCycleCredits.offcycle_credit_groups:
             group_totals[ocg] = 0
 
         vehicle.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile'] = 0
         vehicle.cost_cloud['cert_direct_offcycle_kwh_per_mile'] = 0
         vehicle.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile'] = 0
 
-        for cc in OffCycleCredits._values['credit_columns']:
-            attribute, value = cc.split(':')
+        for credit_column in OffCycleCredits.offcycle_credit_value_columns:
+            attribute, value = credit_column.split(':')
             if vehicle.__getattribute__(attribute) == value:
-                for i in offcycle_credits.itertuples():
-                    credit_value = df[cc].loc[i.Index]
-                    vehicle.cost_cloud[i.credit_destination] += credit_value * vehicle.cost_cloud[i.credit_name]
+                for offcycle_credit in OffCycleCredits.offcycle_credit_names:
+                    start_years = OffCycleCredits._values[offcycle_credit]['start_year']
+                    credit_start_year = max(start_years[start_years <= vehicle.model_year])
+
+                    credit_value = OffCycleCredits._values[offcycle_credit][credit_start_year][credit_column]
+                    credit_destination = \
+                        OffCycleCredits._values[offcycle_credit][credit_start_year]['credit_destination']
+
+                    vehicle.cost_cloud[credit_destination] += credit_value * vehicle.cost_cloud[offcycle_credit]
 
         return vehicle.cost_cloud
 
@@ -156,17 +157,23 @@ class OffCycleCredits(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                OffCycleCredits._values['start_year'] = np.array(df['start_year'])
-                OffCycleCredits._values['data'] = df
+                OffCycleCredits.offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
 
-                cls.offcycle_credit_names = df['credit_name'].unique().tolist()
-
-                OffCycleCredits._values['credit_columns'] = [c for c in df.columns if (':' in c)]
-
-                for cc in OffCycleCredits._values['credit_columns']:
+                for cc in OffCycleCredits.offcycle_credit_value_columns:
                     reg_class_id = cc.split(':')[1]
-                    if not reg_class_id in omega_globals.options.RegulatoryClasses.reg_classes:
+                    if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
                         template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
+
+                if not template_errors:
+                    cls.offcycle_credit_names = df['credit_name'].unique().tolist()
+                    cls.offcycle_credit_groups = df['credit_group'].unique().tolist()
+
+                    for _, r in df.iterrows():
+                        if r.credit_name not in OffCycleCredits._values:
+                            OffCycleCredits._values[r.credit_name] = {
+                                'start_year': np.array(df['start_year'].loc[df['credit_name'] == r.credit_name])}
+                        OffCycleCredits._values[r.credit_name][r.start_year] = \
+                            r.drop(['start_year', 'credit_name']).to_dict()
 
         return template_errors
 
@@ -203,8 +210,6 @@ if __name__ == '__main__':
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            OffCycleCredits._values['data'].to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'required_zev_shares.csv', index=False)
 
             class dummyVehicle:
                 model_year = 2020
