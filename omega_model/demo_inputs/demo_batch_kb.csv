@@ -47,7 +47,7 @@ Runtime Settings,,,
 Num Market Share Options,#,5,5
 Num Tech Options per ICE Vehicle,#,5,5
 Num Tech Options per BEV Vehicle,#,1,1
-Allow Backsliding,TRUE / FALSE,TRUE,"TRUE, FALSE"
+Allow Backsliding,TRUE / FALSE,TRUE,TRUE
 Cost Curve Frontier Affinity Factor,#,0.75,0.75
 Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
 Verbose Output,TRUE / FALSE,FALSE,FALSE

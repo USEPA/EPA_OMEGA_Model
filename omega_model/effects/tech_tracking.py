@@ -3,7 +3,6 @@
 **Functions to track vehicle technology use.**
 
 
-
 ----
 
 **CODE**
@@ -33,7 +32,6 @@ def get_vehicle_info(vehicle_id, attribute_list):
     return vehicles_dict[vehicle_id]
 
 
-# TODO off-cycle values as cls attributes in DecompositionAttributes
 def calc_tech_volumes(physical_effects_dict):
 
     """
@@ -43,23 +41,24 @@ def calc_tech_volumes(physical_effects_dict):
         dictionary of attributes and attribute value pairs.
 
     Returns:
-        A dictionary key, value pair where the key is a tuple (vehicle_id, calendar_year, age) and the value is a dictionary of key, value pairs providing
-        vehicle attributes (model_year, reg_class_id, in_use_fuel_id) and inventory attributes (co2 tons, fuel consumed, etc.) and their attribute values.
+        A dictionary of key, value pairs where the key is a tuple (vehicle_id, calendar_year, age) and the value is a dictionary of key, value pairs providing
+        vehicle attributes (e.g., model_year, reg_class_id, in_use_fuel_id, etc.) and tech attributes (e.g., 'gdi', 'turb11', etc.) and their attribute values.
 
     """
     from producer.vehicles import VehicleFinal, DecompositionAttributes
-    # from effects.inventory import get_vehicle_info
 
-    tech_flag_list = DecompositionAttributes.other_values
+    tech_flag_list = DecompositionAttributes.other_values + DecompositionAttributes.offcycle_values
     new_vehicle_tech_flag_dict = dict()
     tech_volumes_dict = dict()
     for key in physical_effects_dict.keys():
         vehicle_id, calendar_year, age = key
         physical = physical_effects_dict[key]
 
-        tech_volumes_dict[key] = {'model_year': physical['model_year'],
+        tech_volumes_dict[key] = {'manufacturer_id': physical['manufacturer_id'],
+                                  'model_year': physical['model_year'],
                                   'reg_class_id': physical['reg_class_id'],
                                   'in_use_fuel_id': physical['in_use_fuel_id'],
+                                  'non_responsive_market_group': physical['non_responsive_market_group'],
                                   'registered_count': physical['registered_count']
                                   }
 

@@ -108,6 +108,8 @@ class RequiredSalesShare(OMEGABase):
         """
         import numpy as np
 
+        RequiredSalesShare._values = pd.DataFrame()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 

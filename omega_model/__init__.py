@@ -142,6 +142,8 @@ try:
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             self.calc_effects = False
+            self.discount_values_to_year = 2021
+            self.costs_start = 'end-year' # end-year will discount 1st year; start-year will not discount first year
             self.calc_criteria_emission_costs = False
             # effects modeling files
             self.ip_deflators_file = path + 'demo_inputs/implicit_price_deflators.csv'

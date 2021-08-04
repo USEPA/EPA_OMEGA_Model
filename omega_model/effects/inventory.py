@@ -141,7 +141,7 @@ def calc_inventory(calendar_year):
 
     Returns:
         A dictionary key, value pair where the key is a tuple (vehicle_id, calendar_year, age) and the value is a dictionary of key, value pairs providing
-        vehicle attributes (model_year, reg_class_id, in_use_fuel_id) and inventory attributes (co2 tons, fuel consumed, etc.) and their attribute values.
+        vehicle attributes (e.g., model_year, reg_class_id, in_use_fuel_id, etc.) and inventory attributes (e.g., co2 tons, fuel consumed, etc.) and their attribute values.
 
     """
     from producer.vehicle_annual_data import VehicleAnnualData
@@ -151,13 +151,13 @@ def calc_inventory(calendar_year):
 
     # UPDATE physical effects data
     calendar_year_effects_dict = dict()
-    fuel = None
+    # fuel = None
 
     for vad in vads:
 
-        attribute_list = ['model_year', 'base_year_reg_class_id', 'in_use_fuel_id',
+        attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'in_use_fuel_id', 'non_responsive_market_group',
                           'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        model_year, reg_class_id, in_use_fuel_id, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+        mfr_id, model_year, reg_class_id, in_use_fuel_id, market_group, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vad.vehicle_id, attribute_list)
 
         vehicle_effects_dict = dict()
@@ -270,9 +270,11 @@ def calc_inventory(calendar_year):
             if vmt_liquid_fuel > 0 or vmt_electricity > 0:
                 flag = 1
 
-            vehicle_effects_dict.update({'model_year': calendar_year - vad.age,
+            vehicle_effects_dict.update({'manufacturer_id': mfr_id,
+                                         'model_year': calendar_year - vad.age,
                                          'reg_class_id': reg_class_id,
                                          'in_use_fuel_id': in_use_fuel_id,
+                                         'non_responsive_market_group': market_group,
                                          'registered_count': vad.registered_count,
                                          'annual_vmt': vad.annual_vmt,
                                          'vmt': vad.vmt,
