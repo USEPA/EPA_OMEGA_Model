@@ -7,6 +7,8 @@ Context Case,String,Reference case,
 Analysis Final Year,#,2022,
 Consolidate Manufacturers,TRUE / FALSE,TRUE,
 Run Effects Calculations,TRUE / FALSE,TRUE,
+Discount Values to Year,#,2021,
+Cost Accrual,end-of-year / beginning-of-year,end-of-year,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE

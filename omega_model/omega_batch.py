@@ -362,7 +362,7 @@ def validate_predefined_input(input_str, valid_inputs):
         if type(valid_inputs) is dict:
             return valid_inputs[input_str]
         elif type(valid_inputs) is set:
-            return True
+            return input_str
         else:
             raise Exception(
                 'validate_predefined_input(...,valid_inputs) error: valid_inputs must be a set or dictionary')
@@ -401,16 +401,22 @@ class OMEGABatchObject(OMEGABase):
         self.dataframe = pd.DataFrame()
         self.batch_log = None
         self.auto_close_figures = True
+        self.discount_values_to_year = None
+        self.cost_accrual = ''
 
     def force_numeric_params(self):
         import pandas as pd
 
         numeric_params = {
-            'Cost Curve Frontier Affinity Factor',
+            'Analysis Final Year',
+            'Discount Values to Year',
             'Num Market Share Options',
             'Num Tech Options per ICE Vehicle',
             'Num Tech Options per BEV Vehicle',
+            'Cost Curve Frontier Affinity Factor',
             'New Vehicle Price Elasticity of Demand',
+            'Producer Cross Subsidy Multiplier Min',
+            'Producer Cross Subsidy Multiplier Max',
         }
 
         for p in numeric_params:
@@ -550,6 +556,10 @@ class OMEGABatchObject(OMEGABase):
         self.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
         self.calc_effects = self.read_parameter('Run Effects Calculations')
 
+        self.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
+        self.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
+                                                      {'end-of-year', 'beginning-of-year'})
+
     def num_sessions(self):
         return len(self.dataframe.columns)
 
@@ -615,6 +625,8 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_case_id = self.parent.context_case_id
         self.settings.analysis_final_year = self.parent.analysis_final_year
         self.settings.consolidate_manufacturers = self.parent.consolidate_manufacturers
+        self.settings.discount_values_to_year = self.parent.discount_values_to_year
+        self.settings.cost_accrual = self.parent.cost_accrual
         self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
