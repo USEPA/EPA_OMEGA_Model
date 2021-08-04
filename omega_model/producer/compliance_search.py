@@ -200,8 +200,8 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
     return composite_vehicles
 
 
-def search_production_options(compliance_id, calendar_year, producer_decision_and_response, producer_consumer_iteration_num,
-                              strategic_target_offset_Mg):
+def search_production_options(compliance_id, calendar_year, producer_decision_and_response,
+                              producer_consumer_iteration_num, strategic_target_offset_Mg):
     """
 
     Args:
