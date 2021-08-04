@@ -667,12 +667,15 @@ def calc_market_category_data(producer_decision):
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
     """
+    Detect producer-consumer market share convergence.
 
     Args:
-        producer_decision_and_response:
-        market_class_dict:
+        producer_decision_and_response (Series): contains producer compliance search result and most-convergent
+            consumer response to previous cross subsidy options
+        market_class_dict (dict): dict of candidate vehicles binned by market class
 
     Returns:
+        tuple of convergence bool and convergence error, (converged, convergence_error)
 
     """
     # TODO: paramaterize the 1e-4?
@@ -680,8 +683,8 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     convergence_error = 0
     for mc in market_class_dict:
         convergence_error = \
-            max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] - \
-                                    producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
+            max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
+                                       producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
         converged = converged and (convergence_error <= omega_globals.options.producer_consumer_iteration_tolerance)
 
     return converged, convergence_error
