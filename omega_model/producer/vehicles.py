@@ -32,6 +32,9 @@ Sample Data Columns
         BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,bev_LPW_LRL,{'US electricity':1.0},{'electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
 
 Data Column Name and Description
+
+    **REQUIRED COLUMNS**
+
     :vehicle_id:
         The vehicle name or description, e.g. 'ICE Small Utility truck', 'BEV Subcompact car', etc
 
@@ -72,6 +75,10 @@ Data Column Name and Description
     :sales:
         Number of vehicles sold in the ``model_year``
 
+    **OPTIONAL COLUMNS**
+        These columns become object attributes that may be used to determine vehicle regulatory class
+        (e.g. 'car','truck') based on the simulated policy, or they may be used for other purposes.
+
     :cert_co2e_grams_per_mile:
         Vehicle certification emissions CO2e grams/mile
 
@@ -84,45 +91,41 @@ Data Column Name and Description
     :tot_road_load_hp:
         Vehicle roadload power (horsepower) at a vehicle speed of 50 miles per hour
 
-    VEHICLE PHYSICAL CHARACTERSTICS
-        These characteristics may be used to determine vehicle regulatory class (e.g. 'car','truck') based on the
-        simulated policy
+    :footprint_ft2:
+        Vehicle footprint based on vehicle wheelbase and track (square feet)
 
-        :footprint_ft2:
-            Vehicle footprint based on vehicle wheelbase and track (square feet)
+    :etw_lbs:
+        Vehicle equivalent test weight (ETW) (pounds)
 
-        :etw_lbs:
-            Vehicle equivalent test weight (ETW) (pounds)
+    :length_in:
+        Vehicle overall length (inches)
 
-        :length_in:
-            Vehicle overall length (inches)
+    :width_in:
+        Vehicle overall width (inches)
 
-        :width_in:
-            Vehicle overall width (inches)
+    :height_in:
+        Vehicle overall height (inches)
 
-        :height_in:
-            Vehicle overall height (inches)
+    :ground_clearance_in:
+        Vehicle ground clearance (inches)
 
-        :ground_clearance_in:
-            Vehicle ground clearance (inches)
+    :wheelbase_in:
+        Vehicle wheelbase (inches)
 
-        :wheelbase_in:
-            Vehicle wheelbase (inches)
+    :interior_volume_cuft:
+        Vehicle interior volume (cubic feet)
 
-        :interior_volume_cuft:
-            Vehicle interior volume (cubic feet)
+    :msrp_dollars:
+        Vehicle manufacturer suggested retail price (MSRP)
 
-        :msrp_dollars:
-            Vehicle manufacturer suggested retail price (MSRP)
+    :passenger_capacity:
+        Vehicle passenger capacity (number of occupants)
 
-        :passenger_capacity:
-            Vehicle passenger capacity (number of occupants)
+    :payload_capacity_lbs:
+        Vehicle payload capacity (pounds)
 
-        :payload_capacity_lbs:
-            Vehicle payload capacity (pounds)
-
-        :towing_capacity_lbs:
-            Vehicle towing capacity (pounds)
+    :towing_capacity_lbs:
+        Vehicle towing capacity (pounds)
 
 ----
 
