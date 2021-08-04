@@ -195,7 +195,7 @@ def run_producer_consumer():
                                                                 producer_decision_and_response,
                                                                 producer_consumer_iteration_num, strategic_target_offset_Mg)
 
-                market_class_vehicle_dict = calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision)
+                market_class_vehicle_dict = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
 
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
                     iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
@@ -320,7 +320,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                     producer_decision_and_response,
                                                     total_sales=producer_decision_and_response['new_vehicle_sales'])
         # propagate vehicle sales up to market class sales
-        calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
+        calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
         ###############################################################################################################
 
         producer_decision_and_response['strategic_compliance_ratio'] = \
@@ -553,10 +553,10 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
     return multiplier_range, search_collapsed
 
 
-def calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision):
+def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
     """
-    Calculate market class average CO2e g/mi, kWh/mi, manufacturer new vehicle cost and generalized cost, average fuel
-    price, and sales.  Also calculates market sector data.
+    Creates a dictionary of candidate vehicles binned by market class, calculates market class and market category
+    data via ``calc_market_class_data()`` and ``calc_market_category_data()``
 
     Args:
         candidate_mfr_composite_vehicles: list of candidate composite vehicles that minimize producer compliance cost
@@ -564,11 +564,10 @@ def calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision):
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
     Returns:
-        dict of candidate vehicles binned by market class and reg class, updates producer_decision with
-        sales-weighted average cost and CO2e g/mi by market class
+        dict of candidate vehicles binned by market class, updates producer_decision with calculated market data
 
     See Also:
-        ``calc_market_sector_data()``
+        ``calc_market_class_data()``, ``calc_market_category_data()``
 
     """
     from common.omega_functions import weighted_value
@@ -578,6 +577,27 @@ def calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision):
     for new_veh in candidate_mfr_composite_vehicles:
         market_class_vehicle_dict[new_veh.market_class_id].append(new_veh)
 
+    calc_market_class_data(market_class_vehicle_dict, producer_decision)
+
+    calc_market_category_data(producer_decision)
+
+    return market_class_vehicle_dict
+
+
+def calc_market_class_data(market_class_vehicle_dict, producer_decision):
+    """
+    Calculate market class average CO2e g/mi, kWh/mi, manufacturer new vehicle cost and generalized cost, average fuel
+    price, and sales.
+
+    Args:
+        market_class_vehicle_dict (dict): candidate vehicles binned by market class
+        producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
+            shares, costs, compliance data (Mg CO2e), may also contain consumer response
+
+    Returns:
+        Nothing, updates ``producer_decsion`` with calculated market data
+
+    """
     # calculate sales-weighted co2 g/mi and cost by market class
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
@@ -608,41 +628,41 @@ def calc_market_class_data(candidate_mfr_composite_vehicles, producer_decision):
             producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] = 0
             producer_decision['sales_%s' % mc] = 0
 
-    calc_market_sector_data(producer_decision)
 
-    return market_class_vehicle_dict
-
-
-def calc_market_sector_data(winning_combo):
+def calc_market_category_data(producer_decision):
     """
+    Calculate market category average cost and generalized cost, average cross subsidized price, sales and producer
+    absolute shares.
 
     Args:
-        winning_combo:
+        producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
+            shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
     Returns:
+        Nothing, updates ``producer_decsion`` with calculated market data
 
     """
     import numpy as np
 
     for mcat in omega_globals.options.MarketClass.market_categories:
-        winning_combo['average_cost_%s' % mcat] = 0
-        winning_combo['average_generalized_cost_%s' % mcat] = 0
-        winning_combo['average_cross_subsidized_price_%s' % mcat] = 0
-        winning_combo['sales_%s' % mcat] = 0
-        winning_combo['producer_abs_share_frac_%s' % mcat] = 0
+        producer_decision['average_cost_%s' % mcat] = 0
+        producer_decision['average_generalized_cost_%s' % mcat] = 0
+        producer_decision['average_cross_subsidized_price_%s' % mcat] = 0
+        producer_decision['sales_%s' % mcat] = 0
+        producer_decision['producer_abs_share_frac_%s' % mcat] = 0
 
         for mc in omega_globals.options.MarketClass.market_classes:
             if mcat in mc.split('.'):
-                winning_combo['average_cost_%s' % mcat] += winning_combo['average_new_vehicle_mfr_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
-                winning_combo['average_generalized_cost_%s' % mcat] += winning_combo['average_new_vehicle_mfr_generalized_cost_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
-                if 'average_cross_subsidized_price_%s' % mc in winning_combo:
-                    winning_combo['average_cross_subsidized_price_%s' % mcat] += winning_combo['average_cross_subsidized_price_%s' % mc] * np.maximum(1, winning_combo['sales_%s' % mc])
-                winning_combo['sales_%s' % mcat] += np.maximum(1, winning_combo['sales_%s' % mc])
-                winning_combo['producer_abs_share_frac_%s' % mcat] += winning_combo['producer_abs_share_frac_%s' % mc]
+                producer_decision['average_cost_%s' % mcat] += producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * np.maximum(1, producer_decision['sales_%s' % mc])
+                producer_decision['average_generalized_cost_%s' % mcat] += producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * np.maximum(1, producer_decision['sales_%s' % mc])
+                if 'average_cross_subsidized_price_%s' % mc in producer_decision:
+                    producer_decision['average_cross_subsidized_price_%s' % mcat] += producer_decision['average_cross_subsidized_price_%s' % mc] * np.maximum(1, producer_decision['sales_%s' % mc])
+                producer_decision['sales_%s' % mcat] += np.maximum(1, producer_decision['sales_%s' % mc])
+                producer_decision['producer_abs_share_frac_%s' % mcat] += producer_decision['producer_abs_share_frac_%s' % mc]
 
-        winning_combo['average_cost_%s' % mcat] = winning_combo['average_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
-        winning_combo['average_generalized_cost_%s' % mcat] = winning_combo['average_generalized_cost_%s' % mcat] / winning_combo['sales_%s' % mcat]
-        winning_combo['average_cross_subsidized_price_%s' % mcat] = winning_combo['average_cross_subsidized_price_%s' % mcat] / winning_combo['sales_%s' % mcat]
+        producer_decision['average_cost_%s' % mcat] = producer_decision['average_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
+        producer_decision['average_generalized_cost_%s' % mcat] = producer_decision['average_generalized_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
+        producer_decision['average_cross_subsidized_price_%s' % mcat] = producer_decision['average_cross_subsidized_price_%s' % mcat] / producer_decision['sales_%s' % mcat]
 
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
