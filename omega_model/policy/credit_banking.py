@@ -477,8 +477,8 @@ if __name__ == '__main__':
         # validate output folder
         file_io.validate_folder(omega_globals.options.database_dump_folder)
 
-        credit_bank.credit_bank.to_csv(omega_globals.options.database_dump_folder + '/credit_bank.csv', index=False)
-        credit_bank.transaction_log.to_csv(omega_globals.options.database_dump_folder + '/credit_bank_transactions.csv', index=False)
+        credit_bank.credit_bank.to_csv(omega_globals.options.database_dump_folder + '/GHG_credit_balances.csv', index=False)
+        credit_bank.transaction_log.to_csv(omega_globals.options.database_dump_folder + '/GHG_credit_transactions.csv', index=False)
 
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

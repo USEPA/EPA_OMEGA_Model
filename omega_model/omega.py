@@ -240,11 +240,11 @@ def run_producer_consumer():
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
-                                                       '_credit_balances %s.csv' % compliance_id, index=False)
+                                                       '_GHG_credit_balances %s.csv' % compliance_id, index=False)
 
         credit_banks[compliance_id].transaction_log.to_csv(
             omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-            '_credit_bank_transactions %s.csv' % compliance_id, index=False)
+            '_GHG_credit_transactions %s.csv' % compliance_id, index=False)
 
     return iteration_log, credit_banks
 
