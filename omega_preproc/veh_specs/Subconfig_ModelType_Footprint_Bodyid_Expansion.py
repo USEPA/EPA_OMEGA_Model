@@ -7,7 +7,7 @@ CSV_OUTPUT_DEBUG_MODE = False
 DEBUGGING_CAFE_MFR_CD_MODE = False
 DEBUGGING_CAFE_MFR_CD = 'FMX'
 ESTIMATE_NV_RATIO_SET_COEF_ABC_BY_ROAD_LOAD_HP = False
-ESTIMATE_TARGET_COEF_BEST_MTH_3_4 = False
+ESTIMATE_TARGET_COEF_BEST_MTH_3_4 = True
 
 def file_errta_update(footprintSubconfigMY_file, errta_table, Column_Name, Old_Value, New_Value, MODEL_YEAR, MFR_DIVISION_NM, MFR_DIVISION_CD, MFR_CARLINE_CD, CAFE_ID, footprintSubconfig_INDEX):
     errta_table.loc[pd.isnull(errta_table[Old_Value]), Old_Value] = ''
@@ -665,11 +665,9 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
 
             if ESTIMATE_TARGET_COEF_BEST_MTH_3_4:
                 tstcar_MY_carline_name_mapping_table = pd.read_csv(root_drive_letter + test_car_filename_path + '\\' + tstcar_MY_carline_name_mapping_filename, encoding="ISO-8859-1", na_values=['-'])
-                # tstcar_MY_carline_name_mapping_table['CARLINE_NAME'] = tstcar_MY_carline_name_mapping_table['CARLINE_NAME'].astype(str).str.upper()
-                # tstcar_MY_carline_name_mapping_table['Represented Test Veh Model'] = tstcar_MY_carline_name_mapping_table['Represented Test Veh Model'].astype(str).str.upper()
                 tstcar_MY_carline_name_mapping_table = tstcar_MY_carline_name_mapping_table.applymap(lambda s: s.upper() if type(s) == str else s)
                 set_roadload_coefficient_table = set_roadload_coefficient_table.applymap(lambda s: s.upper() if type(s) == str else s)
-                vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.applymap(lambda s: s.upper() if type(s) == str else s)
+                # vehghg_file_nonflexfuel = vehghg_file_nonflexfuel.applymap(lambda s: s.upper() if type(s) == str else s)
 
                 df_target_coef_null = vehghg_file_nonflexfuel.loc[(pd.isnull(vehghg_file_nonflexfuel['TARGET_COEF_A_SURRO'])), :]
                 df_target_coef_null_index = list(df_target_coef_null.index)
@@ -710,7 +708,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                             _label_mfr_cd = df_vehghg_file_nonflexfuel_target_coef.loc[j, 'LABEL_MFR_CD']
                             _mfr_divsion_short_nm = df_vehghg_file_nonflexfuel_target_coef.loc[j, 'MFR_DIVISION_SHORT_NM']
                             df_tstcar_nonflexfuel_target_coef = tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, tstcar_MY_carline_name_mapping_table, _model_year, _cafe_mfr_cd, _label_mfr_cd, \
-                                                                                                            _carline_name_j, _mfr_divsion_short_nm, _engine_displacement_j, _etw_j, _num_trans_gears, _engine_displacement_check)
+                                                                                                            _carline_name_j.upper(), _mfr_divsion_short_nm.upper(), _engine_displacement_j, _etw_j, _num_trans_gears, _engine_displacement_check)
                         else:
                             df_tstcar_nonflexfuel_target_coef = set_roadload_coefficient_table.loc[tstcar_checks, :]
 
@@ -761,7 +759,7 @@ def Subconfig_ModelType_Footprint_Bodyid_Expansion(root_drive_letter, input_path
                     _num_trans_gears =  df_target_coef_null.loc[i, 'TOTAL_NUM_TRANS_GEARS']
                     _rated_hp = pd.to_numeric(df_target_coef_null.loc[i, 'ENG_RATED_HP'], errors='coerce')
                     df_tstcar_table = tstcar_target_coef_cafe_mfr_cd_carline_name(set_roadload_coefficient_table, tstcar_MY_carline_name_mapping_table, _model_year, _cafe_mfr_cd, \
-                                                                                  _label_mfr_cd, _carline_name, _mfr_divsion_short_nm, _displ, _etw, _num_trans_gears, _engine_displacement_check)
+                                                                                  _label_mfr_cd, _carline_name.upper(), _mfr_divsion_short_nm.upper(), _displ, _etw, _num_trans_gears, _engine_displacement_check)
                     if len(df_tstcar_table) == 0: continue
                     df_sort = df_tstcar_table.iloc[(df_tstcar_table['Equivalent Test Weight (lbs.)'] - _etw).abs().argsort()[:1]]
                     _index_df_sort = df_sort.index.tolist()[0]

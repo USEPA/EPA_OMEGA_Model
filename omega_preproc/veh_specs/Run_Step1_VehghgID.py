@@ -7,15 +7,15 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 home = str(Path.home())
 
-root_drive_letter = 'c:'
-print(os.getcwd())
-main_path = root_drive_letter + '\Project\Midterm Review\Trends\Original Trends Team Data Gathering and Analysis\Tech Specifications'\
-            +'\\'+'techspecconsolidator\VehGHG Runs'
+root_drive_letter = 'I:'
 
+main_path = root_drive_letter + '/Project/Midterm Review/Trends/Original Trends Team Data Gathering and Analysis/Tech Specifications/techspecconsolidator/VehGHG Runs'
 run_folder = str(input('Enter Run Folder Name: '))
-os.listdir(main_path + '\\' + run_folder)
-run_controller = pd.read_csv(main_path + '\\' + run_folder + '\\' + 'VehghgID Run Controller.csv')
-# run_controller = run_controller.applymap(lambda s: s.upper() if type(s) == str else s)
+run_folder_path = os.path.join(main_path, run_folder)
+run_controller_file = os.path.join(run_folder_path, 'VehghgID Run Controller.csv')
+
+run_controller = pd.read_csv(run_controller_file, encoding="ISO-8859-1")
+# run_controller = run_controller.replace(np.nan, '', regex=True)
 for run_count in range (0,len(run_controller)):
     # run_folder = str(run_controller['Run Folder'][run_count])
     input_path = main_path + '\\' + run_folder + '\\' + 'inputs'
