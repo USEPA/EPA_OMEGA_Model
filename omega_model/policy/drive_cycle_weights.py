@@ -193,9 +193,12 @@ class DriveCycleWeights(OMEGABase):
 
         """
         start_years = cache[fueling_class]['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
-        return cache[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
-                                                              weighted=weighted)
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
+            return cache[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+                                                                  weighted=weighted)
+        else:
+            raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
 
     @staticmethod
     def calc_cert_direct_oncycle_co2e_grams_per_mile(calendar_year, fueling_class, cycle_values):

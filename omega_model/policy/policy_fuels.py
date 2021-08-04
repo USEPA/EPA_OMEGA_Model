@@ -91,9 +91,12 @@ class PolicyFuel(OMEGABase):
 
         """
         start_years = cache[fuel_id]['start_year']
-        year = max(start_years[start_years <= calendar_year])
+        if len(start_years[start_years <= calendar_year]) > 0:
+            year = max(start_years[start_years <= calendar_year])
 
-        return cache[fuel_id][year][attribute]
+            return cache[fuel_id][year][attribute]
+        else:
+            raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
 
     @staticmethod
     def validate_fuel_id(fuel_id):

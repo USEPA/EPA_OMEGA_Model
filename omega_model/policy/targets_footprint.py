@@ -122,23 +122,27 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         """
         start_years = cache[vehicle.reg_class_id]['start_year']
-        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
+            vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_id)
-        if cache_key not in cache:
-            cache[cache_key] = omega_globals.session.query(VehicleTargets). \
-                filter(VehicleTargets.reg_class_id == vehicle.reg_class_id). \
-                filter(VehicleTargets.model_year == vehicle_model_year).one()
-        coefficients = cache[cache_key]
+            cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_id)
+            if cache_key not in cache:
+                cache[cache_key] = omega_globals.session.query(VehicleTargets). \
+                    filter(VehicleTargets.reg_class_id == vehicle.reg_class_id). \
+                    filter(VehicleTargets.model_year == vehicle_model_year).one()
+            coefficients = cache[cache_key]
 
-        if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
-            target_co2e_gpmi = coefficients.coeff_a
-        elif vehicle.footprint_ft2 > coefficients.footprint_max_sqft:
-            target_co2e_gpmi = coefficients.coeff_b
+            if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
+                target_co2e_gpmi = coefficients.coeff_a
+            elif vehicle.footprint_ft2 > coefficients.footprint_max_sqft:
+                target_co2e_gpmi = coefficients.coeff_b
+            else:
+                target_co2e_gpmi = vehicle.footprint_ft2 * coefficients.coeff_c + coefficients.coeff_d
+
+            return target_co2e_gpmi
         else:
-            target_co2e_gpmi = vehicle.footprint_ft2 * coefficients.coeff_c + coefficients.coeff_d
-
-        return target_co2e_gpmi
+            raise Exception('Missing GHG CO2e g/mi target parameters for %s, %d or prior'
+                            % (vehicle.reg_class_id, vehicle.model_year))
 
     @staticmethod
     def calc_cert_lifetime_vmt(reg_class_id, model_year):
@@ -155,14 +159,19 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         """
         start_years = cache[reg_class_id]['start_year']
-        model_year = max(start_years[start_years <= model_year])
+        if len(start_years[start_years <= model_year]) > 0:
+            model_year = max(start_years[start_years <= model_year])
 
-        cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
-        if cache_key not in cache:
-            cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
-                filter(VehicleTargets.reg_class_id == reg_class_id). \
-                filter(VehicleTargets.model_year == model_year).scalar()
-        return cache[cache_key]
+            cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
+            if cache_key not in cache:
+                cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
+                    filter(VehicleTargets.reg_class_id == reg_class_id). \
+                    filter(VehicleTargets.model_year == model_year).scalar()
+
+            return cache[cache_key]
+        else:
+            raise Exception('Missing GHG target lifetime VMT parameters for %s, %d or prior'
+                            % (reg_class_id, model_year))
 
     @staticmethod
     def calc_target_co2e_Mg(vehicle, sales_variants=None):
@@ -188,21 +197,25 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         from policy.incentives import Incentives
 
         start_years = cache[vehicle.reg_class_id]['start_year']
-        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
+            vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
+            lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
-        co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
+            co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
-        if sales_variants is not None:
-            if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
-                sales = np.array(sales_variants)
+            if sales_variants is not None:
+                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                    sales = np.array(sales_variants)
+                else:
+                    sales = sales_variants
             else:
-                sales = sales_variants
-        else:
-            sales = vehicle.initial_registered_count
+                sales = vehicle.initial_registered_count
 
-        return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+            return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+        else:
+            raise Exception('Missing GHG target parameters for %s, %d or prior'
+                            % (vehicle.reg_class_id, vehicle.model_year))
 
     @staticmethod
     def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
@@ -229,25 +242,29 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         from policy.incentives import Incentives
 
         start_years = cache[vehicle.reg_class_id]['start_year']
-        vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
+            vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-        lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
+            lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
-        if co2_gpmi_variants is not None:
-            if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
-                sales = np.array(sales_variants)
+            if co2_gpmi_variants is not None:
+                if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
+                    sales = np.array(sales_variants)
+                else:
+                    sales = sales_variants
+
+                if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
+                    co2_gpmi = np.array(co2_gpmi_variants)
+                else:
+                    co2_gpmi = co2_gpmi_variants
             else:
-                sales = sales_variants
+                sales = vehicle.initial_registered_count
+                co2_gpmi = vehicle.cert_co2e_grams_per_mile
 
-            if not (type(co2_gpmi_variants) == pd.Series) or (type(co2_gpmi_variants) == np.ndarray):
-                co2_gpmi = np.array(co2_gpmi_variants)
-            else:
-                co2_gpmi = co2_gpmi_variants
+            return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
         else:
-            sales = vehicle.initial_registered_count
-            co2_gpmi = vehicle.cert_co2e_grams_per_mile
-
-        return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+            raise Exception('Missing GHG target parameters for %s, %d or prior'
+                            % (vehicle.reg_class_id, vehicle.model_year))
 
     @staticmethod
     def init_from_file(filename, verbose=False):

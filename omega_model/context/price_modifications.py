@@ -77,15 +77,18 @@ class PriceModifications(OMEGABase):
             The requested price modification, or 0 if there is none.
 
         """
-        start_years = PriceModifications._values['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
+        price_modification = 0
 
-        mod_key = '%s:%s' % (market_class_id, price_modification_str)
-        if mod_key in PriceModifications._values:
-            return PriceModifications._values['%s:%s' % (market_class_id, price_modification_str)].loc[
-                PriceModifications._values['start_year'] == calendar_year].item()
-        else:
-            return 0
+        start_years = PriceModifications._values['start_year']
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
+
+            mod_key = '%s:%s' % (market_class_id, price_modification_str)
+            if mod_key in PriceModifications._values:
+                price_modification = PriceModifications._values['%s:%s' % (market_class_id, price_modification_str)].loc[
+                    PriceModifications._values['start_year'] == calendar_year].item()
+
+        return price_modification
 
     @staticmethod
     def init_from_file(filename, verbose=False):

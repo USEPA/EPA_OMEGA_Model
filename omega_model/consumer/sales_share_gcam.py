@@ -113,13 +113,16 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
         """
         start_years = cache[market_class_id]['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
 
-        key = '%s_%s' % (calendar_year, market_class_id)
-        if not key in cache:
-            cache[key] = omega_globals.session.query(SalesShare). \
-                filter(SalesShare.calendar_year == calendar_year). \
-                filter(SalesShare.market_class_id == market_class_id).one()
+            key = '%s_%s' % (calendar_year, market_class_id)
+            if not key in cache:
+                cache[key] = omega_globals.session.query(SalesShare). \
+                    filter(SalesShare.calendar_year == calendar_year). \
+                    filter(SalesShare.market_class_id == market_class_id).one()
+        else:
+            raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
 
         return cache[key]
 

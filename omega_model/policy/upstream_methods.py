@@ -167,12 +167,15 @@ class UpstreamMethods(OMEGABase):
 
         """
         start_years = cache['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
 
-        method = UpstreamMethods._methods['upstream_calculation_method'].loc[
-            UpstreamMethods._methods['start_year'] == calendar_year].item()
+            method = UpstreamMethods._methods['upstream_calculation_method'].loc[
+                UpstreamMethods._methods['start_year'] == calendar_year].item()
 
-        return upstream_method_dict[method]
+            return upstream_method_dict[method]
+        else:
+            raise Exception('Missing upstream calculation method for %d or prior' % calendar_year)
 
     @staticmethod
     def init_from_file(filename, verbose=False):

@@ -82,15 +82,18 @@ class RequiredSalesShare(OMEGABase):
             ``producer.compliance_strategy.create_tech_and_share_sweeps()``
 
         """
-        start_years = RequiredSalesShare._values['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
+        minimum_share = 0
 
-        min_key = '%s:%s' % (market_class_id, min_share_units_str)
-        if min_key in RequiredSalesShare._values:
-            return RequiredSalesShare._values['%s:%s' % (market_class_id, min_share_units_str)].loc[
-                RequiredSalesShare._values['start_year'] == calendar_year].item()
-        else:
-            return 0
+        start_years = RequiredSalesShare._values['start_year']
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
+
+            min_key = '%s:%s' % (market_class_id, min_share_units_str)
+            if min_key in RequiredSalesShare._values:
+                minimum_share = RequiredSalesShare._values['%s:%s' % (market_class_id, min_share_units_str)].loc[
+                    RequiredSalesShare._values['start_year'] == calendar_year].item()
+
+        return minimum_share
 
     @staticmethod
     def init_from_file(filename, verbose=False):

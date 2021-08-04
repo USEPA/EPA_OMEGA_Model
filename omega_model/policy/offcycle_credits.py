@@ -120,6 +120,7 @@ class OffCycleCredits(OMEGABase):
                             OffCycleCredits._values[offcycle_credit][credit_start_year]['credit_destination']
 
                         vehicle.cost_cloud[credit_destination] += credit_value * vehicle.cost_cloud[offcycle_credit]
+
         return vehicle.cost_cloud
 
     @classmethod

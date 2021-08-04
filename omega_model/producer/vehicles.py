@@ -355,21 +355,22 @@ class VehicleAttributeCalculations(OMEGABase):
 
         """
         start_years = VehicleAttributeCalculations.cache['start_year']
-        cache_key = max(start_years[start_years <= vehicle.model_year])
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
+            cache_key = max(start_years[start_years <= vehicle.model_year])
 
-        if cache_key in VehicleAttributeCalculations.cache:
-            calcs = VehicleAttributeCalculations.cache[cache_key]
-            for calc, value in calcs.items():
-                select_attribute, select_value, operator, action = calc.split(':')
-                if vehicle.__getattribute__(select_attribute) == select_value:
-                    attribute_source, attribute_target = action.split('->')
-                    # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
-                    if cost_cloud is not None:
-                        cost_cloud[attribute_target] = \
-                            eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
-                    else:
-                        vehicle.__setattr__(attribute_target,
-                                            eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
+            if cache_key in VehicleAttributeCalculations.cache:
+                calcs = VehicleAttributeCalculations.cache[cache_key]
+                for calc, value in calcs.items():
+                    select_attribute, select_value, operator, action = calc.split(':')
+                    if vehicle.__getattribute__(select_attribute) == select_value:
+                        attribute_source, attribute_target = action.split('->')
+                        # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
+                        if cost_cloud is not None:
+                            cost_cloud[attribute_target] = \
+                                eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
+                        else:
+                            vehicle.__setattr__(attribute_target,
+                                                eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
 
 
 class CompositeVehicle(OMEGABase):

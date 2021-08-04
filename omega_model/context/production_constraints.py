@@ -87,16 +87,19 @@ class ProductionConstraints(OMEGABase):
             ``producer.compliance_strategy.create_tech_and_share_sweeps()``
 
         """
+        minimum_share = 0
+
         start_years = cache['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
 
-        min_key = '%s:%s' % (market_class_id, min_share_units)
+            min_key = '%s:%s' % (market_class_id, min_share_units)
 
-        if min_key in ProductionConstraints._values:
-            return ProductionConstraints._values[min_key].loc[
-                ProductionConstraints._values['start_year'] == calendar_year].item()
-        else:
-            return 0
+            if min_key in ProductionConstraints._values:
+                minimum_share = ProductionConstraints._values[min_key].loc[
+                    ProductionConstraints._values['start_year'] == calendar_year].item()
+
+        return minimum_share
 
     @staticmethod
     def get_maximum_share(calendar_year, market_class_id):
@@ -114,16 +117,19 @@ class ProductionConstraints(OMEGABase):
             ``producer.compliance_strategy.create_tech_and_share_sweeps()``
 
         """
+        maximum_share = 1
+
         start_years = cache['start_year']
-        calendar_year = max(start_years[start_years <= calendar_year])
+        if len(start_years[start_years <= calendar_year]) > 0:
+            calendar_year = max(start_years[start_years <= calendar_year])
 
-        max_key = '%s:%s' % (market_class_id, max_share_units)
+            max_key = '%s:%s' % (market_class_id, max_share_units)
 
-        if max_key in ProductionConstraints._values:
-            return ProductionConstraints._values[max_key].loc[
-                ProductionConstraints._values['start_year'] == calendar_year].item()
-        else:
-            return 1
+            if max_key in ProductionConstraints._values:
+                maximum_share = ProductionConstraints._values[max_key].loc[
+                    ProductionConstraints._values['start_year'] == calendar_year].item()
+
+        return maximum_share
 
     @staticmethod
     def init_from_file(filename, verbose=False):
