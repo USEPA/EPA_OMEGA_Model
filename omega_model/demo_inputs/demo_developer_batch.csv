@@ -73,7 +73,7 @@ Producer Cross Subsidy Price Tolerance,#,1.00E-004,1.00E-004
 Run Profiler,TRUE / FALSE,FALSE,FALSE
 Flat Context,TRUE / FALSE,FALSE,FALSE
 Flat Context Year,#,2020,2020
-Verbose Console Modules,"['producer', 'consumer'] or subset","['producer', 'consumer']",[]
+Verbose Console Modules,"['producer', 'consumer'] or subset or []","['producer', 'consumer']",[]
 Log Producer Iteration Years,"'all' or [year, …] or []",[],[]
 Log Consumer Iteration Years,"'all' or [year, …] or []",[2050],[2050]
 Log Producer Decision and Response Years,"'all' or [year, …] or []",[],[]
