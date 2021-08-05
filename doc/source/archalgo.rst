@@ -104,15 +104,38 @@ x
 
 Vehicle Definitions
 -------------------
-x
+The core unit impacted by decisions in the producer module is at the vehicle level.  Each OMEGA “vehicle” is defined in the analysis context and represents a set of distinct attributes.  In the demo, for example, the attributes associated with each vehicle definition are included in the vehicles.csv file.  The figure below shows a subset of attributes that characterize each vehicle in the demo.
+
+.. image:: _static/vehicles.csv.png
+
+As shown in the figure, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity.  A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
 
 Vehicle Simulation and Cost Inputs
 ------------------------------------------
-x
+One of the most important sets of inputs to the Producer Module is the simulated vehicles file.  It contains the vehicles parameters used by OMEGA to generate all possible vehicle technology (and cost) options available to the producers – these are referred to as the “Vehicle Clouds”.  The use of these vehicle clouds by OMEGA is described in 3.3.4.
+
+The simulated vehicle file contains the various vehicles of different core attributes (such as vehicle size, weight, powertrain, etc), the CO2-reducing technologies that are applied to each, and their predicted energy consumption, CO2 performance, and cost.  While not required by all users, EPA uses its own simulation tool (ALPHA) to predict the energy consumption and CO2 emissions for each vehicle and technology combination.  For the demo, these vehicle and technology options (and associated CO2 performance) are consolidated into the simulated_vehicles.csv file.
+The simulated vehicles csv file contains the following fields for use in the producer module:
+
+* the associated **cost curve class** (defined by powertrain family and described below)
+* vehicle properties such as curb weight, type of base powertrain (ICE/HEV/PHEV/BEV, etc)
+* other included technologies (e.g., A/C credits, high efficiency alternator, etc)
+* test cycle performance (energy consumption (for plug-in vehicles) and/or CO2 emissions)
+* vehicle attributes, such as included technologies, costs
+
+**Significance of the cost curve class:**
+Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class.  In the demo, EPA grouped multiple vehicles within a single cost curve class to reduce the number of simulations required to represent the design space and to make the producer decision (manageable).
+OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class.  These decisions are then applied to every vehicle within that cost curve class.
+For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular costs cloud unique to each vehicle.  This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
+
 
 Vehicle Clouds, Frontiers, and Aggregation
 ------------------------------------------
-x
+Description of the process in applying vehicle clouds:
+* Use of vehicle clouds in establishing frontiers
+* Interpolation method for identifying best producer options
+* Search of discrete points
+
 
 
 Producer Compliance Strategy
