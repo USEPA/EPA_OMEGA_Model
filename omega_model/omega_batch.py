@@ -260,38 +260,6 @@ Data Row Name and Description
 
 ----
 
-:Runtime Settings:
-    Decorator, not evaluated
-
-:Num Market Share Options *(int, ...)*:
-    Number of market share options to generate as part of the producer compliance search, typically ``5``.
-    Supports multiple comma-separated values
-
-:Num Tech Options per ICE Vehicle *(int, ...)*:
-    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
-    Supports multiple comma-separated values
-
-:Num Tech Options per BEV Vehicle *(int, ...)*:
-    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
-    Supports multiple comma-separated values
-
-:Cost Curve Frontier Affinity Factor *(float, ...)*:
-    Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
-    Supports multiple comma-separated values
-
-:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
-    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
-    Supports multiple comma-separated values
-
-:Verbose Output *(TRUE or FALSE, ...)*:
-    Enables detailed console and logfile output if ``TRUE``
-    Supports multiple comma-separated values
-
-:Slice Tech Combo Tables *(TRUE or FALSE)*:
-    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
-
-----
-
 :Postproc Settings:
     Decorator, not evaluated
 
@@ -331,6 +299,43 @@ Data Row Name and Description
     The relative or absolute path to the consumer price index file,
     loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
+----
+
+**DEVELOPER SETTINGS**
+
+These settings are primarily for debugging or code development, if not provided by the user then default values will be
+applied.
+
+:Developer Settings:
+    Decorator, not evaluated
+
+:Num Market Share Options *(int, ...)*:
+    Number of market share options to generate as part of the producer compliance search, typically ``5``.
+    Supports multiple comma-separated values
+
+:Num Tech Options per ICE Vehicle *(int, ...)*:
+    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
+    Supports multiple comma-separated values
+
+:Num Tech Options per BEV Vehicle *(int, ...)*:
+    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
+    Supports multiple comma-separated values
+
+:Cost Curve Frontier Affinity Factor *(float, ...)*:
+    Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
+    Supports multiple comma-separated values
+
+:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
+    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
+    Supports multiple comma-separated values
+
+:Verbose Output *(TRUE or FALSE, ...)*:
+    Enables detailed console and logfile output if ``TRUE``
+    Supports multiple comma-separated values
+
+:Slice Tech Combo Tables *(TRUE or FALSE)*:
+    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
+
 """
 
 print('importing %s' % __file__)
@@ -349,6 +354,8 @@ from common.file_io import validate_file, relocate_file, get_filenameext
 
 bundle_input_folder_name = 'in'
 bundle_output_folder_name = OMEGASessionSettings().output_folder
+
+true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
 
 
 def validate_predefined_input(input_str, valid_inputs):
@@ -398,16 +405,12 @@ class OMEGABatchObject(OMEGABase):
         self.discount_values_to_year = None
         self.cost_accrual = ''
 
-    def force_numeric_params(self):
+    def force_numeric_user_params(self):
         import pandas as pd
 
         numeric_params = {
             'Analysis Final Year',
             'Discount Values to Year',
-            'Num Market Share Options',
-            'Num Tech Options per ICE Vehicle',
-            'Num Tech Options per BEV Vehicle',
-            'Cost Curve Frontier Affinity Factor',
             'New Vehicle Price Elasticity of Demand',
             'Producer Cross Subsidy Multiplier Min',
             'Producer Cross Subsidy Multiplier Max',
@@ -415,6 +418,20 @@ class OMEGABatchObject(OMEGABase):
 
         for p in numeric_params:
             self.dataframe.loc[p] = pd.to_numeric(self.dataframe.loc[p])
+
+    def force_numeric_developer_params(self):
+        import pandas as pd
+
+        numeric_params = {
+            'Num Market Share Options',
+            'Num Tech Options per ICE Vehicle',
+            'Num Tech Options per BEV Vehicle',
+            'Cost Curve Frontier Affinity Factor',
+        }
+
+        for p in numeric_params:
+            if p in self.dataframe:
+                self.dataframe.loc[p] = pd.to_numeric(self.dataframe.loc[p])
 
     def read_parameter(self, index_str):
         return self.dataframe.loc[index_str][0]
@@ -599,14 +616,12 @@ class OMEGASessionObject(OMEGABase):
 
         self.num = session_num
         self.settings.session_is_reference = self.num == 0
-        true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
         self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
         self.output_path = OMEGASessionSettings().output_folder  # self.read_parameter('Session Output Folder Name')
 
-    def get_io_settings(self, remote=False):
-        true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
-        self.parent.batch_log.logwrite('Getting Session I/O settings...')
+    def get_user_settings(self, remote=False):
+        self.parent.batch_log.logwrite('Getting User settings...')
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.parent.name + '_' + self.name
@@ -621,6 +636,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.discount_values_to_year = self.parent.discount_values_to_year
         self.settings.cost_accrual = self.parent.cost_accrual
         self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
+
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
@@ -632,7 +648,8 @@ class OMEGASessionObject(OMEGABase):
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
-        self.settings.vehicle_simulation_results_and_costs_file = self.read_parameter('Vehicle Simulation Results and Costs File')
+        self.settings.vehicle_simulation_results_and_costs_file = \
+            self.read_parameter('Vehicle Simulation Results and Costs File')
         self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
         self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
         self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
@@ -645,68 +662,65 @@ class OMEGASessionObject(OMEGABase):
         self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
         self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
-        self.settings.verbose = validate_predefined_input(self.read_parameter('Verbose Output'), true_false_dict)
-        self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
-            self.read_parameter('Slice Tech Combo Tables'), true_false_dict)
 
-    def get_runtime_settings(self):
-        import pandas as pd
+        self.settings.new_vehicle_price_elasticity_of_demand = \
+            self.read_parameter('New Vehicle Price Elasticity of Demand')
+        self.settings.consumer_pricing_multiplier_min = \
+            self.read_parameter('Producer Cross Subsidy Multiplier Min')
+        self.settings.consumer_pricing_multiplier_max = \
+            self.read_parameter('Producer Cross Subsidy Multiplier Max')
 
-        true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
-
-        self.parent.batch_log.logwrite('Getting Runtime Settings...')
-
-        if not pd.isna(self.read_parameter('Num Market Share Options')):
-            self.settings.producer_num_market_share_options = int(
-                self.read_parameter('Num Market Share Options'))
-
-        if not pd.isna(self.read_parameter('Num Tech Options per ICE Vehicle')):
-            self.settings.producer_num_tech_options_per_ice_vehicle = int(
-                self.read_parameter('Num Tech Options per ICE Vehicle'))
-
-        if not pd.isna(self.read_parameter('Num Tech Options per BEV Vehicle')):
-            self.settings.producer_num_tech_options_per_bev_vehicle = int(
-                self.read_parameter('Num Tech Options per BEV Vehicle'))
-
-        if not pd.isna(self.read_parameter('New Vehicle Price Elasticity of Demand')):
-            self.settings.new_vehicle_price_elasticity_of_demand = \
-                self.read_parameter('New Vehicle Price Elasticity of Demand')
-
-        if not pd.isna(self.read_parameter('Producer Cross Subsidy Multiplier Min')):
-            self.settings.consumer_pricing_multiplier_min = float(
-                self.read_parameter('Producer Cross Subsidy Multiplier Min'))
-
-        if not pd.isna(self.read_parameter('Producer Cross Subsidy Multiplier Max')):
-            self.settings.consumer_pricing_multiplier_max = float(
-                self.read_parameter('Producer Cross Subsidy Multiplier Max'))
-
-        self.settings.cost_curve_frontier_affinity_factor = self.read_parameter('Cost Curve Frontier Affinity Factor')
-        self.settings.iterate_producer_consumer = validate_predefined_input(
-            self.read_parameter('Iterate Producer-Consumer'),
-            true_false_dict)
-
-    def get_postproc_settings(self):
-        true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 'TRUE': True, 'FALSE': False})
-
-        self.parent.batch_log.logwrite('Getting Postproc Settings...')
         self.settings.calc_effects = self.parent.calc_effects
         self.settings.calc_criteria_emission_costs = self.parent.calc_effects
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
-        self.settings.energysecurity_cost_factors_file = self.read_parameter('Context Energy Security Cost Factors File')
-        self.settings.congestion_noise_cost_factors_file = self.read_parameter('Context Congestion-Noise Cost Factors File')
-        self.settings.emission_factors_powersector_file = self.read_parameter('Context Powersector Emission Factors File')
+        self.settings.energysecurity_cost_factors_file = \
+            self.read_parameter('Context Energy Security Cost Factors File')
+        self.settings.congestion_noise_cost_factors_file = \
+            self.read_parameter('Context Congestion-Noise Cost Factors File')
+        self.settings.emission_factors_powersector_file = \
+            self.read_parameter('Context Powersector Emission Factors File')
         self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
+    def get_developer_settings(self):
+        self.parent.batch_log.logwrite('Getting Developer Settings...')
+
+        self.settings.producer_num_market_share_options = \
+            int(self.read_parameter('Num Market Share Options',
+                                    self.settings.producer_num_market_share_options))
+
+        self.settings.producer_num_tech_options_per_ice_vehicle = \
+            int(self.read_parameter('Num Tech Options per ICE Vehicle',
+                                    self.settings.producer_num_tech_options_per_ice_vehicle))
+
+        self.settings.producer_num_tech_options_per_bev_vehicle = \
+            int(self.read_parameter('Num Tech Options per BEV Vehicle',
+                                    self.settings.producer_num_tech_options_per_bev_vehicle))
+
+        self.settings.cost_curve_frontier_affinity_factor = \
+            self.read_parameter('Cost Curve Frontier Affinity Factor',
+                                self.settings.cost_curve_frontier_affinity_factor)
+
+        self.settings.iterate_producer_consumer = validate_predefined_input(
+            self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
+            true_false_dict)
+
+        self.settings.verbose = validate_predefined_input(
+            self.read_parameter('Verbose Output', self.settings.verbose),
+            true_false_dict)
+
+        self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
+            self.read_parameter('Slice Tech Combo Tables', self.settings.slice_tech_combo_cloud_tables),
+            true_false_dict)
+
     def init(self, validate_only=False, remote=False):
         if not validate_only:
             self.parent.batch_log.logwrite("Starting Session '%s' -> %s" % (self.name, self.output_path))
-        self.get_io_settings(remote=remote)
-        self.get_runtime_settings()
-        self.get_postproc_settings()
+        self.get_user_settings(remote=remote)
+        self.get_developer_settings()
 
     def run(self, remote=False):
         from omega import run_omega
@@ -781,7 +795,8 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
                             inplace=True)
     batch.dataframe.drop('Type', axis=1, inplace=True,
                          errors='ignore')  # drop Type column, no error if it's not there
-    batch.force_numeric_params()
+    batch.force_numeric_user_params()
+    batch.force_numeric_developer_params()
     batch.get_batch_settings()
     batch.auto_close_figures = options.auto_close_figures
     batch.add_sessions(verbose=False)
@@ -906,7 +921,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                                errors='ignore')  # drop Type column, no error if it's not there
 
         batch.expand_dataframe(verbose=options.verbose)
-        batch.force_numeric_params()
+        batch.force_numeric_user_params()
+        batch.force_numeric_developer_params()
         batch.get_batch_settings()
 
         if not options.no_bundle:

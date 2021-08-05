@@ -45,15 +45,6 @@ New Vehicle Price Elasticity of Demand,#,-0.5,-0.5
 Producer Cross Subsidy Multiplier Min,#,0.95,0.95
 Producer Cross Subsidy Multiplier Max,#,1.05,1.05
 ,,,
-Runtime Settings,,,
-Num Market Share Options,#,5,5
-Num Tech Options per ICE Vehicle,#,5,5
-Num Tech Options per BEV Vehicle,#,1,1
-Cost Curve Frontier Affinity Factor,#,0.75,0.75
-Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
-Verbose Output,TRUE / FALSE,FALSE,FALSE
-Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
-,,,
 Postproc Settings,,,
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
 Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
