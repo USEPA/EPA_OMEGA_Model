@@ -121,8 +121,6 @@ try:
             self.slice_tech_combo_cloud_tables = True
             self.offcycle_credits_file = path + 'demo_inputs/offcycle_credits.csv'
 
-            self.allow_backsliding = True
-
             self.producer_max_iterations = 15
             self.producer_num_market_share_options = 5
             self.producer_num_tech_options_per_ice_vehicle = 5

@@ -80,7 +80,6 @@ Sample Data Columns
         Num Market Share Options,#,5,5
         Num Tech Options per ICE Vehicle,#,5,5
         Num Tech Options per BEV Vehicle,#,1,1
-        Allow Backsliding,TRUE / FALSE,TRUE,"TRUE, FALSE"
         Cost Curve Frontier Affinity Factor,#,0.75,0.75
         Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
         Verbose Output,TRUE / FALSE,FALSE,FALSE
@@ -274,11 +273,6 @@ Data Row Name and Description
 
 :Num Tech Options per BEV Vehicle *(int, ...)*:
     Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
-    Supports multiple comma-separated values
-
-:Allow Backsliding *(TRUE or FALSE, ...)*:
-    If ``TRUE`` then there is no upper limit to vehicle CO2e g/mi over time, if ``FALSE`` then vehicle CO2e cannot get
-    worse year over year
     Supports multiple comma-separated values
 
 :Cost Curve Frontier Affinity Factor *(float, ...)*:
@@ -487,7 +481,6 @@ class OMEGABatchObject(OMEGABase):
             'New Vehicle Price Elasticity of Demand': 'NVPE',
             'Producer Cross Subsidy Multiplier Min': 'PCSMMIN',
             'Producer Cross Subsidy Multiplier Max': 'PCSMMAX',
-            'Allow Backsliding': 'BS',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
             'Verbose Output': 'VB',
             'Iterate Producer-Consumer': 'IPC',
@@ -686,9 +679,6 @@ class OMEGASessionObject(OMEGABase):
         if not pd.isna(self.read_parameter('Producer Cross Subsidy Multiplier Max')):
             self.settings.consumer_pricing_multiplier_max = float(
                 self.read_parameter('Producer Cross Subsidy Multiplier Max'))
-
-        self.settings.allow_backsliding = validate_predefined_input(self.read_parameter('Allow Backsliding'),
-                                                                    true_false_dict)
 
         self.settings.cost_curve_frontier_affinity_factor = self.read_parameter('Cost Curve Frontier Affinity Factor')
         self.settings.iterate_producer_consumer = validate_predefined_input(

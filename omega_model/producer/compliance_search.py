@@ -63,11 +63,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                     num_tech_options = omega_globals.options.producer_num_tech_options_per_bev_vehicle
 
                 veh_min_co2e_gpmi = new_veh.get_min_co2e_gpmi()
-
-                if omega_globals.options.allow_backsliding:
-                    veh_max_co2e_gpmi = new_veh.get_max_co2e_gpmi()
-                else:
-                    veh_max_co2e_gpmi = new_veh.cert_co2e_grams_per_mile
+                veh_max_co2e_gpmi = new_veh.get_max_co2e_gpmi()
 
                 if winning_combos is not None:
                     co2_gpmi_options = np.array([])
@@ -76,7 +72,8 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                         if (combo['veh_%s_sales' % new_veh.vehicle_id] > 0) or (new_veh.tech_option_iteration_num > 0):
                             new_veh.tech_option_iteration_num += 1
 
-                        tech_share_range = omega_globals.options.producer_convergence_factor ** new_veh.tech_option_iteration_num
+                        tech_share_range = omega_globals.options.producer_convergence_factor ** \
+                                           new_veh.tech_option_iteration_num
                         veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % new_veh.vehicle_id]
                         min_co2e_gpmi = max(veh_min_co2e_gpmi, veh_co2e_gpmi * (1 - tech_share_range))
                         max_co2e_gpmi = min(veh_max_co2e_gpmi, veh_co2e_gpmi * (1 + tech_share_range))
