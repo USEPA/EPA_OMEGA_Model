@@ -372,7 +372,8 @@ class VehicleAttributeCalculations(OMEGABase):
                             vehicle.__setattr__(attribute_target,
                                                 eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
         else:
-            raise Exception('Missing vehicle attribute calculations for %d, or prior' % vehicle.model_year)
+            raise Exception('Missing vehicle attribute (vehicle onroad) calculations for %d, or prior'
+                            % vehicle.model_year)
 
 
 class CompositeVehicle(OMEGABase):
