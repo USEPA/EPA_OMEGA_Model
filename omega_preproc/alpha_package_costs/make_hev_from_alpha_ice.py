@@ -1,5 +1,5 @@
 import pandas as pd
-from omega_preproc.alpha_package_costs.alpha_package_costs import SetInputs as settings, Engines, clean_alpha_data
+from omega_preproc.alpha_package_costs.alpha_package_costs import InputSettings, Engines, clean_alpha_data
 
 
 class SelectICEforHEV:
@@ -44,30 +44,30 @@ class SelectICEforHEV:
         return return_df
 
 
-def adjust_co2(settings, df):
+def adjust_co2(input_settings, df):
     """
 
     Args:
-        settings: The SetInputs class of the alpha_package_costs module.
+        input_settings: The InputSettings class of the alpha_package_costs module.
         df: A DataFrame of ICE-based ALPHA packages that are being "converted" to HEV.
 
     Returns:
         A DataFrame of HEV packages with ICE-based CO2 values adjusted to reflect hybridization.
 
     """
-    df['EPA_FTP_1 gCO2e/mi'] = df['EPA_FTP_1 gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
-    df['EPA_FTP_2 gCO2e/mi'] = df['EPA_FTP_2 gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
-    df['EPA_FTP_3 gCO2e/mi'] = df['EPA_FTP_3 gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
-    df['EPA_HWFET gCO2e/mi'] = df['EPA_HWFET gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_hwy_hev']['value'])
-    df['Combined GHG gCO2e/mi'] = df['Combined GHG gCO2e/mi'] * (1 - settings.hev_metrics_dict['co2_reduction_cycle_hev']['value'])
+    df['EPA_FTP_1 gCO2e/mi'] = df['EPA_FTP_1 gCO2e/mi'] * (1 - input_settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
+    df['EPA_FTP_2 gCO2e/mi'] = df['EPA_FTP_2 gCO2e/mi'] * (1 - input_settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
+    df['EPA_FTP_3 gCO2e/mi'] = df['EPA_FTP_3 gCO2e/mi'] * (1 - input_settings.hev_metrics_dict['co2_reduction_city_hev']['value'])
+    df['EPA_HWFET gCO2e/mi'] = df['EPA_HWFET gCO2e/mi'] * (1 - input_settings.hev_metrics_dict['co2_reduction_hwy_hev']['value'])
+    df['Combined GHG gCO2e/mi'] = df['Combined GHG gCO2e/mi'] * (1 - input_settings.hev_metrics_dict['co2_reduction_cycle_hev']['value'])
     return df
 
 
-def add_battery(settings, df):
+def add_battery(input_settings, df):
     """
 
     Args:
-        settings: The SetInputs class of the alpha_package_costs module.
+        input_settings: The InputSettings class of the alpha_package_costs module.
         df: A DataFrame of ICE-based ALPHA packages that are being "converted" to HEV.
 
     Returns:
@@ -76,18 +76,18 @@ def add_battery(settings, df):
     """
     df.insert(len(df.columns), 'battery_kwh_gross', 0)
     df['battery_kwh_gross'] \
-        = settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['x_cubed_factor'] * ((df['Test Weight lbs'] - 300)/settings.lbs_per_kg) ** 3 \
-          + settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['x_squared_factor'] * ((df['Test Weight lbs'] - 300)/settings.lbs_per_kg) ** 2 \
-          + settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['x_factor'] * ((df['Test Weight lbs'] - 300)/settings.lbs_per_kg) \
-          + settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['constant']
+        = input_settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['x_cubed_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 3 \
+          + input_settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['x_squared_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 2 \
+          + input_settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['x_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) \
+          + input_settings.hev_curves_dict['kWh_pack_per_kg_curbwt_curve']['constant']
     return df
 
 
-def add_motor(settings, df):
+def add_motor(input_settings, df):
     """
 
     Args:
-        settings: The SetInputs class of the alpha_package_costs module.
+        input_settings: The InputSettings class of the alpha_package_costs module.
         df: A DataFrame of ICE-based ALPHA packages that are being "converted" to HEV.
 
     Returns:
@@ -96,10 +96,10 @@ def add_motor(settings, df):
     """
     df.insert(len(df.columns), 'motor_kw', 0)
     df['motor_kw'] \
-        = settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['x_cubed_factor'] * ((df['Test Weight lbs'] - 300)/settings.lbs_per_kg) ** 3 \
-          + settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['x_squared_factor'] * ((df['Test Weight lbs'] - 300)/settings.lbs_per_kg) ** 2 \
-          + settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['x_factor'] * ((df['Test Weight lbs'] - 300)/settings.lbs_per_kg) \
-          + settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['constant']
+        = input_settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['x_cubed_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 3 \
+          + input_settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['x_squared_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 2 \
+          + input_settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['x_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) \
+          + input_settings.hev_curves_dict['kW_motor_per_kg_curbwt_curve']['constant']
     return df
 
 
@@ -143,8 +143,9 @@ def add_motor(settings, df):
 
 
 def main():
-    ice_folder_path = settings.path_alpha_inputs / 'ICE'
-    hev_folder_path = settings.path_alpha_inputs / 'HEV'
+    input_settings = InputSettings()
+    ice_folder_path = input_settings.path_alpha_inputs / 'ICE'
+    hev_folder_path = input_settings.path_alpha_inputs / 'HEV'
     hev_folder_path.mkdir(exist_ok=True)
 
     hev_packages_df = pd.DataFrame()
@@ -161,10 +162,10 @@ def main():
         df = SelectICEforHEV(alpha_file_df).return_df()
         hev_packages_df = pd.concat([hev_packages_df, df], axis=0, ignore_index=True)
 
-    hev_packages_df = add_battery(settings, hev_packages_df)
-    hev_packages_df = add_motor(settings, hev_packages_df)
-    hev_packages_df = adjust_co2(settings, hev_packages_df)
-    # hev_packages_df = add_size_scalers(settings, hev_packages_df)
+    hev_packages_df = add_battery(input_settings, hev_packages_df)
+    hev_packages_df = add_motor(input_settings, hev_packages_df)
+    hev_packages_df = adjust_co2(input_settings, hev_packages_df)
+    # hev_packages_df = add_size_scalers(input_settings, hev_packages_df)
     hev_packages_df = pd.concat([sub_header, hev_packages_df], axis=0, ignore_index=True)
     hev_packages_df.to_csv(hev_folder_path / 'HEV.csv', index=False)
     print(f'HEV packages file is saved to {hev_folder_path}')
