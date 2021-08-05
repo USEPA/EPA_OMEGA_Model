@@ -52,19 +52,14 @@ Additional functions of OMEGA related to policy assumptions and environmental/ec
 
 Iteration and Convergence
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-A compliance solution which only minimizes producer generalized costs without consideration of consumer demand may not satisfy the market requirements at the fleet mix and level of sales preferred by the producer. Since there is no deterministic approach to the general problem of convergence between producers and consumers, OMEGA uses an iterative search approach.
-
-OMEGA’s Producer Module and Consumer Module represent distinct decision making entities, which if treated separately and in isolation may not arrive at an equilibrium of vehicles supplied and demanded. The identification of an equilibrium solution in OMEGA requires an interactive relationship between the Producer Module and Consumer Module.
-
-Internal to OMEGA, the two primary Modules receive and respond to each other’s outputs, iterating until the demands of consumers converge with the vehicles provided by the producers.
-Brief intro: Diagram + high level summary
+OMEGA is intended to find a solution which simultaneously satisfies producer, consumer, and policy requirements while minimizing the producer’s generalized costs. OMEGA’s Producer and Consumer modules represent distinct decision-making entities, with behaviors defined separately by the user. Without some type of interaction between these modules, the model would likely not arrive at an equilibrium of vehicles supplied and demanded. For example, a compliance solution which only minimizes producer generalized costs without consideration of consumer demand may not satisfy the market requirements at the fleet mix and level of sales preferred by the producer. Since there is no general analytical solution to this problem which also allows model users to independently define producer and consumer behavior, OMEGA uses an iterative search approach.
 
 Analysis Resolution
 ^^^^^^^^^^^^^^^^^^^
 The outcomes of consumer and producer decision-making in OMEGA are expressed via the vehicles modeled in the analysis period, the volumes of vehicles produced, the applied technologies and relevant vehicle attributes, and the re-registration and use over all vehicles’ lifetimes. Because there can be nearly 20 million light-duty vehicles produced for sale each year in the US, and hundreds of millions of vehicles registered for use at any given time, OMEGA must aggregate, as appropriate, while still distinguishing between vehicles when needed. The approach for aggregating vehicles varies based on the different functions and modules within OMEGA, with the general principles applied throughout OMEGA to 1) use the amount of vehicle detail required, but no more than is required, to perform any particular modeling sub-task, and 2) to retain vehicle details that will be needed for subsequent modeling tasks.
 
-* The modeling of producer decisions requires that that the model retains sufficient detail to calculate the target and achieved compliance emissions, as well as any details needed to calculate the generalized producer cost.
-* The modeling of consumer decisions requires that the model retains sufficient detail to distinguish market segments between which the consumer is choosing. The definition of these OMEGA ‘market classes’ depends on the requirements of the particular Consumer Module being used. For this reason, OMEGA assigns market classes to vehicles internally according the attribute definitions of the market classes (e.g. size, interior volume, frame type, AWD, electric range, etc), rather than being hard-coded in the context inputs for fleet projections.
+* The modeling of producer decisions requires that the model retains sufficient detail to calculate the target and achieved compliance emissions, as well as any details needed to calculate the generalized producer cost.
+* The modeling of consumer decisions requires that the model retains sufficient detail to distinguish between market classes for representing both the purchase choices among different classes, and the reregistration and use of vehicles within a given class. Because the way that consumer decisions are modeled is a replaceable module, the definition of market classes depends on the requirements of the approach used.
 
 How to Navigate this Documentation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
