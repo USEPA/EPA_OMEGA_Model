@@ -40,6 +40,8 @@ Sample Data Columns
         Analysis Final Year,#,2050,
         Consolidate Manufacturers,TRUE / FALSE,TRUE,
         Run Effects Calculations,TRUE / FALSE,FALSE,
+        Discount Values to Year,#,2021,
+        Cost Accrual,end-of-year / beginning-of-year,end-of-year,
         ,,,
         Session Settings,,,
         Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -66,7 +68,7 @@ Sample Data Columns
         Market Classes File,String,market_classes.csv,market_classes.csv
         Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
         Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
-        Producer Generalized Cost File,producer_generalized_cost.csv,producer_generalized_cost.csv
+        Producer Generalized Cost File,String,producer_generalized_cost.csv,producer_generalized_cost.csv
         Production Constraints File,String,production_constraints.csv,production_constraints.csv
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
         Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
@@ -75,15 +77,6 @@ Sample Data Columns
         New Vehicle Price Elasticity of Demand,#,-0.5,-0.5
         Producer Cross Subsidy Multiplier Min,#,0.95,0.95
         Producer Cross Subsidy Multiplier Max,#,1.05,1.05
-        ,,,
-        Runtime Settings,,,
-        Num Market Share Options,#,5,5
-        Num Tech Options per ICE Vehicle,#,5,5
-        Num Tech Options per BEV Vehicle,#,1,1
-        Cost Curve Frontier Affinity Factor,#,0.75,0.75
-        Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
-        Verbose Output,TRUE / FALSE,FALSE,FALSE
-        Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
         ,,,
         Postproc Settings,,,
         Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
@@ -325,16 +318,42 @@ applied.
     Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
     Supports multiple comma-separated values
 
-:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
-    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
-    Supports multiple comma-separated values
+:Slice Tech Combo Tables *(TRUE or FALSE)*:
+    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
 
 :Verbose Output *(TRUE or FALSE, ...)*:
     Enables detailed console and logfile output if ``TRUE``
     Supports multiple comma-separated values
 
-:Slice Tech Combo Tables *(TRUE or FALSE)*:
-    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
+:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
+    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
+    Supports multiple comma-separated values
+
+:Producer-Consumer Max Iterations:
+
+:Producer-Consumer Convergence Tolerance:
+
+:Producer Compliance Search Max Iterations:
+
+:Producer Compliance Search Convergence Factor:
+
+:Producer Compliance Search Tolerance:
+
+:Producer Cross Subsidy Price Tolerance:
+
+:Run Profiler:
+
+:Flat Context:
+
+:Flat Context Year:
+
+:Verbose Console Modules:
+
+:Log Producer Iteration Years:
+
+:Log Consumer Iteration Years:
+
+:Log Producer Decision and Response Years:
 
 """
 
@@ -427,6 +446,13 @@ class OMEGABatchObject(OMEGABase):
             'Num Tech Options per ICE Vehicle',
             'Num Tech Options per BEV Vehicle',
             'Cost Curve Frontier Affinity Factor',
+            'Producer-Consumer Max Iterations',
+            'Producer-Consumer Convergence Tolerance',
+            'Producer Compliance Search Max Iterations',
+            'Producer Compliance Search Convergence Factor',
+            'Producer Compliance Search Tolerance',
+            'Producer Cross Subsidy Price Tolerance',
+            'Flat Context Year',
         }
 
         for p in numeric_params:
@@ -701,20 +727,72 @@ class OMEGASessionObject(OMEGABase):
                                     self.settings.producer_num_tech_options_per_bev_vehicle))
 
         self.settings.cost_curve_frontier_affinity_factor = \
-            self.read_parameter('Cost Curve Frontier Affinity Factor',
-                                self.settings.cost_curve_frontier_affinity_factor)
+            float(self.read_parameter('Cost Curve Frontier Affinity Factor',
+                                self.settings.cost_curve_frontier_affinity_factor))
 
-        self.settings.iterate_producer_consumer = validate_predefined_input(
-            self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
+        self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
+            self.read_parameter('Slice Tech Combo Tables', self.settings.slice_tech_combo_cloud_tables),
             true_false_dict)
 
         self.settings.verbose = validate_predefined_input(
             self.read_parameter('Verbose Output', self.settings.verbose),
             true_false_dict)
 
-        self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
-            self.read_parameter('Slice Tech Combo Tables', self.settings.slice_tech_combo_cloud_tables),
+        self.settings.iterate_producer_consumer = validate_predefined_input(
+            self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
             true_false_dict)
+
+        self.settings.producer_consumer_max_iterations = \
+            int(self.read_parameter('Producer-Consumer Max Iterations',
+                                    self.settings.producer_consumer_max_iterations))
+
+        self.settings.producer_consumer_convergence_tolerance = \
+            float(self.read_parameter('Producer-Consumer Convergence Tolerance',
+                                self.settings.producer_consumer_convergence_tolerance))
+
+        self.settings.producer_compliance_search_max_iterations = \
+            int(self.read_parameter('Producer Compliance Search Max Iterations',
+                                    self.settings.producer_compliance_search_max_iterations))
+
+        self.settings.producer_compliance_search_convergence_factor = \
+            float(self.read_parameter('Producer Compliance Search Convergence Factor',
+                                self.settings.producer_compliance_search_convergence_factor))
+
+        self.settings.producer_compliance_search_tolerance = \
+            float(self.read_parameter('Producer Compliance Search Tolerance',
+                                self.settings.producer_compliance_search_tolerance))
+
+        self.settings.producer_cross_subsidy_price_tolerance = \
+            float(self.read_parameter('Producer Cross Subsidy Price Tolerance',
+                                self.settings.producer_cross_subsidy_price_tolerance))
+
+        self.settings.run_profiler = validate_predefined_input(
+            self.read_parameter('Run Profiler', self.settings.run_profiler),
+            true_false_dict)
+
+        self.settings.flat_context = validate_predefined_input(
+            self.read_parameter('Flat Context', self.settings.flat_context),
+            true_false_dict)
+
+        self.settings.flat_context_year = \
+            int(self.read_parameter('Flat Context Year',
+                                    self.settings.flat_context_year))
+
+        self.settings.verbose_console_modules = \
+            self.read_parameter('Verbose Console Modules',
+                                self.settings.verbose_console_modules)
+
+        # self.settings.log_producer_iteration_years = \
+        #     self.read_parameter('Log Producer Iteration Years',
+        #                         self.settings.log_producer_iteration_years)
+
+        # self.settings.log_consumer_iteration_years = \
+        #     self.read_parameter('Log Consumer Iteration Years',
+        #                         self.settings.log_consumer_iteration_years)
+
+        # self.settings.log_producer_decision_and_response_years = \
+        #     self.read_parameter('Log Producer Decision and Response Years',
+        #                         self.settings.log_producer_decision_and_response_years)
 
     def init(self, validate_only=False, remote=False):
         if not validate_only:

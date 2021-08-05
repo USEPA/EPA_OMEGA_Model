@@ -259,7 +259,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             best_candidate_production_decision = \
                 candidate_production_decisions.loc[candidate_production_decisions['strategic_compliance_error'].idxmin()]
 
-        if 'producer' in omega_globals.options.verbose_console:
+        if 'producer' in omega_globals.options.verbose_console_modules:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
                                               search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
                                     best_candidate_production_decision['strategic_compliance_ratio']), echo_console=True)
@@ -269,7 +269,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         continue_search = abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) > \
                            omega_globals.options.producer_compliance_search_tolerance
 
-    if 'producer' in omega_globals.options.verbose_console:
+    if 'producer' in omega_globals.options.verbose_console_modules:
         omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
                            echo_console=True)
 
@@ -289,7 +289,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     # log the final iteration, as opposed to the winning iteration:
     selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
-    if 'producer' in omega_globals.options.verbose_console:
+    if 'producer' in omega_globals.options.verbose_console_modules:
         for mc in omega_globals.options.MarketClass.market_classes:
             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' %
                                (selected_production_decision['producer_abs_share_frac_%s' % mc]), echo_console=True)
@@ -470,7 +470,7 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_id]
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
-            (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console:
+            (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console_modules:
             cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
         cv.decompose()  # propagate sales to source vehicles
         for v in cv.vehicle_list:
@@ -724,7 +724,7 @@ def select_candidate_manufacturing_decisions(tech_share_combos_total, calendar_y
         # winning_combos = tech_share_combos_total.loc[[[cost_name].idxmin()]]
 
     if (omega_globals.options.log_producer_iteration_years == 'all') or (calendar_year in omega_globals.options.log_producer_iteration_years):
-        if 'producer' in omega_globals.options.verbose_console:
+        if 'producer' in omega_globals.options.verbose_console_modules:
             tech_share_combos_total.loc[winning_combos.index, 'winner'] = True
             if omega_globals.options.slice_tech_combo_cloud_tables:
                 tech_share_combos_total = tech_share_combos_total[tech_share_combos_total['strategic_compliance_ratio'] <= 1.2]

@@ -101,7 +101,6 @@ try:
             self.drive_cycle_weights_file = path + 'demo_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'demo_inputs/context_new_vehicle_market.csv'
             self.vehicle_simulation_results_and_costs_file = path + 'demo_inputs/simulated_vehicles.csv'
-            self.cost_curve_frontier_affinity_factor = 0.75
             self.analysis_initial_year = None
             self.analysis_final_year = 2021
             self.logfile_prefix = 'o2log_'
@@ -145,28 +144,28 @@ try:
             self.end_time = 0
 
             # developer settings
-            self.verbose = False
-            self.iterate_producer_consumer = True
             self.producer_num_market_share_options = 5
             self.producer_num_tech_options_per_ice_vehicle = 5
             self.producer_num_tech_options_per_bev_vehicle = 1
+            self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = True
+            self.verbose = False
+            self.iterate_producer_consumer = True
 
             self.producer_consumer_max_iterations = 2  # recommend 2+
+            self.producer_consumer_convergence_tolerance = 1e-3
             self.producer_compliance_search_max_iterations = 15
             self.producer_compliance_search_convergence_factor = 0.33
             self.producer_compliance_search_tolerance = 1e-6
-
             self.producer_cross_subsidy_price_tolerance = 1e-4
-            self.producer_consumer_convergence_tolerance = 1e-3
-
-            self.verbose_console = []  # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False
             self.flat_context_year = 2021
+
+            self.verbose_console_modules = []  # list of modules to allow verbose console output, or empty to disable
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_decision_and_response_years = []  # [2029]  # 'all'  # = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
 
             # dynamic modules / classes
             self.RegulatoryClasses = None

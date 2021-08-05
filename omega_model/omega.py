@@ -369,7 +369,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
         iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
-        if 'consumer' in omega_globals.options.verbose_console:
+        if 'consumer' in omega_globals.options.verbose_console_modules:
             logwrite_shares_and_costs(calendar_year, convergence_error, producer_decision_and_response, producer_consumer_iteration_num,
                                       cross_subsidy_iteration_num)
 
@@ -380,7 +380,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
         continue_search = continue_search and not converged
 
-    if 'consumer' in omega_globals.options.verbose_console:
+    if 'consumer' in omega_globals.options.verbose_console_modules:
         for mc, cc in zip(omega_globals.options.MarketClass.market_classes, multiplier_columns):
             omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc], echo_console=True)
         if converged:
@@ -499,7 +499,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, multiplier_colu
 
     if not producer_decision_and_response.empty and search_collapsed:
         continue_search = False
-        if 'consumer' in omega_globals.options.verbose_console:
+        if 'consumer' in omega_globals.options.verbose_console_modules:
             omega_log.logwrite('SEARCH COLLAPSED')
 
     return continue_search, price_options_df
@@ -546,7 +546,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
         np.linspace(min_val, max_val, omega_globals.options.consumer_pricing_num_options),
         producer_decision_and_response[multiplier_column]))
     search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or ((max_val / min_val - 1) <= 1e-3))
-    if 'consumer' in omega_globals.options.verbose_console:
+    if 'consumer' in omega_globals.options.verbose_console_modules:
         omega_log.logwrite(('%s' % multiplier_column).ljust(50) + '= %.5f MR:%s R:%f' % (
             producer_decision_and_response[multiplier_column], multiplier_range, max_val / min_val), echo_console=True)
 
