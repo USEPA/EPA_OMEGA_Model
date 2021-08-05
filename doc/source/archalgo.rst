@@ -106,7 +106,8 @@ Vehicle Definitions
 -------------------
 The core unit impacted by decisions in the producer module is at the vehicle level.  Each OMEGA “vehicle” is defined in the analysis context and represents a set of distinct attributes.  In the demo, for example, the attributes associated with each vehicle definition are included in the vehicles.csv file.  The figure below shows a subset of attributes that characterize each vehicle in the demo.
 
-.. image:: _static/vehicles.csv.png
+.. figure:: _static/mo_figures/vehicles.csv.png
+    :align: center
 
 As shown in the figure, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity.  A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
 
@@ -132,6 +133,7 @@ For possible future consideration, EPA recommends the generation of RSEs (respon
 Vehicle Clouds, Frontiers, and Aggregation
 ------------------------------------------
 Description of the process in applying vehicle clouds:
+
 * Use of vehicle clouds in establishing frontiers
 * Interpolation method for identifying best producer options
 * Search of discrete points
