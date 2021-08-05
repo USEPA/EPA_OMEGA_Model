@@ -79,7 +79,6 @@ try:
             self.session_name = 'OMEGA Demo'
             self.session_unique_name = 'OMEGA Demo'
             self.session_is_reference = True
-            self.verbose = False
             self.auto_close_figures = False
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
@@ -118,19 +117,7 @@ try:
             self.production_constraints_file = path + 'demo_inputs/production_constraints.csv'
             self.vehicle_reregistration_file = path + 'demo_inputs/reregistration_fixed_by_age.csv'
             self.onroad_vmt_file = path + 'demo_inputs/annual_vmt_fixed_by_age.csv'
-            self.slice_tech_combo_cloud_tables = True
             self.offcycle_credits_file = path + 'demo_inputs/offcycle_credits.csv'
-
-            self.producer_max_iterations = 15
-            self.producer_num_market_share_options = 5
-            self.producer_num_tech_options_per_ice_vehicle = 5
-            self.producer_num_tech_options_per_bev_vehicle = 1
-            self.producer_iteration_tolerance = 1e-6
-            self.producer_convergence_factor = 0.33
-
-            self.iterate_producer_consumer = True
-            self.producer_consumer_max_iterations = 2  # recommend 2+
-            self.producer_consumer_iteration_tolerance = 1e-3
 
             self.consumer_pricing_num_options = 4
             self.consumer_pricing_multiplier_min = 0.95
@@ -157,7 +144,22 @@ try:
             self.start_time = 0
             self.end_time = 0
 
-            # debugging options
+            # developer settings
+            self.verbose = False
+            self.iterate_producer_consumer = True
+            self.producer_num_market_share_options = 5
+            self.producer_num_tech_options_per_ice_vehicle = 5
+            self.producer_num_tech_options_per_bev_vehicle = 1
+            self.slice_tech_combo_cloud_tables = True
+
+            self.producer_consumer_max_iterations = 2  # recommend 2+
+            self.producer_compliance_search_max_iterations = 15
+            self.producer_compliance_search_convergence_factor = 0.33
+            self.producer_compliance_search_tolerance = 1e-6
+
+            self.producer_cross_subsidy_price_tolerance = 1e-4
+            self.producer_consumer_convergence_tolerance = 1e-3
+
             self.verbose_console = []  # ['producer', 'consumer']  # list of modules to allow verbose console output, or empty to disable
             self.run_profiler = False
             self.flat_context = False

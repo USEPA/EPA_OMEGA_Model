@@ -72,7 +72,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                         if (combo['veh_%s_sales' % new_veh.vehicle_id] > 0) or (new_veh.tech_option_iteration_num > 0):
                             new_veh.tech_option_iteration_num += 1
 
-                        tech_share_range = omega_globals.options.producer_convergence_factor ** \
+                        tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
                                            new_veh.tech_option_iteration_num
                         veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % new_veh.vehicle_id]
                         min_co2e_gpmi = max(veh_min_co2e_gpmi, veh_co2e_gpmi * (1 - tech_share_range))
@@ -224,8 +224,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     search_iteration = 0
     best_candidate_production_decision = None
 
-    while continue_search and search_iteration < omega_globals.options.producer_max_iterations:
-        share_range = omega_globals.options.producer_convergence_factor ** search_iteration
+    while continue_search and search_iteration < omega_globals.options.producer_compliance_search_max_iterations:
+        share_range = omega_globals.options.producer_compliance_search_convergence_factor ** search_iteration
 
         composite_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
@@ -267,7 +267,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         search_iteration += 1
 
         continue_search = abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) > \
-                           omega_globals.options.producer_iteration_tolerance
+                           omega_globals.options.producer_compliance_search_tolerance
 
     if 'producer' in omega_globals.options.verbose_console:
         omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),

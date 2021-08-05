@@ -678,14 +678,15 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
         tuple of convergence bool and convergence error, (converged, convergence_error)
 
     """
-    # TODO: parameterize the 1e-4?
-    converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= 1e-4
+    converged = abs(1 - producer_decision_and_response['price_cost_ratio_total']) <= \
+                omega_globals.options.producer_cross_subsidy_price_tolerance
+
     convergence_error = 0
     for mc in market_class_dict:
         convergence_error = \
             max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
                                        producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-        converged = converged and (convergence_error <= omega_globals.options.producer_consumer_iteration_tolerance)
+        converged = converged and (convergence_error <= omega_globals.options.producer_consumer_convergence_tolerance)
 
     return converged, convergence_error
 
