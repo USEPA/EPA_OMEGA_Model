@@ -133,7 +133,7 @@ def get_refinery_ef(calendar_year, fuel):
 
 
 # TODO when calculating refinery inventory, we need to consider where fuel is refined so we'll need a new input file for that
-def calc_inventory(calendar_year):
+def calc_physical_effects(calendar_year):
     """
 
     Args:
