@@ -619,8 +619,6 @@ def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, f
         if deacpd != 0: deacpd_value = 1
         if deacfc != 0: deacfc_value = 1
     if fuel_key == 'bev':
-        startstop = 1
-        accessory_value = 1
         bev_value = 1
     if fuel_key == 'hev': hev_value = 1
     if fuel_key == 'phev': phev_value = 1
@@ -1424,12 +1422,11 @@ def main():
                                   'alpha_filename', 'cs_cert_direct_oncycle_co2e_grams_per_mile',
                                   'cd_cert_direct_oncycle_kwh_per_mile')
         # open the 'simulated_vehicles.csv' input template into which results will be placed.
-        cost_clouds_template_info = pd.read_csv(input_settings.path_input_templates.joinpath('simulated_vehicles.csv'), 'b', nrows=0)
-        temp = ' '.join((item for item in cost_clouds_template_info))
-        temp2 = temp.split(',')
-        temp2 = temp2[:4]
-        temp2.append(f'{input_settings.name_id}')
-        df = pd.DataFrame(columns=temp2)
+        cost_clouds_template_info = pd.read_csv(input_settings.path_input_templates.joinpath('simulated_vehicles.csv'), nrows=0, usecols=[0, 1, 2, 3, 4])
+        temp = [item for item in cost_clouds_template_info]
+        temp.append(f'{input_settings.dollar_basis}')
+        temp.append(f'{input_settings.name_id}')
+        df = pd.DataFrame(columns=temp)
         df.to_csv(input_settings.path_of_run_folder.joinpath('simulated_vehicles.csv'), index=False)
 
         with open(input_settings.path_of_run_folder.joinpath('simulated_vehicles.csv'), 'a', newline='') as cloud_file:
