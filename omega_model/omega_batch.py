@@ -525,6 +525,9 @@ class OMEGABatchObject(OMEGABase):
         fullfact_dimensions_vectors = []
         for column_index in range(0, len(self.dataframe.columns)):
             fullfact_dimensions_vectors.append(self.parse_column_params(column_index, verbose))
+            if column_index == 0 and max(fullfact_dimensions_vectors[0]) > 1:
+                raise Exception('Reference session of batch (first session column) must not contain any '
+                                'comma-separated values')
         return fullfact_dimensions_vectors
 
     def expand_dataframe(self, verbose=False):
@@ -607,21 +610,24 @@ class OMEGABatchObject(OMEGABase):
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
         self.settings.calc_effects = self.read_parameter('Run Effects Calculations')
 
+        # read context scalar settings
         self.settings.context_id = self.read_parameter('Context Name')
         self.settings.context_case_id = self.read_parameter('Context Case')
-        self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
-        self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
-        self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
-        self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.new_vehicle_price_elasticity_of_demand = \
             self.read_parameter('New Vehicle Price Elasticity of Demand')
-        self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
-        self.settings.onroad_vehicle_calculations_file = self.read_parameter('Onroad Vehicle Calculations File')
-        self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
         self.settings.consumer_pricing_multiplier_max = \
             self.read_parameter('Producer Cross Subsidy Multiplier Max')
         self.settings.consumer_pricing_multiplier_min = \
             self.read_parameter('Producer Cross Subsidy Multiplier Min')
+
+        # read context file settings
+        self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
+        self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
+        self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
+        self.settings.market_classes_file = self.read_parameter('Market Classes File')
+        self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
+        self.settings.onroad_vehicle_calculations_file = self.read_parameter('Onroad Vehicle Calculations File')
+        self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
         self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
         self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
         self.settings.sales_share_file = self.read_parameter('Sales Share File')
@@ -682,15 +688,34 @@ class OMEGASessionObject(OMEGABase):
         self.output_path = OMEGASessionSettings().output_folder  # self.read_parameter('Session Output Folder Name')
 
     def get_user_settings(self, remote=False):
+        from copy import copy
+
         self.parent.batch_log.logwrite('Getting User settings...')
 
-        self.settings = self.parent.settings    # copy batch-level settings to session
+        self.settings = copy(self.parent.settings)    # copy batch-level settings to session
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.parent.name + '_' + self.name
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
         self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
+
+        # read context settings
+        self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
+        self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
+        self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
+        self.settings.market_classes_file = self.read_parameter('Market Classes File')
+        self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
+        self.settings.onroad_vehicle_calculations_file = self.read_parameter('Onroad Vehicle Calculations File')
+        self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
+        self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
+        self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
+        self.settings.sales_share_file = self.read_parameter('Sales Share File')
+        self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
+        self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
+        self.settings.vehicle_simulation_results_and_costs_file = \
+            self.read_parameter('Vehicle Simulation Results and Costs File')
+        self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
@@ -1104,6 +1129,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
             else:
                 session_list = [options.session_num]
 
+            batch.dataframe_orig = batch.dataframe.copy()
+
             # copy session inputs to session folder(s) for active session(s)
             for s in session_list:
                 if batch.sessions[s].enabled:
@@ -1134,6 +1161,10 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                         if str(i).endswith(' File'):
                             source_file_path = batch.dataframe.loc[i][session.num]
 
+                            if s > 0 and type(source_file_path) is float:
+                                # assume file is a batch setting, not a session setting
+                                source_file_path = batch.dataframe_orig.loc[i][0]
+
                             if type(source_file_path) is str:
                                 # fix path separators, if necessary
                                 source_file_path = source_file_path.replace('\\', os.sep)
@@ -1149,8 +1180,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 # file_path is relative path
                                 if options.verbose:
                                     batch.batch_log.logwrite('relocating %s to %s' % (
-                                        batch.batch_definition_path + batch.dataframe.loc[i][session.num],
-                                        options.session_path + source_file_path))
+                                        batch.batch_definition_path + source_file_path,
+                                        options.session_path + bundle_input_folder_name))
                                 batch.dataframe.loc[i][session.num] = session.name + os.sep + bundle_input_folder_name + os.sep + relocate_file(
                                     options.session_path + bundle_input_folder_name, batch.batch_definition_path + source_file_path)
 
