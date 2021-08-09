@@ -89,7 +89,6 @@ try:
             self.onroad_vehicle_calculations_file = path + 'demo_inputs/onroad_vehicle_calculations.csv'
             self.sales_share_file = path + 'demo_inputs/sales_share-gcam.csv'
             self.onroad_fuels_file = path + 'demo_inputs/onroad_fuels.csv'
-            self.context_folder = ''
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
             self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'

@@ -1,51 +1,50 @@
 Parameter,Type,Value,
 Batch Settings,,,
 Batch Name,String,demo_batch,
-Context Folder Name,String,,
-Context Name,String,AEO2021,
-Context Case,String,Reference case,
 Analysis Final Year,#,2050,
 Consolidate Manufacturers,TRUE / FALSE,TRUE,
-Run Effects Calculations,TRUE / FALSE,FALSE,
-Discount Values to Year,#,2021,
 Cost Accrual,end-of-year / beginning-of-year,end-of-year,
+Discount Values to Year,#,2021,
+Run Effects Calculations,TRUE / FALSE,FALSE,
+,,,
+Batch Analysis Context Settings,,,
+Context Name,String,AEO2021,
+Context Case,String,Reference case,
+Context Fuel Prices File,String,context_fuel_prices.csv,
+Context New Vehicle Market File,String,context_new_vehicle_market.csv,
+Manufacturers File,String,manufacturers.csv,
+Market Classes File,String,market_classes.csv,
+New Vehicle Price Elasticity of Demand,#,-0.5,
+Onroad Fuels File,String,onroad_fuels.csv,
+Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
+Onroad VMT File,String,annual_vmt_fixed_by_age.csv,
+Producer Cross Subsidy Multiplier Max,#,1.05,
+Producer Cross Subsidy Multiplier Min,#,0.95,
+Producer Generalized Cost File,String,producer_generalized_cost.csv,
+Production Constraints File,String,production_constraints.csv,
+Sales Share File,String,sales_share-gcam.csv,
+Vehicle Price Modifications File,String,vehicle_price_modifications.csv,
+Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
+Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,
+Vehicles File,String,vehicles.csv,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
 Session Name,String,NoActionPolicy,ActionAlternative
 ,,,
-Policy Alternatives Settings,,,
-Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
+Session Policy Alternatives Settings,,,
 Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
+Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
 GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
 GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
-Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
 Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
 Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
 Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
 Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
 Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
 ,,,
-Analysis Context Settings,,,
-Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
-Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
-Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,simulated_vehicles.csv
-Sales Share File,String,sales_share-gcam.csv,sales_share-gcam.csv
-Manufacturers File,String,manufacturers.csv,manufacturers.csv
-Market Classes File,String,market_classes.csv,market_classes.csv
-Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
-Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
-Producer Generalized Cost File,String,producer_generalized_cost.csv,producer_generalized_cost.csv
-Production Constraints File,String,production_constraints.csv,production_constraints.csv
-Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
-Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
-Vehicles File,String,vehicles.csv,vehicles.csv
-Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,onroad_vehicle_calculations.csv
-New Vehicle Price Elasticity of Demand,#,-0.5,-0.5
-Producer Cross Subsidy Multiplier Min,#,0.95,0.95
-Producer Cross Subsidy Multiplier Max,#,1.05,1.05
-,,,
-Postproc Settings,,,
+Session Postproc Settings,,,
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
 Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
 Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv

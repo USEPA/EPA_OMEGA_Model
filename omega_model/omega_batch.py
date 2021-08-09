@@ -34,51 +34,50 @@ Sample Data Columns
         Parameter,Type,Value,
         Batch Settings,,,
         Batch Name,String,demo_batch,
-        Context Folder Name,String,,
-        Context Name,String,AEO2021,
-        Context Case,String,Reference case,
         Analysis Final Year,#,2050,
         Consolidate Manufacturers,TRUE / FALSE,TRUE,
-        Run Effects Calculations,TRUE / FALSE,FALSE,
-        Discount Values to Year,#,2021,
         Cost Accrual,end-of-year / beginning-of-year,end-of-year,
+        Discount Values to Year,#,2021,
+        Run Effects Calculations,TRUE / FALSE,FALSE,
+        ,,,
+        Batch Analysis Context Settings,,,
+        Context Name,String,AEO2021,
+        Context Case,String,Reference case,
+        Context Fuel Prices File,String,context_fuel_prices.csv,
+        Context New Vehicle Market File,String,context_new_vehicle_market.csv,
+        Manufacturers File,String,manufacturers.csv,
+        Market Classes File,String,market_classes.csv,
+        New Vehicle Price Elasticity of Demand,#,-0.5,
+        Onroad Fuels File,String,onroad_fuels.csv,
+        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
+        Onroad VMT File,String,annual_vmt_fixed_by_age.csv,
+        Producer Cross Subsidy Multiplier Max,#,1.05,
+        Producer Cross Subsidy Multiplier Min,#,0.95,
+        Producer Generalized Cost File,String,producer_generalized_cost.csv,
+        Production Constraints File,String,production_constraints.csv,
+        Sales Share File,String,sales_share-gcam.csv,
+        Vehicle Price Modifications File,String,vehicle_price_modifications.csv,
+        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
+        Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,
+        Vehicles File,String,vehicles.csv,
         ,,,
         Session Settings,,,
         Enable Session,TRUE / FALSE,TRUE,TRUE
         Session Name,String,NoActionPolicy,ActionAlternative
         ,,,
-        Policy Alternatives Settings,,,
-        Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
+        Session Policy Alternatives Settings,,,
         Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
+        Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
         GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
         GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
-        Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
         Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
         Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
+        Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
         Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
         Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
         Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
         ,,,
-        Analysis Context Settings,,,
-        Context Fuel Prices File,String,context_fuel_prices.csv,context_fuel_prices.csv
-        Context New Vehicle Market File,String,context_new_vehicle_market.csv,context_new_vehicle_market.csv
-        Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,simulated_vehicles.csv
-        Sales Share File,String,sales_share-gcam.csv,sales_share-gcam.csv
-        Manufacturers File,String,manufacturers.csv,manufacturers.csv
-        Market Classes File,String,market_classes.csv,market_classes.csv
-        Onroad Fuels File,String,onroad_fuels.csv,onroad_fuels.csv
-        Vehicle Price Modifications File,String,vehicle_price_modifications.csv,vehicle_price_modifications.csv
-        Producer Generalized Cost File,String,producer_generalized_cost.csv,producer_generalized_cost.csv
-        Production Constraints File,String,production_constraints.csv,production_constraints.csv
-        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,reregistration_fixed_by_age.csv
-        Onroad VMT File,String,annual_vmt_fixed_by_age.csv,annual_vmt_fixed_by_age.csv
-        Vehicles File,String,vehicles.csv,vehicles.csv
-        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,onroad_vehicle_calculations.csv
-        New Vehicle Price Elasticity of Demand,#,-0.5,-0.5
-        Producer Cross Subsidy Multiplier Min,#,0.95,0.95
-        Producer Cross Subsidy Multiplier Max,#,1.05,1.05
-        ,,,
-        Postproc Settings,,,
+        Session Postproc Settings,,,
         Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
         Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
         Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
@@ -103,23 +102,103 @@ Data Row Name and Description
 :Batch Name *(str)*:
     The name of the batch, combined with a timestamp (YYYY_MM_DD_hh_mm_ss) becomes the name of the bundle folder
 
-:Context Folder Name *(str)*:
-    Unused, for now
-
-:Context Name *(str)*:
-    Context name, e.g. ``AEO2021``
-    
-:Context Case *(str)*:
-    Context case name, e.g. ``Reference case``
-
 :Analysis Final Year *(int)*:
     Analysis Final Year, e.g. ``2050``
 
 :Consolidate Manufacturers *(TRUE or FALSE)*:
     If ``TRUE`` then manufacturers will be conslidated into a "consolidated_OEM", otherwise manufacturers will be run independently
 
+:Cost Accrual:
+    Cost accrual time of outputs, ``end-of-year`` or ``beginning-of-year``
+
+:Discount Values to Year:
+    Dollar basis year of outputs, default is ``2021``
+
 :Run Effects Calculations *(TRUE or FALSE)*:
     If ``TRUE`` then run the emissions and cost effects post-processing
+
+:Batch Analysis Context Settings:
+    Decorator, not evaluated
+
+:Context Name *(str)*:
+    Context name, e.g. ``AEO2021``
+
+:Context Case *(str)*:
+    Context case name, e.g. ``Reference case``
+
+:Context Fuel Prices File *(str)*:
+    The relative or absolute path to the context fuel prices file,
+    loaded by ``context.fuel_prices.FuelPrice``
+
+:Context New Vehicle Market File *(str)*:
+    The relative or absolute path to the context new vehicle market file,
+    loaded by ``context.new_vehicle_market.NewVehicleMarket``
+
+:Manufacturers File *(str)*:
+    The relative or absolute path to the manufacturers file,
+    loaded by ``producer.manufacturers.Manufacturer``
+
+:Market Classes File *(str)*:
+    The relative or absolute path to the market classes file,
+    loaded by ``consumer.market_classes.MarketClass``
+
+:New Vehicle Price Elasticity of Demand *(float, ...)*:
+    Numeric value of the new vehicle price elastiticy of demand, typically <= 0, e.g. ``-0.5``
+    Supports multiple comma-separated values
+
+:Onroad Fuels File *(str)*:
+    The relative or absolute path to the onroad fuels file,
+    loaded by ``context.onroad_fuels.OnroadFuel``
+
+:Onroad Vehicle Calculations File *(str)*:
+    The relative or absolute path to the onroad vehicle calculations (onroad gap) file,
+    loaded by ``producer.vehicles.VehicleFinal``
+
+:Onroad VMT File *(str)*:
+    The relative or absolute path to the onroad VMT file,
+    loaded dynamically by the ``OnroadVMT`` class defined in the module specified by the file header,
+    e.g. ``consumer.annual_vmt_fixed_by_age``
+
+:Producer Cross Subsidy Multiplier Max *(float, ...)*:
+    Numeric value of the minimum producer cross subsidy multiplier, typically >= 1, e.g. ``1.05``
+    Supports multiple comma-separated values
+
+:Producer Cross Subsidy Multiplier Min *(float, ...)*:
+    Numeric value of the minimum producer cross subsidy multiplier, typically <= 1, e.g. ``0.95``
+    Supports multiple comma-separated values
+
+:Producer Generalized Cost File *(str)*:
+    The relative or absolute path to the vehicle producer generalized costs file,
+    loaded dynamically by the ``ProducerGeneralizedCost`` class defined in the module specified by the file header,
+    e.g. ``producer.producer_generalized_cost``
+
+:Production Constraints File *(str)*:
+    The relative or absolute path to the production constraints file,
+    loaded by ``context.production_constraints.ProductionConstraints``
+
+:Sales Share File *(str)*:
+    The relative or absolute path to the sales share (consumer sales response) file,
+    loaded dynamically by the ``SalesShare`` class defined in the module specified by the file header,
+    e.g. ``consumer.sales_share_gcam``
+
+:Vehicle Price Modifications File *(str)*:
+    The relative or absolute path to the vehicle price modifications file,
+    loaded by ``context.price_modifications.PriceModifications``
+
+:Vehicle Reregistration File *(str)*:
+    The relative or absolute path to the vehicle re-registration file,
+    loaded dynamically by the ``Reregistration`` class defined in the module specified by the file header,
+    e.g. ``consumer.reregistration_fixed_by_age``
+
+:Vehicle Simulation Results and Costs File *(str)*:
+    The relative or absolute path to the vehicle simulation results and costs file,
+    loaded by ``context.cost_clouds.CostCloud``
+
+:Vehicles File *(str)*:
+    The relative or absolute path to the vehicles (base year fleet) file,
+    loaded by ``producer.vehicles.VehicleFinal``
+
+----
 
 :Session Settings:
     Decorator, not evaluated
@@ -132,16 +211,16 @@ Data Row Name and Description
 
 ----
 
-:Policy Alternatives Settings:
+:Session Policy Alternatives Settings:
     Decorator, not evaluated
-
-:Drive Cycles File *(str)*:
-    The relative or absolute path to the drive cycles file,
-    loaded by ``policy.drive_cycles.DriveCycles``
 
 :Drive Cycle Weights File *(str)*:
     The relative or absolute path to the drive cycle weights file,
     loaded by ``policy.drive_cycle_weights.DriveCycleWeights``
+
+:Drive Cycles File *(str)*:
+    The relative or absolute path to the drive cycles file,
+    loaded by ``policy.drive_cycles.DriveCycles``
 
 :GHG Credits File *(str)*:
     The relative or absolute path to the GHG credits file,
@@ -152,10 +231,6 @@ Data Row Name and Description
     loaded dynamically by the VehicleTargets class defined in the module specified by the file header,
     e.g. ``policy.targets_footprint``
 
-:Policy Fuels File *(str)*:
-    The relative or absolute path to the policy fuels file,
-    loaded by ``policy.policy_fuels.PolicyFuel``
-
 :Off-Cycle Credits File *(str)*:
     The relative or absolute path to the off-cycle credits file,
     loaded by ``policy.offcycle_credits.OffCycleCredits``
@@ -163,6 +238,10 @@ Data Row Name and Description
 :Policy Fuel Upstream Methods File *(str)*:
     The relative or absolute path to the policy fuel upstream methods file,
     loaded by ``policy.upstream_methods.UpstreamMethods``
+
+:Policy Fuels File *(str)*:
+    The relative or absolute path to the policy fuels file,
+    loaded by ``policy.policy_fuels.PolicyFuel``
 
 :Production Multipliers File *(str)*:
     The relative or absolute path to the production multipliers file,
@@ -179,81 +258,7 @@ Data Row Name and Description
 
 ----
 
-:Analysis Context Settings:
-    Decorator, not evaluated
-
-:Context Fuel Prices File *(str)*:
-    The relative or absolute path to the context fuel prices file,
-    loaded by ``context.fuel_prices.FuelPrice``
-
-:Context New Vehicle Market File *(str)*:
-    The relative or absolute path to the context new vehicle market file,
-    loaded by ``context.new_vehicle_market.NewVehicleMarket``
-
-:Vehicle Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the vehicle simulation results and costs file,
-    loaded by ``context.cost_clouds.CostCloud``
-
-:Sales Share File *(str)*:
-    The relative or absolute path to the sales share (consumer sales response) file,
-    loaded dynamically by the SalesShare class defined in the module specified by the file header,
-    e.g. ``consumer.sales_share_gcam``
-
-:Manufacturers File *(str)*:
-    The relative or absolute path to the manufacturers file,
-    loaded by ``producer.manufacturers.Manufacturer``
-
-:Market Classes File *(str)*:
-    The relative or absolute path to the market classes file,
-    loaded by ``consumer.market_classes.MarketClass``
-
-:Onroad Fuels File *(str)*:
-    The relative or absolute path to the onroad fuels file,
-    loaded by ``context.onroad_fuels.OnroadFuel``
-
-:Vehicle Price Modifications File *(str)*:
-    The relative or absolute path to the vehicle price modifications file,
-    loaded by ``context.price_modifications.PriceModifications``
-
-:Producer Generalized Cost File *(str)*:
-
-:Production Constraints File *(str)*:
-    The relative or absolute path to the production constraints file,
-    loaded by ``context.production_constraints.ProductionConstraints``
-
-:Vehicle Reregistration File *(str)*:
-    The relative or absolute path to the vehicle re-registration file,
-    loaded dynamically by the Reregistration class defined in the module specified by the file header,
-    e.g. ``consumer.reregistration_fixed_by_age``
-
-:Onroad VMT File *(str)*:
-    The relative or absolute path to the onroad VMT file,
-    loaded dynamically by the OnroadVMT class defined in the module specified by the file header,
-    e.g. ``consumer.annual_vmt_fixed_by_age``
-
-:Vehicles File *(str)*:
-    The relative or absolute path to the vehicles (base year fleet) file,
-    loaded by ``producer.vehicles.VehicleFinal``
-
-:Onroad Vehicle Calculations File *(str)*:
-    The relative or absolute path to the onroad vehicle calculations (onroad gap) file,
-    loaded by ``producer.vehicles.VehicleFinal``
-
-:New Vehicle Price Elasticity of Demand *(float, ...)*:
-    Numeric value of the new vehicle price elastiticy of demand, typically <= 0, e.g. ``-0.5``
-    Supports multiple comma-separated values
-
-:Producer Cross Subsidy Multiplier Min *(float, ...)*:
-    Numeric value of the minimum producer cross subsidy multiplier, typically <= 1, e.g. ``0.95``
-    Supports multiple comma-separated values
-
-:Producer Cross Subsidy Multiplier Max *(float, ...)*:
-    Numeric value of the minimum producer cross subsidy multiplier, typically >= 1, e.g. ``1.05``
-    Supports multiple comma-separated values
-
-----
-
-:Postproc Settings:
+:Session Postproc Settings:
     Decorator, not evaluated
 
 :Context Criteria Cost Factors File *(str)*:
@@ -302,57 +307,9 @@ applied.
 :Developer Settings:
     Decorator, not evaluated
 
-:Num Market Share Options *(int, ...)*:
-    Number of market share options to generate as part of the producer compliance search, typically ``5``.
-    Supports multiple comma-separated values
-
-:Num Tech Options per ICE Vehicle *(int, ...)*:
-    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
-    Supports multiple comma-separated values
-
-:Num Tech Options per BEV Vehicle *(int, ...)*:
-    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
-    Supports multiple comma-separated values
-
 :Cost Curve Frontier Affinity Factor *(float, ...)*:
     Determines how closely the frontier hews to the source points of the cost cloud, typically ``0.75``
     Supports multiple comma-separated values
-
-:Slice Tech Combo Tables *(TRUE or FALSE)*:
-    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
-
-:Verbose Output *(TRUE or FALSE, ...)*:
-    Enables detailed console and logfile output if ``TRUE``
-    Supports multiple comma-separated values
-
-:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
-    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
-    Supports multiple comma-separated values
-
-:Producer-Consumer Max Iterations *(int)*:
-    Maximum number of market share iterations between the producer and consumer.  Recommended minimum is ``2``
-
-:Producer-Consumer Convergence Tolerance *(float)*:
-    Used in ``omega_model.detect_convergence()``, compared with the convergence error.  Default is ``1e-3``
-
-:Producer Compliance Search Max Iterations *(int)*:
-    Used in ``producer.compliance_search.search_production_options()``, max number of production search iterations.
-    Default value is ``15``
-
-:Producer Compliance Search Convergence Factor *(float)*:
-    Determines the search progression of tech options and market shares, used in
-    ``producer.compliance_search.create_tech_and_share_sweeps()`` and
-    ``producer.compliance_search.search_production_options()``.  Default value is ``0.33``
-
-:Producer Compliance Search Tolerance *(float)*:
-    Used in ``producer.compliance_search.search_production_options()``, used to determine accuracy of compliance
-    outcome relative to the targeted CO2e Mg, default value is ``1e-6``
-
-:Producer Cross Subsidy Price Tolerance *(float)*:
-    Used in ``omega_model.detect_convergence()``, applied to the total average cost accuracy, default value is ``1e-4``
-
-:Run Profiler *(TRUE or FALSE)*:
-    If TRUE then the model with run with profiling enabled.  See ``omega_model.run_omega()``
 
 :Flat Context *(TRUE or FALSE)*:
     If TRUE then all context values will come from a fixed year
@@ -360,13 +317,9 @@ applied.
 :Flat Context Year *(int)*:
     The fixed year when using flat context, default value is ``2020``
 
-:Verbose Console Modules *([strs])*:
-    List of modules to activate detailed console output, may contain ``'producer'`` or ``'consumer'`` or both.
-    Default value is ``[]``
-
-:Log Producer Iteration Years *(['all'] or [int(s)])*:
-    List of year(s) to log detailed producer iteration data, including composite vehicle cost curves and compliance
-    search data (cost clouds).  Default value is ``[]``
+:Iterate Producer-Consumer *(TRUE or FALSE, ...)*:
+    If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
+    Supports multiple comma-separated values
 
 :Log Consumer Iteration Years *(['all'] or [int(s)])*:
     List of year(s) to log producer-consumer market share iteration, default value is ``2050``, which writes the log
@@ -375,6 +328,58 @@ applied.
 :Log Producer Decision and Response Years *(['all'] or [int(s)])*:
     List of year(s) to log producer decision and consumer response data (costs, market shares and tech decision).
     Default value is ``[]``
+
+:Log Producer Iteration Years *(['all'] or [int(s)])*:
+    List of year(s) to log detailed producer iteration data, including composite vehicle cost curves and compliance
+    search data (cost clouds).  Default value is ``[]``
+
+:Num Market Share Options *(int, ...)*:
+    Number of market share options to generate as part of the producer compliance search, typically ``5``.
+    Supports multiple comma-separated values
+
+:Num Tech Options per BEV Vehicle *(int, ...)*:
+    Number of tech options to generate for BEV vehicles as part of the producer compliance search, typically ``1``
+    Supports multiple comma-separated values
+
+:Num Tech Options per ICE Vehicle *(int, ...)*:
+    Number of tech options to generate for ICE vehicles as part of the producer compliance search, typically ``5``
+    Supports multiple comma-separated values
+
+:Producer Compliance Search Convergence Factor *(float)*:
+    Determines the search progression of tech options and market shares, used in
+    ``producer.compliance_search.create_tech_and_share_sweeps()`` and
+    ``producer.compliance_search.search_production_options()``.  Default value is ``0.33``
+
+:Producer Compliance Search Max Iterations *(int)*:
+    Used in ``producer.compliance_search.search_production_options()``, max number of production search iterations.
+    Default value is ``15``
+
+:Producer Compliance Search Tolerance *(float)*:
+    Used in ``producer.compliance_search.search_production_options()``, used to determine accuracy of compliance
+    outcome relative to the targeted CO2e Mg, default value is ``1e-6``
+
+:Producer Cross Subsidy Price Tolerance *(float)*:
+    Used in ``omega_model.detect_convergence()``, applied to the total average cost accuracy, default value is ``1e-4``
+
+:Producer-Consumer Convergence Tolerance *(float)*:
+    Used in ``omega_model.detect_convergence()``, compared with the convergence error.  Default is ``1e-3``
+
+:Producer-Consumer Max Iterations *(int)*:
+    Maximum number of market share iterations between the producer and consumer.  Recommended minimum is ``2``
+
+:Run Profiler *(TRUE or FALSE)*:
+    If TRUE then the model with run with profiling enabled.  See ``omega_model.run_omega()``
+
+:Slice Tech Combo Tables *(TRUE or FALSE)*:
+    If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
+
+:Verbose Console Modules *([strs])*:
+    List of modules to activate detailed console output, may contain ``'producer'`` or ``'consumer'`` or both.
+    Default value is ``[]``
+
+:Verbose Output *(TRUE or FALSE, ...)*:
+    Enables detailed console and logfile output if ``TRUE``
+    Supports multiple comma-separated values
 
 """
 
@@ -426,21 +431,15 @@ class OMEGABatchObject(OMEGABase):
     def __init__(self, name='', analysis_final_year=None, **kwargs):
         import pandas as pd
 
-        self.batch_definition_path = ''
         self.name = name
-        self.context_folder = ''
-        self.context_id = ''
-        self.context_case_id = ''
-        self.generate_context_new_vehicle_generalized_costs_file = False
-        self.analysis_final_year = analysis_final_year
-        self.consolidate_manufacturers = False
+        self.batch_definition_path = ''
         self.output_path = "." + os.sep
         self.sessions = []
         self.dataframe = pd.DataFrame()
         self.batch_log = None
-        self.auto_close_figures = True
-        self.discount_values_to_year = None
-        self.cost_accrual = ''
+
+        self.settings = OMEGASessionSettings()
+        self.settings.analysis_final_year = analysis_final_year
 
     def force_numeric_user_params(self):
         import pandas as pd
@@ -539,11 +538,11 @@ class OMEGABatchObject(OMEGABase):
             'Num Market Share Options': 'NMSO',
             'Num Tech Options per ICE Vehicle': 'NITO',
             'Num Tech Options per BEV Vehicle': 'NBTO',
-            'New Vehicle Price Elasticity of Demand': 'NVPE',
-            'Producer Cross Subsidy Multiplier Min': 'PCSMMIN',
-            'Producer Cross Subsidy Multiplier Max': 'PCSMMAX',
+            # 'New Vehicle Price Elasticity of Demand': 'NVPE',
+            # 'Producer Cross Subsidy Multiplier Min': 'PCSMMIN',
+            # 'Producer Cross Subsidy Multiplier Max': 'PCSMMAX',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
-            'Verbose Output': 'VB',
+            # 'Verbose Output': 'VB',
             'Iterate Producer-Consumer': 'IPC',
         }
 
@@ -599,20 +598,38 @@ class OMEGABatchObject(OMEGABase):
 
     def get_batch_settings(self):
         self.name = self.read_parameter('Batch Name')
-        self.context_folder = self.read_parameter('Context Folder Name')
-        self.context_id = self.read_parameter('Context Name')
-        self.context_case_id = self.read_parameter('Context Case')
-
-        if self.analysis_final_year is not None:
-            self.dataframe.loc['Analysis Final Year'][0] = self.analysis_final_year
-
-        self.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
-        self.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
-        self.calc_effects = self.read_parameter('Run Effects Calculations')
-
-        self.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
-        self.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
+        if self.settings.analysis_final_year is not None:
+            self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
+        self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
+        self.settings.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
+        self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
                                                       {'end-of-year', 'beginning-of-year'})
+        self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
+        self.settings.calc_effects = self.read_parameter('Run Effects Calculations')
+
+        self.settings.context_id = self.read_parameter('Context Name')
+        self.settings.context_case_id = self.read_parameter('Context Case')
+        self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
+        self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
+        self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
+        self.settings.market_classes_file = self.read_parameter('Market Classes File')
+        self.settings.new_vehicle_price_elasticity_of_demand = \
+            self.read_parameter('New Vehicle Price Elasticity of Demand')
+        self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
+        self.settings.onroad_vehicle_calculations_file = self.read_parameter('Onroad Vehicle Calculations File')
+        self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
+        self.settings.consumer_pricing_multiplier_max = \
+            self.read_parameter('Producer Cross Subsidy Multiplier Max')
+        self.settings.consumer_pricing_multiplier_min = \
+            self.read_parameter('Producer Cross Subsidy Multiplier Min')
+        self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
+        self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
+        self.settings.sales_share_file = self.read_parameter('Sales Share File')
+        self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
+        self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
+        self.settings.vehicle_simulation_results_and_costs_file = \
+            self.read_parameter('Vehicle Simulation Results and Costs File')
+        self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
     def num_sessions(self):
         return len(self.dataframe.columns)
@@ -667,55 +684,27 @@ class OMEGASessionObject(OMEGABase):
     def get_user_settings(self, remote=False):
         self.parent.batch_log.logwrite('Getting User settings...')
 
+        self.settings = self.parent.settings    # copy batch-level settings to session
+
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.parent.name + '_' + self.name
-        self.settings.auto_close_figures = self.parent.auto_close_figures
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
-        self.settings.context_folder = self.parent.context_folder
-        self.settings.context_id = self.parent.context_id
-        self.settings.context_case_id = self.parent.context_case_id
-        self.settings.analysis_final_year = self.parent.analysis_final_year
-        self.settings.consolidate_manufacturers = self.parent.consolidate_manufacturers
-        self.settings.discount_values_to_year = self.parent.discount_values_to_year
-        self.settings.cost_accrual = self.parent.cost_accrual
         self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
 
-        self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
-        self.settings.market_classes_file = self.read_parameter('Market Classes File')
-        self.settings.vehicles_file = self.read_parameter('Vehicles File')
-        self.settings.onroad_vehicle_calculations_file = self.read_parameter('Onroad Vehicle Calculations File')
-        self.settings.sales_share_file = self.read_parameter('Sales Share File')
-        self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
-        self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
-        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
+        # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
-        self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
-        self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
-        self.settings.vehicle_simulation_results_and_costs_file = \
-            self.read_parameter('Vehicle Simulation Results and Costs File')
-        self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
+        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
+        self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
         self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
+        self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
+        self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
         self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
         self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
-        self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
-        self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
+        self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
         self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
-        self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
-        self.settings.production_constraints_file = self.read_parameter('Production Constraints File')
-        self.settings.producer_generalized_cost_file = self.read_parameter('Producer Generalized Cost File')
-        self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
-        self.settings.onroad_vmt_file = self.read_parameter('Onroad VMT File')
 
-        self.settings.new_vehicle_price_elasticity_of_demand = \
-            self.read_parameter('New Vehicle Price Elasticity of Demand')
-        self.settings.consumer_pricing_multiplier_min = \
-            self.read_parameter('Producer Cross Subsidy Multiplier Min')
-        self.settings.consumer_pricing_multiplier_max = \
-            self.read_parameter('Producer Cross Subsidy Multiplier Max')
-
-        self.settings.calc_effects = self.parent.calc_effects
-        self.settings.calc_criteria_emission_costs = self.parent.calc_effects
+        # read postproc settings
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
         self.settings.energysecurity_cost_factors_file = \
@@ -732,6 +721,35 @@ class OMEGASessionObject(OMEGABase):
     def get_developer_settings(self):
         self.parent.batch_log.logwrite('Getting Developer Settings...')
 
+        self.settings.cost_curve_frontier_affinity_factor = \
+            float(self.read_parameter('Cost Curve Frontier Affinity Factor',
+                                self.settings.cost_curve_frontier_affinity_factor))
+
+        self.settings.flat_context = validate_predefined_input(
+            self.read_parameter('Flat Context', self.settings.flat_context),
+            true_false_dict)
+
+        self.settings.flat_context_year = \
+            int(self.read_parameter('Flat Context Year',
+                                    self.settings.flat_context_year))
+
+        self.settings.iterate_producer_consumer = validate_predefined_input(
+            self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
+            true_false_dict)
+
+        # these don't work yet, when the session goes to run...
+        # self.settings.log_consumer_iteration_years = \
+        #     self.read_parameter('Log Consumer Iteration Years',
+        #                         self.settings.log_consumer_iteration_years)
+
+        # self.settings.log_producer_decision_and_response_years = \
+        #     self.read_parameter('Log Producer Decision and Response Years',
+        #                         self.settings.log_producer_decision_and_response_years)
+
+        # self.settings.log_producer_iteration_years = \
+        #     self.read_parameter('Log Producer Iteration Years',
+        #                         self.settings.log_producer_iteration_years)
+
         self.settings.producer_num_market_share_options = \
             int(self.read_parameter('Num Market Share Options',
                                     self.settings.producer_num_market_share_options))
@@ -744,37 +762,13 @@ class OMEGASessionObject(OMEGABase):
             int(self.read_parameter('Num Tech Options per BEV Vehicle',
                                     self.settings.producer_num_tech_options_per_bev_vehicle))
 
-        self.settings.cost_curve_frontier_affinity_factor = \
-            float(self.read_parameter('Cost Curve Frontier Affinity Factor',
-                                self.settings.cost_curve_frontier_affinity_factor))
-
-        self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
-            self.read_parameter('Slice Tech Combo Tables', self.settings.slice_tech_combo_cloud_tables),
-            true_false_dict)
-
-        self.settings.verbose = validate_predefined_input(
-            self.read_parameter('Verbose Output', self.settings.verbose),
-            true_false_dict)
-
-        self.settings.iterate_producer_consumer = validate_predefined_input(
-            self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
-            true_false_dict)
-
-        self.settings.producer_consumer_max_iterations = \
-            int(self.read_parameter('Producer-Consumer Max Iterations',
-                                    self.settings.producer_consumer_max_iterations))
-
-        self.settings.producer_consumer_convergence_tolerance = \
-            float(self.read_parameter('Producer-Consumer Convergence Tolerance',
-                                self.settings.producer_consumer_convergence_tolerance))
+        self.settings.producer_compliance_search_convergence_factor = \
+            float(self.read_parameter('Producer Compliance Search Convergence Factor',
+                                self.settings.producer_compliance_search_convergence_factor))
 
         self.settings.producer_compliance_search_max_iterations = \
             int(self.read_parameter('Producer Compliance Search Max Iterations',
                                     self.settings.producer_compliance_search_max_iterations))
-
-        self.settings.producer_compliance_search_convergence_factor = \
-            float(self.read_parameter('Producer Compliance Search Convergence Factor',
-                                self.settings.producer_compliance_search_convergence_factor))
 
         self.settings.producer_compliance_search_tolerance = \
             float(self.read_parameter('Producer Compliance Search Tolerance',
@@ -784,33 +778,29 @@ class OMEGASessionObject(OMEGABase):
             float(self.read_parameter('Producer Cross Subsidy Price Tolerance',
                                 self.settings.producer_cross_subsidy_price_tolerance))
 
+        self.settings.producer_consumer_convergence_tolerance = \
+            float(self.read_parameter('Producer-Consumer Convergence Tolerance',
+                                self.settings.producer_consumer_convergence_tolerance))
+
+        self.settings.producer_consumer_max_iterations = \
+            int(self.read_parameter('Producer-Consumer Max Iterations',
+                                    self.settings.producer_consumer_max_iterations))
+
         self.settings.run_profiler = validate_predefined_input(
             self.read_parameter('Run Profiler', self.settings.run_profiler),
             true_false_dict)
 
-        self.settings.flat_context = validate_predefined_input(
-            self.read_parameter('Flat Context', self.settings.flat_context),
+        self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
+            self.read_parameter('Slice Tech Combo Tables', self.settings.slice_tech_combo_cloud_tables),
             true_false_dict)
-
-        self.settings.flat_context_year = \
-            int(self.read_parameter('Flat Context Year',
-                                    self.settings.flat_context_year))
 
         self.settings.verbose_console_modules = \
             self.read_parameter('Verbose Console Modules',
                                 self.settings.verbose_console_modules)
 
-        # self.settings.log_producer_iteration_years = \
-        #     self.read_parameter('Log Producer Iteration Years',
-        #                         self.settings.log_producer_iteration_years)
-
-        # self.settings.log_consumer_iteration_years = \
-        #     self.read_parameter('Log Consumer Iteration Years',
-        #                         self.settings.log_consumer_iteration_years)
-
-        # self.settings.log_producer_decision_and_response_years = \
-        #     self.read_parameter('Log Producer Decision and Response Years',
-        #                         self.settings.log_producer_decision_and_response_years)
+        self.settings.verbose = validate_predefined_input(
+            self.read_parameter('Verbose Output', self.settings.verbose),
+            true_false_dict)
 
     def init(self, validate_only=False, remote=False):
         if not validate_only:
