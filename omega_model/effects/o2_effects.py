@@ -14,8 +14,8 @@ vehicle_annual_data table and included in the vehicle_annual_data.csv output fil
 
 """
 from omega_model import *
-from omega_model.effects.inventory import calc_inventory
-from omega_model.effects.social_costs import calc_cost_effects
+from omega_model.effects.physical_effects import calc_physical_effects
+from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
 from omega_model.effects.tech_tracking import calc_tech_volumes
@@ -34,17 +34,17 @@ def run_effects_calcs():
 
     physical_effects_dict = dict()
     for calendar_year in calendar_years:
-        print(f'Calculating inventories for {int(calendar_year)}')
-        omega_log.logwrite(f'Calculating inventories for {int(calendar_year)}')
-        physical_effects_dict.update(calc_inventory(calendar_year))
+        print(f'Calculating physical effects for {int(calendar_year)}')
+        omega_log.logwrite(f'Calculating physical effects for {int(calendar_year)}')
+        physical_effects_dict.update(calc_physical_effects(calendar_year))
 
     print('Calculating tech volumes')
     omega_log.logwrite('Calculating tech volumes')
     tech_volumes_dict = calc_tech_volumes(physical_effects_dict)
 
     cost_effects_dict = dict()
-    print('Calculating costs')
-    omega_log.logwrite('Calculating costs')
+    print('Calculating cost effects')
+    omega_log.logwrite('Calculating cost effects')
     cost_effects_dict.update(calc_cost_effects(physical_effects_dict))
 
     print('Discounting costs')

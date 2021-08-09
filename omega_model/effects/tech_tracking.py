@@ -31,7 +31,7 @@ def get_vehicle_info(vehicle_id, attribute_list):
 
     return vehicles_dict[vehicle_id]
 
-# TODO need to track both base year reg class and reg class all the time
+
 def calc_tech_volumes(physical_effects_dict):
 
     """
@@ -70,9 +70,12 @@ def calc_tech_volumes(physical_effects_dict):
                 new_vehicle_tech_flag_dict[vehicle_id].update({tech_flag: tech_flag_values[idx]})
 
         for tech_flag, tech_flag_value in new_vehicle_tech_flag_dict[vehicle_id].items():
-            # if tech_flag == 'curb_weight':
-            #     tech_volumes_dict[key].update({tech_flag: tech_flag_value})
-            # else:
-            tech_volumes_dict[key].update({tech_flag: tech_flag_value * physical['registered_count']})
+            if tech_flag == 'curb_weight':
+                tech_volumes_dict[key].update({tech_flag: tech_flag_value})
+                tech_volumes_dict[key].update({'fleet_pounds': tech_flag_value * physical['registered_count']})
+            elif tech_flag == 'weight_reduction':
+                tech_volumes_dict[key].update({tech_flag: tech_flag_value})
+            else:
+                tech_volumes_dict[key].update({tech_flag: tech_flag_value * physical['registered_count']})
 
     return tech_volumes_dict
