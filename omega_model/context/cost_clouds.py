@@ -35,7 +35,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.21,``{optional_source_data_comment}``
+       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.22,dollar_basis,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -137,7 +137,7 @@ class CostCloud(OMEGABase):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'simulated_vehicle_results_and_costs'
-        input_template_version = 0.21
+        input_template_version = 0.22
         input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
                                   'new_vehicle_mfr_cost_dollars'}
         input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
