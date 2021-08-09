@@ -329,31 +329,52 @@ applied.
     If ``TRUE`` then multiple producer-consumer tech and market share convergence iterations are enabled
     Supports multiple comma-separated values
 
-:Producer-Consumer Max Iterations:
+:Producer-Consumer Max Iterations *(int)*:
+    Maximum number of market share iterations between the producer and consumer.  Recommended minimum is ``2``
 
-:Producer-Consumer Convergence Tolerance:
+:Producer-Consumer Convergence Tolerance *(float)*:
+    Used in ``omega_model.detect_convergence()``, compared with the convergence error.  Default is ``1e-3``
 
-:Producer Compliance Search Max Iterations:
+:Producer Compliance Search Max Iterations *(int)*:
+    Used in ``producer.compliance_search.search_production_options()``, max number of production search iterations.
+    Default value is ``15``
 
-:Producer Compliance Search Convergence Factor:
+:Producer Compliance Search Convergence Factor *(float)*:
+    Determines the search progression of tech options and market shares, used in
+    ``producer.compliance_search.create_tech_and_share_sweeps()`` and
+    ``producer.compliance_search.search_production_options()``.  Default value is ``0.33``
 
-:Producer Compliance Search Tolerance:
+:Producer Compliance Search Tolerance *(float)*:
+    Used in ``producer.compliance_search.search_production_options()``, used to determine accuracy of compliance
+    outcome relative to the targeted CO2e Mg, default value is ``1e-6``
 
-:Producer Cross Subsidy Price Tolerance:
+:Producer Cross Subsidy Price Tolerance *(float)*:
+    Used in ``omega_model.detect_convergence()``, applied to the total average cost accuracy, default value is ``1e-4``
 
-:Run Profiler:
+:Run Profiler *(TRUE or FALSE)*:
+    If TRUE then the model with run with profiling enabled.  See ``omega_model.run_omega()``
 
-:Flat Context:
+:Flat Context *(TRUE or FALSE)*:
+    If TRUE then all context values will come from a fixed year
 
-:Flat Context Year:
+:Flat Context Year *(int)*:
+    The fixed year when using flat context, default value is ``2020``
 
-:Verbose Console Modules:
+:Verbose Console Modules *([strs])*:
+    List of modules to activate detailed console output, may contain ``'producer'`` or ``'consumer'`` or both.
+    Default value is ``[]``
 
-:Log Producer Iteration Years:
+:Log Producer Iteration Years *(['all'] or [int(s)])*:
+    List of year(s) to log detailed producer iteration data, including composite vehicle cost curves and compliance
+    search data (cost clouds).  Default value is ``[]``
 
-:Log Consumer Iteration Years:
+:Log Consumer Iteration Years *(['all'] or [int(s)])*:
+    List of year(s) to log producer-consumer market share iteration, default value is ``2050``, which writes the log
+    file in the year 2050 and contains all prior years
 
-:Log Producer Decision and Response Years:
+:Log Producer Decision and Response Years *(['all'] or [int(s)])*:
+    List of year(s) to log producer decision and consumer response data (costs, market shares and tech decision).
+    Default value is ``[]``
 
 """
 
@@ -363,9 +384,6 @@ import os, sys
 
 # make sure top-level project folder is on the path (i.e. folder that contains omega_model)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# print('omega_model omega_batch.py path = %s' %  os.path.abspath(__file__))
-# print('SYS Path = %s' % sys.path)
 
 from common.omega_types import OMEGABase
 from omega_model import OMEGASessionSettings
