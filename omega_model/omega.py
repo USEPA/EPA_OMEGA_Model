@@ -74,10 +74,10 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
                            ), echo_console=True)
         omega_log.logwrite(
             ('cross subsidized price / cost %s' % mc).ljust(50) + '$%d / $%d R:%f' % (
-            producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
-            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
-            producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
-            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
+                producer_decision_and_response['average_cross_subsidized_price_%s' % mc],
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
+                producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
             ), echo_console=True)
 
     omega_log.logwrite('convergence_error = %f' % convergence_error, echo_console=True)
@@ -85,22 +85,24 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, producer_decisio
     for cat in omega_globals.options.MarketClass.market_categories:
         omega_log.logwrite(
             ('cross subsidized price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
-            producer_decision_and_response['average_cross_subsidized_price_%s' % cat],
-            producer_decision_and_response['average_cost_%s' % cat],
-            producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
-            producer_decision_and_response['average_cost_%s' % cat]
+                producer_decision_and_response['average_cross_subsidized_price_%s' % cat],
+                producer_decision_and_response['average_cost_%s' % cat],
+                producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
+                producer_decision_and_response['average_cost_%s' % cat]
             ), echo_console=True)
 
     omega_log.logwrite(
-        'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (producer_decision_and_response['average_cross_subsidized_price_total'],
-                                                             producer_decision_and_response['average_new_vehicle_mfr_cost'],
-                                                             producer_decision_and_response['average_cross_subsidized_price_total'] /
-                                                             producer_decision_and_response['average_new_vehicle_mfr_cost']
-                                                             ), echo_console=True)
+        'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (
+            producer_decision_and_response['average_cross_subsidized_price_total'],
+            producer_decision_and_response['average_new_vehicle_mfr_cost'],
+            producer_decision_and_response['average_cross_subsidized_price_total'] /
+            producer_decision_and_response['average_new_vehicle_mfr_cost']
+        ), echo_console=True)
+
     omega_log.logwrite(
         '%d_%d_%d  SCORE:%f  SWSD:%f\n' % (calendar_year, producer_consumer_iteration_num, cross_subsidy_iteration_num,
-                                                producer_decision_and_response['pricing_convergence_score'],
-                                                producer_decision_and_response['abs_share_delta_total']), echo_console=True)
+                                           producer_decision_and_response['pricing_convergence_score'],
+                                           producer_decision_and_response['abs_share_delta_total']), echo_console=True)
 
 
 def update_iteration_log(iteration_log, calendar_year, compliance_id, converged, producer_consumer_iteration_num,
@@ -651,16 +653,33 @@ def calc_market_category_data(producer_decision):
 
         for mc in omega_globals.options.MarketClass.market_classes:
             if mcat in mc.split('.'):
-                producer_decision['average_cost_%s' % mcat] += producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * np.maximum(1, producer_decision['sales_%s' % mc])
-                producer_decision['average_generalized_cost_%s' % mcat] += producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * np.maximum(1, producer_decision['sales_%s' % mc])
-                if 'average_cross_subsidized_price_%s' % mc in producer_decision:
-                    producer_decision['average_cross_subsidized_price_%s' % mcat] += producer_decision['average_cross_subsidized_price_%s' % mc] * np.maximum(1, producer_decision['sales_%s' % mc])
-                producer_decision['sales_%s' % mcat] += np.maximum(1, producer_decision['sales_%s' % mc])
-                producer_decision['producer_abs_share_frac_%s' % mcat] += producer_decision['producer_abs_share_frac_%s' % mc]
+                producer_decision['average_cost_%s' % mcat] += \
+                    producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
+                    np.maximum(1, producer_decision['sales_%s' % mc])
 
-        producer_decision['average_cost_%s' % mcat] = producer_decision['average_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
-        producer_decision['average_generalized_cost_%s' % mcat] = producer_decision['average_generalized_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
-        producer_decision['average_cross_subsidized_price_%s' % mcat] = producer_decision['average_cross_subsidized_price_%s' % mcat] / producer_decision['sales_%s' % mcat]
+                producer_decision['average_generalized_cost_%s' % mcat] += \
+                    producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
+                    np.maximum(1, producer_decision['sales_%s' % mc])
+
+                if 'average_cross_subsidized_price_%s' % mc in producer_decision:
+                    producer_decision['average_cross_subsidized_price_%s' % mcat] += \
+                        producer_decision['average_cross_subsidized_price_%s' % mc] * \
+                        np.maximum(1, producer_decision['sales_%s' % mc])
+
+                producer_decision['sales_%s' % mcat] += \
+                    np.maximum(1, producer_decision['sales_%s' % mc])
+
+                producer_decision['producer_abs_share_frac_%s' % mcat] += \
+                    producer_decision['producer_abs_share_frac_%s' % mc]
+
+        producer_decision['average_cost_%s' % mcat] = \
+            producer_decision['average_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
+
+        producer_decision['average_generalized_cost_%s' % mcat] = \
+            producer_decision['average_generalized_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
+
+        producer_decision['average_cross_subsidized_price_%s' % mcat] = \
+            producer_decision['average_cross_subsidized_price_%s' % mcat] / producer_decision['sales_%s' % mcat]
 
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
@@ -954,7 +973,7 @@ def init_omega(session_runtime_options):
         # update vehicle annual data for base year fleet
         stock.update_stock(omega_globals.options.analysis_initial_year - 1)
 
-    except Exception as e:
+    except:
         init_fail += ["\n#INIT FAIL\n%s\n" % traceback.format_exc()]
 
     return init_fail
@@ -999,10 +1018,12 @@ def run_omega(session_runtime_options, standalone_run=False):
             # write output files
             summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name + \
                                '_summary_results.csv'
+
             session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             from context.new_vehicle_market import NewVehicleMarket
+
             if omega_globals.options.session_is_reference and \
                     omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
                 NewVehicleMarket.save_context_new_vehicle_generalized_costs(
