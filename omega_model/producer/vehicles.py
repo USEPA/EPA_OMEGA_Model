@@ -1004,12 +1004,12 @@ class Vehicle(OMEGABase):
 
 if __name__ == '__main__':
     # required to set up reg classes list for reg_class_id validation
-    from omega import init_user_definable_modules
+    from omega import init_user_definable_submodules
 
     omega_globals.options = OMEGASessionSettings()
 
     init_fail = []
-    init_fail += init_user_definable_modules()
+    init_fail += init_user_definable_submodules()
 
 
 class VehicleFinal(SQABase, Vehicle):

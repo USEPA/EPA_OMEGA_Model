@@ -9,6 +9,14 @@ omega\_model.effects package
 Submodules
 ----------
 
+omega\_model.effects.cost\_effects module
+-----------------------------------------
+
+.. automodule:: omega_model.effects.cost_effects
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 omega\_model.effects.cost\_factors\_congestion\_noise module
 ------------------------------------------------------------
 
@@ -81,14 +89,6 @@ omega\_model.effects.general\_functions module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.effects.inventory module
--------------------------------------
-
-.. automodule:: omega_model.effects.inventory
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.effects.o2\_effects module
 ---------------------------------------
 
@@ -97,10 +97,10 @@ omega\_model.effects.o2\_effects module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.effects.social\_costs module
------------------------------------------
+omega\_model.effects.physical\_effects module
+---------------------------------------------
 
-.. automodule:: omega_model.effects.social_costs
+.. automodule:: omega_model.effects.physical_effects
    :members:
    :undoc-members:
    :show-inheritance:
