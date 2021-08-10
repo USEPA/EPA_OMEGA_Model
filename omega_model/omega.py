@@ -1,8 +1,8 @@
 """
 
-OMEGA2 top level code
+OMEGA top level code
 
-Runs a single session.
+Runs a single session, writes info to log files and the console, executes session post-processing.
 
 ----
 
