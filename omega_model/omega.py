@@ -754,8 +754,6 @@ def init_user_definable_decomposition_attributes(verbose_init):
         List of template/input errors, else empty list on success
 
     """
-
-    # from policy.offcycle_credits import OffCycleCredits
     from policy.drive_cycles import DriveCycles
     from producer.vehicles import VehicleFinal, DecompositionAttributes
     from context.cost_clouds import CostCloud
@@ -765,8 +763,8 @@ def init_user_definable_decomposition_attributes(verbose_init):
     init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                       verbose=verbose_init)
 
-    # init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
-    #                                             verbose=verbose_init)
+    init_fail += omega_globals.options.OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
+                                                verbose=verbose_init)
 
     init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
                                             verbose=verbose_init)
@@ -828,7 +826,6 @@ def init_omega(session_runtime_options):
     from context.production_constraints import ProductionConstraints
     from context.cost_clouds import CostCloud
 
-    # from policy.offcycle_credits import OffCycleCredits
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare
     from policy.drive_cycles import DriveCycles
