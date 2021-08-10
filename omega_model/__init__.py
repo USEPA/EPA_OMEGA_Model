@@ -169,6 +169,7 @@ try:
             # dynamic modules / classes
             self.RegulatoryClasses = None
             self.VehicleTargets = None
+            self.OffCycleCredits = None
             self.Reregistration = None
             self.OnroadVMT = None
             self.SalesShare = None

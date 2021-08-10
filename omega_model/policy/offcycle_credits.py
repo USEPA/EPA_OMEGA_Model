@@ -74,17 +74,17 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-class OffCycleCredits(OMEGABase):
+class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
     """
     **Loads, stores and applies off-cycle credits to vehicle cost clouds**
 
     """
 
     _values = dict()
+    _offcycle_credit_groups = []  #: list of credit groups, populated during init
+    _offcycle_credit_value_columns = [] #: list of columns that contain credit values, of the format ``vehicle_attribute:attribute_value``
 
     offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
-    offcycle_credit_groups = []  #: list of credit groups, populated during init
-    offcycle_credit_value_columns = [] #: list of columns that contain credit values, of the format ``vehicle_attribute:attribute_value``
 
     @staticmethod
     def calc_off_cycle_credits(vehicle):
@@ -100,14 +100,14 @@ class OffCycleCredits(OMEGABase):
         """
         # TODO: off cycle groups can be used to apply credit limits by credit group
         group_totals = dict()
-        for ocg in OffCycleCredits.offcycle_credit_groups:
+        for ocg in OffCycleCredits._offcycle_credit_groups:
             group_totals[ocg] = 0
 
         vehicle.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile'] = 0
         vehicle.cost_cloud['cert_direct_offcycle_kwh_per_mile'] = 0
         vehicle.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile'] = 0
 
-        for credit_column in OffCycleCredits.offcycle_credit_value_columns:
+        for credit_column in OffCycleCredits._offcycle_credit_value_columns:
             attribute, value = credit_column.split(':')
             if vehicle.__getattribute__(attribute) == value:
                 for offcycle_credit in OffCycleCredits.offcycle_credit_names:
@@ -123,8 +123,8 @@ class OffCycleCredits(OMEGABase):
 
         return vehicle.cost_cloud
 
-    @classmethod
-    def init_from_file(cls, filename, verbose=False):
+    @staticmethod
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -144,8 +144,8 @@ class OffCycleCredits(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'offcycle_credits'
-        input_template_version = 0.1
+        input_template_name = __name__
+        input_template_version = 0.11
         input_template_columns = {'start_year', 'credit_name', 'credit_group', 'credit_destination'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -158,16 +158,16 @@ class OffCycleCredits(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                OffCycleCredits.offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
+                OffCycleCredits._offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
 
-                for cc in OffCycleCredits.offcycle_credit_value_columns:
+                for cc in OffCycleCredits._offcycle_credit_value_columns:
                     reg_class_id = cc.split(':')[1]
                     if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
                         template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
 
                 if not template_errors:
-                    cls.offcycle_credit_names = df['credit_name'].unique().tolist()
-                    cls.offcycle_credit_groups = df['credit_group'].unique().tolist()
+                    OffCycleCredits.offcycle_credit_names = df['credit_name'].unique().tolist()
+                    OffCycleCredits._offcycle_credit_groups = df['credit_group'].unique().tolist()
 
                     for _, r in df.iterrows():
                         if r.credit_name not in OffCycleCredits._values:
@@ -180,6 +180,9 @@ class OffCycleCredits(OMEGABase):
 
 
 if __name__ == '__main__':
+
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
+
     try:
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))

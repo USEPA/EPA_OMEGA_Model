@@ -570,8 +570,6 @@ def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
         ``calc_market_class_data()``, ``calc_market_category_data()``
 
     """
-    from common.omega_functions import weighted_value
-
     # group vehicles by market class
     market_class_vehicle_dict = omega_globals.options.MarketClass.get_market_class_dict()
     for new_veh in candidate_mfr_composite_vehicles:
@@ -724,6 +722,9 @@ def init_user_definable_modules():
     module_name = get_template_name(omega_globals.options.policy_targets_file)
     omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
 
+    module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+    omega_globals.options.OffCycleCredits = importlib.import_module(module_name).OffCycleCredits
+
     module_name = get_template_name(omega_globals.options.vehicle_reregistration_file)
     omega_globals.options.Reregistration = importlib.import_module(module_name).Reregistration
 
@@ -754,7 +755,7 @@ def init_user_definable_decomposition_attributes(verbose_init):
 
     """
 
-    from policy.offcycle_credits import OffCycleCredits
+    # from policy.offcycle_credits import OffCycleCredits
     from policy.drive_cycles import DriveCycles
     from producer.vehicles import VehicleFinal, DecompositionAttributes
     from context.cost_clouds import CostCloud
@@ -764,8 +765,8 @@ def init_user_definable_decomposition_attributes(verbose_init):
     init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                       verbose=verbose_init)
 
-    init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
-                                                verbose=verbose_init)
+    # init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
+    #                                             verbose=verbose_init)
 
     init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
                                             verbose=verbose_init)
@@ -827,7 +828,7 @@ def init_omega(session_runtime_options):
     from context.production_constraints import ProductionConstraints
     from context.cost_clouds import CostCloud
 
-    from policy.offcycle_credits import OffCycleCredits
+    # from policy.offcycle_credits import OffCycleCredits
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare
     from policy.drive_cycles import DriveCycles

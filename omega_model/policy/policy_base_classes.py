@@ -151,3 +151,44 @@ class VehicleTargetsBase:
         """
         return ['**Attempt to call abstract method TargetsBase.%s() without child class override**' %
                 inspect.currentframe().f_code.co_name]
+
+
+class OffCycleCreditsBase:
+    """
+    **Loads, stores and applies off-cycle credits to vehicle cost clouds**
+
+    """
+
+    offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
+
+    @staticmethod
+    def calc_off_cycle_credits(vehicle):
+        """
+        Calculate vehicle off-cycle credits for the vehicle's cost cloud
+
+        Args:
+            vehicle (Vehicle): the vehicle to apply off-cycle credits to
+
+        Returns:
+            vehicle.cost_cloud with off-cycle credits calculated
+
+        """
+        raise Exception('**Attempt to call abstract method OffCycleCreditsBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
+    def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        return ['**Attempt to call abstract method OffCycleCreditsBase.%s() without child class override**' %
+                inspect.currentframe().f_code.co_name]
