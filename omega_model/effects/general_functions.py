@@ -11,25 +11,27 @@ import pandas as pd
 from math import log10, floor
 
 
-def adjust_dollars(df, deflators, *args):
+def adjust_dollars(df, deflators, dollar_basis_year, *args):
     """
 
     Args:
         df: The DataFrame of values to be converted to a consistent dollar basis.
-        deflators: A DataFrame of price deflators.
+        deflators: A dictionary of price deflators.
+        dollar_basis_year: An integer representing the desired dollar basis for the return DataFrame.
         args: The attributes to be converted to a consistent dollar basis.
 
     Returns:
         The passed DataFrame with args expressed in a consistent dollar basis.
 
     """
-    basis_years = df['dollar_basis'].unique()
+    basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+    adj_factor_numerator = deflators[dollar_basis_year]['price_deflator']
     df_return = df.copy()
     for basis_year in basis_years:
         for arg in args:
-            adj_factor = deflators.at[basis_year, 'adjustment_factor']
+            adj_factor = adj_factor_numerator / deflators[basis_year]['price_deflator']
             df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
-    df_return['dollar_basis'] = deflators.index[deflators['adjustment_factor'] == 1][0]
+    df_return['dollar_basis'] = dollar_basis_year
     return df_return
 
 
