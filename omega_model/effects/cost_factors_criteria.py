@@ -123,8 +123,8 @@ class CostFactorsCriteria(SQABase, OMEGABase):
                                                          input_template_version, verbose=verbose)
 
         input_template_name = 'context_cpi_price_deflators'
-        input_template_version = 0.1
-        deflators_input_template_columns = {'price_deflator', 'adjustment_factor'}
+        input_template_version = 0.2
+        deflators_input_template_columns = {'price_deflator'}
 
         template_errors += validate_template_version_info(cpi_deflators_file, input_template_name,
                                                           input_template_version, verbose=verbose)
@@ -140,9 +140,11 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             deflators = pd.read_csv(cpi_deflators_file, skiprows=1, index_col=0)
 
             template_errors += validate_template_columns(cpi_deflators_file, deflators_input_template_columns,
-                                                        deflators.columns, verbose=verbose)
+                                                         deflators.columns, verbose=verbose)
+            deflators = deflators.to_dict('index')
+
             if not template_errors:
-                df = gen_fxns.adjust_dollars(df, deflators,
+                df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis,
                                              'pm25_tailpipe_3.0_USD_per_uston',
                                              'pm25_upstream_3.0_USD_per_uston',
                                              'nox_tailpipe_3.0_USD_per_uston',
