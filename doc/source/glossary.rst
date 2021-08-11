@@ -80,4 +80,6 @@ Glossary
  DEFINITION
 :On-Road Gap:
  Difference between direct cert emissions and direct on-road emissions
+:Reregistration:
+ DEFINITION
 
