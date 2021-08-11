@@ -762,18 +762,17 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
             true_false_dict)
 
-        # these don't work yet, when the session goes to run...
-        # self.settings.log_consumer_iteration_years = \
-        #     self.read_parameter('Log Consumer Iteration Years',
-        #                         self.settings.log_consumer_iteration_years)
+        self.settings.log_consumer_iteration_years = \
+            self.read_parameter('Log Consumer Iteration Years',
+                                self.settings.log_consumer_iteration_years)
 
-        # self.settings.log_producer_decision_and_response_years = \
-        #     self.read_parameter('Log Producer Decision and Response Years',
-        #                         self.settings.log_producer_decision_and_response_years)
+        self.settings.log_producer_decision_and_response_years = \
+            self.read_parameter('Log Producer Decision and Response Years',
+                                self.settings.log_producer_decision_and_response_years)
 
-        # self.settings.log_producer_iteration_years = \
-        #     self.read_parameter('Log Producer Iteration Years',
-        #                         self.settings.log_producer_iteration_years)
+        self.settings.log_producer_iteration_years = \
+            self.read_parameter('Log Producer Iteration Years',
+                                self.settings.log_producer_iteration_years)
 
         self.settings.producer_num_market_share_options = \
             int(self.read_parameter('Num Market Share Options',
@@ -906,6 +905,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
                             inplace=True)
     batch.dataframe.drop('Type', axis=1, inplace=True,
                          errors='ignore')  # drop Type column, no error if it's not there
+    batch.parse_dataframe_params()  # convert '[2020]' -> [2020], etc
     batch.force_numeric_user_params()
     batch.force_numeric_developer_params()
     batch.get_batch_settings()
