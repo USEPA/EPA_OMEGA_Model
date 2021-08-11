@@ -1,6 +1,6 @@
 Parameter,Type,Value,
 Batch Settings,,,
-Batch Name,String,demo_batch,
+Batch Name,String,demo_dev_batch,
 Context Folder Name,String,,
 Context Name,String,AEO2021,
 Context Case,String,Reference case,
@@ -73,7 +73,7 @@ Producer Cross Subsidy Price Tolerance,#,1.00E-004,1.00E-004
 Run Profiler,TRUE / FALSE,FALSE,FALSE
 Flat Context,TRUE / FALSE,FALSE,FALSE
 Flat Context Year,#,2020,2020
-Verbose Console Modules,"['producer', 'consumer'] or subset or []","['producer', 'consumer']",[]
-Log Producer Iteration Years,"'all' or [year, …] or []",[],[]
+Verbose Console Modules,"['producer', 'consumer'] or subset or []",[],[]
+Log Producer Iteration Years,"'all' or [year, …] or []",[2020],[]
 Log Consumer Iteration Years,"'all' or [year, …] or []",[2050],[2050]
 Log Producer Decision and Response Years,"'all' or [year, …] or []",[],[]

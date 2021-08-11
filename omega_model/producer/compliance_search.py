@@ -419,13 +419,11 @@ def create_composite_vehicles(calendar_year, compliance_id):
             mctrc[new_veh.market_class_id][new_veh.reg_class_id].append(new_veh)
             mctrc[new_veh.market_class_id]['sales'] += new_veh.initial_registered_count
 
-        CompositeVehicle.reset_vehicle_ids()
         manufacturer_composite_vehicles = []
         for mc in mctrc:
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc], calendar_year, weight_by='market_share')
-                    cv.vehicle_id = mc + '.' + rc
+                    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='market_share')
                     cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 
