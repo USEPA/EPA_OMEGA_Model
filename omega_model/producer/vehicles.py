@@ -596,6 +596,7 @@ class CompositeVehicle(OMEGABase):
     def get_cost_from_cost_curve(self, target_co2e_gpmi):
         """
 
+
         Args:
             target_co2e_gpmi:
 
@@ -668,6 +669,16 @@ class CompositeVehicle(OMEGABase):
         self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_cost_dollars')
 
+    def set_new_vehicle_mfr_generalized_cost_dollars(self):
+        """
+
+        Returns:
+
+        """
+        from common.omega_functions import weighted_value
+        self.new_vehicle_mfr_generalized_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
+                                                                       'new_vehicle_mfr_generalized_cost_dollars')
+
     def set_cert_target_co2e_Mg(self):
         """
 
@@ -714,6 +725,7 @@ class Vehicle(OMEGABase):
         self.cert_target_co2e_grams_per_mile = 0
         self.cert_co2e_Mg = 0
         self.cert_target_co2e_Mg = 0
+        self.normalized_cert_target_co2e_Mg = 0
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
@@ -842,52 +854,6 @@ class Vehicle(OMEGABase):
         """
         self.cert_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self)
 
-    def set_new_vehicle_mfr_cost_dollars_from_cost_curve(self):
-        """
-
-        Returns:
-
-        """
-        self.new_vehicle_mfr_cost_dollars = self.get_cost_from_cost_curve(self.cert_co2e_grams_per_mile)
-
-    def set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve(self):
-        """
-
-        Returns:
-
-        """
-        self.new_vehicle_mfr_generalized_cost_dollars = self.get_generalized_cost_from_cost_curve(self.cert_co2e_grams_per_mile)
-
-    def get_cost_from_cost_curve(self, target_co2e_gpmi):
-        """
-
-        Args:
-            target_co2e_gpmi:
-
-        Returns:
-
-        """
-        # get cost from cost curve for target_co2e_gpmi(s)
-        return DecompositionAttributes.interp1d(self.cost_curve,
-                                                'veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id,
-                                                target_co2e_gpmi,
-                                                self, 'new_vehicle_mfr_cost_dollars')
-
-    def get_generalized_cost_from_cost_curve(self, target_co2e_gpmi):
-        """
-
-        Args:
-            target_co2e_gpmi:
-
-        Returns:
-
-        """
-        # get cost from cost curve for target_co2e_gpmi(s)
-        return DecompositionAttributes.interp1d(self.cost_curve,
-                                                'veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id,
-                                                target_co2e_gpmi,
-                                                self, 'new_vehicle_mfr_generalized_cost_dollars')
-
     def set_cert_co2e_Mg(self):
         """
 
@@ -925,40 +891,29 @@ class Vehicle(OMEGABase):
             self.__setattr__(attr, vehicle.__getattribute__(attr))
 
         self.set_cert_target_co2e_grams_per_mile()  # varies by model year
-        self.initial_registered_count = vehicle.initial_registered_count
 
         if type(self) == Vehicle and type(vehicle) == VehicleFinal:
-            from policy.upstream_methods import UpstreamMethods
             from context.cost_clouds import CostCloud
-
-            # need to add upstream to direct co2 g/mi and calculate this year's frontier
-            self.cert_direct_co2e_grams_per_mile = vehicle.cert_direct_co2e_grams_per_mile
-
-            # calculate cert co2 g/mi
-            upstream = UpstreamMethods.get_upstream_method(self.model_year)
-            self.cert_direct_kwh_per_mile = vehicle.cert_direct_kwh_per_mile
-            self.cert_indirect_co2e_grams_per_mile = upstream(self, self.cert_direct_co2e_grams_per_mile, self.cert_direct_kwh_per_mile)
-            self.cert_co2e_grams_per_mile = self.cert_direct_co2e_grams_per_mile + self.cert_indirect_co2e_grams_per_mile
 
             if omega_globals.options.flat_context:
                 self.cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, self.cost_curve_class)
             else:
                 self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
-            self.cost_curve = self.create_frontier_df()  # create frontier, including generalized cost
-            self.set_new_vehicle_mfr_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2e_grams_per_mile
-            self.set_new_vehicle_mfr_generalized_cost_dollars_from_cost_curve()  # varies by model_year and cert_co2e_grams_per_mile
-            self.set_cert_target_co2e_Mg()  # varies by model year and initial_registered_count
-            self.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
+            self.cost_curve = self.create_frontier_df()  # create frontier, inc. generalized cost and policy effects
+
+            self.normalized_cert_target_co2e_Mg = \
+                omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self, sales_variants=1)
+
             VehicleAttributeCalculations.perform_attribute_calculations(self)
         else:  # type(self) == VehicleFinal and type(vehicle == Vehicle)
+            self.initial_registered_count = vehicle.initial_registered_count
+
             # set dynamic attributes
             for attr in DecompositionAttributes.values:
                 self.__setattr__(attr, vehicle.__getattribute__(attr))
-            self.cert_direct_co2e_grams_per_mile = vehicle.cert_co2e_grams_per_mile - vehicle.cert_indirect_co2e_grams_per_mile
+
             self.cert_target_co2e_Mg = vehicle.cert_target_co2e_Mg
             self.cert_co2e_Mg = vehicle.cert_co2e_Mg
-
-        self.normalized_cert_target_co2e_Mg = self.cert_target_co2e_Mg / self.initial_registered_count
 
     def create_frontier_df(self):
         """
