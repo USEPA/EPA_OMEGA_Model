@@ -30,19 +30,22 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_new_vehicle_market,input_template_version:,0.1
+       input_template_name:,context_new_vehicle_market,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        context_id,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
-        AEO2020,Reference case,Minicompact,2019,car,0.42,0.19,30958.78204,2938.287598,266.538513,0.090712193,32.889961,26.8584355,57.07032,46.60447937,0.816615,76875.038,0
-        AEO2020,Reference case,Large Utility,2019,truck,5.01,2.67,419179.8267,5278.119141,347.891754,0.065912069,25.18989,20.53877833,28.389875,23.1479117,0.815358,62510.323,109753.937
+        context_id,dollar_basis,case_id,context_size_class,calendar_year,reg_class_id,sales_share_of_regclass,sales_share_of_total,sales,weight_lbs,horsepower,horsepower_to_weight_ratio,mpg_conventional,mpg_conventional_onroad,mpg_alternative,mpg_alternative_onroad,onroad_to_cycle_mpg_ratio,ice_price_dollars,bev_price_dollars
+        AEO2020,2019,Reference case,Minicompact,2019,car,0.42,0.19,30958.78204,2938.287598,266.538513,0.090712193,32.889961,26.8584355,57.07032,46.60447937,0.816615,76875.038,0
+        AEO2020,2019,Reference case,Large Utility,2019,truck,5.01,2.67,419179.8267,5278.119141,347.891754,0.065912069,25.18989,20.53877833,28.389875,23.1479117,0.815358,62510.323,109753.937
 
 Data Column Name and Description
     :context_id:
         The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
+
+    :dollar_basis:
+        The dollar basis of any monetary values taken from the given AEO version.
 
     :case_id:
         The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
@@ -124,6 +127,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
     __tablename__ = 'context_new_vehicle_market'  # database table name
     index = Column(Integer, primary_key=True)  #: database table index
     context_id = Column('context_id', String)  #: str: e.g. 'AEO2020'
+    dollar_basis = Column(Numeric)
     case_id = Column('case_id', String)  #: str: e.g. 'Reference case'
     context_size_class = Column(String)   #: str: e.g. 'Small Crossover'
     calendar_year = Column(Numeric)  #: numeric: calendar year of the market data
@@ -339,8 +343,8 @@ class NewVehicleMarket(SQABase, OMEGABase):
         NewVehicleMarket.hauling_context_size_class_info = dict()
 
         input_template_name = 'context_new_vehicle_market'
-        input_template_version = 0.1
-        input_template_columns = {'context_id',	'case_id', 'context_size_class', 'calendar_year', 'reg_class_id',
+        input_template_version = 0.2
+        input_template_columns = {'context_id', 'dollar_basis',	'case_id', 'context_size_class', 'calendar_year', 'reg_class_id',
                                   'sales_share_of_regclass', 'sales_share_of_total', 'sales', 'weight_lbs',
                                   'horsepower', 'horsepower_to_weight_ratio', 'mpg_conventional',
                                   'mpg_conventional_onroad', 'mpg_alternative', 'mpg_alternative_onroad',
@@ -361,6 +365,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
                 for i in df.index:
                     obj_list.append(NewVehicleMarket(
                         context_id=df.loc[i, 'context_id'],
+                        dollar_basis=df.loc[i, 'dollar_basis'],
                         case_id=df.loc[i, 'case_id'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         calendar_year=df.loc[i, 'calendar_year'],

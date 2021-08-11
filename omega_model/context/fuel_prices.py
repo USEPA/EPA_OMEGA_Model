@@ -19,19 +19,22 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_fuel_prices,input_template_version:,0.1
+       input_template_name:,context_fuel_prices,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        context_id,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
-        AEO2020,Reference case,pump gasoline,2019,2.665601,2.10838
-        AEO2020,Reference case,US electricity,2019,0.12559407,0.10391058
+        context_id,dollar_basis,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
+        AEO2020,2019,Reference case,pump gasoline,2019,2.665601,2.10838
+        AEO2020,2019,Reference case,US electricity,2019,0.12559407,0.10391058
 
 Data Column Name and Description
     :context_id:
         The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
+
+    :dollar_basis:
+        The dollar basis of the fuel prices in the given AEO version.
 
     :case_id:
         The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
@@ -72,6 +75,7 @@ class FuelPrice(SQABase, OMEGABase):
     __tablename__ = 'context_fuel_prices'  # database table name
     index = Column('index', Integer, primary_key=True)  #: database table index
     context_id = Column('context_id', String)  #: str: e.g. 'AEO2020'
+    dollar_basis = Column(Numeric)
     case_id = Column('case_id', String)  #: str: e.g. 'Reference case'
     fuel_id = Column('fuel_id', String)  #: str: e.g. 'pump gasoline'
     calendar_year = Column(Numeric)  #: numeric: calendar year of the price values
@@ -148,8 +152,8 @@ class FuelPrice(SQABase, OMEGABase):
 
         # don't forget to update the module docstring with changes here
         input_template_name = 'context_fuel_prices'
-        input_template_version = 0.1
-        input_template_columns = {'context_id', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
+        input_template_version = 0.2
+        input_template_columns = {'context_id', 'dollar_basis', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
                                   'pretax_dollars_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -171,6 +175,7 @@ class FuelPrice(SQABase, OMEGABase):
                     if OnroadFuel.validate_fuel_id(fuel_id):
                         obj_list.append(FuelPrice(
                             context_id=df.loc[i, 'context_id'],
+                            dollar_basis=df.loc[i, 'dollar_basis'],
                             case_id=df.loc[i, 'case_id'],
                             fuel_id=fuel_id,
                             calendar_year=df.loc[i, 'calendar_year'],

@@ -10,7 +10,6 @@ from datetime import datetime
 import shutil
 
 
-
 def read_table(path, table_name, skiprows=4):
     """
 
@@ -184,41 +183,38 @@ class GetContext:
 
 
 class SetInputs:
-    aeo_version = '2021'
-    path_cwd = Path.cwd()
-    path_aeo_inputs = path_cwd / f'omega_preproc/aeo_tables/AEO{aeo_version}'
-    path_bea_inputs = path_cwd / f'omega_preproc/bea_tables/BEA{aeo_version}'
-    path_outputs = path_cwd / 'omega_preproc/output_context_aeo'
-    try:
-        path_outputs.mkdir(exist_ok=True)
-    except:
-        pass
-    path_input_templates = path_cwd / 'omega_model/demo_inputs'
 
-    vehicles_context_template = 'context_new_vehicle_market.csv'
-    fuels_context_template = 'context_fuel_prices.csv'
-    price_deflators_template = 'implicit_price_deflators.csv'
-    cpiu_deflators_template = 'cpi_price_deflators.csv'
+    def __init__(self):
+        self.path_preproc = Path(__file__).parent
+        self.path_project = self.path_preproc.parent
+        self.path_aeo_tables = self.path_preproc / 'aeo_tables'
+        self.path_bea_tables = self.path_preproc / 'bea_tables'
+        self.path_outputs = self.path_preproc / 'output_context_aeo'
+        try:
+            self.path_outputs.mkdir(exist_ok=True)
+        except:
+            pass
+        self.path_input_templates = self.path_project / 'omega_model/demo_inputs'
 
-    aeo_cases = ['Reference case', 'High oil price', 'Low oil price']
-    gasoline_upstream = 2478  # 77 FR 63181
-    electricity_upstream = 534  # 77 FR 63182
+        self.vehicles_context_template = 'context_new_vehicle_market.csv'
+        self.fuels_context_template = 'context_fuel_prices.csv'
+        self.price_deflators_template = 'implicit_price_deflators.csv'
+        self.cpiu_deflators_template = 'cpi_price_deflators.csv'
 
-    # name the aeo table(s) being used
-    aeo_class_attributes_table_file = 'Table_42._Summary_of_New_Light-Duty_Vehicle_Size_Class_Attributes.csv'
-    aeo_sales_table_file = 'Table_38._Light-Duty_Vehicle_Sales_by_Technology_Type.csv'
-    if aeo_version == '2020':
-        aeo_petroleum_fuel_prices_table_file = 'Table_58._Components_of_Selected_Petroleum_Product_Prices.csv'
-    elif aeo_version == '2021':
-        aeo_petroleum_fuel_prices_table_file = 'Table_57._Components_of_Selected_Petroleum_Product_Prices.csv'
-    else:
-        print('Error finding AEO fuel prices table.')
-    aeo_electricity_fuel_prices_table_file = 'Table_8._Electricity_Supply_Disposition_Prices_and_Emissions.csv'
-    aeo_vehicle_prices_table_file = 'Table_52._New_Light-Duty_Vehicle_Prices.csv'
+        self.aeo_cases = ['Reference case', 'High oil price', 'Low oil price']
+        self.gasoline_upstream = 2478  # 77 FR 63181
+        self.electricity_upstream = 534  # 77 FR 63182
 
-    # and the bea table(s) being used
-    deflators_table_file = 'Table_1.1.9_ImplicitPriceDeflators.csv'
-    cpiu_table_file = 'SeriesReport.csv'
+        # name the aeo table(s) being used
+        self.aeo_class_attributes_table_file = 'Summary_of_New_Light-Duty_Vehicle_Size_Class_Attributes.csv'
+        self.aeo_sales_table_file = 'Light-Duty_Vehicle_Sales_by_Technology_Type.csv'
+        self.aeo_petroleum_fuel_prices_table_file = 'Components_of_Selected_Petroleum_Product_Prices.csv'
+        self.aeo_electricity_fuel_prices_table_file = 'Electricity_Supply_Disposition_Prices_and_Emissions.csv'
+        self.aeo_vehicle_prices_table_file = 'New_Light-Duty_Vehicle_Prices.csv'
+
+        # and the bea table(s) being used
+        self.deflators_table_file = 'Table_1.1.9_ImplicitPriceDeflators.csv'
+        self.cpiu_table_file = 'SeriesReport.csv'
 
 
 def main():
@@ -226,221 +222,228 @@ def main():
     settings = SetInputs()
     start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
-    # read files as DataFrames
-    aeo_class_attributes_table = read_table(settings.path_aeo_inputs, settings.aeo_class_attributes_table_file)
-    aeo_sales_table = read_table(settings.path_aeo_inputs, settings.aeo_sales_table_file)
-    aeo_petroleum_fuel_prices_table = read_table(settings.path_aeo_inputs, settings.aeo_petroleum_fuel_prices_table_file)
-    aeo_electricity_fuel_prices_table = read_table(settings.path_aeo_inputs, settings.aeo_electricity_fuel_prices_table_file)
-    aeo_vehicle_prices_table = read_table(settings.path_aeo_inputs, settings.aeo_vehicle_prices_table_file)
-    deflators_table = read_table(settings.path_bea_inputs, settings.deflators_table_file)
-    cpi_table = pd.read_csv(settings.path_bea_inputs / settings.cpiu_table_file, skiprows=11, usecols=[0, 1])
+    deflators_table = read_table(settings.path_bea_tables, settings.deflators_table_file)
+    cpi_table = pd.read_csv(settings.path_bea_tables / settings.cpiu_table_file, skiprows=11, usecols=[0, 1])
 
-    # first work on class attributes by looping thru the aeo cases
     fleet_context_df = pd.DataFrame()
-    for aeo_case in settings.aeo_cases:
-        print(f'Working on market context vehicle attributes for the AEO {aeo_case}')
-        attribute = dict()
-        attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case)
-        aeo_table_obj = GetContext(attributes_df)
-        attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', replace='New Vehicle Attributes: Horsepower: Conventional ')
-        attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', replace='New Vehicle Attributes: Weight: Conventional ')
-        attribute['percent'] = aeo_table_obj.select_table_rows('full name', 'Sales Shares', replace='New Vehicle Attributes: Sales Shares: ')
-        attribute['mpg_conventional'] = aeo_table_obj.select_table_rows('full name', 'EPA Efficiency', replace='New Vehicle Attributes: EPA Efficiency: Conventional ')
-        attribute['mpg_alternative'] = aeo_table_obj.select_table_rows('full name', 'Fuel Efficiency', replace='New Vehicle Attributes: Fuel Efficiency: Alternative-Fuel ')
-        attribute['ratio'] = aeo_table_obj.select_table_rows('full name', 'Degradation Factors', replace='New Vehicle Attributes: Degradation Factors: ')
-
-        # merge things together; start with shares since that metric excludes any averages which makes for a better merge
-        aeo_veh_context = melt_df(attribute['percent'], 'full name', 'sales_share_of_regclass')
-        aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['lb'], 'full name', 'weight_lbs'), on=['full name', 'calendar_year'])
-        aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['HP'], 'full name', 'horsepower'), on=['full name', 'calendar_year'])
-        aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['mpg_conventional'], 'full name', 'mpg_conventional'), on=['full name', 'calendar_year'])
-        aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['mpg_alternative'], 'full name', 'mpg_alternative'), on=['full name', 'calendar_year'])
-
-        # define reg_class in aeo_veh_context and ratio DFs and then merge ratio in
-        ratio_df = melt_df(attribute['ratio'], 'full name', 'onroad_to_cycle_mpg_ratio')
-        for df in [aeo_veh_context, ratio_df]:
-            df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class_id', '')
-            df = new_metric(df, 'full name', 'reg_class_id', 'car', 'Car')
-            df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Truck')
-        ratio_df.drop(columns='full name', inplace=True)
-        aeo_veh_context = aeo_veh_context.merge(ratio_df, on=['reg_class_id', 'calendar_year'])
-
-        # calculate some new metrics
-        aeo_veh_context.insert(aeo_veh_context.columns.get_loc('horsepower') + 1,
-                               'horsepower_to_weight_ratio',
-                               aeo_veh_context['horsepower'] / aeo_veh_context['weight_lbs'])
-        aeo_veh_context.insert(aeo_veh_context.columns.get_loc('mpg_conventional') + 1,
-                               'mpg_conventional_onroad',
-                               aeo_veh_context[['mpg_conventional', 'onroad_to_cycle_mpg_ratio']].product(axis=1))
-        aeo_veh_context.insert(aeo_veh_context.columns.get_loc('mpg_alternative') + 1,
-                               'mpg_alternative_onroad',
-                               aeo_veh_context[['mpg_alternative', 'onroad_to_cycle_mpg_ratio']].product(axis=1))
-        aeo_veh_context.insert(0, 'case_id', f'{aeo_case}')
-        aeo_veh_context.insert(0, 'context_id', aeo_table_obj.aeo_year())
-
-        # work on sales
-        sales_df = return_df(aeo_sales_table, 'full name', aeo_case)
-        aeo_table_obj = GetContext(sales_df)
-        print(f'Working on market context vehicle sales for the AEO {aeo_case}')
-        sales_fleet = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total Vehicles Sales')
-        sales_car = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Car')
-        sales_truck = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Truck')
-
-        # merge individual sales into a new DF
-        sales = melt_df(sales_fleet, 'full name', 'sales_fleet')\
-            .merge(melt_df(sales_car, 'full name', 'sales_car', 'full name'), on='calendar_year')\
-            .merge(melt_df(sales_truck, 'full name', 'sales_truck', 'full name'), on='calendar_year')
-        sales_cols = [col for col in sales if 'sales' in col]
-        sales[sales_cols] = sales[sales_cols] * 1000
-
-        # insert share of fleet data into aeo_class_attributes
-        aeo_veh_context.insert(aeo_veh_context.columns.get_loc('sales_share_of_regclass') + 1,
-                               'sales_share_of_total',
-                               0)
-        aeo_veh_context.insert(aeo_veh_context.columns.get_loc('sales_share_of_total') + 1,
-                               'sales',
-                               0)
-        # calc some new metrics
-        case_dict = dict()
-        case_df = pd.DataFrame()
-        for year in range(aeo_veh_context['calendar_year'].min(), aeo_veh_context['calendar_year'].max() + 1):
-            sales_df = pd.DataFrame(sales.loc[sales['calendar_year'] == year, :])
-            sales_df.reset_index(drop=True, inplace=True)
-            car_sales = sales_df.at[0, 'sales_car']
-            truck_sales = sales_df.at[0, 'sales_truck']
-            fleet_sales = sales_df.at[0, 'sales_fleet']
-
-            case_dict[year, 'car'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class_id'] == 'car'), :])
-            case_dict[year, 'car']['sales'] = (case_dict[year, 'car']['sales_share_of_regclass'] / 100) * car_sales
-            case_dict[year, 'car']['sales_share_of_total'] = (case_dict[year, 'car']['sales'] / fleet_sales) * 100
-
-            case_dict[year, 'truck'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class_id'] == 'truck'), :])
-            case_dict[year, 'truck']['sales'] = (case_dict[year, 'truck']['sales_share_of_regclass'] / 100) * truck_sales
-            case_dict[year, 'truck']['sales_share_of_total'] = (case_dict[year, 'truck']['sales'] / fleet_sales) * 100
-            case_df = pd.concat([case_df, case_dict[year, 'car'], case_dict[year, 'truck']], axis=0, ignore_index=True)
-
-        # work on vehicle prices
-        prices_df = return_df(aeo_vehicle_prices_table, 'full name', aeo_case)
-        aeo_table_obj = GetContext(prices_df)
-        print(f'Working on market context vehicle prices for the AEO {aeo_case}')
-        vehicle_prices = dict()
-        vehicle_prices['gasoline'] = aeo_table_obj.select_table_rows('full name', 'Gasoline: ', replace='New Light-Duty Vehicle Prices: Gasoline: ')
-        vehicle_prices['electric'] = aeo_table_obj.select_table_rows('full name', '300 Mile Electric Vehicle: ', replace='New Light-Duty Vehicle Prices: 300 Mile Electric Vehicle: ')
-
-        vehicle_prices['gasoline'] = melt_df(vehicle_prices['gasoline'], 'full name', 'ice_price_dollars')
-        vehicle_prices['electric'] = melt_df(vehicle_prices['electric'], 'full name', 'bev_price_dollars')
-        vehicle_prices['gasoline']['ice_price_dollars'] = vehicle_prices['gasoline']['ice_price_dollars'] * 1000
-        vehicle_prices['electric']['bev_price_dollars'] = vehicle_prices['electric']['bev_price_dollars'] * 1000
-
-        # clean up vehicle_prices for merging
-        for df in [vehicle_prices['gasoline'], vehicle_prices['electric']]:
-            df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class_id', '')
-            df = new_metric(df, 'full name', 'reg_class_id', 'car', 'full name', 'Car')
-            df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Truck')
-            df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Pickup')
-            df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Van')
-            df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Utility')
-            df.replace({'full name': r' Car'}, {'full name': ''}, regex=True, inplace=True)
-            df.replace({'full name': r'Mini-compact'}, {'full name': 'Minicompact'}, regex=True, inplace=True)
-            df.replace({'full name': r' Light Truck'}, {'full name': ''}, regex=True, inplace=True)
-        vehicle_prices_df = vehicle_prices['gasoline'].merge(vehicle_prices['electric'], on=['full name', 'calendar_year', 'reg_class_id'])
-
-        # merge prices into larger context DF, but first make the "full name" columns consistent
-        case_df.replace({'full name': r'Cars: '}, {'full name': ''}, regex=True, inplace=True)
-        case_df.replace({'full name': r'Light Trucks: '}, {'full name': ''}, regex=True, inplace=True)
-
-        case_df = case_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class_id'], how='left')
-        case_df.rename(columns={'full name': 'context_size_class'}, inplace=True)
-
-        # lastly, round all the sales shares and force sum to 100
-        for yr in range(case_df['calendar_year'].min(), case_df['calendar_year'].max() + 1):
-            shares = pd.Series(case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total']).tolist()
-            new_shares = round_floats_to_100(shares, 2)
-            case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total'] = new_shares
-            for reg_class in ['car', 'truck']:
-                shares = pd.Series(case_df.loc[(case_df['calendar_year'] == yr) & (case_df['reg_class_id'] == reg_class), 'sales_share_of_regclass']).tolist()
-                new_shares = round_floats_to_100(shares, 2)
-                case_df.loc[(case_df['calendar_year'] == yr) & (case_df['reg_class_id'] == reg_class), 'sales_share_of_regclass'] = new_shares
-
-        fleet_context_df = pd.concat([fleet_context_df, case_df], axis=0, ignore_index=True)
-
-    # work on fuel prices
     fuel_context_df = pd.DataFrame()
-    for aeo_case in settings.aeo_cases:
-        print(f'Working on context gasoline prices for the AEO {aeo_case}')
-        case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case)
-        aeo_table_obj = GetContext(case_df)
-        gasoline_retail_prices = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price')
-        # the above selects all rows but all we want is the true end user price row, so now get that alone
-        gasoline_retail_prices = gasoline_retail_prices.loc[gasoline_retail_prices['full name'] == 'Price Components: Motor Gasoline: End-User Price', :]
-    
-        gasoline_distribution = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Distribution Costs')
-    
-        gasoline_wholesale = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Wholesale Price')
-    
-        gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
-        gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline')
-        gasoline_retail_prices.insert(0, 'case_id', f'{aeo_case}')
-        gasoline_retail_prices.insert(0, 'context_id', aeo_table_obj.aeo_year())
-    
-        gasoline_distribution = melt_df(gasoline_distribution, 'full name', 'gasoline_distribution', 'full name')
-        gasoline_wholesale = melt_df(gasoline_wholesale, 'full name', 'gasoline_wholesale', 'full name')
-    
-        gasoline_pretax_prices = gasoline_retail_prices.copy()
-        gasoline_pretax_prices['pretax_dollars_per_unit'] = gasoline_distribution['gasoline_distribution'] \
-                                                          + gasoline_wholesale['gasoline_wholesale']
-        gasoline_pretax_prices['fuel_id'] = 'pump gasoline'
-    
-        gasoline_prices = gasoline_retail_prices.join(gasoline_pretax_prices[['pretax_dollars_per_unit']])
-    
-        usd_basis = aeo_table_obj.aeo_dollars()
-    
-        # electricity prices
-        case_df = return_df(aeo_electricity_fuel_prices_table, 'full name', aeo_case)
-        aeo_table_obj = GetContext(case_df)
-        electricity_prices_residential = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: Residential')
-        electricity_prices_allsecavg = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: All Sectors Average')
-        # the above gets prices in constant and nominal cents so nominal need to be removed
-        electricity_prices_residential = electricity_prices_residential.loc[~electricity_prices_residential['units'].str.contains('nom'), :]
-        electricity_prices_allsecavg = electricity_prices_allsecavg.loc[~electricity_prices_allsecavg['units'].str.contains('nom'), :]
-    
-        electricity_prices_residential = melt_df(electricity_prices_residential, 'full name', 'retail_dollars_per_unit', 'full name')
-        electricity_prices_allsecavg = melt_df(electricity_prices_allsecavg, 'full name', 'pretax_dollars_per_unit', 'full name')
-    
-        electricity_prices_residential['retail_dollars_per_unit'] = electricity_prices_residential['retail_dollars_per_unit'] / 100
-        electricity_prices_allsecavg['pretax_dollars_per_unit'] = electricity_prices_allsecavg['pretax_dollars_per_unit'] / 100
-    
-        electricity_prices_residential.insert(0, 'fuel_id', 'US electricity')
-        electricity_prices_allsecavg.insert(0, 'fuel_id', 'US electricity')
-    
-        for df in [electricity_prices_residential, electricity_prices_allsecavg]:
-            df.insert(0, 'case_id', f'{aeo_case}')
-            df.insert(0, 'context_id', aeo_table_obj.aeo_year())
-    
-        electricity_prices = electricity_prices_residential.join(electricity_prices_allsecavg[['pretax_dollars_per_unit']])
 
-        case_prices = pd.concat([gasoline_prices, electricity_prices], axis=0, ignore_index=True)
-        # concatenate the fuel prices into one DF
-        fuel_context_df = pd.concat([fuel_context_df, case_prices], ignore_index=True, axis=0)
+    for path_aeo_version in settings.path_aeo_tables.iterdir():
+
+        # read files as DataFrames
+        aeo_class_attributes_table = read_table(path_aeo_version, settings.aeo_class_attributes_table_file)
+        aeo_sales_table = read_table(path_aeo_version, settings.aeo_sales_table_file)
+        aeo_petroleum_fuel_prices_table = read_table(path_aeo_version, settings.aeo_petroleum_fuel_prices_table_file)
+        aeo_electricity_fuel_prices_table = read_table(path_aeo_version, settings.aeo_electricity_fuel_prices_table_file)
+        aeo_vehicle_prices_table = read_table(path_aeo_version, settings.aeo_vehicle_prices_table_file)
+
+        # work on fuel prices
+        for aeo_case in settings.aeo_cases:
+            print(f'Working on context gasoline prices for the AEO {aeo_case}')
+            case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case)
+            aeo_table_obj = GetContext(case_df)
+
+            usd_basis = aeo_table_obj.aeo_dollars()
+
+            gasoline_retail_prices = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price')
+            # the above selects all rows but all we want is the true end user price row, so now get that alone
+            gasoline_retail_prices = gasoline_retail_prices.loc[gasoline_retail_prices['full name'] == 'Price Components: Motor Gasoline: End-User Price', :]
+
+            gasoline_distribution = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Distribution Costs')
+
+            gasoline_wholesale = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Wholesale Price')
+
+            gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
+            gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline')
+            gasoline_retail_prices.insert(0, 'case_id', f'{aeo_case}')
+            gasoline_retail_prices.insert(0, 'dollar_basis', f'{usd_basis}')
+            gasoline_retail_prices.insert(0, 'context_id', aeo_table_obj.aeo_year())
+
+            gasoline_distribution = melt_df(gasoline_distribution, 'full name', 'gasoline_distribution', 'full name')
+            gasoline_wholesale = melt_df(gasoline_wholesale, 'full name', 'gasoline_wholesale', 'full name')
+
+            gasoline_pretax_prices = gasoline_retail_prices.copy()
+            gasoline_pretax_prices['pretax_dollars_per_unit'] = gasoline_distribution['gasoline_distribution'] \
+                                                                + gasoline_wholesale['gasoline_wholesale']
+            gasoline_pretax_prices['fuel_id'] = 'pump gasoline'
+
+            gasoline_prices = gasoline_retail_prices.join(gasoline_pretax_prices[['pretax_dollars_per_unit']])
+
+            # electricity prices
+            case_df = return_df(aeo_electricity_fuel_prices_table, 'full name', aeo_case)
+            aeo_table_obj = GetContext(case_df)
+            electricity_prices_residential = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: Residential')
+            electricity_prices_allsecavg = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: All Sectors Average')
+            # the above gets prices in constant and nominal cents so nominal need to be removed
+            electricity_prices_residential = electricity_prices_residential.loc[~electricity_prices_residential['units'].str.contains('nom'), :]
+            electricity_prices_allsecavg = electricity_prices_allsecavg.loc[~electricity_prices_allsecavg['units'].str.contains('nom'), :]
+
+            electricity_prices_residential = melt_df(electricity_prices_residential, 'full name', 'retail_dollars_per_unit', 'full name')
+            electricity_prices_allsecavg = melt_df(electricity_prices_allsecavg, 'full name', 'pretax_dollars_per_unit', 'full name')
+
+            electricity_prices_residential['retail_dollars_per_unit'] = electricity_prices_residential['retail_dollars_per_unit'] / 100
+            electricity_prices_allsecavg['pretax_dollars_per_unit'] = electricity_prices_allsecavg['pretax_dollars_per_unit'] / 100
+
+            electricity_prices_residential.insert(0, 'fuel_id', 'US electricity')
+            electricity_prices_allsecavg.insert(0, 'fuel_id', 'US electricity')
+
+            for df in [electricity_prices_residential, electricity_prices_allsecavg]:
+                df.insert(0, 'case_id', f'{aeo_case}')
+                df.insert(0, 'dollar_basis', f'{usd_basis}')
+                df.insert(0, 'context_id', aeo_table_obj.aeo_year())
+
+            electricity_prices = electricity_prices_residential.join(electricity_prices_allsecavg[['pretax_dollars_per_unit']])
+
+            case_prices = pd.concat([gasoline_prices, electricity_prices], axis=0, ignore_index=True)
+            # concatenate the fuel prices into one DF
+            fuel_context_df = pd.concat([fuel_context_df, case_prices], ignore_index=True, axis=0)
+
+            print(f'Working on market context vehicle attributes for the AEO {aeo_case}')
+            attribute = dict()
+            attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case)
+            aeo_table_obj = GetContext(attributes_df)
+
+            attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', replace='New Vehicle Attributes: Horsepower: Conventional ')
+            attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', replace='New Vehicle Attributes: Weight: Conventional ')
+            attribute['percent'] = aeo_table_obj.select_table_rows('full name', 'Sales Shares', replace='New Vehicle Attributes: Sales Shares: ')
+            attribute['mpg_conventional'] = aeo_table_obj.select_table_rows('full name', 'EPA Efficiency', replace='New Vehicle Attributes: EPA Efficiency: Conventional ')
+            attribute['mpg_alternative'] = aeo_table_obj.select_table_rows('full name', 'Fuel Efficiency', replace='New Vehicle Attributes: Fuel Efficiency: Alternative-Fuel ')
+            attribute['ratio'] = aeo_table_obj.select_table_rows('full name', 'Degradation Factors', replace='New Vehicle Attributes: Degradation Factors: ')
+
+            # merge things together; start with shares since that metric excludes any averages which makes for a better merge
+            aeo_veh_context = melt_df(attribute['percent'], 'full name', 'sales_share_of_regclass')
+            aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['lb'], 'full name', 'weight_lbs'), on=['full name', 'calendar_year'])
+            aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['HP'], 'full name', 'horsepower'), on=['full name', 'calendar_year'])
+            aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['mpg_conventional'], 'full name', 'mpg_conventional'), on=['full name', 'calendar_year'])
+            aeo_veh_context = aeo_veh_context.merge(melt_df(attribute['mpg_alternative'], 'full name', 'mpg_alternative'), on=['full name', 'calendar_year'])
+
+            # define reg_class in aeo_veh_context and ratio DFs and then merge ratio in
+            ratio_df = melt_df(attribute['ratio'], 'full name', 'onroad_to_cycle_mpg_ratio')
+            for df in [aeo_veh_context, ratio_df]:
+                df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class_id', '')
+                df = new_metric(df, 'full name', 'reg_class_id', 'car', 'Car')
+                df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Truck')
+            ratio_df.drop(columns='full name', inplace=True)
+            aeo_veh_context = aeo_veh_context.merge(ratio_df, on=['reg_class_id', 'calendar_year'])
+
+            # calculate some new metrics
+            aeo_veh_context.insert(aeo_veh_context.columns.get_loc('horsepower') + 1,
+                                   'horsepower_to_weight_ratio',
+                                   aeo_veh_context['horsepower'] / aeo_veh_context['weight_lbs'])
+            aeo_veh_context.insert(aeo_veh_context.columns.get_loc('mpg_conventional') + 1,
+                                   'mpg_conventional_onroad',
+                                   aeo_veh_context[['mpg_conventional', 'onroad_to_cycle_mpg_ratio']].product(axis=1))
+            aeo_veh_context.insert(aeo_veh_context.columns.get_loc('mpg_alternative') + 1,
+                                   'mpg_alternative_onroad',
+                                   aeo_veh_context[['mpg_alternative', 'onroad_to_cycle_mpg_ratio']].product(axis=1))
+            aeo_veh_context.insert(0, 'case_id', f'{aeo_case}')
+            aeo_veh_context.insert(0, 'dollar_basis', f'{usd_basis}')
+            aeo_veh_context.insert(0, 'context_id', aeo_table_obj.aeo_year())
+
+            # work on sales
+            sales_df = return_df(aeo_sales_table, 'full name', aeo_case)
+            aeo_table_obj = GetContext(sales_df)
+            print(f'Working on market context vehicle sales for the AEO {aeo_case}')
+            sales_fleet = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total Vehicles Sales')
+            sales_car = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Car')
+            sales_truck = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Truck')
+
+            # merge individual sales into a new DF
+            sales = melt_df(sales_fleet, 'full name', 'sales_fleet')\
+                .merge(melt_df(sales_car, 'full name', 'sales_car', 'full name'), on='calendar_year')\
+                .merge(melt_df(sales_truck, 'full name', 'sales_truck', 'full name'), on='calendar_year')
+            sales_cols = [col for col in sales if 'sales' in col]
+            sales[sales_cols] = sales[sales_cols] * 1000
+
+            # insert share of fleet data into aeo_class_attributes
+            aeo_veh_context.insert(aeo_veh_context.columns.get_loc('sales_share_of_regclass') + 1,
+                                   'sales_share_of_total',
+                                   0)
+            aeo_veh_context.insert(aeo_veh_context.columns.get_loc('sales_share_of_total') + 1,
+                                   'sales',
+                                   0)
+            # calc some new metrics
+            case_dict = dict()
+            case_df = pd.DataFrame()
+            for year in range(aeo_veh_context['calendar_year'].min(), aeo_veh_context['calendar_year'].max() + 1):
+                sales_df = pd.DataFrame(sales.loc[sales['calendar_year'] == year, :])
+                sales_df.reset_index(drop=True, inplace=True)
+                car_sales = sales_df.at[0, 'sales_car']
+                truck_sales = sales_df.at[0, 'sales_truck']
+                fleet_sales = sales_df.at[0, 'sales_fleet']
+
+                case_dict[year, 'car'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class_id'] == 'car'), :])
+                case_dict[year, 'car']['sales'] = (case_dict[year, 'car']['sales_share_of_regclass'] / 100) * car_sales
+                case_dict[year, 'car']['sales_share_of_total'] = (case_dict[year, 'car']['sales'] / fleet_sales) * 100
+
+                case_dict[year, 'truck'] = pd.DataFrame(aeo_veh_context.loc[(aeo_veh_context['calendar_year'] == year) & (aeo_veh_context['reg_class_id'] == 'truck'), :])
+                case_dict[year, 'truck']['sales'] = (case_dict[year, 'truck']['sales_share_of_regclass'] / 100) * truck_sales
+                case_dict[year, 'truck']['sales_share_of_total'] = (case_dict[year, 'truck']['sales'] / fleet_sales) * 100
+                case_df = pd.concat([case_df, case_dict[year, 'car'], case_dict[year, 'truck']], axis=0, ignore_index=True)
+
+            # work on vehicle prices
+            prices_df = return_df(aeo_vehicle_prices_table, 'full name', aeo_case)
+            aeo_table_obj = GetContext(prices_df)
+            print(f'Working on market context vehicle prices for the AEO {aeo_case}')
+            vehicle_prices = dict()
+            vehicle_prices['gasoline'] = aeo_table_obj.select_table_rows('full name', 'Gasoline: ', replace='New Light-Duty Vehicle Prices: Gasoline: ')
+            vehicle_prices['electric'] = aeo_table_obj.select_table_rows('full name', '300 Mile Electric Vehicle: ', replace='New Light-Duty Vehicle Prices: 300 Mile Electric Vehicle: ')
+
+            vehicle_prices['gasoline'] = melt_df(vehicle_prices['gasoline'], 'full name', 'ice_price_dollars')
+            vehicle_prices['electric'] = melt_df(vehicle_prices['electric'], 'full name', 'bev_price_dollars')
+            vehicle_prices['gasoline']['ice_price_dollars'] = vehicle_prices['gasoline']['ice_price_dollars'] * 1000
+            vehicle_prices['electric']['bev_price_dollars'] = vehicle_prices['electric']['bev_price_dollars'] * 1000
+
+            # clean up vehicle_prices for merging
+            for df in [vehicle_prices['gasoline'], vehicle_prices['electric']]:
+                df.insert(df.columns.get_loc('calendar_year') + 1, 'reg_class_id', '')
+                df = new_metric(df, 'full name', 'reg_class_id', 'car', 'full name', 'Car')
+                df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Truck')
+                df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Pickup')
+                df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Van')
+                df = new_metric(df, 'full name', 'reg_class_id', 'truck', 'Utility')
+                df.replace({'full name': r' Car'}, {'full name': ''}, regex=True, inplace=True)
+                df.replace({'full name': r'Mini-compact'}, {'full name': 'Minicompact'}, regex=True, inplace=True)
+                df.replace({'full name': r' Light Truck'}, {'full name': ''}, regex=True, inplace=True)
+            vehicle_prices_df = vehicle_prices['gasoline'].merge(vehicle_prices['electric'], on=['full name', 'calendar_year', 'reg_class_id'])
+
+            # merge prices into larger context DF, but first make the "full name" columns consistent
+            case_df.replace({'full name': r'Cars: '}, {'full name': ''}, regex=True, inplace=True)
+            case_df.replace({'full name': r'Light Trucks: '}, {'full name': ''}, regex=True, inplace=True)
+
+            case_df = case_df.merge(vehicle_prices_df, on=['full name', 'calendar_year', 'reg_class_id'], how='left')
+            case_df.rename(columns={'full name': 'context_size_class'}, inplace=True)
+
+            # lastly, round all the sales shares and force sum to 100
+            for yr in range(case_df['calendar_year'].min(), case_df['calendar_year'].max() + 1):
+                shares = pd.Series(case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total']).tolist()
+                new_shares = round_floats_to_100(shares, 2)
+                case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total'] = new_shares
+                for reg_class in ['car', 'truck']:
+                    shares = pd.Series(case_df.loc[(case_df['calendar_year'] == yr) & (case_df['reg_class_id'] == reg_class), 'sales_share_of_regclass']).tolist()
+                    new_shares = round_floats_to_100(shares, 2)
+                    case_df.loc[(case_df['calendar_year'] == yr) & (case_df['reg_class_id'] == reg_class), 'sales_share_of_regclass'] = new_shares
+
+            fleet_context_df = pd.concat([fleet_context_df, case_df], axis=0, ignore_index=True)
 
     # work on deflators
     print('Working on GDP price deflators.')
     deflators = return_df(deflators_table, 'Unnamed: 1', 'Gross domestic product')
     deflators = melt_df(deflators, 'Unnamed: 1', 'price_deflator', 'Unnamed: 1')
     deflators['price_deflator'] = deflators['price_deflator'].astype(float)
-    basis_factor_df = pd.DataFrame(deflators.loc[deflators['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)
-    basis_factor = basis_factor_df.at[0, 'price_deflator']
-    deflators.insert(len(deflators.columns),
-                     'adjustment_factor',
-                     basis_factor / deflators['price_deflator'])
+    # basis_factor_df = pd.DataFrame(deflators.loc[deflators['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)
+    # basis_factor = basis_factor_df.at[0, 'price_deflator']
+    # deflators.insert(len(deflators.columns),
+    #                  'adjustment_factor',
+    #                  basis_factor / deflators['price_deflator'])
 
     print('Working on CPIU price deflators.')
     cpi_table.rename(columns={'Year': 'calendar_year', 'Annual': 'price_deflator'}, inplace=True)
-    basis_factor_df = pd.DataFrame(cpi_table.loc[cpi_table['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)
-    basis_factor = basis_factor_df.at[0, 'price_deflator']
-    cpi_table.insert(len(cpi_table.columns),
-                     'adjustment_factor',
-                     basis_factor / cpi_table['price_deflator'])
+    # basis_factor_df = pd.DataFrame(cpi_table.loc[cpi_table['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)
+    # basis_factor = basis_factor_df.at[0, 'price_deflator']
+    # cpi_table.insert(len(cpi_table.columns),
+    #                  'adjustment_factor',
+    #                  basis_factor / cpi_table['price_deflator'])
 
     # print to output files
     path_of_run_folder = settings.path_outputs / f'{start_time_readable}_run'
@@ -450,7 +453,6 @@ def main():
     fleet_context_df.to_csv(path_of_run_folder / settings.vehicles_context_template, index=False)
     fuel_context_df.to_csv(path_of_run_folder / settings.fuels_context_template, index=False)
     deflators.to_csv(path_of_run_folder / settings.price_deflators_template, index=False)
-    deflators.to_csv(settings.path_cwd / f'omega_preproc/bea_tables/implicit_price_deflators_{usd_basis}.csv', index=False)
     cpi_table.to_csv(path_of_run_folder / settings.cpiu_deflators_template, index=False)
 
 
