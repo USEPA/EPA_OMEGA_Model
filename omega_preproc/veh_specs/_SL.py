@@ -375,8 +375,6 @@ for model_year in model_years:
                 if query_type == 'max' or query_type == 'min' or query_type == 'avg' \
                         or query_type == 'std' or query_type == 'sum':
                     try:
-                        # master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                        #     master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                         master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                             pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
                     except ValueError:
@@ -385,7 +383,8 @@ for model_year in model_years:
                         if pd.isnull(testing_column).sum() >= 0:
                             master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                                 master_index_file_with_desired_field_all_merges[
-                                    information_toget_source_column_name].str.extract('(\d+)').astype(float)
+                                    information_toget_source_column_name].str.extract(
+                                    '(\d+)').astype(float)
                         else:
                             master_index_file_with_desired_field_all_merges[
                                 information_toget_source_column_name] = testing_column
@@ -437,17 +436,19 @@ for model_year in model_years:
                         list(aggregating_columns)) \
                         .sum().reset_index()
                 elif query_type == 'all':
-                    # if information_toget_source_column_name == 'FINAL_CALC_CITY_FE_4':
-                    #     print(information_toget_source_column_name)
                     query_output_source = master_index_file_with_desired_field_all_merges[ \
                         list(aggregating_columns) + [information_toget_source_column_name]].groupby(\
                         list(aggregating_columns))[information_toget_source_column_name].apply(lambda x: '|'.join(map(str, x))).reset_index()
                     for all_count in range(0, len(query_output_source)):
                         query_output_source[information_toget_source_column_name][all_count] = \
-                            '|'.join(list(pd.Series(query_output_source[information_toget_source_column_name][all_count].split('|')).unique()))
+                            '|'.join(list(pd.Series(query_output_source[information_toget_source_column_name][all_count]\
+                            .split('|')).unique()))
+                        if '|' in query_output_source[information_toget_source_column_name][all_count]:
+                            print(query_output_source[information_toget_source_column_name][all_count])
+
                 elif query_type == 'avg':
                     master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                        pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
+                    pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
                     if weighting_field == str(np.nan) or pd.isnull(weighting_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
                             list(aggregating_columns) + [information_toget_source_column_name]].groupby(

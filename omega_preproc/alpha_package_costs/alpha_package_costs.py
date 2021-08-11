@@ -215,6 +215,7 @@ def cost_vs_plot(input_settings, df, path, *years):
             x, y = ice_plot
             ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=ice_legends)
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
+            ax.set_ylabel(f'{input_settings.dollar_basis_for_output_file} dollars', fontsize=9)
             plt.legend(loc=2)
             plt.title(f'ice_{year}')
             plt.savefig(path / f'ice_{year}_{input_settings.name_id}.png')
@@ -227,6 +228,7 @@ def cost_vs_plot(input_settings, df, path, *years):
             x, y = bev_plot
             ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=bev_legends)
             ax.set(xlim=(0, 0.5), ylim=(10000, 60000))
+            ax.set_ylabel(f'{input_settings.dollar_basis_for_output_file} dollars', fontsize=9)
             plt.legend(loc=4)
             plt.title(f'bev_{year}')
             plt.savefig(path / f'bev_{year}_{input_settings.name_id}.png')
@@ -239,6 +241,7 @@ def cost_vs_plot(input_settings, df, path, *years):
             x, y = hev_plot
             ax.scatter(x, y, alpha=0.8, edgecolors='none', s=30, label=hev_legends)
             ax.set(xlim=(0, 500), ylim=(10000, 60000))
+            ax.set_ylabel(f'{input_settings.dollar_basis_for_output_file} dollars', fontsize=9)
             plt.legend(loc=2)
             plt.title(f'hev_{year}')
             plt.savefig(path / f'hev_{year}_{input_settings.name_id}.png')
@@ -698,7 +701,7 @@ def ice_package_results(runtime_settings, input_settings, key, alpha_file_dict, 
     package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile', ftp1_co2)
     if runtime_settings.set_tech_tracking_flags:
         package_cost_df = create_tech_flags_from_cost_key(package_cost_df, engine_key, weight_key, accessory_key, fuel_key)
-    package_cost_df.insert(0, 'dollar_basis', input_settings.dollar_basis)
+    package_cost_df.insert(0, 'dollar_basis', input_settings.dollar_basis_for_output_file)
     package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
     package_cost_df.insert(0, 'alpha_filename', alpha_file_name)
@@ -755,7 +758,7 @@ def pev_package_results(runtime_settings, input_settings, key, alpha_file_dict, 
     if runtime_settings.set_tech_tracking_flags:
         package_cost_df = create_tech_flags_from_cost_key(package_cost_df, engine_key, weight_key, accessory_key, fuel_key)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
-    package_cost_df.insert(0, 'dollar_basis', input_settings.dollar_basis)
+    package_cost_df.insert(0, 'dollar_basis', input_settings.dollar_basis_for_output_file)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
     package_cost_df.insert(0, 'alpha_filename', alpha_file_name)
@@ -1167,72 +1170,93 @@ class InputSettings:
         self.start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
         # get the price deflators
-        self.dollar_basis = int(context_aeo_inputs.aeo_version) - 1
+        # self.dollar_basis = int(context_aeo_inputs.aeo_version) - 1
 
         # set input filenames
-        self.gdp_deflators_file = self.path_preproc / f'bea_tables/implicit_price_deflators_{self.dollar_basis}.csv'
+        self.gdp_deflators_file = self.path_input_templates / 'implicit_price_deflators.csv'
+        # self.gdp_deflators_file = self.path_preproc / f'bea_tables/implicit_price_deflators_{self.dollar_basis}.csv'
         self.techcosts_file = pd.ExcelFile(self.path_inputs / 'alpha_package_costs_module_inputs.xlsx')
 
         try:
-            self.gdp_deflators = pd.read_csv(self.path_preproc / f'bea_tables/implicit_price_deflators_{self.dollar_basis}.csv', index_col=0)
-            self.gdp_deflators = self.gdp_deflators.to_dict('index')
-            self.techcosts_file = pd.ExcelFile(self.path_inputs / 'alpha_package_costs_module_inputs.xlsx')
+            self.gdp_deflators = pd.read_csv(self.gdp_deflators_file, skiprows=1, index_col=0).to_dict('index')
+            # self.gdp_deflators = pd.read_csv(self.path_preproc / f'bea_tables/implicit_price_deflators_{self.dollar_basis}.csv', index_col=0)
+            # self.gdp_deflators = self.gdp_deflators.to_dict('index')
+
+            # self.techcosts_file = pd.ExcelFile(self.path_inputs / 'alpha_package_costs_module_inputs.xlsx')
+            # set inputs
+            self.inputs_code = pd.read_excel(self.techcosts_file, 'inputs_code', index_col=0).to_dict('index')
+            self.dollar_basis_for_output_file = int(self.inputs_code['dollar_basis_for_output_file']['value'])
+            self.start_year = int(self.inputs_code['start_year']['value'])
+            self.end_year = int(self.inputs_code['end_year']['value'])
+            self.years = range(self.start_year, self.end_year + 1)
+            self.learning_rate_weight = self.inputs_code['learning_rate_weight']['value']
+            self.learning_rate_ice_powertrain = self.inputs_code['learning_rate_ice_powertrain']['value']
+            self.learning_rate_roadload = self.inputs_code['learning_rate_roadload']['value']
+            self.learning_rate_bev = self.inputs_code['learning_rate_bev']['value']
+            self.boost_multiplier = self.inputs_code['boost_multiplier']['value']
+            self.run_id = self.inputs_code['run_ID']['value']
+            if self.run_id != 0:
+                self.name_id = f'{self.run_id}_{self.start_time_readable}'
+            else:
+                self.name_id = self.start_time_readable
+
             self.price_class_dict = pd.read_excel(self.techcosts_file, 'price_class', index_col=0).to_dict('index')
-            # read tech costs input file, convert dollar values to dollar basis, and create dictionaries
-            self.engine_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            # read cost sheets from the tech costs input file, convert dollar values to consistent dollar basis, and create dictionaries
+            self.engine_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                    'engine', 'item_cost', 'dmc').to_dict('index')
-            self.trans_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.trans_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                   'trans', 'item_cost', 'dmc', 'dmc_increment').to_dict('index')
-            self.accessories_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.accessories_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                         'accessories', 'item_cost', 'dmc').to_dict('index')
-            self.startstop_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.startstop_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                       'start-stop', 'item_cost', 'dmc').to_dict('index')
-            self.weight_cost_ice_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.weight_cost_ice_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                        'weight_ice', 'item_cost', 'dmc_per_pound').to_dict('index')
-            self. weight_cost_pev_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self. weight_cost_pev_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                         'weight_pev', 'item_cost', 'dmc_per_pound').to_dict('index')
-            self.aero_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.aero_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                  'aero', 'item_cost', 'dmc').to_dict('index')
-            self.nonaero_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.nonaero_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                     'nonaero', 'item_cost', 'dmc').to_dict('index')
-            self.ac_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.ac_cost_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                'ac', 'item_cost', 'dmc').to_dict('index')
 
-            self.bev_curves_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.bev_curves_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                   'bev_curves', 'x_cubed_factor', 'x_squared_factor',
                                                                                   'x_factor', 'constant').to_dict('index')
-            self.hev_curves_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.hev_curves_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                   'hev_curves', 'x_cubed_factor', 'x_squared_factor',
                                                                                   'x_factor', 'constant').to_dict('index')
 
-            self.bev_nonbattery_single_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.bev_nonbattery_single_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                              'bev_nonbattery_single',
                                                                                              'slope', 'intercept').to_dict('index')
-            self.bev_nonbattery_dual_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.bev_nonbattery_dual_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                            'bev_nonbattery_dual',
                                                                                            'slope', 'intercept').to_dict('index')
-            self.hev_nonbattery_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis, self.techcosts_file,
+            self.hev_nonbattery_dict = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators, self.dollar_basis_for_output_file, self.techcosts_file,
                                                                                       'hev_nonbattery',
                                                                                       'slope', 'intercept').to_dict('index')
             # phev_curves_dict = 0
             self.pev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
             self.hev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
 
-            # set inputs
-            self.cost_inputs = pd.read_excel(self.techcosts_file, 'inputs_code', index_col=0).to_dict('index')
-            self.start_year = int(self.cost_inputs['start_year']['value'])
-            self.end_year = int(self.cost_inputs['end_year']['value'])
-            self.years = range(self.start_year, self.end_year + 1)
-            self.learning_rate_weight = self.cost_inputs['learning_rate_weight']['value']
-            self.learning_rate_ice_powertrain = self.cost_inputs['learning_rate_ice_powertrain']['value']
-            self.learning_rate_roadload = self.cost_inputs['learning_rate_roadload']['value']
-            self.learning_rate_bev = self.cost_inputs['learning_rate_bev']['value']
-            self.boost_multiplier = self.cost_inputs['boost_multiplier']['value']
-            self.run_id = self.cost_inputs['run_ID']['value']
-            if self.run_id != '':
-                self.name_id = f'{self.run_id}_{self.start_time_readable}'
-            else:
-                self.name_id = self.start_time_readable
+            # # set inputs
+            # self.inputs_code = pd.read_excel(self.techcosts_file, 'inputs_code', index_col=0).to_dict('index')
+            # self.dollar_basis_for_output_file = int(self.inputs_code['dollar_basis_for_output_file']['value'])
+            # self.start_year = int(self.inputs_code['start_year']['value'])
+            # self.end_year = int(self.inputs_code['end_year']['value'])
+            # self.years = range(self.start_year, self.end_year + 1)
+            # self.learning_rate_weight = self.inputs_code['learning_rate_weight']['value']
+            # self.learning_rate_ice_powertrain = self.inputs_code['learning_rate_ice_powertrain']['value']
+            # self.learning_rate_roadload = self.inputs_code['learning_rate_roadload']['value']
+            # self.learning_rate_bev = self.inputs_code['learning_rate_bev']['value']
+            # self.boost_multiplier = self.inputs_code['boost_multiplier']['value']
+            # self.run_id = self.inputs_code['run_ID']['value']
+            # if self.run_id != '':
+            #     self.name_id = f'{self.run_id}_{self.start_time_readable}'
+            # else:
+            #     self.name_id = self.start_time_readable
 
             self.ice_glider_share = 0.85
 
@@ -1275,25 +1299,46 @@ class InputSettings:
         df = self.convert_dollars_to_analysis_basis(df, deflators, dollar_basis, *args)
         return df
 
-    def convert_dollars_to_analysis_basis(self, df, deflators, dollar_basis, *args):
+    def convert_dollars_to_analysis_basis(self, df, deflators, dollar_basis_year, *args):
         """
 
         Args:
-            df: A DataFrame containing monetized values to be converted into a consistent dollar_basis.
-            deflators: A dictionary of GDP deflators with years as the keys.
-            dollar_basis: The dollar basis to which all monetized values are to be converted.
-            args: The arguments to be converted.
+            df: The DataFrame of values to be converted to a consistent dollar basis.
+            deflators: A dictionary of price deflators.
+            dollar_basis_year: An integer representing the desired dollar basis for the return DataFrame.
+            args: The attributes to be converted to a consistent dollar basis.
 
         Returns:
-            A DataFrame of monetized values in a consistent dollar_basis valuation.
+            The passed DataFrame with args expressed in a consistent dollar basis.
 
         """
-        dollar_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
-        for year in dollar_years:
+        basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+        adj_factor_numerator = deflators[dollar_basis_year]['price_deflator']
+        df_return = df.copy()
+        for basis_year in basis_years:
             for arg in args:
-                df.loc[df['dollar_basis'] == year, arg] = df[arg] * deflators[year]['adjustment_factor']
-        df['dollar_basis'] = dollar_basis
-        return df
+                adj_factor = adj_factor_numerator / deflators[basis_year]['price_deflator']
+                df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
+        df_return['dollar_basis'] = dollar_basis_year
+        return df_return
+        # """
+        #
+        # Args:
+        #     df: A DataFrame containing monetized values to be converted into a consistent dollar_basis.
+        #     deflators: A dictionary of GDP deflators with years as the keys.
+        #     dollar_basis: The dollar basis to which all monetized values are to be converted.
+        #     args: The arguments to be converted.
+        #
+        # Returns:
+        #     A DataFrame of monetized values in a consistent dollar_basis valuation.
+        #
+        # """
+        # dollar_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+        # for year in dollar_years:
+        #     for arg in args:
+        #         df.loc[df['dollar_basis'] == year, arg] = df[arg] * deflators[year]['adjustment_factor']
+        # df['dollar_basis'] = dollar_basis
+        # return df
 
 
 def main():
@@ -1424,7 +1469,7 @@ def main():
         # open the 'simulated_vehicles.csv' input template into which results will be placed.
         cost_clouds_template_info = pd.read_csv(input_settings.path_input_templates.joinpath('simulated_vehicles.csv'), nrows=0, usecols=[0, 1, 2, 3, 4])
         temp = [item for item in cost_clouds_template_info]
-        temp.append(f'{input_settings.dollar_basis}')
+        temp.append(f'{input_settings.dollar_basis_for_output_file}')
         temp.append(f'{input_settings.name_id}')
         df = pd.DataFrame(columns=temp)
         df.to_csv(input_settings.path_of_run_folder.joinpath('simulated_vehicles.csv'), index=False)
@@ -1440,7 +1485,7 @@ def main():
         # cost_cloud_verbose.to_csv(settings.path_of_run_folder / f'simulated_vehicles_verbose.csv', index=False)
 
     # save additional outputs
-    modified_costs = pd.ExcelWriter(input_settings.path_of_run_folder.joinpath(f'techcosts_in_{input_settings.dollar_basis}_dollars.xlsx'))
+    modified_costs = pd.ExcelWriter(input_settings.path_of_run_folder.joinpath(f'techcosts_in_{input_settings.dollar_basis_for_output_file}_dollars.xlsx'))
     pd.DataFrame(input_settings.engine_cost_dict).transpose().to_excel(modified_costs, sheet_name='engine', index=True)
     pd.DataFrame(input_settings.trans_cost_dict).transpose().to_excel(modified_costs, sheet_name='trans', index=True)
     pd.DataFrame(input_settings.startstop_cost_dict).transpose().to_excel(modified_costs, sheet_name='start-stop', index=False)
