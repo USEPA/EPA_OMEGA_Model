@@ -166,68 +166,93 @@ Market Class Definitions
 The Consumer Module estimates new vehicle sales at an aggregate level, with vehicles separated into high level market classes. These market classes are the fundamental unit of analysis within the Consumer Module. The choice of market classes are tied to the model used to estimate the shares of new vehicles sold, and are dependent on the attributes available in the input data files. For example, vehicles can be identified by their fuel type (electric, gas, diesel, etc.), by their expected use (primarily for goods or passenger transport), or by their geographic description (urban vs. rural).
 Users can define market classes; in doing so, the user must ensure that all other inputs and user-defined submodules (for example, with respect to stock and use estimation) within the Consumer Module are defined consistently. The designation of market classes can be used to account for expected market heterogeneity in terms of purchasing behavior or vehicle use based on specific vehicle attributes. In addition, the user can categorize market classes as 'responsive,' where the share of total vehicles attributed to those market classes change in response to user defined endogenous inputs (like relative costs), or 'nonresponsive,' where the share of total vehicles attributed to those market classes does not change with the policy being analyzed.
 
-Within the demo analysis, vehicles are separated into four market classes depending on whether they are categorized as hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do), and their fuel type (battery electric vehicle (BEV) or internal combustion engine vehicles (ICE)). The hauling/nonhauling market class is defined as nonresponsive. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The BEV/ICE market class is defined as responsive, and the share of vehicles in that market class is estimated within the Consumer Module.
+.. admonition:: Demo Example
 
-Before the Consumer Module can estimate sales and or shares response, all vehicles must be categorized into their market classes. For ease of explanation, the process can be thought of as creating branches of a tree. Using the demo analysis market classes, where hauling/nonhauling is categorized as nonresponsive, vehicles are first separated into the appropriate hauling and nonhauling class. The Consumer Module then uses interim inputs from the Producer Module to determine the share of vehicles in the responsive category, BEV/ICE. These steps are identified by the solid lines in the figure below. During Phase 1, if the share of BEVs that consumers will accept under the given vehicle attributes, including the relative price of ICE and BEV, does not converge with the share that Producer Module estimates, the iterative process continues. Given different interim inputs, for example where the relative price of ICE and BEVs change during iteration, the Consumer Module will redistribute vehicles into the BEV and ICE classes. However, the relative share of hauling and nonhauling vehicles will not change. This is represented by the dashed lines between each set of BEV/ICE class. Note that the dashed lines travel within the hauling class and within the nonhauling class, but do not travel across them.
+    Within the demo analysis, vehicles are separated into four market classes depending on whether they are categorized as hauling (primarily meant for transporting goods or towing, as a body-on-frame vehicle would be expected to do) or non-hauling (primarily meant for passenger transportation, as a unibody vehicle might do), and their fuel type (battery electric vehicle (BEV) or internal combustion engine vehicles (ICE)). The hauling/nonhauling market class is defined as nonresponsive. The share of vehicles defined as hauling or non-hauling, regardless of the fuel type, depends on analysis context inputs, and is unaffected by model results. The BEV/ICE market class is defined as responsive, and the share of vehicles in that market class is estimated within the Consumer Module.
 
-:numref:`mo_label_mktree` Illustration of the Market Class Structure in the Demo Analysis.
+Before the Consumer Module can estimate sales and or shares response, all vehicles must be categorized into their market classes. For ease of explanation, the process can be thought of as creating branches of a tree. Vehicles are categorized into nonresponsive market classes, and within those nonresponsive market classes, vehicles are allocated to their responsive market classes based on the attributes of the vehicles input from the Producer Module and the user defined method of categorizing responsive market classes. During the initial phase of iteration with the Producer Module, the share of vehicles allocated to the nonresponsive market classes remains consistent, however shares of vehicles allocated to the responsive market classes may change.
 
-.. _mo_label_mktree:
-.. figure:: _static/mo_figures/market_class_tree.png
-    :align: center
+.. admonition:: Demo Example
 
-.. todo: [[make text size in figure larger]]
+    The figure below illustrates an example of a market class tree using the demo analysis market classes as an example. Hauling/nonhauling is categorized as nonresponsive, and vehicles separated into the appropriate hauling and nonhauling class using the projection of hauling/nonhauling shares from the Analysis Context inputs. The interim inputs from the Producer Module, namely relative vehicle costs, are used to determine the share of vehicles in the responsive category, BEV/ICE, as described in examples below. These initial categorization steps are identified by the solid lines in the figure below. During Phase 1, if the share of BEVs that consumers will accept given the vehicle attributes does not converge with the share that the Producer Module estimates, the iterative process continues. The demanded BEV share is passed back to the Producer Module, which will return a new set of interim inputs, including relative costs. Given the updated interim inputs, the Consumer Module will redistribute vehicles into the BEV and ICE classes. However, the relative share of hauling and nonhauling vehicles will not change. This possible redistribution between responsive market classes is represented by the dashed lines between each set of BEV/ICE classes. Note that the dashed lines travel within the hauling class and within the nonhauling class, but do not travel across them.
+
+    :numref:`mo_label_mktree` Illustration of the Market Class Structure in the Demo Analysis.
+
+    .. _mo_label_mktree:
+    .. figure:: _static/mo_figures/market_class_tree.png
+        :align: center
+
 
 Phase 1: New Vehicle Sales
 --------------------------
-The Consumer Module estimates both total new vehicle sales, as well as the demanded market shares of those new vehicles.
+During the first, iterative, phase of the Consumer Module, the Producer Module and Consumer Module converge on an estimate of total new vehicle sales, as well as the demanded market shares of those new vehicles. An initial set of vehicles and their attributes, including prices, that meet the policy targets as estimated in the Producer Module are combined with exogenous inputs from the Analysis Context to determine the total volume of new vehicles accepted by consumers, and the market class allocations of those vehicles, under the given conditions. If the sale and shares results estimated within the Consumer Modules are not within a given threshold of the estimates from the Producer Module, iteration between the Modules occurs. The Consumer Module results are sent to the Producer Module to determine the cost to producers to achieve the policy targets as defined with the Policy Module in a way that consumers will accept. Within this first phase of the Consumer Module, there are two main determinations being made; the total sales volume consumers will accept, and the share of vehicles they demand from each defined market class.
 
 **Sales Volumes**
 
 The Consumer Module estimates the total new vehicles sold at the aggregated market class level. The vehicles the Producer Module estimates will be produced, with their relevant attributes, including prices, are sent to the Consumer Module. As vehicles are aggregated into the market classes identified by the user, the Consumer Module determines how many vehicles in each category are demanded, given the Analysis Context assumptions. Many parts of the sales estimates can be defined by the user, including consumer responsiveness to price, what is included in the price consumers take into account, and how much of the cost to producers is passed on to consumers.
 
-The estimate starts with an assumption of sales volumes in the absence of policy. These estimates are an endogenous input from the Analysis Context. An elasticity of demand, defined by the user, is used in conjunction with an assumed change in price to estimate the change in sales expected due to the action alternative under consideration.
+.. sidebar:: Elasticity of Demand
 
-The elasticity of demand is the percent change in quantity of a good demanded for a 1%  change in the price of that good, where the good demanded in the Consumer Module is new light duty vehicles. This value represents how responsive consumers are to a change in price. The value should be negative due to the law of demand; generally, as the price of a good increases, the amount of that good purchased falls. Larger (smaller) negative values are associated with more (less) 'elastic', or larger (smaller), changes in demand for a given change in price.
+    Demand elasticities are generally negative: as the price of a good increases (a positive denominator), the amount of that good purchased falls (a negative numerator). Larger (smaller) negative values are associated with more (less) 'elastic', or larger (smaller), changes in demand for a given change in price.
 
-The price of new vehicles that consumers consider is determined by a user defined consumer generalized cost value. This consumer generalized cost includes factors the user assumes consumers consider in their purchase decision. Some factors that might be included are depreciation, the share of total costs the producers pass onto the consumers, and amount of fuel savings consumers consider in their purchase decision.
+The change in new vehicle sales estimate starts with an assumption of sales volumes in the absence of policy. These estimates are an endogenous input from the Analysis Context. An elasticity of demand, defined by the user, is used in conjunction with the Producer Module's estimated change in price due to an action alternative as defined within the Policy Module to estimate the change in sales expected due to the action alternative under consideration. Demand elasticity is defined as the percent change in the quantity of a good demanded for a 1%  change in the price of that good, where the good demanded in the Consumer Module is new light duty vehicles. This value represents how responsive consumers are to a change in price. The general elasticity equation is:
+
+.. Math::
+    :label: demand elasticity
+
+    \epsilon=\frac{\Delta Q} {\Delta P}
+
+Where :math:`\epsilon` is the elasticity of demand, :math:`\Delta Q` is the change in the quantity demanded, and :math:`\Delta P` is the change in the good's price.
+
+.. admonition:: Demo Example
+
+    In the demo analysis, the elasticity of demand is set to -1. For a 1% change in the consumer generalized cost, the vehicles demanded by consumers will fall by 1%.
+
+In order to estimate the change in sales expected as function of the estimated change in price, this equation is rearranged:
+
+.. Math::
+    :label: change in sales
+
+    \Delta Q=\epsilon * \Delta P
+
+At an aggregate level, the average expected change in the price of new vehicle is multiplied by the defined demand elasticity to get the estimated change in vehicles demanded. This change is added to the projected new vehicle sales under the no-action alternative, from the Analysis Context, to get the total new vehicle sales under the action alternative outlined in the Policy Module.
+
+The price of new vehicles that consumers consider, :math:`\Delta P`, is determined by a user defined consumer generalized cost value. This consumer generalized cost includes factors the user assumes consumers consider in their purchase decision. Some factors that might be included are depreciation, the share of total costs the producers pass onto the consumers, and amount of fuel savings consumers consider in their purchase decision.
 
 The amount of fuel savings considered in the purchase decision is a key factor in determining the net cost used in determining new vehicle sales. This value is represented by the number of years of fuel savings consumers consider when purchasing a new vehicle and can range from 0 through the full lifetime of the vehicle. Using vehicle fuel consumption rates from the Producer Module, projections of fuel costs from the Analysis Context, the assumed user defined VMT schedules as described below, and the assumed user defined vehicle reregistration schedules, also described below, the Consumer Module estimates fuel costs for the set of vehicles under the no-action alternative as well as the action alternative under consideration. The user specified amount of fuel savings is added to the action alternative set of vehicle prices input from the Producer Module to get the set of net costs used in conjunction with the elasticity of demand to estimate the change in vehicle sales.
 
-In the demo analysis, the elasticity of demand is set to -1. For a 1% change in the consumer generalized cost, the vehicles demanded by consumers will fall by 1%.
-The generalized cost value in the Consumer Module demo analysis includes the share of total cost producers pass onto the consumer, fuel cost savings, and depreciation. As part of this cost estimation, the demo analysis assumes 'full cost pass-through'. This means that the full increase in cost that producers are subject to in achieving emission reduction targets is passed on to the consumers. For the amount of fuel consumption considered in the vehicle purchase decision, the demo analysis assumes 2.5 years.
+.. admonition:: Demo Example
+
+    The generalized cost value in the Consumer Module demo analysis includes the share of total cost producers pass onto the consumer, fuel cost savings, and depreciation. As part of this cost estimation, the demo analysis assumes 'full cost pass-through'. This means that the full increase in cost that producers are subject to in achieving emission reduction targets is passed on to the consumers. For the amount of fuel consumption considered in the vehicle purchase decision, the demo analysis assumes 2.5 years.
 
 
 **Sales Shares**
 
 The new vehicles sold are categorized into the user defined market classes using estimates of sales shares. As mentioned above, those market classes can be nonresponsive or responsive to the policy being analyzed. Sales shares for the market classes can be defined in user defined submodules. Nonresponsive vehicle shares may change over time in a prescribed way using exogenous inputs, for example to follow external projections of relative market class shares over time. Users can define responsive market share responses to endogenous inputs fed in from the Producer Module, for example vehicle price. The user defined sales shares submodules must be consistent with related submodules. For example, market classes must be consistent with those defined in the market classes submodule. In addition, inputs used to estimate shares, both endogenous and exogenous must be available.
 
-Within the demo analysis, the hauling/nonhauling market classes are nonresponsive. The sales shares for these classes are defined using exogenous inputs from the Analysis Context. The shares change over time as relative projections of hauling and nonhauling vehicles change over time. However, given a consistent Analysis Context, the shares do not change across different policy alternatives as defined in the Policy Module.
+.. admonition:: Demo Example
 
-The demo analysis defines BEV and ICE market classes as responsive to the policy being analyzed. The method used to estimate BEV shares is based on a logit curve, which has been used in peer reviewed economic literature as far back a 1957 to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module.
+    Within the demo analysis, the hauling/nonhauling market classes are nonresponsive. The sales shares for these classes are defined using exogenous inputs from the Analysis Context. The shares change over time as relative projections of hauling and nonhauling vehicles change over time. However, given a consistent Analysis Context, the shares do not change across different policy alternatives as defined in the Policy Module.
 
-The logit curve estimates the share of the technology Iin the case of the demo analysis, the technology is BEVs) demanded by consumers, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to the prices that are input from the Producer Module. The speed of acceptance and price responsiveness are factors the user can identify within the user defined submodule. The logit equation is:
+    The demo analysis defines BEV and ICE market classes as responsive to the policy being analyzed. The method used to estimate BEV shares is based on a logit curve, which has been used in peer reviewed economic literature as far back a 1957 to estimate technology adoption over time. The logit curve estimation is contained within a user defined submodule, which enables users to tailor assumptions in a way that is consistent with other affected submodules within the Consumer Module.
+
+The logit curve estimates the share of the technology (in the case of the demo analysis, the technology is BEVs) demanded by consumers, accounting for how quickly (or slowly) new technology is phased into public acceptance, as well as how responsive consumers are to the prices that are input from the Producer Module. The speed of acceptance and price responsiveness are factors the user can identify within the user defined submodule. The logit equation is:
 
 .. Math::
     :label: logit_curve
 
     s_{i}=\frac{\alpha_{i} * p_{i}^{\gamma}} {\Sigma_{j=1}^{N} \alpha_{j} * p_{j}^{\gamma}}
 
-Where:
-s_{i} is the share of vehicles in market class *i*
+Where :math:`s_{i}` is the share of vehicles in market class *i*, :math:`\alpha_{i}` is the share weight of market class *i* (which determines how quickly new technology is phased in to consumer acceptance) :math:`p_{i}` is the generalized cost of each vehicle in market class *i*, and :math:`\gamma` represents how sensitive the model is to price.
 
-\alpha_{i} is the share weight of market class *i*. This determines how quickly new technology is phased in to consumer acceptance.
+.. admonition:: Demo Example
 
-p_{i} is the generalized cost of each vehicle in market class *i*
-
-\gamma represents how sensitive the model is to price
-
-The share weight and price sensitivity parameters in the demo analysis are informed by the inputs and assumptions to the passenger transportation section of GCAM-USA.
+    The share weight and price sensitivity parameters in the demo analysis are informed by the inputs and assumptions to the passenger transportation section of GCAM-USA.
 
 
 Phase 2: Vehicle Stock and Use
 ------------------------------
-After convergence with respect to the sales of new vehicles is achieved, the Consumer Module estimates total vehicle stock and use, keeping internal consistency between the number of vehicles demanded and the use of those vehicles. Vehicle stock is the total on-road registered fleet, including both new vehicles sales, and the reregistered (used) vehicles. A simple way to determine stock is to estimate the reregistered fleet of vehicles from the total used fleet, and add in the new vehicles sold. The initial stock of vehicles is an exogenous input from the Analysis Context. This set of vehicles includes vehicle counts and attributes, including model year and the features or attributes used to designate market class. The final set of new vehicles sold, and their market classes, is determined as explained above.
+After convergence with respect to the sales of new vehicles is achieved, the Consumer Module estimates total vehicle stock and use, keeping internal consistency between the number of vehicles demanded and the use of those vehicles. Vehicle stock is the total onroad registered fleet, including both new vehicles sales, and the reregistered (used) vehicles. A simple way to determine stock is to estimate the reregistered fleet of vehicles from the total used fleet, and add in the new vehicles sold. The initial stock of vehicles is an exogenous input from the Analysis Context. This set of vehicles includes vehicle counts and attributes, including model year and the features or attributes used to designate market class. The final set of new vehicles sold, and their market classes, is determined as explained above.
 The method of estimating the reregistered fleet is in a user defined submodule. This method can be a static schedule, or depend on other vehicle attributes, like VMT. In the demo analysis, reregistration is estimated using fixed schedules based on vehicle age. For every calendar year, a specified set of vehicles in each model year are assumed to be reregistered for use in the following calendar year. The percent of vehicles reentering the fleet for use in the following year falls as the cohort of vehicles age. If users update the reregistration submodule to follow a different prescribed static rate, or to allow interdependencies between the rate of reregistration and other vehicle attributes, they need to retain consistency between the reregistration submodule and other submodule, for example the submodules estimating new vehicle sales and total VMT.
 
 The method of estimating total VMT for the stock of vehicles is also in a user defined submodule. In the demo analysis, VMT is estimated in a way to maintain total VMT demanded from the Analysis Context (not including rebound driving) across Policy Alternatives. This ensures an overall logical relationship is maintained between consumer demand for mobility and the total availability of vehicles. The VMT demand from the Analysis Context is used to estimate the proportion of VMT attributed to each cohort of vehicles, separated by age and market class. For each calendar year, the total VMT projected in the Analysis Context is allocated across the internally estimated stock of vehicles using this fixed relationship.
