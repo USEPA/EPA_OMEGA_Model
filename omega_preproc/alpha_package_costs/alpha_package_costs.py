@@ -247,46 +247,6 @@ def cost_vs_plot(input_settings, df, path, *years):
             plt.savefig(path / f'hev_{year}_{input_settings.name_id}.png')
 
 
-def create_cost_df_in_consistent_dollar_basis(deflators, dollar_basis, file, sheet_name, *args, index_col=0):
-    """
-
-    Args:
-        deflators: A dictionary of GDP deflators with years as the keys.
-        dollar_basis: The dollar basis to which all monetized values are to be converted.
-        file: The file containing monetized values to be converted into dollar_basis dollars.
-        sheet_name: The specific worksheet within file for which monetized values are to be converted.
-        args: The arguments to be converted.
-
-    Returns:
-         A DataFrame of monetized values in a consistent dollar_basis valuation.
-
-    """
-    df = pd.read_excel(file, sheet_name, index_col=index_col)
-    df = convert_dollars_to_analysis_basis(df, deflators, dollar_basis, *args)
-    return df
-
-
-def convert_dollars_to_analysis_basis(df, deflators, dollar_basis, *args):
-    """
-
-    Args:
-        df: A DataFrame containing monetized values to be converted into a consistent dollar_basis.
-        deflators: A dictionary of GDP deflators with years as the keys.
-        dollar_basis: The dollar basis to which all monetized values are to be converted.
-        args: The arguments to be converted.
-
-    Returns:
-        A DataFrame of monetized values in a consistent dollar_basis valuation.
-
-    """
-    dollar_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
-    for year in dollar_years:
-        for arg in args:
-            df.loc[df['dollar_basis'] == year, arg] = df[arg] * deflators[year]['adjustment_factor']
-    df['dollar_basis'] = dollar_basis
-    return df
-
-
 def calc_year_over_year_costs(df, arg, years, learning_rate):
     """
 
@@ -1136,11 +1096,11 @@ class RuntimeSettings:
 
         """
         # set what to run (i.e., what outputs to generate)
-        self.run_ice = True
+        self.run_ice = False
         self.run_bev = True
         self.run_phev = False
-        self.run_hev = True
-        self.generate_simulated_vehicles_file = True
+        self.run_hev = False
+        self.generate_simulated_vehicles_file = False
         self.generate_simulated_vehicles_verbose_file = False
 
         # set tech to track via tech flags

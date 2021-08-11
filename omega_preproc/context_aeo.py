@@ -13,23 +13,29 @@ import shutil
 def read_table(path, table_name, skiprows=4):
     """
 
-    :param path: The path to input files.
-    :param table_name: The AEO table to read.
-    :param skiprows: The number of rows to be skipped when reading the AEO table.
-    :return: A DataFrame of the table_name.
-
+    Args:
+        path: The path to input files.
+        table_name: The AEO table to read.
+        skiprows: The number of rows to be skipped when reading the AEO table.
+    
+    Returns:
+        A DataFrame of the table_name.
+        
     """
     return pd.read_csv(path / table_name, skiprows=skiprows, error_bad_lines=False).dropna()
 
 
 def return_df(table, col_id, string_id):
     """
-
-    :param table: A DataFrame of the table_name passed thru the read_table function.
-    :param col_id: The column identifier where string_id data can be found.
-    :param string_id: The string identifier (e.g., the string_id such as Reference case, High Oil Price, etc.).
-    :return: A DataFrame consisting of only the data for the given AEO case; the name of the AEO case is also removed from the 'full name' column entries.
     
+    Args:
+        table: A DataFrame of the table_name passed thru the read_table function.
+        col_id: The column identifier where string_id data can be found.
+        string_id: The string identifier (e.g., the string_id such as Reference case, High Oil Price, etc.).
+    
+    Returns:
+        A DataFrame consisting of only the data for the given AEO case; the name of the AEO case is also removed from the 'full name' column entries.
+        
     """
     df_return = pd.DataFrame(table.loc[table[col_id].str.endswith(f'{string_id}'), :]).reset_index(drop=True)
     df_return.replace({col_id: f': {string_id}'}, {col_id: ''}, regex=True, inplace=True)
@@ -38,12 +44,19 @@ def return_df(table, col_id, string_id):
 
 def melt_df(df, id_col, value_name, drop_col=None):
     """
-    Melt the passed DataFrame from short-and-wide to long-and-narrow.
-    :param df: The passed DataFrame.
-    :param value_name: The name for the resultant data column.
-    :param drop_col: The name of any columns to be dropped after melt.
-    :return: The melted DataFrame with a column of data named value_name.
-
+    
+    A function to melt the passed DataFrame from short-and-wide (data for each year in separate columns) to long-and-narrow (data for each year
+    in a single column).
+    
+    Args:
+        df: The passed DataFrame.
+        id_col: The identifying column of data around which values will be melted.
+        value_name: The name for the resultant data column.
+        drop_col: The name of any columns to be dropped after melt.
+    
+    Returns:
+        The melted DataFrame with a column of data named value_name.
+        
     """
     df = pd.melt(df, id_vars=[id_col], value_vars=[col for col in df.columns if '20' in col], var_name='calendar_year', value_name=value_name)
     df['calendar_year'] = df['calendar_year'].astype(int)
@@ -54,14 +67,17 @@ def melt_df(df, id_col, value_name, drop_col=None):
 
 def new_metric(df, id_column, new_metric, new_metric_entry, *id_words):
     """
-
-    :param df: DataFrame in which new entries (new_metric_entry) are needed for a new_metric.
-    :param id_column: The column of data that contains necessary data to determine the new_metric_entry.
-    :param new_metric: The name of the new_metric that is to be populated.
-    :param new_metric_entry: The new entry to be populated into the new_metric column.
-    :param id_words: The words to look for in the id_column to determine what the new_metric_entry should be.
-    :return: The passed DataFrame with the new_metric column populated with the new_metric_entries
-
+    
+    Args:
+        df: DataFrame in which new entries (new_metric_entry) are needed for a new_metric.
+        id_column: The column of data that contains necessary data to determine the new_metric_entry.
+        new_metric: The name of the new_metric that is to be populated.
+        new_metric_entry: The new entry value to be populated into the new_metric column.
+        id_words: The words to look for in the id_column to determine what the new_metric_entry should be.
+    
+    Returns:
+        The passed DataFrame with the new_metric column populated with the new_metric_entries.
+        
     """
     for index, row in df.iterrows():
         for id_word in id_words:
@@ -73,31 +89,16 @@ def new_metric(df, id_column, new_metric, new_metric_entry, *id_words):
     return df
 
 
-def save_template(settings, df, path_to_save, template_name):
-    """
-
-    :param df: The DataFrame containing data to save to the template.
-    :param settings: The SetInputs class.
-    :param path_to_save: Path to the save folder.
-    :param template_name: Name of template.
-    :return: Confirmation message that the template has been saved and to where.
-
-    """
-    shutil.copy2(settings.path_input_templates / f'{template_name}', path_to_save / f'{template_name}')
-
-    # open the input template into which results will be placed.
-    template_info = pd.read_csv(path_to_save / f'{template_name}', 'b', nrows=0)
-    temp = ' '.join((item for item in template_info))
-    temp2 = temp.split(',')
-    template_info_df = pd.DataFrame(columns=temp2)
-    template_info_df.to_csv(path_to_save / f'{template_name}', index=False)
-
-    with open(path_to_save / f'{template_name}', 'a', newline='') as template_file:
-        df.to_csv(template_file, index=False)
-    return print(f'\n{template_name} saved to {path_to_save}')
-
-
 def error_gen(actual, rounded):
+    """
+
+    Args:
+        actual:
+        rounded:
+
+    Returns:
+
+    """
     divisor = np.sqrt(1.0 if actual < 1.0 else actual)
     return abs(rounded - actual) ** 2 / divisor
 
@@ -105,8 +106,14 @@ def error_gen(actual, rounded):
 def round_to_100(percents):
     """
 
-    :param percents: A list of percentages to be rounded.
-    :return: A list of percents rounded to integers and summing to 100.
+    This function is not being used and has not been tested.
+
+    Args:
+        percents: A list of percentages to be rounded.
+
+    Returns:
+        A list of percents rounded to integers and summing to 100.
+
     """
     if not np.isclose(sum(percents), 100):
         raise ValueError
@@ -123,9 +130,13 @@ def round_to_100(percents):
 def round_floats_to_100(percents, decimals):
     """
 
-    :param percents: A list of percentages to be rounded.
-    :param decimals: The number of decimal places in rounded values.
-    :return: A list of percents rounded to 'decimals' number of decimal places and summing to 100.
+    Args:
+        percents: A list of percentages to be rounded.
+        decimals: The number of decimal places in rounded values.
+
+    Returns:
+        A list of percents rounded to 'decimals' number of decimal places and summing to 100.
+
     """
     if not np.isclose(sum(percents), 100):
         raise ValueError
@@ -143,17 +154,26 @@ def round_floats_to_100(percents, decimals):
 
 
 class GetContext:
+    """
+
+    A class to extract specific data values from AEO tables.
+
+    """
     def __init__(self, table):
         """
 
-        :param table: A DataFrame of the table being worked on.
+        Args:
+            table: A DataFrame of the table being worked on.
+
         """
         self.table = table
 
     def aeo_year(self):
         """
 
-        :return: The year of the report, e.g., 'AEO2020'.
+        Returns:
+            The year of the report, e.g., 'AEO2020'.
+
         """
         a_loc = self.table.at[0, 'api key'].find('A')
         return self.table.at[0, 'api key'][a_loc: a_loc + 7]
@@ -161,7 +181,9 @@ class GetContext:
     def aeo_dollars(self):
         """
 
-        :return: The dollar basis of the AEO report.
+        Return:
+            The dollar basis of the AEO report.
+
         """
         usd_loc = self.table.at[0, 'units'].find(' $')
         return int(self.table.at[0, 'units'][0: usd_loc])
@@ -169,9 +191,13 @@ class GetContext:
     def select_table_rows(self, col_id, arg, replace=None):
         """
 
-        :param arg: The identifying string used to determine what rows to be included in the returned DataFrame.
-        :param replace: Any string elements that are to be removed from the entries containing 'metric'.
-        :return: A DataFrame of those AEO table rows containing 'metric' within the 'full name' column.
+        Args:
+            col_id: The column of data in which to look for arg.
+            arg: The identifying string used to determine what rows to be included in the returned DataFrame.
+            replace: Any string elements that are to be removed from the entries containing 'metric'.
+
+        Returns:
+            A DataFrame of those AEO table rows containing arg within the col_id column.
         """
         df_rows = pd.DataFrame()
         df_rows = pd.concat([df_rows, self.table.loc[self.table[col_id].str.contains(arg), :]],
