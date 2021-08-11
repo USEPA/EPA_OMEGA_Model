@@ -302,12 +302,28 @@ class DecompositionAttributes(OMEGABase):
 
 class VehicleAttributeCalculations(OMEGABase):
     """
-    **VehicleAttributeCalculations**
+    **Performs vehicle attribute calculations, as outlined in the input file.**
+
+    Currently used to calculate the on-road "gap" in GHG performance.  See the input file format above for more
+    information.
+
     """
     cache = dict()
 
     @staticmethod
     def init_vehicle_attribute_calculations_from_file(filename, clear_cache=False, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         import numpy as np
 
         if clear_cache:
@@ -346,12 +362,16 @@ class VehicleAttributeCalculations(OMEGABase):
     @staticmethod
     def perform_attribute_calculations(vehicle, cost_cloud=None):
         """
-        **perform_attribute_calculations**
+        Perform attribute calculations as specified by the input file.  Calculations may be applied to the vehicle
+        directly, or to values in the cost_cloud if provided.
+
         Args:
-            vehicle:
-            cost_cloud:
+            vehicle (Vehicle): the vehicle to perform calculations on
+            cost_cloud (DataFrame): optional dataframe to perform calculations on
 
         Returns:
+            Nothing, If ``cost_cloud`` is not provided then attribute calculations are performed on the vehicle object
+            else they are performed on the cost cloud data
 
         """
         start_years = VehicleAttributeCalculations.cache['start_year']
@@ -378,25 +398,45 @@ class VehicleAttributeCalculations(OMEGABase):
 
 class CompositeVehicle(OMEGABase):
     """
-    **CompositeVehicle**
-    """
-    next_vehicle_id = -1
+    **Implements vehicle composition and decomposition.**
 
-    def __init__(self, vehicle_list, calendar_year, verbose=False, calc_composite_cost_curve=True,
+    A CompositeVehicle contains a list of Vehicle objects whose attributes are weighted and combined to create
+    "composite" attributes.  The weighting may be by sales (initial registered count), for example.
+    The sum of the weights do not need to add up to 1.0 or any other particular value within the group of Vehicles,
+    they are normalized internally by the class, so ultimately the relative weights are what determine the composite
+    attributes.
+
+    Of particular importance is the composite cost curve since it determines the range of technologies available to the
+    manufacturer and their costs.  The producer compliance search is on the basis of composite vehicles in order to
+    reduce the mathematical complexity of the factorial search process.
+
+    During decomposition, the composite attributes are used to determine the attributes of the source Vehicles by
+    reversing the weighting process.  Vehicles **must** be grouped in such a way that the weighting values do not
+    change within a simulation year or else the composition and decomposition process will be invalid since the weights
+    must remain the same throughout the process.
+
+    Composite, normalized, target and cert CO2e Mg attributes are calculated from the bottom up based on the source
+    Vehicle reg classes, physical attributes, etc, and the active policy.
+
+    """
+    def __init__(self, vehicle_list, vehicle_id, verbose=False, calc_composite_cost_curve=True,
                  weight_by='initial_registered_count'):
         """
-        Build composite vehicle from list of vehicles
-        :param vehicle_list: list of vehicles (must be of same reg_class, market class, fueling_class)
-        """
+        Create composite vehicle from list of Vehicle objects.
 
+        Args:
+            vehicle_list ([Vehicle, ...]: list of one or more ``Vehicle`` objects
+            verbose (bool): enable additional console and logfile output if ``True``
+            calc_composite_cost_curve (bool): if ``True`` then calculate the composite cost curve
+            weight_by (str): name of the ``Vehicle`` attribute to weight by, e.g. 'initial_registered_count'
+
+        """
         from common.omega_functions import weighted_value
 
         self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
 
-        self.vehicle_id = CompositeVehicle.next_vehicle_id
-        CompositeVehicle.set_next_vehicle_id()
-
+        self.vehicle_id = vehicle_id
         self.weight_by = weight_by
 
         self.model_year = self.vehicle_list[0].model_year  # calendar_year?
@@ -440,31 +480,15 @@ class CompositeVehicle(OMEGABase):
 
         self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
 
-    @staticmethod
-    def reset_vehicle_ids():
-        """
-
-        Returns:
-
-        """
-        CompositeVehicle.next_vehicle_id = -1
-
-    @staticmethod
-    def set_next_vehicle_id():
-        """
-
-        Returns:
-
-        """
-        CompositeVehicle.next_vehicle_id = CompositeVehicle.next_vehicle_id - 1
-
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
+        Calculate the weighted retail fuel price in dollars per unit from the Vehicles in the ``vehicle_list``.
 
         Args:
-            calendar_year:
+            calendar_year (int): the year to perform calculations in
 
         Returns:
+            Weighted Vehicle ``retail_fuel_price_dollars_per_unit``
 
         """
         from common.omega_functions import weighted_value
@@ -477,8 +501,15 @@ class CompositeVehicle(OMEGABase):
 
     def decompose(self):
         """
+        Decompose composite vehicle attributes to source Vehicles in the ``vehicle_list``.  In addition to assigning
+        Vehicle initial registered counts, attributes stored in the weighted cost curve are interpolated on the basis
+        of composite ``cert_co2e_grams_per_mile`` and assigned the Vehicles.
 
         Returns:
+            Nothing, updates attributes of Vehicles in the ``vehicle_list``
+
+        See Also:
+            ``producer.vehicles.DecompositionAttributes``
 
         """
         for v in self.vehicle_list:
@@ -494,11 +525,19 @@ class CompositeVehicle(OMEGABase):
 
     def calc_composite_cost_curve(self, plot=False):
         """
+        Calculate a composite ``cost_curve`` from the cost curves of Vehicles in the ``vehicle_list``.
+
+        Each Vehicle's cost curve is sequentially weighted into the composite cost curve by performing a full
+        factorial combination of the points in the prior composite curve with the new Vehicle's curve and then
+        calculating a new frontier from the resulting cloud.  In this way the mathematical complexity of calculating
+        the full factorial combination of all Vehicle cost curve points is avoided, while still arriving at the correct
+        weighted answer for the frontier.
 
         Args:
-            plot:
+            plot (bool): plot composite curve if ``True``
 
         Returns:
+            DataFrame containing the composite cost curve
 
         """
         from common.omega_functions import cartesian_prod, calc_frontier
@@ -540,14 +579,15 @@ class CompositeVehicle(OMEGABase):
 
             # calculate new sales-weighted frontier
             composite_frontier_df = calc_frontier(composite_frontier_df, 'cert_co2e_grams_per_mile',
-                                                                 'new_vehicle_mfr_generalized_cost_dollars',
-                                                                 allow_upslope=True)
+                                                  'new_vehicle_mfr_generalized_cost_dollars',
+                                                  allow_upslope=True)
 
             composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
 
         if plot:
             ax1.plot(composite_frontier_df['cert_co2e_grams_per_mile'],
                      composite_frontier_df['new_vehicle_mfr_cost_dollars'], 'x-')
+
             ax1.plot(composite_frontier_df['cert_co2e_grams_per_mile'],
                      composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], 'x--')
 
@@ -627,16 +667,6 @@ class CompositeVehicle(OMEGABase):
         from common.omega_functions import weighted_value
         self.new_vehicle_mfr_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
                                                            'new_vehicle_mfr_cost_dollars')
-
-    # def set_new_vehicle_mfr_generalized_cost_dollars(self):
-    #     """
-    #
-    #     Returns:
-    #
-    #     """
-    #     from omega_functions import weighted_value
-    #     self.new_vehicle_mfr_generalized_cost_dollars = weighted_value(self.vehicle_list, self.weight_by,
-    #                                                        'new_vehicle_mfr_generalized_cost_dollars')
 
     def set_cert_target_co2e_Mg(self):
         """
