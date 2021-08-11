@@ -191,6 +191,7 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
         VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
         new_veh.decompose()
         new_veh.set_new_vehicle_mfr_cost_dollars()
+        new_veh.set_new_vehicle_mfr_generalized_cost_dollars()
         new_veh.set_cert_target_co2e_Mg()
         new_veh.set_cert_co2e_Mg()
 
