@@ -62,8 +62,8 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                 else:
                     num_tech_options = omega_globals.options.producer_num_tech_options_per_bev_vehicle
 
-                veh_min_co2e_gpmi = cv.get_min_co2e_gpmi()
-                veh_max_co2e_gpmi = cv.get_max_co2e_gpmi()
+                veh_min_co2e_gpmi = cv.get_min_cert_co2e_gpmi()
+                veh_max_co2e_gpmi = cv.get_max_cert_co2e_gpmi()
 
                 if winning_combos is not None:
                     co2_gpmi_options = np.array([])

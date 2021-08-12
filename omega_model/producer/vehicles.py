@@ -594,12 +594,12 @@ class CompositeVehicle(OMEGABase):
 
         return composite_frontier_df
 
-    def get_new_vehicle_mfr_cost_from_cost_curve(self, target_co2e_gpmi):
+    def get_new_vehicle_mfr_cost_from_cost_curve(self, query_co2e_gpmi):
         """
-        Get new vehicle manufacturer cost from the composite cost curve for the provided co2e g/mi value(s).
+        Get new vehicle manufacturer cost from the composite cost curve for the provided cert CO2e g/mi value(s).
 
         Args:
-            target_co2e_gpmi (numeric list or Array): the co2e values at which to query the cost curve
+            query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi values at which to query the cost curve
 
         Returns:
             A float or numeric Array of new vehicle manufacturer costs
@@ -611,16 +611,16 @@ class CompositeVehicle(OMEGABase):
                                                       fill_value=(self.cost_curve['new_vehicle_mfr_cost_dollars'].min(),
                                                                   self.cost_curve['new_vehicle_mfr_cost_dollars'].max())
                                                       , bounds_error=False)
-            return cost_dollars(target_co2e_gpmi)
+            return cost_dollars(query_co2e_gpmi)
         else:
             return float(self.cost_curve['new_vehicle_mfr_cost_dollars'])
 
-    def get_cert_direct_kwh_pmi_from_cost_curve(self, target_co2e_gpmi):
+    def get_cert_direct_kwh_pmi_from_cost_curve(self, query_co2e_gpmi):
         """
-        Get kWh/mi from the composite cost curve for the provided co2e g/mi value(s).
+        Get kWh/mi from the composite cost curve for the provided cert CO2e g/mi value(s).
 
         Args:
-            target_co2e_gpmi (numeric list or Array): the co2e value(s) at which to query the cost curve
+            query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi value(s) at which to query the cost curve
 
         Returns:
             A float or numeric Array of kWh/mi values
@@ -628,15 +628,16 @@ class CompositeVehicle(OMEGABase):
         """
         return DecompositionAttributes.interp1d(self.cost_curve,
                                                 'cert_co2e_grams_per_mile',
-                                                target_co2e_gpmi,
+                                                query_co2e_gpmi,
                                                 self, 'cert_direct_kwh_per_mile')
 
-    def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, target_co2e_gpmi):
+    def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
         """
-        Get new vehicle manufacturer generalzied cost from the composite cost curve for the provided co2e g/mi value(s).
+        Get new vehicle manufacturer generalzied cost from the composite cost curve for the provided cert CO2e g/mi
+        value(s).
 
         Args:
-            target_co2e_gpmi (numeric list or Array): the co2e value(s) at which to query the cost curve
+            query_co2e_gpmi (numeric list or Array): the cert CO2e value(s) at which to query the cost curve
 
         Returns:
             A float or numeric Array of new vehicle manufacturer generalized costs
@@ -644,25 +645,27 @@ class CompositeVehicle(OMEGABase):
         """
         return DecompositionAttributes.interp1d(self.cost_curve,
                                                 'cert_co2e_grams_per_mile',
-                                                target_co2e_gpmi,
+                                                query_co2e_gpmi,
                                                 self, 'new_vehicle_mfr_generalized_cost_dollars')
 
-    def get_max_co2e_gpmi(self):
+    def get_max_cert_co2e_gpmi(self):
         """
+        Get maximum cert CO2e g/mi from the cost curve.
 
         Returns:
+            A float, max cert CO2e g/mi from the cost curve
 
         """
-        # get max co2_gpmi from self.cost_curve
         return self.cost_curve['cert_co2e_grams_per_mile'].max()
 
-    def get_min_co2e_gpmi(self):
+    def get_min_cert_co2e_gpmi(self):
         """
+        Get minimum cert CO2e g/mi from the cost curve.
 
         Returns:
+            A float, min cert CO2e g/mi from the cost curve
 
         """
-        # get min co2_gpmi from self.cost_curve
         return self.cost_curve['cert_co2e_grams_per_mile'].min()
 
     def get_weighted_attribute(self, attribute_name):
