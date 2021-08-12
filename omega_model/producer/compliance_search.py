@@ -317,7 +317,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     Returns:
 
     """
-    from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle
+    from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle, transfer_vehicle_data
     from consumer.sales_volume import context_new_vehicle_sales
     from context.new_vehicle_market import NewVehicleMarket
 
@@ -332,7 +332,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # update each vehicle and calculate compliance target for each vehicle
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
-            new_veh.convert_vehicle(prior_veh, model_year=calendar_year)
+            transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
             new_veh.initial_registered_count = new_veh.base_year_market_share
 
@@ -464,7 +464,7 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
 
     """
     from producer.manufacturer_annual_data import ManufacturerAnnualData
-    from producer.vehicles import VehicleFinal
+    from producer.vehicles import VehicleFinal, transfer_vehicle_data
 
     manufacturer_new_vehicles = []
 
@@ -476,12 +476,12 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
             (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console_modules:
             cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
         cv.decompose()  # propagate sales to source vehicles
-        for v in cv.vehicle_list:
+        for veh in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
-            #     v.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (v.model_year, v.vehicle_id))
-            new_veh = VehicleFinal()
-            new_veh.convert_vehicle(v)
-            manufacturer_new_vehicles.append(new_veh)
+            #     veh.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (veh.model_year, veh.vehicle_id))
+            veh_final = VehicleFinal()
+            transfer_vehicle_data(veh, veh_final)
+            manufacturer_new_vehicles.append(veh_final)
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 
