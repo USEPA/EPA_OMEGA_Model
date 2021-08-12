@@ -1,6 +1,6 @@
 """
 
-**Functions to track vehicle technology use.**
+Functions to track vehicle technology use.
 
 
 ----

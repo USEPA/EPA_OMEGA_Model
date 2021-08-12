@@ -1,7 +1,7 @@
 """
 
-**Functions to get vehicle data based on vehicle ID, vehicle emission factors for the given vehicle model year and reg-class, refinery and power section emission factors for the given calendar year,
-and then to calculate from them the pollutant inventories, including fuel consumed, for each year in the analysis.**
+Functions to get vehicle data based on vehicle ID, vehicle emission factors for the given vehicle model year and reg-class, refinery and power section emission factors for the given calendar year,
+and then to calculate from them the pollutant inventories, including fuel consumed, for each year in the analysis.
 
 
 
