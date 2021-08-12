@@ -199,11 +199,9 @@ class DecompositionAttributes(OMEGABase):
 
     """
 
-    values = []
-    base_values = []
-    offcycle_values = []
-    dynamic_values = []
-    other_values = []
+    values = []  #: list of all decomposition attribute names
+    offcycle_values = []  #: list of off cycle credits that in the simulated vehicle file AND in the off cycle credits intput file
+    other_values = []  #: non-base, non-offcycle, non-drive-cycle attribute names from the simulated vehicles input file, e.g. tech application columns like `cooled EGR`, etc
 
     @classmethod
     def init(cls):
@@ -212,27 +210,27 @@ class DecompositionAttributes(OMEGABase):
         from context.cost_clouds import CostCloud
 
         # set base values
-        cls.base_values = ['cert_co2e_grams_per_mile',
-                           'new_vehicle_mfr_generalized_cost_dollars',
+        base_values = ['cert_co2e_grams_per_mile',
+                       'new_vehicle_mfr_generalized_cost_dollars',
 
-                           'new_vehicle_mfr_cost_dollars',
+                       'new_vehicle_mfr_cost_dollars',
 
-                           'cert_indirect_co2e_grams_per_mile',
+                       'cert_indirect_co2e_grams_per_mile',
 
-                           'cert_direct_co2e_grams_per_mile',
-                           'cert_direct_kwh_per_mile',
+                       'cert_direct_co2e_grams_per_mile',
+                       'cert_direct_kwh_per_mile',
 
-                           'onroad_direct_co2e_grams_per_mile',
-                           'onroad_direct_kwh_per_mile',
+                       'onroad_direct_co2e_grams_per_mile',
+                       'onroad_direct_kwh_per_mile',
 
-                           'cert_direct_oncycle_kwh_per_mile',
-                           'cert_direct_offcycle_kwh_per_mile',
+                       'cert_direct_oncycle_kwh_per_mile',
+                       'cert_direct_offcycle_kwh_per_mile',
 
-                           'cert_direct_oncycle_co2e_grams_per_mile',
-                           'cert_direct_offcycle_co2e_grams_per_mile',
+                       'cert_direct_oncycle_co2e_grams_per_mile',
+                       'cert_direct_offcycle_co2e_grams_per_mile',
 
-                           'cert_indirect_offcycle_co2e_grams_per_mile',
-                           ]
+                       'cert_indirect_offcycle_co2e_grams_per_mile',
+                       ]
 
         # determine dynamic values
         simulation_drive_cycles = list(set.intersection(set(CostCloud.cost_cloud_data_columns),
@@ -242,30 +240,29 @@ class DecompositionAttributes(OMEGABase):
                                                  set(OffCycleCredits.offcycle_credit_names)))
 
         cls.other_values = list(set(CostCloud.cost_cloud_data_columns).
-                                  difference(cls.base_values).
-                                  difference(simulation_drive_cycles).
-                                  difference(cls.offcycle_values))
-
-        cls.dynamic_values = cls.offcycle_values + simulation_drive_cycles + cls.other_values
+                                difference(base_values).
+                                difference(simulation_drive_cycles).
+                                difference(cls.offcycle_values))
 
         # combine base and dynamic values
-        cls.values = cls.base_values + cls.dynamic_values
+        cls.values = base_values + cls.offcycle_values + simulation_drive_cycles + cls.other_values
 
     @staticmethod
-    def interp1d(cost_curve, index_column, index, vehicle, attribute):
+    def interp1d(vehicle, cost_curve, index_column, index_value, attribute_name):
         """
+        Interpolate the given cost curve using the given index column name, index value(s), vehicle and attribute name.
 
         Args:
-            cost_curve:
-            index_column:
-            index:
-            vehicle:
-            attribute:
+            vehicle (Vehicle or CompositeVehicle):
+            cost_curve (DataFrame): the cost curve to interpolate
+            index_column (str): the name of the x-axis / index column
+            index_value (numeric): the x-axis / index value(s) at which to interpolate
+            attribute_name (str): name of the attribute to interpolate
 
         Returns:
+            A float or numeric Array of values and each index value
 
         """
-
         if type(vehicle) != CompositeVehicle:
             prefix = 'veh_%s_' % vehicle.vehicle_id
         else:
@@ -273,23 +270,27 @@ class DecompositionAttributes(OMEGABase):
 
         if len(cost_curve) > 1:
             interp1d = scipy.interpolate.interp1d(cost_curve[index_column],
-                                              cost_curve['%s%s' % (prefix, attribute)],
-                                              fill_value=(cost_curve['%s%s' % (prefix, attribute)].min(),
-                                                          cost_curve['%s%s' % (prefix, attribute)].max()),
-                                              bounds_error=False)
-            return interp1d(index)
+                                                  cost_curve['%s%s' % (prefix, attribute_name)],
+                                                  fill_value=(cost_curve['%s%s' % (prefix, attribute_name)].min(),
+                                                          cost_curve['%s%s' % (prefix, attribute_name)].max()),
+                                                  bounds_error=False)
+            return interp1d(index_value)
         else:
-            return cost_curve['%s%s' % (prefix, attribute)].item()
+            return cost_curve['%s%s' % (prefix, attribute_name)].item()
 
     @classmethod
-    def rename_decomposition_columns(cls, vehicle, cost_cloud):
+    def rename_decomposition_columns(cls, vehicle, cost_curve):
         """
+        Rename the cost curve decomposition columns from non-vehicle specific to vehicle-specific (unique) columns,
+        e.g. 'cert_co2e_grams_per_mile' -> 'veh_0_cert_co2e_grams_per_mile'.  Used to track the data associated with
+        individual Vehicles in a CompositeVehicle cost curve.
 
         Args:
-            vehicle:
-            cost_cloud:
+            vehicle (Vehicle): the vehicle associated with the new column names
+            cost_curve (DataFrame): the cost curve to rename columns in
 
         Returns:
+            ``cost_curve`` with renamed columns
 
         """
         rename_dict = dict()
@@ -297,7 +298,7 @@ class DecompositionAttributes(OMEGABase):
         for ccv in cls.values:
             rename_dict[ccv] = 'veh_%s_%s' % (vehicle.vehicle_id, ccv)
 
-        return cost_cloud.rename(columns=rename_dict)
+        return cost_curve.rename(columns=rename_dict)
 
 
 class VehicleAttributeCalculations(OMEGABase):
@@ -318,7 +319,8 @@ class VehicleAttributeCalculations(OMEGABase):
 
         Args:
             filename (str): name of input file
-            verbose (bool): enable additional console and logfile output if True
+            clear_cache (bool): if ``True`` then clear ``VehicleAttributeCalculations.cache``
+            verbose (bool): enable additional console and logfile output if ``True``
 
         Returns:
             List of template/input errors, else empty list on success
@@ -516,10 +518,8 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    v.__setattr__(ccv, DecompositionAttributes.interp1d(self.cost_curve,
-                                                                        'cert_co2e_grams_per_mile',
-                                                                        self.cert_co2e_grams_per_mile,
-                                                                        v, ccv))
+                    v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, 'cert_co2e_grams_per_mile',
+                                                                        self.cert_co2e_grams_per_mile, ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_cert_target_co2e_Mg()  # varies by model year and initial_registered_count
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
@@ -626,10 +626,8 @@ class CompositeVehicle(OMEGABase):
             A float or numeric Array of kWh/mi values
 
         """
-        return DecompositionAttributes.interp1d(self.cost_curve,
-                                                'cert_co2e_grams_per_mile',
-                                                query_co2e_gpmi,
-                                                self, 'cert_direct_kwh_per_mile')
+        return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
+                                                'cert_direct_kwh_per_mile')
 
     def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
         """
@@ -643,10 +641,8 @@ class CompositeVehicle(OMEGABase):
             A float or numeric Array of new vehicle manufacturer generalized costs
 
         """
-        return DecompositionAttributes.interp1d(self.cost_curve,
-                                                'cert_co2e_grams_per_mile',
-                                                query_co2e_gpmi,
-                                                self, 'new_vehicle_mfr_generalized_cost_dollars')
+        return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
+                                                'new_vehicle_mfr_generalized_cost_dollars')
 
     def get_max_cert_co2e_gpmi(self):
         """
@@ -671,6 +667,66 @@ class CompositeVehicle(OMEGABase):
     def get_weighted_attribute(self, attribute_name):
         from common.omega_functions import weighted_value
         return weighted_value(self.vehicle_list, self.weight_by, attribute_name)
+
+
+def convert_vehicle(from_vehicle, to_vehicle, model_year=None):
+    """
+
+    Convert a vehicle object from VehicleFinal to Vehicle, or vice versa.  Conversion from VehicleFinal to Vehicle
+    creats a new cost curve, based on the simulated vehicles data and policy factors for the model year.
+
+    Args:
+        from_vehicle (VehicleFinal, Vehicle): the vehicle to convert from
+        to_vehicle (Vehicle, VehicleFinal): the vehicle to convert to
+        model_year (int): if provided, sets the ``to_vehicle`` model year, otherwise model year comes from the
+            ``from_vehicle``
+
+    Returns:
+        Nothing, updates ``to_vehicle`` attributes
+
+    """
+    base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
+                       'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
+                       'cert_fuel_id', 'market_class_id', 'epa_size_class',
+                       'context_size_class', 'base_year_market_share', 'non_responsive_market_group',
+                       'electrification_class'}
+
+    for attr in base_properties:
+        to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+
+    if model_year:
+        to_vehicle.model_year = model_year
+
+    # transfer dynamic attributes
+    for attr in VehicleFinal.dynamic_attributes:
+        to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+
+    to_vehicle.set_cert_target_co2e_grams_per_mile()  # varies by model year
+
+    if type(from_vehicle) == VehicleFinal:
+        # finish conversion from VehicleFinal to Vehicle
+        from context.cost_clouds import CostCloud
+
+        if omega_globals.options.flat_context:
+            to_vehicle.cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, to_vehicle.cost_curve_class)
+        else:
+            to_vehicle.cost_cloud = CostCloud.get_cloud(to_vehicle.model_year, to_vehicle.cost_curve_class)
+        to_vehicle.cost_curve = to_vehicle.create_frontier_df()  # create frontier, inc. generalized cost and policy effects
+
+        to_vehicle.normalized_cert_target_co2e_Mg = \
+            omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
+
+        VehicleAttributeCalculations.perform_attribute_calculations(to_vehicle)
+    else:  # type(from_vehicle == Vehicle)
+        # finish conversion from Vehicle to VehicleFinal
+        to_vehicle.initial_registered_count = from_vehicle.initial_registered_count
+
+        # set dynamic attributes
+        for attr in DecompositionAttributes.values:
+            to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+
+        to_vehicle.cert_target_co2e_Mg = from_vehicle.cert_target_co2e_Mg
+        to_vehicle.cert_co2e_Mg = from_vehicle.cert_co2e_Mg
 
 
 class Vehicle(OMEGABase):
@@ -791,59 +847,6 @@ class Vehicle(OMEGABase):
 
         """
         self.cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self)
-
-    def convert_vehicle(self, vehicle, model_year=None):
-        """
-
-        Convert a vehicle object from VehicleFinal to Vehicle, or vice versa.  Conversion from VehicleFinal to Vehicle
-        creats a new cost curve, based on the simulated vehicles data and policy factors for the model year.
-
-        Args:
-            self (Vehicle, VehicleFinal)
-            vehicle (VehicleFinal, Vehicle):
-            model_year (int): vehicle model year
-
-        """
-        base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
-                           'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                           'cert_fuel_id', 'market_class_id', 'epa_size_class',
-                           'context_size_class', 'base_year_market_share', 'non_responsive_market_group',
-                           'electrification_class'}
-
-        for attr in base_properties:
-            self.__setattr__(attr, vehicle.__getattribute__(attr))
-
-        if model_year:
-            self.model_year = model_year
-
-        # transfer dynamic attributes
-        for attr in VehicleFinal.dynamic_attributes:
-            self.__setattr__(attr, vehicle.__getattribute__(attr))
-
-        self.set_cert_target_co2e_grams_per_mile()  # varies by model year
-
-        if type(self) == Vehicle and type(vehicle) == VehicleFinal:
-            from context.cost_clouds import CostCloud
-
-            if omega_globals.options.flat_context:
-                self.cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, self.cost_curve_class)
-            else:
-                self.cost_cloud = CostCloud.get_cloud(self.model_year, self.cost_curve_class)
-            self.cost_curve = self.create_frontier_df()  # create frontier, inc. generalized cost and policy effects
-
-            self.normalized_cert_target_co2e_Mg = \
-                omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self, sales_variants=1)
-
-            VehicleAttributeCalculations.perform_attribute_calculations(self)
-        else:  # type(self) == VehicleFinal and type(vehicle == Vehicle)
-            self.initial_registered_count = vehicle.initial_registered_count
-
-            # set dynamic attributes
-            for attr in DecompositionAttributes.values:
-                self.__setattr__(attr, vehicle.__getattribute__(attr))
-
-            self.cert_target_co2e_Mg = vehicle.cert_target_co2e_Mg
-            self.cert_co2e_Mg = vehicle.cert_co2e_Mg
 
     def create_frontier_df(self):
         """
