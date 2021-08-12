@@ -691,6 +691,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'context_size_class', 'base_year_market_share', 'non_responsive_market_group',
                        'electrification_class'}
 
+    # transfer base properties
     for attr in base_properties:
         to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
 
@@ -704,7 +705,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     to_vehicle.set_cert_target_co2e_grams_per_mile()  # varies by model year
 
     if type(from_vehicle) == VehicleFinal:
-        # finish conversion from VehicleFinal to Vehicle
+        # finish transfer from VehicleFinal to Vehicle
         from context.cost_clouds import CostCloud
 
         if omega_globals.options.flat_context:
@@ -718,7 +719,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
 
         VehicleAttributeCalculations.perform_attribute_calculations(to_vehicle)
     else:  # type(from_vehicle == Vehicle)
-        # finish conversion from Vehicle to VehicleFinal
+        # finish transfer from Vehicle to VehicleFinal
         to_vehicle.initial_registered_count = from_vehicle.initial_registered_count
 
         # set dynamic attributes
