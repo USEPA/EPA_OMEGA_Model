@@ -50,31 +50,31 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                                              consumer_response,
                                              node_name=k))
         else:
-            # process leaf
-            for new_veh in market_class_dict[k]:
+            # process leaf, loop over composite vehicles
+            for cv in market_class_dict[k]:
                 df = pd.DataFrame()
 
                 if share_range == 1.0:
-                    new_veh.tech_option_iteration_num = 0  # reset vehicle tech option progression
+                    cv.tech_option_iteration_num = 0  # reset vehicle tech option progression
 
-                if new_veh.fueling_class == 'ICE':
+                if cv.fueling_class == 'ICE':
                     num_tech_options = omega_globals.options.producer_num_tech_options_per_ice_vehicle
                 else:
                     num_tech_options = omega_globals.options.producer_num_tech_options_per_bev_vehicle
 
-                veh_min_co2e_gpmi = new_veh.get_min_co2e_gpmi()
-                veh_max_co2e_gpmi = new_veh.get_max_co2e_gpmi()
+                veh_min_co2e_gpmi = cv.get_min_co2e_gpmi()
+                veh_max_co2e_gpmi = cv.get_max_co2e_gpmi()
 
                 if winning_combos is not None:
                     co2_gpmi_options = np.array([])
                     for idx, combo in winning_combos.iterrows():
 
-                        if (combo['veh_%s_sales' % new_veh.vehicle_id] > 0) or (new_veh.tech_option_iteration_num > 0):
-                            new_veh.tech_option_iteration_num += 1
+                        if (combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0):
+                            cv.tech_option_iteration_num += 1
 
                         tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
-                                           new_veh.tech_option_iteration_num
-                        veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % new_veh.vehicle_id]
+                                           cv.tech_option_iteration_num
+                        veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % cv.vehicle_id]
                         min_co2e_gpmi = max(veh_min_co2e_gpmi, veh_co2e_gpmi * (1 - tech_share_range))
                         max_co2e_gpmi = min(veh_max_co2e_gpmi, veh_co2e_gpmi * (1 + tech_share_range))
                         co2_gpmi_options = \
@@ -91,14 +91,14 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                     else:
                         co2_gpmi_options = np.linspace(veh_min_co2e_gpmi, veh_max_co2e_gpmi, num=num_tech_options)
 
-                tech_cost_options = new_veh.get_cost_from_cost_curve(co2_gpmi_options)
-                tech_generalized_cost_options = new_veh.get_generalized_cost_from_cost_curve(co2_gpmi_options)
-                tech_kwh_options = new_veh.get_kwh_pmi(co2_gpmi_options)
+                tech_cost_options = cv.get_new_vehicle_mfr_cost_from_cost_curve(co2_gpmi_options)
+                tech_generalized_cost_options = cv.get_new_vehicle_mfr_generalized_cost_from_cost_curve(co2_gpmi_options)
+                tech_kwh_options = cv.get_cert_direct_kwh_pmi_from_cost_curve(co2_gpmi_options)
 
-                df['veh_%s_co2e_gpmi' % new_veh.vehicle_id] = co2_gpmi_options
-                df['veh_%s_kwh_pmi' % new_veh.vehicle_id] = tech_kwh_options
-                df['veh_%s_cost_dollars' % new_veh.vehicle_id] = tech_cost_options
-                df['veh_%s_generalized_cost_dollars' % new_veh.vehicle_id] = tech_generalized_cost_options
+                df['veh_%s_co2e_gpmi' % cv.vehicle_id] = co2_gpmi_options
+                df['veh_%s_kwh_pmi' % cv.vehicle_id] = tech_kwh_options
+                df['veh_%s_cost_dollars' % cv.vehicle_id] = tech_cost_options
+                df['veh_%s_generalized_cost_dollars' % cv.vehicle_id] = tech_generalized_cost_options
 
                 child_df_list.append(df)
 
@@ -184,16 +184,20 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
     from producer.vehicles import VehicleAttributeCalculations
 
     # assign co2 values and sales to vehicles...
-    for new_veh in composite_vehicles:
-        new_veh.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_gpmi' % new_veh.vehicle_id]
-        new_veh.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % new_veh.vehicle_id]
-        new_veh.initial_registered_count = selected_production_decision['veh_%s_sales' % new_veh.vehicle_id]
-        VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
-        new_veh.decompose()
-        new_veh.set_new_vehicle_mfr_cost_dollars()
-        new_veh.set_new_vehicle_mfr_generalized_cost_dollars()
-        new_veh.set_cert_target_co2e_Mg()
-        new_veh.set_cert_co2e_Mg()
+    for cv in composite_vehicles:
+        cv.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_gpmi' % cv.vehicle_id]
+        cv.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % cv.vehicle_id]
+        cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
+        VehicleAttributeCalculations.perform_attribute_calculations(cv)
+        cv.decompose()
+        cv.new_vehicle_mfr_cost_dollars = \
+            cv.get_weighted_attribute('new_vehicle_mfr_cost_dollars')
+        cv.new_vehicle_mfr_generalized_cost_dollars = \
+            cv.get_weighted_attribute('new_vehicle_mfr_generalized_cost_dollars')
+        cv.cert_target_co2e_Mg = \
+            cv.get_weighted_attribute('cert_target_co2e_Mg')
+        cv.cert_co2e_Mg = \
+            cv.get_weighted_attribute('cert_co2e_Mg')
 
     return composite_vehicles
 
@@ -330,9 +334,9 @@ def create_composite_vehicles(calendar_year, compliance_id):
             new_veh = Vehicle()
             new_veh.convert_vehicle(prior_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
-            new_veh.initial_registered_count = new_veh.market_share
+            new_veh.initial_registered_count = new_veh.base_year_market_share
 
-        # sum([new_veh.market_share for new_veh in manufacturer_vehicles]) == 2.0 at this point due to intentional
+        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) == 2.0 at this point due to intentional
         # duplicate entries for "alternative" powertrain vehicles, but "market_share" is used for relative proportions
 
         total_sales = 0  # sales total by compliance id size class share
@@ -352,14 +356,14 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
             nrmc_initial_registered_count = context_new_vehicle_sales(calendar_year)[nrmc]
             distribute_by_attribute(nrmc_dict[nrmc], nrmc_initial_registered_count,
-                                    weight_by='market_share',
+                                    weight_by='base_year_market_share',
                                     distribute_to='initial_registered_count')
 
             # print('%s:%s' % (nrmc, nrmc_initial_registered_count))
 
         # calculate new vehicle absolute market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
-            new_veh.market_share = \
+            new_veh.base_year_market_share = \
                 new_veh.initial_registered_count * \
                 VehicleFinal.mfr_base_year_size_class_share[compliance_id][new_veh.context_size_class] / \
                 total_sales
@@ -383,7 +387,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         #         print('%s:%s:%s' % (csc, lrc, projection_initial_registered_count))
         #
         #         distribute_by_attribute(csc_dict[csc][lrc], projection_initial_registered_count,
-        #                             weight_by='market_share',
+        #                             weight_by='base_year_market_share',
         #                             distribute_to='initial_registered_count')
 
         # group by context size class
@@ -400,14 +404,14 @@ def create_composite_vehicles(calendar_year, compliance_id):
                 * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]
 
             distribute_by_attribute(csc_dict[csc], projection_initial_registered_count,
-                                    weight_by='market_share',
+                                    weight_by='base_year_market_share',
                                     distribute_to='initial_registered_count')
 
         # calculate new vehicle market share based on vehicle size mix from context
         for new_veh in manufacturer_vehicles:
-            new_veh.market_share = new_veh.initial_registered_count / total_sales
+            new_veh.base_year_market_share = new_veh.initial_registered_count / total_sales
 
-        # sum([new_veh.market_share for new_veh in manufacturer_vehicles]) == 1.0 at this point,
+        # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) == 1.0 at this point,
         # sum([new_veh.initial_registered_count for new_veh in manufacturer_vehicles]) = total_sales
 
         # group by market class / reg class
@@ -424,7 +428,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         for mc in mctrc:
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='market_share')
+                    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
                     cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
                     manufacturer_composite_vehicles.append(cv)
 
