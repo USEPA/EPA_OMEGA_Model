@@ -317,7 +317,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     Returns:
 
     """
-    from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle, convert_vehicle
+    from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle, transfer_vehicle_data
     from consumer.sales_volume import context_new_vehicle_sales
     from context.new_vehicle_market import NewVehicleMarket
 
@@ -332,7 +332,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # update each vehicle and calculate compliance target for each vehicle
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
-            convert_vehicle(prior_veh, new_veh, model_year=calendar_year)
+            transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
             new_veh.initial_registered_count = new_veh.base_year_market_share
 
@@ -464,7 +464,7 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
 
     """
     from producer.manufacturer_annual_data import ManufacturerAnnualData
-    from producer.vehicles import VehicleFinal, convert_vehicle
+    from producer.vehicles import VehicleFinal, transfer_vehicle_data
 
     manufacturer_new_vehicles = []
 
@@ -480,7 +480,7 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
             # if 'producer' in o2.options.verbose_console:
             #     veh.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (veh.model_year, veh.vehicle_id))
             veh_final = VehicleFinal()
-            convert_vehicle(veh, veh_final)
+            transfer_vehicle_data(veh, veh_final)
             manufacturer_new_vehicles.append(veh_final)
 
     omega_globals.session.add_all(manufacturer_new_vehicles)

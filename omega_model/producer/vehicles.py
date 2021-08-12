@@ -669,11 +669,11 @@ class CompositeVehicle(OMEGABase):
         return weighted_value(self.vehicle_list, self.weight_by, attribute_name)
 
 
-def convert_vehicle(from_vehicle, to_vehicle, model_year=None):
+def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
 
-    Convert a vehicle object from VehicleFinal to Vehicle, or vice versa.  Conversion from VehicleFinal to Vehicle
-    creats a new cost curve, based on the simulated vehicles data and policy factors for the model year.
+    Transfer data from a VehicleFinal to Vehicle object, or vice versa.  Transfer from VehicleFinal to Vehicle
+    creates a new cost curve, based on the simulated vehicles data and policy factors for the model year.
 
     Args:
         from_vehicle (VehicleFinal, Vehicle): the vehicle to convert from
