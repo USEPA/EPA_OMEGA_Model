@@ -319,3 +319,104 @@ calculated using a 3 percent discount rate and a 2.5 percent discount rate shoul
 The tech volumes output file provides volume of each vehicle equipped with the technologies for which tech flags or tech data is present in the simulated_vehicles.csv input file. For example, if vehicle number 1 had 100 sales and half were HEVs while the other half were BEVs, the tech volumes output file would show that vehicle as having the following tech volumes: HEV=50; BEV=50. This is not the case for the weight-related technologies where curb weight is presented as the curb weight of the vehicle, weight reduction is presented as the weight reduction that has been applied to the vehicle to achieve that curb weight, and fleet pounds is the registered count of the vehicle multiplied by its curb weight.
 
 Each of the above files presents vehicle-level data for each analysis year that has been run and for each age of vehicle present in that calendar year. The model year of each vehicle is also provided.
+
+Physical Effects Calculations
+-----------------------------
+Physical effects are calculated at the vehicle level for all calendar years included in the analysis. Vehicle_ID and VMT driven by the given vehicle
+pulled from the VehicleAnnualData class. Vehicle attributes are pulled from VehicleFinal class. Fuel attributes are pulled from the OnroadFuel class
+which draws them from the onroad_fuels input file.
+
+Fuel consumption
+++++++++++++++++
+Liquid fuel consumption and electricity consumption are calculated for a given Vehicle ID as:
+
+**Liquid fuel consumption**
+
+.. Math::
+    :label: ice_fuel_consumption
+
+    FuelConsumption_{gallons}=VMT_{liquid fuel} * \frac{CO_{2} grams/mile_{onroad, direct}} {CO_{2} grams/gallon * TransmissionEfficiency}
+
+Where:
+
+* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`CO_{2} grams/mile_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
+* :math:`CO_{2} grams/gallon` is the :math:`CO_{2}` content of the in-use, or retail, fuel
+* :math:`TransmissionEfficiency` is the efficiency of liquid fuel transmission as set by the user
+
+**Electricity consumption**
+
+.. Math::
+    :label: bev_fuel_consumption
+
+    FuelConsumption_{kWh}=VMT_{electricity} * \frac{kWh/mile_{onroad, direct}} {TransmissionEfficiency}
+
+Where:
+
+* :math:`VMT_{electricity}=VMT * FuelShare_{electricity}`
+* :math:`kWh/mile_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
+* :math:`TransmissionEfficiency` is the efficiency of the power grid as set by the user
+
+.. note:: Multi-fuel vehicle fuel consumption
+
+    Multi-fuel vehicles consume both electricity and liquid fuel. Consumption of both is calculated for such vehicles and emission effects such
+    as upstream and tailpipe emissions are calculated uniquely for both fuels.
+
+Emission Inventories
+++++++++++++++++++++
+Emission inventories are calculated for a given Vehicle ID as:
+
+**Tailpipe Criteria Emissions (except for SO2)**
+
+.. Math::
+    :label: tailpipe_criteria_tons
+
+    PollutantEmissions_{US tons}=VMT_{liquid fuel} * \frac{Pollutant grams/mile} {grams/US ton}
+
+Where:
+
+* :math:`Pollutant` would be any of the criteria air pollutants such as VOC, PM2.5, NOx, etc., with the exception of :math:`SO_{2}`
+* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`Pollutant grams/mile` is an Emission Factor (e.g., a MOVES emission factor) from the emission factors input file
+* :math:`grams/US ton` = 907,185
+
+**Tailpipe SO2**
+
+.. Math::
+    :label: tailpipe_so2_tons
+
+    SO_{2}Emissions_{US tons}=FuelConsumption_{liquid fuel} * \frac{SO_{2} grams/gallon} {grams/US ton}
+
+Where:
+
+* :math:`FuelConsumption_{liquid fuel}` is calculated by :math:numref:`ice_fuel_consumption`
+* :math:`SO_{2} grams/mile` is the :math:`SO_{2}` Emission Factor (e.g., a MOVES emission factor) from the emission factors input file
+* :math:`grams/US ton` = 907,185
+
+**Tailpipe CH4 and N2O Emissions**
+
+.. Math::
+    :label: tailpipe_non_co2_tons
+
+    PollutantEmissions_{Metric tons}=VMT_{liquid fuel} * \frac{Pollutant grams/mile} {grams/Metric ton}
+
+Where:
+
+* :math:`Pollutant` would be either :math:`CH_{4}` or :math:`N_{2}O`
+* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`Pollutant grams/mile` is an Emission Factor (e.g., a MOVES emission factor) from the emission factors input file
+* :math:`grams/Metric ton` = 1,000,000
+
+**Tailpipe CO2 Emissions**
+
+.. Math::
+    :label: tailpipe_co2_tons
+
+    CO_{2}Emissions_{Metric tons}=VMT_{liquid fuel} * \frac{CO_{2} grams/mile_{onroad, direct}} {grams/Metric ton}
+
+Where:
+
+* :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
+* :math:`CO_{2} grams/mile_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
+* :math:`grams/Metric ton` = 1,000,000
+

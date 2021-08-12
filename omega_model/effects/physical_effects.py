@@ -206,7 +206,7 @@ def calc_physical_effects(calendar_year):
                 elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
                     liquid_fuel = fuel
                     vmt_liquid_fuel = vad.vmt * fuel_share
-                    onroad_gallons_per_mile += fuel_share * onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
+                    onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
                     fuel_consumption_gallons = vad.vmt * onroad_gallons_per_mile / transmission_efficiency
 
                     # vehicle tailpipe emissions for liquid fuel operation
