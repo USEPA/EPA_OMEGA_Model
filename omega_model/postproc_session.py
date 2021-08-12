@@ -38,7 +38,7 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
     market_categories = omega_globals.options.MarketClass.market_categories
 
     if omega_globals.options.calc_effects:
-        from effects.o2_effects import run_effects_calcs
+        from effects.omega_effects import run_effects_calcs
         run_effects_calcs()
 
     if not standalone_run:

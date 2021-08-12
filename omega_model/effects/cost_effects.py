@@ -1,6 +1,7 @@
 """
 
-A series of functions to calculate social costs and benefits. Each function is called by the calc_social_costs function.
+A series of functions to calculate costs associated with the policy. The calc_cost_effects function is called by the o2_effects module and
+other functions here are called from within the calc_cost_effects function.
 
 ----
 
