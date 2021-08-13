@@ -317,8 +317,23 @@ Algorithm descriptions, code snippets, equations, etc
 
 Effects Module
 ^^^^^^^^^^^^^^
-In its primary function as a regulatory support tool, OMEGA’s modeled outputs are intended to inform the type of benefit-cost analyses used in EPA rulemakings. We would likely use many of OMEGA’s outputs directly in the analysis for a regulatory action. In other cases, OMEGA produces values that might help inform other models like MOVES. The scope of OMEGA’s effects modeling includes estimating both monetized effects and physical effects.
+In its primary function as a regulatory support tool, OMEGA’s modeled outputs are intended to inform the type of benefit-cost analyses used
+in EPA rulemakings. We would likely use many of OMEGA’s outputs directly in the analysis for a regulatory action. In other cases, OMEGA
+produces values that might help inform other models like MOVES. The scope of OMEGA’s effects modeling includes estimating both monetized
+or cost effects and physical effects. The effects module builds on the outputs of the consumer and producer modules along with the analysis
+context inputs as shown in :numref:`effects_module_figure`.
 
+.. _effects_module_figure:
+.. figure:: _static/mo_figures/effects_module.png
+    :align: center
+
+    Overview of the Effects Module
+
+* Key examples of physical effects that OMEGA will estimate:
+	* Stock of registered vehicles, along with key attributes
+	* VMT of registered vehicles
+	* Tailpipe GHG and criteria pollutant emissions
+	* Upstream (refinery, power sector) GHG and criteria pollutant emissions
 * Key examples of monetized effects that OMEGA will estimate:
 	* Vehicle production costs
 	* Vehicle ownership and operation costs, including fuel and maintenance and other consumer impacts
@@ -326,33 +341,51 @@ In its primary function as a regulatory support tool, OMEGA’s modeled outputs 
 	* Impacts of criteria air pollutants
 	* Impacts of greenhouse gas pollutants
 	* Congestion, noise, and safety costs
-* Key examples of physical effects that OMEGA will estimate:
-	* Stock of registered vehicles, along with key attributes
-	* VMT of registered vehicles
-	* Tailpipe GHG and criteria pollutant emissions
-	* Upstream (refinery, power sector) GHG and criteria pollutant emissions
 
-The Effects Module generates 3 output files: physical effects, cost effects and technology volumes. In general, the cost effects output file builds upon the physical effects output
-file in conjunction with several of the context input files. Those context input files are the cost factor and emission factor input files. For example, the cost effects file would
-present CO2-related costs as the CO2 cost factor (a cost/ton value set in the input file) multiplied by the tons of CO2 as presented in the physical effects file. Similarly, fuel costs
-would be calculated as fuel price (dollars/gallon as provided in the input file) multiplied by gallons consumed as presented in the physical effects file.
+The Effects Module generates 3 output files: physical effects, cost effects and technology volumes. In general, the cost effects output file
+builds upon the physical effects output file in conjunction with several of the context input files. Those context input files are the cost
+factor and emission factor input files. For example, the cost effects file would present CO2-related costs as the CO2 cost factor (a cost/ton
+value set in the input file) multiplied by the tons of CO2 as presented in the physical effects file. Similarly, fuel costs would be
+calculated as fuel price (dollars/gallon as provided in the input file) multiplied by gallons consumed as presented in the physical effects file.
 
-Each of these physical and cost effects are calculated on an absolute basis. In other words, an inventory of CO2 tons multiplied by "costs" of CO2 per ton provides the "cost" of CO2 emissions. However, the calculation of criteria and GHG emission impacts is done using the $/ton estimates included in the cost_factors-criteria.csv and cost_factors-scc.csv input files. The $/ton estimates provided in those files are best understood to be the marginal costs associated with the reduction of the individual pollutants as opposed to the absolute costs associated with a ton of each pollutant. As such, the criteria and climate "costs" calculated by the model should not be seen as true costs associated with pollution, but rather the first step in estimating the benefits associated with reductions of those pollutants. For that reason, the user must be careful not to consider those as absolute costs, but once compared to the "costs" of another scenario (presumably via calculation of a difference in "costs" between two scenarios) the result can be interpreted as a benefit.
+Each of these physical and cost effects are calculated on an absolute basis. In other words, an inventory of CO2 tons multiplied by "costs"
+of CO2 per ton provides the "cost" of CO2 emissions. However, the calculation of criteria and GHG emission impacts is done using the $/ton
+estimates included in the cost_factors-criteria.csv and cost_factors-scc.csv input files. The $/ton estimates provided in those files are
+best understood to be the marginal costs associated with the reduction of the individual pollutants as opposed to the absolute costs
+associated with a ton of each pollutant. As such, the criteria and climate "costs" calculated by the model should not be seen as true costs
+associated with pollution, but rather the first step in estimating the benefits associated with reductions of those pollutants. For that
+reason, the user must be careful not to consider those as absolute costs, but once compared to the "costs" of another scenario (presumably
+via calculation of a difference in "costs" between two scenarios) the result can be interpreted as a benefit.
 
-There are certain other parameters included in the cost effects file that must be handled differently than discussed above. For example, drive surplus is the economic value of the increased owner/operator surplus provided by added driving and is estimated as one half of the product of the decline in vehicle operating costs per vehicle-mile and the resulting increase in the annual number of miles driven via the rebound effect. Since the drive surplus is calculated using a change in operating costs, the new operating costs must be compared to another operating cost. Since OMEGA operates on a single scenario, the "other" operating cost does not exist. Drive surplus, safety effects and net benefits are not currently included in OMEGA.
+There are certain other parameters included in the cost effects file that must be handled differently than discussed above. For example,
+drive surplus is the economic value of the increased owner/operator surplus provided by added driving and is estimated as one half of the
+product of the decline in vehicle operating costs per vehicle-mile and the resulting increase in the annual number of miles driven via the
+rebound effect. Since the drive surplus is calculated using a change in operating costs, the new operating costs must be compared to another
+operating cost. Since OMEGA operates on a single scenario, the "other" operating cost does not exist. Drive surplus, safety effects and net
+benefits are not currently included in OMEGA.
 
-Importantly, the cost factor inputs (as OMEGA calls them) have been generated using several discount rates. The values calculated using each of the different discount rates should not be added to one another. In other words, PM costs calculated using a 3 percent discount rate and a 7 percent discount rate should never be added together. Similarly, climate costs
-calculated using a 3 percent discount rate and a 2.5 percent discount rate should never be added. This does not necessarily hold true when adding criteria air pollutant costs and climate costs when it is acceptable to add costs using different discount rates. Lastly, when discounting future values, the same discount rate must be used as was used in generating the cost factors.
+Importantly, the cost factor inputs (as OMEGA calls them) have been generated using several discount rates. The values calculated using each
+of the different discount rates should not be added to one another. In other words, PM costs calculated using a 3 percent discount rate and
+a 7 percent discount rate should never be added together. Similarly, climate costs calculated using a 3 percent discount rate and a 2.5
+percent discount rate should never be added. This does not necessarily hold true when adding criteria air pollutant costs and climate costs
+when it is acceptable to add costs using different discount rates. Lastly, when discounting future values, the same discount rate must be
+used as was used in generating the cost factors.
 
-The tech volumes output file provides volume of each vehicle equipped with the technologies for which tech flags or tech data is present in the simulated_vehicles.csv input file. For example, if vehicle number 1 had 100 sales and half were HEVs while the other half were BEVs, the tech volumes output file would show that vehicle as having the following tech volumes: HEV=50; BEV=50. This is not the case for the weight-related technologies where curb weight is presented as the curb weight of the vehicle, weight reduction is presented as the weight reduction that has been applied to the vehicle to achieve that curb weight, and fleet pounds is the registered count of the vehicle multiplied by its curb weight.
+The tech volumes output file provides volume of each vehicle equipped with the technologies for which tech flags or tech data is present in
+the simulated_vehicles.csv input file. For example, if vehicle number 1 had 100 sales and half were HEVs while the other half were BEVs, the
+tech volumes output file would show that vehicle as having the following tech volumes: HEV=50; BEV=50. This is not the case for the
+weight-related technologies where curb weight is presented as the curb weight of the vehicle, weight reduction is presented as the weight
+reduction that has been applied to the vehicle to achieve that curb weight, and fleet pounds is the registered count of the vehicle
+multiplied by its curb weight.
 
-Each of the above files presents vehicle-level data for each analysis year that has been run and for each age of vehicle present in that calendar year. The model year of each vehicle is also provided.
+Each of the above files presents vehicle-level data for each analysis year that has been run and for each age of vehicle present in that
+calendar year. The model year of each vehicle is also provided.
 
 Physical Effects Calculations
 -----------------------------
-Physical effects are calculated at the vehicle level for all calendar years included in the analysis. Vehicle_ID and VMT driven by the given vehicle
-pulled from the VehicleAnnualData class. Vehicle attributes are pulled from VehicleFinal class. Fuel attributes are pulled from the OnroadFuel class
-which draws them from the onroad_fuels input file.
+Physical effects are calculated at the vehicle level for all calendar years included in the analysis. Vehicle_ID and VMT driven by the
+given vehicle pulled from the VehicleAnnualData class. Vehicle attributes are pulled from VehicleFinal class. Fuel attributes are pulled
+from the OnroadFuel class which draws them from the onroad_fuels input file.
 
 Fuel consumption
 ++++++++++++++++
