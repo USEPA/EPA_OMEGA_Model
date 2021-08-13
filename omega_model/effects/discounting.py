@@ -42,7 +42,7 @@ def discount_values(dict_of_values):
                               and f'{str(emission_dr3)}' not in arg
                               and f'{str(emission_dr5)}' not in arg
                               and f'{str(emission_dr7)}' not in arg]
-        id_args = [arg for arg in args if 'id' in arg or 'model_year' in arg]
+        id_args = [arg for arg in args if 'cost' not in arg]
 
         if cost_accrual == 'beginning-of-year': discount_offset = 0
         elif cost_accrual == 'end-of-year': discount_offset = 1
