@@ -485,4 +485,7 @@ Where:
 * :math:`TailpipeEmissions_{Pollutant, Metric tons}` is calculated by equation :math:numref:`tailpipe_non_co2_tons` or :math:numref:`tailpipe_co2_tons`
 * :math:`UpstreamEmissions_{Pollutant, Metric tons}` is calculated by equation :math:numref:`upstream_ghg_tons`
 
-
+Cost Effects Calculations
+-------------------------
+Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarly, the physical effects
+described above. (more to come)
