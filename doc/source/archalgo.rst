@@ -340,13 +340,13 @@ Liquid fuel consumption and electricity consumption are calculated for a given V
 .. Math::
     :label: ice_fuel_consumption
 
-    FuelConsumption_{gallons}=VMT_{liquid fuel} * \frac{CO_{2} grams/mile_{onroad, direct}} {CO_{2} grams/gallon * TransmissionEfficiency}
+    FuelConsumption_{gallons}=VMT_{liquid fuel} * \frac{(CO_{2} grams/mile)_{onroad, direct}} {(CO_{2} grams/gallon) * TransmissionEfficiency}
 
 Where:
 
 * :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
-* :math:`CO_{2} grams/mile_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
-* :math:`CO_{2} grams/gallon` is the :math:`CO_{2}` content of the in-use, or retail, fuel
+* :math:`(CO_{2} grams/mile)_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
+* :math:`(CO_{2} grams/gallon)` is the :math:`CO_{2}` content of the in-use, or retail, fuel
 * :math:`TransmissionEfficiency` is the efficiency of liquid fuel transmission as set by the user
 
 **Electricity consumption**
@@ -354,12 +354,12 @@ Where:
 .. Math::
     :label: bev_fuel_consumption
 
-    FuelConsumption_{kWh}=VMT_{electricity} * \frac{kWh/mile_{onroad, direct}} {TransmissionEfficiency}
+    FuelConsumption_{kWh}=VMT_{electricity} * \frac{(kWh/mile)_{onroad, direct}} {TransmissionEfficiency}
 
 Where:
 
 * :math:`VMT_{electricity}=VMT * FuelShare_{electricity}`
-* :math:`kWh/mile_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
+* :math:`(kWh/mile)_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
 * :math:`TransmissionEfficiency` is the efficiency of the power grid as set by the user
 
 .. note:: Multi-fuel vehicle fuel consumption
@@ -376,13 +376,13 @@ Emission inventories are calculated for a given Vehicle ID as:
 .. Math::
     :label: tailpipe_criteria_tons
 
-    PollutantEmissions_{US tons}=VMT_{liquid fuel} * \frac{Pollutant grams/mile} {grams/US ton}
+    TailpipeEmissions_{Pollutant, US tons}=VMT_{liquid fuel} * \frac{(grams/mile)_{Pollutant}} {grams/US ton}
 
 Where:
 
 * :math:`Pollutant` would be any of the criteria air pollutants such as VOC, PM2.5, NOx, etc., with the exception of :math:`SO_{2}`
 * :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
-* :math:`Pollutant grams/mile` is an Emission Factor (e.g., a MOVES emission factor) from the emission factors input file
+* :math:`(grams/mile)_{Pollutant}` is an emission factor (e.g., a MOVES emission factor) from the emission factors input file
 * :math:`grams/US ton` = 907,185
 
 **Tailpipe SO2**
@@ -390,12 +390,12 @@ Where:
 .. Math::
     :label: tailpipe_so2_tons
 
-    SO_{2}Emissions_{US tons}=FuelConsumption_{liquid fuel} * \frac{SO_{2} grams/gallon} {grams/US ton}
+    TailpipeEmissions_{SO_{2}, US tons}=FuelConsumption_{liquid fuel} * \frac{(grams/gallon)_{SO_{2}}} {grams/US ton}
 
 Where:
 
-* :math:`FuelConsumption_{liquid fuel}` is calculated by :math:numref:`ice_fuel_consumption`
-* :math:`SO_{2} grams/mile` is the :math:`SO_{2}` Emission Factor (e.g., a MOVES emission factor) from the emission factors input file
+* :math:`FuelConsumption_{liquid fuel}` is calculated by equation :math:numref:`ice_fuel_consumption`
+* :math:`(grams/gallon)_{SO_{2}}` is the :math:`SO_{2}` emission factor (e.g., a MOVES emission factor) from the emission factors input file
 * :math:`grams/US ton` = 907,185
 
 **Tailpipe CH4 and N2O Emissions**
@@ -403,13 +403,13 @@ Where:
 .. Math::
     :label: tailpipe_non_co2_tons
 
-    PollutantEmissions_{Metric tons}=VMT_{liquid fuel} * \frac{Pollutant grams/mile} {grams/Metric ton}
+    TailpipeEmissions_{Pollutant, Metric tons}=VMT_{liquid fuel} * \frac{(grams/mile)_{Pollutant}} {grams/Metric ton}
 
 Where:
 
 * :math:`Pollutant` would be either :math:`CH_{4}` or :math:`N_{2}O`
 * :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
-* :math:`Pollutant grams/mile` is an Emission Factor (e.g., a MOVES emission factor) from the emission factors input file
+* :math:`(grams/mile)_{Pollutant}` is an emission factor (e.g., a MOVES emission factor) from the emission factors input file
 * :math:`grams/Metric ton` = 1,000,000
 
 **Tailpipe CO2 Emissions**
@@ -417,11 +417,72 @@ Where:
 .. Math::
     :label: tailpipe_co2_tons
 
-    CO_{2}Emissions_{Metric tons}=VMT_{liquid fuel} * \frac{CO_{2} grams/mile_{onroad, direct}} {grams/Metric ton}
+    TailpipeEmissions_{CO_{2}, Metric tons}=VMT_{liquid fuel} * \frac{(CO_{2} grams/mile)_{onroad, direct}} {grams/Metric ton}
 
 Where:
 
 * :math:`VMT_{liquid fuel}=VMT * FuelShare_{liquid fuel}`
-* :math:`CO_{2} grams/mile_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
+* :math:`(CO_{2} grams/mile)_{onroad, direct}` is calculated within OMEGA and accounts for any credits that do not improve fuel consumption and test-to-onroad gaps
 * :math:`grams/Metric ton` = 1,000,000
+
+**Upstream Criteria Emissions**
+
+.. Math::
+    :label: upstream_criteria_tons
+
+    & UpstreamEmissions_{Pollutant, US tons} \\
+    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} + FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/US ton}
+
+Where:
+
+* :math:`Pollutant` would be any of the criteria air pollutants such as VOC, PM2.5, NOx, etc.
+* :math:`FC_{kWh}` is :math:`FuelConsumption_{kWh}` calculated by equation :math:numref:`bev_fuel_consumption`
+* :math:`(grams/kWh)_{Pollutant, EGU}` is the Electricity Generating Unit (or Power Sector) emission factor for the given Pollutant
+* :math:`FC_{gallons}` is :math:`FuelConsumption_{gallons}` calculated by equation :math:numref:`ice_fuel_consumption`
+* :math:`(grams/gallon)_{Pollutant, Refinery}` is the Refinery emission factor for the given pollutant
+* :math:`grams/US ton` = 907,185
+
+**Upstream GHG Emissions**
+
+.. Math::
+    :label: upstream_ghg_tons
+
+    & UpstreamEmissions_{Pollutant, Metric tons} \\
+    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} + FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/Metric ton}
+
+Where:
+
+* :math:`Pollutant` would be any of the criteria air pollutants such as VOC, PM2.5, NOx, etc.
+* :math:`FC_{kWh}` is :math:`FuelConsumption_{kWh}` calculated by equation :math:numref:`bev_fuel_consumption`
+* :math:`(grams/kWh)_{Pollutant, EGU}` is the Electricity Generating Unit (or Power Sector) emission factor for the given Pollutant
+* :math:`FC_{gallons}` is :math:`FuelConsumption_{gallons}` calculated by equation :math:numref:`ice_fuel_consumption`
+* :math:`(grams/gallon)_{Pollutant, Refinery}` is the Refinery emission factor for the given pollutant
+* :math:`grams/Metric ton` = 1,000,000
+
+**Total Criteria Emissions**
+
+.. Math::
+    :label: total_criteria_tons
+
+    & TotalEmissions_{Pollutant, US tons} \\
+    & = TailpipeEmissions_{Pollutant, US tons} + UpstreamEmissions_{Pollutant, US tons}
+
+Where:
+
+* :math:`TailpipeEmissions_{Pollutant, US tons}` is calculated by equation :math:numref:`tailpipe_criteria_tons` or :math:numref:`tailpipe_so2_tons`
+* :math:`UpstreamEmissions_{Pollutant, US tons}` is calculated by equation :math:numref:`upstream_criteria_tons`
+
+**Total GHG Emissions**
+
+.. Math::
+    :label: total_ghg_tons
+
+    & TotalEmissions_{Pollutant, Metric tons} \\
+    & = TailpipeEmissions_{Pollutant, Metric tons} + UpstreamEmissions_{Pollutant, Metric tons}
+
+Where:
+
+* :math:`TailpipeEmissions_{Pollutant, Metric tons}` is calculated by equation :math:numref:`tailpipe_non_co2_tons` or :math:numref:`tailpipe_co2_tons`
+* :math:`UpstreamEmissions_{Pollutant, Metric tons}` is calculated by equation :math:numref:`upstream_ghg_tons`
+
 
