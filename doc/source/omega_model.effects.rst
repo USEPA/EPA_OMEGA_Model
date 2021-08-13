@@ -89,10 +89,10 @@ omega\_model.effects.general\_functions module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.effects.o2\_effects module
----------------------------------------
+omega\_model.effects.omega\_effects module
+------------------------------------------
 
-.. automodule:: omega_model.effects.o2_effects
+.. automodule:: omega_model.effects.omega_effects
    :members:
    :undoc-members:
    :show-inheritance:
