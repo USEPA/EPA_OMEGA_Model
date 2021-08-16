@@ -168,6 +168,8 @@ class FuelPrice(SQABase, OMEGABase):
             if not template_errors:
                 from context.onroad_fuels import OnroadFuel
 
+                # TODO: convert costs to Analysis Dollar Basis
+
                 obj_list = []
                 # load data into database
                 for i in df.index:

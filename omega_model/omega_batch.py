@@ -39,6 +39,7 @@ Sample Data Columns
         Cost Accrual,end-of-year / beginning-of-year,end-of-year,
         Discount Values to Year,#,2021,
         Run Effects Calculations,TRUE / FALSE,FALSE,
+        Analysis Dollar Basis,#,2020,
         ,,,
         Batch Analysis Context Settings,,,
         Context Name,String,AEO2021,
@@ -114,7 +115,7 @@ Data Row Name and Description
 :Discount Values to Year:
     The year to which all monetized values in the cost effects outputs will be discounted, default is ``2021``
 
-:Dollar Basis:
+:Analysis Dollar Basis:
     The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
 
 :Run Effects Calculations *(TRUE or FALSE)*:
@@ -612,6 +613,7 @@ class OMEGABatchObject(OMEGABase):
                                                       {'end-of-year', 'beginning-of-year'})
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
         self.settings.calc_effects = self.read_parameter('Run Effects Calculations')
+        self.settings.analysis_dollar_basis = self.read_parameter('Analysis Dollar Basis')
 
         # read context scalar settings
         self.settings.context_id = self.read_parameter('Context Name')
