@@ -3,18 +3,38 @@
 
 Model Architecture and Algorithms
 =================================
+As described in Chapter 1, OMEGA's four main modules represent distinct and important components for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the Policy, Producer, and Consumer modules, and then by a section on the approach for iteration and convergence between these three modules. Finally, the accounting method is described for the physical and monetary effects in the Effects Module.
 
+Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to the Developer Guide for more information on how to view and rerun the demo analysis.
 
 Overall Simulation Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Simulation Scope and Units of Analysis
+--------------------------------------
+The model boundary of OMEGA as illustrated in :numref:`mo_label_compare` determines the system elements which are modeled internally, and the elements which are specified as user inputs and assumptions. The timeframe of a given analysis spans the years between analysis start and end years defined by the user. Together, the boundary and analysis timeframe define the scope of an analysis.
+
+.. sidebar:: Analysis start year and the base year
+
+   The analysis start year is the first year in which modeling is performed, and is one year after a *base year* representing actual observations of key elements of the light duty sector, such as descriptions of the vehicle stock and new vehicle attributes. Due to the timing of when this base year input data becomes available, it is often necessary for the first analysis year to be earlier than the actual year in which the analysis is conducted.
+
+Inputs are often specified uniquely for each analysis year. Examples include technology costs and availability, emissions costs factors, consumer response assumptions, and other parameters that are expected to change over time. The analysis timeframe can be extended to cover not only the last year in which an analyzed policy is changing, but also years further into the future. This longer modeling timeframe may be useful for evaluating how policy alternatives influence the evolution of the vehicle stock and use over time, how producers might manage compliance credits year-over-year given an extended time horizon,  and how consumer and producer decisions might evolve over time based on projected trends in the exogenous inputs.
+
+.. admonition:: Demo Example: Analysis timeframe
+
+    Within the demo analysis, base year inputs are specified for 2019, and include model year 2019 new vehicle attributes. The year immediately following the base year, and therefore the analysis start year, is 2020. The analysis end year is set to 2050 in the demo inputs. In cases where to context input projections do not extend to the analysis end year, the value in the last year for which a particular input is specified year is assumed to hold constant in subsequent years. For example, if the last specified fuel price input were in 2045, the same value would be used for 2046 through 2050. Alternatively, the user can provide an extended range of analysis context projections in the model inputs. For this demo analysis, the generated effects outputs files report modeled results from 2020 to 2050.
 
 Process Flow Summary
 --------------------
 x
 
-Simulation Scope and Units of Analysis
---------------------------------------
-x
+.. _al_label_overallprocessflow:
+.. figure:: _static/al_figures/overall_process_flow.png
+    :align: center
+
+    OMEGA process flow
+
+
 
 Model Inputs
 ------------
@@ -41,7 +61,6 @@ Analysis Context Inputs:
 	* Fuel Costs (gas and electricity)
 	* Vehicle Fleet
 	* Vehicle VMT distribution
-
 
 Projections and the Analysis Context
 ------------------------------------
@@ -72,9 +91,33 @@ OMEGA is designed so that within an analysis year, credits from all the producer
 * definition of attribute-based target function
 * definition of the vehicles’ assumed lifetime miles
 
+.. admonition:: Demo Example: Off-cycle credits
+
+    [add example details]
+
+.. admonition:: Demo Example: Certification test procedure
+
+    [add example details]
+
+.. admonition:: Demo Example: Form of GHG standards
+
+    [add example details]
+
+.. admonition:: Demo Example: Production incentives
+
+    [add example details]
+
+.. admonition:: Demo Example: Upstream emissions accounting
+
+    [add example details]
 
 **Policy Alternatives Requiring Specific Technologies:**
 This type of policy requires all, or a portion, of producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with a fleet averaging emissions standard; for example, a minimum Zero Emission Vehicle (ZEV) share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
+
+
+.. admonition:: Demo Example: Required sales share
+
+    [add example details]
 
 **Policy Representation in the Analysis Context:**
 Some policies are not modeled in OMEGA as policy alternatives, either because the policy is not aimed directly at the producer as a regulated entity, or because the particular OMEGA analysis is not attempting to evaluate the impact of that policy relative to other alternatives. Still, it is important that the Analysis Context inputs are able to reflect any policies that might significantly influence the producer or consumer decisions. Some examples include:
@@ -90,9 +133,15 @@ Producer Module
 ^^^^^^^^^^^^^^^
 Producer Module Overview
 ------------------------
-The modeling of producer decisions is a core function of OMEGA, and is based on minimizing the producers' generalized costs, subject to the constraints of regulatory compliance and consumer demand. The ‘producer’ defined in OMEGA encompasses both the broader meaning as a supplier of a transportation good or service to the market, and in the narrower sense as the regulated entity subject to EPA policies.
+The modeling of producer decisions is central to the optimization problem that OMEGA has been developed to solve. In short, the objective is to minimize the producers' generalized costs subject to the constraints of regulatory compliance and consumer demand. The ‘producer’ is defined in OMEGA as a regulated entity that is subject to the policy alternatives being modeled, and responsible for making decisions about the attributes and pricing of new vehicles offered to consumers. A user might choose to model producers as an individual manufacturer of light duty vehicles, as a division of a single manufacturer, or as a collection of manufacturers. This choice will depend on the goals of the particular analysis, and what assumptions the user is making about the transfer of compliance credits within and between manufacturers.
 
-The Producer Module uses exogenous inputs from the analysis context (including xyz) to meet the compliance targets defined in the Policy Module. Its outputs of xyz must ultimately reconcile with the outputs from the Consumer Module through a series of iterations, as described in the Consumer Module section.
+:numref:`al_label_pm_ov` shows the flow of inputs and outputs for the Producer Module. Analysis context inputs are not influenced by the modeling within the Consumer, Producer, and Policy Modules, and are therefore considered as exogenous to OMEGA.
+
+.. _al_label_pm_ov:
+.. figure:: _static/al_figures/producermod_ov.png
+    :align: center
+
+    Overview of the Producer Module
 
 **Inputs to the Producer Module**
 Policy Alternative inputs are used to calculate a compliance target for the producer, in Mg CO2 for a given analysis year, using the provided attribute-based standards curve, vehicle regulatory class definitions, and assumed VMT for compliance. Other policy inputs may define, for example, the credit lifetime for carry-forward and carry-back, or a floor on the minimum share of ZEV vehicles produced.
@@ -104,18 +153,18 @@ x
 
 Vehicle Definitions
 -------------------
-The core unit impacted by decisions in the producer module is at the vehicle level.  Each OMEGA “vehicle” is defined in the analysis context and represents a set of distinct attributes.  In the demo, for example, the attributes associated with each vehicle definition are included in the vehicles.csv file.  The figure below shows a subset of attributes that characterize each vehicle in the demo.
+The core unit impacted by decisions in the producer module is at the vehicle level. Each OMEGA “vehicle” is defined in the analysis context and represents a set of distinct attributes. In the demo, for example, the attributes associated with each vehicle definition are included in the vehicles.csv file. The figure below shows a subset of attributes that characterize each vehicle in the demo.
 
 .. figure:: _static/mo_figures/vehicles.csv.png
     :align: center
 
-As shown in the figure, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity.  A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
+As shown in the figure, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity. A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
 
 Vehicle Simulation and Cost Inputs
 ------------------------------------------
-One of the most important sets of inputs to the Producer Module is the simulated vehicles file.  It contains the vehicles parameters used by OMEGA to generate all possible vehicle technology (and cost) options available to the producers – these are referred to as the “Vehicle Clouds”.  The use of these vehicle clouds by OMEGA is described in 3.3.4.
+One of the most important sets of inputs to the Producer Module is the simulated vehicles file. It contains the vehicles parameters used by OMEGA to generate all possible vehicle technology (and cost) options available to the producers – these are referred to as the “Vehicle Clouds”. The use of these vehicle clouds by OMEGA is described in 3.3.4.
 
-The simulated vehicle file contains the various vehicles of different core attributes (such as vehicle size, weight, powertrain, etc), the CO2-reducing technologies that are applied to each, and their predicted energy consumption, CO2 performance, and cost.  While not required by all users, EPA uses its own simulation tool (ALPHA) to predict the energy consumption and CO2 emissions for each vehicle and technology combination.  For the demo, these vehicle and technology options (and associated CO2 performance) are consolidated into the simulated_vehicles.csv file.
+The simulated vehicle file contains the various vehicles of different core attributes (such as vehicle size, weight, powertrain, etc), the CO2-reducing technologies that are applied to each, and their predicted energy consumption, CO2 performance, and cost. While not required by all users, EPA uses its own simulation tool (ALPHA) to predict the energy consumption and CO2 emissions for each vehicle and technology combination. For the demo, these vehicle and technology options (and associated CO2 performance) are consolidated into the simulated_vehicles.csv file.
 The simulated vehicles csv file contains the following fields for use in the producer module:
 
 * the associated **cost curve class** (defined by powertrain family and described below)
@@ -125,9 +174,9 @@ The simulated vehicles csv file contains the following fields for use in the pro
 * vehicle attributes, such as included technologies, costs
 
 **Significance of the cost curve class:**
-Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class.  In the demo, EPA grouped multiple vehicles within a single cost curve class to reduce the number of simulations required to represent the design space and to make the producer decision (manageable).
-OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class.  These decisions are then applied to every vehicle within that cost curve class.
-For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular costs cloud unique to each vehicle.  This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
+Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class. In the demo, EPA grouped multiple vehicles within a single cost curve class to reduce the number of simulations required to represent the design space and to make the producer decision (manageable).
+OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class. These decisions are then applied to every vehicle within that cost curve class.
+For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular costs cloud unique to each vehicle. This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
 
 
 Vehicle Clouds, Frontiers, and Aggregation
@@ -138,7 +187,17 @@ Description of the process in applying vehicle clouds:
 * Interpolation method for identifying best producer options
 * Search of discrete points
 
+.. admonition:: Demo Example: Vehicle Clouds
 
+    [add example details]
+
+.. admonition:: Demo Example: Finding the frontier
+
+    [add example details]
+
+.. admonition:: Demo Example: Vehicle aggregation and disaggregation
+
+    [add example details]
 
 Producer Compliance Strategy
 ----------------------------
@@ -543,5 +602,5 @@ Where:
 
 Cost Effects Calculations
 -------------------------
-Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarly, the physical effects
+Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarily, the physical effects
 described above. (more to come)
