@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(path, '..', '..'))  # picks up the top-level pac
 
 # -- Project information -----------------------------------------------------
 
-project = 'OMEGA2'
+project = 'OMEGA'
 copyright = '2021, US EPA'
 author = 'US EPA'
 
