@@ -732,7 +732,21 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
 
 class Vehicle(OMEGABase):
     """
-    **Vehicle**
+    **Implements "candidate" or "working" vehicles for use during the producer compliance search.**
+
+    ``Vehicle`` objects are initialized from ``VehicleFinal`` objects and then appropriate attributes are transferred from
+    ``Vehicle`` objects to ``VehicleFinal`` objects at the conclusion of the producer search and producer-consumer
+    iteration.
+
+    Each ``Vehicle`` object has a unique ``cost_curve`` (and potentially ``cost_cloud``) that tracks multiple aspects
+    of vehicle technology application as a function of cert CO2e g/mi and the data contained in the simulated
+    vehicles file.  The cost curve is calculated from the cost cloud at the start of each model year as a function
+    of the active policy and the simulated vehicle data and costs.  For example, the value of off-cycle credits may
+    vary from one model year to the next and technology costs may decrease over time.
+
+    See Also:
+        ``producer.vehicles.transfer_vehicle_data()``, ``VehicleFinal``, ``context.CostCloud``
+
     """
     next_vehicle_id = 0
 
