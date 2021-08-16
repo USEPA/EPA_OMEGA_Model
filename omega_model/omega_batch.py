@@ -613,6 +613,7 @@ class OMEGABatchObject(OMEGABase):
                                                       {'end-of-year', 'beginning-of-year'})
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
         self.settings.calc_effects = self.read_parameter('Run Effects Calculations')
+        self.settings.analysis_dollar_basis = self.read_parameter('Analysis Dollar Basis')
 
         # read context scalar settings
         self.settings.context_id = self.read_parameter('Context Name')
