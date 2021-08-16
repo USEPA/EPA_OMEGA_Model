@@ -155,6 +155,8 @@ class CostCloud(OMEGABase):
             # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
 
             if not template_errors:
+                # TODO: convert costs to Analysis Dollar Basis
+
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
                 # for each cost curve class
