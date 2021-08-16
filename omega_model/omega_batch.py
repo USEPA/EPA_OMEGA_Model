@@ -38,7 +38,6 @@ Sample Data Columns
         Consolidate Manufacturers,TRUE / FALSE,TRUE,
         Cost Accrual,end-of-year / beginning-of-year,end-of-year,
         Discount Values to Year,#,2021,
-        Run Effects Calculations,TRUE / FALSE,FALSE,
         Analysis Dollar Basis,#,2020,
         ,,,
         Batch Analysis Context Settings,,,
@@ -117,9 +116,6 @@ Data Row Name and Description
 
 :Analysis Dollar Basis:
     The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
-
-:Run Effects Calculations *(TRUE or FALSE)*:
-    If ``TRUE`` then run the emissions and cost effects post-processing
 
 :Batch Analysis Context Settings:
     Decorator, not evaluated
@@ -612,7 +608,6 @@ class OMEGABatchObject(OMEGABase):
         self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
                                                       {'end-of-year', 'beginning-of-year'})
         self.settings.discount_values_to_year = int(self.read_parameter('Discount Values to Year'))
-        self.settings.calc_effects = self.read_parameter('Run Effects Calculations')
         self.settings.analysis_dollar_basis = self.read_parameter('Analysis Dollar Basis')
 
         # read context scalar settings
