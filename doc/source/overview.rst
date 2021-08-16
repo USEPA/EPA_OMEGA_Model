@@ -48,8 +48,6 @@ OMEGA is structured around two key modules; a Producer Module and a Consumer Mod
 
 The two additional Modules are the Policy Module and Effects Module. The Policy Module is used to identify the policy alternative assumptions producers are required to meet in the Producer Module. The Effects Module estimates the final model outputs, including costs and benefits.
 
-Additional functions of OMEGA related to policy assumptions and environmental/economic effects are also designed as modules
-
 Iteration and Convergence
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 OMEGA is intended to find a solution which simultaneously satisfies producer, consumer, and policy requirements while minimizing the producer’s generalized costs. OMEGA’s Producer and Consumer modules represent distinct decision-making entities, with behaviors defined separately by the user. Without some type of interaction between these modules, the model would likely not arrive at an equilibrium of vehicles supplied and demanded. For example, a compliance solution which only minimizes producer generalized costs without consideration of consumer demand may not satisfy the market requirements at the fleet mix and level of sales preferred by the producer. Since there is no general analytical solution to this problem which also allows model users to independently define producer and consumer behavior, OMEGA uses an iterative search approach.

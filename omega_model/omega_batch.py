@@ -109,10 +109,13 @@ Data Row Name and Description
     If ``TRUE`` then manufacturers will be conslidated into a "consolidated_OEM", otherwise manufacturers will be run independently
 
 :Cost Accrual:
-    Cost accrual time of outputs, ``end-of-year`` or ``beginning-of-year``
+    The time of year when costs are assumed to accrue, ``end-of-year`` or ``beginning-of-year``
 
 :Discount Values to Year:
-    Dollar basis year of outputs, default is ``2021``
+    The year to which all monetized values in the cost effects outputs will be discounted, default is ``2021``
+
+:Dollar Basis:
+    The dollar valuation for all monetized values in the cost effects outputs, i.e., costs are expressed in "Dollar Basis" dollars
 
 :Run Effects Calculations *(TRUE or FALSE)*:
     If ``TRUE`` then run the emissions and cost effects post-processing
@@ -599,7 +602,7 @@ class OMEGABatchObject(OMEGABase):
         # dfx.fillna('-----', inplace=True)
         self.dataframe = dfx
 
-    def get_batch_settings(self):
+    def get_batch_settings(self): # TODO need to add analysis_dollar_basis to the batch settings
         self.name = self.read_parameter('Batch Name')
         if self.settings.analysis_final_year is not None:
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year

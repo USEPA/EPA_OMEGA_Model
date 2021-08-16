@@ -25,6 +25,9 @@ analysis.
 Each of the physical, cost and tech tracking elements, and each parameter within each, is calculated for every vehicle in the analysis and for
 each year of its life. The results are then written to the physical_effects, cost_effects and tech_volumes output files.
 
+Note:
+    The omega_effects module runs only if the "Run Effects Calculations" input setting is set to TRUE. Otherwise, effects calculations will
+    not be done.
 
 ----
 

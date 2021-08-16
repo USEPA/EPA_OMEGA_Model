@@ -13,6 +13,8 @@ inputs_code
         A user defined ID for the given run of the alpha_package_costs module. This run_ID will be included in the output filename.
     :optional_run_description:
         An optional description for the run. This is not used other than here.
+    :dollar_basis_for_output_file:
+        The dollar basis desired for the module output file(s). Note that this dollar basis will be converted within OMEGA (if necessary) for consistency with the OMEGA run.
     :start_year:
         The start year for cost calculations and the year from which learning effects will occur.
     :end_year:

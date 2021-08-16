@@ -13,9 +13,10 @@ def discount_values(dict_of_values):
         The passed dictionary with new key, value pairs where keys stipulate the discount rate and monetized values are discounted at their internally consistent discount rate.
 
     Note:
-        The costs_start entry set <somewhere> should be set to 'start-year' or 'end-year', where start-year represents costs
-        starting at time t=0 (i.e., first year costs are undiscounted), and end-year represents costs starting at time t=1 (i.e., first year
-        costs are discounted).
+        Important input settings for discounting of monetized values are the "Discount Values to Year" and "Cost Accrual" settings.
+        The year to which to discount monetized values is set by the "Discount Values to Year" entry of the input settings.
+        The "Cost Accrual" input setting should be set to 'beginning-of-year' or 'end-of-year', where beginning-of-year represents costs
+        accruing at time t=0 within the year, and end-of-year represents costs accruing at the end of the year.
 
     """
     discount_to_year = omega_globals.options.discount_values_to_year
@@ -41,7 +42,7 @@ def discount_values(dict_of_values):
                               and f'{str(emission_dr3)}' not in arg
                               and f'{str(emission_dr5)}' not in arg
                               and f'{str(emission_dr7)}' not in arg]
-        id_args = [arg for arg in args if 'id' in arg or 'model_year' in arg]
+        id_args = [arg for arg in args if 'cost' not in arg]
 
         if cost_accrual == 'beginning-of-year': discount_offset = 0
         elif cost_accrual == 'end-of-year': discount_offset = 1
