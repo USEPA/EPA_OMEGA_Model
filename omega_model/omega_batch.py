@@ -682,7 +682,6 @@ class OMEGASessionObject(OMEGABase):
         from omega import OMEGASessionSettings
 
         self.num = session_num
-        self.settings.session_is_reference = self.num == 0
         self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
         self.output_path = OMEGASessionSettings().output_folder  # self.read_parameter('Session Output Folder Name')
@@ -696,6 +695,7 @@ class OMEGASessionObject(OMEGABase):
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.parent.name + '_' + self.name
+        self.settings.session_is_reference = self.num == 0
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
         self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)

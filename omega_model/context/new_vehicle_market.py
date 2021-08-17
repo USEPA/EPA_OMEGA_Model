@@ -163,6 +163,9 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         """
 
+        cls.context_size_class_info_by_nrmc.clear()
+        cls.context_size_classes.clear()
+        cls.manufacturer_context_size_classes.clear()
         cls._context_new_vehicle_generalized_costs.clear()
         cls._session_new_vehicle_generalized_costs.clear()
 
