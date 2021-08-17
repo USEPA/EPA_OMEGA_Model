@@ -24,7 +24,7 @@ With the release of version 2.0, we aim to improve usability and flexibility whi
 
 **Update #4: the addition of a consumer response component.** The light-duty vehicle market has evolved significantly in the time since the initial release of OMEGA. In particular, as the range of available technologies and services has grown wider, so has the range of possible responses to policy alternatives. The model structure for this version includes a Consumer Module that can be used to define how the light-duty vehicle market responds to policy-driven changes in price, fuel operating costs, and other consumer-facing vehicle attributes. The Consumer Module outputs the estimated responses for overall sales and sales shares, as well as vehicle re-registration and use, which together determine the stock of new and used vehicles and the associated allocation of total VMT.
 
-**Update #5: the addition of feedback loops for producer decisions.** This version of OMEGA is structured around modeling the interactions between vehicle producers responding to a policy and consumers who own and use those vehicles. These interactions are bi-directional, in that the producer's compliance planning and vehicle design decisions will both influence, and be influenced by, the sales and shares of vehicles sold and the GHG credits assigned under the policy. Iterative feedback loops have now been incorporated between the producer and consumer modules, and between the producer and policy modules.
+**Update #5: the addition of feedback loops for producer decisions.** This version of OMEGA is structured around modeling the interactions between vehicle producers responding to a policy and consumers who own and use those vehicles. These interactions are bi-directional, in that the producer's compliance planning and vehicle design decisions will both influence, and be influenced by, the sales and shares of vehicles sold and the GHG credits assigned under the policy. Iterative feedback loops have now been incorporated between the Producer and Consumer modules, and between the Producer and Policy modules.
 
 Inputs and Outputs
 ^^^^^^^^^^^^^^^^^^
@@ -36,7 +36,7 @@ The inputs and assumptions are categorized according to whether they fall inside
 
 * *Analysis Context* inputs and assumptions cover the range of factors that the user assumes, for the purpose of analyses, are independent of the policy alternatives. The user may project changes in the context inputs over the analysis timeframe based on other sources, but for a given analysis year the context definition requires that these inputs are common across the policy alternatives being compared. The context inputs may include fuel costs, costs and emissions rates for a particular vehicle technology package, consumer demand parameters, and many more.
 
-A full description of the input files can be found in [Chapter 7].
+A full description of the input files can be found in `Chapter 7`_.
 
 The primary outputs are the environmental effects and societal costs and benefits for a given policy alternative and analysis context pair. These outputs are expressed in absolute values, so that incremental effects, costs, and benefits can be evaluated by comparing two policy alternatives (for a given context) or the sensitivity to assumptions for two different analysis contexts (for a given policy alternative.)
 
@@ -46,7 +46,7 @@ OMEGA has been set up so that primary components of the model are clearly deline
 
 OMEGA is structured around two key modules; a Producer Module and a Consumer Module, which each contain a decision-model for the respective entities. The Producer Module's purpose is to estimate how producers will respond to a policy within the given analysis context. The Consumer Module’s purpose is to estimate how vehicle ownership and use respond to key vehicle characteristics, including vehicle cost, within a given analysis context.
 
-The two additional Modules are the Policy Module and Effects Module. The Policy Module is used to identify the policy alternative assumptions producers are required to meet in the Producer Module. The Effects Module estimates the final model outputs, including costs and benefits.
+The two additional modules are the Policy Module and Effects Module. The Policy Module is used to identify the policy alternative assumptions producers are required to meet in the Producer Module. The Effects Module estimates the final model outputs, including costs and benefits.
 
 Iteration and Convergence
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +54,7 @@ OMEGA is intended to find a solution which simultaneously satisfies producer, co
 
 Analysis Resolution
 ^^^^^^^^^^^^^^^^^^^
-The outcomes of consumer and producer decision-making in OMEGA are expressed via the vehicles modeled in the analysis period, the volumes of vehicles produced, the applied technologies and relevant vehicle attributes, and the re-registration and use over all vehicles’ lifetimes. Because there can be nearly 20 million light-duty vehicles produced for sale each year in the US, and hundreds of millions of vehicles registered for use at any given time, OMEGA must aggregate, as appropriate, while still distinguishing between vehicles when needed. The approach for aggregating vehicles varies based on the different functions and modules within OMEGA, with the general principles applied throughout OMEGA to 1) use the amount of vehicle detail required, but no more than is required, to perform any particular modeling sub-task, and 2) to retain vehicle details that will be needed for subsequent modeling tasks.
+The outcomes of consumer and producer decision-making in OMEGA are expressed via the vehicles modeled in the analysis period, the volumes of vehicles produced, the applied technologies and relevant vehicle attributes, and the reregistration and use over all vehicles’ lifetimes. Because there can be nearly 20 million light-duty vehicles produced for sale each year in the US, and hundreds of millions of vehicles registered for use at any given time, OMEGA must aggregate, as appropriate, while still distinguishing between vehicles when needed. The approach for aggregating vehicles varies based on the different functions and modules within OMEGA, with the general principles applied throughout OMEGA to 1) use the amount of vehicle detail required, but no more than is required, to perform any particular modeling sub-task, and 2) to retain vehicle details that will be needed for subsequent modeling tasks.
 
 * The modeling of producer decisions requires that the model retains sufficient detail to calculate the target and achieved compliance emissions, as well as any details needed to calculate the generalized producer cost.
 * The modeling of consumer decisions requires that the model retains sufficient detail to distinguish between market classes for representing both the purchase choices among different classes, and the reregistration and use of vehicles within a given class. Because the way that consumer decisions are modeled is a replaceable module, the definition of market classes depends on the requirements of the approach used.
