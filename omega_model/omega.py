@@ -937,12 +937,12 @@ def init_omega(session_runtime_options):
                                                           omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=verbose_init)
 
-        if omega_globals.options.calc_criteria_emission_costs:
-            init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                     omega_globals.options.cpi_deflators_file,
-                                                                     verbose=verbose_init)
+        # if omega_globals.options.calc_criteria_emission_costs:
+        #     init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
+        #                                                              omega_globals.options.cpi_deflators_file,
+        #                                                              verbose=verbose_init)
 
-        if omega_globals.options.calc_effects:
+        if omega_globals.options.calc_effects == 'Physical and Costs':
             init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
                                                                             verbose=verbose_init)
 
@@ -952,6 +952,10 @@ def init_omega(session_runtime_options):
             init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
                                                                          verbose=verbose_init)
 
+            init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
+                                                                     omega_globals.options.cpi_deflators_file,
+                                                                     verbose=verbose_init)
+
             init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
                                                                 verbose=verbose_init)
 
@@ -960,6 +964,16 @@ def init_omega(session_runtime_options):
 
             init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
                                                                             verbose=verbose_init)
+
+        if omega_globals.options.calc_effects == 'Physical':
+            init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                                            verbose=verbose_init)
+
+            init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                                         verbose=verbose_init)
+
+            init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                                         verbose=verbose_init)
 
         # initial year = initial fleet model year (latest year of data)
         omega_globals.options.analysis_initial_year = \

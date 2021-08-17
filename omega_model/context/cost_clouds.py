@@ -35,7 +35,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.22,dollar_basis,``{optional_source_data_comment}``
+       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.22,dollar_basis:,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -65,7 +65,8 @@ Data Column Name and Description
         :cd_hwfet:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
 
     :new_vehicle_mfr_cost_dollars:
-        The manufacturer cost associated with the simulation results, based on vehicle technology content and model year
+        The manufacturer cost associated with the simulation results, based on vehicle technology content and model year.Note that the
+         costs are converted in-code to 'analysis_dollar_basis' using the implicit_price_deflators input file.
 
     CHARGE-SUSTAINING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
@@ -147,15 +148,25 @@ class CostCloud(OMEGABase):
 
         if not template_errors:
             # read in the data portion of the input file
+            cost_clouds_template_info = pd.read_csv(filename, nrows=0)
+            temp = [item for item in cost_clouds_template_info]
+            dollar_basis_template = int(temp[temp.index('dollar_basis:') + 1])
+
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns,
                                                         verbose=verbose)
 
+            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
+
+            adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
+                                / deflators[dollar_basis_template]['price_deflator']
+
+            df['new_vehicle_mfr_cost_dollars'] = df['new_vehicle_mfr_cost_dollars'] * adjustment_factor
+
             # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
 
             if not template_errors:
-                # TODO: convert costs to Analysis Dollar Basis
 
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()

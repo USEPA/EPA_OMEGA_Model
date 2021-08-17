@@ -28,7 +28,8 @@ Data Column Name and Description
         The calendar year for which specific cost factors are applicable.
 
     :dollar_basis:
-        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+        The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
+        implicit_price_deflators input file.
 
     :co2_global_5.0_USD_per_metricton:
         The structure for all cost factors is pollutant_scope_discount-rate_units, where scope is global or domestic and units are in US dollars per metric ton.
@@ -93,8 +94,6 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
         return cache[cache_key]
 
-
-
     @staticmethod
     def init_database_from_file(filename, verbose=False):
         cache.clear()
@@ -130,21 +129,11 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
+            cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
+
             deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
-            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis,
-                                         'co2_global_5.0_USD_per_metricton',
-                                         'co2_global_3.0_USD_per_metricton',
-                                         'co2_global_2.5_USD_per_metricton',
-                                         'co2_global_3.95_USD_per_metricton',
-                                         'ch4_global_5.0_USD_per_metricton',
-                                         'ch4_global_3.0_USD_per_metricton',
-                                         'ch4_global_2.5_USD_per_metricton',
-                                         'ch4_global_3.95_USD_per_metricton',
-                                         'n2o_global_5.0_USD_per_metricton',
-                                         'n2o_global_3.0_USD_per_metricton',
-                                         'n2o_global_2.5_USD_per_metricton',
-                                         'n2o_global_3.95_USD_per_metricton',
-                                         )
+
+            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
                 obj_list = []

@@ -8,7 +8,7 @@ post-compliance-modeling output generation (charts, summary files, etc)
 **CODE**
 
 """
-
+import effects.omega_effects
 from omega_model import *
 from common.omega_plot import *
 from policy.credit_banking import CreditBank
@@ -31,15 +31,18 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
 
     """
     from producer.vehicles import VehicleFinal
+    from effects.omega_effects import run_effects_calcs
     import pandas as pd
 
     global market_classes, market_categories
     market_classes = omega_globals.options.MarketClass.market_classes
     market_categories = omega_globals.options.MarketClass.market_categories
 
-    if omega_globals.options.calc_effects:
-        from effects.omega_effects import run_effects_calcs
-        run_effects_calcs()
+    # if omega_globals.options.calc_effects:
+    #     from effects.omega_effects import run_effects_calcs
+    #     run_effects_calcs()
+
+    run_effects_calcs() # this runs tech_tracking always and physical/cost effects based on globals.options
 
     if not standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)

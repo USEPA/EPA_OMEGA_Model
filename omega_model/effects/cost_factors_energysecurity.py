@@ -27,7 +27,8 @@ Data Column Name and Description
         The calendar year for which $/gallon values are applicable.
 
     :dollar_basis:
-        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+        The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
+        implicit_price_deflators input file.
 
     :dollars_per_gallon:
         The cost (in US dollars) per gallon of liquid fuel associated with energy security.

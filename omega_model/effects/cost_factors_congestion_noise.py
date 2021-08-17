@@ -30,7 +30,8 @@ Data Column Name and Description
         or 'legacy' reg class.
 
     :dollar_basis:
-        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+        The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
+        implicit_price_deflators input file.
 
     :congestion_cost_dollars_per_mile:
         The cost per vehicle mile traveled associated with congestion.
@@ -112,10 +113,10 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
+            cols_to_convert = [col for col in df.columns if 'dollars_per_mile' in col]
+
             deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
-            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis,
-                                         'congestion_cost_dollars_per_mile',
-                                         'noise_cost_dollars_per_mile')
+            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
                 obj_list = []
