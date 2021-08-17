@@ -28,7 +28,8 @@ Data Column Name and Description
         The calendar year for which specific cost factors are applicable.
 
     :dollar_basis:
-        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+        The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
+        implicit_price_deflators input file.
 
     :co2_global_5.0_USD_per_metricton:
         The structure for all cost factors is pollutant_scope_discount-rate_units, where scope is global or domestic and units are in US dollars per metric ton.

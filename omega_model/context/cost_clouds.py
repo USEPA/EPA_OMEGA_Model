@@ -35,7 +35,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.22,dollar_basis,``{optional_source_data_comment}``
+       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.22,dollar_basis:,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -65,7 +65,8 @@ Data Column Name and Description
         :cd_hwfet:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
 
     :new_vehicle_mfr_cost_dollars:
-        The manufacturer cost associated with the simulation results, based on vehicle technology content and model year
+        The manufacturer cost associated with the simulation results, based on vehicle technology content and model year.Note that the
+         costs are converted in-code to 'analysis_dollar_basis' using the implicit_price_deflators input file.
 
     CHARGE-SUSTAINING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``

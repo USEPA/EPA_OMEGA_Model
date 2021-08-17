@@ -30,7 +30,8 @@ Data Column Name and Description
         or 'legacy' reg class.
 
     :dollar_basis:
-        The dollar basis of values within the table. Values are converted in code to the dollar basis to be used in the analysis.
+        The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
+        implicit_price_deflators input file.
 
     :congestion_cost_dollars_per_mile:
         The cost per vehicle mile traveled associated with congestion.

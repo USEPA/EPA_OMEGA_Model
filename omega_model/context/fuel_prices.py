@@ -34,7 +34,8 @@ Data Column Name and Description
         The name of the context source, e.g. 'AEO2020', 'AEO2021', etc
 
     :dollar_basis:
-        The dollar basis of the fuel prices in the given AEO version.
+        The dollar basis of the fuel prices in the given AEO version. Note that this dollar basis is converted in-code to
+        'analysis_dollar_basis' using the implicit_price_deflators input file.
 
     :case_id:
         The name of the case within the context, e.g. 'Reference Case', 'High oil price', etc
