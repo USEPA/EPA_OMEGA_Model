@@ -137,6 +137,8 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             template_errors = validate_template_columns(criteria_cost_factors_file, cost_factors_input_template_columns,
                                                         df.columns, verbose=verbose)
 
+            cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
+
             deflators = pd.read_csv(cpi_deflators_file, skiprows=1, index_col=0)
 
             template_errors += validate_template_columns(cpi_deflators_file, deflators_input_template_columns,
@@ -144,20 +146,7 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             deflators = deflators.to_dict('index')
 
             if not template_errors:
-                df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis,
-                                             'pm25_tailpipe_3.0_USD_per_uston',
-                                             'pm25_upstream_3.0_USD_per_uston',
-                                             'nox_tailpipe_3.0_USD_per_uston',
-                                             'nox_upstream_3.0_USD_per_uston',
-                                             'so2_tailpipe_3.0_USD_per_uston',
-                                             'so2_upstream_3.0_USD_per_uston',
-                                             'pm25_tailpipe_7.0_USD_per_uston',
-                                             'pm25_upstream_7.0_USD_per_uston',
-                                             'nox_tailpipe_7.0_USD_per_uston',
-                                             'nox_upstream_7.0_USD_per_uston',
-                                             'so2_tailpipe_7.0_USD_per_uston',
-                                             'so2_upstream_7.0_USD_per_uston',
-                                             )
+                df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
                 obj_list = []
                 # load data into database
