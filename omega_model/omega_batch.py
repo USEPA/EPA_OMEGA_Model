@@ -428,7 +428,7 @@ def is_absolute_path(source_file_path):
 
 
 class OMEGABatchObject(OMEGABase):
-    def __init__(self, name='', analysis_final_year=None, **kwargs):
+    def __init__(self, name='', analysis_final_year=None, calc_effects=None, **kwargs):
         import pandas as pd
 
         self.name = name
@@ -440,6 +440,7 @@ class OMEGABatchObject(OMEGABase):
 
         self.settings = OMEGASessionSettings()
         self.settings.analysis_final_year = analysis_final_year
+        self.settings.calc_effects = calc_effects
 
     def force_numeric_user_params(self):
         import pandas as pd
@@ -599,11 +600,11 @@ class OMEGABatchObject(OMEGABase):
         # dfx.fillna('-----', inplace=True)
         self.dataframe = dfx
 
-    def get_batch_settings(self): # TODO need to add analysis_dollar_basis to the batch settings
+    def get_batch_settings(self):
         self.name = self.read_parameter('Batch Name')
         if self.settings.analysis_final_year is not None:
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
-        self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
+        self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
         self.settings.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
         self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
                                                       {'end-of-year', 'beginning-of-year'})
@@ -889,6 +890,7 @@ class OMEGABatchOptions(OMEGABase):
         self.local = True
         self.network = False
         self.analysis_final_year = None
+        self.calc_effects = 'None'
 
 
 def run_bundled_sessions(batch, options, remote_batchfile, session_list):
@@ -896,7 +898,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
     from common.omega_log import OMEGABatchLog
     import time
 
-    batch = OMEGABatchObject()
+    batch = OMEGABatchObject(analysis_final_year=options.analysis_final_year, calc_effects=options.calc_effects)
     batch.batch_definition_path = options.batch_path
     batch.batch_log = OMEGABatchLog(options)
     batch.batch_log.logwrite('REMOTE BATCHFILE = %s' % remote_batchfile)
@@ -966,7 +968,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
 def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + os.sep + 'bundle', no_bundle=False,
                     batch_file='', session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
-                    network=False, analysis_final_year=None):
+                    network=False, analysis_final_year=None, calc_effects=None):
 
     import sys
 
@@ -992,6 +994,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     options.local = local
     options.network = network
     options.analysis_final_year = analysis_final_year
+    options.calc_effects = calc_effects
 
     if options.no_bundle:
         batchfile_path = os.path.split(args.batch_file)[0]
@@ -1018,7 +1021,8 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         dispycluster.find_nodes()
         print("*** ping complete ***")
     else:
-        batch = OMEGABatchObject(analysis_final_year=options.analysis_final_year)
+        batch = OMEGABatchObject(analysis_final_year=options.analysis_final_year,
+                                 calc_effects=options.calc_effects)
         batch.batch_definition_path = os.path.dirname(os.path.abspath(options.batch_file)) + os.sep
 
         if '.csv' in options.batch_file:
@@ -1260,6 +1264,9 @@ if __name__ == '__main__':
         parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
         parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
         parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
+        parser.add_argument('--calc_effects', type=str,
+                            help='Type of effects calcs to run: "None", "Physical", or "Physical and Costs"',
+                            default='None')
         parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
         parser.add_argument('--timestamp', type=str,
                             help='Timestamp string, overrides creating timestamp from system clock', default=None)
@@ -1282,7 +1289,8 @@ if __name__ == '__main__':
                         verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
                         dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
                         dispy_exclusive=args.dispy_exclusive, dispy_scheduler=args.dispy_scheduler, local=args.local,
-                        network=args.network, analysis_final_year=args.analysis_final_year)
+                        network=args.network, analysis_final_year=args.analysis_final_year,
+                        calc_effects=args.calc_effects)
 
     except:
         import traceback
