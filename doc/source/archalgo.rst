@@ -5,7 +5,7 @@ Model Architecture and Algorithms
 =================================
 As described in Chapter 1, OMEGA's four main modules represent distinct and important components for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for iteration and convergence between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
 
-Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to the `Developer Guide`_ for more information on how to view and rerun the demo analysis.
+Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to the Developer Guide for more information on how to view and rerun the demo analysis.
 
 Overall Simulation Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -20,7 +20,7 @@ The model boundary of OMEGA as illustrated in :numref:`mo_label_compare` determi
 
 Inputs are often specified uniquely for each analysis year. Examples include technology costs and availability, emissions costs factors, consumer response assumptions, and other parameters that are expected to change over time. The analysis timeframe can be extended to cover not only the last year in which an analyzed policy is changing, but also years further into the future. This longer modeling timeframe may be useful for evaluating how policy alternatives influence the evolution of the vehicle stock and use over time, how producers might manage compliance credits year-over-year given an extended time horizon,  and how consumer and producer decisions might evolve over time based on projected trends in the exogenous inputs.
 
-.. admonition:: Demo Example: Analysis timeframe
+.. admonition:: Demo example: Analysis timeframe
 
     Within the demo analysis, base year inputs are specified for 2019, and include model year 2019 new vehicle attributes. The year immediately following the base year, and therefore the analysis start year, is 2020. The analysis end year is set to 2050 in the demo inputs. In cases where to context input projections do not extend to the analysis end year, the value in the last year for which a particular input is specified year is assumed to hold constant in subsequent years. For example, if the last specified fuel price input were in 2045, the same value would be used for 2046 through 2050. Alternatively, the user can provide an extended range of analysis context projections in the model inputs. For this demo analysis, the generated effects outputs files report modeled results from 2020 to 2050.
 
@@ -93,23 +93,23 @@ OMEGA is designed so that within an analysis year, credits from all the producer
 * definition of attribute-based target function
 * definition of the vehicles’ assumed lifetime miles
 
-.. admonition:: Demo Example: Off-cycle credits
+.. admonition:: Demo example: Off-cycle credits
 
     [add example details]
 
-.. admonition:: Demo Example: Certification test procedure
+.. admonition:: Demo example: Certification test procedure
 
     [add example details]
 
-.. admonition:: Demo Example: Form of GHG standards
+.. admonition:: Demo example: Form of GHG standards
 
     [add example details]
 
-.. admonition:: Demo Example: Production incentives
+.. admonition:: Demo example: Production incentives
 
     [add example details]
 
-.. admonition:: Demo Example: Upstream emissions accounting
+.. admonition:: Demo example: Upstream emissions accounting
 
     [add example details]
 
@@ -117,7 +117,7 @@ OMEGA is designed so that within an analysis year, credits from all the producer
 This type of policy requires all, or a portion, of producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with a fleet averaging emissions standard; for example, a minimum Zero Emission Vehicle (ZEV) share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
 
 
-.. admonition:: Demo Example: Required sales share
+.. admonition:: Demo example: Required sales share
 
     [add example details]
 
@@ -190,15 +190,15 @@ Description of the process in applying vehicle clouds:
 * Interpolation method for identifying best producer options
 * Search of discrete points
 
-.. admonition:: Demo Example: Vehicle clouds
+.. admonition:: Demo example: Vehicle clouds
 
     [add example details]
 
-.. admonition:: Demo Example: Finding the frontier
+.. admonition:: Demo example: Finding the frontier
 
     [add example details]
 
-.. admonition:: Demo Example: Vehicle aggregation and disaggregation
+.. admonition:: Demo example: Vehicle aggregation and disaggregation
 
     [add example details]
 

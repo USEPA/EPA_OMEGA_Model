@@ -36,7 +36,7 @@ The inputs and assumptions are categorized according to whether they fall inside
 
 * *Analysis Context* inputs and assumptions cover the range of factors that the user assumes, for the purpose of analyses, are independent of the policy alternatives. The user may project changes in the context inputs over the analysis timeframe based on other sources, but for a given analysis year the context definition requires that these inputs are common across the policy alternatives being compared. The context inputs may include fuel costs, costs and emissions rates for a particular vehicle technology package, consumer demand parameters, and many more.
 
-A full description of the input files can be found in `Chapter 7`_.
+A full description of the input files can be found in Chapter 7.
 
 The primary outputs are the environmental effects and societal costs and benefits for a given policy alternative and analysis context pair. These outputs are expressed in absolute values, so that incremental effects, costs, and benefits can be evaluated by comparing two policy alternatives (for a given context) or the sensitivity to assumptions for two different analysis contexts (for a given policy alternative.)
 
