@@ -165,10 +165,22 @@ class FuelPrice(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
+            df = df.loc[(df['context_id'] == omega_globals.options.context_id) & (df['case_id'] == omega_globals.options.context_case_id), :]
+            aeo_dollar_basis = df['dollar_basis'].mean()
+            cols_to_convert = [col for col in df.columns if 'dollars_per_unit' in col]
+
+            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
+
+            adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
+                                / deflators[aeo_dollar_basis]['price_deflator']
+
+            for col in cols_to_convert:
+                df[col] = df[col] * adjustment_factor
+
+            df['dollar_basis'] = omega_globals.options.analysis_dollar_basis
+
             if not template_errors:
                 from context.onroad_fuels import OnroadFuel
-
-                # TODO: convert costs to Analysis Dollar Basis
 
                 obj_list = []
                 # load data into database
