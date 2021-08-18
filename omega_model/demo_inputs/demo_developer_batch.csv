@@ -65,7 +65,7 @@ Verbose Output,TRUE / FALSE,FALSE,FALSE
 Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
 Producer-Consumer Max Iterations,#,2,2
 Producer-Consumer Convergence Tolerance,#,1.00E-003,1.00E-003
-Producer Compliance Search Min Share Range,#,15,15
+Producer Compliance Search Min Share Range,#,1.00E-004,1.00E-004
 Producer Compliance Search Convergence Factor,#,0.33,0.33
 Producer Compliance Search Tolerance,#,1.00E-006,1.00E-006
 Producer Cross Subsidy Price Tolerance,#,1.00E-004,1.00E-004
