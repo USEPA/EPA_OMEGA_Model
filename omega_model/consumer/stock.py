@@ -33,12 +33,13 @@ def get_vehicle_info(vehicle_id):
     return vehicles_cache[vehicle_id]
 
 
-def update_stock(calendar_year):
+def update_stock(calendar_year, compliance_id=None):
     """
     Re-register vehicles by calendar year, as a function of vehicle attributes (e.g. age, market class...)
     Also calculates vehicle miles travelled for each vehilce by market class and age.
 
     Args:
+        compliance_id (str): optional argument, manufacturer name, or 'consolidated_OEM'
         calendar_year (int): calendar year to re-register vehicles in
 
     Returns:
@@ -48,7 +49,7 @@ def update_stock(calendar_year):
     from producer.vehicle_annual_data import VehicleAnnualData
 
     # pull in this year's vehicle ids:
-    this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
+    this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year, compliance_id)
 
     omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
@@ -65,7 +66,8 @@ def update_stock(calendar_year):
         vad.annual_vmt = annual_vmt
         vad.vmt = annual_vmt * registered_count
 
-    prior_year_vehicle_ids = sql_unpack_result(VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, 'vehicle_id'))
+    prior_year_vehicle_ids = \
+        sql_unpack_result(VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, compliance_id, 'vehicle_id'))
 
     vad_list = []
 

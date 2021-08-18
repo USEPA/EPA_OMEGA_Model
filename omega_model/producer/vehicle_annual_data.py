@@ -71,7 +71,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
         return sql_unpack_result(omega_globals.session.query(VehicleAnnualData.calendar_year).all())
 
     @staticmethod
-    def get_vehicle_annual_data(calendar_year, attributes=None):
+    def get_vehicle_annual_data(calendar_year, compliance_id=None, attributes=None):
         """
         Get vehicle annual data for the given calendar year.
 
@@ -84,16 +84,32 @@ class VehicleAnnualData(SQABase, OMEGABase):
             ``[(1,), (2,), (3,), ...`` which can be conveniently unpacked by ``omega_db.sql_unpack_result()``
 
         """
-        if attributes is None:
-            return omega_globals.session.query(VehicleAnnualData).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+        from producer.vehicles import VehicleFinal
+
+        if attributes is None and compliance_id is None:
+            result = omega_globals.session.query(VehicleAnnualData)\
+                .filter(VehicleAnnualData.calendar_year == calendar_year).all()
+        elif attributes is None and compliance_id is not None:
+            result = omega_globals.session.query(VehicleAnnualData)\
+                .filter(VehicleAnnualData.calendar_year == calendar_year)\
+                .filter(VehicleFinal.compliance_id == compliance_id)\
+                .all()
         else:
             if type(attributes) is not list:
                 attributes = [attributes]
             attrs = VehicleAnnualData.get_class_attributes(attributes)
 
-            result = omega_globals.session.query(*attrs).filter(VehicleAnnualData.calendar_year == calendar_year).all()
+            if compliance_id is None:
+                result = omega_globals.session.query(*attrs)\
+                    .filter(VehicleAnnualData.calendar_year == calendar_year).all()
+            else:
+                result = omega_globals.session.query(*attrs)\
+                    .filter(VehicleAnnualData.calendar_year == calendar_year) \
+                    .filter(VehicleFinal.compliance_id == compliance_id) \
+                    .filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id) \
+                    .all()
 
-            return result
+        return result
 
 
 if __name__ == '__main__':

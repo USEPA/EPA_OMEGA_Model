@@ -232,7 +232,7 @@ def run_producer_consumer():
             credit_banks[compliance_id].handle_credit(calendar_year,
                                                      producer_decision_and_response['total_credits_co2e_megagrams'])
 
-            stock.update_stock(calendar_year)  # takes about 7.5 seconds
+            stock.update_stock(calendar_year, compliance_id)
 
         if (omega_globals.options.log_consumer_iteration_years == 'all') or \
                 (calendar_year in omega_globals.options.log_consumer_iteration_years)\
