@@ -56,30 +56,6 @@ Context Implicit Price Deflators File,String,analysis_context\implicit_price_def
 Context Consumer Price Index File,String,analysis_context\cpi_price_deflators.csv,analysis_context\cpi_price_deflators.csv
 ,,,
 Developer Settings,,,
-Num Market Share Options,#,5,5
-Num Tech Options per ICE Vehicle,#,5,4
-Num Tech Options per BEV Vehicle,#,1,1
-Cost Curve Frontier Affinity Factor,#,0.75,0.75
-Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
-Verbose Output,TRUE / FALSE,FALSE,FALSE
-Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
-Producer-Consumer Max Iterations,#,2,2
-Producer-Consumer Convergence Tolerance,#,1.00E-003,1.00E-003
-Producer Compliance Search Max Iterations,#,15,15
-Producer Compliance Search Convergence Factor,#,0.33,0.33
-Producer Compliance Search Tolerance,#,1.00E-006,1.00E-006
-Producer Cross Subsidy Price Tolerance,#,1.00E-004,1.00E-004
-Run Profiler,TRUE / FALSE,FALSE,FALSE
-Flat Context,TRUE / FALSE,FALSE,FALSE
-Flat Context Year,#,2020,2020
-Verbose Console Modules,"['producer', 'consumer'] or subset or []",[],[]
-Log Producer Iteration Years,"all' or [year, …] or []",[2020],[]
-Log Consumer Iteration Years,"all' or [year, …] or []",[2050],[2050]
-Log Producer Decision and Response Years,"all' or [year, …] or []",[],[]
-,,,
-Developer Settings,,,
-,,,
-Developer Settings,,,
 Num Market Share Options,#,5,3
 Num Tech Options per ICE Vehicle,#,5,3
 Num Tech Options per BEV Vehicle,#,1,1
