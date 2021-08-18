@@ -145,8 +145,8 @@ try:
             self.end_time = 0
 
             # developer settings
-            self.producer_num_market_share_options = 5
-            self.producer_num_tech_options_per_ice_vehicle = 5
+            self.producer_num_market_share_options = 3
+            self.producer_num_tech_options_per_ice_vehicle = 3
             self.producer_num_tech_options_per_bev_vehicle = 1
             self.cost_curve_frontier_affinity_factor = 0.75
             self.slice_tech_combo_cloud_tables = True
@@ -156,7 +156,7 @@ try:
             self.producer_consumer_max_iterations = 2  # recommend 2+
             self.producer_consumer_convergence_tolerance = 1e-3
             self.producer_compliance_search_min_share_range = 1e-4
-            self.producer_compliance_search_convergence_factor = 0.33
+            self.producer_compliance_search_convergence_factor = 0.66
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
             self.run_profiler = False
