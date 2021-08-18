@@ -913,7 +913,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
     batch.force_numeric_user_params()
     batch.force_numeric_developer_params()
     batch.get_batch_settings()
-    batch.auto_close_figures = options.auto_close_figures
+    batch.settings.auto_close_figures = options.auto_close_figures
     batch.add_sessions(verbose=False)
     # process sessions:
     for s_index in session_list:
