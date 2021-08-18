@@ -229,7 +229,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     search_iteration = 0
     best_candidate_production_decision = None
 
-    while continue_search and search_iteration < omega_globals.options.producer_compliance_search_max_iterations:
+    while continue_search:
         share_range = omega_globals.options.producer_compliance_search_convergence_factor ** search_iteration
 
         composite_vehicles, market_class_tree, context_based_total_sales = \
@@ -271,8 +271,9 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         search_iteration += 1
 
-        continue_search = abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) > \
-                           omega_globals.options.producer_compliance_search_tolerance
+        continue_search = (abs(1 - best_candidate_production_decision['strategic_compliance_ratio']) > \
+                           omega_globals.options.producer_compliance_search_tolerance) and \
+                          (share_range > omega_globals.options.producer_compliance_search_min_share_range)
 
     if 'producer' in omega_globals.options.verbose_console_modules:
         omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),

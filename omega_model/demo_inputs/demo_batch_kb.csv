@@ -59,3 +59,6 @@ Developer Settings,,,
 Num Market Share Options,#,3,3
 Num Tech Options per ICE Vehicle,#,3,3
 Num Tech Options per BEV Vehicle,#,1,1
+Verbose Console Modules,"['producer', 'consumer'] or subset or []",['producer'],['producer']
+Producer Compliance Search Min Share Range,#,1.00E-004,1.00E-004
+Producer Compliance Search Convergence Factor,#,0.66,0.33

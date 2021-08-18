@@ -350,9 +350,10 @@ applied.
     ``producer.compliance_search.create_tech_and_share_sweeps()`` and
     ``producer.compliance_search.search_production_options()``.  Default value is ``0.33``
 
-:Producer Compliance Search Max Iterations *(int)*:
-    Used in ``producer.compliance_search.search_production_options()``, max number of production search iterations.
-    Default value is ``15``
+:Producer Compliance Search Min Share Range *(float)*:
+    Used in ``producer.compliance_search.search_production_options()``, minimum share range limit, stops compliance
+    search when below.
+    Default value is ``1e-4``
 
 :Producer Compliance Search Tolerance *(float)*:
     Used in ``producer.compliance_search.search_production_options()``, used to determine accuracy of compliance
@@ -466,7 +467,7 @@ class OMEGABatchObject(OMEGABase):
             'Cost Curve Frontier Affinity Factor',
             'Producer-Consumer Max Iterations',
             'Producer-Consumer Convergence Tolerance',
-            'Producer Compliance Search Max Iterations',
+            'Producer Compliance Search Min Share Range',
             'Producer Compliance Search Convergence Factor',
             'Producer Compliance Search Tolerance',
             'Producer Cross Subsidy Price Tolerance',
@@ -792,9 +793,9 @@ class OMEGASessionObject(OMEGABase):
             float(self.read_parameter('Producer Compliance Search Convergence Factor',
                                 self.settings.producer_compliance_search_convergence_factor))
 
-        self.settings.producer_compliance_search_max_iterations = \
-            int(self.read_parameter('Producer Compliance Search Max Iterations',
-                                    self.settings.producer_compliance_search_max_iterations))
+        self.settings.producer_compliance_search_min_share_range = \
+            float(self.read_parameter('Producer Compliance Search Min Share Range',
+                                    self.settings.producer_compliance_search_min_share_range))
 
         self.settings.producer_compliance_search_tolerance = \
             float(self.read_parameter('Producer Compliance Search Tolerance',
