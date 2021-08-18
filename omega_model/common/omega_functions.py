@@ -569,8 +569,9 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
     for df in dfs:
         dfx = cartesian_prod(dfx, df)
 
-    dfx = dfx[dfx.sum(axis=1) <= 1]
-    dfx[columns[-1]] = 1 - dfx.sum(axis=1)
+    # dfx2 prevents >>intermittent<< "A value is trying to be set on a copy of a slice from a DataFrame." errors
+    dfx2 = dfx[dfx.sum(axis=1) <= 1]
+    dfx.loc[:, columns[-1]] = 1 - dfx2.sum(axis=1)  # using ".loc" in combination with dfx2 prevents errors
 
     if verbose:
         print(dfx)
