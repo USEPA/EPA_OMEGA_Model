@@ -54,3 +54,8 @@ Context Refinery Emission Factors File,String,analysis_context\emission_factors-
 Context Vehicle Emission Factors File,String,analysis_context\emission_factors-vehicles.csv,analysis_context\emission_factors-vehicles.csv
 Context Implicit Price Deflators File,String,analysis_context\implicit_price_deflators.csv,analysis_context\implicit_price_deflators.csv
 Context Consumer Price Index File,String,analysis_context\cpi_price_deflators.csv,analysis_context\cpi_price_deflators.csv
+,,,
+Developer Settings,,,
+Num Market Share Options,#,3,3
+Num Tech Options per ICE Vehicle,#,3,3
+Num Tech Options per BEV Vehicle,#,1,1
