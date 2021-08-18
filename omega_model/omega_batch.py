@@ -604,6 +604,7 @@ class OMEGABatchObject(OMEGABase):
         self.name = self.read_parameter('Batch Name')
         if self.settings.analysis_final_year is not None:
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
+        self.settings.analysis_final_year = int(self.read_parameter('Analysis Final Year'))
         self.dataframe.loc['Calc Effects'] = self.settings.calc_effects
         self.settings.consolidate_manufacturers = self.read_parameter('Consolidate Manufacturers')
         self.settings.cost_accrual = validate_predefined_input(self.read_parameter('Cost Accrual'),
