@@ -751,6 +751,10 @@ class Vehicle(OMEGABase):
     next_vehicle_id = 0
 
     def __init__(self):
+        """
+        Create a new ``Vehicle`` object
+
+        """
         self.vehicle_id = Vehicle.next_vehicle_id
         Vehicle.set_next_vehicle_id()
         self.name = ''
@@ -787,8 +791,7 @@ class Vehicle(OMEGABase):
     @staticmethod
     def reset_vehicle_ids():
         """
-
-        Returns:
+        Reset vehicle IDs.  Sets ``Vehicle.next_vehicle_id`` to an initial value.
 
         """
         Vehicle.next_vehicle_id = 0
@@ -796,19 +799,21 @@ class Vehicle(OMEGABase):
     @staticmethod
     def set_next_vehicle_id():
         """
-
-        Returns:
+        Increments ``Vehicle.next_vehicle_id``.
 
         """
         Vehicle.next_vehicle_id = Vehicle.next_vehicle_id + 1
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
+        Get the retail fuel price for the Vehicle in dollars per unit for the given calendar year.
+        Used to calculate producer generalized cost and also average fuel cost by market class.
 
         Args:
-            calendar_year:
+            calendar_year (int): the year to get the price in
 
         Returns:
+            The retail fuel price in dollars per unit for the given year.
 
         """
         from context.fuel_prices import FuelPrice
@@ -824,8 +829,11 @@ class Vehicle(OMEGABase):
 
     def onroad_co2e_emissions_grams_per_unit(self):
         """
+        Calculate the onroad (in-use) CO2e emission in grams per unit of onroad fuel, including refuel efficiency.
+        Used to calculate producer generalized cost.
 
         Returns:
+            The onroad CO2e emission in grams per unit of onroad fuel, including refuel efficiency.
 
         """
         from context.onroad_fuels import OnroadFuel
@@ -841,32 +849,49 @@ class Vehicle(OMEGABase):
 
     def set_cert_target_co2e_grams_per_mile(self):
         """
+        Set the vehicle cert target CO2e grams per mile based on the current policy and vehicle attributes.
 
         Returns:
+            Nothing, updates ``cert_target_co2e_grams_per_mile``
 
         """
         self.cert_target_co2e_grams_per_mile = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(self)
 
     def set_cert_target_co2e_Mg(self):
         """
+        Set the vehicle cert target CO2e megagrams based on the current policy and vehicle attributes.
 
         Returns:
+            Nothing, updates ``cert_target_co2e_Mg``
 
         """
         self.cert_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self)
 
     def set_cert_co2e_Mg(self):
         """
+        Set the vehicle cert CO2e megagrams based on the current policy and vehicle attributes.
 
         Returns:
+            Nothing, updates ``cert_co2e_Mg``
 
         """
         self.cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self)
 
     def create_frontier_df(self):
         """
+        Create a frontier ("cost curve") from a vehicle's cloud of simulated vehicle points ("cost cloud") based
+        on the current policy and vehicle attributes.  The cost values are a function of the producer generalized cost
+        and the CO2e values are a function of the simulated vehicle data and the policy.
+
+        Policy factors that modify the cost cloud and may modify the frontier from year to year include off cycle
+        credit values, drive cycle weightings, upstream values, etc.  This method is also where costs could be
+        updated dynamically before calculating the frontier (for example, cost reductions due to learning may
+        aready be present in the cost cloud, or could be implemented here instead).
+
+        Additionally, each point in the frontier contains the values as determined by ``DecompositionAttributes``.
 
         Returns:
+            The vehicle frontier / cost curve as a DataFrame.
 
         """
         from common.omega_functions import calc_frontier
