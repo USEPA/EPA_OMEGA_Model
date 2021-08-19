@@ -1013,20 +1013,22 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             if omega_globals.options.run_profiler:
                 # run with profiler
-                import cProfile
-                import re
-                # return values of cProfile.run() show up in the globals namespace
-                cProfile.run('iteration_log, credit_history = run_producer_consumer()', filename='omega2_profile.dmp')
-                session_summary_results = postproc_session.run_postproc(
-                    omega_globals()['iteration_log', 'credit_history'], standalone_run)
-            else:
-                # run without profiler
-                iteration_log, credit_banks = run_producer_consumer()
-                session_summary_results = postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
+                import cProfile, pstats
+                profiler = cProfile.Profile()
+                profiler.enable()
+
+            iteration_log, credit_banks = run_producer_consumer()
+
+            if omega_globals.options.run_profiler:
+                profiler.disable()
+                stats = pstats.Stats(profiler)
+                stats.dump_stats('omega_profile.dmp')
+
+            session_summary_results = postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
 
             # write output files
-            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name + \
-                               '_summary_results.csv'
+            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
+                               + '_summary_results.csv'
 
             session_summary_results.to_csv(summary_filename, index=False)
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
@@ -1045,7 +1047,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             omega_log.end_logfile("\nSession Complete")
 
             if omega_globals.options.run_profiler:
-                os.system('snakeviz omega2_profile.dmp')
+                os.system('snakeviz omega_profile.dmp')
 
             # shut down the db
             omega_globals.session.close()
@@ -1068,7 +1070,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 if __name__ == "__main__":
     try:
         import producer
-        run_omega(OMEGASessionSettings(), standalone_run=True)  # to view in terminal: snakeviz omega2_profile.dmp
+        run_omega(OMEGASessionSettings(), standalone_run=True)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
