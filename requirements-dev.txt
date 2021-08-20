@@ -12,3 +12,6 @@ bumpversion
 
 # for building the executable:
 pyinstaller
+
+# for visualizing profiler results
+snakeviz
