@@ -39,7 +39,7 @@ from omega_model.effects.physical_effects import calc_physical_effects
 from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
-from omega_model.effects.tech_tracking import calc_tech_volumes
+from omega_model.effects.tech_tracking import calc_tech_tracking
 
 
 def run_effects_calcs():
@@ -53,12 +53,12 @@ def run_effects_calcs():
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
     calendar_years = [year for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
-    print('Calculating tech volumes')
-    omega_log.logwrite('Calculating tech volumes')
-    tech_volumes_dict = calc_tech_volumes(calendar_years)
+    print('Calculating tech volumes and shares')
+    omega_log.logwrite('Calculating tech volumes and shares')
+    tech_tracking_dict = calc_tech_tracking(calendar_years)
 
-    save_dict_to_csv(tech_volumes_dict, omega_globals.options.output_folder + '%s_tech_volumes' %
-                     omega_globals.options.session_unique_name, list(), 'vehicle_id', 'calendar_year', 'age')
+    save_dict_to_csv(tech_tracking_dict, f'{omega_globals.options.output_folder}' + f'{omega_globals.options.session_unique_name}_tech_tracking',
+                     list(), 'vehicle_id', 'calendar_year', 'age')
 
     if omega_globals.options.calc_effects.__contains__('Physical'):
         physical_effects_dict = dict()
@@ -77,10 +77,8 @@ def run_effects_calcs():
             omega_log.logwrite('Discounting costs')
             cost_effects_dict = discount_values(cost_effects_dict)
 
-            save_dict_to_csv(cost_effects_dict, omega_globals.options.output_folder + '%s_cost_effects' %
-                             omega_globals.options.session_unique_name, list(), 'vehicle_id', 'calendar_year', 'age', 'discount_rate')
+            save_dict_to_csv(cost_effects_dict, f'{omega_globals.options.output_folder}' + f'{omega_globals.options.session_unique_name}_cost_effects',
+                             list(), 'vehicle_id', 'calendar_year', 'age', 'discount_rate')
 
-        save_dict_to_csv(physical_effects_dict, omega_globals.options.output_folder + '%s_physical_effects' %
-                         omega_globals.options.session_unique_name, list(), 'vehicle_id', 'calendar_year', 'age')
-
-
+        save_dict_to_csv(physical_effects_dict, f'{omega_globals.options.output_folder}' + f'{omega_globals.options.session_unique_name}_physical_effects',
+                         list(), 'vehicle_id', 'calendar_year', 'age')

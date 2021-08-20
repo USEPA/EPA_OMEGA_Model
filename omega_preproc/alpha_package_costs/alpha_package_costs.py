@@ -548,7 +548,6 @@ def create_package_dict(input_settings, input_df, fuel_id):
     df.insert(0, 'key', keys)
     df.set_index('key', inplace=True)
     df_dict = df.to_dict('index')
-    # return keys, df_dict
     return df_dict
 
 
@@ -1131,20 +1130,12 @@ class InputSettings:
 
         self.start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
-        # get the price deflators
-        # self.dollar_basis = int(context_aeo_inputs.aeo_version) - 1
-
         # set input filenames
         self.gdp_deflators_file = self.path_input_templates / 'implicit_price_deflators.csv'
-        # self.gdp_deflators_file = self.path_preproc / f'bea_tables/implicit_price_deflators_{self.dollar_basis}.csv'
         self.techcosts_file = pd.ExcelFile(self.path_inputs / 'alpha_package_costs_module_inputs.xlsx')
 
         try:
             self.gdp_deflators = pd.read_csv(self.gdp_deflators_file, skiprows=1, index_col=0).to_dict('index')
-            # self.gdp_deflators = pd.read_csv(self.path_preproc / f'bea_tables/implicit_price_deflators_{self.dollar_basis}.csv', index_col=0)
-            # self.gdp_deflators = self.gdp_deflators.to_dict('index')
-
-            # self.techcosts_file = pd.ExcelFile(self.path_inputs / 'alpha_package_costs_module_inputs.xlsx')
             # set inputs
             self.inputs_code = pd.read_excel(self.techcosts_file, 'inputs_code', index_col=0).to_dict('index')
             self.dollar_basis_for_output_file = int(self.inputs_code['dollar_basis_for_output_file']['value'])
@@ -1202,23 +1193,6 @@ class InputSettings:
             # phev_curves_dict = 0
             self.pev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='pev_metrics', index_col=0).to_dict('index')
             self.hev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
-
-            # # set inputs
-            # self.inputs_code = pd.read_excel(self.techcosts_file, 'inputs_code', index_col=0).to_dict('index')
-            # self.dollar_basis_for_output_file = int(self.inputs_code['dollar_basis_for_output_file']['value'])
-            # self.start_year = int(self.inputs_code['start_year']['value'])
-            # self.end_year = int(self.inputs_code['end_year']['value'])
-            # self.years = range(self.start_year, self.end_year + 1)
-            # self.learning_rate_weight = self.inputs_code['learning_rate_weight']['value']
-            # self.learning_rate_ice_powertrain = self.inputs_code['learning_rate_ice_powertrain']['value']
-            # self.learning_rate_roadload = self.inputs_code['learning_rate_roadload']['value']
-            # self.learning_rate_bev = self.inputs_code['learning_rate_bev']['value']
-            # self.boost_multiplier = self.inputs_code['boost_multiplier']['value']
-            # self.run_id = self.inputs_code['run_ID']['value']
-            # if self.run_id != '':
-            #     self.name_id = f'{self.run_id}_{self.start_time_readable}'
-            # else:
-            #     self.name_id = self.start_time_readable
 
             self.ice_glider_share = 0.85
 
@@ -1283,31 +1257,12 @@ class InputSettings:
                 df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
         df_return['dollar_basis'] = dollar_basis_year
         return df_return
-        # """
-        #
-        # Args:
-        #     df: A DataFrame containing monetized values to be converted into a consistent dollar_basis.
-        #     deflators: A dictionary of GDP deflators with years as the keys.
-        #     dollar_basis: The dollar basis to which all monetized values are to be converted.
-        #     args: The arguments to be converted.
-        #
-        # Returns:
-        #     A DataFrame of monetized values in a consistent dollar_basis valuation.
-        #
-        # """
-        # dollar_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
-        # for year in dollar_years:
-        #     for arg in args:
-        #         df.loc[df['dollar_basis'] == year, arg] = df[arg] * deflators[year]['adjustment_factor']
-        # df['dollar_basis'] = dollar_basis
-        # return df
 
 
 def main():
 
     runtime_settings = RuntimeSettings()
     input_settings = InputSettings()
-    # settings = SetInputs()
 
     ice_packages_df, bev_packages_df, hev_packages_df, phev_packages_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
     if runtime_settings.run_bev:
@@ -1347,8 +1302,6 @@ def main():
         for idx, alpha_file_name in enumerate(alpha_file_names):
             alpha_file_dict = read_and_clean_file(input_settings, alpha_file_name, fuel_id)
             for key in alpha_file_dict.keys():
-            # keys, alpha_file_dict = read_and_clean_file(settings, alpha_file_name, fuel_id)
-            # for key in keys:
                 package_result = ice_package_results(runtime_settings, input_settings, key, alpha_file_dict, alpha_file_name)
                 ice_packages_df = pd.concat([ice_packages_df, package_result], axis=0, ignore_index=False)
 
@@ -1444,7 +1397,6 @@ def main():
 
         with open(input_settings.path_of_run_folder.joinpath('simulated_vehicles_verbose.csv'), 'a', newline='') as cloud_file:
             cost_cloud_verbose.to_csv(cloud_file, index=False)
-        # cost_cloud_verbose.to_csv(settings.path_of_run_folder / f'simulated_vehicles_verbose.csv', index=False)
 
     # save additional outputs
     modified_costs = pd.ExcelWriter(input_settings.path_of_run_folder.joinpath(f'techcosts_in_{input_settings.dollar_basis_for_output_file}_dollars.xlsx'))
