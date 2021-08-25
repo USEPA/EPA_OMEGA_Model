@@ -1037,11 +1037,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
         batch.dataframe = batch.dataframe.drop('Type', axis=1,
                                                errors='ignore')  # drop Type column, no error if it's not there
 
-        batch.expand_dataframe(verbose=options.verbose)
-        batch.force_numeric_user_params()
-        batch.force_numeric_developer_params()
-        batch.get_batch_settings()
-
+        batch.name = batch.read_parameter('Batch Name')
         if not options.no_bundle:
             if not options.timestamp:
                 options.timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -1055,6 +1051,17 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         from common.omega_log import OMEGABatchLog
         batch.batch_log = OMEGABatchLog(options)
+
+        if len(batch.dataframe.loc['Session Name']) != len(batch.dataframe.loc['Session Name'].unique()):
+            msg = 'Duplicate Session Name, all Sessions must have a unique name %s' \
+                  % str(tuple(batch.dataframe.loc['Session Name']))
+            batch.batch_log.logwrite(msg)
+            raise Exception(msg)
+
+        batch.expand_dataframe(verbose=options.verbose)
+        batch.force_numeric_user_params()
+        batch.force_numeric_developer_params()
+        batch.get_batch_settings()
 
         batch.add_sessions(verbose=options.verbose)
 
