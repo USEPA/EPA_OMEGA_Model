@@ -407,7 +407,7 @@ context inputs as shown in :numref:`effects_module_figure`.
 	* Impacts of greenhouse gas pollutants
 	* Congestion, noise, and safety costs
 
-The Effects Module generates 3 output files: physical effects, cost effects and technology volumes. In general, the cost effects output file
+The Effects Module generates 3 output files: physical effects, cost effects and technology tracking. In general, the cost effects output file
 builds upon the physical effects output file in conjunction with several of the context input files. Those context input files are the cost
 factor and emission factor input files. For example, the cost effects file would present CO2-related costs as the CO2 cost factor (a cost/ton
 value set in the input file) multiplied by the tons of CO2 as presented in the physical effects file. Similarly, fuel costs would be
