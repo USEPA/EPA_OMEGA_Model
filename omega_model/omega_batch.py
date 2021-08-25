@@ -970,7 +970,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
 def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + os.sep + 'bundle', no_bundle=False,
                     batch_file='', session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
-                    network=False, analysis_final_year=None, calc_effects=None):
+                    network=False, analysis_final_year=None, calc_effects='None'):
 
     import sys
 
