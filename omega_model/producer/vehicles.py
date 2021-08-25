@@ -21,7 +21,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,vehicles,input_template_version:,0.41
+       input_template_name:,vehicles,input_template_version:,0.43
 
 Sample Data Columns
     .. csv-table::
@@ -962,12 +962,13 @@ class Vehicle(OMEGABase):
 
 class VehicleFinal(SQABase, Vehicle):
     """
-    **VehicleFinal**
+    **Loads the base year vehicle data and stores finalized vehicles in the database.**
+
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    vehicle_id = Column(Integer, primary_key=True)
-    name = Column('name', String)
+    vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, databse table primary key
+    name = Column('name', String)  #: vehicle name
     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))
     compliance_id = Column(String)
     manufacturer = relationship('Manufacturer', back_populates='vehicles')
