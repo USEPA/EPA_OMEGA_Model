@@ -964,38 +964,41 @@ class VehicleFinal(SQABase, Vehicle):
     """
     **Loads the base year vehicle data and stores finalized vehicles in the database.**
 
+    Finalized vehicles are those ultimately produced by the manufacturer and are the basis for the effect and cost
+    calculations performed after the compliance modeling.
+
     """
     # --- database table properties ---
     __tablename__ = 'vehicles'
-    vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, databse table primary key
+    vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
     name = Column('name', String)  #: vehicle name
-    manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))
-    compliance_id = Column(String)
-    manufacturer = relationship('Manufacturer', back_populates='vehicles')
-    annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')
+    manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
+    compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
+    manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
+    annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')  #: SQLAlchemy relationship link to vehicle annual data table
 
-    model_year = Column(Numeric)
-    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))
-    cost_curve_class = Column(String)
-    base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))
-    reg_class_id = Column(String)
-    epa_size_class = Column(String)
-    context_size_class = Column(String)
-    base_year_market_share = Column(Float)
-    non_responsive_market_group = Column(String)
-    electrification_class = Column(String)
-    cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)
-    cert_co2e_Mg = Column('cert_co2e_megagrams', Float)
-    cert_target_co2e_Mg = Column('cert_target_co2e_megagrams', Float)
-    in_use_fuel_id = Column('in_use_fuel_id', String)
-    cert_fuel_id = Column('cert_fuel_id', String)
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))
+    model_year = Column(Numeric)  #: vehicle model year
+    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
+    cost_curve_class = Column(String)  #: ALPHA modeling result class
+    base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
+    reg_class_id = Column(String)  #: regulatory class assigned according the active policy
+    epa_size_class = Column(String)  #: EPA size class
+    context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
+    base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
+    non_responsive_market_group = Column(String)  #: vehicle non-responsive market group, used to maintain relative market share between market classes that don't have a sales response in the consumer subpackage
+    electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
+    cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
+    cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
+    cert_target_co2e_Mg = Column('cert_target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
+    in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
+    cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
+    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, as determined by the consumer subpackage
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 
     # --- static properties ---
-    compliance_ids = set()
-    mfr_base_year_size_class_share = None
+    compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
+    mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
     base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
@@ -1003,13 +1006,15 @@ class VehicleFinal(SQABase, Vehicle):
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
 
-    #: **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
+    # **additional attributes are dynamically added from DecompositionAttributes.values during omega2.init_omega()**
 
     @property
     def initial_registered_count(self):
         """
+        Get the vehicle initial registered count
 
         Returns:
+            The vehicle initial registered count
 
         """
         return self._initial_registered_count
@@ -1017,18 +1022,19 @@ class VehicleFinal(SQABase, Vehicle):
     @initial_registered_count.setter
     def initial_registered_count(self, initial_registered_count):
         """
+        Setter for vehicle initial registered count
 
         Args:
-            initial_registered_count:
+            initial_registered_count (numeric): the vehicle initial registered count
 
         Returns:
+            Nothing, updates vehicle initial registered count
 
         """
         from producer.vehicle_annual_data import VehicleAnnualData
         self._initial_registered_count = initial_registered_count
 
         omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
-        # o2.session.flush()
 
         VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=self.model_year,
@@ -1037,8 +1043,10 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def get_max_model_year():
         """
+        Get the maximum model year present in the base year vehicle data, used to set the analysis initial year
 
         Returns:
+            The maximum model year present in the base year vehicle data
 
         """
         return omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()
@@ -1046,12 +1054,15 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def get_compliance_vehicles(calendar_year, compliance_id):
         """
+        Get vehicles by year and compliance ID.  Used at the beginning of the producer compliance search to pull in
+        the prior year vehicles
 
         Args:
-            calendar_year:
-            compliance_id:
+            calendar_year (int): the calendar year (model year) to pull vehicles from
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns:
+            A list of ``VehicleFinal`` objects for the given year and compliance ID
 
         """
         return omega_globals.session.query(VehicleFinal). \
@@ -1061,12 +1072,14 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def get_vehicle_attributes(vehicle_id, attributes):
         """
+        A generic 'getter' to retrieve one or more ``VehicleFinal`` object attributes
 
         Args:
-            vehicle_id:
-            attributes:
+            vehicle_id (int): the vehicle ID
+            attributes (str, [strs]): the name or list of names of vehicle attributes to get
 
         Returns:
+            The value(s) of the requested attribute(s)
 
         """
         if type(attributes) is not list:
@@ -1077,12 +1090,14 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def calc_cert_target_co2e_Mg(model_year, compliance_id):
         """
+        Calculate the total cert target CO2e Mg for the given model year and compliance ID
 
         Args:
-            model_year:
-            compliance_id:
+            model_year (int): the model year of the cert target
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns:
+            The sum of vehicle cert target CO2e Mg for the given model year and compliance ID
 
         """
         return omega_globals.session.query(func.sum(VehicleFinal.cert_target_co2e_Mg)). \
@@ -1092,12 +1107,14 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def calc_cert_co2e_Mg(model_year, compliance_id):
         """
+        Calculate the total cert CO2e Mg for the given model year and compliance ID
 
         Args:
-            model_year:
-            compliance_id:
+            model_year (int): the model year of the cert Mg
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
 
         Returns:
+            The sum of vehicle cert CO2e Mg for the given model year and compliance ID
 
         """
         return omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)). \
@@ -1107,11 +1124,13 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def clone_vehicle(vehicle):
         """
+        Make a "clone" of a vehicle, used to create alternate powertrain versions of vehicles in the base year fleet
 
         Args:
-            vehicle:
+            vehicle (VehicleFinal): the vehicle to clone
 
         Returns:
+            A new ``VehicleFinal`` object with non-powertrain attributes copied from the given vehicle
 
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
@@ -1132,11 +1151,14 @@ class VehicleFinal(SQABase, Vehicle):
     def init_vehicles_from_file(filename, verbose=False):
         """
 
+        Load data from the base year vehicle file
+
         Args:
-            filename:
-            verbose:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
+            List of template/input errors, else empty list on success
 
         """
         from context.new_vehicle_market import NewVehicleMarket
@@ -1297,13 +1319,19 @@ class VehicleFinal(SQABase, Vehicle):
     @staticmethod
     def init_database_from_file(vehicles_file, vehicle_onroad_calculations_file, verbose=False):
         """
+        Init vehicle database from the base year vehicles file and set up the onroad / vehicle attribute calculations.
+        Also initializes decomposition attributes.
 
         Args:
-            vehicles_file:
-            vehicle_onroad_calculations_file:
-            verbose:
+            vehicles_file (str): the name of the base year vehicles file
+            vehicle_onroad_calculations_file (str): the name of the vehicle onroad calculations (vehicle attribute calculations) file
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
+            List of template/input errors, else empty list on success
+
+        See Also:
+            ``VehicleAttributeCalculations``, ``DecompositionAttributes``
 
         """
         init_fail = []
