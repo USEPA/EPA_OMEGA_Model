@@ -1,5 +1,3 @@
-.. _Chapter 7:
-
 Code Details
 ============
 
