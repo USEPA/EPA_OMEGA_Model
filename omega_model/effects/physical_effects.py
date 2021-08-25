@@ -156,13 +156,14 @@ def calc_physical_effects(calendar_year):
     for vad in vads:
 
         attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id', 'non_responsive_market_group',
-                          'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
-        mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+                          'cert_target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+        mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, \
+        cert_target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
             = get_vehicle_info(vad.vehicle_id, attribute_list)
 
         vehicle_effects_dict = dict()
         flag = None
-        if onroad_direct_co2e_grams_per_mile is not None and onroad_direct_kwh_per_mile is not None:
+        if cert_target_co2e_grams_per_mile is not None:
 
             liquid_fuel = None
             electric_fuel = None
