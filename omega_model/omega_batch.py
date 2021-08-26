@@ -526,26 +526,26 @@ class OMEGABatchObject(OMEGABase):
             if p in self.dataframe:
                 self.dataframe.loc[p] = pd.to_numeric(self.dataframe.loc[p])
 
-    def read_parameter(self, index_str):
+    def read_parameter(self, param_name):
         """
         Read batch-level parameter, setting applies to all sessions.
 
         Args:
-            index_str (str): the name of setting to read
+            param_name (str): the name of the parameter to read
 
         Returns:
             The value of the batch setting, taken from the first data column of the batch file
 
         """
-        return self.dataframe.loc[index_str][0]
+        return self.dataframe.loc[param_name][0]
 
-    def parse_parameter(self, index_str, session_num):
+    def parse_parameter(self, param_name, session_num):
         """
-        Returns the evaluated value of the requested row (``index_str``) and column (``session_num``) from the
+        Returns the evaluated value of the requested row (``param_name``) and column (``session_num``) from the
         batch file.
 
         Args:
-            index_str (str): the name of the row to evaluate
+            param_name (str): the name of the parameter to evaluate
             session_num (int): which session to evaluate, the first session is session ``0``
 
         Returns:
@@ -553,7 +553,7 @@ class OMEGABatchObject(OMEGABase):
             evaluating the raw parameter string (i.e. for tuples or dicts in the batch file inputs)
 
         """
-        raw_param = self.dataframe.loc[index_str][session_num]
+        raw_param = self.dataframe.loc[param_name][session_num]
         params_dict = {'TRUE': True,
                        'FALSE': False,
                        }
@@ -569,12 +569,12 @@ class OMEGABatchObject(OMEGABase):
 
         return param
 
-    def set_parameter(self, index_str, session_num, value):
+    def set_parameter(self, param_name, session_num, value):
         """
         Set the value of a given parameter for a given session in the batch dataframe
 
         Args:
-            index_str (str): the name of the row to evaluate
+            param_name (str): the name of the parameter to evaluate
             session_num (int): which session to set the value of, the first session is session ``0``
             value: the value to be set
 
@@ -582,14 +582,14 @@ class OMEGABatchObject(OMEGABase):
             Nothing, sets the value for the parameter in the given session in the batch dataframe
 
         """
-        self.dataframe.loc[index_str][session_num] = value
+        self.dataframe.loc[param_name][session_num] = value
 
     def parse_session_params(self, session_num, verbose=False):
         """
         Parse session params and determine the full factorial dimensions of the session
 
         Args:
-            session_num (int): the number of the session to parse
+            session_num (int): the number of the session to parse, the first session is session ``0``
             verbose (bool): enables additional console output if ``True``
 
         Returns:
@@ -597,10 +597,10 @@ class OMEGABatchObject(OMEGABase):
 
         """
         fullfact_dimensions = []
-        for index_str in self.dataframe.index:
-            if type(index_str) is str:
-                param = self.parse_parameter(index_str, session_num)
-                self.set_parameter(index_str, session_num, param)
+        for param_name in self.dataframe.index:
+            if type(param_name) is str:
+                param = self.parse_parameter(param_name, session_num)
+                self.set_parameter(param_name, session_num, param)
                 if type(param) is tuple:
                     if verbose:
                         print('found tuple')
@@ -690,7 +690,7 @@ class OMEGABatchObject(OMEGABase):
                     num_params = len(dfx.index)
                     for param_index in range(0, num_params):
                         param_name = dfx.index[param_index]
-                        if type(param_name) is str:  # if param_name is not blank (np.nan):
+                        if type(param_name) is str:  # i.e. if param_name is not blank (np.nan):
                             if (expanded_session_num == 0) or (param_index >= session_params_start_index):
                                 # copy all data for df_column 0 (includes batchsettings) or
                                 # just session settings for subsequent columns
@@ -797,7 +797,7 @@ class OMEGABatchObject(OMEGABase):
             self.batch_log.logwrite("In Batch '{}':".format(self.name))
         for s in range(0, self.num_sessions()):
             self.sessions.append(OMEGASessionObject("session_{%d}" % s))
-            self.sessions[s].parent = self
+            self.sessions[s].batch = self
             self.sessions[s].get_session_settings(s)
             if verbose:
                 self.batch_log.logwrite("Found Session %s:'%s'" % (s, self.sessions[s].name))
@@ -807,18 +807,20 @@ class OMEGABatchObject(OMEGABase):
 
 class OMEGASessionObject(OMEGABase):
     """
-
+    **Holds settings and information for a single OMEGA simulation session.**
+    
     """
-    def __init__(self, name, **kwargs):
+    def __init__(self, name):
         """
-
+        Create an ``OMEGASessionObject``
+        
         Args:
-            name:
-            **kwargs:
+            name (str): the name of the session
+            
         """
         from omega import OMEGASessionSettings
 
-        self.parent = []
+        self.batch = []
         self.name = name
         self.num = 0
         self.output_path = "." + os.sep
@@ -826,22 +828,25 @@ class OMEGASessionObject(OMEGABase):
         self.settings = OMEGASessionSettings()
         self.result = []
 
-    def read_parameter(self, index_str, default_value=None):
+    def read_parameter(self, param_name, default_value=None):
         """
+        Read a parameter from the batch dataframe, if present in the batch file, or set it to a default value.
+        Raises an Exception if the parameter is not present and no default value is provided
 
         Args:
-            index_str:
-            default_value:
+            param_name (str): the name of the parameter to read
+            default_value: optional default value for the parameter if it's not provided by the batch file
 
         Returns:
+            The value of the parameter, or raises an Exception on error
 
         """
         try:
-            param = self.parent.dataframe.loc[index_str][self.num]
+            param = self.batch.dataframe.loc[param_name][self.num]
         except:
             if default_value is None:
-                if index_str not in self.parent.dataframe:
-                    raise Exception('Batch file missing row "%s"' % index_str)
+                if param_name not in self.batch.dataframe:
+                    raise Exception('Batch file missing row "%s"' % param_name)
             else:
                 param = default_value
         finally:
@@ -849,11 +854,14 @@ class OMEGASessionObject(OMEGABase):
 
     def get_session_settings(self, session_num):
         """
+        Set the session number, get the name of the session and whether it is enabled or not.
+        Set the output path of the session.
 
         Args:
-            session_num:
+            session_num (int): the session to get settings for, the first session is session ``0``
 
         Returns:
+            Nothing, updates session attributes
 
         """
         from omega import OMEGASessionSettings
@@ -861,25 +869,24 @@ class OMEGASessionObject(OMEGABase):
         self.num = session_num
         self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
-        self.output_path = OMEGASessionSettings().output_folder  # self.read_parameter('Session Output Folder Name')
+        self.output_path = OMEGASessionSettings().output_folder
 
-    def get_user_settings(self, remote=False):
+    def get_user_settings(self):
         """
-
-        Args:
-            remote:
+        Get non-developer settings for the session from the batch.
 
         Returns:
+            Nothing, updates ``self.settings``
 
         """
         from copy import copy
 
-        self.parent.batch_log.logwrite('Getting User settings...')
+        self.batch.batch_log.logwrite('Getting User settings...')
 
-        self.settings = copy(self.parent.settings)    # copy batch-level settings to session
+        self.settings = copy(self.batch.settings)    # copy batch-level settings to session
 
         self.settings.session_name = self.name
-        self.settings.session_unique_name = self.parent.name + '_' + self.name
+        self.settings.session_unique_name = self.batch.name + '_' + self.name
         self.settings.session_is_reference = self.num == 0
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
@@ -930,11 +937,13 @@ class OMEGASessionObject(OMEGABase):
 
     def get_developer_settings(self):
         """
+        Get developer settings for the session from the batch.
 
         Returns:
+            Nothing, updates ``self.settings``
 
         """
-        self.parent.batch_log.logwrite('Getting Developer Settings...')
+        self.batch.batch_log.logwrite('Getting Developer Settings...')
 
         self.settings.cost_curve_frontier_affinity_factor = \
             float(self.read_parameter('Cost Curve Frontier Affinity Factor',
@@ -1016,35 +1025,38 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Verbose Output', self.settings.verbose),
             true_false_dict)
 
-    def init(self, validate_only=False, remote=False):
+    def init(self, verbose=False):
         """
+        Get user and developer settings for the session
 
         Args:
-            validate_only:
-            remote:
+            verbose (bool): enables additional console output if ``True``
 
         Returns:
+            Nothing, updates ``self.settings``
 
         """
-        if not validate_only:
-            self.parent.batch_log.logwrite("Starting Session '%s' -> %s" % (self.name, self.output_path))
-        self.get_user_settings(remote=remote)
+        if not verbose:
+            self.batch.batch_log.logwrite("Initializing Session '%s' -> %s" % (self.name, self.output_path))
+        self.get_user_settings()
         self.get_developer_settings()
 
-    def run(self, remote=False):
+    def run(self):
         """
-
-        Args:
-            remote:
+        Initialize and run the session
 
         Returns:
+            The result of running the session
+
+        See Also:
+            ``omega_model.omega.run_omega()``
 
         """
         from omega import run_omega
 
-        self.init(remote=remote)
+        self.init()
 
-        self.parent.batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
+        self.batch.batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
         result = run_omega(self.settings)
         return result
 
@@ -1127,7 +1139,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
             batch.batch_log.logwrite("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
             batch.batch_log.logwrite('')
         else:
-            batch.sessions[s_index].result = batch.sessions[s_index].run(remote=True)
+            batch.sessions[s_index].result = batch.sessions[s_index].run()
 
             if not batch.sessions[s_index].result:
                 # normal run, no failures
@@ -1309,7 +1321,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                 validate_file(batch.batch_definition_path + source_file_path)
 
                 batch.batch_log.logwrite('Validating Session %d Parameters...' % s)
-                session.init(validate_only=True)
+                session.init(verbose=True)
 
         batch.batch_log.logwrite("\n*** validation complete ***")
 
