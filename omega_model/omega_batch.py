@@ -1062,6 +1062,19 @@ class OMEGASessionObject(OMEGABase):
 
 
 def validate_folder(batch_root, batch_name='', session_name=''):
+    """
+    Confirm the existence of a batch folder (bundle folder or subfolder), create it if it doesn't exist.
+    Raises an Exception on error
+
+    Args:
+        batch_root (str): the root of the folder to validate
+        batch_name (str): optional argument, the name of the batch
+        session_name (str): optional argument, the name of the session
+
+    Returns:
+        The pathname of the folder, e.g. '/Users/omega_user/Code/GitHub/USEPA_OMEGA2/bundle/'
+
+    """
     dstfolder = batch_root + os.sep
     if not batch_name == '':
         dstfolder = dstfolder + batch_name + os.sep
@@ -1076,12 +1089,24 @@ def validate_folder(batch_root, batch_name='', session_name=''):
 
             print('Couldn''t access or create {"%s"}' % (dstfolder), file=sys.stderr)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            sys.exit(-1)
+            raise Exception(traceback.format_exc())
+
     return dstfolder
 
 
 class OMEGABatchCLIOptions(OMEGABase):
+    """
+    **Stores command-line interface arguments**
+
+    Attempts to get the IP address of the computer for use with ``dispy`` parallel processing and logs the start
+    time of batch processing for timestamping the batch and sessions
+
+    """
     def __init__(self):
+        """
+        Create an OMEGABatchCLIOptions, get the IP address of the computer and log the start time of batch processing.
+
+        """
         import time
         import socket
         hostname = socket.gethostname()
@@ -1111,7 +1136,22 @@ class OMEGABatchCLIOptions(OMEGABase):
         self.calc_effects = 'None'
 
 
-def run_bundled_sessions(batch, options, remote_batchfile, session_list):
+def run_bundled_sessions(options, remote_batchfile, session_list):
+    """
+    Run a bundled batch.  Bundling copies the source code and all input files to a single directory structure that
+    contains everything needed to run the batch at any time without any external dependencies (except of course a
+    Python install with the required packages)
+
+    Args:
+        options (OMEGABatchCLIOptions): the command line arguments, contains the path to the remote batch, etc
+        remote_batchfile (str): the name of the remote batch file, e.g. '2021_08_26_15_35_16_demo_batch.csv'
+        session_list (list): a list containing the session number(s) to run from the remote batch, e.g. ``[0]`` or
+            ``[0, 1, 4, ...], etc``
+
+    Returns:
+        The ``OMEGABatchObject`` created to run the remote batch
+
+    """
     import pandas as pd
     from common.omega_log import OMEGABatchLog
     import time
@@ -1187,7 +1227,39 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                     batch_file='', session_num=None, verbose=False, timestamp=None, show_figures=False, dispy=False,
                     dispy_ping=False, dispy_debug=False, dispy_exclusive=False, dispy_scheduler=None, local=False,
                     network=False, analysis_final_year=None, calc_effects='None'):
+    """
+    The top-level entry point for running a batch with the given settings, called from the GUI with a dictionary
+    of arguments.  Reads the source batch file, expanding factorially where there are multi-valued parameters, bundles
+    the source code and input files to a common directory and runs the batch from there.  Also handles parallel
+    processing via ``dispy`` options
 
+    Args:
+        no_validate (bool): don't validate (ensure the existence of) source files
+        no_sim (bool): skip simulation if ``True``, otherwise run as normal.  Typically not used except for debugging
+        bundle_path (str): the full path to the bundle folder, e.g. '/Users/omega_user/Code/GitHub/USEPA_OMEGA2/bundle'
+        no_bundle (bool): don't bundle files if ``True``, else bundle
+        batch_file (str): the path name of the source (original, non-expanded, non-bundled) batch file,
+            e.g. 'omega_model/demo_inputs/demo_batch.csv'
+        session_num (int): the number of the session to run, if ``None`` all sessions are run
+        verbose (bool): enables additional console and logfile output if ``True``
+        timestamp (str): optional externally created timestamp (e.g. from the GUI)
+        show_figures (bool): output figure windows are created when ``True``, otherwise figures are only save to files
+        dispy (bool): enables parallel processing via the ``dispy`` Python package when ``True``
+        dispy_ping (bool): ping ``dispy`` nodes if ``True`` and ``dispy`` is ``True``
+        dispy_debug (bool): enables additional console output for investigating ``dispy`` behavior when ``True``
+        dispy_exclusive (bool): if ``True`` then the ``dispy`` node runs a non-shared ``dispy`` cluster
+        dispy_scheduler (str): the name / ip address of a shared ``dispy`` scheduler,
+            available when ``dispy_exclusive`` is ``False``
+        local (bool): if ``True`` then run ``dispy`` parallel processing on the local machine only, no network nodes
+        network (bool): if ``True`` then allow ``dispy`` parallel processing on networked nodes
+        analysis_final_year (int): optional override for the analysis final year batch parameter
+        calc_effects (str): 'None', 'Physical' or 'Physical and Costs', determines what kind of effects post-processing
+            to run
+
+    Returns:
+        Nothing
+
+    """
     import sys
 
     # print('run_omega_batch sys.path = %s' % sys.path)
@@ -1289,7 +1361,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
         if options.validate_batch:
             batch.batch_log.logwrite('Validating batch definition source files...')
-            # validate shared (batch) files
+            # validate (make sure they exist) shared (batch) files
             validate_file(options.batch_file)
 
             sys.path.insert(0, os.getcwd())
@@ -1437,7 +1509,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
 
                 import copy
                 # run reference case to generate vehicle prices then dispy the rest
-                run_bundled_sessions(copy.copy(batch), options, remote_batchfile, [0])
+                run_bundled_sessions(options, remote_batchfile, [0])
                 dispy_session_list = dispy_session_list[1:]
 
                 if dispy_session_list:
@@ -1450,7 +1522,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
                                                  dispy_session_list)
                     batch.batch_log.end_logfile("*** dispy batch complete ***")
             else:  # run from here
-                batch = run_bundled_sessions(batch, options, remote_batchfile, session_list)
+                batch = run_bundled_sessions(options, remote_batchfile, session_list)
 
             batch_summary_filename = ''
             # if not running a session inside a dispy batch (i.e. we are the top-level batch):
