@@ -402,6 +402,21 @@ true_false_dict = dict({True: True, False: False, 'True': True, 'False': False, 
 
 
 def validate_predefined_input(input_str, valid_inputs):
+    """
+    Validate the input string against set or dictionary of valid inputs. If ``valid_inputs`` is a set the
+    ``input_str`` is checked for inclusion and returned, if ``valid_inputs`` is a dict, the value associated with the
+    ``input_str`` key is returned.
+
+    Args:
+        input_str (str): the string to be validated
+        valid_inputs (set, dict): set or dict of valid inputs
+
+    Returns:
+        Raises Exception if ``input_str`` not in ``valid_inputs`` or if ``valid_inputs`` is not a set or dict,
+        else ``input_str`` if ``valid_inputs`` is a set,
+        else ``valid_inputs[input_str]`` if ``valid_inputs`` is a dict.
+
+    """
     if input_str in valid_inputs:
         if type(valid_inputs) is dict:
             return valid_inputs[input_str]
@@ -416,9 +431,10 @@ def validate_predefined_input(input_str, valid_inputs):
 
 def is_absolute_path(source_file_path):
     """
+    Check if source file path is absolute (as opposed to relative).  Wrapper for ``os.path.isabs()``
 
     Args:
-        source_file_path: file path
+        source_file_path (str): file path
 
     Returns: True if file path is absolute
 
@@ -429,7 +445,22 @@ def is_absolute_path(source_file_path):
 
 
 class OMEGABatchObject(OMEGABase):
-    def __init__(self, name='', analysis_final_year=None, calc_effects=None, **kwargs):
+    """
+    **Manages batch-level settings and contains a list of sessions.**
+
+    """
+    def __init__(self, name='', analysis_final_year=None, calc_effects=None):
+        """
+        Create an ``OMEGABatchObject``
+
+        Args:
+            name (str): the name of the batch
+            analysis_final_year (int): optional externally-provided analysis final year, otherwise the analysis final
+                year is determined by the batch file
+            calc_effects (str): 'None', 'Physical' or 'Physical and Costs', determines which effects calcs to run
+                post-compliance modeling
+
+        """
         import pandas as pd
 
         self.name = name
@@ -444,11 +475,20 @@ class OMEGABatchObject(OMEGABase):
         self.settings.calc_effects = calc_effects
 
     def force_numeric_user_params(self):
+        """
+        Force certain user batch inputs to be numeric values. List of numeric params must be updated manually when
+        new numeric params are added to the batch settings.
+
+        Returns:
+            Nothing, changes ``self.dataframe`` values to numeric values as required
+
+        """
         import pandas as pd
 
         numeric_params = {
             'Analysis Final Year',
             'Discount Values to Year',
+            'Analysis Dollar Basis',
             'New Vehicle Price Elasticity of Demand',
             'Producer Cross Subsidy Multiplier Min',
             'Producer Cross Subsidy Multiplier Max',
@@ -458,6 +498,14 @@ class OMEGABatchObject(OMEGABase):
             self.dataframe.loc[p] = pd.to_numeric(self.dataframe.loc[p])
 
     def force_numeric_developer_params(self):
+        """
+        Force certain developer batch inputs to be numeric values. List of numeric params must be updated manually when
+        new numeric params are added to the batch settings.
+
+        Returns:
+            Nothing, changes ``self.dataframe`` values to numeric values as required
+
+        """
         import pandas as pd
 
         numeric_params = {
@@ -479,38 +527,80 @@ class OMEGABatchObject(OMEGABase):
                 self.dataframe.loc[p] = pd.to_numeric(self.dataframe.loc[p])
 
     def read_parameter(self, index_str):
+        """
+        Read batch-level parameter, setting applies to all sessions.
+
+        Args:
+            index_str (str): the name of setting to read
+
+        Returns:
+            The value of the batch setting, taken from the first data column of the batch file
+
+        """
         return self.dataframe.loc[index_str][0]
 
-    def parse_parameter(self, index_str, column_index, verbose=False):
-        raw_param = self.dataframe.loc[index_str][column_index]
-        params_dict = {'Y': 'Y',
-                       'N': 'N',
-                       'TRUE': True,
+    def parse_parameter(self, index_str, session_num):
+        """
+        Returns the evaluated value of the requested row (``index_str``) and column (``session_num``) from the
+        batch file.
+
+        Args:
+            index_str (str): the name of the row to evaluate
+            session_num (int): which session to evaluate, the first session is session ``0``
+
+        Returns:
+            The raw value, ``True`` for 'TRUE' and ``False`` for 'FALSE', or the valid python object created by
+            evaluating the raw parameter string (i.e. for tuples or dicts in the batch file inputs)
+
+        """
+        raw_param = self.dataframe.loc[index_str][session_num]
+        params_dict = {'TRUE': True,
                        'FALSE': False,
                        }
 
+        param = raw_param  # default is to pass through the raw value
+
         if type(raw_param) is str:
-            if verbose:
-                print('%s = "%s"' % (index_str, raw_param))
             try:
+                # try to evaluate the param as a python code-compatible string
                 param = eval(raw_param, {'__builtins__': None}, params_dict)
             except:
-                param = raw_param
-            return param
-        else:
-            if verbose:
-                print('%s = %s' % (index_str, str(raw_param)))
-            return raw_param
+                pass
 
-    def set_parameter(self, index_str, column_index, value):
-        self.dataframe.loc[index_str][column_index] = value
+        return param
 
-    def parse_column_params(self, column_index, verbose=False):
+    def set_parameter(self, index_str, session_num, value):
+        """
+        Set the value of a given parameter for a given session in the batch dataframe
+
+        Args:
+            index_str (str): the name of the row to evaluate
+            session_num (int): which session to set the value of, the first session is session ``0``
+            value: the value to be set
+
+        Returns:
+            Nothing, sets the value for the parameter in the given session in the batch dataframe
+
+        """
+        self.dataframe.loc[index_str][session_num] = value
+
+    def parse_session_params(self, session_num, verbose=False):
+        """
+        Parse session params and determine the full factorial dimensions of the session
+
+        Args:
+            session_num (int): the number of the session to parse
+            verbose (bool): enables additional console output if ``True``
+
+        Returns:
+            The full factorial dimensions of the given session, e.g. (1,1,2,1...)
+
+        """
         fullfact_dimensions = []
         for index_str in self.dataframe.index:
             if type(index_str) is str:
-                param = self.parse_parameter(index_str, column_index)
-                self.set_parameter(index_str, column_index, param)
+                param = self.parse_parameter(index_str, session_num)
+                self.set_parameter(index_str, session_num, param)
                 if type(param) is tuple:
                     if verbose:
                         print('found tuple')
@@ -523,50 +613,75 @@ class OMEGABatchObject(OMEGABase):
             print('fullfact dimensions = %s' % fullfact_dimensions)
         return fullfact_dimensions
 
-    def parse_dataframe_params(self, verbose=False):
+    def parse_batch_params(self, verbose=False):
+        """
+        Parse settings for each session and return the full factorial dimensions of all sessions
+
+        Args:
+            verbose (bool): enables additional console output if ``True``
+
+        Returns:
+            A list of tuples of the full factorial dimensions of each session, e.g. [(1,1,2,1...), (1,2,2,1...)]
+
+        """
         fullfact_dimensions_vectors = []
-        for column_index in range(0, len(self.dataframe.columns)):
-            fullfact_dimensions_vectors.append(self.parse_column_params(column_index, verbose))
-            if column_index == 0 and max(fullfact_dimensions_vectors[0]) > 1:
+        for session_num in range(0, len(self.dataframe.columns)):
+            fullfact_dimensions_vectors.append(self.parse_session_params(session_num, verbose))
+            if session_num == 0 and max(fullfact_dimensions_vectors[0]) > 1:
                 raise Exception('Reference session of batch (first session column) must not contain any '
                                 'comma-separated values')
         return fullfact_dimensions_vectors
 
     def expand_dataframe(self, verbose=False):
+        """
+        Expand dataframe as necessary, creating new session names that represent the multi-valued parameters.
+
+        Args:
+            verbose (bool): enables additional console output if ``True``
+
+        Returns:
+            Nothing, but sets the batch dataframe to the newly expanded dataframe, raises Exception if multiple values
+            are found in a parameter that does not support multiple values
+
+        """
         import pyDOE2 as doe
         import pandas as pd
         import numpy as np
 
+        # dict of acronyms for auto-generating session names from parameters that support multiple values
         acronyms_dict = {
             False: '0',
             True: '1',
             'Num Market Share Options': 'NMSO',
-            'Num Tech Options per ICE Vehicle': 'NITO',
-            'Num Tech Options per BEV Vehicle': 'NBTO',
-            # 'New Vehicle Price Elasticity of Demand': 'NVPE',
-            # 'Producer Cross Subsidy Multiplier Min': 'PCSMMIN',
-            # 'Producer Cross Subsidy Multiplier Max': 'PCSMMAX',
+            'Num Tech Options per ICE Vehicle': 'NTOI',
+            'Num Tech Options per BEV Vehicle': 'NTOB',
             'Cost Curve Frontier Affinity Factor': 'CFAF',
-            # 'Verbose Output': 'VB',
             'Iterate Producer-Consumer': 'IPC',
+            'Producer-Consumer Max Iterations': 'PCMI',
+            'Producer-Consumer Convergence Tolerance': 'PCCT',
+            'Producer Compliance Search Min Share Range': 'PCSMSR',
+            'Producer Compliance Search Convergence Factor': 'PCSCF',
+            'Producer Compliance Search Tolerance': 'PCST',
+            'Producer Cross Subsidy Price Tolerance': 'PCSPT',
+            'Flat Context Year': 'FCY',
         }
 
-        fullfact_dimensions_vectors = self.parse_dataframe_params(verbose=verbose)
+        fullfact_dimensions_vectors = self.parse_batch_params(verbose=verbose)
 
-        dfx = pd.DataFrame()
+        dfx = pd.DataFrame()  # create expanded dataframe
         dfx['Parameters'] = self.dataframe.index
         dfx.set_index('Parameters', inplace=True)
         session_params_start_index = np.where(dfx.index == 'Enable Session')[0][0]
 
-        dfx_column_index = 0
+        expanded_session_num = 0
         # for each column in dataframe, copy or expand into dfx
-        for df_column_index in range(0, len(self.dataframe.columns)):
-            df_ff_dimensions_vector = fullfact_dimensions_vectors[df_column_index]
+        for session_num in range(0, len(self.dataframe.columns)):
+            df_ff_dimensions_vector = fullfact_dimensions_vectors[session_num]
             df_ff_matrix = np.int_(doe.fullfact(df_ff_dimensions_vector))
             num_expanded_columns = np.product(df_ff_dimensions_vector)
             # expand variations and write to dfx
             for variation_index in range(0, num_expanded_columns):
-                column_name = self.dataframe.loc['Session Name'][df_column_index]
+                column_name = self.dataframe.loc['Session Name'][session_num]
                 session_name = column_name
                 if num_expanded_columns > 1:  # expand variations
                     column_name = column_name + '_%d' % variation_index
@@ -576,32 +691,48 @@ class OMEGABatchObject(OMEGABase):
                     for param_index in range(0, num_params):
                         param_name = dfx.index[param_index]
                         if type(param_name) is str:  # if param_name is not blank (np.nan):
-                            if (dfx_column_index == 0) or (param_index >= session_params_start_index):
-                                # copy all data for df_column 0 (includes batchsettings) or just session settings for subsequent columns
-                                if type(self.dataframe.loc[param_name][
-                                            df_column_index]) == tuple:  # index tuple and get this variations element
-                                    value = self.dataframe.loc[param_name][df_column_index][
-                                        ff_param_indices[param_index]]
+                            if (expanded_session_num == 0) or (param_index >= session_params_start_index):
+                                # copy all data for df_column 0 (includes batchsettings) or
+                                # just session settings for subsequent columns
+                                if type(self.dataframe.loc[param_name][session_num]) == tuple:
+                                    # index tuple and get this variations element
+                                    value = self.dataframe.loc[param_name][session_num][ff_param_indices[param_index]]
                                 else:
-                                    value = self.dataframe.loc[param_name][df_column_index]  # else copy source value
-                                dfx.loc[param_name, dfx.columns[dfx_column_index]] = value
+                                    value = self.dataframe.loc[param_name][session_num]  # else copy source value
+
+                                if value == []:
+                                    # special case for assigning empty list (occurs with some developer settings)
+                                    dfx.loc[param_name][dfx.columns[expanded_session_num]] = value
+                                else:
+                                    # normal assignment, avoid setting a value on a copy errors...
+                                    dfx.loc[param_name, dfx.columns[expanded_session_num]] = value
+
                                 if df_ff_dimensions_vector[param_index] > 1:
-                                    # batch_log.logwrite(param_name + ' has ' + str(df_ff_dimensions_vector[param_index]) + ' values ')
-                                    if value in acronyms_dict:
+                                    if value in acronyms_dict and param_name in acronyms_dict:
                                         session_name = session_name + '-' + acronyms_dict[param_name] + '=' + \
                                                        acronyms_dict[value]
-                                    else:
+                                    elif param_name in acronyms_dict:
                                         session_name = session_name + '-' + acronyms_dict[param_name] + '=' + str(value)
-                                    # batch_log.logwrite(session_name)
-                    # dfx.loc['Session Name', dfx.columns[dfx_column]] = column_name
+                                    else:
+                                        msg = 'Unsupported multi-value field %s = %s in session "%s"' % \
+                                                        (param_name, self.dataframe.loc[param_name][session_num],
+                                                         self.dataframe.loc['Session Name'][session_num])
+                                        self.batch_log.logwrite(msg)
+                                        raise Exception(msg)
                     dfx.loc['Session Name', column_name] = session_name
                 else:  # just copy column
-                    dfx[column_name] = self.dataframe.iloc[:, df_column_index]
-                dfx_column_index = dfx_column_index + 1
-        # dfx.fillna('-----', inplace=True)
+                    dfx[column_name] = self.dataframe.iloc[:, session_num]
+                expanded_session_num = expanded_session_num + 1
         self.dataframe = dfx
 
     def get_batch_settings(self):
+        """
+        Get batch settings, settings apply to all sessions
+
+        Returns:
+            Nothing, updates ``self.settings``
+
+        """
         self.name = self.read_parameter('Batch Name')
         if self.settings.analysis_final_year is not None:
             self.dataframe.loc['Analysis Final Year'][0] = self.settings.analysis_final_year
@@ -641,9 +772,26 @@ class OMEGABatchObject(OMEGABase):
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
     def num_sessions(self):
+        """
+        Get the number of sessions
+
+        Returns:
+            The number of sessions in the batch
+
+        """
         return len(self.dataframe.columns)
 
     def add_sessions(self, verbose=True):
+        """
+        Create an ``OMEGASessionObject`` for each session in the batch file and add it to the ``self.sessions`` list
+
+        Args:
+            verbose (bool): enables additional console output if ``True``
+
+        Returns:
+            Nothing, updates ``self.sessions`` list
+
+        """
         if verbose:
             self.batch_log.logwrite('')
             self.batch_log.logwrite("In Batch '{}':".format(self.name))
@@ -658,7 +806,16 @@ class OMEGABatchObject(OMEGABase):
 
 
 class OMEGASessionObject(OMEGABase):
+    """
+
+    """
     def __init__(self, name, **kwargs):
+        """
+
+        Args:
+            name:
+            **kwargs:
+        """
         from omega import OMEGASessionSettings
 
         self.parent = []
@@ -670,6 +827,15 @@ class OMEGASessionObject(OMEGABase):
         self.result = []
 
     def read_parameter(self, index_str, default_value=None):
+        """
+
+        Args:
+            index_str:
+            default_value:
+
+        Returns:
+
+        """
         try:
             param = self.parent.dataframe.loc[index_str][self.num]
         except:
@@ -682,6 +848,14 @@ class OMEGASessionObject(OMEGABase):
             return param
 
     def get_session_settings(self, session_num):
+        """
+
+        Args:
+            session_num:
+
+        Returns:
+
+        """
         from omega import OMEGASessionSettings
 
         self.num = session_num
@@ -690,6 +864,14 @@ class OMEGASessionObject(OMEGABase):
         self.output_path = OMEGASessionSettings().output_folder  # self.read_parameter('Session Output Folder Name')
 
     def get_user_settings(self, remote=False):
+        """
+
+        Args:
+            remote:
+
+        Returns:
+
+        """
         from copy import copy
 
         self.parent.batch_log.logwrite('Getting User settings...')
@@ -747,6 +929,11 @@ class OMEGASessionObject(OMEGABase):
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
 
     def get_developer_settings(self):
+        """
+
+        Returns:
+
+        """
         self.parent.batch_log.logwrite('Getting Developer Settings...')
 
         self.settings.cost_curve_frontier_affinity_factor = \
@@ -830,12 +1017,29 @@ class OMEGASessionObject(OMEGABase):
             true_false_dict)
 
     def init(self, validate_only=False, remote=False):
+        """
+
+        Args:
+            validate_only:
+            remote:
+
+        Returns:
+
+        """
         if not validate_only:
             self.parent.batch_log.logwrite("Starting Session '%s' -> %s" % (self.name, self.output_path))
         self.get_user_settings(remote=remote)
         self.get_developer_settings()
 
     def run(self, remote=False):
+        """
+
+        Args:
+            remote:
+
+        Returns:
+
+        """
         from omega import run_omega
 
         self.init(remote=remote)
@@ -864,7 +1068,7 @@ def validate_folder(batch_root, batch_name='', session_name=''):
     return dstfolder
 
 
-class OMEGABatchOptions(OMEGABase):
+class OMEGABatchCLIOptions(OMEGABase):
     def __init__(self):
         import time
         import socket
@@ -909,7 +1113,7 @@ def run_bundled_sessions(batch, options, remote_batchfile, session_list):
                             inplace=True)
     batch.dataframe.drop('Type', axis=1, inplace=True,
                          errors='ignore')  # drop Type column, no error if it's not there
-    batch.parse_dataframe_params()  # convert '[2020]' -> [2020], etc
+    batch.parse_batch_params()  # convert '[2020]' -> [2020], etc
     batch.force_numeric_user_params()
     batch.force_numeric_developer_params()
     batch.get_batch_settings()
@@ -977,7 +1181,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=os.getcwd() + o
     # print('run_omega_batch sys.path = %s' % sys.path)
     from common import omega_globals
 
-    options = OMEGABatchOptions()
+    options = OMEGABatchCLIOptions()
     options.validate_batch = not no_validate
     options.no_sim = no_sim
     options.bundle_path_root = bundle_path
