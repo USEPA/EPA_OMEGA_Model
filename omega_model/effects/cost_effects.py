@@ -11,28 +11,6 @@ other functions here are called from within the calc_cost_effects function.
 
 from omega_model import *
 
-vehicles_dict = dict()
-
-
-# TODO refueling time; drive value; maintenance
-def get_vehicle_info(vehicle_id, attribute_list):
-    """
-
-    Args:
-        vehicle_id: The vehicle ID number from the VehicleFinal database table.
-        attribute_list: The list of vehicle attributes for the vehicle_id vehicle for which vehicle information is needed.
-
-    Returns:
-        The attribute values associated with each element of attribute_list.
-
-    """
-    from producer.vehicles import VehicleFinal
-
-    if vehicle_id not in vehicles_dict:
-        vehicles_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)
-
-    return vehicles_dict[vehicle_id]
-
 
 def get_scc_cf(calendar_year):
     """
@@ -142,9 +120,11 @@ def calc_cost_effects(physical_effects_dict):
 
     """
     from context.fuel_prices import FuelPrice
+    from producer.vehicles import VehicleFinal
 
     # UPDATE cost effects data
     costs_dict = dict()
+    vehicle_info_dict = dict()
     fuel = None
     for key in physical_effects_dict.keys():
 
@@ -171,7 +151,10 @@ def calc_cost_effects(physical_effects_dict):
             pm25_tailpipe_7, pm25_upstream_7, nox_tailpipe_7, nox_upstream_7, so2_tailpipe_7, so2_upstream_7 = 12 * [0]
 
             attribute_list = ['new_vehicle_mfr_cost_dollars']
-            new_vehicle_cost = get_vehicle_info(vehicle_id, attribute_list)[0]
+            if vehicle_id not in vehicle_info_dict:
+                vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)[0]
+
+            new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
             mfr_id, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
                 = physical['manufacturer_id'], physical['base_year_reg_class_id'], physical['reg_class_id'], \

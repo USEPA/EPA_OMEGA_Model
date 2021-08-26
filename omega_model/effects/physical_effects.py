@@ -14,28 +14,6 @@ and then to calculate from them the pollutant inventories, including fuel consum
 grams_per_us_ton = 907185
 grams_per_metric_ton = 1_000_000
 
-# create some empty dicts in which to store VehicleFinal objects and vehicle/refinery/powersector emission factors
-vehicles_dict = dict()
-
-
-def get_vehicle_info(vehicle_id, attribute_list):
-    """
-
-    Args:
-        vehicle_id: The vehicle ID number from the VehicleFinal database table.
-        attribute_list: The list of vehicle attributes for the vehicle_id vehicle for which vehicle information is needed.
-
-    Returns:
-        The attribute values associated with each element of attribute_list.
-
-    """
-    from producer.vehicles import VehicleFinal
-
-    if vehicle_id not in vehicles_dict:
-        vehicles_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, attribute_list)
-
-    return vehicles_dict[vehicle_id]
-
 
 def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
     """
@@ -145,21 +123,25 @@ def calc_physical_effects(calendar_year):
 
     """
     from producer.vehicle_annual_data import VehicleAnnualData
+    from producer.vehicles import VehicleFinal
     from context.onroad_fuels import OnroadFuel
 
     vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
     # UPDATE physical effects data
     calendar_year_effects_dict = dict()
-    # fuel = None
-
+    vehicle_info_dict = dict()
     for vad in vads:
 
         attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id', 'non_responsive_market_group',
                           'cert_target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile', 'onroad_direct_kwh_per_mile']
+
+        if vad.vehicle_id not in vehicle_info_dict:
+            vehicle_info_dict[vad.vehicle_id] = VehicleFinal.get_vehicle_attributes(vad.vehicle_id, attribute_list)
+
         mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, \
         cert_target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-            = get_vehicle_info(vad.vehicle_id, attribute_list)
+            = vehicle_info_dict[vad.vehicle_id]
 
         vehicle_effects_dict = dict()
         flag = None
