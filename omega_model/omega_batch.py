@@ -1248,7 +1248,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         dispy_ping (bool): ping ``dispy`` nodes if ``True`` and ``dispy`` is ``True``
         dispy_debug (bool): enables additional console output for investigating ``dispy`` behavior when ``True``
         dispy_exclusive (bool): if ``True`` then the ``dispy`` node runs a non-shared ``dispy`` cluster
-        dispy_scheduler (str): the name / ip address of a shared ``dispy`` scheduler,
+        dispy_scheduler (str): the name / IP address of a shared ``dispy`` scheduler,
             available when ``dispy_exclusive`` is ``False``
         local (bool): if ``True`` then run ``dispy`` parallel processing on the local machine only, no network nodes
         network (bool): if ``True`` then allow ``dispy`` parallel processing on networked nodes
