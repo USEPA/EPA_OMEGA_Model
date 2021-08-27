@@ -626,38 +626,39 @@ def create_production_options(composite_vehicles, tech_and_share_combinations, t
     return production_options
 
 
-def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
+def _plot_tech_share_combos_total(calendar_year, production_options):
     """
+    Optional function that can bse used to investigate production options via various plots
 
     Args:
-        calendar_year:
-        tech_share_combos_total:
+        calendar_year (int): the calendar year of the production options
+        production_options (DataFrame): dataframe of the production options, including compliance outcomes in Mg
 
     """
     import matplotlib.pyplot as plt
     plt.figure()
-    plt.plot(tech_share_combos_total['total_cert_co2e_megagrams'],
-             tech_share_combos_total['total_cost_dollars'], '.')
-    plt.plot(tech_share_combos_total['total_target_co2e_megagrams'],
-             tech_share_combos_total['total_cost_dollars'], 'r.')
+    plt.plot(production_options['total_cert_co2e_megagrams'],
+             production_options['total_cost_dollars'], '.')
+    plt.plot(production_options['total_target_co2e_megagrams'],
+             production_options['total_cost_dollars'], 'r.')
     plt.xlabel('CO2e WITHOUT Offset [Mg]')
     plt.ylabel('Cost [$]')
     plt.title('%s' % calendar_year)
     plt.grid()
 
     plt.figure()
-    plt.plot(tech_share_combos_total['total_cert_co2e_megagrams'] - tech_share_combos_total['strategic_target_offset_Mg'],
-             tech_share_combos_total['total_cost_dollars'], '.')
-    plt.plot(tech_share_combos_total['total_target_co2e_megagrams'],
-             tech_share_combos_total['total_cost_dollars'], 'r.')
+    plt.plot(production_options['total_cert_co2e_megagrams'] - production_options['strategic_target_offset_Mg'],
+             production_options['total_cost_dollars'], '.')
+    plt.plot(production_options['total_target_co2e_megagrams'],
+             production_options['total_cost_dollars'], 'r.')
     plt.xlabel('CO2e WITH Offset [Mg]')
     plt.ylabel('Cost [$]')
     plt.title('%s' % calendar_year)
     plt.grid()
 
     plt.figure()
-    plt.plot(tech_share_combos_total['strategic_compliance_ratio'],
-             tech_share_combos_total['total_cost_dollars'], '.')
+    plt.plot(production_options['strategic_compliance_ratio'],
+             production_options['total_cost_dollars'], '.')
     plt.plot([1, 1], plt.ylim(), 'r')
     plt.xlabel('Compliance Ratio WITH Offset')
     plt.ylabel('Cost [$]')
@@ -665,8 +666,8 @@ def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
     plt.grid()
 
     plt.figure()
-    plt.plot(tech_share_combos_total['strategic_compliance_ratio'],
-             tech_share_combos_total['total_generalized_cost_dollars'], '.')
+    plt.plot(production_options['strategic_compliance_ratio'],
+             production_options['total_generalized_cost_dollars'], '.')
     plt.plot([1, 1], plt.ylim(), 'r')
     plt.xlabel('Compliance Ratio WITH Offset')
     plt.ylabel('Generalized Cost [$]')
@@ -674,9 +675,9 @@ def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
     plt.grid()
 
     plt.figure()
-    plt.plot(tech_share_combos_total['strategic_compliance_ratio'],
-             tech_share_combos_total['total_credits_co2e_megagrams'] +
-             tech_share_combos_total['strategic_target_offset_Mg'], '.')
+    plt.plot(production_options['strategic_compliance_ratio'],
+             production_options['total_credits_co2e_megagrams'] +
+             production_options['strategic_target_offset_Mg'], '.')
     plt.plot([1, 1], plt.ylim(), 'r')
     plt.xlabel('Compliance Ratio WITH Offset')
     plt.ylabel('Credits WITH Offset [Mg]')
@@ -684,34 +685,41 @@ def plot_tech_share_combos_total(calendar_year, tech_share_combos_total):
     plt.grid()
 
 
-def select_candidate_manufacturing_decisions(tech_share_combos_total, calendar_year, search_iteration,
+def select_candidate_manufacturing_decisions(production_options, calendar_year, search_iteration,
                                              producer_iteration_log, strategic_target_offset_Mg):
     """
+    Select candidate manufacturing decisions from the cloud of production options.  If possible, there will be two
+    candidates, one on either side of the compliance target.  If not possible then the closest option will be selected.
 
     Args:
-        tech_share_combos_total:
-        calendar_year:
-        search_iteration:
-        producer_iteration_log:
+        production_options (DataFrame): dataframe of the production options, including compliance outcomes in Mg
+        calendar_year (int): the calendar year of the production options
+        search_iteration (int): the iteration number of the compliance search
+        producer_iteration_log (IterationLog): used to optionally log the production options based on developer settings
+        strategic_target_offset_Mg (float): if positive, the raw compliance outcome will be under-compliance, if
+            negative then the raw compliance outcome will be over-compliance. Used to strategically under- or over-
+            comply, perhaps as a result of the desired to earn or burn prior credits in the credit bank
 
     Returns:
+        tuple ``candidate_production_decisions`` (the best available production decisions),
+        ``compliance_possible`` (bool indicating whether compliance was possible)
 
     """
-    # tech_share_combos_total = tech_share_combos_total.drop_duplicates('total_credits_co2e_megagrams')
+    # production_options = production_options.drop_duplicates('total_credits_co2e_megagrams')
 
     cost_name = 'total_generalized_cost_dollars'
 
     mini_df = pd.DataFrame()
     mini_df['total_credits_with_offset_co2e_megagrams'] = \
-        tech_share_combos_total['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
-    mini_df['total_cost_dollars'] = tech_share_combos_total['total_cost_dollars']
-    mini_df['total_generalized_cost_dollars'] = tech_share_combos_total['total_generalized_cost_dollars']
-    mini_df['strategic_compliance_ratio'] = tech_share_combos_total['strategic_compliance_ratio']
+        production_options['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
+    mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
+    mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
+    mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
 
-    tech_share_combos_total['producer_search_iteration'] = search_iteration
-    tech_share_combos_total['winner'] = False
-    tech_share_combos_total['strategic_compliance_error'] = abs(1-tech_share_combos_total['strategic_compliance_ratio'])  # / tech_share_combos_total['total_generalized_cost_dollars']
-    tech_share_combos_total['slope'] = 0
+    production_options['producer_search_iteration'] = search_iteration
+    production_options['winner'] = False
+    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'])  # / tech_share_combos_total['total_generalized_cost_dollars']
+    production_options['slope'] = 0
 
     compliant_tech_share_options = mini_df[(mini_df['total_credits_with_offset_co2e_megagrams']) >= 0].copy()
     non_compliant_tech_share_options = mini_df[(mini_df['total_credits_with_offset_co2e_megagrams']) < 0].copy()
@@ -721,7 +729,7 @@ def select_candidate_manufacturing_decisions(tech_share_combos_total, calendar_y
         compliance_possible = True
 
         # grab lowest-cost compliant option
-        lowest_cost_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options[cost_name].idxmin()]]
+        lowest_cost_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
 
         # grab best non-compliant option
         non_compliant_tech_share_options['weighted_slope'] = \
@@ -729,7 +737,7 @@ def select_candidate_manufacturing_decisions(tech_share_combos_total, calendar_y
             ((non_compliant_tech_share_options[cost_name] - float(lowest_cost_compliant_tech_share_option[cost_name])) /
             (non_compliant_tech_share_options['strategic_compliance_ratio'] - float(lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'])))
 
-        best_non_compliant_tech_share_option = tech_share_combos_total.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+        best_non_compliant_tech_share_option = production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
 
         if float(best_non_compliant_tech_share_option[cost_name]) > float(lowest_cost_compliant_tech_share_option[cost_name]):
             # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
@@ -738,36 +746,37 @@ def select_candidate_manufacturing_decisions(tech_share_combos_total, calendar_y
                 ((compliant_tech_share_options[cost_name] - float(best_non_compliant_tech_share_option[cost_name])) /
                 (compliant_tech_share_options['strategic_compliance_ratio'] - float(best_non_compliant_tech_share_option['strategic_compliance_ratio'])))
 
-            best_compliant_tech_share_option = tech_share_combos_total.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
+            best_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
         else:
             best_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
-        winning_combos = pd.DataFrame.append(best_compliant_tech_share_option, best_non_compliant_tech_share_option)
+        candidate_production_decisions = pd.DataFrame.append(best_compliant_tech_share_option, best_non_compliant_tech_share_option)
 
     elif compliant_tech_share_options.empty:
         # grab best non-compliant option (least under-compliance)
         compliance_possible = False
-        winning_combos = tech_share_combos_total.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
+        candidate_production_decisions = production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
 
     else: # non_compliant_tech_share_options.empty:
         # grab best compliant option (least over-compliant OR lowest cost?)
         compliance_possible = True
         # least over-compliant:
-        winning_combos = tech_share_combos_total.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmin()]]
+        candidate_production_decisions = production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmin()]]
         # lowest cost:
-        # winning_combos = tech_share_combos_total.loc[[[cost_name].idxmin()]]
+        # candidate_production_decisions = tech_share_combos_total.loc[[[cost_name].idxmin()]]
 
-    if (omega_globals.options.log_producer_iteration_years == 'all') or (calendar_year in omega_globals.options.log_producer_iteration_years):
+    if (omega_globals.options.log_producer_iteration_years == 'all') or \
+            (calendar_year in omega_globals.options.log_producer_iteration_years):
         if 'producer' in omega_globals.options.verbose_console_modules:
-            tech_share_combos_total.loc[winning_combos.index, 'winner'] = True
+            production_options.loc[candidate_production_decisions.index, 'winner'] = True
             if omega_globals.options.slice_tech_combo_cloud_tables:
-                tech_share_combos_total = tech_share_combos_total[tech_share_combos_total['strategic_compliance_ratio'] <= 1.2]
-            producer_iteration_log.write(tech_share_combos_total)
+                production_options = production_options[production_options['strategic_compliance_ratio'] <= 1.2]
+            producer_iteration_log.write(production_options)
         else:
-            winning_combos['winner'] = True
-            producer_iteration_log.write(winning_combos)
+            candidate_production_decisions['winner'] = True
+            producer_iteration_log.write(candidate_production_decisions)
 
-    return winning_combos.copy(), compliance_possible
+    return candidate_production_decisions.copy(), compliance_possible
 
 
 if __name__ == '__main__':
