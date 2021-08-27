@@ -51,7 +51,7 @@ def run_effects_calcs():
     from producer.vehicle_annual_data import VehicleAnnualData
 
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
-    calendar_years = [year for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
+    calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
     print('Calculating tech volumes and shares')
     omega_log.logwrite('Calculating tech volumes and shares')
@@ -61,11 +61,9 @@ def run_effects_calcs():
                      list(), 'vehicle_id', 'calendar_year', 'age')
 
     if omega_globals.options.calc_effects.__contains__('Physical'):
-        physical_effects_dict = dict()
-        for calendar_year in calendar_years:
-            print(f'Calculating physical effects for {int(calendar_year)}')
-            omega_log.logwrite(f'Calculating physical effects for {int(calendar_year)}')
-            physical_effects_dict.update(calc_physical_effects(calendar_year))
+        print('Calculating physical effects')
+        omega_log.logwrite('Calculating physical effects')
+        physical_effects_dict = calc_physical_effects(calendar_years)
 
         if omega_globals.options.calc_effects.__contains__('Costs'):
             cost_effects_dict = dict()
