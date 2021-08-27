@@ -27,9 +27,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs
-        ICE Small Utility truck,USA Motors,2019,truck,Small SUV 4WD,Small Utility,Nice_LPW_HRL,{'pump gasoline':1.0},{'gasoline':1.0},3204422,312.3688658,0,47.00990646,216.1551053,14.29126821,4090.657984,183.2251956,73.74951226,66.63903079,7.976806551,107.4727695,140.101209,34200.17292,5.29582511,1173.586089,2726.343428
-        BEV Subcompact car,USA Motors,2019,car,Subcompact Cars,Subcompact,EV,bev_LPW_LRL,{'US electricity':1.0},{'electricity':1.0},1557,0,0.27,43.48657675,,11.50635838,3283.236994,158.2,70.2,62.75,5.35,101.2,,47975,4,,
+        vehicle_name,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure
+        ICE Compact car,OEM_B,2019,car,Compact Cars,Compact,N,ice_LPW_LRL,{'pump gasoline':1.0},{'gasoline':1.0},839879,257.8936409,0,44.28736034,175.8843009,10.89410333,3401.137407,179.9070854,70.60266938,57.67845524,5.539186933,105.9507198,117.7314786,30396.74418,4.906687002,941.7256279,2175.140322,1
+        BEV Large Utility truck,OEM_B,2019,truck,Standard SUV 4WD,Large Utility,EV,bev_MPW_HRL,{'US electricity':1.0},{'electricity':1.0},10416,0,0.36,51.8,,13.4,6000,193,76.3,65.5,6.9,115.1,,78300,5,,4000,1
 
 Data Column Name and Description
 
@@ -126,6 +126,9 @@ Data Column Name and Description
 
     :towing_capacity_lbs:
         Vehicle towing capacity (pounds)
+
+    :unibody_structure:
+        Vehicle body structure; 1 = unibody, 0 = body-on-frame
 
 ----
 

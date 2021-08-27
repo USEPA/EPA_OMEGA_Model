@@ -82,10 +82,10 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
             The vehicle's market class ID based on vehicle characteristics.
 
         """
-        if 'Pickup' in vehicle.context_size_class and vehicle.electrification_class == 'EV':
+        if vehicle.unibody_structure == 0 and vehicle.electrification_class == 'EV':
             market_class_id = 'hauling.BEV'
             non_responsive_market_group = 'hauling'
-        elif 'Pickup' in vehicle.context_size_class and vehicle.electrification_class != 'EV':
+        elif vehicle.unibody_structure == 0 and vehicle.electrification_class != 'EV':
             market_class_id = 'hauling.ICE'
             non_responsive_market_group = 'hauling'
         elif vehicle.electrification_class == 'EV':
