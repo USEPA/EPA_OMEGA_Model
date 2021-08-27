@@ -9,10 +9,10 @@ omega\_gui package
 Submodules
 ----------
 
-omega\_gui.omega\_gui\_batch module
------------------------------------
+omega\_gui.omega\_gui module
+----------------------------
 
-.. automodule:: omega_gui.omega_gui_batch
+.. automodule:: omega_gui.omega_gui
    :members:
    :undoc-members:
    :show-inheritance:
