@@ -93,12 +93,10 @@ class Form(QObject):
         This function runs once during program start.
         Loads the gui along with defining all connections and element defaults.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :param ui_file:
+        :param parent:
         """
+
         # Load the gui.
         super(Form, self).__init__(parent)
         ui_file = QFile(ui_file)
