@@ -18,27 +18,55 @@ import consumer
 cache = dict()
 
 
-def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combos, share_range, consumer_response,
-                                 node_name='', verbose=False):
+def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
+                                 consumer_response, node_name='', verbose=False):
     """
+    Create tech and share sweeps is responsible for combining tech (CO2e g/mi levels) and market share options to
+    develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
+    active policy.  The function recursively navigates the ``market_class_dict`` as a tree of market categories.
+
+    The combination of shares (to determine vehicle sales) and g/mi levels determines the CO2e Mg compliance outcome of
+    each option outside of this function.
+
+    On the first pass through this function, there are no ``candidate_production_decisions`` and there is not yet a
+    ``consumer_response`` to those production decisions so the result of the first pass is effectively unconstrained
+    (in the absence of required minimum production levels or production constraints).
+
+    On the second pass, the producer has chosen one or more candidate production options from the prior cloud of
+    choices, the share range is compressed based on the ``producer_compliance_search_convergence_factor`` setting.
+    Subsequent tech options and market shares will be generated around the ``candidate_production_decisions``.
+
+    Calls continue with subsequently tighter share ranges until the compliance target has been met within a tolerance.
+    Ultimately a single candidate production decision is selected and passed to the consumer which reacts to the
+    generalized cost of each option with a desired market share.
+
+    If none of the outcomes are within the market share convergence tolerance then subsequent calls to this function
+    include the ``consumer_response`` and are used as to generate nearby market share options, again as a function of
+    the ``share_range`` as the producer continues to search the range of tech options.
 
     Args:
-        calendar_year:
-        market_class_dict:
-        winning_combos:
-        share_range:
-        consumer_response:
-        node_name:
-        verbose:
+        calendar_year (int): the year in which the compliance calculations take place
+        market_class_dict (dict): a dict of CompositeVehicle object lists hiearchically grouped by market categories
+            into market classes
+        candidate_production_decisions (None, DataFrame): zero or 1 or 2 candidate production decisions chosen from the
+            results of the previous search iteration
+        share_range (float): determines the numerical range of share and tech options that are considered
+        consumer_response (Series): a pandas Series containing the final producer decision from prior iterations and
+            containing the consumer desired market shares based on that decision and the producer's cross-subsidy, if
+            any
+        node_name (str): name of the node in the ``market_class_dict``, used to traverse the market class tree
+        verbose (bool): enables additional console output if ``True``
 
     Returns:
-
+        A dataframe containing a range of composite vehicle CO2e g/mi options factorially combined with market share
+        options
+         
     """
-
     child_df_list = []
 
     children = list(market_class_dict)
 
+    # Generate tech options (CO2e g/mi levels)
     for k in market_class_dict:
         if verbose:
             print('processing ' + k)
@@ -46,7 +74,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
             # process subtree
             child_df_list.append(
                 create_tech_and_share_sweeps(calendar_year, market_class_dict[k],
-                                             winning_combos, share_range,
+                                             candidate_production_decisions, share_range,
                                              consumer_response,
                                              node_name=k))
         else:
@@ -65,9 +93,9 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                 veh_min_co2e_gpmi = cv.get_min_cert_co2e_gpmi()
                 veh_max_co2e_gpmi = cv.get_max_cert_co2e_gpmi()
 
-                if winning_combos is not None:
+                if candidate_production_decisions is not None:
                     co2_gpmi_options = np.array([])
-                    for idx, combo in winning_combos.iterrows():
+                    for idx, combo in candidate_production_decisions.iterrows():
 
                         if (combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0):
                             cv.tech_option_iteration_num += 1
@@ -102,6 +130,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
 
                 child_df_list.append(df)
 
+    # Generate market share options
     if consumer_response is None:
         # generate producer desired market shares for responsive market sectors
         producer_prefix = 'producer_share_frac_'
@@ -126,15 +155,18 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
 
             if share_range == 1.0:
                 # span the whole space of shares
-                sales_share_df = partition(share_column_names, num_levels=omega_globals.options.producer_num_market_share_options,
+                sales_share_df = partition(share_column_names,
+                                           num_levels=omega_globals.options.producer_num_market_share_options,
                                            min_constraints=min_constraints, max_constraints=max_constraints)
             else:
                 # narrow search span to a range of shares around the winners
                 from common.omega_functions import generate_constrained_nearby_shares
-                sales_share_df = generate_constrained_nearby_shares(share_column_names, winning_combos, share_range,
-                                                                    omega_globals.options.producer_num_market_share_options,
-                                                                    min_constraints=min_constraints,
-                                                                    max_constraints=max_constraints)
+                sales_share_df = \
+                    generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                                                       share_range,
+                                                       omega_globals.options.producer_num_market_share_options,
+                                                       min_constraints=min_constraints,
+                                                       max_constraints=max_constraints)
         else:
             sales_share_df = pd.DataFrame()
             for c, cn in zip(children, share_column_names):
@@ -154,6 +186,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, winning_combo
                 sales_share_df[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
                 share_total += sales_share_df[cn]
 
+    # Combine tech and market share options
     if verbose:
         print('combining ' + str(children))
     tech_combos_df = pd.DataFrame()
