@@ -296,7 +296,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                              candidate_production_decisions, share_range,
                                                              producer_decision_and_response)
 
-        production_options = create_production_options(calendar_year, composite_vehicles, tech_and_share_sweeps,
+        production_options = create_production_options(composite_vehicles, tech_and_share_sweeps,
                                                        context_based_total_sales)
 
         # insert code to cull production options based on policy here #
@@ -530,25 +530,25 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
     omega_globals.session.flush()
 
 
-def create_production_options(calendar_year, manufacturer_composite_vehicles, tech_and_share_combinations,
-                              total_sales):
+def create_production_options(composite_vehicles, tech_and_share_combinations, total_sales):
     """
-    on the first time through, from the producer module, total_sales is based on context, market shares
-    come from the producer desired market shares
-    on the second time through, from the omega2 module, total_sales is determined by sales response, market shares
-    come from the consumer demanded market shares...
+    Create a set of production options, including compliance outcomes, based on the given tech and share combinations.
+
+    On the first time through, from the ``producer`` module, total_sales is based on context, market shares
+    come from the producer desired market shares.
+
+    On the second time through, from the ``omega`` module, total_sales is determined by sales response, market shares
+    come from the consumer demanded market shares.
 
     Args:
-        calendar_year:
-        manufacturer_composite_vehicles:
-        tech_and_share_combinations:
-        total_sales:
+        composite_vehicles (list): list of ``CompositeVehicle`` objects
+        tech_and_share_combinations (DataFrame): the result of ``create_tech_and_share_sweeps()``
+        total_sales (float): manufacturer total vehicle sales based on the context or the consumer response
 
     Returns:
-        production_options
+        ``production_options`` DataFrame of technology and share options including compliance outcomes in CO2e Mg
 
     """
-
     production_options = tech_and_share_combinations
 
     total_target_co2e_Mg = 0
@@ -556,7 +556,7 @@ def create_production_options(calendar_year, manufacturer_composite_vehicles, te
     total_cost_dollars = 0
     total_generalized_cost_dollars = 0
 
-    for composite_veh in manufacturer_composite_vehicles:
+    for composite_veh in composite_vehicles:
         # assign sales to vehicle based on market share fractions and reg class share fractions
         market_class = composite_veh.market_class_id
 
