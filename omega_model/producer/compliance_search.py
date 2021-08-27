@@ -478,16 +478,20 @@ def create_composite_vehicles(calendar_year, compliance_id):
     return composite_vehicles, market_class_tree, context_based_total_sales
 
 
-def finalize_production(calendar_year, compliance_id, manufacturer_composite_vehicles, winning_combo):
+def finalize_production(calendar_year, compliance_id, composite_vehicles, selected_production_decision):
     """
+    Finalize vehicle production at the conclusion of the compliance search and producer-consumer market share
+    iteration.  Source ``Vehicle`` objects from the composite vehicles are are converted to ``VehicleFinal`` objects
+    and stored in the database.  Manufacturer Annual Data is updated with the certification results in CO2e Mg
 
     Args:
-        calendar_year:
-        compliance_id:
-        manufacturer_composite_vehicles:
-        winning_combo:
+        calendar_year (int): the year of the compliance search
+        compliance_id (str): manufacturer name, or 'consolidated_OEM'
+        composite_vehicles (list): list of ``CompositeVehicle`` objects
+        selected_production_decision (Series): the production decision as a result of the compliance search
 
     Returns:
+        Nothing, updates the OMEGA database with the finalized vehicles
 
     """
     from producer.manufacturer_annual_data import ManufacturerAnnualData
@@ -496,9 +500,9 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
     manufacturer_new_vehicles = []
 
     # pull final vehicles from composite vehicles
-    for cv in manufacturer_composite_vehicles:
+    for cv in composite_vehicles:
         # update sales, which may have changed due to consumer response and iteration
-        cv.initial_registered_count = winning_combo['veh_%s_sales' % cv.vehicle_id]
+        cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
             (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console_modules:
             cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
@@ -521,7 +525,7 @@ def finalize_production(calendar_year, compliance_id, manufacturer_composite_veh
                                         compliance_id=compliance_id,
                                         cert_target_co2e_Mg=cert_target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
-                                        manufacturer_vehicle_cost_dollars=winning_combo['total_cost_dollars'],
+                                        manufacturer_vehicle_cost_dollars=selected_production_decision['total_cost_dollars'],
                                         )
     omega_globals.session.flush()
 
