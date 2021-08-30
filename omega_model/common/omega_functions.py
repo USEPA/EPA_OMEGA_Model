@@ -104,19 +104,21 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         if cloud[x_key].min() != cloud[x_key].max():
             while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) \
                     and not np.isinf(min_frontier_factor) and not cloud.empty:
+
+                prior_x = frontier_pts[-1][x_key]
+                prior_y = frontier_pts[-1][y_key]
+
                 # calculate frontier factor (more negative is more better) = slope of each point relative
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                cloud = cloud.loc[cloud[x_key] > frontier_pts[-1][x_key]].copy()
-                cloud['frontier_factor'] = (cloud[y_key] - frontier_pts[-1][y_key]) / \
-                                           (cloud[x_key] - frontier_pts[-1][x_key]) \
+                cloud = cloud.loc[cloud[x_key] > prior_x].copy()
+                cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
                                            ** omega_globals.options.cost_curve_frontier_affinity_factor
                 # find next frontier point (lowest slope), if there is one, and add to frontier list
                 min_frontier_factor = cloud['frontier_factor'].min()
 
                 if min_frontier_factor > 0 and allow_upslope:
                     # frontier factor is different for up-slope (swap x & y and invert "y")
-                    cloud['frontier_factor'] = (frontier_pts[-1][x_key] - cloud[x_key]) / \
-                                               (cloud[y_key] - frontier_pts[-1][y_key]) \
+                    cloud['frontier_factor'] = (prior_x - cloud[x_key]) / (cloud[y_key] - prior_y) \
                                                ** omega_globals.options.cost_curve_frontier_affinity_factor
                     min_frontier_factor = cloud['frontier_factor'].min()
 
@@ -133,12 +135,11 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
                     if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                         frontier_pts.append(cloud.loc[idxmin])
 
-        frontier_df = pd.concat(frontier_pts, axis=1)
-        frontier_df = frontier_df.transpose()
-        frontier_df['frontier_factor'] = 0
+        frontier_df = pd.concat(frontier_pts, axis=1).transpose()
     else:
         frontier_df = cloud
-        frontier_df['frontier_factor'] = 0
+
+    frontier_df['frontier_factor'] = 0
 
     return frontier_df.copy()
 
