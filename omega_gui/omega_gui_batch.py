@@ -93,12 +93,10 @@ class Form(QObject):
         This function runs once during program start.
         Loads the gui along with defining all connections and element defaults.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :param ui_file:
+        :param parent:
         """
+
         # Load the gui.
         super(Form, self).__init__(parent)
         ui_file = QFile(ui_file)
@@ -219,12 +217,9 @@ class Form(QObject):
         """
         Clears the gui and the input dictionary.
 
-        Args:
-            N/A
+        :return:
+        """
 
-        Returns:
-            N/A
-         """
         self.clear_event_monitor()
         self.window.input_batch_file_1_result.setPlainText("")
         self.window.configuration_file_1_result.setPlainText("")
@@ -241,12 +236,9 @@ class Form(QObject):
         When complete:
             Global variable "scenario_file" = user selected configuration file name.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         # playsound(button_click_sound)
         global configuration_file, scenario, configuration_file_valid, input_batch_file_valid
         global output_batch_directory_valid, input_batch_file, output_batch_directory
@@ -369,12 +361,9 @@ class Form(QObject):
             Global variable "scenario_file" = user selected configuration file name.
             Global variable "working_directory" = User selected path to configuration file.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global configuration_file, scenario, input_batch_file, output_batch_directory
         global configuration_file_valid
         self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
@@ -421,12 +410,9 @@ class Form(QObject):
         When complete:
             Global variable "input_batch_file" = user selected input batch file.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global input_batch_file, scenario, configuration_file
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
         # self.window.statusBar().showMessage("Open File")
@@ -476,12 +462,9 @@ class Form(QObject):
         When complete:
             Global variable "output_batch_directory" = user selected output batch directory.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global output_batch_directory, scenario, configuration_file
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
         # self.window.statusBar().showMessage("Open File")
@@ -527,14 +510,12 @@ class Form(QObject):
         """
         Appends text to event monitor window.
 
-        Args:
-            text: Text to append to event monitor window
-            color: Color to display text
-            timecode: 'dt' will display current date and time before text
-
-        Returns:
-            N/A
+        :param text: Text to append to event monitor window
+        :param color: Color to display text
+        :param timecode: 'dt' will display current date and time before text
+        :return:
         """
+
         if timecode == 'dt':
             now = datetime.now()
             date_time = now.strftime("%m/%d/%Y %H:%M:%S")
@@ -547,12 +528,9 @@ class Form(QObject):
         """
         Clears the event monitor textbox.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         self.window.event_monitor_result.setPlainText("")
 
     # def wizard(self, text, color):
@@ -566,36 +544,27 @@ class Form(QObject):
         """
         Opens the OMEGA documentation website in browser.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
 
     def launch_epa_website(self):
         """
         Opens the EPA website in browser.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         os.system("start \"\" https://epa.gov")
 
     def launch_about(self):
         """
         Displays the OMEGA version in a popup box.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global omega2_version, button_click_sound
         message_title = "About OMEGA"
         message = "OMEGA Code Version = " + omega2_version
@@ -605,12 +574,9 @@ class Form(QObject):
         """
         Displays help for multiprocessor in a popup box.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global omega2_version
         message_title = "About Multiprocessor Mode"
         message = "To use Multiprocessor mode, a batch file customized to the configuration\n" \
@@ -625,12 +591,9 @@ class Form(QObject):
         """
         Handles the gui logic to enable and disable various controls and launch event monitor messages.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
 
             temp2 = "Configuration File Loaded:\n    [" + configuration_file + "]"
@@ -682,12 +645,9 @@ class Form(QObject):
         """
         Initialize various gui program functions.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global scenario, status_bar_message, omega2_version
         global configuration_file, input_batch_file, output_batch_directory, output_batch_subdirectory
         global configuration_file_valid, input_batch_file_valid, output_batch_directory_valid
@@ -748,12 +708,9 @@ class Form(QObject):
         """
         Clears all fields in the gui.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         self.window.configuration_file_1_result.setPlainText("")
         self.window.input_batch_file_1_result.setPlainText("")
         self.window.output_batch_directory_1_result.setPlainText("")
@@ -772,12 +729,9 @@ class Form(QObject):
         --dispy --local --dispy_exclusive --dispy_debug
         --timestamp [current date and time]
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         elapsed_start = datetime.now()
         # model_sound_start = 'gui/elements/click.mp3'
         # model_sound_stop = 'gui/elements/model_stop.mp3'
@@ -970,15 +924,12 @@ class Form(QObject):
 
     def showbox(self, message_title, message):
         """
-        Displays a popup message box.
 
-        Args:
-            message_title: Title for message box
-            message: Text for message box.
-
-        Returns:
-            N/A
+        :param message_title: Title for message box
+        :param message: Text for message box.
+        :return:
         """
+
         msg = QMessageBox()
         msg.setWindowTitle(message_title)
         msg.setText(message)
@@ -988,12 +939,9 @@ class Form(QObject):
         """
         Runs when the user requests gui close.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         # Close the gui.
         self.window.close()
 
@@ -1002,12 +950,9 @@ class Form(QObject):
         Runs after the user closes the gui.
         Close any processes that are running outside the gui.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         # Message to the terminal.
         print("User Terminating Process")
         # Stop timer process
@@ -1015,14 +960,11 @@ class Form(QObject):
 
     def multiprocessor_mode(self):
         """
-        Checks the status of the Multiprocessor checkbox
+        Checks the status of the Multiprocessor checkbox.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global multiprocessor_mode_selected
         if self.window.multiprocessor_checkbox.isChecked():
             self.event_monitor("Multi Processor Mode Selected", "black", 'dt')
@@ -1035,12 +977,10 @@ class Form(QObject):
         """
         Enables and disables the run model button.
 
-        Args:
-            enable: Boolean to enable or disable run model button and display appropriate button image
-
-        Returns:
-            N/A
+        :param enable: Boolean to enable or disable run model button and display appropriate button image
+        :return:
         """
+
         if enable:
             self.window.run_model_button.setIcon(QIcon(run_button_image_enabled))
             self.window.run_model_button.setEnabled(1)
@@ -1056,12 +996,10 @@ class Form(QObject):
         """
         Enables and disables various gui functions during model run.
 
-        Args:
-            enable: Boolean to enable or disable selected gui functions during model run
-
-        Returns:
-            N/A
+        :param enable: Boolean to enable or disable selected gui functions during model run
+        :return:
         """
+
         self.window.open_configuration_file_button.setEnabled(enable)
         self.window.save_configuration_file_button.setEnabled(enable)
         self.window.select_input_batch_file_button.setEnabled(enable)
@@ -1089,12 +1027,9 @@ class Form(QObject):
         """
         Opens a Windows dialog to select a previous model run for plotting.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global plot_select_directory
         global plot_select_directory_name
         file_name = ""
@@ -1134,12 +1069,9 @@ class Form(QObject):
         """
         Opens the current model run for plotting.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global plot_select_directory_name
         global plot_select_directory
         self.window.list_graphs_1.clear()
@@ -1166,12 +1098,9 @@ class Form(QObject):
         """
         Plots the selected data.
 
-        Args:
-            N/A
-
-        Returns:
-            N/A
+        :return:
         """
+
         global plot_select_directory_name
         global plot_select_directory
         # See if valid selections have been made
@@ -1189,12 +1118,9 @@ def status_bar():
     """
     Called once per second to display the date, time, and global variable "status_bar_message" in the status bar.
 
-    Args:
-        N/A
-
-    Returns:
-        N/A
+    :return:
     """
+
     global status_bar_message
     # Put date, time, and message on status bar
     now = datetime.now()
