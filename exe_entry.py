@@ -12,7 +12,7 @@ pyinstaller exe_entry.py --name omega2 --paths omega_model:omega_gui --add-data 
 """
 
 # import omega_model
-import omega_gui.omega_gui_batch
+import omega_gui.omega_gui
 
 # omega_model.run_omega(omega_model.OMEGARuntimeOptions(), standalone_run=True)
-omega_gui.omega_gui_batch.run_gui()
+omega_gui.omega_gui.run_gui()
