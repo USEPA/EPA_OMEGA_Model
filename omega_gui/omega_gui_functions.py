@@ -21,12 +21,10 @@ def open_file_action(filepath):
     """
     Loads a yaml formatted file and converts to a Python formatted dictionary.
 
-    Args:
-        filepath: Full path of yaml source file
-
-    Returns:
-        Python formatted dictionary
+    :param filepath: Full path of yaml source file
+    :return: Python formatted dictionary
     """
+
     with open(filepath, "r") as file_descriptor:
         data = yaml.full_load(file_descriptor)
     return data
@@ -36,29 +34,24 @@ def save_file_action(filepath, data):
     """
     Dumps data to a yaml file.
 
-    Args:
-        filepath: Full path to destination file
-        data: Dictionary to save
-
-    Returns:
-        N/A
+    :param filepath: Full path to destination file
+    :param data: Dictionary to save
+    :return:
     """
+
     with open(filepath, "w") as file_descriptor:
         yaml.dump(data, file_descriptor)
 
 
 def file_dialog_save(file_name, file_type, file_dialog_title):
     """
-    Opens a file dialog to select a file with extension options.
 
-    Args:
-        file_name: Default file name
-        file_type: Specifies extension filter type
-        file_dialog_title: Title for dialog box
-
-    Returns:
-        User selected file name, Echo file_type, Echo file_dialog_title
+    :param file_name: Default file name
+    :param file_type: Specifies extension filter type
+    :param file_dialog_title: Title for dialog box
+    :return: User selected file name, Echo file_type, Echo file_dialog_title
     """
+
     dialog = QFileDialog()
     dialog.selectFile(file_name)
     dialog.setWindowTitle(file_dialog_title)
@@ -81,14 +74,12 @@ def file_dialog(file_name, file_type, file_dialog_title):
     """
     Opens a file dialog to select a file with extension options.
 
-    Args:
-        file_name: Default file name
-        file_type: Specifies extension filter type
-        file_dialog_title: Title for dialog box
-
-    Returns:
-        User selected file name, Echo file_type, Echo file_dialog_title
+    :param file_name: Default file name
+    :param file_type: Specifies extension filter type
+    :param file_dialog_title: Title for dialog box
+    :return: User selected file name, Echo file_type, Echo file_dialog_title
     """
+
     dialog = QFileDialog()
     dialog.selectFile(file_name)
     dialog.setWindowTitle(file_dialog_title)
@@ -110,14 +101,12 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     """
     Opens a file dialog to select a directory.
 
-    Args:
-        file_name: Default file name
-        file_type: Specifies extension filter type
-        file_dialog_title: Title for dialog box
-
-    Returns:
-        User selected directory name, Echo file_type, Echo file_dialog_title
+    :param file_name: Default file name
+    :param file_type: Specifies extension filter type
+    :param file_dialog_title: Title for dialog box
+    :return: User selected directory name, Echo file_type, Echo file_dialog_title
     """
+
     dialog = QFileDialog()
     dialog.selectFile(file_name)
     dialog.setWindowTitle(file_dialog_title)
@@ -142,12 +131,10 @@ def sec_to_hours(seconds):
     """
     Converts seconds to hours, minutes, and seconds.
 
-    Args:
-        seconds: Seconds
-
-    Returns:
-        formatted xx hours  xx mins  xx seconds
+    :param seconds: Seconds
+    :return: Formatted xx hours  xx mins  xx seconds
     """
+
     a = str(seconds//3600)
     b = str((seconds % 3600)//60)
     c = str((seconds % 3600) % 60)
@@ -159,12 +146,10 @@ def status_output_color(g):
     """
     Examines strings for specific cases to change the color for display.
 
-    Args:
-        g: input string
-
-    Returns:
-        Color for display
+    :param g: input string
+    :return: Color for display
     """
+
     if g.find("Manufacturer=") != -1:
         g = "green"
     elif g.find("RROR") == -1 and g.find("rror") == -1 and g.find("###") == -1 and g.find("FAIL") == -1\
@@ -179,12 +164,13 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name, 
     """
     Reads a csv file and plots selected graph.
 
-    Args:
-        y-axis: column to plot
-
-    Returns:
-        N/A
+    :param plot_selection:
+    :param scenario_selection:
+    :param plot_select_directory_name:
+    :param plot_select_directory:
+    :return:
     """
+
     import os
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
 
@@ -235,15 +221,12 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name, 
 
 def is_running(script):
     """
-        Checks to see if a Python script is running.
+    Checks to see if a Python script is running.
 
-        Args:
-            script: Python script to check
+    :param script: Python script to check
+    :return: True if script is running - False if script is not running
+    """
 
-        Returns:
-            True if script is running
-            False if script is not running
-        """
     for q in psutil.process_iter():
         if q.name().startswith('python'):
             if len(q.cmdline())>1 and script in q.cmdline()[1] and q.pid !=os.getpid():

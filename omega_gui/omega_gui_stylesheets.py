@@ -10,12 +10,10 @@ def tab_stylesheet(stylesheet):
     """
     Loads the stylesheet for the tab area of the gui.
 
-    Args:
-        N/A
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
 
-    Returns:
-        String containing stylesheet.
-        """
     stylesheet = """
             QTabBar::tab { 
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -55,12 +53,10 @@ def background_stylesheet(stylesheet):
     """
     Loads the stylesheet for the main window of the gui.
 
-    Args:
-        N/A
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
 
-    Returns:
-        String containing stylesheet.
-        """
     stylesheet = """
         QWidget {
             background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
@@ -74,12 +70,10 @@ def button_stylesheet(stylesheet):
     """
     Loads the stylesheet for buttons contained in the gui.
 
-    Args:
-        N/A
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
 
-    Returns:
-        String containing stylesheet.
-        """
     stylesheet = """
         QPushButton {
         background-color: rgb(32, 84, 147);
@@ -111,12 +105,10 @@ def logo_button_stylesheet(stylesheet):
     """
     Loads the stylesheet for logo buttons contained in the gui.
 
-    Args:
-        N/A
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
 
-    Returns:
-        String containing stylesheet.
-        """
     stylesheet = """
         QPushButton {
         background-color: rgb(00, 113, 188);
@@ -148,12 +140,10 @@ def label_stylesheet(stylesheet):
     """
     Loads the stylesheet for labels contained in the gui.
 
-    Args:
-        N/A
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
 
-    Returns:
-        String containing stylesheet.
-        """
     stylesheet = """
         QLabel { color : white; }
      """
@@ -164,12 +154,10 @@ def checkbox_stylesheet(stylesheet):
     """
     Loads the stylesheet for checkboxes contained in the gui.
 
-    Args:
-        N/A
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
 
-    Returns:
-        String containing stylesheet.
-        """
     stylesheet = """
         QCheckBox { color : white; }
      """
