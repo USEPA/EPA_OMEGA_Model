@@ -924,6 +924,7 @@ class Form(QObject):
 
     def showbox(self, message_title, message):
         """
+        Displays a popup message box.
 
         :param message_title: Title for message box
         :param message: Text for message box.
