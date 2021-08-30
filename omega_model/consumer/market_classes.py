@@ -84,18 +84,14 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
         """
         if vehicle.unibody_structure == 0 and vehicle.electrification_class == 'EV':
             market_class_id = 'hauling.BEV'
-            non_responsive_market_group = 'hauling'
         elif vehicle.unibody_structure == 0 and vehicle.electrification_class != 'EV':
             market_class_id = 'hauling.ICE'
-            non_responsive_market_group = 'hauling'
         elif vehicle.electrification_class == 'EV':
             market_class_id = 'non_hauling.BEV'
-            non_responsive_market_group = 'non_hauling'
         else:
             market_class_id = 'non_hauling.ICE'
-            non_responsive_market_group = 'non_hauling'
 
-        return market_class_id, non_responsive_market_group
+        return market_class_id
 
     @staticmethod
     # override this method in the user-defined MarketClass

@@ -156,9 +156,9 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, base_year_reg_class_id, reg_class_id, in_use_fuel_id, market_group, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
+            mfr_id, base_year_reg_class_id, reg_class_id, in_use_fuel_id, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
                 = physical['manufacturer_id'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
-                  physical['in_use_fuel_id'], physical['non_responsive_market_group'], \
+                  physical['in_use_fuel_id'], \
                   physical['registered_count'], physical['annual_vmt'], physical['vmt'], \
                   physical['vmt_liquid_fuel'], physical['vmt_electricity']
 
@@ -281,7 +281,6 @@ def calc_cost_effects(physical_effects_dict):
                                      'base_year_reg_class_id': base_year_reg_class_id,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
-                                     'non_responsive_market_group': market_group,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
                                      'vmt': vmt,

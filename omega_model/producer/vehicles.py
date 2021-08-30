@@ -691,8 +691,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'epa_size_class',
-                       'context_size_class', 'base_year_market_share', 'non_responsive_market_group',
-                       'electrification_class'}
+                       'context_size_class', 'base_year_market_share', 'electrification_class'}
 
     # transfer base properties
     for attr in base_properties:
@@ -771,7 +770,6 @@ class Vehicle(OMEGABase):
         self.epa_size_class = None
         self.context_size_class = None
         self.base_year_market_share = 0
-        self.non_responsive_market_group = None
         self.electrification_class = None
         self.cert_target_co2e_grams_per_mile = 0
         self.cert_co2e_Mg = 0
@@ -988,7 +986,6 @@ class VehicleFinal(SQABase, Vehicle):
     epa_size_class = Column(String)  #: EPA size class
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
-    non_responsive_market_group = Column(String)  #: vehicle non-responsive market group, used to maintain relative market share between market classes that don't have a sales response in the consumer subpackage
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
     cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
@@ -1138,7 +1135,7 @@ class VehicleFinal(SQABase, Vehicle):
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
-                              'base_year_market_share', 'non_responsive_market_group'] + \
+                              'base_year_market_share'] + \
                              VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
@@ -1218,7 +1215,7 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.fueling_class = 'ICE'
 
                     veh.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
-                    veh.market_class_id, veh.non_responsive_market_group = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+                    veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
                     veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
 
@@ -1236,15 +1233,18 @@ class VehicleFinal(SQABase, Vehicle):
 
                     vehicles_list.append(veh)
 
-                    if veh.non_responsive_market_group not in NewVehicleMarket.context_size_class_info_by_nrmc:
-                        NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group] = dict()
+                    non_responsive_market_category = \
+                        omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
+
+                    if non_responsive_market_category not in NewVehicleMarket.context_size_class_info_by_nrmc:
+                        NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category] = dict()
 
                     if veh.context_size_class not in \
-                            NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group]:
-                        NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group][veh.context_size_class] = \
+                            NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category]:
+                        NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class] = \
                             {'total': veh.initial_registered_count, 'share': 0}
                     else:
-                        NewVehicleMarket.context_size_class_info_by_nrmc[veh.non_responsive_market_group][veh.context_size_class]['total'] += \
+                        NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
                             veh.initial_registered_count
 
                     if veh.context_size_class not in NewVehicleMarket.context_size_classes:
