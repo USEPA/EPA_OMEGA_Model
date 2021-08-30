@@ -22,7 +22,7 @@ def open_file_action(filepath):
     Loads a yaml formatted file and converts to a Python formatted dictionary.
 
     :param filepath: Full path of yaml source file
-    :return:
+    :return: Python formatted dictionary
     """
 
     with open(filepath, "r") as file_descriptor:
@@ -49,7 +49,7 @@ def file_dialog_save(file_name, file_type, file_dialog_title):
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
-    :return:
+    :return: User selected file name, Echo file_type, Echo file_dialog_title
     """
 
     dialog = QFileDialog()
@@ -77,7 +77,7 @@ def file_dialog(file_name, file_type, file_dialog_title):
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
-    :return:
+    :return: User selected file name, Echo file_type, Echo file_dialog_title
     """
 
     dialog = QFileDialog()
@@ -104,7 +104,7 @@ def directory_dialog(file_name, file_type, file_dialog_title):
     :param file_name: Default file name
     :param file_type: Specifies extension filter type
     :param file_dialog_title: Title for dialog box
-    :return:
+    :return: User selected directory name, Echo file_type, Echo file_dialog_title
     """
 
     dialog = QFileDialog()
@@ -132,7 +132,7 @@ def sec_to_hours(seconds):
     Converts seconds to hours, minutes, and seconds.
 
     :param seconds: Seconds
-    :return:
+    :return: Formatted xx hours  xx mins  xx seconds
     """
 
     a = str(seconds//3600)
@@ -224,7 +224,7 @@ def is_running(script):
     Checks to see if a Python script is running.
 
     :param script: Python script to check
-    :return: True if script is running, False if script is not running
+    :return: True if script is running - False if script is not running
     """
 
     for q in psutil.process_iter():
