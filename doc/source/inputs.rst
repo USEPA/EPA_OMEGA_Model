@@ -195,6 +195,33 @@ The desired plot will appear as shown in :numref:`ug_label10` below.
 
     Typical Plot Output
 
+.. admonition:: Demo example: Manufacturer compliance plot
+
+    The manufacturer compliance plot provides several visual details on how the manufacturers are achieving compliance (or not) for each model year, and is a good starting point to inform the user of the model results.  An example run with the demo inputs is shown in :numref:`ug_plot`.
+
+.. _ug_plot:
+.. figure:: _static/ug_figures/comp_plot.jpg
+    :align: center
+
+    Typical manufacturer compliance plot
+
+The following describes the key features of this plot:
+
+* The Y-axis represents the total CO2 emissions, in metric tons (or Mg) for each model year.
+* The blue line and dots represent the required industry standard for each year, in metric tons (Mg).
+* The orange line and dots represent the industry-achieved net standard after credits have been applied or carried to other model years.
+* Green lines indicate the source model year (green dot) and the model year in which credits have been applied (the ending arrow)
+* Vertical down arrows, in red, indicate that some or all credits were expired (forfeited) that were generated in that model year.
+* Red x icons indicate years that compliance was not achieved.
+
+Other plots that may be of interest to the user include:
+
+* sales shares, based on context size class, market category, market class, reg class
+* total industry sales
+* average vehicle certification CO2 g/mi, by market category and market class
+* average vehicle certification energy consumption (kWh/mi), by market category and market class
+* average vehicle cost, by market category and market class
+
 There are also 3 primary output files associated with the effects module. Those files are:
 
 * physical_effects.csv
@@ -229,3 +256,10 @@ associated with a ton of each pollutant. As such, the criteria and climate "cost
 associated with pollution, but rather the first step in estimating the benefits associated with reductions of those pollutants. For that
 reason, the user must be careful not to consider those as absolute costs, but once compared to the "costs" of another scenario (presumably
 via calculation of a difference in "costs" between two scenarios) the result can be interpreted as a benefit.
+
+Additionally, OMEGA also outputs the following CSVs from the Producer Module:
+
+* a year-by-year list of credit balances
+* a ledger of credit transactions between model years to achieve compliance
+
+
