@@ -160,10 +160,13 @@ Vehicle Definitions
 -------------------
 The core unit impacted by decisions in the Producer Module is at the vehicle level. Each OMEGA “vehicle” is defined in the analysis context and represents a set of distinct attributes. In the demo, for example, the attributes associated with each vehicle definition are included in the vehicles.csv file. The figure below shows a subset of attributes that characterize each vehicle in the demo.
 
+.. _mo_label_vehicles:
 .. figure:: _static/mo_figures/vehicles.csv.png
     :align: center
 
-As shown in the figure, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity. A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
+    Sample fields in vehicles.csv file
+
+As shown in :numref:`mo_label_vehicles`, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity. A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
 
 Vehicle Simulation and Cost Inputs
 ------------------------------------------
