@@ -217,6 +217,10 @@ The producer’s generalized cost is made up of both the monetary expenses of br
 
 Consumer Module
 ^^^^^^^^^^^^^^^
+The Consumer Module is a significant addition to OMEGA. With the ongoing evolutions in the light-duty vehicle market, including major growth in technologies and services, the need for an endogenous consumer response is clear. The Consumer Module is structured to project how consumers of light-duty vehicles would respond to policy-driven changes in new vehicle prices, fuel operating costs, trip fees for ride hailing services, and other consumer-facing elements. The module is set up to allow the inputs to affect total new vehicle sales (both in number and proportion of sales attributes to different market classes), total vehicle stock (including how the used vehicle market responds), and total vehicle use (the VMT of the stock of vehicles).
+
+An important consideration with the addition of the Consumer Module is ensuring consistency between the set of vehicles and their attributes that the Producer Module supplies and the set of vehicles adn their attributes that the Consumer Module demands. In order to estimate the set of new vehicles that provide this equilibrium, the Consumer and Producer modules iterate until convergence is achieved - where the set of vehicles, including their prices adn attributes, that satisfy producers is the same est of vehicles that satisfy consumers.
+
 Consumer Module Overview
 ------------------------
 As explained in the Overview chapter, and shown in :numref:`mo_label_compare`, OMEGA is structured in a modular format. This means that each primary module, the Policy Module, Producer Module, Consumer Module and Effects Module, can be changed without requiring code changes in other modules. This ensures users can update model assumptions and methods while preserving the consistency and functionality of OMEGA.
@@ -224,19 +228,19 @@ As explained in the Overview chapter, and shown in :numref:`mo_label_compare`, O
 An overview of the Consumer Module can be seen in :numref:`al_label_cm_ov`. This overview shows the connections between the Consumer Module, the analysis context, and other OMEGA modules. The Consumer Module receives inputs from the analysis context and the Producer Module, and computes outputs used in iteration with the Producer Module and for use in the Effects Module.
 
 .. _al_label_cm_ov:
-.. figure:: _static/consmod_ov.png
+.. figure:: _static/al_figures/consmod_ov.png
     :align: center
 
     Overview of the Consumer Module
 
 .. sidebar:: Reregistration
 
-    Reregistration measures the vehicles that have been kept in the fleet for onroad use, or reregistered, each year; that is, it measures the used vehicle stock. Reregistration can be thought of as the flip side of scrappage. Scrappage measures the vehicles that are taken out of use each year. The term is used throughout OMEGA for precision in describing the vehicle stock of interest in an analysis of policy effects, which is made up of registered and in-use vehicles, as opposed to vehicles which have not been physically scrapped.
+    Reregistration measures the vehicles that have been kept in the fleet for onroad use, or reregistered, each year; that is, it measures the used vehicle stock. Reregistration can be thought of as those vehilces that survive (the inverse of scrappage). Scrappage measures the vehicles that are taken out of use each year. The term is used throughout OMEGA for precision in describing the vehicle stock of interest in an analysis of policy effects, which is made up of registered and in-use vehicles, as opposed to vehicles which have not been physically scrapped.
 
-The Consumer Module’s purpose is to estimate how light duty vehicle ownership and use respond to key vehicle characteristics within a given analysis context. There are five main user-definable elements estimated within the Consumer Module, as seen in :numref:`al_label_inside_cm`. These estimates are: total new sales volumes, market class definitions, shares of new vehicles by market class (where market classes depend on the requirements of the specific consumer decision approach used in the analysis), used vehicle market responses (including reregistration), and the use of both new and used vehicles in the market measured using vehicle miles traveled (VMT). Further explanations of each of these elements are described in the following sections.
+The Consumer Module’s purpose is to estimate how light duty vehicle ownership and use respond to key vehicle characteristics within a given analysis context. There are five main user-definable elements estimated within the Consumer Module, as seen in :numref:`al_label_inside_cm`. These estimates are: market class definitions, new sales volumes, new vehicle sales sharesby market class (where market classes depend on the requirements of the specific consumer decision approach used in the analysis), used vehicle market responses (including reregistration), and new and used vehicle use measured using vehicle miles traveled (VMT). Further explanations of each of these elements are described in the following sections.
 
 .. _al_label_inside_cm:
-.. figure:: _static/inside_cm.png
+.. figure:: _static/al_figures/inside_cm.png
     :align: center
 
     Inside the Consumer Module
@@ -245,13 +249,13 @@ The Consumer Module’s purpose is to estimate how light duty vehicle ownership 
 
     Throughout this chapter, 'shares' refers to the portion of all new vehicle sales that are classified into each of the different user-defined vehicle market classes.
 
-The Consumer Module works in two phases: first, an iterative new vehicle phase, followed by a non-iterative stock and use phase. During the first phase, the Consumer Module and Producer Module iterate to achieve convergence on the estimates of new vehicles produced and demanded. Candidate vehicle prices and attributes are passed from the Producer Module to the Consumer Module, while the resulting estimates of total new vehicles demanded, and the shares of those new vehicles in the specified market classes, is passed back to the Producer Module. Once convergence between the Producer and Consumer Module is achieved, the Consumer Module enters the second phase. In this phase, total vehicle stock (new and used vehicles and their attributes) and use (VMT) are estimated.
+The Consumer Module works in two phases: first, an iterative new vehicle phase, followed by a non-iterative stock and use phase. During the first phase, the Consumer Module and Producer Module iterate to achieve convergence on the estimates of new vehicles produced and demanded. The Producer Module sends a set of candidate vehicles, including their prices and attributes, to the Consumer Module to consider. The Consumer Module uses that set of candidate vehicles to estimate total new vehicles demanded and the shares of those new vehicles in the specified market classes, which are passed back to the Producer Module. If the estimates do not converge, a new set of candidate vehicles is sent to teh Consumer Module for consideration. Once convergence between the Producer and Consumer Module is achieved, the set of candidate vehicles are no longer considered candidates for consideration, but are the estimated new vehicle fleet, and the Consumer Module enters the second phase. In this phase, total vehicle stock (new and used vehicles and their attributes) and use (VMT) are estimated.
 
 **Inputs to the Consumer Module**
-Because the Consumer Module's internal representation of consumer decisions can be defined by the user, the specific inputs required will depend on the approach used. In general, the Consumer Module uses exogenous inputs from the Analysis Context, and endogenous inputs from the Producer Module. The exogenous inputs may include items such as fuel prices, existing vehicle stock, and specific modeling parameters such as those used in estimation vehicle ownership and use decision as a function of policies being analyzed. The analysis context must also contain the information needed to define projections of vehicle ownership and use in the absence of any policy alternatives being analyzed. These projections might be provided directly as inputs to the Consumer Module, or generated within the Consumer Module based on exogenous inputs, including future demographic or macroeconomic trends. Endogenous inputs are factors determined withing the model and passed to the Consumer Module from the Producer Module. They may include vehicle prices and other relevant vehicle attributes, such as fuel consumption rate. The vehicle attributes needed as inputs to the Consumer Module are determined by the methods used to estimate new vehicle sales, the market shares of vehicles demanded, used vehicle reregistration, and new and used vehicle use.
+Because the Consumer Module's internal representation of consumer decisions can be defined by the user, the specific inputs required will depend on the approach used. In general, the Consumer Module uses exogenous inputs from the analysis context, and endogenous inputs from the Producer Module. The exogenous inputs may include items such as fuel prices, existing vehicle stock, and specific modeling parameters such as those used in estimation of vehicle ownership and use decision as a function of policies being analyzed. The analysis context must also contain the information needed to define projections of vehicle ownership and use in the absence of any policy alternatives being analyzed. These projections might be provided directly as inputs to the Consumer Module, or generated within the Consumer Module based on exogenous inputs, including future demographic or macroeconomic trends. Endogenous inputs are factors determined within the model and passed to the Consumer Module from the Producer Module. They may include vehicle prices and other relevant vehicle attributes, such as fuel consumption rate. The vehicle attributes needed as inputs to the Consumer Module are determined by the methods used to estimate new vehicle sales, the market shares of vehicles demanded, used vehicle reregistration, and new and used vehicle use.
 
 **Outputs of the Consumer Module**
-The Consumer Module produces two categories of outputs. During the iterative phase, outputs of the Consumer Module, including new vehicle sales and responsive market shares (explained in the following section), are fed back to the Producer Module for iteration and convergence. Once that convergence is achieved, the Consumer Module estimates the outputs for total stock at the vehicle level, including new vehicle sales, the total stock of new and reregistered used vehicles and VMT, that are used by the Effects Module.
+The Consumer Module produces two categories of outputs: sales estimates during the iterative Phase 1, and stock and use estimates during the non-iterative Phase 2. During the iterative phase, outputs of the Consumer Module, including new vehicle sales and responsive market shares (explained in the following section), are fed back to the Producer Module for iteration and convergence. See section 3.4.3 for more information on what happens during Phase 1, and Section 3.5 for more detailed information on how OMEGA estimates iteration and convergence between the Producer and Consumer modules. Once that convergence is achieved, the Consumer Module estimates the outputs of the stock of vehicles, including both new and reregistered used vehicles, and VMT, which are used by the Effects Module.
 
 Market Class Definitions
 ------------------------
@@ -272,7 +276,7 @@ Before the Consumer Module can estimate sales and or shares response, all vehicl
         :numref:`mo_label_mktree` Illustration of the Market Class Structure in the Demo Analysis.
 
         .. _mo_label_mktree:
-        .. figure:: _static/mo_figures/market_class_tree.png
+        .. figure:: _static/al_figures/market_class_tree.png
             :align: center
 
 

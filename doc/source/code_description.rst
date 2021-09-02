@@ -2,8 +2,6 @@
 
 .. _developer_guide_label:
 
-.. _Developer Guide:
-
 Developer Guide
 ===============
 
