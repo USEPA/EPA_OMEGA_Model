@@ -47,7 +47,7 @@ The lists of policy alternatives and analysis context inputs are provided below.
 Policy Alternatives Inputs:
 	* Emissions targets
 	* Rules on banking/trading of credits
-	* Technology multipliers
+	* Technology multipliers (if applicable)
 	* Reg class definitions
 	* VMT assumption
 
@@ -56,11 +56,13 @@ Analysis Context Inputs:
 	* Vehicle costs
 	* Vehicle prices
 	* Vehicle energy consumption
-	* Off-cycle credit tech values
+    * Fuel emissions factors
+	* Off-cycle credit tech values (if applicable).  This file also includes A/C credits, despite the title.
 	* Starting credit balances
 	* Fuel Costs (gas and electricity)
-	* Vehicle Fleet
+	* Vehicle fleet.  The characterization of the base year vehicle fleet, which includes the list of all vehicles and sales volumes represented in the base year.  “Vehicles” are further defined in 3.3.2.
 	* Vehicle VMT distribution
+    * Simulated vehicles.  The list of simulated vehicle and powertrain technology combinations, and associated attributes (weight, applied technology, CO2 emissions, fuel consumption, etc.) available to the manufacturer within the producer module.
 
 Projections and the Analysis Context
 ------------------------------------
