@@ -278,7 +278,7 @@ class CreditBank(OMEGABase):
         Expiration takes the form of entries in the ``transaction_log``.
 
             * Expiring credits with non-zero balances are marked as 'EXPIRATION' transactions and then dropped
-            * Expiring debits with non-zero balances are marked as 'PAST_DUE' transactions and are not dropped
+            * Expiring debits with non-zero balances are marked as 'PAST_DUE' transactions and are then dropped
 
         Result is an updated ``credit_bank`` and an updated ``transaction_log``, as needed
 
@@ -321,6 +321,7 @@ class CreditBank(OMEGABase):
                     t['credit_value_Mg'] = debit['ending_balance_Mg']
                     t['credit_destination'] = 'PAST_DUE'
                     self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
+                    last_years_credits = last_years_credits.drop(idx)
 
         self.credit_bank = pd.DataFrame.append(self.credit_bank, last_years_credits)
 
