@@ -19,6 +19,7 @@ Simulation Scope, Resolution, and Units of Analysis
 The model boundary of OMEGA as illustrated in :numref:`al_label_modelboundary` defines the system elements which are modeled internally, and the elements which are specified as user inputs and assumptions. The timeframe of a given analysis spans the years between analysis start and end years defined by the user. Together, the boundary and analysis timeframe define the scope of an analysis.
 
 .. _al_label_modelboundary:
+
 .. figure:: _static/al_figures/model_boundary.png
     :align: center
 
