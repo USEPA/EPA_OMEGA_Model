@@ -110,7 +110,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
                 # calculate frontier factor (more negative is more better) = slope of each point relative
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                cloud = cloud.loc[cloud[x_key] > prior_x].copy()
+                cloud = cloud.loc[cloud[x_key] > prior_x] # .copy()
                 cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
                                            ** omega_globals.options.cost_curve_frontier_affinity_factor
                 # find next frontier point (lowest slope), if there is one, and add to frontier list
