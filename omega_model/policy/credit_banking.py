@@ -302,13 +302,11 @@ class CreditBank(OMEGABase):
         current_credits = []
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
-        credit_max_life_years = self.get_credit_param(calendar_year, 'credit_carryforward_years')
-        debit_max_life_years = self.get_credit_param(calendar_year, 'credit_carryback_years')
-
         # apply lifetime rules
         ghg_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
         if not ghg_credits.empty:
             for _, credit in ghg_credits.iterrows():
+                credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if credit['age'] <= credit_max_life_years:
                     current_credits.append(
                         CreditInfo(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1))
@@ -319,6 +317,7 @@ class CreditBank(OMEGABase):
         ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
         if not ghg_debits.empty:
             for _, debit in ghg_debits.iterrows():
+                debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if debit['age'] <= debit_max_life_years:
                     current_debits.append(
                         CreditInfo(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1))
@@ -339,12 +338,11 @@ class CreditBank(OMEGABase):
         expiring_credits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
-        credit_max_life_years = self.get_credit_param(calendar_year, 'credit_carryforward_years')
-
         # apply lifetime rules
         ghg_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
         if not ghg_credits.empty:
             for _, credit in ghg_credits.iterrows():
+                credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if credit['age'] == credit_max_life_years:
                     expiring_credits_Mg = credit['ending_balance_Mg']
 
@@ -365,12 +363,11 @@ class CreditBank(OMEGABase):
         expiring_debits_Mg = 0
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year]
 
-        debit_max_life_years = self.get_credit_param(calendar_year, 'credit_carryback_years')
-
         # apply lifetime rules
         ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
         if not ghg_debits.empty:
             for _, debit in ghg_debits.iterrows():
+                debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if debit['age'] >= debit_max_life_years:
                     expiring_debits_Mg += debit['ending_balance_Mg']
 
@@ -403,14 +400,12 @@ class CreditBank(OMEGABase):
         last_years_credits['calendar_year'] = calendar_year
         last_years_credits['beginning_balance_Mg'] = last_years_credits['ending_balance_Mg']
 
-        credit_max_life_years = self.get_credit_param(calendar_year, 'credit_carryforward_years')
-        debit_max_life_years = self.get_credit_param(calendar_year, 'credit_carryback_years')
-
         # apply lifetime rules
         ghg_credits = last_years_credits[last_years_credits['ending_balance_Mg'] >= 0]
         if not ghg_credits.empty:
             for idx, credit in ghg_credits.iterrows():
                 # log the death of non-zero value credits
+                credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if ((credit['age'] > 0) and (credit['ending_balance_Mg'] == 0)) or \
                         credit['age'] > credit_max_life_years:
                     if credit['ending_balance_Mg'] > 0:
@@ -423,6 +418,7 @@ class CreditBank(OMEGABase):
         ggh_debits = last_years_credits[last_years_credits['beginning_balance_Mg'] < 0]
         if not ggh_debits.empty:
             for idx, debit in ggh_debits.iterrows():
+                debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if (debit['age'] > 0) and (debit['ending_balance_Mg'] == 0):
                     # silently drop zero-value debits after age 0
                     last_years_credits = last_years_credits.drop(idx)
