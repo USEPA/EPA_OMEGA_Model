@@ -157,7 +157,9 @@ def run_producer_consumer():
 
         analysis_end_year = omega_globals.options.analysis_final_year + 1
 
-        credit_banks[compliance_id] = CreditBank(omega_globals.options.ghg_credits_file, compliance_id)
+        credit_banks[compliance_id] = CreditBank(
+            omega_globals.options.ghg_credit_params_file,
+            omega_globals.options.ghg_credits_file, compliance_id)
 
         for calendar_year in range(omega_globals.options.analysis_initial_year, analysis_end_year):
 
@@ -926,6 +928,9 @@ def init_omega(session_runtime_options):
 
         init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
                                                verbose=verbose_init)
+
+        init_fail += CreditBank.validate_ghg_credit_params_template(omega_globals.options.ghg_credit_params_file,
+                                                              verbose=verbose_init)
 
         init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
                                                               verbose=verbose_init)

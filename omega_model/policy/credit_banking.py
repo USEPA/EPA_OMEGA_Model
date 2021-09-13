@@ -11,7 +11,42 @@ See Also:
 
 ----
 
-**INPUT FILE FORMAT**
+**INPUT FILE FORMAT (GHG credit parameters file)**
+
+The file format consists of a one-row template header followed by a one-row data header and subsequent data
+rows.
+
+The data represents GHG credit parameters such as credit carry-forward and carry-back year limits
+
+File Type
+    comma-separated values (CSV)
+
+Template Header
+    .. csv-table::
+
+       input_template_name:,ghg_credit_params,input_template_version:,0.1
+
+Sample Data Columns
+    .. csv-table::
+        :widths: auto
+
+        start_year,credit_carryforward_years,credit_carryback_years
+        2020,5,3
+
+Data Column Name and Description
+
+:start_year:
+    Start model year of the credit parameter
+
+:credit_carryforward_years:
+    Number of years the credit can carry forward to pay future debits
+
+:credit_carryback_years:
+    Number of years the credit can carry back to pay prior debits
+
+----
+
+**INPUT FILE FORMAT (GHG credits file)**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
@@ -57,13 +92,6 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-credit_max_life_years = 5  #: credit max life, in years, a.k.a. credit carry-foward
-debit_max_life_years = 3  #: debit max life, in years, a.k.a. credit carry-back
-
-_input_template_name = 'ghg_credit_history'
-_input_template_version = 0.21
-_input_template_columns = {'calendar_year', 'model_year', 'compliance_id', 'balance_Mg'}
-
 
 class CreditInfo(OMEGABase):
     """
@@ -91,34 +119,96 @@ class CreditBank(OMEGABase):
     Each manufacturer will use its own unique credit bank object.
 
     """
-    def __init__(self, filename, compliance_id, verbose=False):
+    def __init__(self, ghg_credit_params_filename, ghg_credits_filename, compliance_id, verbose=False):
         """
 
-        Initialize credit bank data from input file, call after validating ghg_credits template.
+        Initialize credit bank data from input file, call after validating ghg_credits and ghg_params templates.
 
         Args:
-            filename (str): name of input file containing pre-existing credit info
+            ghg_credits_filename (str): name of input file containing pre-existing credit info
             compliance_id (str): name of manufacturer, e.g. 'consolidated_OEM'
             verbose (bool): enable additional console and logfile output if True
 
-        Returns:
-            List of template/input errors, else empty list on success
+        Note:
+            Raises exception on input file format error
+
+        See Also:
+            ``validate_ghg_credit_params_template()``, ``validate_ghg_credits_template()``
 
         """
+        self.compliance_id = compliance_id
+        self.credit_params = CreditBank.init_ghg_credit_params(ghg_credit_params_filename, verbose)
+        self.credit_bank = CreditBank.init_ghg_credit_bank(ghg_credits_filename, compliance_id, verbose)
+        self.transaction_log = pd.DataFrame()
 
+    @staticmethod
+    def init_ghg_credit_params(ghg_credit_params_filename, verbose):
+        """
+
+        Args:
+            ghg_credit_params_filename:
+            verbose:
+
+        Returns:
+
+        """
         if verbose:
-            omega_log.logwrite('\nInitializing credit bank from %s...' % filename)
+            omega_log.logwrite('\nInitializing credit params from %s...' % ghg_credit_params_filename)
 
         # read in the data portion of the input file
-        self.compliance_id = compliance_id
+        credit_params = pd.read_csv(ghg_credit_params_filename, skiprows=1).set_index('start_year')
 
-        self.credit_bank = pd.read_csv(filename, skiprows=1)
-        self.credit_bank = self.credit_bank.loc[self.credit_bank['compliance_id'] == self.compliance_id]
-        self.credit_bank = self.credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
-        self.credit_bank['ending_balance_Mg'] = self.credit_bank['beginning_balance_Mg']
-        self.credit_bank['age'] = self.credit_bank['calendar_year'] - self.credit_bank['model_year']
+        return credit_params
 
-        self.transaction_log = pd.DataFrame()
+    @staticmethod
+    def init_ghg_credit_bank(ghg_credits_filename, compliance_id, verbose):
+        """
+
+        Args:
+            ghg_credits_filename:
+            compliance_id:
+            verbose:
+
+        Returns:
+
+        """
+        if verbose:
+            omega_log.logwrite('\nInitializing credit bank from %s...' % ghg_credits_filename)
+
+        credit_bank = pd.read_csv(ghg_credits_filename, skiprows=1)
+
+        credit_bank = credit_bank.loc[credit_bank['compliance_id'] == compliance_id]
+        credit_bank = credit_bank.rename({'balance_Mg': 'beginning_balance_Mg'}, axis='columns')
+        credit_bank['ending_balance_Mg'] = credit_bank['beginning_balance_Mg']
+        credit_bank['age'] = credit_bank['calendar_year'] - credit_bank['model_year']
+
+        return credit_bank
+
+    @staticmethod
+    def validate_ghg_credit_params_template(filename, verbose):
+        """
+        Validate GHG credit input file template.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template errors, or empty list on success.
+
+        """
+        input_template_name = 'ghg_credit_params'
+        input_template_version = 0.1
+        input_template_columns = {'start_year', 'credit_carryforward_years', 'credit_carryback_years'}
+
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
+
+        if not template_errors:
+            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
+                                                        verbose=verbose)
+
+        return template_errors
 
     @staticmethod
     def validate_ghg_credits_template(filename, verbose):
@@ -133,11 +223,15 @@ class CreditBank(OMEGABase):
             List of template errors, or empty list on success.
 
         """
-        template_errors = validate_template_version_info(filename, _input_template_name, _input_template_version,
+        input_template_name = 'ghg_credit_history'
+        input_template_version = 0.21
+        input_template_columns = {'calendar_year', 'model_year', 'compliance_id', 'balance_Mg'}
+
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_columns(filename, _input_template_columns, _input_template_columns,
+            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
                                                         verbose=verbose)
 
         return template_errors
@@ -187,6 +281,13 @@ class CreditBank(OMEGABase):
         new_credit_transaction = pd.DataFrame(new_credit_transaction, columns=new_credit_transaction.keys(), index=[0])
         return new_credit_transaction
 
+    def get_credit_param(self, calendar_year, param):
+        start_years = self.credit_params.index
+
+        calendar_year = max(start_years[start_years <= calendar_year])
+
+        return self.credit_params.loc[calendar_year, param]
+
     def get_credit_info(self, calendar_year):
         """
         Get lists of valid (non-expired) credits and debits for the given year.
@@ -205,6 +306,7 @@ class CreditBank(OMEGABase):
         ghg_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
         if not ghg_credits.empty:
             for _, credit in ghg_credits.iterrows():
+                credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if credit['age'] <= credit_max_life_years:
                     current_credits.append(
                         CreditInfo(credit['ending_balance_Mg'], credit_max_life_years - credit['age'] + 1))
@@ -215,6 +317,7 @@ class CreditBank(OMEGABase):
         ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
         if not ghg_debits.empty:
             for _, debit in ghg_debits.iterrows():
+                debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if debit['age'] <= debit_max_life_years:
                     current_debits.append(
                         CreditInfo(debit['ending_balance_Mg'], debit_max_life_years - debit['age'] + 1))
@@ -239,6 +342,7 @@ class CreditBank(OMEGABase):
         ghg_credits = this_years_credits[this_years_credits['ending_balance_Mg'] >= 0]
         if not ghg_credits.empty:
             for _, credit in ghg_credits.iterrows():
+                credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if credit['age'] == credit_max_life_years:
                     expiring_credits_Mg = credit['ending_balance_Mg']
 
@@ -263,6 +367,7 @@ class CreditBank(OMEGABase):
         ghg_debits = this_years_credits[this_years_credits['ending_balance_Mg'] < 0]
         if not ghg_debits.empty:
             for _, debit in ghg_debits.iterrows():
+                debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if debit['age'] >= debit_max_life_years:
                     expiring_debits_Mg += debit['ending_balance_Mg']
 
@@ -300,6 +405,7 @@ class CreditBank(OMEGABase):
         if not ghg_credits.empty:
             for idx, credit in ghg_credits.iterrows():
                 # log the death of non-zero value credits
+                credit_max_life_years = self.get_credit_param(credit['model_year'], 'credit_carryforward_years')
                 if ((credit['age'] > 0) and (credit['ending_balance_Mg'] == 0)) or \
                         credit['age'] > credit_max_life_years:
                     if credit['ending_balance_Mg'] > 0:
@@ -312,6 +418,7 @@ class CreditBank(OMEGABase):
         ggh_debits = last_years_credits[last_years_credits['beginning_balance_Mg'] < 0]
         if not ggh_debits.empty:
             for idx, debit in ggh_debits.iterrows():
+                debit_max_life_years = self.get_credit_param(debit['model_year'], 'credit_carryback_years')
                 if (debit['age'] > 0) and (debit['ending_balance_Mg'] == 0):
                     # silently drop zero-value debits after age 0
                     last_years_credits = last_years_credits.drop(idx)
@@ -464,7 +571,9 @@ if __name__ == '__main__':
         # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)
         # credit_bank.transaction_log.to_csv('../out/__dump/debit_bank_transactions.csv', index=False)
 
-        credit_bank = CreditBank(omega_globals.options.ghg_credits_file, 'consolidated_OEM')
+        credit_bank = CreditBank(
+            omega_globals.options.ghg_credit_params_file,
+            omega_globals.options.ghg_credits_file, 'consolidated_OEM')
 
         import random
 

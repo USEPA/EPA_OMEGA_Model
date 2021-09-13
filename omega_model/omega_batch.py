@@ -912,6 +912,7 @@ class OMEGASessionObject(OMEGABase):
         # read policy settings
         self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
         self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
+        self.settings.ghg_credit_params_file = self.read_parameter('GHG Credit Params File')
         self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
         self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
         self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')

@@ -43,7 +43,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-initial_credit_bank = dict()
+# initial_credit_bank = dict()
 
 # cache = dict()
 
@@ -107,10 +107,12 @@ class Manufacturer(SQABase, OMEGABase):
 
                 Manufacturer.manufacturers = list(df['manufacturer_id'].unique())
 
-                template_errors = CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file, verbose)
-
-                if not template_errors:
-                    initial_credit_bank[manufacturer_id] = CreditBank(omega_globals.options.ghg_credits_file, manufacturer_id)
+                # template_errors = CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file, verbose)
+                #
+                # if not template_errors:
+                #     initial_credit_bank[manufacturer_id] = CreditBank(omega_globals.options.ghg_credit_params_file,
+                #                                                       omega_globals.options.ghg_credits_file,
+                #                                                       manufacturer_id)
 
         return template_errors
 
