@@ -109,6 +109,7 @@ try:
             self.policy_reg_classes_file = path + 'demo_inputs/regulatory_classes.csv'
             self.production_multipliers_file = path + 'demo_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'demo_inputs/policy_fuels.csv'
+            self.ghg_credit_params_file = path + 'demo_inputs/ghg_credit_params.csv'
             self.ghg_credits_file = path + 'demo_inputs/ghg_credits.csv'
             self.required_sales_share_file = path + 'demo_inputs/required_sales_share.csv'
             self.producer_generalized_cost_file = path + 'demo_inputs/producer_generalized_cost.csv'
