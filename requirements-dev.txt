@@ -1,17 +1,27 @@
-# This requirements file can be used to install optional packages for developers
-#
-# Install using pip:
-# pip install -r requirements-dev.txt
-
-# for building docs from .rst files (optional):
-Sphinx<4.0.0
-sphinx-rtd-theme
-
-# for bumping the version number:
-bumpversion
-
-# for building the executable:
-pyinstaller
-
-# for visualizing profiler results
-snakeviz
+bleach==3.3.0
+bump2version==0.5.10
+certifi==2019.6.16
+chardet==3.0.4
+cycler==0.10.0
+decorator==4.4.1
+docutils==0.15.1
+idna==2.8
+kiwisolver==1.1.0
+matplotlib==3.1.1
+networkx==2.4
+numpy==1.17.3
+pandas==0.25.2
+pkginfo==1.5.0.1
+Pygments==2.7.4
+pyparsing==2.4.2
+python-dateutil==2.8.0
+pytz==2019.3
+readme-renderer==24.0
+requests==2.22.0
+requests-toolbelt==0.9.1
+six==1.12.0
+tqdm==4.32.2
+twine==1.13.0
+urllib3==1.26.5
+webencodings==0.5.1
+xlrd==1.2.0

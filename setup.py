@@ -29,7 +29,7 @@ setup(
     ],
     packages=["omega_model"],                # or something like packages=find_packages(exclude=("tests",)),
     include_package_data=True,
-    install_requires=["numpy", "matplotlib"],
+    install_requires=["numpy", "matplotlib", 'PySide2', 'PyYAML', 'multitimer'],
     entry_points={
         "console_scripts": [
             "omega2=omega_model.__main__:main",

@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1115</width>
+    <height>754</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tab_select">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>791</width>
+      <height>491</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::North</enum>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Triangular</enum>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>16</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="tabBarAutoHide">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="intro_tab">
+     <attribute name="title">
+      <string>Intro</string>
+     </attribute>
+     <widget class="QLabel" name="intro_text_1">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>22</y>
+        <width>751</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>images/This Is OMEGA 2.jpg</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="file_path_tab">
+     <attribute name="title">
+      <string>File Path</string>
+     </attribute>
+     <widget class="QTextEdit" name="configuration_file_1_result">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>70</y>
+        <width>701</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>The Configuration File contains all parameters for an OMEGA 2 model run</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="configuration_file_1_label">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>39</y>
+        <width>441</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Configuration File</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="input_directory_1_label">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>119</y>
+        <width>511</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Input File Directory</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="input_file_directory_1_result">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>150</y>
+        <width>701</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Input File Directory contains all input files for an OMEGA 2 model run</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="project_directory_1_label">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>199</y>
+        <width>461</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Project Directory</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="project_directory_1_result">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>230</y>
+        <width>701</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Project Directory will receive a copy of the input files and all OMEGA 2 model output files</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_project_directory_button">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>230</y>
+        <width>61</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="select_input_directory_button">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>61</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="open_configuration_file_button">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>61</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Opens an existing OMEGA 2 Configuration File</string>
+      </property>
+      <property name="text">
+       <string>Open</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>20</y>
+      <width>661</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>22</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>EPA OMEGA Model</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="epa_logo_label1">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>20</y>
+      <width>61</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>EPA Logo</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/green_car.jpg</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>false</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="status_monitor_result">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>590</y>
+      <width>1011</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Status Monitor records ongoing program events</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_monitor_label">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>560</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Status Monitor records ongoing program events</string>
+    </property>
+    <property name="text">
+     <string>Status Monitor</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="clear_status_monitor_button">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>630</y>
+      <width>61</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Button clears all data</string>
+    </property>
+    <property name="text">
+     <string>Clear</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="wizard_result">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>150</y>
+      <width>301</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Wizard provides user assistance</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="status_monitor_label_2">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>120</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Wizard provides user assistance</string>
+    </property>
+    <property name="text">
+     <string>Wizard</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1115</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMenu1">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="action_new_file"/>
+    <addaction name="action_open_configuration_file"/>
+    <addaction name="action_save_configuration_file"/>
+    <addaction name="separator"/>
+    <addaction name="action_select_input_file_directory"/>
+    <addaction name="action_select_project_directory"/>
+    <addaction name="separator"/>
+    <addaction name="action_exit"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>false</bool>
+    </property>
+    <addaction name="actionAbout_OMEGA_2"/>
+   </widget>
+   <widget class="QMenu" name="menuRun">
+    <property name="title">
+     <string>Run</string>
+    </property>
+   </widget>
+   <addaction name="menuMenu1"/>
+   <addaction name="menuRun"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <action name="actionEngines">
+   <property name="text">
+    <string>Engines</string>
+   </property>
+  </action>
+  <action name="actionTransmissions">
+   <property name="text">
+    <string>Transmissions</string>
+   </property>
+  </action>
+  <action name="actionRoad_Loads">
+   <property name="text">
+    <string>Road Loads</string>
+   </property>
+  </action>
+  <action name="action_open_configuration_file">
+   <property name="text">
+    <string>Open Configuration File</string>
+   </property>
+  </action>
+  <action name="action_save_configuration_file">
+   <property name="text">
+    <string>Save Configuration File</string>
+   </property>
+  </action>
+  <action name="action_select_input_file_directory">
+   <property name="text">
+    <string>Select Input File Directory</string>
+   </property>
+  </action>
+  <action name="action_new_file">
+   <property name="text">
+    <string>New...</string>
+   </property>
+  </action>
+  <action name="actionAbout_OMEGA_2">
+   <property name="text">
+    <string>About OMEGA</string>
+   </property>
+  </action>
+  <action name="action_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="action_select_project_directory">
+   <property name="text">
+    <string>Select Project Directory</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
