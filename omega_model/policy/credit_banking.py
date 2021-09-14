@@ -144,12 +144,14 @@ class CreditBank(OMEGABase):
     @staticmethod
     def init_ghg_credit_params(ghg_credit_params_filename, verbose):
         """
+        Read GHG credit parameters input file
 
         Args:
-            ghg_credit_params_filename:
-            verbose:
+            ghg_credit_params_filename (str): name of the input file
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
+            DataFrame of credit parameters
 
         """
         if verbose:
@@ -163,13 +165,15 @@ class CreditBank(OMEGABase):
     @staticmethod
     def init_ghg_credit_bank(ghg_credits_filename, compliance_id, verbose):
         """
+        Read GHG banked credits file and return credit bank info.
 
         Args:
-            ghg_credits_filename:
-            compliance_id:
-            verbose:
+            ghg_credits_filename (str): name of input file
+            compliance_id (str): manufacturer name, or 'consolidated_OEM'
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
+            DataFrame of credit bank data
 
         """
         if verbose:
