@@ -126,16 +126,18 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
         return cache[key]
 
-    def calc_shares(market_class_data, calendar_year):
+    def calc_shares_gcam(market_class_data, calendar_year, parent_market_class, child_market_classes):
         """
-        Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
-        calculated within non-responsive market categories then converted to absolute shares.
+        Determine consumer desired ICE/BEV market shares for the given vehicles, their costs, etc.
+        Relative shares are calculated within the parent market class and then converted to absolute shares.
 
         Args:
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
             calendar_year (int): calendar year to calculate market shares in
+            parent_market_class (str):
+            child_market_classes ([strs]):
 
         Returns:
             A copy of ``market_class_data`` with demanded ICE/BEV share columns by market class, e.g.
@@ -148,18 +150,11 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
         if omega_globals.options.flat_context:
             calendar_year = omega_globals.options.flat_context_year
 
-        #  PHASE0: hauling/non, EV/ICE, with hauling/non share fixed. We don't need shared/private for beta
-
-        # group by non responsive market group
-        sales_share_denominator = dict()
-        for nrmc in omega_globals.options.MarketClass.non_responsive_market_categories:
-            sales_share_denominator[nrmc] = 0
-
+        sales_share_denominator = 0
         sales_share_numerator = dict()
 
         for pass_num in [0, 1]:
-            for market_class_id in omega_globals.options.MarketClass.market_classes:
-                nrmc = omega_globals.options.MarketClass.get_non_responsive_market_category(market_class_id)
+            for market_class_id in child_market_classes:
                 if pass_num == 0:
                     fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
 
@@ -205,16 +200,56 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
                     market_class_data[
                         'consumer_generalized_cost_dollars_%s' % market_class_id] = total_cost_w_fuel_per_PMT
 
-                    sales_share_denominator[nrmc] += sales_share_numerator[market_class_id]
+                    sales_share_denominator += sales_share_numerator[market_class_id]
 
                 else:
-                    demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator[nrmc]
-                    demanded_absolute_share = demanded_share * market_class_data['producer_abs_share_frac_%s' % nrmc]
+                    demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
+                    demanded_absolute_share = demanded_share * \
+                                              market_class_data['consumer_abs_share_frac_%s' % parent_market_class]
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
         return market_class_data.copy()
+
+    def calc_shares(market_class_data, calendar_year):
+        """
+        Determine consumer desired market shares for the given vehicles, their costs, etc.
+
+        Args:
+            market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
+                'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
+                columns, where MC = market class ID
+            calendar_year (int): calendar year to calculate market shares in
+
+        Returns:
+            A copy of ``market_class_data`` with demanded share columns by market class, e.g.
+            'consumer_share_frac_MC', 'consumer_abs_share_frac_MC', and 'consumer_generalized_cost_dollars_MC' where
+            MC = market class ID
+
+        """
+
+        # calculate the absolute market shares by traversing the market class tree and calling appropriate
+        # share-calculation methods at each level
+
+        # for the sake of the demo, the consumer hauling and non_hauling absolute shares are taken from the producer,
+        # which gets them from the context size class projections and the makeup of the base year fleet.
+        # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
+        # be called here.
+        market_class_data['consumer_abs_share_frac_hauling'] = \
+            market_class_data['producer_abs_share_frac_hauling']
+
+        market_class_data['consumer_abs_share_frac_non_hauling'] = \
+            market_class_data['producer_abs_share_frac_non_hauling']
+
+        # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
+        market_class_data = SalesShare.calc_shares_gcam(market_class_data, calendar_year, 'hauling',
+                                                        ['hauling.ICE', 'hauling.BEV'])
+
+        market_class_data = SalesShare.calc_shares_gcam(market_class_data, calendar_year, 'non_hauling',
+                                                        ['non_hauling.ICE', 'non_hauling.BEV'])
+
+        return market_class_data
 
     @staticmethod
     def init_from_file(filename, verbose=False):
