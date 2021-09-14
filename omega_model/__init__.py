@@ -87,7 +87,7 @@ try:
             self.market_classes_file = path + 'demo_inputs/market_classes.csv'
             self.vehicles_file = path + 'demo_inputs/vehicles.csv'
             self.onroad_vehicle_calculations_file = path + 'demo_inputs/onroad_vehicle_calculations.csv'
-            self.sales_share_file = path + 'demo_inputs/sales_share-gcam.csv'
+            self.sales_share_file = path + 'demo_inputs/sales_share_params.csv'
             self.onroad_fuels_file = path + 'demo_inputs/onroad_fuels.csv'
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
