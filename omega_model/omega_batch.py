@@ -55,7 +55,7 @@ Sample Data Columns
         Producer Cross Subsidy Multiplier Min,#,0.95,
         Producer Generalized Cost File,String,producer_generalized_cost.csv,
         Production Constraints File,String,production_constraints.csv,
-        Sales Share File,String,sales_share-gcam.csv,
+        Sales Share File,String,sales_share_params.csv,
         Vehicle Price Modifications File,String,vehicle_price_modifications.csv,
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
         Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,

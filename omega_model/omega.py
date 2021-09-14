@@ -723,6 +723,7 @@ def init_user_definable_submodules():
 
     init_fail = []
 
+    # user-definable policy modules
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
     omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
@@ -735,6 +736,7 @@ def init_user_definable_submodules():
     module_name = get_template_name(omega_globals.options.offcycle_credits_file)
     omega_globals.options.OffCycleCredits = importlib.import_module(module_name).OffCycleCredits
 
+    # user-definable consumer modules
     module_name = get_template_name(omega_globals.options.vehicle_reregistration_file)
     omega_globals.options.Reregistration = importlib.import_module(module_name).Reregistration
 
@@ -744,11 +746,12 @@ def init_user_definable_submodules():
     module_name = get_template_name(omega_globals.options.sales_share_file)
     omega_globals.options.SalesShare = importlib.import_module(module_name).SalesShare
 
-    module_name = get_template_name(omega_globals.options.producer_generalized_cost_file)
-    omega_globals.options.ProducerGeneralizedCost = importlib.import_module(module_name).ProducerGeneralizedCost
-
     module_name = get_template_name(omega_globals.options.market_classes_file)
     omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+
+    # user-definable producer modules
+    module_name = get_template_name(omega_globals.options.producer_generalized_cost_file)
+    omega_globals.options.ProducerGeneralizedCost = importlib.import_module(module_name).ProducerGeneralizedCost
 
     return init_fail
 
