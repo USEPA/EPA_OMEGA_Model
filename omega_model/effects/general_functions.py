@@ -72,7 +72,7 @@ def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
         A CSV file with individual key elements split out into columns with args as names.
 
     """
-    print('Saving dictionary to CSV.')
+    print('Saving %s.csv' % save_path)
     df = pd.DataFrame(dict_to_save).transpose()
     df.reset_index(inplace=True)
     for idx, arg in enumerate(args):

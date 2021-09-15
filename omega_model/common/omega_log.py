@@ -72,7 +72,7 @@ class OMEGABatchLog(OMEGABase):
         self.start_time = time.time()
 
         with open(self.logfilename, 'w') as log:
-            log.write('OMEGA %s batch log started at %s %s\n\n' %
+            log.write('OMEGA %s batch started at %s %s\n\n' %
                       (code_version, datetime.date.today(), time.strftime('%H:%M:%S')))
 
     def logwrite(self, message, terminator='\n'):
@@ -105,8 +105,8 @@ class OMEGABatchLog(OMEGABase):
         elapsed_time = (time.time() - self.start_time)
         import datetime
 
-        for msg in ('\nOMEGA log ended at %s %s\n' % (datetime.date.today(), time.strftime('%H:%M:%S')),
-                    'Elapsed Time %.2f Seconds\n' % elapsed_time):
+        for msg in ('\nOMEGA batch ended at %s %s' % (datetime.date.today(), time.strftime('%H:%M:%S')),
+                    'OMEGA batch elapsed time %.2f seconds\n' % elapsed_time):
             self.logwrite(msg)
             if self.verbose:
                 print(msg)
@@ -146,9 +146,8 @@ def end_logfile(message):
     omega_globals.options.end_time = time.time()
     elapsed_time = (omega_globals.options.end_time - omega_globals.options.start_time)
     import datetime
-    logwrite('\nSession ended at %s %s\n' % (datetime.date.today(), time.strftime('%H:%M:%S')))
-    logwrite('Elapsed Time %.2f Seconds\n' % elapsed_time)
-    print('Elapsed Time %.2f Seconds\n' % elapsed_time)
+    logwrite('\nSession ended at %s %s' % (datetime.date.today(), time.strftime('%H:%M:%S')), echo_console=True)
+    logwrite('Session elapsed time %.2f seconds\n' % elapsed_time, echo_console=True)
     logwrite(message, terminator='')
 
 
