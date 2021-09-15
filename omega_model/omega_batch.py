@@ -1523,7 +1523,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                     dispycluster.find_nodes()
                     dispycluster.submit_sessions(batch, batch.name, options.bundle_path_root,
                                                  options.batch_path + batch.name,
-                                                 dispy_session_list)
+                                                 dispy_session_list, options.calc_effects)
                     batch.batch_log.end_logfile("*** dispy batch complete ***")
             else:  # run from here
                 batch = run_bundled_sessions(options, remote_batchfile, session_list)
