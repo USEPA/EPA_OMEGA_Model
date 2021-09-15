@@ -457,7 +457,7 @@ After convergence with respect to the sales and shares of new vehicles is achiev
 
 :numref:`mo_label_stockflow` Vehicle stock estimation flow diagram
 
-.. _mo_label_stockflow:
+        .. _mo_label_stockflow:
         .. figure:: _static/al_figures/stock_flow.png
             :align: center
 
