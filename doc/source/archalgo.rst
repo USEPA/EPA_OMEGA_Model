@@ -313,6 +313,20 @@ The Consumer Module’s purpose is to estimate how light duty vehicle ownership 
 
 Each of these five elements represents a user-definable submodule within the Consumer Module code. The code within each submodule may be updated by a user, or the submodule may be replaced with an alternative submodule. When a user updates or replaces a submodule, they must ensure that the submodule retains consistency with the other submodules within the Consumer Module, as well as with the rest of OMEGA. For example, if the market class submodule is changed from the demo analysis version, the sales share submodule must be updated as well.
 
+.. admonition:: Demo example: Consumer Module user-definable submodules
+
+    The user definable submodules in the demo analysis version of OMEGA are listed in the table below.
+
+    .. csv-table::
+        :widths: auto
+
+        **Element**, **Submodule**
+        Market class definitions, market_classes.py
+        New vehicle sales volume, sales_volume.py
+        New vehicle sales shares, sales_share.py
+        Used vehicle reregistration, reregistration_fixed_by_age.py
+        New and used vehicle use, annual_vmt_fixed_by_age.py
+
 The Consumer Module works in two phases: first, an iterative new vehicle phase, followed by a non-iterative stock and use phase. During the first phase, the Consumer Module and Producer Module iterate to achieve convergence on the estimates of new vehicles produced and demanded that meet the standards set in the Policy Module. The Producer Module sends a set of candidate vehicles, including their prices and attributes, to the Consumer Module to consider. The Consumer Module uses that set of candidate vehicles to estimate total new vehicles demanded and the shares of those new vehicles in the specified market classes, which are passed back to the Producer Module. If the estimates do not converge, a new set of candidate vehicles is sent to teh Consumer Module for consideration. Once convergence between the Producer and Consumer Module is achieved, the set of candidate vehicles are no longer considered candidates for consideration, but are the estimated new vehicle fleet, and the Consumer Module enters the second phase. In this phase, total vehicle stock (new and used vehicles and their attributes) and use (VMT) are estimated.
 
 **Inputs to the Consumer Module**
@@ -328,6 +342,10 @@ During the iterative first phase, the Consumer Module considers vehicle prices a
 Users can define market classes; in doing so, the user must ensure that all other inputs and user-defined submodules (for example, with respect to stock and use estimation) within the Consumer Module are defined consistently. The designation of market classes can be used to reflect market heterogeneity in purchasing behavior or vehicle use based on specific vehicle attributes. In addition, the user can categorize market classes as 'responsive,' where the shares of total vehicles attributed to those market classes change in response to user-defined endogenous inputs (like relative costs), or 'nonresponsive,' where the shares of total vehicles attributed to those market classes do not change with the policy being analyzed.
 
 Market classes can be defined using vehicle attributes and inputs from the analysis context. In defining market classes, the user must ensure they are defined consistently with the modeling in the sales share submodule. For example, if the sales share submodule is defined as estimating shares of vehicles in a set of fuel type categories, those fuel type categories must be defined within the market class submodule.
+
+.. sidebar:: Independent market share assumption
+
+    The assumptions of independence in parent market class categories is consistent with the assumption of independence of irrelevant alternatives (IIA) commonly used in nested choice models, such as GCAM-USA.
 
 Before the Consumer Module can estimate sales and or shares responses, all vehicles must be categorized into their market classes. This categorization is defined as a series of nested market category levels. The user can define any number of market classes, or levels, as well as the hierarchy of the levels. In defining the hierarchy, it is important to note that OMEGA assumes that the sales share estimates within a parent category are independent of sales share estimates outside the parent category. This means that changing the available market classes outside the parent category will not change the sales share estimates within the parent category.
 
@@ -396,7 +414,7 @@ If a user adopts the demo analysis method of estimating sales volumes using an e
 
 **Sales shares**
 
-The new vehicles sold are categorized into the user-defined market classes using estimates of sales shares. As mentioned above, those market classes can be nonresponsive or responsive to the policy being analyzed. Nonresponsive vehicle shares do not change with updated candidate vehicle sets or across policy alternatives. Though not responsive to endogenous inputs, the nonresponsive sales shares do not have to be constant. For example, they may be provided as a set of values for different points in time if the shares are expected to change exogenously over time.
+The new vehicles sold are categorized into the user-defined market classes using estimates of sales shares. As mentioned above, those market classes can be nonresponsive or responsive to the policy being analyzed. Nonresponsive vehicle shares do not change with updated candidate vehicle sets or across policy alternatives. Though not responsive to endogenous inputs, the nonresponsive sales shares do not have to be constant. For example, they may be provided as a set of values for different points in time if the shares are expected to change exogenously over time. In addition, users can define sales shares to explicitly consider consumer heterogeneity by defining separate sales share estimates for different consumer groups. For example, sales share responses can differ between rural and urban consumers. If users identify heterogenous consumer groups with separate sales share responses, the analysis context must include the approproate inputs. For example, the proportion of the vehicle buying population in urban and rural areas for each year being analyzed within the model.
 
 .. admonition:: Demo example: Nonresponsive market share estimates
 
@@ -435,7 +453,13 @@ After convergence with respect to the sales and shares of new vehicles is achiev
 
 **Vehicle stock**
 
-To estimate vehicle stock, the model starts with an initial stock of vehicles. The initial stock of vehicles can be an exogenous input from the analysis context, or estimated within the Consumer Module as defined by the user. From there, a simple way to determine stock for each modeled calendar year is to add in the produced new vehicles for that year as described in Section 3.4.3, and estimate the reregistered fleet of vehicles from the total used fleet. The total used fleet in the initial analysis year includes all the vehicles from the initial stock. For each subsequent, modeled, year, the total used fleet is the set of initial stock remaining in the fleet, plus the remaining set of modeled vehicles that were added to the fleet from each previous modeled year.
+:numref:`mo_label_stockflow` below steps through the flow of how total vehicle stock is estimated in OMEGA. To estimated vehicle stock, the model starts with a base year stock of vehicles, which is an inputs from the analysis context. The base year is the last year actual observations of vehicle stock are available. From there, the produced new vehicles for the analysis start year are estimated, as described in Section 3.4.3. The analysis start year is the first year in which modeling is performed and immediately follows the base year. These vehicles are added to teh set of reregistered base year stock. This new fleet of vehicles, reregistered base year stock plus modeled vehicles from the analysis start year, becomes the total analysis start year stock. For each subsequent modeled (analysis) year, the total used fleet is the set of base year stock remaining, plus the remaining set of modeled vehicles that were added to the fleet from the initial analysis year to the current modeled, analysis, year.
+
+:numref:`mo_label_stockflow` Vehicle stock estimation flow diagram
+
+.. _mo_label_stockflow:
+        .. figure:: _static/al_figures/stock_flow.png
+            :align: center
 
 The method of estimating the reregistered fleet is in a user-defined used vehicle reregistration submodule. This method can make use of a static schedule, for example, where a vehicle's age is the only determinant of the proportion of vehicles remaining in the fleet over time, or depend on other vehicle attributes, like VMT. If users update the reregistration submodule to follow a different prescribed static rate, or to allow interdependencies between the rate of reregistration and other vehicle attributes, they need to retain consistency between the reregistration submodule and other submodule, for example the submodules estimating new vehicle sales and total VMT.
 
