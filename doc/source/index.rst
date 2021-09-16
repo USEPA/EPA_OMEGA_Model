@@ -11,11 +11,11 @@ OMEGA Documentation
 
     overview
     getstart
-    archalgo
     inputs
+    archalgo
     code_description
-    glossary
     code_details
+    glossary
     software_policy
 
 Indices and Tables
