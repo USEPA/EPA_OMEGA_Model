@@ -5,24 +5,6 @@
 Developer Guide
 ===============
 
-Description of Code
-^^^^^^^^^^^^^^^^^^^
-
-Text 1
-------
-
-Make your own modules
-^^^^^^^^^^^^^^^^^^^^^
-
-Text 1
-------
-
-Make your own modules
-^^^^^^^^^^^^^^^^^^^^^
-
-Text1
------
-
 Developer Notes
 ^^^^^^^^^^^^^^^
 
