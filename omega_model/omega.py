@@ -733,16 +733,16 @@ def init_user_definable_submodules():
     import importlib.util
 
     module_path = sys.path[0] + os.sep + str.split(module_name, '.')[0] + os.sep + '__init__.py'
-    module_name = str.split(module_name, '.')[1]
+    module_suffix = str.split(module_name, '.')[1]
 
     print('module_path = "%s"' % module_path)
-    print('module_name = "%s"' % module_name)
+    print('module_name = "%s"' % module_suffix)
 
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    spec = importlib.util.spec_from_file_location(module_suffix, module_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
-    omega_globals.options.RegulatoryClasses = module.RegulatoryClasses
+    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
 
     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
         omega_globals.options.policy_reg_classes_file)
