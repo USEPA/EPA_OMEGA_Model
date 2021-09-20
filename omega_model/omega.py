@@ -723,10 +723,27 @@ def init_user_definable_submodules():
 
     init_fail = []
 
+    print('RC file = "%s"' % omega_globals.options.policy_reg_classes_file)
+
     # user-definable policy modules
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+    # omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+
+    import importlib.util
+
+    module_path = sys.path[0] + os.sep + str.split(module_name, '.')[0] + os.sep + '__init__.py'
+    module_name = str.split(module_name, '.')[1]
+
+    print('module_path = "%s"' % module_path)
+    print('module_name = "%s"' % module_name)
+
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    omega_globals.options.RegulatoryClasses = module.RegulatoryClasses
+
     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
         omega_globals.options.policy_reg_classes_file)
 
@@ -1007,6 +1024,18 @@ def run_omega(session_runtime_options, standalone_run=False):
     """
     import traceback
     import time
+
+    import sys
+    # sys.path.insert(0, os.path.join(session_runtime_options.remote_omega_path, '..'))  # picks up omega_model sub-packages
+    sys.path.insert(0, session_runtime_options.remote_omega_path)
+    # os.chdir(session_runtime_options.remote_omega_path)
+
+    print('\n CWD = "%s"' % os.getcwd())
+
+    print('\nsys.path = "%s"' % sys.path)
+
+    path = os.path.dirname(os.path.abspath(__file__))
+    print('\nfile path = "%s"' % path)
 
     session_runtime_options.start_time = time.time()
 
