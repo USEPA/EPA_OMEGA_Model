@@ -301,9 +301,9 @@ def reshape_df_for_cloud_file(runtime_settings, input_settings, df_source, *id_a
     """
     df_return = pd.DataFrame()
     id_variables = [id_arg for id_arg in id_args]
-    tech_flag_list = ['ac_leakage', 'ac_efficiency', 'high_eff_alternator', 'start_stop', 'hev', 'phev', 'bev',
-                      'weight_reduction', 'curb_weight', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
-                      ]
+
+    tech_flag_list = input_settings.tech_flag_tracking
+
     for tech in tech_flag_list:
         id_variables.append(tech)
     if runtime_settings.run_bev or runtime_settings.run_phev:
@@ -551,7 +551,7 @@ def create_package_dict(input_settings, input_df, fuel_id):
     return df_dict
 
 
-def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, fuel_key):
+def create_tech_flags_from_cost_key(df, alpha_class_key, engine_key, weight_key, accessory_key, fuel_key):
     """
 
     Args:
@@ -566,8 +566,9 @@ def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, f
 
     """
     # set tech flags to 0, indicating that the tech is not present on the package
-    turb11_value, turb12_value, di_value, atk2_value, cegr_value, deacpd_value, deacfc_value, accessory_value, startstop, hev_value, bev_value, phev_value \
-        = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    turb11_value, turb12_value, di_value, atk2_value, cegr_value, deacpd_value, deacfc_value, \
+    accessory_value, startstop, hev_value, hev_truck_value, bev_value, phev_value \
+        = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
     # set tech flags to 1 where applicable
     curb_weight, glider_weight, battery_weight, weight_rdxn = weight_key
@@ -584,7 +585,9 @@ def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, f
         if deacfc != 0: deacfc_value = 1
     if fuel_key == 'bev':
         bev_value = 1
-    if fuel_key == 'hev': hev_value = 1
+    if fuel_key == 'hev':
+        hev_value = 1
+        if alpha_class_key == 'Truck': hev_truck_value = 1
     if fuel_key == 'phev': phev_value = 1
 
     df.insert(0, 'ac_leakage', 1)
@@ -593,6 +596,7 @@ def create_tech_flags_from_cost_key(df, engine_key, weight_key, accessory_key, f
     df.insert(0, 'bev', bev_value)
     df.insert(0, 'phev', phev_value)
     df.insert(0, 'hev', hev_value)
+    df.insert(0, 'hev_truck', hev_truck_value)
     df.insert(0, 'start_stop', startstop)
     df.insert(0, 'curb_weight', curb_weight)
     df.insert(0, 'weight_reduction', weight_rdxn / 100)
@@ -661,7 +665,7 @@ def ice_package_results(runtime_settings, input_settings, key, alpha_file_dict, 
     package_cost_df.insert(0, 'cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile', ftp2_co2)
     package_cost_df.insert(0, 'cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile', ftp1_co2)
     if runtime_settings.set_tech_tracking_flags:
-        package_cost_df = create_tech_flags_from_cost_key(package_cost_df, engine_key, weight_key, accessory_key, fuel_key)
+        package_cost_df = create_tech_flags_from_cost_key(package_cost_df, alpha_class_key, engine_key, weight_key, accessory_key, fuel_key)
     package_cost_df.insert(0, 'dollar_basis', input_settings.dollar_basis_for_output_file)
     package_cost_df.insert(0, 'cost_curve_class', f'ice_{alpha_class_key}')
     package_cost_df.insert(0, 'cost_key', str(cost_key))
@@ -717,7 +721,7 @@ def pev_package_results(runtime_settings, input_settings, key, alpha_file_dict, 
     package_cost_df.insert(0, 'cd_ftp_2:cert_direct_oncycle_kwh_per_mile', ftp2_kwh)
     package_cost_df.insert(0, 'cd_ftp_1:cert_direct_oncycle_kwh_per_mile', ftp1_kwh)
     if runtime_settings.set_tech_tracking_flags:
-        package_cost_df = create_tech_flags_from_cost_key(package_cost_df, engine_key, weight_key, accessory_key, fuel_key)
+        package_cost_df = create_tech_flags_from_cost_key(package_cost_df, alpha_class_key, engine_key, weight_key, accessory_key, fuel_key)
     package_cost_df.insert(0, 'battery_kwh_gross', battery_kwh_gross)
     package_cost_df.insert(0, 'dollar_basis', input_settings.dollar_basis_for_output_file)
     package_cost_df.insert(0, 'cost_curve_class', f'{fuel_key}_{alpha_class_key}')
@@ -1097,11 +1101,11 @@ class RuntimeSettings:
 
         """
         # set what to run (i.e., what outputs to generate)
-        self.run_ice = False
+        self.run_ice = True
         self.run_bev = True
         self.run_phev = False
-        self.run_hev = False
-        self.generate_simulated_vehicles_file = False
+        self.run_hev = True
+        self.generate_simulated_vehicles_file = True
         self.generate_simulated_vehicles_verbose_file = False
 
         # set tech to track via tech flags
@@ -1127,6 +1131,10 @@ class InputSettings:
         self.path_outputs = self.path_to_file / 'outputs'
         self.path_alpha_inputs = self.path_to_file / 'ALPHA'
         self.path_input_templates = self.path_project / 'omega_model/demo_inputs'
+
+        self.tech_flag_tracking = ['ac_leakage', 'ac_efficiency', 'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'phev', 'bev',
+                                   'weight_reduction', 'curb_weight', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',
+                                   ]
 
         self.start_time_readable = datetime.now().strftime('%Y%m%d-%H%M%S')
 
