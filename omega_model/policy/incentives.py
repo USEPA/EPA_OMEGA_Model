@@ -75,7 +75,7 @@ class Incentives(OMEGABase):
         production_multiplier = 1
 
         start_years = cache['start_year']
-        if start_years.size > 0 and start_years[start_years <= vehicle.model_year]:
+        if len(start_years[start_years <= vehicle.model_year]) > 0:
             cache_key = max(start_years[start_years <= vehicle.model_year])
 
             if cache_key in cache:
