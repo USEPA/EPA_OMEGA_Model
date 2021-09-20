@@ -199,20 +199,20 @@ The desired plot will appear as shown in :numref:`ug_label10` below.
 
     The manufacturer compliance plot provides several visual details on how the manufacturers are achieving compliance (or not) for each model year, and is a good starting point to inform the user of the model results.  An example run with the demo inputs is shown in :numref:`ug_plot`.
 
-.. _ug_plot:
-.. figure:: _static/ug_figures/comp_plot.jpg
-    :align: center
+    .. _ug_plot:
+    .. figure:: _static/ug_figures/comp_plot.jpg
+        :align: center
 
-    Typical manufacturer compliance plot
+        Typical manufacturer compliance plot
 
-The following describes the key features of this plot:
+    The following describes the key features of this plot:
 
-* The Y-axis represents the total CO2 emissions, in metric tons (or Mg) for each model year.
-* The blue line and dots represent the required industry standard for each year, in metric tons (Mg).
-* The orange line and dots represent the industry-achieved net standard after credits have been applied or carried to other model years.
-* Green lines indicate the source model year (green dot) and the model year in which credits have been applied (the ending arrow)
-* Vertical down arrows, in red, indicate that some or all credits were expired (forfeited) that were generated in that model year.
-* Red x icons indicate years that compliance was not achieved.
+    * The Y-axis represents the total CO2 emissions, in metric tons (or Mg) for each model year.
+    * The blue line and dots represent the required industry standard for each year, in metric tons (Mg).
+    * The orange line and dots represent the industry-achieved net standard after credits have been applied or carried to other model years.
+    * Green lines indicate the source model year (green dot) and the model year in which credits have been applied (the ending arrow)
+    * Vertical down arrows, in red, indicate that some or all credits were expired (forfeited) that were generated in that model year.
+    * Red x icons indicate years that compliance was not achieved.
 
 Other plots that may be of interest to the user include:
 

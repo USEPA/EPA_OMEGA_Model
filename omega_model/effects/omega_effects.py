@@ -53,26 +53,23 @@ def run_effects_calcs():
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
     calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
-    print('Calculating tech volumes and shares')
-    omega_log.logwrite('Calculating tech volumes and shares')
+    omega_log.logwrite('\nCalculating tech volumes and shares', echo_console=True)
     tech_tracking_dict = calc_tech_tracking(calendar_years)
 
     save_dict_to_csv(tech_tracking_dict, f'{omega_globals.options.output_folder}' + f'{omega_globals.options.session_unique_name}_tech_tracking',
                      list(), 'vehicle_id', 'calendar_year', 'age')
 
     if omega_globals.options.calc_effects.__contains__('Physical'):
-        print('Calculating physical effects')
-        omega_log.logwrite('Calculating physical effects')
+        omega_log.logwrite('\nCalculating physical effects', echo_console=True)
         physical_effects_dict = calc_physical_effects(calendar_years)
 
         if omega_globals.options.calc_effects.__contains__('Costs'):
             cost_effects_dict = dict()
-            print('Calculating cost effects')
-            omega_log.logwrite('Calculating cost effects')
+
+            omega_log.logwrite('\nCalculating cost effects', echo_console=True)
             cost_effects_dict.update(calc_cost_effects(physical_effects_dict))
 
-            print('Discounting costs')
-            omega_log.logwrite('Discounting costs')
+            omega_log.logwrite('\nDiscounting costs', echo_console=True)
             cost_effects_dict = discount_values(cost_effects_dict)
 
             save_dict_to_csv(cost_effects_dict, f'{omega_globals.options.output_folder}' + f'{omega_globals.options.session_unique_name}_cost_effects',
