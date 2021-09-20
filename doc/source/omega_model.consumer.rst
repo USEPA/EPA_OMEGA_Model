@@ -41,10 +41,10 @@ omega\_model.consumer.reregistration\_fixed\_by\_age module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.consumer.sales\_share\_gcam module
------------------------------------------------
+omega\_model.consumer.sales\_share module
+-----------------------------------------
 
-.. automodule:: omega_model.consumer.sales_share_gcam
+.. automodule:: omega_model.consumer.sales_share
    :members:
    :undoc-members:
    :show-inheritance:
