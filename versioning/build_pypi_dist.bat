@@ -11,4 +11,4 @@ python setup.py sdist
 REM upload distribution to pypi or trypi
 twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
-cd crank_win
+cd versioning
