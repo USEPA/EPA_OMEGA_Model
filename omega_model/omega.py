@@ -723,26 +723,33 @@ def init_user_definable_submodules():
 
     init_fail = []
 
-    print('RC file = "%s"' % omega_globals.options.policy_reg_classes_file)
+    # print('RC file = "%s"' % omega_globals.options.policy_reg_classes_file)
+
+    modules = [k for k in sys.modules.keys()]
+    modules.sort()
+    for m in modules:
+        print(m)
 
     # user-definable policy modules
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-    # omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-
-    import importlib.util
-
-    module_path = sys.path[0] + os.sep + str.split(module_name, '.')[0] + os.sep + '__init__.py'
-    module_suffix = str.split(module_name, '.')[1]
-
-    print('module_path = "%s"' % module_path)
-    print('module_name = "%s"' % module_suffix)
-
-    spec = importlib.util.spec_from_file_location(module_suffix, module_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
     omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
+
+    # import importlib.util
+    #
+    #
+    # module_suffix = str.split(module_name, '.')[1]
+    # module_path = sys.path[0] + os.sep + str.split(module_name, '.')[0] + os.sep + module_suffix # '__init__.py'
+    #
+    # print('module_path = "%s"' % module_path)
+    # print('module_name = "%s"' % module_suffix)
+    #
+    # spec = importlib.util.spec_from_file_location(module_name, module_path)
+    # module = importlib.util.module_from_spec(spec)
+    # # sys.modules[spec.name] = module
+    #
+    # spec.loader.exec_module(module)
+    # omega_globals.options.RegulatoryClasses = module.RegulatoryClasses
 
     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
         omega_globals.options.policy_reg_classes_file)
