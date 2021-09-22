@@ -710,6 +710,20 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     return converged, convergence_error
 
 
+def get_module(module_name):
+    import importlib.util
+
+    module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
+    module_suffix = str.split(module_name, '.')[1]
+    module_path = sys.path[0] + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
+
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    return module
+
+
 def init_user_definable_submodules():
     """
     Import dynamic modules that are specified by the input file input template name and set the session runtime
@@ -723,33 +737,10 @@ def init_user_definable_submodules():
 
     init_fail = []
 
-    # print('RC file = "%s"' % omega_globals.options.policy_reg_classes_file)
-
-    modules = [k for k in sys.modules.keys()]
-    modules.sort()
-    for m in modules:
-        print(m)
-
     # user-definable policy modules
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
-    omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
-
-    # import importlib.util
-    #
-    #
-    # module_suffix = str.split(module_name, '.')[1]
-    # module_path = sys.path[0] + os.sep + str.split(module_name, '.')[0] + os.sep + module_suffix # '__init__.py'
-    #
-    # print('module_path = "%s"' % module_path)
-    # print('module_name = "%s"' % module_suffix)
-    #
-    # spec = importlib.util.spec_from_file_location(module_name, module_path)
-    # module = importlib.util.module_from_spec(spec)
-    # # sys.modules[spec.name] = module
-    #
-    # spec.loader.exec_module(module)
-    # omega_globals.options.RegulatoryClasses = module.RegulatoryClasses
+    omega_globals.options.RegulatoryClasses = get_module(module_name).RegulatoryClasses
 
     init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
         omega_globals.options.policy_reg_classes_file)
