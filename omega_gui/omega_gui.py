@@ -121,8 +121,8 @@ class Form(QObject):
         self.window.action_exit.triggered.connect(self.exit_gui)
         self.window.select_input_batch_file_button.clicked.connect(self.open_input_batch_file)
         self.window.select_output_batch_directory_button.clicked.connect(self.open_output_batch_directory)
-        self.window.open_configuration_file_button.clicked.connect(self.open_file)
-        self.window.save_configuration_file_button.clicked.connect(self.save_file)
+        # self.window.open_configuration_file_button.clicked.connect(self.open_file)
+        # self.window.save_configuration_file_button.clicked.connect(self.save_file)
         self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
         self.window.run_model_button.clicked.connect(self.run_model)
         self.window.action_run_model.triggered.connect(self.run_model)
@@ -141,7 +141,7 @@ class Form(QObject):
 
         # Initialize items
         # Select file path tab
-        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "run_model_tab"))
+        self.window.tab_select.setCurrentWidget(self.window.tab_select.findChild(QWidget, "intro_tab"))
         # Set status monitor window options
         self.window.event_monitor_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.event_monitor_result.setReadOnly(1)
@@ -149,8 +149,8 @@ class Form(QObject):
         self.window.input_batch_file_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.input_batch_file_1_result.setReadOnly(1)
         # Set configuration file window options
-        self.window.configuration_file_1_result.setWordWrapMode(QTextOption.NoWrap)
-        self.window.configuration_file_1_result.setReadOnly(1)
+        # self.window.configuration_file_1_result.setWordWrapMode(QTextOption.NoWrap)
+        # self.window.configuration_file_1_result.setReadOnly(1)
         # Set project directory window options
         self.window.output_batch_directory_1_result.setWordWrapMode(QTextOption.NoWrap)
         self.window.output_batch_directory_1_result.setReadOnly(1)
@@ -174,8 +174,8 @@ class Form(QObject):
         stylesheet = ""
         stylesheet = button_stylesheet(stylesheet)
         self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
-        self.window.open_configuration_file_button.setStyleSheet(stylesheet)
-        self.window.save_configuration_file_button.setStyleSheet(stylesheet)
+        # self.window.open_configuration_file_button.setStyleSheet(stylesheet)
+        # self.window.save_configuration_file_button.setStyleSheet(stylesheet)
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
         self.window.select_output_batch_directory_button.setStyleSheet(stylesheet)
         self.window.run_model_button.setStyleSheet(stylesheet)
@@ -192,7 +192,7 @@ class Form(QObject):
         # Load stylesheet for labels
         stylesheet = ""
         stylesheet = label_stylesheet(stylesheet)
-        self.window.configuration_file_1_label.setStyleSheet(stylesheet)
+        # self.window.configuration_file_1_label.setStyleSheet(stylesheet)
         self.window.input_batch_file_1_label.setStyleSheet(stylesheet)
         self.window.output_batch_directory_1_label.setStyleSheet(stylesheet)
         self.window.project_description_1_label.setStyleSheet(stylesheet)
@@ -222,7 +222,7 @@ class Form(QObject):
 
         self.clear_event_monitor()
         self.window.input_batch_file_1_result.setPlainText("")
-        self.window.configuration_file_1_result.setPlainText("")
+        # self.window.configuration_file_1_result.setPlainText("")
         self.window.output_batch_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
         self.initialize_gui()
@@ -264,8 +264,8 @@ class Form(QObject):
         configuration_file = temp2 + temp1
         # Place path in gui
         color = "green"
-        self.window.configuration_file_1_result.setTextColor(QColor(color))
-        self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
+        # self.window.configuration_file_1_result.setTextColor(QColor(color))
+        # self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
         # Create python dictionary 'scenario' from YAML formatted configuration file
         filepath = configuration_file
         scenario = open_file_action(filepath)
@@ -297,14 +297,16 @@ class Form(QObject):
             input_batch_file = item_value
             color = "green"
             self.window.input_batch_file_1_result.setTextColor(QColor(color))
-            self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
+            # self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
+            self.window.input_batch_file_1_result.setPlainText(input_batch_file)
             input_batch_file_valid = True
         else:
             # Display error message if invalid
             input_batch_file = item_value
             color = "red"
             self.window.input_batch_file_1_result.setTextColor(QColor(color))
-            self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
+            # self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
+            self.window.input_batch_file_1_result.setPlainText(input_batch_file)
             input_batch_file_valid = False
             configuration_file_valid = False
 
@@ -323,14 +325,16 @@ class Form(QObject):
             color = "green"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
             # path = pathlib.PurePath(output_batch_directory)
-            self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+            #self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+            self.window.output_batch_directory_1_result.setPlainText(output_batch_directory)
             output_batch_directory_valid = True
         else:
             # Display error message if invalid
             output_batch_directory = item_value
             color = "red"
             self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-            self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+            # self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+            self.window.output_batch_directory_1_result.setPlainText(output_batch_directory)
             output_batch_directory_valid = False
             configuration_file_valid = False
 
@@ -349,7 +353,7 @@ class Form(QObject):
         self.window.project_description.setPlainText(str(item_value))
         self.wizard_logic()
         self.event_monitor(event_separator, "black", "")
-        self.window.configuration_file_1_result.setToolTip(configuration_file)
+        # self.window.configuration_file_1_result.setToolTip(configuration_file)
         self.window.input_batch_file_1_result.setToolTip(input_batch_file)
         self.window.output_batch_directory_1_result.setToolTip(output_batch_directory)
 
@@ -387,8 +391,8 @@ class Form(QObject):
         configuration_file = temp2 + temp1
         # Place path in gui
         color = "green"
-        self.window.configuration_file_1_result.setTextColor(QColor(color))
-        self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
+        # self.window.configuration_file_1_result.setTextColor(QColor(color))
+        # self.window.configuration_file_1_result.setPlainText(os.path.basename(configuration_file))
         temp1 = "Configuration File Saved:\n    [" + configuration_file + "]"
         self.event_monitor(temp1, "green", 'dt')
         # Save text from Project Description window to dictionary
@@ -442,11 +446,12 @@ class Form(QObject):
         # temp3 = '...' + directory[-40:]
         color = "green"
         self.window.input_batch_file_1_result.setTextColor(QColor(color))
-        self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
+        # self.window.input_batch_file_1_result.setPlainText(os.path.basename(input_batch_file))
+        self.window.input_batch_file_1_result.setPlainText(input_batch_file)
         temp2 = "Input Batch File Loaded:\n    [" + directory + "]"
         self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
-        self.window.configuration_file_1_result.setPlainText("")
+        # self.window.configuration_file_1_result.setPlainText("")
         configuration_file = ""
         configuration_file_valid = False
         input_batch_file_valid = True
@@ -493,11 +498,12 @@ class Form(QObject):
         directory = output_batch_directory
         color = "green"
         self.window.output_batch_directory_1_result.setTextColor(QColor(color))
-        self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+        # self.window.output_batch_directory_1_result.setPlainText(os.path.basename(output_batch_directory))
+        self.window.output_batch_directory_1_result.setPlainText(output_batch_directory)
         temp2 = "Project Directory Loaded:\n    [" + directory + "]"
         self.event_monitor(temp2, color, 'dt')
         # Configuration has changed so blank out configuration file
-        self.window.configuration_file_1_result.setPlainText("")
+        # self.window.configuration_file_1_result.setPlainText("")
         configuration_file = ""
         configuration_file_valid = False
         output_batch_directory_valid = True
@@ -594,6 +600,7 @@ class Form(QObject):
         :return:
         """
 
+        global configuration_file_valid
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
 
             temp2 = "Configuration File Loaded:\n    [" + configuration_file + "]"
@@ -604,40 +611,45 @@ class Form(QObject):
             # temp1 = temp1 + "Punch It Chewie!"
             self.event_monitor(temp1, 'black', '')
 
-            self.window.save_configuration_file_button.setEnabled(1)
-            self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
-            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
+            # self.window.save_configuration_file_button.setEnabled(1)
+            # self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
+            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
 
         elif not configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             # self.clear_wizard()
-            temp1 = "Configuration has changed.  Save Configuration File to continue."
+            temp1 = "Configuration has changed.  Save Configuration File if desired."
             self.event_monitor(temp1, 'black', '')
-            self.window.save_configuration_file_button.setEnabled(1)
-            self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
-            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
+            # self.window.save_configuration_file_button.setEnabled(1)
+            # self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+            temp1 = "Configuration Loaded.\n"
+            temp1 = temp1 + "Model Run Enabled."
+            # temp1 = temp1 + "Punch It Chewie!"
+            self.event_monitor(temp1, 'black', '')
+            configuration_file_valid = True
+            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         elif not configuration_file_valid and (not input_batch_file_valid or not output_batch_directory_valid):
             # self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid:"
             self.event_monitor(temp1, 'black', '')
-            self.window.save_configuration_file_button.setEnabled(0)
-            self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
-            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
+            # self.window.save_configuration_file_button.setEnabled(0)
+            # self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
             if not input_batch_file_valid:
                 temp2 = "Input Batch File Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
-                self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
+                # self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
             if not output_batch_directory_valid:
                 temp2 = "Output Batch Directory Invalid:\n    [" + output_batch_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
-                self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
+                # self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             self.enable_run_button(True)
-            self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
-            self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
+            # self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
+            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
+            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         else:
             self.enable_run_button(False)
 
@@ -694,11 +706,11 @@ class Form(QObject):
         output_batch_directory_valid = False
         status_bar_message = "Status = Ready"
         self.enable_run_button(False)
-        self.window.save_configuration_file_button.setEnabled(0)
+        # self.window.save_configuration_file_button.setEnabled(0)
         self.window.epa_button.setIcon(QIcon(epa_button_image))
-        self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
-        self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
-        self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
+        # self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
+        # self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
+        # self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         self.window.setWindowTitle("EPA OMEGA Model     Version: " + omega2_version)
 
         self.window.model_status_label.setText("Model Idle")
@@ -711,7 +723,7 @@ class Form(QObject):
         :return:
         """
 
-        self.window.configuration_file_1_result.setPlainText("")
+        # self.window.configuration_file_1_result.setPlainText("")
         self.window.input_batch_file_1_result.setPlainText("")
         self.window.output_batch_directory_1_result.setPlainText("")
         self.window.project_description.setPlainText("")
@@ -1001,8 +1013,8 @@ class Form(QObject):
         :return:
         """
 
-        self.window.open_configuration_file_button.setEnabled(enable)
-        self.window.save_configuration_file_button.setEnabled(enable)
+        # self.window.open_configuration_file_button.setEnabled(enable)
+        # self.window.save_configuration_file_button.setEnabled(enable)
         self.window.select_input_batch_file_button.setEnabled(enable)
         self.window.select_output_batch_directory_button.setEnabled(enable)
         self.window.action_new_file.setEnabled(enable)
@@ -1152,7 +1164,7 @@ def run_gui():
 
     app = QApplication(sys.argv)
     # Load the gui
-    uifilename = path + 'omega_gui/elements/omega_gui_v22.ui'
+    uifilename = path + 'omega_gui/elements/omega_gui_qt.ui'
     print('uifilename = %s' % uifilename)
     form = Form(uifilename)
     sys.exit(app.exec_())
