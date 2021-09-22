@@ -711,7 +711,12 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
 
 
 def get_module(module_name):
+    import importlib
     import importlib.util
+
+    # try:
+    #     module = importlib.import_module(module_name)
+    # except:
 
     module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
     module_suffix = str.split(module_name, '.')[1]
@@ -719,6 +724,7 @@ def get_module(module_name):
 
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
     spec.loader.exec_module(module)
 
     return module
@@ -733,8 +739,6 @@ def init_user_definable_submodules():
         List of template/input errors, else empty list on success
 
     """
-    import importlib
-
     init_fail = []
 
     # user-definable policy modules
@@ -746,27 +750,27 @@ def init_user_definable_submodules():
         omega_globals.options.policy_reg_classes_file)
 
     module_name = get_template_name(omega_globals.options.policy_targets_file)
-    omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
+    omega_globals.options.VehicleTargets = get_module(module_name).VehicleTargets
 
     module_name = get_template_name(omega_globals.options.offcycle_credits_file)
-    omega_globals.options.OffCycleCredits = importlib.import_module(module_name).OffCycleCredits
+    omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
 
     # user-definable consumer modules
     module_name = get_template_name(omega_globals.options.vehicle_reregistration_file)
-    omega_globals.options.Reregistration = importlib.import_module(module_name).Reregistration
+    omega_globals.options.Reregistration = get_module(module_name).Reregistration
 
     module_name = get_template_name(omega_globals.options.onroad_vmt_file)
-    omega_globals.options.OnroadVMT = importlib.import_module(module_name).OnroadVMT
+    omega_globals.options.OnroadVMT = get_module(module_name).OnroadVMT
 
     module_name = get_template_name(omega_globals.options.sales_share_file)
-    omega_globals.options.SalesShare = importlib.import_module(module_name).SalesShare
+    omega_globals.options.SalesShare = get_module(module_name).SalesShare
 
     module_name = get_template_name(omega_globals.options.market_classes_file)
-    omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+    omega_globals.options.MarketClass = get_module(module_name).MarketClass
 
     # user-definable producer modules
     module_name = get_template_name(omega_globals.options.producer_generalized_cost_file)
-    omega_globals.options.ProducerGeneralizedCost = importlib.import_module(module_name).ProducerGeneralizedCost
+    omega_globals.options.ProducerGeneralizedCost = get_module(module_name).ProducerGeneralizedCost
 
     return init_fail
 
