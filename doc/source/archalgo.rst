@@ -131,7 +131,7 @@ Policy Module
 OMEGA's primary function is to help evaluate and compare policy alternatives which may vary in terms of regulatory program structure and stringency. Because we cannot anticipate all possible policy elements in advance, the code within the Policy Module is generic, to the greatest extent possible. This leaves most of the policy definition to be defined by the user as inputs to the model. Where regulatory program elements cannot be easily provided as inputs, for example the equations used to calculate GHG target values, the code has been organized as user-definable submodules. Much like the definitions recorded in the Code of Federal Regulations (CFR), the combination of inputs and user-definable submodules must unambiguously describe the methodologies for determining vehicle-level emissions targets and certification values, as well as the accounting rules for determining how individual vehicles contribute to a manufacturer's overall compliance determination.
 
 
-:numref:`al_label_plcym_ov` shows the flow of inputs and outputs for the Policy Module. As shown in this simple representation, the policy targets and achieved certification values are output from the module, as a function of the attributes of candidate vehicle presented by the Producer Module.
+:numref:`al_label_plcym_ov` shows the flow of inputs and outputs for the Policy Module. As shown in this simple representation, the vehicle GHG targets and achieved certification values are output from the module, as a function of the attributes of candidate vehicle presented by the Producer Module.
 
 .. _al_label_plcym_ov:
 .. figure:: _static/al_figures/policymod_ov.png
@@ -139,16 +139,20 @@ OMEGA's primary function is to help evaluate and compare policy alternatives whi
 
     Overview of the Policy Module
 
-In this documentation, *policy alternatives* refer only to what is being evaluated in a particular model run. There will also be relevant inputs and assumptions which are technically policies but are assumed to be fixed (i.e. exogenous) for a given comparison of alternatives. Such assumptions are defined by the user in the *analysis context*, and may reflect a combination of local, state, and federal programs that influence the transportation sector through regulatory and market-based mechanisms. .. todo: [[add examples, and links]] A comparison of policy alternatives requires the user to specify a no-action, or baseline policy, and one or more action alternatives.
+Throughout OMEGA, *policy alternatives* refer only to the regulatory options that are being evaluated in a particular model run. There will also be relevant inputs and assumptions which are technically policies but are assumed to be fixed (i.e. exogenous) for a given comparison of alternatives. Such assumptions are defined by the user in the *analysis context*, and may reflect a combination of local, state, and federal programs that influence the transportation sector through regulatory and market-based mechanisms. For example, these exogenous context policies might include some combination of state-level mandates for zero-emissions vehicles, local restrictions or fees on ICE vehicle use, state or Federal vehicle purchase incentives, fuel taxes, or a carbon tax. A comparison of policy alternatives requires that the user specify a no-action policy (aka baseline policy) and one or more action alternatives.
 
-Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards and rules for the accounting of compliance credits, and those that specify a required share of a specific technology. OMEGA can model either category as an independent alternative, or model both categories together; for example, in the case of a policy which requires a minimum share of a technology while still satisfying fleet averaging requirements.
+Policy alternatives that can be defined within OMEGA fall into two categories: those that involve fleet average emissions standards with compliance based on the accounting of credits, and those that specify a required share of a specific technology. OMEGA can model either policy type as an independent alternative, or model both types together; for example, in the case of a policy which requires a minimum share of a technology while still satisfying fleet averaging requirements.
 
 **Policy alternatives Involving fleet average emissions standards:**
-In this type of policy, the key principal is that the compliance status of a manufacturer is a result of the combined performance of all of the vehicles, and not the result of every vehicle achieving compliance individually. Fleet averaging in the Policy Module is based on CO2 *credits* as the fungible accounting currency. Each vehicle has an emissions target and an achieved certification emissions value. The difference between the target and certification emissions in absolute terms (Mg CO2) is referred to as a *credit*, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy alternative. The user-defined policy inputs can be used to specify restrictions on credit averaging and banking, including limits on credit lifetime or the ability to carry a negative balance into the future. The analogy of a financial bank is useful here, and OMEGA has adopted data structures and names that mirror the familiar bank account balance and transaction logs.
+In this type of policy, the key principle is that the compliance determination for a manufacturer is the result of the combined performance of all vehicles, and does not require that every vehicle achieves compliance individually. Fleet averaging in the Policy Module is based on CO2 *credits* as the fungible accounting currency. Each vehicle has an emissions target and an achieved certification emissions value. The difference between the target and certification emissions in absolute terms (Mg CO2) is referred to as a *credit*, and might be a positive or negative value that can be transferred across years, depending on the credit accounting rules defined in the policy alternative. The user-defined policy inputs can be used to specify restrictions on credit averaging and banking, including limits on credit lifetime or the ability to carry a negative balance into the future. The analogy of a financial bank is useful here, and OMEGA has adopted data structures and names that mirror the familiar bank account balance and transaction logs.
 .. todo: [[insert example transaction and balance tables]]
 
 
-OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the producer's credit bank. This program feature is known as *fleet averaging*, where vehicles with positive credits may contribute to offset other vehicles with negative credits. The OMEGA model calculates overall credits earned in an analysis year as the difference between the aggregate certification emissions minus the aggregate target emissions. An alternative approach of calculating overall credits as the sum of individual vehicle credits might seem more straightforward, and while technically possible, it is not used for several reasons. First, some credits, such as those generated by advanced technology incentive multipliers, are not easily accounted for on a per-vehicle basis. The transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a hypothetical 'consolidated' producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers. Emissions standards are defined in OMEGA using a range of policy elements, including:
+OMEGA is designed so that within an analysis year, credits from all the producer’s vehicles are counted without limitations towards the producer's credit balance. This program feature is known as *fleet averaging*, where vehicles with positive credits may contribute to offset other vehicles with negative credits. The OMEGA model calculates overall credits earned in an analysis year as the difference between the aggregate certification emissions minus the aggregate target emissions. An alternative approach of calculating overall credits as the sum of individual vehicle credits, while technically possible, is unnecessary and in some cases more complicated. To give one example, the credits generated by advanced technology incentive multipliers are not easily accounted for on a per-vehicle basis.
+
+The transfer of credits between producers can be simulated in OMEGA by representing multiple regulated entities as a hypothetical 'consolidated' producer, under an assumption that there is no cost or limitation to the transfer of compliance credits among entities. OMEGA is not designed to explicitly model any strategic considerations involved with the transfer of credits between producers.
+
+Emissions standards are defined in OMEGA using a range of policy elements, including:
 
 * rules for the accounting of upstream emissions
 * definition of compliance incentives, like multipliers
@@ -156,25 +160,29 @@ OMEGA is designed so that within an analysis year, credits from all the producer
 * definition of attribute-based target function
 * definition of the vehicles’ assumed lifetime miles
 
-.. admonition:: Demo example: Off-cycle credits
+.. admonition:: Demo example: Input files for no-action and action policy definitions
+
+    .. csv-table::
+        :widths: auto
+        :header-rows: 1
+
+        Policy element, No-action policy [Action policy] input files, Description
+        Drive cycles, drive_cycles-alt0[alt1].csv; drive_cycle_weights-alt0[alt1].csv, Drive cycle id's and weights for calculating weighted average emissions from certification tests.
+        Fuels, policy_fuels-alt0[alt1].csv, Direct and indirect CO2 values used in certification calculations for each fuel.
+        GHG credit rules, ghg_credit_params-alt0[alt1].csv, Credit carry-forward and carry-back rules.
+        GHG targets, ghg_standards-alt0[alt1].csv, Formula definitions for calculating g CO2/mi targets from vehicle attributes and regulatory classes. Also includes lifetime VMT assumptions.
+        Offcycle credits, offcycle_credits-alt0[alt1].csv, Offcycle credit values for specific technologies.
+        Upstream emissions accounting, policy_fuel_upstream_methods-alt0[alt1].csv, Selection of which methods to use for the calculation of indirect emissions certification values.
+        Advanced technology multipliers, production_multipliers-alt0[alt1].csv, Values for multipliers used in credit calculations to incentivize the introduction of specific technologies.
+        Reg classes, regulatory_classes-alt0[alt1].csv, Regulatory class id's and descriptions.
+        Technology mandates, required_sales_share-alt0[alt1].csv, Minimum required production shares as required by the policy.
+
 
     [add example details]
 
-.. admonition:: Demo example: Certification test procedure
+.. admonition:: Demo example:
 
-    [add example details]
-
-.. admonition:: Demo example: Form of GHG standards
-
-    [add example details]
-
-.. admonition:: Demo example: Production incentives
-
-    [add example details]
-
-.. admonition:: Demo example: Upstream emissions accounting
-
-    [add example details]
+    [Off-cycle credits, Certification test procedure, Form of GHG standards, Production incentives, Upstream emissions accounting]
 
 **Policy alternatives requiring specific technologies:**
 This type of policy requires all, or a portion, of a producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with a fleet averaging emissions standard; for example, a minimum Zero Emission Vehicle (ZEV) share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
