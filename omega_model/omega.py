@@ -718,14 +718,17 @@ def get_module(module_name):
     #     module = importlib.import_module(module_name)
     # except:
 
-    module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
-    module_suffix = str.split(module_name, '.')[1]
-    module_path = sys.path[0] + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
+    if module_name in sys.modules:
+        module = sys.modules[module_name]
+    else:
+        module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
+        module_suffix = str.split(module_name, '.')[1]
+        module_path = sys.path[0] + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
 
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
 
     return module
 
