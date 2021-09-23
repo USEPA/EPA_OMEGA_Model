@@ -1042,7 +1042,7 @@ class OMEGASessionObject(OMEGABase):
         self.get_user_settings()
         self.get_developer_settings()
 
-    def run(self, remote_omega_path):
+    def run(self):
         """
         Initialize and run the session
 
@@ -1058,7 +1058,6 @@ class OMEGASessionObject(OMEGABase):
         self.init()
 
         self.batch.batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
-        self.settings.omega_model_path = remote_omega_path
         result = run_omega(self.settings)
         return result
 
@@ -1181,7 +1180,7 @@ def run_bundled_sessions(options, remote_batchfile, session_list):
             batch.batch_log.logwrite("Skipping Disabled Session '%s'" % batch.sessions[s_index].name)
             batch.batch_log.logwrite('')
         else:
-            batch.sessions[s_index].result = batch.sessions[s_index].run(options.batch_path + 'omega_model')
+            batch.sessions[s_index].result = batch.sessions[s_index].run()
 
             if not batch.sessions[s_index].result:
                 # normal run, no failures
