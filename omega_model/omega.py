@@ -1026,17 +1026,6 @@ def run_omega(session_runtime_options, standalone_run=False):
     import traceback
     import time
 
-    # import sys
-
-    # sys.path.insert(0, session_runtime_options.omega_model_path)
-
-    # print('\n CWD = "%s"' % os.getcwd())
-    #
-    # print('\nsys.path = "%s"' % sys.path)
-    #
-    # path = os.path.dirname(os.path.abspath(__file__))
-    # print('\nfile path = "%s"' % path)
-
     session_runtime_options.start_time = time.time()
 
     init_fail = None
