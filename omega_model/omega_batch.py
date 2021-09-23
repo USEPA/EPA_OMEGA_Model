@@ -1058,7 +1058,7 @@ class OMEGASessionObject(OMEGABase):
         self.init()
 
         self.batch.batch_log.logwrite("Starting Compliance Run %s ..." % self.name)
-        self.settings.remote_omega_path = remote_omega_path
+        self.settings.omega_model_path = remote_omega_path
         result = run_omega(self.settings)
         return result
 

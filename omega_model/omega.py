@@ -714,16 +714,12 @@ def get_module(module_name):
     import importlib
     import importlib.util
 
-    # try:
-    #     module = importlib.import_module(module_name)
-    # except:
-
     if module_name in sys.modules:
         module = sys.modules[module_name]
     else:
         module_relpath = str.rsplit(module_name, '.', maxsplit=1)[0].replace('.', os.sep)
         module_suffix = str.split(module_name, '.')[1]
-        module_path = sys.path[0] + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
+        module_path = omega_globals.options.omega_model_path + os.sep + module_relpath + os.sep + '%s.py' % module_suffix
 
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         module = importlib.util.module_from_spec(spec)
@@ -1030,17 +1026,16 @@ def run_omega(session_runtime_options, standalone_run=False):
     import traceback
     import time
 
-    import sys
-    # sys.path.insert(0, os.path.join(session_runtime_options.remote_omega_path, '..'))  # picks up omega_model sub-packages
-    sys.path.insert(0, session_runtime_options.remote_omega_path)
-    # os.chdir(session_runtime_options.remote_omega_path)
+    # import sys
 
-    print('\n CWD = "%s"' % os.getcwd())
+    # sys.path.insert(0, session_runtime_options.omega_model_path)
 
-    print('\nsys.path = "%s"' % sys.path)
-
-    path = os.path.dirname(os.path.abspath(__file__))
-    print('\nfile path = "%s"' % path)
+    # print('\n CWD = "%s"' % os.getcwd())
+    #
+    # print('\nsys.path = "%s"' % sys.path)
+    #
+    # path = os.path.dirname(os.path.abspath(__file__))
+    # print('\nfile path = "%s"' % path)
 
     session_runtime_options.start_time = time.time()
 
