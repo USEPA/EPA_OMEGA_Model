@@ -73,6 +73,6 @@ Run Profiler,TRUE / FALSE,FALSE,FALSE
 Flat Context,TRUE / FALSE,FALSE,FALSE
 Flat Context Year,"#, …",2020,2020
 Verbose Console Modules,"['producer', 'consumer'] or subset or []",[],[]
-Log Producer Iteration Years,"all' or [year, …] or []",[2020],[]
-Log Consumer Iteration Years,"all' or [year, …] or []",[2050],[2050]
-Log Producer Decision and Response Years,"all' or [year, …] or []",[],[]
+Log Producer Iteration Years,"'all' or [year, …] or []",[2020],[]
+Log Consumer Iteration Years,"'all' or [year, …] or []",[2050],[2050]
+Log Producer Decision and Response Years,"'all' or [year, …] or []",[],[]
