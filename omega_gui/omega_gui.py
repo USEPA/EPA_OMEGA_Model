@@ -85,7 +85,7 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
-button_click_sound = path + 'omega_gui/elements/click.mp3'
+# button_click_sound = path + 'omega_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -573,7 +573,7 @@ class Form(QObject):
         :return:
         """
 
-        global omega2_version, button_click_sound
+        global omega2_version
         message_title = "About OMEGA"
         message = "OMEGA Code Version = " + omega2_version
         self.showbox(message_title, message)
