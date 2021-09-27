@@ -1,0 +1,380 @@
+input_template_name:,context_fuel_prices,input_template_version:,0.2,,,
+context_id,dollar_basis,case_id,fuel_id,calendar_year,retail_dollars_per_unit,pretax_dollars_per_unit
+AEO2020,2019,Reference case,pump gasoline,2019,2.665601,2.10838
+AEO2020,2019,Reference case,pump gasoline,2020,2.639979,2.086804
+AEO2020,2019,Reference case,pump gasoline,2021,2.64319,2.094743
+AEO2020,2019,Reference case,pump gasoline,2022,2.64413,2.100513
+AEO2020,2019,Reference case,pump gasoline,2023,2.633867,2.09524
+AEO2020,2019,Reference case,pump gasoline,2024,2.599251,2.065917
+AEO2020,2019,Reference case,pump gasoline,2025,2.628672,2.100097
+AEO2020,2019,Reference case,pump gasoline,2026,2.650331,2.126037
+AEO2020,2019,Reference case,pump gasoline,2027,2.682016,2.161779
+AEO2020,2019,Reference case,pump gasoline,2028,2.694953,2.178818
+AEO2020,2019,Reference case,pump gasoline,2029,2.729894,2.217607
+AEO2020,2019,Reference case,pump gasoline,2030,2.813741,2.264958
+AEO2020,2019,Reference case,pump gasoline,2031,2.832745,2.288131
+AEO2020,2019,Reference case,pump gasoline,2032,2.85718,2.316642
+AEO2020,2019,Reference case,pump gasoline,2033,2.907378,2.365156
+AEO2020,2019,Reference case,pump gasoline,2034,2.953295,2.414751
+AEO2020,2019,Reference case,pump gasoline,2035,2.983456,2.448793
+AEO2020,2019,Reference case,pump gasoline,2036,3.018609,2.486603
+AEO2020,2019,Reference case,pump gasoline,2037,3.027417,2.49834
+AEO2020,2019,Reference case,pump gasoline,2038,3.060073,2.533639
+AEO2020,2019,Reference case,pump gasoline,2039,3.100547,2.576556
+AEO2020,2019,Reference case,pump gasoline,2040,3.11111,2.589809
+AEO2020,2019,Reference case,pump gasoline,2041,3.132885,2.614152
+AEO2020,2019,Reference case,pump gasoline,2042,3.180762,2.664272
+AEO2020,2019,Reference case,pump gasoline,2043,3.206139,2.692087
+AEO2020,2019,Reference case,pump gasoline,2044,3.230979,2.71927
+AEO2020,2019,Reference case,pump gasoline,2045,3.272165,2.762639
+AEO2020,2019,Reference case,pump gasoline,2046,3.281969,2.774897
+AEO2020,2019,Reference case,pump gasoline,2047,3.338524,2.83338
+AEO2020,2019,Reference case,pump gasoline,2048,3.376594,2.873584
+AEO2020,2019,Reference case,pump gasoline,2049,3.405497,2.90462
+AEO2020,2019,Reference case,pump gasoline,2050,3.430088,2.931466
+AEO2020,2019,Reference case,US electricity,2019,0.12559407,0.10391058
+AEO2020,2019,Reference case,US electricity,2020,0.1239522,0.10212733
+AEO2020,2019,Reference case,US electricity,2021,0.12462153,0.10144772
+AEO2020,2019,Reference case,US electricity,2022,0.1247601,0.10119162
+AEO2020,2019,Reference case,US electricity,2023,0.12547039,0.10121079
+AEO2020,2019,Reference case,US electricity,2024,0.12677696,0.10184604
+AEO2020,2019,Reference case,US electricity,2025,0.12859044,0.10321589
+AEO2020,2019,Reference case,US electricity,2026,0.13024888,0.10438571
+AEO2020,2019,Reference case,US electricity,2027,0.1311085,0.10493044
+AEO2020,2019,Reference case,US electricity,2028,0.13094872,0.10451485
+AEO2020,2019,Reference case,US electricity,2029,0.1304935,0.10390381
+AEO2020,2019,Reference case,US electricity,2030,0.1305922,0.10370628
+AEO2020,2019,Reference case,US electricity,2031,0.13030392,0.10328291
+AEO2020,2019,Reference case,US electricity,2032,0.12999648,0.10280963
+AEO2020,2019,Reference case,US electricity,2033,0.13043603,0.10315948
+AEO2020,2019,Reference case,US electricity,2034,0.13062144,0.1032381
+AEO2020,2019,Reference case,US electricity,2035,0.12998402,0.1026488
+AEO2020,2019,Reference case,US electricity,2036,0.12962379,0.10233636
+AEO2020,2019,Reference case,US electricity,2037,0.12922574,0.10199707
+AEO2020,2019,Reference case,US electricity,2038,0.12934729,0.1021621
+AEO2020,2019,Reference case,US electricity,2039,0.12897934,0.10185767
+AEO2020,2019,Reference case,US electricity,2040,0.12841133,0.10131741
+AEO2020,2019,Reference case,US electricity,2041,0.12819372,0.10114
+AEO2020,2019,Reference case,US electricity,2042,0.12780978,0.10088268
+AEO2020,2019,Reference case,US electricity,2043,0.12748143,0.10056148
+AEO2020,2019,Reference case,US electricity,2044,0.12743569,0.10052033
+AEO2020,2019,Reference case,US electricity,2045,0.12719047,0.10030838
+AEO2020,2019,Reference case,US electricity,2046,0.12680022,0.10001727
+AEO2020,2019,Reference case,US electricity,2047,0.1267236,0.10003813
+AEO2020,2019,Reference case,US electricity,2048,0.12634107,0.0997754
+AEO2020,2019,Reference case,US electricity,2049,0.12567993,0.09932341
+AEO2020,2019,Reference case,US electricity,2050,0.12516408,0.09903041
+AEO2020,2019,High oil price,pump gasoline,2019,2.665599,2.108376
+AEO2020,2019,High oil price,pump gasoline,2020,3.236049,2.677195
+AEO2020,2019,High oil price,pump gasoline,2021,3.351047,2.796643
+AEO2020,2019,High oil price,pump gasoline,2022,3.505075,2.955343
+AEO2020,2019,High oil price,pump gasoline,2023,3.727231,3.182042
+AEO2020,2019,High oil price,pump gasoline,2024,3.827311,3.288308
+AEO2020,2019,High oil price,pump gasoline,2025,3.876024,3.344136
+AEO2020,2019,High oil price,pump gasoline,2026,3.939892,3.414506
+AEO2020,2019,High oil price,pump gasoline,2027,3.950555,3.431717
+AEO2020,2019,High oil price,pump gasoline,2028,3.998198,3.485319
+AEO2020,2019,High oil price,pump gasoline,2029,4.147246,3.598679
+AEO2020,2019,High oil price,pump gasoline,2030,4.185226,3.642617
+AEO2020,2019,High oil price,pump gasoline,2031,4.250091,3.713089
+AEO2020,2019,High oil price,pump gasoline,2032,4.364346,3.826795
+AEO2020,2019,High oil price,pump gasoline,2033,4.447692,3.915383
+AEO2020,2019,High oil price,pump gasoline,2034,4.479072,3.952371
+AEO2020,2019,High oil price,pump gasoline,2035,4.535181,4.014091
+AEO2020,2019,High oil price,pump gasoline,2036,4.585422,4.068335
+AEO2020,2019,High oil price,pump gasoline,2037,4.62264,4.10928
+AEO2020,2019,High oil price,pump gasoline,2038,4.670875,4.160807
+AEO2020,2019,High oil price,pump gasoline,2039,4.700146,4.193014
+AEO2020,2019,High oil price,pump gasoline,2040,4.749998,4.24518
+AEO2020,2019,High oil price,pump gasoline,2041,4.788712,4.28623
+AEO2020,2019,High oil price,pump gasoline,2042,4.810071,4.309533
+AEO2020,2019,High oil price,pump gasoline,2043,4.846516,4.347817
+AEO2020,2019,High oil price,pump gasoline,2044,4.831707,4.33492
+AEO2020,2019,High oil price,pump gasoline,2045,4.852967,4.357623
+AEO2020,2019,High oil price,pump gasoline,2046,4.879765,4.385518
+AEO2020,2019,High oil price,pump gasoline,2047,4.921601,4.428263
+AEO2020,2019,High oil price,pump gasoline,2048,4.974297,4.481649
+AEO2020,2019,High oil price,pump gasoline,2049,4.980424,4.488777
+AEO2020,2019,High oil price,pump gasoline,2050,5.01036,4.519616
+AEO2020,2019,High oil price,US electricity,2019,0.12563018,0.1039471
+AEO2020,2019,High oil price,US electricity,2020,0.12454705,0.10241962
+AEO2020,2019,High oil price,US electricity,2021,0.12542105,0.10156312
+AEO2020,2019,High oil price,US electricity,2022,0.12588316,0.10133101
+AEO2020,2019,High oil price,US electricity,2023,0.12649334,0.10095813
+AEO2020,2019,High oil price,US electricity,2024,0.1267317,0.10093446
+AEO2020,2019,High oil price,US electricity,2025,0.12682126,0.10106183
+AEO2020,2019,High oil price,US electricity,2026,0.12704862,0.10138923
+AEO2020,2019,High oil price,US electricity,2027,0.12654735,0.1011174
+AEO2020,2019,High oil price,US electricity,2028,0.1260745,0.10066963
+AEO2020,2019,High oil price,US electricity,2029,0.12526643,0.09980555
+AEO2020,2019,High oil price,US electricity,2030,0.12491394,0.09920994
+AEO2020,2019,High oil price,US electricity,2031,0.12531001,0.09947516
+AEO2020,2019,High oil price,US electricity,2032,0.12517318,0.0992458
+AEO2020,2019,High oil price,US electricity,2033,0.12523967,0.09933933
+AEO2020,2019,High oil price,US electricity,2034,0.12496521,0.09923338
+AEO2020,2019,High oil price,US electricity,2035,0.12426517,0.09881608
+AEO2020,2019,High oil price,US electricity,2036,0.12370098,0.09839632
+AEO2020,2019,High oil price,US electricity,2037,0.12288336,0.09794231
+AEO2020,2019,High oil price,US electricity,2038,0.12246224,0.09764247
+AEO2020,2019,High oil price,US electricity,2039,0.12245173,0.09774037
+AEO2020,2019,High oil price,US electricity,2040,0.12236962,0.09775542
+AEO2020,2019,High oil price,US electricity,2041,0.12249398,0.09794828
+AEO2020,2019,High oil price,US electricity,2042,0.12278561,0.09829474
+AEO2020,2019,High oil price,US electricity,2043,0.12282095,0.09828891
+AEO2020,2019,High oil price,US electricity,2044,0.12339,0.09872075
+AEO2020,2019,High oil price,US electricity,2045,0.12396101,0.09916186
+AEO2020,2019,High oil price,US electricity,2046,0.12439076,0.09935378
+AEO2020,2019,High oil price,US electricity,2047,0.12470434,0.09958037
+AEO2020,2019,High oil price,US electricity,2048,0.12521835,0.09988293
+AEO2020,2019,High oil price,US electricity,2049,0.12500374,0.09964239
+AEO2020,2019,High oil price,US electricity,2050,0.12558438,0.09991344
+AEO2020,2019,Low oil price,pump gasoline,2019,2.665607,2.108375
+AEO2020,2019,Low oil price,pump gasoline,2020,2.132831,1.58404
+AEO2020,2019,Low oil price,pump gasoline,2021,2.07392,1.529976
+AEO2020,2019,Low oil price,pump gasoline,2022,2.062188,1.522555
+AEO2020,2019,Low oil price,pump gasoline,2023,2.046474,1.511174
+AEO2020,2019,Low oil price,pump gasoline,2024,2.02598,1.495213
+AEO2020,2019,Low oil price,pump gasoline,2025,2.012504,1.486296
+AEO2020,2019,Low oil price,pump gasoline,2026,2.017238,1.494763
+AEO2020,2019,Low oil price,pump gasoline,2027,2.024563,1.505711
+AEO2020,2019,Low oil price,pump gasoline,2028,2.029525,1.514225
+AEO2020,2019,Low oil price,pump gasoline,2029,2.032771,1.521007
+AEO2020,2019,Low oil price,pump gasoline,2030,2.091231,1.54275
+AEO2020,2019,Low oil price,pump gasoline,2031,2.091129,1.546403
+AEO2020,2019,Low oil price,pump gasoline,2032,2.102348,1.561179
+AEO2020,2019,Low oil price,pump gasoline,2033,2.120073,1.57684
+AEO2020,2019,Low oil price,pump gasoline,2034,2.117917,1.578163
+AEO2020,2019,Low oil price,pump gasoline,2035,2.127607,1.591241
+AEO2020,2019,Low oil price,pump gasoline,2036,2.136572,1.602591
+AEO2020,2019,Low oil price,pump gasoline,2037,2.154523,1.622853
+AEO2020,2019,Low oil price,pump gasoline,2038,2.153512,1.624377
+AEO2020,2019,Low oil price,pump gasoline,2039,2.164286,1.63758
+AEO2020,2019,Low oil price,pump gasoline,2040,2.178289,1.654003
+AEO2020,2019,Low oil price,pump gasoline,2041,2.183931,1.662215
+AEO2020,2019,Low oil price,pump gasoline,2042,2.188392,1.669191
+AEO2020,2019,Low oil price,pump gasoline,2043,2.187343,1.67074
+AEO2020,2019,Low oil price,pump gasoline,2044,2.193764,1.679673
+AEO2020,2019,Low oil price,pump gasoline,2045,2.204482,1.692885
+AEO2020,2019,Low oil price,pump gasoline,2046,2.196002,1.687072
+AEO2020,2019,Low oil price,pump gasoline,2047,2.199528,1.693301
+AEO2020,2019,Low oil price,pump gasoline,2048,2.206261,1.702673
+AEO2020,2019,Low oil price,pump gasoline,2049,2.204586,1.703788
+AEO2020,2019,Low oil price,pump gasoline,2050,2.202825,1.704869
+AEO2020,2019,Low oil price,US electricity,2019,0.12558916,0.10390669
+AEO2020,2019,Low oil price,US electricity,2020,0.12349121,0.10171651
+AEO2020,2019,Low oil price,US electricity,2021,0.12435987,0.10141973
+AEO2020,2019,Low oil price,US electricity,2022,0.12417786,0.10124799
+AEO2020,2019,Low oil price,US electricity,2023,0.12518229,0.10149848
+AEO2020,2019,Low oil price,US electricity,2024,0.12682319,0.10234589
+AEO2020,2019,Low oil price,US electricity,2025,0.12882314,0.10373189
+AEO2020,2019,Low oil price,US electricity,2026,0.12999442,0.10439418
+AEO2020,2019,Low oil price,US electricity,2027,0.13101677,0.10506055
+AEO2020,2019,Low oil price,US electricity,2028,0.13110347,0.10493812
+AEO2020,2019,Low oil price,US electricity,2029,0.13106191,0.1047153
+AEO2020,2019,Low oil price,US electricity,2030,0.13130845,0.10462358
+AEO2020,2019,Low oil price,US electricity,2031,0.13121428,0.10429055
+AEO2020,2019,Low oil price,US electricity,2032,0.13178733,0.10458194
+AEO2020,2019,Low oil price,US electricity,2033,0.13214205,0.10469698
+AEO2020,2019,Low oil price,US electricity,2034,0.13224892,0.10461735
+AEO2020,2019,Low oil price,US electricity,2035,0.1321223,0.10437464
+AEO2020,2019,Low oil price,US electricity,2036,0.13212389,0.10427672
+AEO2020,2019,Low oil price,US electricity,2037,0.13202671,0.10419188
+AEO2020,2019,Low oil price,US electricity,2038,0.13189365,0.10401021
+AEO2020,2019,Low oil price,US electricity,2039,0.13200848,0.1041442
+AEO2020,2019,Low oil price,US electricity,2040,0.13157898,0.10376634
+AEO2020,2019,Low oil price,US electricity,2041,0.13127256,0.10356902
+AEO2020,2019,Low oil price,US electricity,2042,0.13078157,0.10318008
+AEO2020,2019,Low oil price,US electricity,2043,0.13046492,0.10285508
+AEO2020,2019,Low oil price,US electricity,2044,0.13048251,0.10281334
+AEO2020,2019,Low oil price,US electricity,2045,0.13026961,0.1025709
+AEO2020,2019,Low oil price,US electricity,2046,0.12960264,0.10187393
+AEO2020,2019,Low oil price,US electricity,2047,0.12943594,0.10181696
+AEO2020,2019,Low oil price,US electricity,2048,0.12897487,0.10149324
+AEO2020,2019,Low oil price,US electricity,2049,0.12798641,0.10074056
+AEO2020,2019,Low oil price,US electricity,2050,0.12728194,0.10019148
+AEO2021,2020,Reference case,pump gasoline,2020,2.254854,1.683764
+AEO2021,2020,Reference case,pump gasoline,2021,2.354823,1.782645
+AEO2021,2020,Reference case,pump gasoline,2022,2.399469,1.828079
+AEO2021,2020,Reference case,pump gasoline,2023,2.461965,1.892717
+AEO2021,2020,Reference case,pump gasoline,2024,2.468871,1.902636
+AEO2021,2020,Reference case,pump gasoline,2025,2.511604,1.948789
+AEO2021,2020,Reference case,pump gasoline,2026,2.533375,1.974734
+AEO2021,2020,Reference case,pump gasoline,2027,2.561896,2.007506
+AEO2021,2020,Reference case,pump gasoline,2028,2.625924,2.075205
+AEO2021,2020,Reference case,pump gasoline,2029,2.669297,2.122566
+AEO2021,2020,Reference case,pump gasoline,2030,2.797148,2.206889
+AEO2021,2020,Reference case,pump gasoline,2031,2.808867,2.222628
+AEO2021,2020,Reference case,pump gasoline,2032,2.865813,2.276317
+AEO2021,2020,Reference case,pump gasoline,2033,2.887016,2.301076
+AEO2021,2020,Reference case,pump gasoline,2034,2.92502,2.342296
+AEO2021,2020,Reference case,pump gasoline,2035,2.946772,2.367291
+AEO2021,2020,Reference case,pump gasoline,2036,2.983997,2.407506
+AEO2021,2020,Reference case,pump gasoline,2037,3.015052,2.441399
+AEO2021,2020,Reference case,pump gasoline,2038,3.054285,2.483322
+AEO2021,2020,Reference case,pump gasoline,2039,3.058701,2.490729
+AEO2021,2020,Reference case,pump gasoline,2040,3.110869,2.545406
+AEO2021,2020,Reference case,pump gasoline,2041,3.139569,2.576809
+AEO2021,2020,Reference case,pump gasoline,2042,3.158735,2.598792
+AEO2021,2020,Reference case,pump gasoline,2043,3.177755,2.620718
+AEO2021,2020,Reference case,pump gasoline,2044,3.188731,2.634725
+AEO2021,2020,Reference case,pump gasoline,2045,3.168612,2.617817
+AEO2021,2020,Reference case,pump gasoline,2046,3.211146,2.663128
+AEO2021,2020,Reference case,pump gasoline,2047,3.224338,2.679476
+AEO2021,2020,Reference case,pump gasoline,2048,3.236133,2.694331
+AEO2021,2020,Reference case,pump gasoline,2049,3.229862,2.691332
+AEO2021,2020,Reference case,pump gasoline,2050,3.232289,2.696991
+AEO2021,2020,Reference case,US electricity,2020,0.12205986,0.10416587
+AEO2021,2020,Reference case,US electricity,2021,0.12461187,0.10604009
+AEO2021,2020,Reference case,US electricity,2022,0.1243744,0.10523453
+AEO2021,2020,Reference case,US electricity,2023,0.12395898,0.10404841
+AEO2021,2020,Reference case,US electricity,2024,0.1234876,0.10315864
+AEO2021,2020,Reference case,US electricity,2025,0.12365907,0.1029508
+AEO2021,2020,Reference case,US electricity,2026,0.12410997,0.10309146
+AEO2021,2020,Reference case,US electricity,2027,0.12442007,0.10315582
+AEO2021,2020,Reference case,US electricity,2028,0.12451254,0.10306461
+AEO2021,2020,Reference case,US electricity,2029,0.1248054,0.10313711
+AEO2021,2020,Reference case,US electricity,2030,0.12466349,0.10279489
+AEO2021,2020,Reference case,US electricity,2031,0.12471898,0.10281264
+AEO2021,2020,Reference case,US electricity,2032,0.12444263,0.10238991
+AEO2021,2020,Reference case,US electricity,2033,0.12498111,0.10282258
+AEO2021,2020,Reference case,US electricity,2034,0.12501787,0.10269257
+AEO2021,2020,Reference case,US electricity,2035,0.12499413,0.10265728
+AEO2021,2020,Reference case,US electricity,2036,0.12455545,0.1021719
+AEO2021,2020,Reference case,US electricity,2037,0.12420609,0.10176542
+AEO2021,2020,Reference case,US electricity,2038,0.12382406,0.10133089
+AEO2021,2020,Reference case,US electricity,2039,0.12347831,0.10093248
+AEO2021,2020,Reference case,US electricity,2040,0.12330373,0.10071244
+AEO2021,2020,Reference case,US electricity,2041,0.12311924,0.10046385
+AEO2021,2020,Reference case,US electricity,2042,0.12310627,0.1003348
+AEO2021,2020,Reference case,US electricity,2043,0.12224258,0.0994359
+AEO2021,2020,Reference case,US electricity,2044,0.1221482,0.09922602
+AEO2021,2020,Reference case,US electricity,2045,0.12189885,0.09890602
+AEO2021,2020,Reference case,US electricity,2046,0.12132692,0.09833918
+AEO2021,2020,Reference case,US electricity,2047,0.1212567,0.09821615
+AEO2021,2020,Reference case,US electricity,2048,0.12091168,0.09784544
+AEO2021,2020,Reference case,US electricity,2049,0.12012137,0.09709141
+AEO2021,2020,Reference case,US electricity,2050,0.11927717,0.09634268
+AEO2021,2020,High oil price,pump gasoline,2020,2.254853,1.679478
+AEO2021,2020,High oil price,pump gasoline,2021,2.979453,2.400635
+AEO2021,2020,High oil price,pump gasoline,2022,3.237412,2.659058
+AEO2021,2020,High oil price,pump gasoline,2023,3.459914,2.883351
+AEO2021,2020,High oil price,pump gasoline,2024,3.583037,3.009233
+AEO2021,2020,High oil price,pump gasoline,2025,3.690663,3.120466
+AEO2021,2020,High oil price,pump gasoline,2026,3.730874,3.165522
+AEO2021,2020,High oil price,pump gasoline,2027,3.802338,3.241712
+AEO2021,2020,High oil price,pump gasoline,2028,3.909153,3.353162
+AEO2021,2020,High oil price,pump gasoline,2029,3.972094,3.420903
+AEO2021,2020,High oil price,pump gasoline,2030,4.120898,3.527497
+AEO2021,2020,High oil price,pump gasoline,2031,4.106604,3.518683
+AEO2021,2020,High oil price,pump gasoline,2032,4.166346,3.576451
+AEO2021,2020,High oil price,pump gasoline,2033,4.181954,3.596807
+AEO2021,2020,High oil price,pump gasoline,2034,4.215391,3.634711
+AEO2021,2020,High oil price,pump gasoline,2035,4.283442,3.706585
+AEO2021,2020,High oil price,pump gasoline,2036,4.311099,3.738237
+AEO2021,2020,High oil price,pump gasoline,2037,4.344756,3.775624
+AEO2021,2020,High oil price,pump gasoline,2038,4.341742,3.776533
+AEO2021,2020,High oil price,pump gasoline,2039,4.351453,3.78999
+AEO2021,2020,High oil price,pump gasoline,2040,4.383275,3.825106
+AEO2021,2020,High oil price,pump gasoline,2041,4.390029,3.835233
+AEO2021,2020,High oil price,pump gasoline,2042,4.41859,3.866798
+AEO2021,2020,High oil price,pump gasoline,2043,4.43468,3.885979
+AEO2021,2020,High oil price,pump gasoline,2044,4.46626,3.920499
+AEO2021,2020,High oil price,pump gasoline,2045,4.502784,3.95975
+AEO2021,2020,High oil price,pump gasoline,2046,4.535209,3.994914
+AEO2021,2020,High oil price,pump gasoline,2047,4.568638,4.030995
+AEO2021,2020,High oil price,pump gasoline,2048,4.623489,4.088192
+AEO2021,2020,High oil price,pump gasoline,2049,4.639452,4.106896
+AEO2021,2020,High oil price,pump gasoline,2050,4.682961,4.152825
+AEO2021,2020,High oil price,US electricity,2020,0.12203301,0.10413733
+AEO2021,2020,High oil price,US electricity,2021,0.12535577,0.10645151
+AEO2021,2020,High oil price,US electricity,2022,0.12459047,0.10562426
+AEO2021,2020,High oil price,US electricity,2023,0.12452071,0.10452806
+AEO2021,2020,High oil price,US electricity,2024,0.12384327,0.10340399
+AEO2021,2020,High oil price,US electricity,2025,0.12343873,0.10271297
+AEO2021,2020,High oil price,US electricity,2026,0.12326517,0.10226759
+AEO2021,2020,High oil price,US electricity,2027,0.12285524,0.10169193
+AEO2021,2020,High oil price,US electricity,2028,0.12252204,0.10119052
+AEO2021,2020,High oil price,US electricity,2029,0.12206549,0.10060871
+AEO2021,2020,High oil price,US electricity,2030,0.12178601,0.10023791
+AEO2021,2020,High oil price,US electricity,2031,0.12129193,0.09971442
+AEO2021,2020,High oil price,US electricity,2032,0.12112794,0.09943423
+AEO2021,2020,High oil price,US electricity,2033,0.12058961,0.09882938
+AEO2021,2020,High oil price,US electricity,2034,0.11990764,0.09808546
+AEO2021,2020,High oil price,US electricity,2035,0.1196571,0.09782936
+AEO2021,2020,High oil price,US electricity,2036,0.11895004,0.09711076
+AEO2021,2020,High oil price,US electricity,2037,0.11824274,0.09640843
+AEO2021,2020,High oil price,US electricity,2038,0.1179636,0.09606635
+AEO2021,2020,High oil price,US electricity,2039,0.11769918,0.095682
+AEO2021,2020,High oil price,US electricity,2040,0.11753673,0.0953848
+AEO2021,2020,High oil price,US electricity,2041,0.11742526,0.09509936
+AEO2021,2020,High oil price,US electricity,2042,0.11742474,0.09491819
+AEO2021,2020,High oil price,US electricity,2043,0.11714918,0.09451398
+AEO2021,2020,High oil price,US electricity,2044,0.11716902,0.094331
+AEO2021,2020,High oil price,US electricity,2045,0.11705053,0.09403855
+AEO2021,2020,High oil price,US electricity,2046,0.11697525,0.09381557
+AEO2021,2020,High oil price,US electricity,2047,0.11692012,0.09365891
+AEO2021,2020,High oil price,US electricity,2048,0.11683106,0.09348776
+AEO2021,2020,High oil price,US electricity,2049,0.1164782,0.0930547
+AEO2021,2020,High oil price,US electricity,2050,0.11615891,0.09265312
+AEO2021,2020,Low oil price,pump gasoline,2020,2.254854,1.683262
+AEO2021,2020,Low oil price,pump gasoline,2021,2.032305,1.462094
+AEO2021,2020,Low oil price,pump gasoline,2022,1.982661,1.414964
+AEO2021,2020,Low oil price,pump gasoline,2023,1.99281,1.427413
+AEO2021,2020,Low oil price,pump gasoline,2024,2.000101,1.437653
+AEO2021,2020,Low oil price,pump gasoline,2025,1.997359,1.438765
+AEO2021,2020,Low oil price,pump gasoline,2026,1.985263,1.431106
+AEO2021,2020,Low oil price,pump gasoline,2027,1.990597,1.440858
+AEO2021,2020,Low oil price,pump gasoline,2028,1.990883,1.445462
+AEO2021,2020,Low oil price,pump gasoline,2029,1.986455,1.445318
+AEO2021,2020,Low oil price,pump gasoline,2030,2.060832,1.476627
+AEO2021,2020,Low oil price,pump gasoline,2031,2.061881,1.481634
+AEO2021,2020,Low oil price,pump gasoline,2032,2.101629,1.518236
+AEO2021,2020,Low oil price,pump gasoline,2033,2.117851,1.537913
+AEO2021,2020,Low oil price,pump gasoline,2034,2.122205,1.54563
+AEO2021,2020,Low oil price,pump gasoline,2035,2.140392,1.567012
+AEO2021,2020,Low oil price,pump gasoline,2036,2.146112,1.575876
+AEO2021,2020,Low oil price,pump gasoline,2037,2.168893,1.601534
+AEO2021,2020,Low oil price,pump gasoline,2038,2.172349,1.608016
+AEO2021,2020,Low oil price,pump gasoline,2039,2.185912,1.624462
+AEO2021,2020,Low oil price,pump gasoline,2040,2.180214,1.621854
+AEO2021,2020,Low oil price,pump gasoline,2041,2.175493,1.620192
+AEO2021,2020,Low oil price,pump gasoline,2042,2.182893,1.630554
+AEO2021,2020,Low oil price,pump gasoline,2043,2.185968,1.6367
+AEO2021,2020,Low oil price,pump gasoline,2044,2.192602,1.646415
+AEO2021,2020,Low oil price,pump gasoline,2045,2.194757,1.651687
+AEO2021,2020,Low oil price,pump gasoline,2046,2.203054,1.663065
+AEO2021,2020,Low oil price,pump gasoline,2047,2.212985,1.676052
+AEO2021,2020,Low oil price,pump gasoline,2048,2.225744,1.691836
+AEO2021,2020,Low oil price,pump gasoline,2049,2.222335,1.691565
+AEO2021,2020,Low oil price,pump gasoline,2050,2.238527,1.710728
+AEO2021,2020,Low oil price,US electricity,2020,0.12204718,0.10414722
+AEO2021,2020,Low oil price,US electricity,2021,0.12429275,0.10550802
+AEO2021,2020,Low oil price,US electricity,2022,0.12372595,0.10455111
+AEO2021,2020,Low oil price,US electricity,2023,0.12442369,0.10476224
+AEO2021,2020,Low oil price,US electricity,2024,0.12496245,0.10477499
+AEO2021,2020,Low oil price,US electricity,2025,0.12515879,0.10453077
+AEO2021,2020,Low oil price,US electricity,2026,0.12515789,0.10417976
+AEO2021,2020,Low oil price,US electricity,2027,0.12510028,0.10388753
+AEO2021,2020,Low oil price,US electricity,2028,0.12494801,0.10353666
+AEO2021,2020,Low oil price,US electricity,2029,0.12478988,0.10320629
+AEO2021,2020,Low oil price,US electricity,2030,0.12490314,0.10312216
+AEO2021,2020,Low oil price,US electricity,2031,0.12494825,0.10313834
+AEO2021,2020,Low oil price,US electricity,2032,0.12536235,0.10326543
+AEO2021,2020,Low oil price,US electricity,2033,0.12564436,0.10341116
+AEO2021,2020,Low oil price,US electricity,2034,0.12534458,0.10295838
+AEO2021,2020,Low oil price,US electricity,2035,0.1254682,0.10303685
+AEO2021,2020,Low oil price,US electricity,2036,0.1249929,0.10247453
+AEO2021,2020,Low oil price,US electricity,2037,0.12457651,0.10199443
+AEO2021,2020,Low oil price,US electricity,2038,0.1240441,0.10143495
+AEO2021,2020,Low oil price,US electricity,2039,0.12373555,0.10109461
+AEO2021,2020,Low oil price,US electricity,2040,0.12361532,0.10091956
+AEO2021,2020,Low oil price,US electricity,2041,0.12332853,0.10056538
+AEO2021,2020,Low oil price,US electricity,2042,0.12318606,0.10037699
+AEO2021,2020,Low oil price,US electricity,2043,0.12263195,0.09979266
+AEO2021,2020,Low oil price,US electricity,2044,0.12200953,0.099154
+AEO2021,2020,Low oil price,US electricity,2045,0.12212927,0.0991687
+AEO2021,2020,Low oil price,US electricity,2046,0.12182115,0.09881294
+AEO2021,2020,Low oil price,US electricity,2047,0.12130234,0.09829226
+AEO2021,2020,Low oil price,US electricity,2048,0.12083068,0.0977997
+AEO2021,2020,Low oil price,US electricity,2049,0.1201721,0.09717607
+AEO2021,2020,Low oil price,US electricity,2050,0.11933272,0.0964312
