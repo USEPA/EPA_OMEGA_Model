@@ -86,6 +86,16 @@ Sample Data Columns
         Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
         Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
         ,,,
+        Session Postproc Settings,,,
+        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
+        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
+        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
+        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
+        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
+        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
+        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
+        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
@@ -290,6 +300,47 @@ Data Row Name and Description
 :Required Sales Share File *(str)*:
     The relative or absolute path to the required sales share file,
     loaded by ``policy.required_sales_share.RequiredSalesShare``
+
+----
+
+:Session Postproc Settings:
+    Decorator, not evaluated
+
+:Context Criteria Cost Factors File *(str)*:
+    The relative or absolute path to the criteria pollutant costs file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
+:Context SCC Cost Factors File *(str)*:
+    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Energy Security Cost Factors File *(str)*:
+    The relative or absolute path to the energy security cost factors file,
+    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
+
+:Context Congestion-Noise Cost Factors File *(str)*:
+    The relative or absolute path to the congestion and noise cost factors file,
+    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
+
+:Context Powersector Emission Factors File *(str)*:
+    The relative or absolute path to the power sector emission factors file,
+    loaded by ``effects.emission_factors_powersector.EmissionFactorsPowersector``
+
+:Context Refinery Emission Factors File *(str)*:
+    The relative or absolute path to the refinery emission factors file,
+    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
+
+:Context Vehicle Emission Factors File *(str)*:
+    The relative or absolute path to the vehicle emission factors file,
+    loaded by ``effects.emission_factors_vehicles.EmissionFactorsVehicles``
+
+:Context Implicit Price Deflators File *(str)*:
+    The relative or absolute path to the implicit price deflators file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Consumer Price Index File *(str)*:
+    The relative or absolute path to the consumer price index file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
 ----
 
