@@ -192,7 +192,7 @@ The desired plot will appear as shown in :numref:`ug_label10` below.
     Typical Plot Output
 
 Interpreting the Demo Example Results
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. admonition:: Demo example: Manufacturer compliance plot
 
