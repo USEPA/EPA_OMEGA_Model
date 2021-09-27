@@ -1,11 +1,7 @@
 .. image:: _static/epa_logo_1.jpg
 
-User Guide
+Running and Understanding the Demo Example
 ==========
-
-Preparing Inputs and Assumptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. todo: [This section should discuss how the user might change the input files, or prepare their own. The focus should be on things like a) dynamic field names that the user specifies, b) important areas where consistency between inputs must be maintained, and c) limits of only changing input files, beyond which code changes are needed.  We can also talk about where some of the key inputs might come from (like vehicle simulation and cost data) but only as examples.]
 
 .. _graphical_user_interface_label:
 
@@ -194,6 +190,9 @@ The desired plot will appear as shown in :numref:`ug_label10` below.
     :align: center
 
     Typical Plot Output
+
+Interpreting the Demo Example Results
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. admonition:: Demo example: Manufacturer compliance plot
 

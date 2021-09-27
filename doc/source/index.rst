@@ -13,6 +13,7 @@ OMEGA Documentation
     getstart
     inputs
     archalgo
+    user_guide
     code_description
     code_details
     glossary
