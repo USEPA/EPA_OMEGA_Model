@@ -60,6 +60,15 @@ Sample Data Columns
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
         Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,
         Vehicles File,String,vehicles.csv,
+        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
+        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
+        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
+        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
+        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
+        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
+        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
+        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
         ,,,
         Session Settings,,,
         Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -77,16 +86,6 @@ Sample Data Columns
         Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
         Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
         ,,,
-        Session Postproc Settings,,,
-        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
-        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
-        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
-        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
-        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
-        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
-        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
-        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
-        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
@@ -198,6 +197,42 @@ Data Row Name and Description
     The relative or absolute path to the vehicles (base year fleet) file,
     loaded by ``producer.vehicles.VehicleFinal``
 
+:Context Criteria Cost Factors File *(str)*:
+    The relative or absolute path to the criteria pollutant costs file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
+:Context SCC Cost Factors File *(str)*:
+    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Energy Security Cost Factors File *(str)*:
+    The relative or absolute path to the energy security cost factors file,
+    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
+
+:Context Congestion-Noise Cost Factors File *(str)*:
+    The relative or absolute path to the congestion and noise cost factors file,
+    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
+
+:Context Powersector Emission Factors File *(str)*:
+    The relative or absolute path to the power sector emission factors file,
+    loaded by ``effects.emission_factors_powersector.EmissionFactorsPowersector``
+
+:Context Refinery Emission Factors File *(str)*:
+    The relative or absolute path to the refinery emission factors file,
+    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
+
+:Context Vehicle Emission Factors File *(str)*:
+    The relative or absolute path to the vehicle emission factors file,
+    loaded by ``effects.emission_factors_vehicles.EmissionFactorsVehicles``
+
+:Context Implicit Price Deflators File *(str)*:
+    The relative or absolute path to the implicit price deflators file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Consumer Price Index File *(str)*:
+    The relative or absolute path to the consumer price index file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
 ----
 
 :Session Settings:
@@ -255,47 +290,6 @@ Data Row Name and Description
 :Required Sales Share File *(str)*:
     The relative or absolute path to the required sales share file,
     loaded by ``policy.required_sales_share.RequiredSalesShare``
-
-----
-
-:Session Postproc Settings:
-    Decorator, not evaluated
-
-:Context Criteria Cost Factors File *(str)*:
-    The relative or absolute path to the criteria pollutant costs file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
-
-:Context SCC Cost Factors File *(str)*:
-    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Energy Security Cost Factors File *(str)*:
-    The relative or absolute path to the energy security cost factors file,
-    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
-
-:Context Congestion-Noise Cost Factors File *(str)*:
-    The relative or absolute path to the congestion and noise cost factors file,
-    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
-
-:Context Powersector Emission Factors File *(str)*:
-    The relative or absolute path to the power sector emission factors file,
-    loaded by ``effects.emission_factors_powersector.EmissionFactorsPowersector``
-
-:Context Refinery Emission Factors File *(str)*:
-    The relative or absolute path to the refinery emission factors file,
-    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
-
-:Context Vehicle Emission Factors File *(str)*:
-    The relative or absolute path to the vehicle emission factors file,
-    loaded by ``effects.emission_factors_vehicles.EmissionFactorsVehicles``
-
-:Context Implicit Price Deflators File *(str)*:
-    The relative or absolute path to the implicit price deflators file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Consumer Price Index File *(str)*:
-    The relative or absolute path to the consumer price index file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
 ----
 
@@ -771,6 +765,20 @@ class OMEGABatchObject(OMEGABase):
             self.read_parameter('Vehicle Simulation Results and Costs File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
+        # read postproc settings
+        self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
+        self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
+        self.settings.energysecurity_cost_factors_file = \
+            self.read_parameter('Context Energy Security Cost Factors File')
+        self.settings.congestion_noise_cost_factors_file = \
+            self.read_parameter('Context Congestion-Noise Cost Factors File')
+        self.settings.emission_factors_powersector_file = \
+            self.read_parameter('Context Powersector Emission Factors File')
+        self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
+        self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
+        self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
+        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+
     def num_sessions(self):
         """
         Get the number of sessions
@@ -909,19 +917,6 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Vehicle Simulation Results and Costs File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
-        # read policy settings
-        self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
-        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
-        self.settings.ghg_credit_params_file = self.read_parameter('GHG Credit Params File')
-        self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
-        self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
-        self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
-        self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
-        self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
-        self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
-        self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
-        self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
-
         # read postproc settings
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
@@ -935,6 +930,19 @@ class OMEGASessionObject(OMEGABase):
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+
+        # read policy settings
+        self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
+        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
+        self.settings.ghg_credit_params_file = self.read_parameter('GHG Credit Params File')
+        self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
+        self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
+        self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
+        self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
+        self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
+        self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
+        self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
+        self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
 
     def get_developer_settings(self):
         """
