@@ -7,9 +7,9 @@ Batch Inputs
     .. csv-table::
         :header-rows: 1
 
-        Parameter,Used By
+        Parameter,Read By
         Batch Settings,
-        Batch Name,:any:`omega_model.omega_batch`
+        Batch Name,
         Analysis Final Year,
         Consolidate Manufacturers,
         Cost Accrual,
@@ -19,8 +19,8 @@ Batch Inputs
         Batch Analysis Context Settings,
         Context Name,
         Context Case,
-        Context Fuel Prices File,
-        Context New Vehicle Market File,
+        Context Fuel Prices File,:any:`omega_model/context/fuel_prices.py<omega_model.context.fuel_prices>`
+        Context New Vehicle Market File,:any:`omega_model.context.new_vehicle_market`
         Manufacturers File,
         Market Classes File,
         New Vehicle Price Elasticity of Demand,
