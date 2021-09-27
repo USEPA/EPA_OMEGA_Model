@@ -1,7 +1,7 @@
 .. image:: _static/epa_logo_1.jpg
 
 Running and Understanding the Demo Example
-==========
+==========================================
 
 .. _graphical_user_interface_label:
 
@@ -192,7 +192,7 @@ The desired plot will appear as shown in :numref:`ug_label10` below.
     Typical Plot Output
 
 Interpreting the Demo Example Results
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. admonition:: Demo example: Manufacturer compliance plot
 
