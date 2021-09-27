@@ -7,9 +7,9 @@ if "%1" == "" goto help
 REM Command file for Sphinx documentation
 REM Call from venv command-line, e.g. "make html"
 
-set DOCOPTS=--force --append-syspath --doc-project "Code Details" --doc-version 0.9.1 --module-first --tocfile code_details
+set DOCOPTS=--force --append-syspath --doc-project "Code Details" --doc-version 0.9.1 --module-first --tocfile 7_code_details
 
-sphinx-apidoc -o source ".." %DOCOPTS%
+sphinx-apidoc -o source ".." ['setup.py', 'exe_entry.py'] %DOCOPTS%
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD="sphinx-build"
@@ -17,6 +17,7 @@ if "%SPHINXBUILD%" == "" (
 set SOURCEDIR=source
 set BUILDDIR=build
 set SPHINXOPTS=-v
+set EXCLUDES=../setup.py ../exe_entry.py
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
@@ -31,11 +32,11 @@ if errorlevel 9009 (
 	exit /b 1
 )
 
-%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+%SPHINXBUILD% -M %1 %SOURCEDIR% %EXCLUDES% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
 :help
-%SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+%SPHINXBUILD% -M help %SOURCEDIR% %EXCLUDES% %BUILDDIR% %SPHINXOPTS% %O%
 
 :end
 popd

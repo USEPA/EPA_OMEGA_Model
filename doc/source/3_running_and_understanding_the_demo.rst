@@ -1,7 +1,7 @@
 .. image:: _static/epa_logo_1.jpg
 
 Running and Understanding the Demo Example
-==========
+==========================================
 
 .. _graphical_user_interface_label:
 

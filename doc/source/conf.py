@@ -100,7 +100,7 @@ latex_elements = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
 
-# set top level document to index.rst:
-master_doc = 'index'
+# set top level document to 0_table_of_contents.rst:
+master_doc = '0_table_of_contents'
 
 add_module_names = False
