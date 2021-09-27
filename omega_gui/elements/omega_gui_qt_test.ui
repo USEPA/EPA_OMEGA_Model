@@ -23,6 +23,40 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QWidget" name="background_widget" native="true">
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <widget class="QPushButton" name="epa_button">
+       <property name="geometry">
+        <rect>
+         <x>657</x>
+         <y>5</y>
+         <width>80</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Open EPA Website</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>80</width>
+         <height>80</height>
+        </size>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
    <widget class="QTabWidget" name="tab_select">
     <property name="enabled">
      <bool>true</bool>
@@ -311,9 +345,9 @@ EPA Science Advisory Board - 2020</string>
       <property name="geometry">
        <rect>
         <x>650</x>
-        <y>240</y>
-        <width>94</width>
-        <height>56</height>
+        <y>210</y>
+        <width>111</width>
+        <height>111</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -321,8 +355,8 @@ EPA Science Advisory Board - 2020</string>
       </property>
       <property name="iconSize">
        <size>
-        <width>90</width>
-        <height>52</height>
+        <width>100</width>
+        <height>100</height>
        </size>
       </property>
      </widget>
@@ -631,44 +665,6 @@ EPA Science Advisory Board - 2020</string>
     <property name="text">
      <string>Clear</string>
     </property>
-   </widget>
-   <widget class="QWidget" name="background_widget" native="true">
-    <property name="geometry">
-     <rect>
-      <x>-1</x>
-      <y>-1</y>
-      <width>1131</width>
-      <height>741</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string/>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <widget class="QPushButton" name="epa_button">
-     <property name="geometry">
-      <rect>
-       <x>657</x>
-       <y>5</y>
-       <width>80</width>
-       <height>80</height>
-      </rect>
-     </property>
-     <property name="toolTip">
-      <string>Open EPA Website</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>80</width>
-       <height>80</height>
-      </size>
-     </property>
-    </widget>
    </widget>
    <zorder>background_widget</zorder>
    <zorder>main_title_1_label</zorder>

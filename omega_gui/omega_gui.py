@@ -71,8 +71,8 @@ output_batch_directory_valid = False
 # Images for model run button
 # run_button_image_disabled = path + "omega_gui/elements/green_car_1.jpg"
 # run_button_image_enabled = path + "omega_gui/elements/green_car_1.jpg"
-run_button_image_disabled = path + "omega_gui/elements/play_button.jpg"
-run_button_image_enabled = path + "omega_gui/elements/play_button.jpg"
+run_button_image_disabled = path + "omega_gui/elements/play-button.png"
+run_button_image_enabled = path + "omega_gui/elements/play-button.png"
 epa_button_image = path + "omega_gui/elements/epa_seal_large_trim.gif"
 green_check_image = path + "omega_gui/elements/green_check.png"
 red_x_image = path + "omega_gui/elements/red_x.png"
