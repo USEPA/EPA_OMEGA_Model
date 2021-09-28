@@ -121,3 +121,17 @@ Other command line arguments are available, mostly associated with parallel proc
 
 Selecting Sessions to Run
     Sessions can be enabled or disabled within the batch file by setting the ``Enable Session`` field to ``TRUE`` or ``FALSE``, respectively.  Alternatively, the ``--session_num`` argument can be passed to ``omega_batch``.  The reference session is session number ``0``.  The reference session cannot be disabled, regardless of the ``Enable Session`` field value, as it generates baseline vehicle prices that the other sessions require in order to calculate overall vehicle sales.
+
+Understanding the Batch Process
+    The first step in the batch process is to copy the complete source code to the bundle folder (in the ``omega_model`` directory) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  Also within the bundle folder is the original batch definition file as well as a timestamped batch definition file which is what is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.
+
+    The batch itself and each session will have a log file indicating the progress and success or failure of the process.  The batch log file is named ``batch_logfile.txt`` and exists at the top of the bundle folder.  Session logs have the prefix ``o2log_`` and are located in each session's ``out`` folder.
+
+    If a session completes successfully, the session folder is renamed and prepended with an underscore, ``_``.  Failed session folders are prepended with ``#FAIL_``.  In this way the session status can be monitored by observing the folder names as the batch runs.
+
+    Since the bundle folder contains the source code and all inputs for every session it is possible to re-run a batch, or part of a batch, at a later time and reproduce the results if desired.  To do so, remove any session folder prefixes and use ``omega_batch.py`` to re-run the timestamped batch file, while supplying the advanced ``--no_bundle`` and ``--no_validate`` arguments, since the batch has already been bundled.  As in:
+
+::
+
+    >>python path/to/my/bundle_folder/omega_model/omega_batch.py --batch_file path/to/my/bundle_folder/YYYY_MM_DD_hh_mm_ss_batch.csv --no_bundle --no_validate
+
