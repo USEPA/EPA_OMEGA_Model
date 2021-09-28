@@ -1453,6 +1453,11 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             else:
                 session_list = list({0, options.session_num})
 
+            for session in batch.sessions:
+                # set Enable Session correctly in expanded batch based on session list
+                session.enabled = session.num in session_list
+                batch.dataframe.loc['Enable Session'][session.num] = session.enabled
+
             batch.dataframe_orig = batch.dataframe.copy()
 
             # copy session inputs to session folder(s) for active session(s)
