@@ -20,7 +20,7 @@ Template Header
 Sample Header
     .. csv-table::
 
-       input_template_name:, consumer.market_classes, input_template_version:, 0.32
+       input_template_name:,consumer.market_classes,input_template_version:,0.32
 
 Sample Data Columns
     .. csv-table::
