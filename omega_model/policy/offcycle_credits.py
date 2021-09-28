@@ -15,7 +15,7 @@ under-represent vehicle idle duration in real-world driving so there may be some
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.  The data header uses a dynamic column notation, as detailed below.
+rows.  The template header uses a dynamic format. The data header uses a dynamic column notation, as detailed below.
 
 The data represents offcycle credit values (grams CO2e/mile) credit group and regulatory class.
 
@@ -25,7 +25,12 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,offcycle_credits,input_template_version:,0.1
+       input_template_name:,``[module_name]``,input_template_version:,0.11
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:,policy.offcycle_credits,input_template_version:,0.11
 
 The data header consists of ``start_year``, ``credit_name``, ``credit_group``, ``credit_destination`` columns
 followed by zero or more reg class columns, as needed.
