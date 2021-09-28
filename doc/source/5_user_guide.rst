@@ -61,6 +61,63 @@ Simulation Context
 
 Simulation Sessions
     The Reference Session
-        The batch file must define at least one simulation session, known as the reference session, which is the left-most session in the batch definition file.  The reference session should align with the provided context inputs.  For example, if the context fuel price and new vehicle market data are from AEO, then the policy inputs of the reference session must be consistent with the assumptions used by AEO to generate their projections.  For example, the sales projections take into account ghg and fuel economy policies in force or projected at the time and the policy inputs used for the reference session should be consistent with those.  It would be inconsistent to assume the same sales for a different ghg/fuel economy policy.
+        The batch file must define at least one simulation session, known as the reference session, which is the left-most session in the batch definition file.  The reference session should align with the provided context inputs.  For example, if the context fuel price and new vehicle market data are from AEO, then the policy inputs of the reference session must be consistent with the assumptions used by AEO to generate the projections.  For example, the sales projections take into account ghg and fuel economy policies in force or projected at the time and the policy inputs used for the reference session should be consistent with those.  It would be inconsistent to assume the same sales for a different ghg/fuel economy policy.
     Policy Alternative Sessions
         Optionally, one or more alternative policy sessions may be defined in subsequent columns. Typically these would be various policies under evaluation via OMEGA or perhaps a single policy with various alternative inputs or assumptions.
+
+OMEGA Batch Command Line Options
+    The batch process can be initiated from the OMEGA GUI or from the command line by running ``omega_batch.py`` directly, as in:
+
+::
+
+    >>python omega_model/omega_batch.py --bundle_path path/to/my/bundle_folder --batch_file path/to/my/batch_file.csv
+
+In fact, the GUI can be thought of as a wrapper to a command line call to ``omega_batch.py``.  The paths supplied to the GUI fill in the ``--bundle_path`` and ``--batch_file`` arguments.
+
+.. highlight:: none
+Typical Command Line Usage::
+
+    usage: omega_batch.py
+            [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]
+            [--session_num SESSION_NUM] [--analysis_final_year ANALYSIS_FINAL_YEAR]
+            [--calc_effects CALC_EFFECTS] [--verbose] [--show_figures]
+
+    Run OMEGA batch simulation
+
+    optional arguments:
+      -h, --help            show this help message and exit
+
+      --bundle_path BUNDLE_PATH
+                            Path to bundle folder
+
+      --batch_file BATCH_FILE
+                            Path to batch definition file
+
+      --session_num SESSION_NUM
+                            ID # of session to run from batch
+
+      --analysis_final_year ANALYSIS_FINAL_YEAR
+                            Override analysis final year
+
+      --calc_effects CALC_EFFECTS
+                            Type of effects calcs to run: "None", "Physical",
+                            or "Physical and Costs"
+
+      --verbose             Enable verbose omega_batch messages
+
+Other command line arguments are available, mostly associated with parallel processing options and implementation or code development.  The full list of arguments can be viewed as follows:
+
+::
+
+    >>python omega_model/omega_batch.py
+
+    or
+
+    >>python omega_model/omega_batch.py -h
+
+    or
+
+    >>python omega_model/omega_batch.py --help
+
+Selecting Sessions to Run
+    Sessions can be enabled or disabled within the batch file by setting the ``Enable Session`` field to ``TRUE`` or ``FALSE``, respectively.  Alternatively, the ``--session_num`` argument can be passed to ``omega_batch``.  The reference session is session number ``0``.  The reference session cannot be disabled, regardless of the ``Enable Session`` field value, as it generates baseline vehicle prices that the other sessions require in order to calculate overall vehicle sales.
