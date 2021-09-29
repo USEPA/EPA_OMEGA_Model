@@ -74,8 +74,11 @@ OMEGA Batch Command Line Options
 
 In fact, the GUI can be thought of as a wrapper to a command line call to ``omega_batch.py``.  The paths supplied to the GUI fill in the ``--bundle_path`` and ``--batch_file`` arguments.
 
+Typical Command Line Usage
+
 .. highlight:: none
-Typical Command Line Usage::
+
+::
 
     usage: omega_batch.py
             [-h] [--bundle_path BUNDLE_PATH] [--batch_file BATCH_FILE]
