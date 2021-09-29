@@ -23,6 +23,10 @@ def validate_folder(dstfolder):
 
 
 def init_logfile():
+    """
+    Initialize test_omega2 log file
+
+    """
     import os
     import time, datetime
 
@@ -32,6 +36,13 @@ def init_logfile():
 
 
 def logwrite(message):
+    """
+    Write ``message`` to the test_omega2 log file
+
+    Args:
+        message (str): the message to write
+
+    """
     import os
 
     log = open(test_omega2_output_folder + os.sep + test_omega2_results_file, 'a')
