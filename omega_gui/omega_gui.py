@@ -358,8 +358,8 @@ class Form(QObject):
         self.wizard_logic()
         self.event_monitor(event_separator, "black", "")
         # self.window.configuration_file_1_result.setToolTip(configuration_file)
-        self.window.input_batch_file_1_result.setToolTip(input_batch_file)
-        self.window.output_batch_directory_1_result.setToolTip(output_batch_directory)
+        self.window.input_batch_file_1_result.setToolTip(os.path.basename(input_batch_file))
+        self.window.output_batch_directory_1_result.setToolTip(os.path.basename(output_batch_directory))
 
     def save_file(self):
         """
