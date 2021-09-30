@@ -1,5 +1,7 @@
 .. image:: _static/epa_logo_1.jpg
 
+.. _running_and_understanding_the_demo_label:
+
 Running and Understanding the Demo Example
 ==========================================
 
