@@ -99,7 +99,7 @@
         <x>20</x>
         <y>20</y>
         <width>1041</width>
-        <height>311</height>
+        <height>341</height>
        </rect>
       </property>
       <property name="font">
@@ -111,7 +111,7 @@
        <string>The OMEGA model has been developed by EPA to evaluate policies for reducing greenhouse gas (GHG) emissions from light duty vehicles. Like the prior releases, this latest version is intended primarily to be used as a tool to support regulatory development by providing estimates of the effects of policy alternatives under consideration. These effects include the costs associated with emissions-reducing technologies and the monetized effects normally included in a societal benefit-cost analysis, as well as physical effects that include emissions quantities, fuel consumption, and vehicle stock and usage. In developing this OMEGA version 2.0, our goal was to improve modularity, transparency, and flexibility so that stakeholders can more easily review the model, conduct independent analyses, and potentially adapt the model to meet their own needs.</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -280,7 +280,7 @@
        <rect>
         <x>10</x>
         <y>240</y>
-        <width>591</width>
+        <width>711</width>
         <height>51</height>
        </rect>
       </property>
@@ -320,8 +320,8 @@
      <widget class="QPushButton" name="run_model_button">
       <property name="geometry">
        <rect>
-        <x>650</x>
-        <y>240</y>
+        <x>746</x>
+        <y>238</y>
         <width>94</width>
         <height>56</height>
        </rect>
@@ -339,7 +339,7 @@
      <widget class="QLabel" name="model_status_label">
       <property name="geometry">
        <rect>
-        <x>780</x>
+        <x>870</x>
         <y>230</y>
         <width>211</width>
         <height>71</height>

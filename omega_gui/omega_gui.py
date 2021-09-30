@@ -78,8 +78,8 @@ run_button_image_enabled = path + "omega_gui/elements/play-button.png"
 epa_button_image = path + "omega_gui/elements/epa_seal_large_trim.gif"
 green_check_image = path + "omega_gui/elements/green_check.png"
 red_x_image = path + "omega_gui/elements/red_x.png"
-input_batch_file_button_image = path + "omega_gui/elements/find_file_blue.png"
-output_batch_directory_button_image = path + "omega_gui/elements/find_folder_blue.png"
+input_batch_file_button_image = path + "omega_gui/elements/find_file_transparent.png"
+output_batch_directory_button_image = path + "omega_gui/elements/find_folder_transparent.png"
 
 
 # Common spacer between events
@@ -193,6 +193,14 @@ class Form(QObject):
         self.window.select_plot_2.setStyleSheet(stylesheet)
         self.window.select_plot_3.setStyleSheet(stylesheet)
         self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
+
+        stylesheet = ""
+        stylesheet = textbox_stylesheet(stylesheet)
+        # stylesheet = "border: 1px solid; border-radius:10px; background-color: palette(base); "
+        self.window.event_monitor_result.setStyleSheet(stylesheet)
+        self.window.input_batch_file_1_result.setStyleSheet(stylesheet)
+        self.window.output_batch_directory_1_result.setStyleSheet(stylesheet)
+        self.window.project_description.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""

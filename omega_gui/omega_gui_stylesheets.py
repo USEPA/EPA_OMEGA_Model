@@ -163,6 +163,19 @@ def checkbox_stylesheet(stylesheet):
      """
     return stylesheet
 
+def textbox_stylesheet(stylesheet):
+    """
+    Loads the stylesheet for textboxes contained in the gui.
+
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
+
+    stylesheet = """
+        QTextEdit { border: 1px solid; border-radius:10px; background-color: palette(base);  }
+     """
+    return stylesheet
+
 
 def test1(stylesheet):
     stylesheet = """
