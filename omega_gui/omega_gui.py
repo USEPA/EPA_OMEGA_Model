@@ -78,6 +78,10 @@ run_button_image_enabled = path + "omega_gui/elements/play-button.png"
 epa_button_image = path + "omega_gui/elements/epa_seal_large_trim.gif"
 green_check_image = path + "omega_gui/elements/green_check.png"
 red_x_image = path + "omega_gui/elements/red_x.png"
+input_batch_file_button_image = path + "omega_gui/elements/find_file_blue.png"
+output_batch_directory_button_image = path + "omega_gui/elements/find_folder_blue.png"
+
+
 # Common spacer between events
 event_separator = "----------"
 # OMEGA 2 version
@@ -162,6 +166,8 @@ class Form(QObject):
         # self.window.wizard_result.setReadOnly(1)
         # Disable run model button graphic
         # self.enable_run_button(False)
+        self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
+        self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
 
         # Load stylesheet for tab control
         stylesheet = ""
