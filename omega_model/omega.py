@@ -342,8 +342,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
         if omega_globals.options.log_producer_decision_and_response_years == 'all' or \
                 calendar_year in omega_globals.options.log_producer_decision_and_response_years:
-            producer_decision_and_response.to_csv('%sproducer_decision_and_response_%s_%s_%s.csv' %
-                                                  (omega_globals.options.output_folder, calendar_year, producer_consumer_iteration_num, cross_subsidy_iteration_num))
+            producer_decision_and_response.to_csv('%s%s_%s_%s_producer_cross_subsidy_iteration.csv' %
+                                                  (omega_globals.options.output_folder, calendar_year,
+                                                   producer_consumer_iteration_num, cross_subsidy_iteration_num))
 
         producer_decision_and_response = \
             producer_decision_and_response.loc[producer_decision_and_response['pricing_convergence_score'].idxmin()]
