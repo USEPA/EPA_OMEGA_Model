@@ -5,7 +5,7 @@ Model Architecture and Algorithms
 =================================
 OMEGA is structured around four main modules which represent the distinct and interrelated actors and system elements that are most important for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for iteration and convergence between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
 
-Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to the :ref:`developer_guide_label` for more information on how to view and rerun the demo analysis.
+Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to  :ref:`running_and_understanding_the_demo_label` for more information on how to view and rerun the demo analysis.
 
 Overall Simulation Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,7 +79,9 @@ Whatever the level of resolution, the detail provided in the inputs 1) must meet
 
 Process Flow Summary
 --------------------
-x
+In an OMEGA session, the model runs by looping over analysis years and  producers. Within each successive loop, the simulation of producer and consumer decisions results in new vehicles entering the stock of registered vehicles, and the reregistration and use of existing vehicles from the prior year’s stock.
+
+As shown in :numref:`al_label_overallprocessflow` , this simulation process involves two iterative loops. In one loop, the Policy Module determines whether or not the producer’s strategic compliance target is met by the candidate production options under consideration. In the other iterative loop, the Consumer Module determines whether or not the market will accept the quantities of vehicles offered at the prices set by the producer. Both the Producer<-->Policy and the Producer<-->Consumer iterative loops must achieve convergence for the simulation to proceed. Once all the analysis years and producers have been completed, the effects calculations are performed and results are written to the output files.
 
 .. _al_label_overallprocessflow:
 .. figure:: _static/al_figures/overall_process_flow.png
@@ -93,7 +95,7 @@ Model Inputs
 ------------
 .. todo: [section should just focus on what type of information is provided by the input files, and not about where the data comes from]
 
-As described in the overview, OMEGA model inputs are grouped into two categories: 1) assumptions about the structure and the stringency of the policies being evaluated within the model (these are the policy alternatives) and 2) external assumptions that apply to all policies under analysis (collectively referred to as the analysis context). The policy alternatives define the policy being evaluated in each OMEGA run and are described in the Policy Module section. The analysis context inputs (which include more traditional inputs like fuel prices, technology assumptions, etc) are discussed within the descriptions of the associated modules that use them.
+As described in the :numref:`inputs_and_outputs_label` overview, OMEGA model inputs are grouped into two categories: 1) assumptions about the structure and the stringency of the policies being evaluated within the model (these are the policy alternatives) and 2) external assumptions that apply to all policies under analysis (collectively referred to as the analysis context). The policy alternatives define the policy being evaluated in each OMEGA run and are described in the Policy Module section. The analysis context inputs (which include more traditional inputs like fuel prices, technology assumptions, etc) are discussed within the descriptions of the associated modules that use them.
 
 The lists of policy alternatives and analysis context inputs are provided below. Each input is described in more detail in each of the module descriptions listed later in this section.
 
