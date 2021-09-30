@@ -127,7 +127,7 @@ class Form(QObject):
         self.window.select_output_batch_directory_button.clicked.connect(self.open_output_batch_directory)
         # self.window.open_configuration_file_button.clicked.connect(self.open_file)
         # self.window.save_configuration_file_button.clicked.connect(self.save_file)
-        self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
+        # self.window.clear_event_monitor_button.clicked.connect(self.clear_event_monitor)
         self.window.run_model_button.clicked.connect(self.run_model)
         self.window.action_run_model.triggered.connect(self.run_model)
         self.window.action_documentation.triggered.connect(self.launch_documentation)
@@ -177,7 +177,7 @@ class Form(QObject):
         # Load stylesheet for buttons
         stylesheet = ""
         stylesheet = button_stylesheet(stylesheet)
-        self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
+        # self.window.clear_event_monitor_button.setStyleSheet(stylesheet)
         # self.window.open_configuration_file_button.setStyleSheet(stylesheet)
         # self.window.save_configuration_file_button.setStyleSheet(stylesheet)
         self.window.select_input_batch_file_button.setStyleSheet(stylesheet)
@@ -748,6 +748,7 @@ class Form(QObject):
         :return:
         """
 
+        self.clear_event_monitor()
         elapsed_start = datetime.now()
         # model_sound_start = 'gui/elements/click.mp3'
         # model_sound_stop = 'gui/elements/model_stop.mp3'

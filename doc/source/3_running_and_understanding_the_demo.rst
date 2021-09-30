@@ -36,6 +36,10 @@ Description of the 'Run Model' page elements:
 *  Element 1 - Page Selection
     Tabs to select the various pages of the GUI.
 
+::
+
+    Note: The 'Results' page is not currently active.
+
 *  Element 2 - Input Batch File
     Allows the user to select the Input Batch File.  The Input Batch File is a standard OMEGA input file that describes the complete parameters for a model run.  The Input Batch File may be selected from the file menu or the button to the right of the element field.  When the Input Batch File is selected, the complete path be displayed.  Hovering the cursor over the complete path will display just the base file name.
 
@@ -154,40 +158,6 @@ Final GUI Data:
 
 * The model ending information is detailed in the event monitor.  This includes the time and the Output Batch Directory used.
 * The model status and final model run time are displayed below the 'Run Model' button.
-
-Navigating Model Outputs
-^^^^^^^^^^^^^^^^^^^^^^^^^
-Selecting the 'Results' tab brings up the GUI results page as shown in :numref:`ug_label8` below.
-
-.. _ug_label8:
-.. figure:: _static/ug_figures/gui_results_1.jpg
-    :align: center
-
-    Model Results Page
-
-'Select Current Run' will bring up the plotting options for the current model run as shown in :numref:`ug_label9` below.
-
-.. _ug_label9:
-.. figure:: _static/ug_figures/gui_results_2.jpg
-    :align: center
-
-    Current Run Plotting Options
-
-'Select Previous Run' will bring up a dialog box to select a previous run.
-
-To plot data:
-
-* Select an available scenario
-* Select an available plot
-* Select 'Plot'
-
-The desired plot will appear as shown in :numref:`ug_label10` below.
-
-.. _ug_label10:
-.. figure:: _static/ug_figures/gui_results_3.jpg
-    :align: center
-
-    Typical Plot Output
 
 Interpreting the Demo Example Results
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

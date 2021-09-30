@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1115</width>
+    <width>1121</width>
     <height>787</height>
    </rect>
   </property>
@@ -30,9 +30,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
-      <width>1091</width>
-      <height>381</height>
+      <y>70</y>
+      <width>1101</width>
+      <height>401</height>
      </rect>
     </property>
     <property name="font">
@@ -351,6 +351,9 @@
      </widget>
     </widget>
     <widget class="QWidget" name="results_tab">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <attribute name="title">
       <string>Results</string>
      </attribute>
@@ -545,10 +548,10 @@
    <widget class="QLabel" name="main_title_1_label">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>10</x>
       <y>10</y>
-      <width>541</width>
-      <height>41</height>
+      <width>631</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -561,15 +564,15 @@
      <string>OMEGA</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QTextEdit" name="event_monitor_result">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>510</y>
-      <width>1091</width>
+      <width>1101</width>
       <height>211</height>
      </rect>
     </property>
@@ -605,38 +608,13 @@
      <string>Event Monitor</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="clear_event_monitor_button">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>479</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Clears the Event Monitor</string>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="text">
-     <string>Clear</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="background_widget" native="true">
     <property name="geometry">
      <rect>
       <x>-1</x>
-      <y>-1</y>
+      <y>9</y>
       <width>1131</width>
-      <height>741</height>
+      <height>731</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -648,10 +626,10 @@
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
-       <x>657</x>
-       <y>5</y>
+       <x>1027</x>
+       <y>4</y>
        <width>80</width>
-       <height>80</height>
+       <height>81</height>
       </rect>
      </property>
      <property name="toolTip">
@@ -672,7 +650,6 @@
    <zorder>main_title_1_label</zorder>
    <zorder>event_monitor_result</zorder>
    <zorder>event_monitor_label</zorder>
-   <zorder>clear_event_monitor_button</zorder>
    <zorder>tab_select</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -680,7 +657,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1115</width>
+     <width>1121</width>
      <height>26</height>
     </rect>
    </property>
