@@ -172,7 +172,20 @@ def textbox_stylesheet(stylesheet):
     """
 
     stylesheet = """
-        QTextEdit { border: 1px solid; border-radius:10px; background-color: palette(base);  }
+        QTextEdit { border: 1px solid; border-radius:6px; background-color: palette(base);  }
+     """
+    return stylesheet
+
+def listbox_stylesheet(stylesheet):
+    """
+    Loads the stylesheet for listboxes contained in the gui.
+
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
+
+    stylesheet = """
+        QListWidget { border: 1px solid; border-radius:6px; background-color: palette(base);  }
      """
     return stylesheet
 

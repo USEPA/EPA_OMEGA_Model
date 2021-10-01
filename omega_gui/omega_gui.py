@@ -194,6 +194,7 @@ class Form(QObject):
         self.window.select_plot_3.setStyleSheet(stylesheet)
         self.window.multiprocessor_help_button.setStyleSheet(stylesheet)
 
+        # Load stylesheet for text boxes
         stylesheet = ""
         stylesheet = textbox_stylesheet(stylesheet)
         # stylesheet = "border: 1px solid; border-radius:10px; background-color: palette(base); "
@@ -201,6 +202,12 @@ class Form(QObject):
         self.window.input_batch_file_1_result.setStyleSheet(stylesheet)
         self.window.output_batch_directory_1_result.setStyleSheet(stylesheet)
         self.window.project_description.setStyleSheet(stylesheet)
+
+        # Load stylesheet for list boxes
+        stylesheet = ""
+        stylesheet = listbox_stylesheet(stylesheet)
+        self.window.list_graphs_1.setStyleSheet(stylesheet)
+        self.window.list_graphs_2.setStyleSheet(stylesheet)
 
         # Load stylesheet for logo buttons
         stylesheet = ""
