@@ -168,6 +168,7 @@ class Form(QObject):
         # self.enable_run_button(False)
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
+        self.window.results_comment.setPlainText('Feature Under Development')
 
         # Load stylesheet for tab control
         stylesheet = ""
