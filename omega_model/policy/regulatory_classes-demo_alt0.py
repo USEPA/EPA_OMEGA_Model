@@ -73,11 +73,11 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
 
         """
         if vehicle.passenger_capacity > 5:
-            reg_class_id = 'a_reg_class'
+            reg_class_id = 'car'
         elif vehicle.passenger_capacity > 4:
-            reg_class_id = 'b_reg_class'
+            reg_class_id = 'truck'
         else:
-            reg_class_id = 'c_reg_class'
+            reg_class_id = 'truck'
         return reg_class_id
 
     @staticmethod
