@@ -37,6 +37,8 @@ Data Column Name and Description
 
 ----
 
+.. todo: document context_cpi_price_deflators file format
+
 **CODE**
 
 """

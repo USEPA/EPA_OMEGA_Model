@@ -139,3 +139,4 @@ composer.lock
 /venv*/
 *out*/
 /omega_model/bundle/
+context_new_vehicle_prices.csv

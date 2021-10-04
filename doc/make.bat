@@ -7,9 +7,10 @@ if "%1" == "" goto help
 REM Command file for Sphinx documentation
 REM Call from venv command-line, e.g. "make html"
 
-set DOCOPTS=--force --append-syspath --doc-project "Code Details" --doc-version 0.9.0 --module-first --tocfile code_details
+set DOCOPTS=--force --append-syspath --doc-project "Code Details" --doc-version 0.9.1 --module-first --tocfile 7_code_details
+set EXCLUDES=../setup.py ../exe_entry.py
 
-sphinx-apidoc -o source ".." %DOCOPTS%
+sphinx-apidoc -o source ".." %EXCLUDES% %DOCOPTS%
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD="sphinx-build"

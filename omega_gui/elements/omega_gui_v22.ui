@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1115</width>
-    <height>774</height>
+    <height>890</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>761</width>
+      <width>1091</width>
       <height>411</height>
      </rect>
     </property>
@@ -50,7 +50,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -123,7 +123,7 @@ EPA Science Advisory Board - 2020</string>
        <rect>
         <x>10</x>
         <y>41</y>
-        <width>441</width>
+        <width>1011</width>
         <height>41</height>
        </rect>
       </property>
@@ -186,7 +186,7 @@ EPA Science Advisory Board - 2020</string>
        <rect>
         <x>10</x>
         <y>121</y>
-        <width>441</width>
+        <width>1011</width>
         <height>41</height>
        </rect>
       </property>
@@ -228,7 +228,7 @@ EPA Science Advisory Board - 2020</string>
        <rect>
         <x>10</x>
         <y>201</y>
-        <width>441</width>
+        <width>1011</width>
         <height>41</height>
        </rect>
       </property>
@@ -247,25 +247,25 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QPushButton" name="select_output_batch_directory_button">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>170</y>
-        <width>71</width>
-        <height>31</height>
+        <x>1030</x>
+        <y>200</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
+        <pointsize>30</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="toolTip">
        <string>Selects a new OMEGA Output Batch Directory</string>
       </property>
       <property name="text">
-       <string>Select</string>
+       <string>...</string>
       </property>
      </widget>
      <widget class="QPushButton" name="select_input_batch_file_button">
@@ -274,49 +274,49 @@ EPA Science Advisory Board - 2020</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>90</y>
-        <width>71</width>
-        <height>31</height>
+        <x>1030</x>
+        <y>120</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
+        <pointsize>30</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="toolTip">
        <string>Selects a new OMEGA Input Batch File</string>
       </property>
       <property name="text">
-       <string>Select</string>
+       <string>...</string>
       </property>
      </widget>
      <widget class="QPushButton" name="open_configuration_file_button">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>10</y>
-        <width>71</width>
-        <height>31</height>
+        <x>1030</x>
+        <y>40</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
+        <pointsize>30</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="toolTip">
        <string>Opens an existing OMEGA Configuration File</string>
       </property>
       <property name="text">
-       <string>Open</string>
+       <string>...</string>
       </property>
      </widget>
      <widget class="QPushButton" name="save_configuration_file_button">
@@ -349,7 +349,7 @@ EPA Science Advisory Board - 2020</string>
         <x>10</x>
         <y>280</y>
         <width>441</width>
-        <height>81</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
@@ -389,7 +389,7 @@ EPA Science Advisory Board - 2020</string>
       <property name="geometry">
        <rect>
         <x>420</x>
-        <y>130</y>
+        <y>90</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -407,8 +407,8 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QPushButton" name="configuration_file_check_button">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>50</y>
+        <x>440</x>
+        <y>10</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -426,8 +426,8 @@ EPA Science Advisory Board - 2020</string>
      <widget class="QPushButton" name="output_batch_directory_check_button">
       <property name="geometry">
        <rect>
-        <x>420</x>
-        <y>210</y>
+        <x>430</x>
+        <y>170</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -440,50 +440,6 @@ EPA Science Advisory Board - 2020</string>
         <width>31</width>
         <height>31</height>
        </size>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="run_model_button">
-      <property name="geometry">
-       <rect>
-        <x>529</x>
-        <y>80</y>
-        <width>111</width>
-        <height>111</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Run OMEGA Model</string>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>100</width>
-        <height>100</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QLabel" name="model_status_label">
-      <property name="geometry">
-       <rect>
-        <x>480</x>
-        <y>200</y>
-        <width>211</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Model Status</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </widget>
@@ -805,12 +761,58 @@ EPA Science Advisory Board - 2020</string>
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="run_model_button">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>730</y>
+      <width>111</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Run OMEGA Model</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QLabel" name="model_status_label">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>760</y>
+      <width>211</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Model Status</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
    <zorder>background_widget</zorder>
    <zorder>main_title_1_label</zorder>
    <zorder>event_monitor_result</zorder>
    <zorder>event_monitor_label</zorder>
    <zorder>clear_event_monitor_button</zorder>
    <zorder>tab_select</zorder>
+   <zorder>run_model_button</zorder>
+   <zorder>model_status_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -1,0 +1,13 @@
+input_template_name:,production_constraints,input_template_version:,0.2,
+start_year,hauling.BEV:minimum_share,non_hauling.BEV:minimum_share,hauling.BEV:maximum_share,non_hauling.BEV:maximum_share
+2020,0.001,0.001,0.05,0.05
+2021,0.001,0.001,0.07,0.07
+2022,0.001,0.001,0.09,0.09
+2023,0.001,0.001,0.11,0.11
+2024,0.001,0.001,0.13,0.13
+2025,0.001,0.001,0.15,0.15
+2026,0.001,0.001,0.32,0.32
+2027,0.001,0.001,0.49,0.49
+2028,0.001,0.001,0.66,0.66
+2029,0.001,0.001,0.83,0.83
+2030,0.001,0.001,1,1

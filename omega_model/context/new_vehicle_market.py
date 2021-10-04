@@ -193,7 +193,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         # you shouldn't have to do this either... but somehow pandas (or maybe the OS) rounds the numbers when they get
         # written out to the file... this is the workaround: write the file yourself!
-        with open(filename, 'a') as price_file:
+        with open(filename, 'w') as price_file:
             price_file.write(',new_vehicle_price_dollars\n')
             for k, v in NewVehicleMarket._context_new_vehicle_generalized_costs.items():
                 price_file.write('%s, %.38f\n' % (k, v))

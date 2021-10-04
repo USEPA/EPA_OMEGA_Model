@@ -5,7 +5,7 @@
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.
+rows. The template header uses a dynamic format.
 
 The data represents producer generalized cost parameters by market class ID.
 
@@ -15,7 +15,12 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,producer_generalized_cost,input_template_version:,0.1
+       input_template_name:,``[module_name]``,input_template_version:,0.1
+
+Sample Header
+    .. csv-table::
+
+       input_template_name:,producer.producer_generalized_cost,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::

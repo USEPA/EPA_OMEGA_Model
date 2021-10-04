@@ -65,26 +65,26 @@ omega\_model.policy.policy\_fuels module
    :undoc-members:
    :show-inheritance:
 
-omega\_model.policy.regulatory\_classes\-demo\_alt0 module
-----------------------------------------------------------
-
-.. automodule:: omega_model.policy.regulatory_classes-demo_alt0
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-omega\_model.policy.regulatory\_classes\-demo\_alt1 module
-----------------------------------------------------------
-
-.. automodule:: omega_model.policy.regulatory_classes-demo_alt1
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 omega\_model.policy.regulatory\_classes module
 ----------------------------------------------
 
 .. automodule:: omega_model.policy.regulatory_classes
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.policy.regulatory\_classes\_demo\_alt0 module
+----------------------------------------------------------
+
+.. automodule:: omega_model.policy.regulatory_classes_demo_alt0
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+omega\_model.policy.regulatory\_classes\_demo\_alt1 module
+----------------------------------------------------------
+
+.. automodule:: omega_model.policy.regulatory_classes_demo_alt1
    :members:
    :undoc-members:
    :show-inheritance:

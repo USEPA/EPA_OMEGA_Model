@@ -60,6 +60,15 @@ Sample Data Columns
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
         Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,
         Vehicles File,String,vehicles.csv,
+        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
+        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
+        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
+        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
+        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
+        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
+        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
+        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
         ,,,
         Session Settings,,,
         Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -198,6 +207,42 @@ Data Row Name and Description
     The relative or absolute path to the vehicles (base year fleet) file,
     loaded by ``producer.vehicles.VehicleFinal``
 
+:Context Criteria Cost Factors File *(str)*:
+    The relative or absolute path to the criteria pollutant costs file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
+:Context SCC Cost Factors File *(str)*:
+    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Energy Security Cost Factors File *(str)*:
+    The relative or absolute path to the energy security cost factors file,
+    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
+
+:Context Congestion-Noise Cost Factors File *(str)*:
+    The relative or absolute path to the congestion and noise cost factors file,
+    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
+
+:Context Powersector Emission Factors File *(str)*:
+    The relative or absolute path to the power sector emission factors file,
+    loaded by ``effects.emission_factors_powersector.EmissionFactorsPowersector``
+
+:Context Refinery Emission Factors File *(str)*:
+    The relative or absolute path to the refinery emission factors file,
+    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
+
+:Context Vehicle Emission Factors File *(str)*:
+    The relative or absolute path to the vehicle emission factors file,
+    loaded by ``effects.emission_factors_vehicles.EmissionFactorsVehicles``
+
+:Context Implicit Price Deflators File *(str)*:
+    The relative or absolute path to the implicit price deflators file,
+    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
+
+:Context Consumer Price Index File *(str)*:
+    The relative or absolute path to the consumer price index file,
+    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
+
 ----
 
 :Session Settings:
@@ -255,47 +300,6 @@ Data Row Name and Description
 :Required Sales Share File *(str)*:
     The relative or absolute path to the required sales share file,
     loaded by ``policy.required_sales_share.RequiredSalesShare``
-
-----
-
-:Session Postproc Settings:
-    Decorator, not evaluated
-
-:Context Criteria Cost Factors File *(str)*:
-    The relative or absolute path to the criteria pollutant costs file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
-
-:Context SCC Cost Factors File *(str)*:
-    The relative or absolute path to the social cost of carbon and carbon-equivalent pollutants file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Energy Security Cost Factors File *(str)*:
-    The relative or absolute path to the energy security cost factors file,
-    loaded by ``effects.cost_factors_energysecurity.CostFactorsEnergySecurity``
-
-:Context Congestion-Noise Cost Factors File *(str)*:
-    The relative or absolute path to the congestion and noise cost factors file,
-    loaded by ``effects.cost_factors_congestion_noise.CostFactorsCongestionNoise``
-
-:Context Powersector Emission Factors File *(str)*:
-    The relative or absolute path to the power sector emission factors file,
-    loaded by ``effects.emission_factors_powersector.EmissionFactorsPowersector``
-
-:Context Refinery Emission Factors File *(str)*:
-    The relative or absolute path to the refinery emission factors file,
-    loaded by ``effects.emission_factors_refinery.EmissionFactorsRefinery``
-
-:Context Vehicle Emission Factors File *(str)*:
-    The relative or absolute path to the vehicle emission factors file,
-    loaded by ``effects.emission_factors_vehicles.EmissionFactorsVehicles``
-
-:Context Implicit Price Deflators File *(str)*:
-    The relative or absolute path to the implicit price deflators file,
-    loaded by ``effects.cost_factors_scc.CostFactorsSCC``
-
-:Context Consumer Price Index File *(str)*:
-    The relative or absolute path to the consumer price index file,
-    loaded by ``effects.cost_factors_criteria.CostFactorsCriteria``
 
 ----
 
@@ -771,6 +775,20 @@ class OMEGABatchObject(OMEGABase):
             self.read_parameter('Vehicle Simulation Results and Costs File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
+        # read postproc settings
+        self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
+        self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
+        self.settings.energysecurity_cost_factors_file = \
+            self.read_parameter('Context Energy Security Cost Factors File')
+        self.settings.congestion_noise_cost_factors_file = \
+            self.read_parameter('Context Congestion-Noise Cost Factors File')
+        self.settings.emission_factors_powersector_file = \
+            self.read_parameter('Context Powersector Emission Factors File')
+        self.settings.emission_factors_refinery_file = self.read_parameter('Context Refinery Emission Factors File')
+        self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
+        self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
+        self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+
     def num_sessions(self):
         """
         Get the number of sessions
@@ -867,7 +885,8 @@ class OMEGASessionObject(OMEGABase):
         from omega import OMEGASessionSettings
 
         self.num = session_num
-        self.enabled = validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
+        self.enabled = session_num == 0 or \
+                       validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
         self.name = self.read_parameter('Session Name')
         self.output_path = OMEGASessionSettings().output_folder
 
@@ -909,19 +928,6 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Vehicle Simulation Results and Costs File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
-        # read policy settings
-        self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
-        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
-        self.settings.ghg_credit_params_file = self.read_parameter('GHG Credit Params File')
-        self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
-        self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
-        self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
-        self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
-        self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
-        self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
-        self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
-        self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
-
         # read postproc settings
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
@@ -935,6 +941,19 @@ class OMEGASessionObject(OMEGABase):
         self.settings.emission_factors_vehicles_file = self.read_parameter('Context Vehicle Emission Factors File')
         self.settings.ip_deflators_file = self.read_parameter('Context Implicit Price Deflators File')
         self.settings.cpi_deflators_file = self.read_parameter('Context Consumer Price Index File')
+
+        # read policy settings
+        self.settings.drive_cycle_weights_file = self.read_parameter('Drive Cycle Weights File')
+        self.settings.drive_cycles_file = self.read_parameter('Drive Cycles File')
+        self.settings.ghg_credit_params_file = self.read_parameter('GHG Credit Params File')
+        self.settings.ghg_credits_file = self.read_parameter('GHG Credits File')
+        self.settings.policy_targets_file = self.read_parameter('GHG Standards File')
+        self.settings.offcycle_credits_file = self.read_parameter('Off-Cycle Credits File')
+        self.settings.fuel_upstream_methods_file = self.read_parameter('Policy Fuel Upstream Methods File')
+        self.settings.policy_fuels_file = self.read_parameter('Policy Fuels File')
+        self.settings.production_multipliers_file = self.read_parameter('Production Multipliers File')
+        self.settings.policy_reg_classes_file = self.read_parameter('Regulatory Classes File')
+        self.settings.required_sales_share_file = self.read_parameter('Required Sales Share File')
 
     def get_developer_settings(self):
         """
@@ -1432,7 +1451,12 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             if options.session_num is None:
                 session_list = range(0, batch.num_sessions())
             else:
-                session_list = [options.session_num]
+                session_list = list({0, options.session_num})
+
+            for session in batch.sessions:
+                # set Enable Session correctly in expanded batch based on session list
+                session.enabled = session.num in session_list
+                batch.dataframe.loc['Enable Session'][session.num] = session.enabled
 
             batch.dataframe_orig = batch.dataframe.copy()
 
@@ -1505,7 +1529,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         if options.session_num is None:
             session_list = range(0, batch.num_sessions())
         else:
-            session_list = [options.session_num]
+            session_list = list({0, options.session_num})
 
         if not options.no_sim:
             if options.dispy:  # run remote job on cluster, except for first job if generating context vehicle prices
@@ -1550,51 +1574,54 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
 
 if __name__ == '__main__':
-    try:
-        import os, sys, time
-        import argparse
+    import os, sys, time
+    import argparse
 
-        parser = argparse.ArgumentParser(
-            description='Run an OMEGA compliance batch available on the network on one or more dispyNodes')
-        parser.add_argument('--no_validate', action='store_true', help='Skip validating batch file')
-        parser.add_argument('--no_sim', action='store_true', help='Skip running simulations')
-        parser.add_argument('--bundle_path', type=str, help='Path to folder visible to all nodes',
-                            default=os.getcwd() + os.sep + 'bundle')
-        parser.add_argument('--no_bundle', action='store_true',
-                            help='Do NOT gather and copy all source files to bundle_path')
-        parser.add_argument('--batch_file', type=str, help='Path to session definitions visible to all nodes')
-        parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
-        parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
-        parser.add_argument('--calc_effects', type=str,
-                            help='Type of effects calcs to run: "None", "Physical", or "Physical and Costs"',
-                            default='None')
-        parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
-        parser.add_argument('--timestamp', type=str,
-                            help='Timestamp string, overrides creating timestamp from system clock', default=None)
-        parser.add_argument('--show_figures', action='store_true', help='Display figure windows (no auto-close)')
-        parser.add_argument('--dispy', action='store_true', help='Run sessions on dispynode(s)')
-        parser.add_argument('--dispy_ping', action='store_true', help='Ping dispynode(s)')
-        parser.add_argument('--dispy_debug', action='store_true', help='Enable verbose dispy debug messages)')
-        parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
-        parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
-                            default=None)
+    parser = argparse.ArgumentParser(description='Run OMEGA batch simulation')
+    parser.add_argument('--no_validate', action='store_true', help='Skip validating batch file')
+    parser.add_argument('--no_sim', action='store_true', help='Skip running simulations')
+    parser.add_argument('--bundle_path', type=str, help='Path to bundle folder',
+                        default=os.getcwd() + os.sep + 'bundle')
+    parser.add_argument('--no_bundle', action='store_true',
+                        help='Do NOT gather and copy all source files to bundle_path')
+    parser.add_argument('--batch_file', type=str, help='Path to batch definition file')
+    parser.add_argument('--session_num', type=int, help='ID # of session to run from batch')
+    parser.add_argument('--analysis_final_year', type=int, help='Override analysis final year')
+    parser.add_argument('--calc_effects', type=str,
+                        help='Type of effects calcs to run: "None", "Physical", or "Physical and Costs"',
+                        default='None')
+    parser.add_argument('--verbose', action='store_true', help='Enable verbose omega_batch messages)')
+    parser.add_argument('--timestamp', type=str,
+                        help='Timestamp string, overrides creating timestamp from system clock', default=None)
+    parser.add_argument('--show_figures', action='store_true', help='Display figure windows (no auto-close)')
+    parser.add_argument('--dispy', action='store_true', help='Run sessions on dispynode(s)')
+    parser.add_argument('--dispy_ping', action='store_true', help='Ping dispynode(s)')
+    parser.add_argument('--dispy_debug', action='store_true', help='Enable verbose dispy debug messages)')
+    parser.add_argument('--dispy_exclusive', action='store_true', help='Run exclusive job, do not share dispynodes')
+    parser.add_argument('--dispy_scheduler', type=str, help='Override default dispy scheduler IP address',
+                        default=None)
 
-        group = parser.add_mutually_exclusive_group()
-        group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
-        group.add_argument('--network', action='store_true', help='Run on local machine and/or network nodes')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--local', action='store_true', help='Run only on local machine, no network nodes')
+    group.add_argument('--network', action='store_true', help='Run on local machine and/or network nodes')
 
+    if len(sys.argv) > 1:
         args = parser.parse_args()
 
-        run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
-                        no_bundle=args.no_bundle, batch_file=args.batch_file, session_num=args.session_num,
-                        verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
-                        dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
-                        dispy_exclusive=args.dispy_exclusive, dispy_scheduler=args.dispy_scheduler, local=args.local,
-                        network=args.network, analysis_final_year=args.analysis_final_year,
-                        calc_effects=args.calc_effects)
+        try:
+            run_omega_batch(no_validate=args.no_validate, no_sim=args.no_sim, bundle_path=args.bundle_path,
+                            no_bundle=args.no_bundle, batch_file=args.batch_file, session_num=args.session_num,
+                            verbose=args.verbose, timestamp=args.timestamp, show_figures=args.show_figures,
+                            dispy=args.dispy, dispy_ping=args.dispy_ping, dispy_debug=args.dispy_debug,
+                            dispy_exclusive=args.dispy_exclusive, dispy_scheduler=args.dispy_scheduler,
+                            local=args.local,
+                            network=args.network, analysis_final_year=args.analysis_final_year,
+                            calc_effects=args.calc_effects)
+        except:
+            import traceback
 
-    except:
-        import traceback
+            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
 
-        print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-        os._exit(-1)
+    else:
+        parser.parse_args(['--help'])

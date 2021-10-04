@@ -12,7 +12,7 @@ Defines class OMEGARuntimeOptions which control an individual simulation session
 """
 
 # OMEGA code version number
-code_version = "0.9.0"
+code_version = "0.9.1"
 print('loading omega version %s' % code_version)
 
 import os, sys
@@ -82,6 +82,7 @@ try:
             self.auto_close_figures = False
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
+            self.omega_model_path = path
             self.consolidate_manufacturers = False
             self.manufacturers_file = path + 'demo_inputs/manufacturers.csv'
             self.market_classes_file = path + 'demo_inputs/market_classes.csv'

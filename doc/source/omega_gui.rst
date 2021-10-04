@@ -32,11 +32,3 @@ omega\_gui.omega\_gui\_stylesheets module
    :members:
    :undoc-members:
    :show-inheritance:
-
-omega\_gui.sound\_gui module
-----------------------------
-
-.. automodule:: omega_gui.sound_gui
-   :members:
-   :undoc-members:
-   :show-inheritance:
