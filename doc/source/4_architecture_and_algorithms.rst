@@ -95,18 +95,15 @@ Model Inputs
 ------------
 .. todo: [section should just focus on what type of information is provided by the input files, and not about where the data comes from]
 
-As described in the :numref:`inputs_and_outputs_label` overview, OMEGA model inputs are grouped into two categories: 1) assumptions about the structure and the stringency of the policies being evaluated within the model (these are the policy alternatives) and 2) external assumptions that apply to all policies under analysis (collectively referred to as the analysis context). The policy alternatives define the policy being evaluated in each OMEGA run and are described in the Policy Module section. The analysis context inputs (which include more traditional inputs like fuel prices, technology assumptions, etc) are discussed within the descriptions of the associated modules that use them.
+As described in the :numref:`inputs_and_outputs_label` overview, OMEGA model inputs are grouped into two categories; *policy alternative* inputs and *analysis context* inputs. The policy alternatives define the GHG standards that are being evaluated by the model run, while the analysis context refers collectively to the external assumptions that apply to all policies under analysis.
 
-The lists of policy alternatives and analysis context inputs are provided below. Each input is described in more detail in each of the module descriptions listed later in this section.
 
-Policy Alternatives Inputs:
-    * Emissions targets
-    * Rules on banking/trading of credits
-    * Technology multipliers (if applicable)
-    * Reg class definitions
-    * VMT assumption
 
-Analysis Context Inputs:
+**Policy Alternatives Inputs**
+
+An OMEGA run requires a full description of the GHG standards themselves so that the modeled producer compliance considerations are consistent with how an EPA rule would be defined in the Federal Register and Code of Federal Regulations. As described in Section 4.2, OMEGA is intended primarily for the analysis of fleet averaging standards, and the demo example has been set up to illustrate how accounting rules for GHG credits in a fleet averaging program can be defined. This includes the coefficients for calculating emissions rate targets (gram CO2 per mile) based on vehicle attributes, the methods for determining emissions rate certification values (e.g. drive cycle and fuel definitions, off-cycle credits), and the rules for calculating and accounting for Mg CO2 credits over time (e.g. banking and trading rules, and lifetime VMT assumptions.) See :numref:`al_label_table_policy_alternative_inputs` for a complete list of the policy alternative inputs used in the demo example.
+
+**Analysis Context Inputs**
     * Vehicle costs
     * Vehicle prices
     * Vehicle energy consumption
@@ -164,7 +161,8 @@ Emissions standards are defined in OMEGA using a range of policy elements, inclu
 
 .. admonition:: Demo example: Input files for no-action and action policy definitions
 
-    .. csv-table::
+    .. _al_label_table_policy_alternative_inputs:
+    .. csv-table:: Description of Policy Alternative input files
         :widths: auto
         :header-rows: 1
 
