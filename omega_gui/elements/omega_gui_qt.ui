@@ -325,7 +325,7 @@
        <rect>
         <x>746</x>
         <y>238</y>
-        <width>94</width>
+        <width>75</width>
         <height>56</height>
        </rect>
       </property>
@@ -334,7 +334,7 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>90</width>
+        <width>71</width>
         <height>52</height>
        </size>
       </property>
