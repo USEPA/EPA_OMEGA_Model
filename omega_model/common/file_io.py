@@ -37,6 +37,20 @@ def validate_folder(dstfolder):
             exit(-1)
 
 
+def file_exists(filename):
+    """
+    Verify the existence of filename
+
+    Args:
+        filename: File pathname of the file to validate
+
+    Returns:
+        ``True`` if file is accessible (exists)
+
+    """
+    return os.access(filename, os.F_OK)
+
+
 def validate_file(filename):
     """
     Verify the existence of filename

@@ -717,7 +717,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
 
     production_options['producer_search_iteration'] = search_iteration
-    production_options['winner'] = False
+    production_options['selected_production_option'] = False
     production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'])  # / tech_share_combos_total['total_generalized_cost_dollars']
     production_options['slope'] = 0
 
@@ -755,25 +755,30 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
     elif compliant_tech_share_options.empty:
         # grab best non-compliant option (least under-compliance)
         compliance_possible = False
-        candidate_production_decisions = production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
+        candidate_production_decisions = \
+            production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmax()]]
 
     else: # non_compliant_tech_share_options.empty:
         # grab best compliant option (least over-compliant OR lowest cost?)
         compliance_possible = True
         # least over-compliant:
-        candidate_production_decisions = production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmin()]]
+        candidate_production_decisions = \
+            production_options.loc[[mini_df['total_credits_with_offset_co2e_megagrams'].idxmin()]]
         # lowest cost:
         # candidate_production_decisions = tech_share_combos_total.loc[[[cost_name].idxmin()]]
+
+    candidate_production_decisions['selected_production_option'] = candidate_production_decisions.index
 
     if (omega_globals.options.log_producer_iteration_years == 'all') or \
             (calendar_year in omega_globals.options.log_producer_iteration_years):
         if 'producer' in omega_globals.options.verbose_console_modules:
-            production_options.loc[candidate_production_decisions.index, 'winner'] = True
+            # log (some or all) production options cloud and tag selected points
+            production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True
             if omega_globals.options.slice_tech_combo_cloud_tables:
                 production_options = production_options[production_options['strategic_compliance_ratio'] <= 1.2]
             producer_iteration_log.write(production_options)
         else:
-            candidate_production_decisions['winner'] = True
+            # log candidate production decisions only
             producer_iteration_log.write(candidate_production_decisions)
 
     return candidate_production_decisions.copy(), compliance_possible

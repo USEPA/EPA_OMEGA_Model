@@ -191,13 +191,15 @@ def run_producer_consumer():
 
             while iterate_producer_consumer:
                 omega_log.logwrite("Running %s:  Year=%s  Iteration=%s" %
-                                   (omega_globals.options.session_unique_name, calendar_year, producer_consumer_iteration_num),
+                                   (omega_globals.options.session_unique_name, calendar_year,
+                                    producer_consumer_iteration_num),
                                    echo_console=True)
 
                 candidate_mfr_composite_vehicles, producer_decision, market_class_tree, producer_compliant = \
                     compliance_search.search_production_options(compliance_id, calendar_year,
                                                                 producer_decision_and_response,
-                                                                producer_consumer_iteration_num, strategic_target_offset_Mg)
+                                                                producer_consumer_iteration_num,
+                                                                strategic_target_offset_Mg)
 
                 market_class_vehicle_dict = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
 
@@ -340,14 +342,24 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
         producer_decision_and_response['pricing_convergence_score'] = pricing_convergence_score**1
 
+        producer_decision_and_response['cross_subsidy_iteration_num'] = cross_subsidy_iteration_num
+
+        selected_cross_subsidy_index = producer_decision_and_response['pricing_convergence_score'].idxmin()
+
+        producer_decision_and_response['selected_cross_subsidy_option'] = 0
+        producer_decision_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
+
         if omega_globals.options.log_producer_decision_and_response_years == 'all' or \
                 calendar_year in omega_globals.options.log_producer_decision_and_response_years:
-            producer_decision_and_response.to_csv('%s%s_%s_%s_producer_cross_subsidy_iteration.csv' %
-                                                  (omega_globals.options.output_folder, calendar_year,
-                                                   producer_consumer_iteration_num, cross_subsidy_iteration_num))
+            logfilename = '%s%s_%s_producer_cross_subsidy_iteration.csv' % (omega_globals.options.output_folder,
+                                                                            calendar_year,
+                                                                            producer_consumer_iteration_num)
+            if file_io.file_exists(logfilename):
+                producer_decision_and_response.to_csv(logfilename, mode='a', header=False)
+            else:
+                producer_decision_and_response.to_csv(logfilename, header=True)
 
-        producer_decision_and_response = \
-            producer_decision_and_response.loc[producer_decision_and_response['pricing_convergence_score'].idxmin()]
+        producer_decision_and_response = producer_decision_and_response.loc[selected_cross_subsidy_index]
 
         # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
         # any slight offset during the convergence process:
