@@ -654,7 +654,7 @@ class CompositeVehicle(OMEGABase):
                      composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '-', linewidth=3,
                      label='composite_vehicle_cost_curve')
 
-            ax1.legend(fontsize='medium', bbox_to_anchor=(1.04,0), loc="lower left", borderaxespad=0) # , loc=(ax1.get_xbound()[1], ax1.get_ybound()[0]))
+            ax1.legend(fontsize='medium', bbox_to_anchor=(1.04,0), loc="lower left", borderaxespad=0)
 
             fig.savefig('%s%s_%s_composition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title()), bbox_inches='tight')
 
@@ -1035,18 +1035,22 @@ class Vehicle(OMEGABase):
             from common.omega_plot import figure, label_xyt
 
             fig, ax1 = figure()
-            label_xyt(ax1, 'CO2e g/mi', 'new_vehicle_mfr_generalized_cost_dollars', '%s cost_curve' % self.name)
+            label_xyt(ax1, 'CO2e g/mi', '$', '%s cost_curve' % self.name)
+
+            ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
+                 self.cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
+                 label='veh_%s_%s_new_vehicle_mfr_cost_dollars' % (self.vehicle_id, self.name))
 
             ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
                  self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
-                 label='veh_%s_%s_cost_cloud' % (self.vehicle_id, self.name))
+                 label='veh_%s_%s_new_vehicle_mfr_generalized_cost_dollars' % (self.vehicle_id, self.name))
 
             ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
                  cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
                  color='black',
                  label='veh_%s_%s_cost_curve' % (self.vehicle_id, self.name))
 
-            ax1.legend(fontsize='medium')
+            ax1.legend(fontsize='x-small', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
             fig.savefig('%s%d_%s_cost_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name),
                         bbox_inches='tight')

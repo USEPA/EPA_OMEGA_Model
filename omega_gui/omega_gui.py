@@ -8,21 +8,13 @@ The GUI has been tested to display properly up to 125% text size based on Window
 
 import os
 import sys
-# import subprocess
 
 if 'darwin' in sys.platform:
     os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for Qt on MacOS
 
-# import pandas
 import psutil
 
 import multitimer
-# import time
-
-# import pyqtgraph as pg
-# from pyqtgraph.Qt import QtCore, QtGui
-# import pyqtgraph.exporters
-# import numpy as np
 
 from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
@@ -35,8 +27,6 @@ from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import QFile, QObject
 
 from datetime import datetime
-
-# from plyer import notification
 
 # Import functions from other files
 from omega_gui_functions import *
@@ -71,13 +61,9 @@ configuration_file_valid = False
 input_batch_file_valid = False
 output_batch_directory_valid = False
 # Images for model run button
-# run_button_image_disabled = path + "omega_gui/elements/green_car_1.jpg"
-# run_button_image_enabled = path + "omega_gui/elements/green_car_1.jpg"
 run_button_image_disabled = path + "omega_gui/elements/play_button_gray_transparent.png"
 run_button_image_enabled = path + "omega_gui/elements/play_button_green_transparent.png"
 epa_button_image = path + "omega_gui/elements/epa_seal_large_trim.gif"
-green_check_image = path + "omega_gui/elements/green_check.png"
-red_x_image = path + "omega_gui/elements/red_x.png"
 input_batch_file_button_image = path + "omega_gui/elements/file_select_white.png"
 output_batch_directory_button_image = path + "omega_gui/elements/folder_select_white.png"
 
@@ -91,7 +77,6 @@ omega2_version = ""
 log_file_batch = "batch_logfile.txt"
 log_file_session_prefix = "o2log_"
 log_file_session_suffix = "_ReferencePolicy.txt"
-# button_click_sound = path + 'omega_gui/elements/click.mp3'
 
 
 class Form(QObject):
@@ -635,48 +620,27 @@ class Form(QObject):
 
             temp1 = "Configuration Loaded.\n"
             temp1 = temp1 + "Model Run Enabled."
-            # temp1 = temp1 + "Punch It Chewie!"
             self.event_monitor(temp1, 'black', '')
-
-            # self.window.save_configuration_file_button.setEnabled(1)
-            # self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
-            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
-
         elif not configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             # self.clear_wizard()
             temp1 = "Configuration has changed.  Save Configuration File if desired."
             self.event_monitor(temp1, 'black', '')
-            # self.window.save_configuration_file_button.setEnabled(1)
-            # self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
             temp1 = "Configuration Loaded.\n"
             temp1 = temp1 + "Model Run Enabled."
-            # temp1 = temp1 + "Punch It Chewie!"
             self.event_monitor(temp1, 'black', '')
             configuration_file_valid = True
-            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         elif not configuration_file_valid and (not input_batch_file_valid or not output_batch_directory_valid):
             # self.clear_wizard()
             temp1 = "Elements in the Configuration are invalid:"
             self.event_monitor(temp1, 'black', '')
-            # self.window.save_configuration_file_button.setEnabled(0)
-            # self.window.configuration_file_check_button.setIcon(QIcon(red_x_image))
-            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
             if not input_batch_file_valid:
                 temp2 = "Input Batch File Invalid:\n    [" + input_batch_file + "]"
                 self.event_monitor(temp2, 'red', 'dt')
-                # self.window.input_batch_file_check_button.setIcon(QIcon(red_x_image))
             if not output_batch_directory_valid:
                 temp2 = "Output Batch Directory Invalid:\n    [" + output_batch_directory + "]"
                 self.event_monitor(temp2, 'red', 'dt')
-                # self.window.output_batch_directory_check_button.setIcon(QIcon(red_x_image))
         if configuration_file_valid and input_batch_file_valid and output_batch_directory_valid:
             self.enable_run_button(True)
-            # self.window.configuration_file_check_button.setIcon(QIcon(green_check_image))
-            # self.window.input_batch_file_check_button.setIcon(QIcon(green_check_image))
-            # self.window.output_batch_directory_check_button.setIcon(QIcon(green_check_image))
         else:
             self.enable_run_button(False)
 
@@ -773,8 +737,6 @@ class Form(QObject):
 
         self.clear_event_monitor()
         elapsed_start = datetime.now()
-        # model_sound_start = 'gui/elements/click.mp3'
-        # model_sound_stop = 'gui/elements/model_stop.mp3'
         global status_bar_message
         global multiprocessor_mode_selected
         global output_batch_subdirectory
@@ -816,14 +778,6 @@ class Form(QObject):
         self.event_monitor("Start Model Run", "black", 'dt')
         # Call OMEGA 2 batch as a subprocess with command line options from above
         status_bar_message = "Status = Model Running ..."
-
-        # # Send notification to Windows
-        # notification.notify(
-        #     title="OMEGA Notification",
-        #     message="Model Run Started\n" + "Input File =\n" + "  " + os.path.basename(input_batch_file),
-        #     # app_icon=path + "omega_gui/elements/omega2_icon.ico",
-        #     timeout=5
-        # )
 
         # While the subprocess is running, output communication from the batch process to the event monitor
         # First find the log files
@@ -952,15 +906,6 @@ class Form(QObject):
         # Enable selected gui functions disabled during model run
         self.enable_gui_run_functions(1)
         # self.load_plots_2()
-
-        # Send Notification to Windows
-        # notification.notify(
-        #     title="OMEGA Notification",
-        #     message="Model Run Completed\n" + str(elapsed_time) + "\n" + "Output Directory =\n" +
-        #             "  " + os.path.basename(output_batch_directory),
-        #     # app_icon= path + "omega_gui/elements/omega2_icon.ico",
-        #     timeout=5
-        # )
 
     def showbox(self, message_title, message):
         """
