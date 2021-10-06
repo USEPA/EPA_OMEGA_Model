@@ -169,6 +169,7 @@ class Form(QObject):
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
         self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
+        self.window.results_comment.setStyleSheet(development_stylesheet(""))
 
         # Load stylesheet for tab control
         stylesheet = ""

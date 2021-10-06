@@ -101,6 +101,23 @@ def button_stylesheet(stylesheet):
     return stylesheet
 
 
+def development_stylesheet(stylesheet):
+    """
+    Loads the stylesheet for buttons contained in the gui.
+
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
+
+    stylesheet = """
+        QTextEdit {
+        background-color: rgba(0, 113, 188, 200);
+        border: 2px solid lightGray;
+        }
+     """
+    return stylesheet
+
+
 def logo_button_stylesheet(stylesheet):
     """
     Loads the stylesheet for logo buttons contained in the gui.
