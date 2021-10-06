@@ -86,14 +86,10 @@ def button_stylesheet(stylesheet):
         QPushButton:hover {
         border: 2px solid lightBlue;
         border-radius: 6px;
-        font: bold;
-        color: white;
         }
         QPushButton:pressed {
-        border: 4px solid white;
+        border: 3px solid lightBlue;
         border-radius: 6px;
-        font: bold;
-        color: white;
         }
      """
     return stylesheet
