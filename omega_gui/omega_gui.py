@@ -73,13 +73,13 @@ output_batch_directory_valid = False
 # Images for model run button
 # run_button_image_disabled = path + "omega_gui/elements/green_car_1.jpg"
 # run_button_image_enabled = path + "omega_gui/elements/green_car_1.jpg"
-run_button_image_disabled = path + "omega_gui/elements/play-button.png"
-run_button_image_enabled = path + "omega_gui/elements/play-button.png"
+run_button_image_disabled = path + "omega_gui/elements/play_button_gray_transparent.png"
+run_button_image_enabled = path + "omega_gui/elements/play_button_green_transparent.png"
 epa_button_image = path + "omega_gui/elements/epa_seal_large_trim.gif"
 green_check_image = path + "omega_gui/elements/green_check.png"
 red_x_image = path + "omega_gui/elements/red_x.png"
-input_batch_file_button_image = path + "omega_gui/elements/find_file_transparent.png"
-output_batch_directory_button_image = path + "omega_gui/elements/find_folder_transparent.png"
+input_batch_file_button_image = path + "omega_gui/elements/file_select_transparent.png"
+output_batch_directory_button_image = path + "omega_gui/elements/folder_select_transparent.png"
 
 
 # Common spacer between events
@@ -118,7 +118,7 @@ class Form(QObject):
         # Set the status bar
         # self.window.statusBar().showMessage("Ready")
         # Set the window icon
-        self.window.setWindowIcon(QIcon(path + "omega_gui/elements/omega2_icon.jpg"))
+        self.window.setWindowIcon(QIcon(path + "omega_gui/elements/icon_white.ico"))
 
         # Define gui connections to functions
         self.window.action_new_file.triggered.connect(self.new_file)
@@ -168,7 +168,7 @@ class Form(QObject):
         # self.enable_run_button(False)
         self.window.select_input_batch_file_button.setIcon(QIcon(input_batch_file_button_image))
         self.window.select_output_batch_directory_button.setIcon(QIcon(output_batch_directory_button_image))
-        self.window.results_comment.setPlainText('Feature Under Development')
+        self.window.results_comment.setPlainText('Feature Under Development\nSee Batch Output Directory Session Folders for Outputs')
 
         # Load stylesheet for tab control
         stylesheet = ""

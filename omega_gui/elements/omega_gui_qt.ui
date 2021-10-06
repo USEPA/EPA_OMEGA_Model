@@ -56,7 +56,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -104,7 +104,10 @@
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
@@ -151,7 +154,7 @@
        <rect>
         <x>10</x>
         <y>41</y>
-        <width>1011</width>
+        <width>1001</width>
         <height>51</height>
        </rect>
       </property>
@@ -171,6 +174,9 @@
       </property>
       <property name="toolTip">
        <string>Input Batch File</string>
+      </property>
+      <property name="placeholderText">
+       <string>Select Input Batch File ...</string>
       </property>
      </widget>
      <widget class="QLabel" name="output_batch_directory_1_label">
@@ -199,7 +205,7 @@
        <rect>
         <x>10</x>
         <y>141</y>
-        <width>1011</width>
+        <width>1001</width>
         <height>51</height>
        </rect>
       </property>
@@ -214,14 +220,17 @@
       <property name="toolTip">
        <string>Output Batch Directory</string>
       </property>
+      <property name="placeholderText">
+       <string>Select Output Batch Directory ...</string>
+      </property>
      </widget>
      <widget class="QPushButton" name="select_output_batch_directory_button">
       <property name="geometry">
        <rect>
-        <x>1030</x>
+        <x>1022</x>
         <y>140</y>
-        <width>55</width>
-        <height>55</height>
+        <width>62</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="font">
@@ -240,8 +249,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>51</width>
-        <height>51</height>
+        <width>58</width>
+        <height>47</height>
        </size>
       </property>
      </widget>
@@ -251,10 +260,10 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>1030</x>
+        <x>1022</x>
         <y>40</y>
-        <width>55</width>
-        <height>55</height>
+        <width>62</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="font">
@@ -273,8 +282,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>51</width>
-        <height>51</height>
+        <width>58</width>
+        <height>47</height>
        </size>
       </property>
      </widget>
@@ -283,7 +292,7 @@
        <rect>
         <x>10</x>
         <y>240</y>
-        <width>711</width>
+        <width>1001</width>
         <height>51</height>
        </rect>
       </property>
@@ -297,6 +306,9 @@
       </property>
       <property name="toolTip">
        <string>Project Description is user free formatted text providing a description of the project and any other useful information</string>
+      </property>
+      <property name="placeholderText">
+       <string>Enter Project Description ...</string>
       </property>
      </widget>
      <widget class="QLabel" name="project_description_1_label">
@@ -323,10 +335,10 @@
      <widget class="QPushButton" name="run_model_button">
       <property name="geometry">
        <rect>
-        <x>746</x>
-        <y>238</y>
-        <width>94</width>
-        <height>56</height>
+        <x>12</x>
+        <y>304</y>
+        <width>62</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -334,7 +346,7 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>90</width>
+        <width>71</width>
         <height>52</height>
        </size>
       </property>
@@ -342,9 +354,9 @@
      <widget class="QLabel" name="model_status_label">
       <property name="geometry">
        <rect>
-        <x>870</x>
-        <y>230</y>
-        <width>211</width>
+        <x>90</x>
+        <y>295</y>
+        <width>181</width>
         <height>71</height>
        </rect>
       </property>
@@ -352,6 +364,8 @@
        <font>
         <family>Consolas</family>
         <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="toolTip">
@@ -509,14 +523,15 @@
      <widget class="QTextEdit" name="results_comment">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>20</x>
         <y>50</y>
-        <width>961</width>
-        <height>291</height>
+        <width>1061</width>
+        <height>301</height>
        </rect>
       </property>
       <property name="font">
        <font>
+        <family>Arial</family>
         <pointsize>30</pointsize>
         <weight>75</weight>
         <italic>true</italic>
@@ -525,6 +540,9 @@
       </property>
       <property name="toolTip">
        <string>Feature Under Development</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>
@@ -545,6 +563,8 @@
        <font>
         <family>Arial</family>
         <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="toolTip">
@@ -567,6 +587,8 @@
        <font>
         <family>Arial</family>
         <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="toolTip">
@@ -585,8 +607,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>631</width>
+      <y>15</y>
+      <width>91</width>
       <height>51</height>
      </rect>
     </property>
@@ -662,8 +684,8 @@
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
-       <x>1027</x>
-       <y>4</y>
+       <x>1025</x>
+       <y>7</y>
        <width>80</width>
        <height>81</height>
       </rect>
@@ -694,7 +716,7 @@
      <x>0</x>
      <y>0</y>
      <width>1121</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu1">

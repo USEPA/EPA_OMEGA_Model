@@ -22,7 +22,7 @@ def tab_stylesheet(stylesheet):
                 height: 30px;           /* Sets the height of the tabs */
                 padding-top : 0px;      /* Sets extra space at the top of the tabs */
                 padding-bottom : 0px;   /* Sets extra space at the bottom of the tabs */
-                color: white;            /* Sets the text color and frame color of the tabs */
+                color: white;           /* Sets the text color and frame color of the tabs */
                 font: 12pt "Arial";     /* Sets the font for the tabs */
                 }
             QTabBar::tab:hover { 
@@ -76,13 +76,13 @@ def button_stylesheet(stylesheet):
 
     stylesheet = """
         QPushButton {
-        background-color: rgb(32, 84, 147);
-        border: 1px solid white;
+        background-color: rgb(0, 113, 188);
+        border: 0px solid white;
         border-radius: 6px;
         }
         QPushButton:enabled {
-        background-color: rgb(32, 84, 147); 
-        border: 1px solid white;
+        background-color: rgb(0, 113, 188);
+        border: 0px solid white;
         color: white;
         }
         QPushButton:hover {

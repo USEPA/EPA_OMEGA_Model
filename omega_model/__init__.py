@@ -169,6 +169,7 @@ try:
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.log_vehicles = ['ICE Large Van truck minivan 4WD'] # list of vehicles to log in producer_iteration_years
 
             # dynamic modules / classes
             self.RegulatoryClasses = None

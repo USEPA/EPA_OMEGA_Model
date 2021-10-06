@@ -477,7 +477,10 @@ class CompositeVehicle(OMEGABase):
                 v.composite_vehicle_share_frac = 0
 
         if calc_composite_cost_curve:
-            self.cost_curve = self.calc_composite_cost_curve(plot=verbose)
+            plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or \
+                              (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
+                              any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
+            self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
         self.tech_option_iteration_num = 0
 
@@ -518,6 +521,16 @@ class CompositeVehicle(OMEGABase):
             ``producer.vehicles.DecompositionAttributes``
 
         """
+        plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or \
+                          (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
+                          any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
+
+        if plot_cost_curve:
+            from common.omega_plot import figure, label_xyt
+
+            fig, ax1 = figure()
+            label_xyt(ax1, 'CO2e g/mi', 'new_vehicle_mfr_generalized_cost_dollars', '%s cost_curve' % self.name)
+
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
@@ -526,6 +539,43 @@ class CompositeVehicle(OMEGABase):
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_cert_target_co2e_Mg()  # varies by model year and initial_registered_count
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
+
+            if plot_cost_curve:
+                if (v.name in omega_globals.options.log_vehicles):
+                    ax1.plot(v.cost_curve['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
+                             v.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
+                             color='black',
+                             label='veh_%s_%s' % (v.vehicle_id, v.name))
+
+                    ax1.plot(v.cert_co2e_grams_per_mile,
+                             v.new_vehicle_mfr_generalized_cost_dollars, '*',
+                             color=ax1.get_lines()[-1].get_color(), markersize=15)
+
+                else:
+                    ax1.plot(v.cost_curve['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
+                             v.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], '.--',
+                             linewidth=1,
+                             label='veh_%s_%s' % (v.vehicle_id, v.name))
+
+                    ax1.plot(v.cert_co2e_grams_per_mile,
+                             v.new_vehicle_mfr_generalized_cost_dollars, '*',
+                             color=ax1.get_lines()[-1].get_color(), markersize=10)
+        if plot_cost_curve:
+            ax1.relim()
+            ax1.autoscale()
+
+            ax1.plot(self.cost_curve['cert_co2e_grams_per_mile'],
+                     self.cost_curve['new_vehicle_mfr_generalized_cost_dollars'], '-', linewidth=3,
+                     label='composite_vehicle_cost_curve')
+
+            ax1.plot(self.cert_co2e_grams_per_mile, self.new_vehicle_mfr_generalized_cost_dollars, '*', markersize=25,
+                     color=ax1.get_lines()[-1].get_color())
+
+            ax1.legend(fontsize='medium', bbox_to_anchor=(1.04, 0), loc="lower left",
+                               borderaxespad=0)
+
+            fig.savefig('%s%s_%s_decomposition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title()),
+                        bbox_inches='tight')
 
     def calc_composite_cost_curve(self, plot=False):
         """
@@ -545,11 +595,11 @@ class CompositeVehicle(OMEGABase):
 
         """
         from common.omega_functions import cartesian_prod, calc_frontier
-        from common.omega_plot import figure, label_xy
+        from common.omega_plot import figure, label_xyt
 
         if plot:
             fig, ax1 = figure()
-            label_xy(ax1, 'CO2e g/mi', '$')
+            label_xyt(ax1, 'CO2e g/mi', 'new_vehicle_mfr_generalized_cost_dollars', '%s cost_curve' % self.name)
 
         composite_frontier_df = pd.DataFrame()
         composite_frontier_df['market_share_frac'] = [0]
@@ -588,12 +638,25 @@ class CompositeVehicle(OMEGABase):
 
             composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
 
+            if plot:
+                if (v.name in omega_globals.options.log_vehicles):
+                    ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
+                             vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
+                             color='black',
+                             label='veh_%s_%s' % (v.vehicle_id, v.name))
+                else:
+                    ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id] ,
+                             vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], '.--',
+                             linewidth=1, label='veh_%s_%s' % (v.vehicle_id, v.name))
+
         if plot:
             ax1.plot(composite_frontier_df['cert_co2e_grams_per_mile'],
-                     composite_frontier_df['new_vehicle_mfr_cost_dollars'], 'x-')
+                     composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '-', linewidth=3,
+                     label='composite_vehicle_cost_curve')
 
-            ax1.plot(composite_frontier_df['cert_co2e_grams_per_mile'],
-                     composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], 'x--')
+            ax1.legend(fontsize='medium', bbox_to_anchor=(1.04,0), loc="lower left", borderaxespad=0) # , loc=(ax1.get_xbound()[1], ax1.get_ybound()[0]))
+
+            fig.savefig('%s%s_%s_composition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title()), bbox_inches='tight')
 
         return composite_frontier_df
 
@@ -957,6 +1020,36 @@ class Vehicle(OMEGABase):
 
         # drop frontier factor
         cost_curve = cost_curve.drop(columns=['frontier_factor'])
+
+        if ((omega_globals.options.log_producer_iteration_years == 'all') or
+            (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
+            (self.name in omega_globals.options.log_vehicles):
+
+            logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            self.cost_cloud['frontier'] = False
+            self.cost_cloud.loc[cost_curve.index, 'frontier'] = True
+            self.cost_cloud.to_csv(logfile_name)
+            logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
+            cost_curve.to_csv(logfile_name)
+
+            from common.omega_plot import figure, label_xyt
+
+            fig, ax1 = figure()
+            label_xyt(ax1, 'CO2e g/mi', 'new_vehicle_mfr_generalized_cost_dollars', '%s cost_curve' % self.name)
+
+            ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
+                 self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
+                 label='veh_%s_%s_cost_cloud' % (self.vehicle_id, self.name))
+
+            ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
+                 cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
+                 color='black',
+                 label='veh_%s_%s_cost_curve' % (self.vehicle_id, self.name))
+
+            ax1.legend(fontsize='medium')
+
+            fig.savefig('%s%d_%s_cost_curve.png' % (omega_globals.options.output_folder, self.model_year, self.name),
+                        bbox_inches='tight')
 
         return cost_curve
 
