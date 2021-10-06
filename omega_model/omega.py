@@ -349,6 +349,10 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         producer_decision_and_response['selected_cross_subsidy_option'] = 0
         producer_decision_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
 
+        producer_decision_and_response['price_cost_ratio_total'] = \
+            (producer_decision_and_response['average_cross_subsidized_price_total'] /
+             producer_decision_and_response['average_new_vehicle_mfr_cost'])
+
         if omega_globals.options.log_producer_decision_and_response_years == 'all' or \
                 calendar_year in omega_globals.options.log_producer_decision_and_response_years:
             logfilename = '%s%s_%s_producer_cross_subsidy_iteration.csv' % (omega_globals.options.output_folder,
@@ -374,10 +378,6 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         #     # propagate vehicle sales up to market class sales
         #     calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
         # ###############################################################################################################
-
-        producer_decision_and_response['price_cost_ratio_total'] = \
-            (producer_decision_and_response['average_cross_subsidized_price_total'] /
-             producer_decision_and_response['average_new_vehicle_mfr_cost'])
 
         converged, convergence_error = detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
