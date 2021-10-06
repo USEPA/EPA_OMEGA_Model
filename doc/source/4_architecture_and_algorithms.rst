@@ -93,27 +93,73 @@ As shown in :numref:`al_label_overallprocessflow` , this simulation process invo
 
 Model Inputs
 ------------
-.. todo: [section should just focus on what type of information is provided by the input files, and not about where the data comes from]
 
 As described in the :numref:`inputs_and_outputs_label` overview, OMEGA model inputs are grouped into two categories; *policy alternative* inputs and *analysis context* inputs. The policy alternatives define the GHG standards that are being evaluated by the model run, while the analysis context refers collectively to the external assumptions that apply to all policies under analysis.
-
-
 
 **Policy Alternatives Inputs**
 
 An OMEGA run requires a full description of the GHG standards themselves so that the modeled producer compliance considerations are consistent with how an EPA rule would be defined in the Federal Register and Code of Federal Regulations. As described in Section 4.2, OMEGA is intended primarily for the analysis of fleet averaging standards, and the demo example has been set up to illustrate how accounting rules for GHG credits in a fleet averaging program can be defined. This includes the coefficients for calculating emissions rate targets (gram CO2 per mile) based on vehicle attributes, the methods for determining emissions rate certification values (e.g. drive cycle and fuel definitions, off-cycle credits), and the rules for calculating and accounting for Mg CO2 credits over time (e.g. banking and trading rules, and lifetime VMT assumptions.) See :numref:`al_label_table_policy_alternative_inputs` for a complete list of the policy alternative inputs used in the demo example.
 
 **Analysis Context Inputs**
-    * Vehicle costs
-    * Vehicle prices
-    * Vehicle energy consumption
-    * Fuel emissions factors
-    * Off-cycle credit tech values (if applicable).  This file also includes A/C credits, despite the title.
-    * Starting credit balances
-    * Fuel Costs (gas and electricity)
-    * Vehicle fleet.  The characterization of the base year vehicle fleet, which includes the list of all vehicles and sales volumes represented in the base year.  “Vehicles” are further defined in 3.3.2.
-    * Vehicle VMT distribution
-    * Simulated vehicles.  The list of simulated vehicle and powertrain technology combinations, and associated attributes (weight, applied technology, CO2 emissions, fuel consumption, etc.) available to the manufacturer within the producer module.
+
+The analysis context defines the inputs and assumptions that the user assumes are independent of the policy alternatives. This clear delineation of exogenous factors is what enables the apples-to-apples comparison of policy alternatives within a given analysis context. This is the primary purpose for which OMEGA was designed – to quantify the incremental effects of a policy for informing policy decisions. At the same time, considering how the incremental effects of a policy might vary depending on the analysis context assumptions is a useful approach for understanding the sensitivity of the projected results to uncertainties in assumptions.
+
+.. admonition:: Demo example: Analysis Context inputs for 'context a'
+
+    The demo example includes two policy alternatives (‘alt_0’ and ‘alt_1’) and two sets of analysis context assumptions (‘a’ and ‘b’.) :numref:`al_label_table_policy_context_a_inputs` shows the complete set of input files and settings for context ‘a’ as defined in the ‘demo_batch-context_a.csv’ file.
+
+    .. _al_label_table_policy_context_a_inputs:
+    .. csv-table:: Input files and settings for 'context a'
+        :widths: auto
+        :header-rows: 1
+
+        Analysis context element,Input file name/ Input setting value,Description
+        Context Name,AEO2021,"Together with 'Context Case' setting, selects which set of input values to use from the fuel price and new vehicle market files."
+        Context Case,Reference case,"Together with 'Context Name' setting, selects which set of input values to use from the fuel price and new vehicle market files."
+        Context Fuel Prices File,context_fuel_prices.csv,"Retail and pre-tax price projections for any fuels considered in the analysis (e.g. gasoline, electricity.)"
+        Context New Vehicle Market File,context_new_vehicle_market.csv,"Projections for new vehicle key attributes, sales, and mix under the analysis context conditions, including whatever policies are assumed."
+        GHG Credits File,ghg_credits.csv,"Balance of existing banked credits, by model year earned."
+        Manufacturers File,manufacturers.csv,"List of producers considered as distinct entities for GHG compliance. When 'Consolidate Manufacturers' is set to TRUE, in batch input file, 'consolidated_OEM' value is used for all producers."
+        Market Classes File,market_classes.csv,Market class Id's for distinguishing vehicle classes in the Consumer Module.
+        New Vehicle Price Elasticity of Demand,-1,Scalar value of the price elasticity of demand for overall new vehicle sales.
+        Onroad Fuels File,onroad_fuels.csv,Parameters inherent to fuels and independent of policy or technology (e.g. carbon intensity.)
+        Onroad Vehicle Calculations File,onroad_vehicle_calculations.csv,Multiplicative factors to convert from certification energy and emissions rates to onroad values.
+        Onroad VMT File,annual_vmt_fixed_by_age.csv,Annual mileage accumulation assumptions for estimating vehicle use in Consumer and Effects modules
+        Producer Cross Subsidy Multiplier Max,1.05,Upper limit price multiplier value considered by producers to increase vehicle prices though cross subsidies.
+        Producer Cross Subsidy Multiplier Min,0.95,Lower limit price multiplier value considered by producers to decrease vehicle prices though cross subsidies.
+        Producer Generalized Cost File,producer_generalized_cost.csv,Parameter values for the producers generalized costs for compliance decisions (e.g. the producers view of consumers consideration of fuel costs in purchase decisions.)
+        Production Constraints File,production_constraints-cntxt_a.csv,Upper limits on market class shares due to constraints on production capacity.
+        Sales Share File,sales_share_params-cntxt_a.csv,Parameter values required to specify the demand share estimation in the Consumer Module.
+        Vehicle Price Modifications File,vehicle_price_modifications-cntxt_a.csv,Purchase incentives or taxes/fees which are external to the producer pricing decisions.
+        Vehicle Reregistration File,reregistration_fixed_by_age.csv,"Proportion of vehicles reregistered at each age, by market class."
+        Vehicle Simulation Results and Costs File,simulated_vehicles.csv,Vehicle production costs and emissions rates by technology package and cost curve class.
+        Vehicles File,vehicles.csv,The base year vehicle stock and key attributes. Note that the demo example contains MY2019 vehicles. Prior model years could also be included if needed for stock and use modeling.
+        Context Criteria Cost Factors File,cost_factors-criteria.csv,The marginal pollution damages per unit mass from criteria pollutant emissions.
+        Context SCC Cost Factors File,cost_factors-scc.csv,The marginal costs per unit mass from GHG emissions (i.e. Social Cost of Carbon.)
+        Context Energy Security Cost Factors File,cost_factors-energysecurity.csv,The marginal energy security cost per unit of fuel consumption.
+        Context Congestion-Noise Cost Factors File,cost_factors-congestion-noise.csv,The marginal cost per mile of noise and congestion from changes in VMT.
+        Context Powersector Emission Factors File,emission_factors-powersector.csv,The marginal cost per kWh of upstream emissions from electricity generation.
+        Context Refinery Emission Factors File,emission_factors-refinery.csv,The marginal cost per gallon upstream emissions from fuel refining.
+        Context Vehicle Emission Factors File,emission_factors-vehicles.csv,The marginal cost per mile of direct emissions (i.e. tailpipe emissions) from changes in VMT.
+        Context Implicit Price Deflators File,implicit_price_deflators.csv,Factors for converting costs to a common dollar basis.
+        Context Consumer Price Index File,cpi_price_deflators.csv,Factors for converting costs to a common dollar basis.
+
+.. admonition:: Demo example: Unique Analysis Context inputs for ‘context b’
+
+    While most of the example input files are common for contexts ‘a’ and ‘b’, in cases where context assumptions vary, input files are differentiated using ‘cntxt_a’ and ‘cntxt_b’ in the file names. :numref:`al_label_table_policy_context_b_unique_inputs` shows the input files and settings that are unique for context ‘b’ as defined in the in the ‘demo_batch-context_a.csv’ file.
+
+    .. _al_label_table_policy_context_b_unique_inputs:
+    .. csv-table:: Input files and setting differences between contexts 'a' and 'b'
+        :widths: auto
+        :header-rows: 1
+
+        Analysis context element,Input file name/ Input setting value,Difference between context 'a' and 'b'
+        Context Case,High oil price,"Taken from AEO2021, context 'a' uses the Reference Case fuel prices and context 'b' uses the 'High oil price' case fuel prices."
+        Producer Cross Subsidy Multiplier Max,1.4,Context 'b' uses a higher upper limit price multiplier value compared to the 1.2 value for context 'a'.
+        Producer Cross Subsidy Multiplier Min,0.6,Context 'b' uses a reduced lower limit price multiplier value compared to the 0.8 value for context 'a'.
+        Production Constraints File,production_constraints-cntxt_b.csv,"Context 'b' has a linearly increasing maximum production constraint for BEVs from 2020 to 2030, compared to context 'a' which has no production limits specified in that timeframe."
+        Sales Share File,sales_share_params-cntxt_b.csv,"Context 'b' has BEV share weight parameters for the Consumer Module which represent a logistic function that increases earlier, reaching a value of 0.5 in 2025 instead of 2030 in context 'a'. In other words, context 'b' represents greater consumer demand for BEVs, all else equal."
+        Vehicle Price Modifications File,vehicle_price_modifications-cntxt_b.csv,"Context 'b' introduces an external BEV purchase incentive of $10,000 in 2025, which decreases to $5,000 in 2027, and then linearly to zero in 2036 compared to context 'a' which has no purchase incentives in this timeframe."
 
 Projections and the Analysis Context
 ------------------------------------
