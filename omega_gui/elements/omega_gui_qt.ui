@@ -56,7 +56,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -154,7 +154,7 @@
        <rect>
         <x>10</x>
         <y>41</y>
-        <width>1001</width>
+        <width>1079</width>
         <height>51</height>
        </rect>
       </property>
@@ -205,7 +205,7 @@
        <rect>
         <x>10</x>
         <y>141</y>
-        <width>1001</width>
+        <width>1079</width>
         <height>51</height>
        </rect>
       </property>
@@ -227,10 +227,10 @@
      <widget class="QPushButton" name="select_output_batch_directory_button">
       <property name="geometry">
        <rect>
-        <x>1022</x>
-        <y>140</y>
-        <width>62</width>
-        <height>51</height>
+        <x>1040</x>
+        <y>145</y>
+        <width>45</width>
+        <height>45</height>
        </rect>
       </property>
       <property name="font">
@@ -249,8 +249,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>58</width>
-        <height>47</height>
+        <width>35</width>
+        <height>35</height>
        </size>
       </property>
      </widget>
@@ -260,10 +260,10 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>1022</x>
-        <y>40</y>
-        <width>62</width>
-        <height>51</height>
+        <x>1040</x>
+        <y>45</y>
+        <width>45</width>
+        <height>45</height>
        </rect>
       </property>
       <property name="font">
@@ -282,8 +282,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>58</width>
-        <height>47</height>
+        <width>35</width>
+        <height>35</height>
        </size>
       </property>
      </widget>
@@ -292,7 +292,7 @@
        <rect>
         <x>10</x>
         <y>240</y>
-        <width>1001</width>
+        <width>1079</width>
         <height>51</height>
        </rect>
       </property>
@@ -634,7 +634,7 @@
      <rect>
       <x>10</x>
       <y>15</y>
-      <width>191</width>
+      <width>91</width>
       <height>51</height>
      </rect>
     </property>
@@ -710,7 +710,7 @@
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
-       <x>1025</x>
+       <x>1030</x>
        <y>7</y>
        <width>80</width>
        <height>81</height>
@@ -742,7 +742,7 @@
      <x>0</x>
      <y>0</y>
      <width>1121</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu1">
