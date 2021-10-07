@@ -9,7 +9,7 @@ Running and Understanding the Demo Example
 
 Using The Graphical User Interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.  This introduction will goude the user through running the demo example.
+The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.  This introduction will guide the user through running the demo example.
 
 GUI Basics
 ----------
@@ -68,13 +68,13 @@ The elements required to run the model loaded using an existing Configuration Fi
 .. _ug_label6:
 
 Existing Configuration File
-+++++++++++++++++++++++++++
+---------------------------
 From the file menu, select 'Open Configuration File' to launch a standard File Explorer window to load an existing Configuration File.  When properly loaded, the 'Run Model' page will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
 
 .. _ug_label7:
 
 Create New Model Run From The Demo Example
-++++++++++++++++++++++++++++++++++++++++++
+------------------------------------------
 If a Configuration File is not available, create a new model run using these steps:
 
 * Select the 'Run Model' tab.
