@@ -7,9 +7,9 @@ Running and Understanding the Demo Example
 
 .. _graphical_user_interface_label:
 
-Graphical User Interface
-^^^^^^^^^^^^^^^^^^^^^^^^
-The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.
+Using The Graphical User Interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.  This introduction will goude the user through running the demo example.
 
 GUI Basics
 ----------
@@ -57,9 +57,9 @@ Description of the 'Run Model' page elements:
 *  Element 6 - Run Model
     When everything is properly configured, this button will be enabled for initiation of the OMEGA model run.
 
-Loading The Model Requirements
-------------------------------
-The model requirements are loaded using an existing Configuration File  (:numref:`ug_label6`) or by creating a new model run (:numref:`ug_label7`).
+Running the Demo Example
+^^^^^^^^^^^^^^^^^^^^^^^^
+The elements required to run the model loaded using an existing Configuration File  (:numref:`ug_label6`) or by creating a new model run (:numref:`ug_label7`).  The latter will be used to run the demo example.
 
 ::
 
@@ -73,8 +73,8 @@ From the file menu, select 'Open Configuration File' to launch a standard File E
 
 .. _ug_label7:
 
-Create New Model Run
-++++++++++++++++++++
+Create New Model Run From The Demo Example
+++++++++++++++++++++++++++++++++++++++++++
 If a Configuration File is not available, create a new model run using these steps:
 
 * Select the 'Run Model' tab.
@@ -159,7 +159,7 @@ When the model run is completed, the 'Run Model' page will look similar to :numr
 Final GUI Data:
 
 * The model ending information is detailed in the event monitor.  This includes the time and the Output Batch Directory used.
-* The model status and final model run time are displayed below the 'Run Model' button.
+* The model status and final model run time are displayed adjacent to the 'Run Model' button.
 
 Interpreting the Demo Example Results
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
