@@ -154,7 +154,7 @@
        <rect>
         <x>10</x>
         <y>41</y>
-        <width>1001</width>
+        <width>1079</width>
         <height>51</height>
        </rect>
       </property>
@@ -205,7 +205,7 @@
        <rect>
         <x>10</x>
         <y>141</y>
-        <width>1001</width>
+        <width>1079</width>
         <height>51</height>
        </rect>
       </property>
@@ -227,10 +227,10 @@
      <widget class="QPushButton" name="select_output_batch_directory_button">
       <property name="geometry">
        <rect>
-        <x>1022</x>
-        <y>140</y>
-        <width>62</width>
-        <height>51</height>
+        <x>1040</x>
+        <y>145</y>
+        <width>45</width>
+        <height>45</height>
        </rect>
       </property>
       <property name="font">
@@ -249,8 +249,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>58</width>
-        <height>47</height>
+        <width>35</width>
+        <height>35</height>
        </size>
       </property>
      </widget>
@@ -260,10 +260,10 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>1022</x>
-        <y>40</y>
-        <width>62</width>
-        <height>51</height>
+        <x>1040</x>
+        <y>45</y>
+        <width>45</width>
+        <height>45</height>
        </rect>
       </property>
       <property name="font">
@@ -282,8 +282,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>58</width>
-        <height>47</height>
+        <width>35</width>
+        <height>35</height>
        </size>
       </property>
      </widget>
@@ -292,7 +292,7 @@
        <rect>
         <x>10</x>
         <y>240</y>
-        <width>1001</width>
+        <width>1079</width>
         <height>51</height>
        </rect>
       </property>
@@ -337,7 +337,7 @@
        <rect>
         <x>12</x>
         <y>304</y>
-        <width>62</width>
+        <width>70</width>
         <height>51</height>
        </rect>
       </property>
@@ -346,8 +346,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>71</width>
-        <height>52</height>
+        <width>70</width>
+        <height>51</height>
        </size>
       </property>
      </widget>
@@ -381,7 +381,7 @@
     </widget>
     <widget class="QWidget" name="results_tab">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <attribute name="title">
       <string>Results</string>
@@ -418,6 +418,9 @@
       </property>
      </widget>
      <widget class="QPushButton" name="open_plot_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>530</x>
@@ -473,6 +476,9 @@
       </property>
      </widget>
      <widget class="QPushButton" name="select_plot_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>530</x>
@@ -497,6 +503,9 @@
       </property>
      </widget>
      <widget class="QPushButton" name="select_plot_3">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>530</x>
@@ -519,14 +528,23 @@
       <property name="text">
        <string>Select Current Run</string>
       </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
      </widget>
      <widget class="QTextEdit" name="results_comment">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>50</y>
+        <y>15</y>
         <width>1061</width>
-        <height>301</height>
+        <height>336</height>
        </rect>
       </property>
       <property name="font">
@@ -545,6 +563,14 @@
        <bool>false</bool>
       </property>
      </widget>
+     <zorder>list_graphs_1</zorder>
+     <zorder>available_plots_1_label_2</zorder>
+     <zorder>open_plot_2</zorder>
+     <zorder>list_graphs_2</zorder>
+     <zorder>available_plots_1_label_3</zorder>
+     <zorder>select_plot_3</zorder>
+     <zorder>select_plot_2</zorder>
+     <zorder>results_comment</zorder>
     </widget>
     <widget class="QWidget" name="options_tab">
      <attribute name="title">
@@ -608,7 +634,7 @@
      <rect>
       <x>10</x>
       <y>15</y>
-      <width>91</width>
+      <width>166</width>
       <height>51</height>
      </rect>
     </property>
@@ -684,7 +710,7 @@
     <widget class="QPushButton" name="epa_button">
      <property name="geometry">
       <rect>
-       <x>1025</x>
+       <x>1030</x>
        <y>7</y>
        <width>80</width>
        <height>81</height>

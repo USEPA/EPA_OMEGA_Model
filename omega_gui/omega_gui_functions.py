@@ -179,7 +179,6 @@ def test_plot_2(plot_selection, scenario_selection, plot_select_directory_name, 
     print('path = %s' % path)
     print('gui_path = %s' % gui_path)
 
-    # df = pandas.read_excel('omega_gui/elements/plot_definition.xlsx',index_col=0, sheet_name='plot_definition')
     df = pandas.read_csv(path + 'omega_gui/elements/plot_definition.csv', index_col=0)
 
     if len(plot_selection) > 0:

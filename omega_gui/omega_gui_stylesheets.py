@@ -76,26 +76,37 @@ def button_stylesheet(stylesheet):
 
     stylesheet = """
         QPushButton {
-        background-color: rgb(0, 113, 188);
         border: 0px solid white;
         border-radius: 6px;
         }
         QPushButton:enabled {
-        background-color: rgb(0, 113, 188);
         border: 0px solid white;
         color: white;
         }
         QPushButton:hover {
-        border: 2px solid white;
+        border: 2px solid lightBlue;
         border-radius: 6px;
-        font: bold;
-        color: white;
         }
         QPushButton:pressed {
-        border: 4px solid white;
+        border: 3px solid lightBlue;
         border-radius: 6px;
-        font: bold;
-        color: white;
+        }
+     """
+    return stylesheet
+
+
+def development_stylesheet(stylesheet):
+    """
+    Loads the stylesheet for buttons contained in the gui.
+
+    :param stylesheet:
+    :return: String containing stylesheet.
+    """
+
+    stylesheet = """
+        QTextEdit {
+        background-color: rgba(0, 113, 188, 200);
+        border: 2px solid lightGray;
         }
      """
     return stylesheet
