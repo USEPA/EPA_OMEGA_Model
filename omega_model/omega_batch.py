@@ -1422,7 +1422,14 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
         if not options.no_bundle:
             # copy files to network_batch_path
-            batch.batch_log.logwrite('Bundling Source Files...')
+            batch.batch_log.logwrite('Bundling Source Files and Requirements...')
+
+            # bundle requirements
+            import subprocess
+            v = sys.version_info
+            cmd = '"%s" -m pip freeze > "%s"python_%s_%s_%s_requirements.txt' % \
+                  (sys.executable, options.batch_path, v.major, v.minor, v.micro)
+            subprocess.call(cmd, shell=True)
 
             # go to project top level so we can copy source files
             os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
