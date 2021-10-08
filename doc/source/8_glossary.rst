@@ -11,28 +11,28 @@ Analysis Context:
  The set of assumptions about the future within which the policies are evaluated. Note that all contexts must be internally consistent. Also known as 'Context'
 Analysis Year:
  Any calendar year for which the model is generating results
+Analysis Start Year:
+    The first year for which the model is generating results.
 Baseline Scenarios:
- This is also knows as 'BAU' or 'Reference'. The term is too ambiguous without further clarification. See "Policy Alternatives" and "Context Scenarios" instead.
+ This is also known as 'BAU' or 'Reference'. The term is too ambiguous without further clarification. See "Policy Alternatives" and "Context Scenarios" instead.
 Base Model Year:
  The last model year of the historical fleet
 Base Year:
  The last calendar year of the historical input data. Also known as 'Initial Year'
-Compliance Fleet:
- The fleet of modeled vehicles with Model Year > Initial Year
-Context Scenarios:
- The set of Analysis Contexts that encompass a range of possible inputs representing the future (fuel prices, sales, adoption rates, etc.)
+Candidate Vehicles:
+ The set of vehicles, and their prices and attributes, sent from the Producer Module to the Consumer Module for consideration during the market share iteration between the two modules.
+Consumer Generalized Cost:
+ This is part of the Demo Analysis estimation of market shares, and comes from GCAM-USA. It includes capital costs (including candidate vehicle prices fed in from the Producer Module, and the cost of a home charger), fuel costs, maintenance costs, time cost of fueling, and parameter values for amortization period and discount rate
+Context Policy:
+ The definition of policies which are consistent with all other analysis context assumptions
 Count:
  The number of vehicles registered at a given time. Also known as 'Population'
+Credit:
+ The currency of compliance as measured in Mg CO2 equivalent. In a fleet averaging program, it is determined by the difference between vehicle certified and target emissions aggregated across the producer’s vehicles.
 Effectiveness:
  Incremental percentage reduction in CO2 emissions between two packages
 Generalized Cost:
  Sum of monetary and non-monetary costs of the choices considered by the decision maker. - valuation? What is non-monetary for producers?
-Historical Fleet:
- The vehicles and their attributes that have already been produced in reality, up to and including the base model year
-Initial Analysis Year:
- One year after the initial year. It is the first analysis year
-Legacy Fleet:
- The set of historical vehicles as they are modeled beyond the base year
 Make:
  Consumer recognizable brand of a historical vehicle (e.g. "Chevrolet"). Also known as 'Brand'
 Manufacturer:
@@ -41,39 +41,36 @@ Market Class:
  The categorization of vehicles used for projecting market shares and modeling consumer response to policy through shifts in market shares
 Nameplate:
  Consumer recognizable name of historical vehicles (e.g. "Cruze"). Also known as 'Model'
-No-action Alternative:
- Within any given baseline scenario, the decision to adopt no new OTAQ regulatory actions beyond the existing regulations
+No-action Policy Alternative:
+ The policy alternative from which the effects of the action policy alternatives are measured
 OMEGA:
  Optimization Model for reducing Emissions of Greenhouse Gasses from Automobiles
 On-Road Gap:
  Difference between direct cert emissions and direct on-road emissions
 Policy Alternatives:
  Encompasses both the No-action Alternative and the Action Alternatives. This is a more generic term than the alternatives. Also known as 'Policy Scenarios'
-Powertrain Efficiency:
- Ratio of useful work to total fuel energy
+Produced Vehicles:
+ The set of vehicles and their attributes that lead to convergence in the market share iteration between the Consumer Module and Producer Module. The set of produced vehicles is the final set of candidate vehicles passed from the Producer Module to the Consumer Module.
+Producer Generalized Cost:
+ The total of the monetary expenses of bringing a product to the consumer, and the value the producer expects can be recovered from consumers at the time of purchase
 Regulatory Class:
- The categorization of vehicles defined by the Policy Alternative and considered in the producers compliance decisions and not neccesarilly related to market class classification considered by the consumer
+ The categorization of vehicles defined by the Policy Alternative and considered in the producers' compliance decisions and not necessarily related to market class classification considered by the consumer
+Reregistration:
+ Measures the used vehicle stock, or the vehicles that have been kept in the fleet for onroad use, reregistered, each year
 Scenario:
  This term is too ambiguous without further clarification - avoid using without clarification
 Stock:
- The number of vehicles and their attributes registered at a given time (Legacy Fleet + Compliance Fleet). Also known as 'On-road Fleet'
-Tech Cost:
- The portion of generalized costs associated with producing the vehicle
+ The set of vehicles and their attributes registered at a given time
+Technology Packages:
+ A full set of vehicle design attributes that determine the emissions of an individual candidate vehicle. This includes the combined effects of component efficiencies, component sizing, vehicle weight and road loads on emissions rates over various operating modes (e.g. test cycles.) The technology package would not include attributes that are independent of emissions, such cabin interior features, entertainment system, colors, etc.
+Vehicle Cost:
+ The costs associated with producing a vehicle
 Year:
- Calendar year
+ Calendar year unless otherwise stated
 
 
-Modeling Assumptions:
- DEFINITION
-Producer Generalized Cost:
- DEFINITION. Also referred to as 'PGC'
-Consumer Generalized Cost:
- DEFINITION, ALso referred to as 'CGC'
+
 Price:
- DEFINITION
-Sample:
- DEFINITION
-Default:
  DEFINITION
 Cert:
  DEFINITION
@@ -83,6 +80,5 @@ Direct:
  DEFINITION
 Indirect:
  DEFINITION
-Reregistration:
- DEFINITION
+
 
