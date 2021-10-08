@@ -57,24 +57,14 @@ Description of the 'Run Model' page elements:
 
 Running the Demo Example
 ^^^^^^^^^^^^^^^^^^^^^^^^
-The elements required to run the model loaded using an existing Configuration File  (:numref:`ug_label6`) or by creating a new model run (:numref:`ug_label7`).  The latter will be used to run the demo example.
+The elements required to run the model are loaded by creating a new model run, or by using an existing Configuration File.  As this is the first time the Demo Example will be run, a new model run will be created.
 
 ::
 
     Note: The Event Monitor will provide additional guidance through the model loading process.
 
-.. _ug_label6:
-
-Existing Configuration File
----------------------------
-From the file menu, select 'Open Configuration File' to launch a standard File Explorer window to load an existing Configuration File.  When properly loaded, the 'Run Model' page will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
-
-.. _ug_label7:
-
 Create New Model Run From The Demo Example
 ------------------------------------------
-If a Configuration File is not available, create a new model run using these steps:
-
 * Select the 'Run Model' tab.
 * Load an existing OMEGA Input Batch File using the file menu or button to the right of the field.  (Required)
 * Load a new or existing OMEGA Output Batch Directory using the file menu or button to the right of the field.  (Required)
@@ -82,6 +72,10 @@ If a Configuration File is not available, create a new model run using these ste
 * Use the file menu to save the new Configuration File.  (Optional)
 
 The 'Run Model' page will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
+
+Existing Configuration File
+---------------------------
+If a model run configuration was previously saved, the configuration may be recalled to simplify repeating runs.  From the file menu, select 'Open Configuration File' to launch a standard File Explorer window to load an existing Configuration File.  When properly loaded, the 'Run Model' page will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
 
 .. _ug_label3:
 .. figure:: _static/gui_figures/gui_model_loaded.jpg
@@ -99,7 +93,7 @@ Selecting the 'Options' tab will show a display similar to :numref:`ug_label11` 
 
     GUI Options Page Display
 
-The OMEGA model can be configured to utilize multiple system processors for true multitasking that significantly reduces model completion time.  For example, a typical Intel Core I7(R) has 8 processors total and typically 7 available for OMEGA to utilize.  Checking the 'Enable Multiprocessor' box instructs OMEGA to use multiprocessor mode.  The 'Multiprocessor Help' button provides additional information.
+The OMEGA model can be optionally configured to utilize multiple system processors for true multitasking that significantly reduces model completion time.  For example, a typical Intel Core I7(R) has 8 processors total and typically 7 available for OMEGA to utilize.  Checking the 'Enable Multiprocessor' box instructs OMEGA to use multiprocessor mode.  The 'Multiprocessor Help' button provides additional information.
 
 The Event Monitor will indicate multiprocessor availability during GUI launch as shown in :numref:`ug_label1` above.
 
@@ -152,7 +146,7 @@ When the model run is completed, the 'Run Model' page will look similar to :numr
 .. figure:: _static/ug_figures/gui_model_complete.jpg
     :align: center
 
-    Model Running
+    Model Completed
 
 Final GUI Data:
 
