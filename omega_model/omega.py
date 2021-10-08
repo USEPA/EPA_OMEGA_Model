@@ -226,7 +226,8 @@ def run_producer_consumer():
                     producer_consumer_iteration_num += 1
                 else:
                     if producer_consumer_iteration_num >= omega_globals.options.producer_consumer_max_iterations:
-                        omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
+                        if 'producer' in omega_globals.options.verbose_console_modules:
+                            omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
                                            echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
