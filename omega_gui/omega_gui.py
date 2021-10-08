@@ -820,7 +820,7 @@ class Form(QObject):
                 for root, dirs, files in os.walk(directory):  # Search includes subdirectories
                     for file in files:  # Begin search
                         # Add if .txt file is found and it does not already exist in the log file array
-                        if file.endswith('.txt') and not any(file in x for x in log_file_array):
+                        if file.endswith('.txt') and 'log' in file and not any(file in x for x in log_file_array):
                             fullpath = os.path.join(root, file)  # Generate complete path of file
                             log_file_array.append(fullpath)  # Append filename to log file array
                             log_counter_array.append(0)  # Add another log counter for new file
