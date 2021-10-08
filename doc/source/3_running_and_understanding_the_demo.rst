@@ -2,17 +2,15 @@
 
 .. _running_and_understanding_the_demo_label:
 
-Running and Understanding the Demo Example
-==========================================
+Running the Demo Example using the Graphical User Interface (GUI)
+=================================================================
 
 .. _graphical_user_interface_label:
 
-Using The Graphical User Interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+GUI Basics
+^^^^^^^^^^
 The EPA OMEGA Model is highly modular and can be run using several methods including but not limited to the command line, the Python environment, and the Graphical User Interface (GUI).  The GUI is the best option for new users of OMEGA to reproduce existing model runs and become familiar with the model's input and output structure.  This introduction will guide the user through running the demo example.
 
-GUI Basics
-----------
 After launching the GUI, the 'Run Model' page will appear as shown in :numref:`ug_label1`.
 
 .. _ug_label1:
