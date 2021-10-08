@@ -1427,7 +1427,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             # bundle requirements
             import subprocess
             v = sys.version_info
-            cmd = '%s -m pip freeze > %spython_%s_%s_%s_requirements.txt' % \
+            cmd = '"%s" -m pip freeze > "%s"python_%s_%s_%s_requirements.txt' % \
                   (sys.executable, options.batch_path, v.major, v.minor, v.micro)
             subprocess.call(cmd, shell=True)
 
