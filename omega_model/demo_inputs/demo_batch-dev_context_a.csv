@@ -1,6 +1,6 @@
 Parameter,Type,Value,
 Batch Settings,,,
-Batch Name,String,demo_context_a,
+Batch Name,String,demo_batch-context_a,
 Analysis Final Year,#,2050,
 Consolidate Manufacturers,TRUE / FALSE,TRUE,
 Cost Accrual,end-of-year / beginning-of-year,end-of-year,
