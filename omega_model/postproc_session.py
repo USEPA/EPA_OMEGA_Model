@@ -117,7 +117,25 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
         session_results['average_%s_target_co2e_gpmi' % cat] = average_target_co2e_gpmi_data[cat]
         session_results['%s_co2e_Mg' % cat] = megagrams_data[cat]
 
-    return session_results
+    # write output files
+    summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
+                       + '_summary_results.csv'
+
+    session_results.to_csv(summary_filename, index=False)
+
+    # dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+
+    dump_table_to_csv(omega_globals.options.output_folder, 'vehicles',
+                      omega_globals.options.session_unique_name + '_vehicles',
+                      omega_globals.options.verbose)
+
+    dump_table_to_csv(omega_globals.options.output_folder, 'vehicle_annual_data',
+                      omega_globals.options.session_unique_name + '_vehicle_annual_data',
+                      omega_globals.options.verbose)
+
+    dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
+                      omega_globals.options.session_unique_name + '_manufacturer_annual_data',
+                      omega_globals.options.verbose)
 
 
 def plot_cert_co2e_gpmi(calendar_years):

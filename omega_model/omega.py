@@ -1063,14 +1063,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                 stats = pstats.Stats(profiler)
                 stats.dump_stats('omega_profile.dmp')
 
-            session_summary_results = postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
-
-            # write output files
-            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
-                               + '_summary_results.csv'
-
-            session_summary_results.to_csv(summary_filename, index=False)
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
 
             from context.new_vehicle_market import NewVehicleMarket
 

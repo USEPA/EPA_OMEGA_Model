@@ -197,7 +197,21 @@ def dump_omega_db_to_csv(output_folder, verbose=False):
 
     # dump tables to .csv files using pandas!
     for table in omega_globals.engine.table_names():
-        if verbose:
-            omega_log.logwrite(table)
-        sql_df = pd.read_sql("SELECT * FROM %s" % table, con=omega_globals.engine)
-        sql_df.to_csv('%s/%s_table.csv' % (output_folder, table), index=False)
+        dump_table_to_csv(output_folder, table, '%s_table' % table,  verbose)
+
+
+def dump_table_to_csv(output_folder, table, filename, verbose):
+    """
+    Dump database table to .csv file in an output folder.
+
+    Args:
+        output_folder (str): name of output folder
+        table (str): name of table to dump
+        filename (str): name of the .csv file
+        verbose (bool): enable additional console and logfile output if True
+
+    """
+    if verbose:
+        omega_log.logwrite(table)
+    sql_df = pd.read_sql("SELECT * FROM %s" % table, con=omega_globals.engine)
+    sql_df.to_csv('%s/%s.csv' % (output_folder, filename), index=False)
