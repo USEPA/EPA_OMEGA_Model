@@ -145,7 +145,7 @@ The GUI provides real time information during the model run:
 When the model run is completed, the 'Run Model' page will look similar to :numref:`ug_label5` below.
 
 .. _ug_label5:
-.. figure:: _static/ug_figures/gui_model_complete.jpg
+.. figure:: _static/gui_figures/gui_model_complete.jpg
     :align: center
 
     Model Completed
