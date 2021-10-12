@@ -320,7 +320,7 @@ The Producer Module will first attempt to select the available vehicle design op
 
 In addition to influencing key vehicle attributes by the design decisions, the producer also has some flexibility in how vehicle prices are set. Using cross-subsidization strategies to spur greater sales of some vehicles at the expense of others, producers can incentivize market class sales mix changes in order to reduce generalized costs. This assumption that producers will attempt to minimize their generalized costs is consistent with a producer goal of profit maximization.
 
-In reality, there are limits to the ability of Producers adjust vehicle prices. The user can define upper and lower limits to how much price cross-subsidization can be applied. Also, the model automatically searches only for solutions that maintain the overall average vehicle price, thus forcing any cross-subsidization strategies to be revenue neutral.
+In reality, there are limits to the ability of Producers to adjust vehicle prices. The user can define upper and lower limits to how much price cross-subsidization can be applied. Also, the model automatically searches only for solutions that maintain the overall average vehicle price, thus forcing any cross-subsidization strategies to be revenue neutral.
 
 **Credit management strategy**
 
