@@ -464,7 +464,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         # populate tree with vehicle objects
         for new_veh in composite_vehicles:
-            omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id, new_veh)
+            omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id,
+                                                                      new_veh)
 
         cache[cache_key] = {'composite_vehicles': composite_vehicles,
                             'market_class_tree': market_class_tree,
@@ -504,8 +505,10 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
-            (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console_modules:
-            cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
+            (calendar_year in omega_globals.options.log_producer_iteration_years)) and \
+                'producer' in omega_globals.options.verbose_console_modules:
+            cv.cost_curve.to_csv(omega_globals.options.output_folder +
+                                 '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
         cv.decompose()  # propagate sales to source vehicles
         for veh in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
@@ -525,7 +528,8 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
                                         compliance_id=compliance_id,
                                         cert_target_co2e_Mg=cert_target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
-                                        manufacturer_vehicle_cost_dollars=selected_production_decision['total_cost_dollars'],
+                                        manufacturer_vehicle_cost_dollars=
+                                            selected_production_decision['total_cost_dollars'],
                                         )
     omega_globals.session.flush()
 
