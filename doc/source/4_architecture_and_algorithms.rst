@@ -434,7 +434,7 @@ Once a compliance option is selected through the iteration and convergence proce
 
 .. admonition:: Demo example: Decomposition of composite vehicle
 
-    Because the composite vehicle is made up of individual vehicles of fixed sales shares (at least relative to the other vehicles in the same market class, reg class combination), there is one-and-only-one solution for individual vehicle costs and emissions rates that will result in the selected option for the composite vehicle’s costs and emissions rate.  Figure x.x shows the same orange composite vehicle curve from :numref:`al_label_pm_composite_vehicle_decomposition`, along with star symbols to indicate the selected options for the composite vehicle and associated points for the individual vehicles.
+    Because the composite vehicle is made up of individual vehicles of fixed sales shares (at least relative to the other vehicles in the same market class, reg class combination), there is one-and-only-one solution for individual vehicle costs and emissions rates that will result in the selected option for the composite vehicle’s cost and emissions rate.  :numref:`al_label_pm_composite_vehicle_decomposition` shows the same orange composite vehicle curve from :numref:`al_label_pm_composite_vehicle`, along with star symbols to indicate the selected option for the composite vehicle and associated points for the individual vehicles.
 
     .. _al_label_pm_composite_vehicle_decomposition:
     .. figure:: _static/al_figures/2025_composite_vehicle_non_hauling_ICE_a_reg_class_cost_curve_decomposition.png
