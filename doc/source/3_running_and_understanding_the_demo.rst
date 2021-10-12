@@ -121,6 +121,8 @@ Example Multiprocessor Batch File:
     ECHO ON
     "%PYTHONPATH%python" "%DISPYPATH%dispynode.py" --clean --cpus=%NUM_CPUS% --client_shutdown --ping_interval=15 --daemon --zombie_interval=1
 
+.. _ug_run_the_model:
+
 Run The Model
 -------------
 With all of the model requirements loaded, select the 'Run Model' tab and the 'Model Run' button will be enabled.  Press the 'Model Run' button to start the model run.

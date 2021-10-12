@@ -3,12 +3,14 @@
 
 Model Architecture and Algorithms
 =================================
-OMEGA is structured around four main modules which represent the distinct and interrelated actors and system elements that are most important for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for iteration and convergence between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
+OMEGA is structured around four main modules which represent the distinct and interrelated actors and system elements that are most important for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for `Iteration and Convergence`_ between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
 
-Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to  :ref:`running_and_understanding_the_demo_label` for more information on how to view and rerun the demo analysis.
+Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to  :numref:`ug_run_the_model` for more information on how to view and rerun the demo analysis.
 
 Overall Simulation Process
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. _simulation_scope_and_resolution:
 
 Simulation Scope and Resolution
 --------------------------------------
@@ -48,10 +50,6 @@ An OMEGA analysis can be conducted at various levels of resolution depending on 
 **Market class resolution:** The level of detail, and type of information used within the Producer and Consumer modules is different. For example, we assume that consumers are not aware of the compliance implications and detailed design choices made by the producer, unless those factors are evident in the price, availability, or key attributes of a vehicle. Therefore, consumer decisions regarding the demanded shares of vehicles are modeled based on vehicle characteristics aggregated at the market class level. The user's determination of the appropriate resolution for the market classes will depend on the chosen specification for share response modeling within the Consumer Module. Note that within the Consumer Module, even while share response is modeled at the market class level, other consumer decisions (like reregistration and use) can be based on more detailed vehicle-level information.
 
 **Producer resolution:** The producers in OMEGA are the regulated entities subject to the policy alternatives being analyzed, and are responsible (together with the consumers and policy) for the decisions about the quantities and characteristics of the vehicles produced. The user can choose to model the producers either as an aggregate entity with the assumption that compliance credits are available in an unrestricted market (i.e. 'perfect trading'), or as individual entities with no trading between firms.
-
-.. sidebar:: The Producer's view of consumers
-
-    The producer, as an independent decision-making agent, will not have perfect information about the internal consumer decision process. Within the Producer module, OMEGA allows the user to define the consumer decisions from the producer's perspective, which may be the different (or the same) from the representation within the Consumer Module.
 
 **Consumer resolution:** The approach to account for heterogeneity in consumers is an important consideration when modeling the interaction between producer decisions and the demand for vehicles. By taking advantage of user-definable submodules, a developer can set-up the Consumer Module to account for different responses between consumer segments.
 
@@ -98,7 +96,7 @@ As described in the :numref:`inputs_and_outputs_label` overview, OMEGA model inp
 
 **Policy Alternatives Inputs**
 
-An OMEGA run requires a full description of the GHG standards themselves so that the modeled producer compliance considerations are consistent with how an EPA rule would be defined in the Federal Register and Code of Federal Regulations. As described in Section 4.2, OMEGA is intended primarily for the analysis of fleet averaging standards, and the demo example has been set up to illustrate how accounting rules for GHG credits in a fleet averaging program can be defined. This includes the coefficients for calculating emissions rate targets (gram CO2 per mile) based on vehicle attributes, the methods for determining emissions rate certification values (e.g. drive cycle and fuel definitions, off-cycle credits), and the rules for calculating and accounting for Mg CO2 credits over time (e.g. banking and trading rules, and lifetime VMT assumptions.) See :numref:`al_label_table_policy_alternative_inputs` for a complete list of the policy alternative inputs used in the demo example.
+An OMEGA run requires a full description of the GHG standards themselves so that the modeled producer compliance considerations are consistent with how an EPA rule would be defined in the Federal Register and Code of Federal Regulations. As described in :numref:`Policy Module`, OMEGA is intended primarily for the analysis of fleet averaging standards, and the demo example has been set up to illustrate how accounting rules for GHG credits in a fleet averaging program can be defined. This includes the coefficients for calculating emissions rate targets (gram CO2 per mile) based on vehicle attributes, the methods for determining emissions rate certification values (e.g. drive cycle and fuel definitions, off-cycle credits), and the rules for calculating and accounting for Mg CO2 credits over time (e.g. banking and trading rules, and lifetime VMT assumptions.) See :numref:`al_label_table_policy_alternative_inputs` for a complete list of the policy alternative inputs used in the demo example.
 
 **Analysis Context Inputs**
 
@@ -163,11 +161,41 @@ The analysis context defines the inputs and assumptions that the user assumes ar
 
 Projections and the Analysis Context
 ------------------------------------
-x
+The output of an OMEGA run is a modeled projection of the future. While this projection should not be interpreted as a single point prediction of what will happen, it does represent a forecast that is the result of the modeling algorithms, inputs, and assumptions used for the run. Normally, the projected results for a future year will not remain static for the remainder of the analysis timeframe due to year-to-year changes in the policy, as well changes in producer decisions due to considerations of compliance strategy, credit utilization, and production constraints. Another reason that results in future years will vary is because the exogenous factors in the analysis context are themselves projections of the future, and any year-to-year changes in those factors will influence the model results.
 
+It is important that we consider the relationship between these exogenous projections and the factors being modeled internally within OMEGA to avoid inconsistencies. Three situations are described here, along with an explanation for how the model integrates external projections in a consistent manner.
 
+**Projections that are purely exogenous** For these inputs, the projected item is not influenced at all by the policy response modeled within OMEGA, and is left as specified in the inputs. Examples might include projections of fuel prices, the state of available technology, or upstream emissions factors. While in reality these things might be influenced by the policy alternatives, we are assuming complete independence for modeling purposes, and no additional special treatment is needed for consistency.
 
-.. todo: [[add footnote about terminology, that in the implementation, these are called packages]]
+.. sidebar:: Context policy
+
+    Among the range of assumptions that define the analysis context is an assumption about the light-duty vehicle emissions policy. This is defined as the *context policy*, and is necessarily the first policy alternative session that must be run in order to ensure that the modeled results are consistent with the analysis context.
+
+**Calibrating to projected elements that are also modeled with policy influences** Both the consumer and producer decisions will influence the modeled new vehicle sales and attributes; for example, new vehicle prices, overall sales, sales mix, technology applications, emissions rates and fuel consumption rates. While some of these elements might not be within the scope of the input projections, when a projected element is also modeled as being responsive to policy, OMEGA uses a calibration approach to maintain consistency. Specifically, after calibration, the results of a model run using the context policy will produce results that match the projections in the analysis context. If that were not the case, results for any other policy alternatives could deviate in unrealistic ways from the underlying projections.
+
+.. admonition:: Demo example: Overall sales projections and the context policy
+
+    The overall sales level is an item that is both specified as a projection in the context inputs, and is also modeled internally as responsive to changes in vehicle prices, fuel operating costs, etc. In each batch run (each batch contains two or more policy alternatives), OMEGA automatically calibrates the overall average new vehicle prices in the first session, which represents the context policy. This calibration process ensures that overall sales match the context projected sales by generating calibrated new vehicle prices (P) which are associated with the context. In subsequent sessions of the batch run for the other policy alternatives, these calibrated prices are used as the basis to which any price changes are applied (the P in equation :eq:`al_label_eqn_demand_elasticity`.)
+
+**Elements not explicitly projected in new vehicle market inputs** Some elements related to vehicle attributes and sales mix may be neither part of the projection inputs nor modeled internally, yet still be important to consider in the future projections. The example below describes how sales mix differences between producers are treated in the projections.  In these case, base year vehicle fleet attributes and relative mix characteristics are assumed to hold constant into the future.
+
+.. admonition:: Demo example: Projections for new vehicle size class mix
+
+    In the demo example, overall new vehicle sales projections are taken as purely exogenous. The ‘context_new_vehicle_market.csv’ file specifies the sales mix projections from AEO though 2050 by size class. As shown in :numref:`al_label_fig_context_projections_size_class_share`, the projected sales mix of size classes varies by year, and between context a and context b.
+
+    .. _al_label_fig_context_projections_size_class_share:
+    .. figure:: _static/al_figures/context_projections_size_class_share_by_context_a_b.png
+        :align: center
+
+        Exogenous projections of size class from ‘context_new_vehicle_market.csv’
+
+    All vehicle attributes which are not defined as exogenous projections and not modeled internally are held constant from the base year fleet. For example, while size class projections are provided for overall new sales in each year, the projections are not defined at the individual producer level. Therefore, MY2019 base year relative shares of size classes for each producer are assumed to hold constant in the future. As shown in the left bar chart of :numref:`al_label_fig_context_projections_applied_to_base_year_oem_a_b`, in MY2019 OEM A was more heavily focused on the Large Pickup, Small Utility, and Small Crossover classes, while OEM B was more heavily focused on the Large Utility and Midsize car classes. These relative differences between producers are maintained in the model during the process of applying the size class projections for new sales overall to the individual vehicle projections, and their associated producers, in the base year. The result is shown on the right of Figure :numref:`al_label_fig_context_projections_applied_to_base_year_oem_a_b`. The combined sales of OEM A and OEM B will match the overall new sales size class shares from :numref:`al_label_fig_context_projections_size_class_share`, while retaining the relative tendency for OEM A and OEM B to produce different size class mixes.
+
+    .. _al_label_fig_context_projections_applied_to_base_year_oem_a_b:
+    .. figure:: _static/al_figures/context_projections_applied_to_base_year_oem_a_b.png
+        :align: center
+
+        Context size class projections applied to MY2019 base year vehicles
 
 .. _Policy Module:
 
@@ -263,29 +291,88 @@ The modeling of producer decisions is central to the optimization problem that O
 
     Overview of the Producer Module
 
-**Inputs to the Producer Module**
-Policy Alternative inputs are used to calculate a compliance target for the producer, in Mg CO2 for a given analysis year, using the provided attribute-based standards curve, vehicle regulatory class definitions, and assumed lifetime VMT for compliance. Other policy inputs may define, for example, the credit lifetime for carry-forward and carry-back, or a floor on the minimum share of ZEV vehicles produced.
+**Inputs to the Producer Module:** Policy Alternative inputs are used to calculate a compliance target for the producer (in Mg CO2) for a given analysis year using the provided attribute-based standards curve, vehicle regulatory class definitions, and assumed lifetime VMT for compliance. Other policy inputs may define, for example, the credit lifetime for carry-forward and carry-back, or a floor on the minimum share of ZEV vehicles produced.
 
 Analysis context inputs and assumptions that the Producer Module uses define all factors, apart from the policies under evaluation, that influence the modeled producer decisions. Key factors include the vehicle costs and emissions for the technologies and vehicle attributes considered, and the producer constraints on pricing strategy and cross-subsidization.
 
-**Outputs of the Producer Module**
-x
+During the iteration process, shares of new vehicles demanded are generated by the Consumer Module as inputs to the Producer Module. These shares are at the market class-level, and based on the prices and attributes of the candidate vehicles offered by the producer in that iteration. See :numref:`Iteration and Convergence` for a description of the iteration and convergence algorithms.
+
+**Outputs of the Producer Module:** During the iteration process, the outputs of the Producer Module describe the candidate vehicles -- prices, quantities, and key attributes -- which forms the basis for determining compliance status (by iterating with the Policy Module) and demanded sales shares (by iterating with the Consumer Module.) Once model convergence is achieved, the Producer Module outputs the details of the produced vehicles.
+
+.. _producer_compliance_strategy_section:
+
+Producer Compliance Strategy
+----------------------------
+The Producer Module simulates decisions about vehicle design, pricing, and production quantities that minimize compliance costs while satisfying other considerations imposed by the policy, consumers, and production constraints. With a fleet averaging policy that allows credit banking and trading, the producer is making these product decisions within an overall strategy of managing compliance credits from year-to-year.
+
+**Vehicle design strategy**
+
+
+.. sidebar:: The producer's view of consumers
+
+    The producer, as an independent decision-making agent, will not have perfect information about the internal consumer decision process. Within the Producer module, OMEGA allows the user to define the consumer decisions from the producer’s perspective, which may be the different (or the same) from the representation within the Consumer Module.
+
+While the producer’s modeled objective function is cost minimization, the term ‘cost’ is used generically here, as it is not necessarily the case that the lowest production cost option is the best option for the producer. Consumer willingness to pay for a particular vehicle attribute can result in another choice if the producer expects that the additional production costs can be more than offset by a higher price. Here, the term *producer generalized costs* is defined as the net of vehicle production costs and the producer’s view of consumer’s willingness to pay for that vehicle.
+
+The Producer Module will first attempt to select the available vehicle design options (i.e. tech package applications) and sales mix that minimizes generalized costs while meeting the strategic compliance target (Mg CO2e.) This is the starting point of an iterative process, since in many cases the demand estimated by the Consumer Module will not accept this first set of vehicle attributes, prices, and quantities.
+
+**Vehicle pricing and sales mix strategy**
+
+In addition to influencing key vehicle attributes by the design decisions, the producer also has some flexibility in how vehicle prices are set. Using cross-subsidization strategies to spur greater sales of some vehicles at the expense of others, producers can incentivize market class sales mix changes in order to reduce generalized costs. This assumption that producers will attempt to minimize their generalized costs is consistent with a producer goal of profit maximization.
+
+In reality, there are limits to the ability of Producers adjust vehicle prices. The user can define upper and lower limits to how much price cross-subsidization can be applied. Also, the model automatically searches only for solutions that maintain the overall average vehicle price, thus forcing any cross-subsidization strategies to be revenue neutral.
+
+**Credit management strategy**
+
+With a policy that allows credit banking, the efficient management of compliance credits from year-to-year involves a degree of look-ahead, both in terms of expected changes in regulatory stringency and other policies, and expected changes in generalized costs over time. At this time, OMEGA assumes that producers aim to meet the GHG target in each year, with any banked credits used only to make up small differences between the certification and target values. The producer logic associated with the process box labeled “Determine Strategic Target Offset” in the process flow diagram (:numref:`al_label_overallprocessflow`) therefore simply applies a constant offset to 0 Mg CO2e to the policy GHG target. In a future revision, we plan to consider incorporating producer decisions that are intentionally under- or over-target based on the assumption that producers make strategic decisions looking beyond the immediate present to minimize generalized costs over a longer time horizon.
 
 Vehicle Definitions
 -------------------
-The core unit impacted by decisions in the Producer Module is at the vehicle level. Each OMEGA “vehicle” is defined in the analysis context and represents a set of distinct attributes. In the demo, for example, the attributes associated with each vehicle definition are included in the vehicles.csv file. The figure below shows a subset of attributes that characterize each vehicle in the demo.
+The vehicle is the fundamental unit of analysis within the Producer Module, and the decisions made by producers determine the vehicle attributes and sales in the modeled results. The vehicle resolution is determined by the user (see :numref:`simulation_scope_and_resolution`) consistent with the resolution defined in the base year vehicles input file.  Depending on the focus of a particular run, vehicles might be defined at a market class level using an aggregate representation over multiple producers, or at the nameplate or even subconfiguration level.
 
-.. _mo_label_vehicles:
-.. figure:: _static/mo_figures/vehicles.csv.png
-    :align: center
+Along with a definition of resolution, the base year vehicles inputs also define the key exogenous attributes that are necessary for 1) generating future projections, 2) assigning the policy emissions targets, 3) estimating consumer demanded quantities, 4) determining appropriate emissions rates and costs from the applied technology packages.
 
-    Sample fields in vehicles.csv file
+.. admonition:: Demo example: Vehicle definitions in base year fleet
 
-As shown in :numref:`mo_label_vehicles`, vehicles may be defined in part by manufacturer ID, model year, reg class, electrification class, cost curve class, fuel ID, sales, footprint, rated horsepower, road load hp, test weight, MSRP and towing capacity. A full list of fields used in the demo version can be found by referring to the vehicles.csv file.
+    .. _al_label_table_key_base_year_attributes_and_uses:
+    .. csv-table:: Key base year vehicle attributes and their uses from 'vehicles.csv'
+        :widths: auto
+        :header-rows: 1
+
+        Field Name,Attribute Required For:,Example 1,Example 2,Example 3,Example 4
+        vehicle_name,tracking of producer decisions in modeled results,ICE Large car,ICE Large Crossover truck,ICE-HEV Large Pickup truck 4WD,ICE Large Van truck minivan 4WD
+        manufacturer_id,grouping for producer modeling,OEM_B,OEM_A,OEM_A,OEM_A
+        model_year,determination of analysis start year,2019,2019,2019,2019
+        reg_class_id,reference (assigned by policy in analysis timeframe),car,truck,truck,truck
+        epa_size_class,reference,Large Cars,Standard SUV 2WD,Standard Pick-up Trucks 4WD,"Special Purpose Vehicle, minivan 4WD"
+        context_size_class,sales mix projections,Large,Large Crossover,Large Pickup,Large Van
+        electrification_class,reference (modeled element in analysis timeframe),N,N,HEV,N
+        cost_curve_class,cost and emissions rates for tech packages,ice_MPW_LRL,ice_MPW_HRL,ice_Truck,ice_MPW_HRL
+        in_use_fuel_id,reference (modeled element in analysis timeframe),{'pump gasoline':1.0},{'pump gasoline':1.0},{'pump gasoline':1.0},{'pump gasoline':1.0}
+        cert_fuel_id,reference (modeled element in analysis timeframe),{'gasoline':1.0},{'gasoline':1.0},{'gasoline':1.0},{'gasoline':1.0}
+        sales,sales mix projections,536531,496834,78297,13795
+        cert_direct_oncycle_co2e_grams_per_mile,reference (modeled element in analysis timeframe),345.3,418.6,405.8,403.0
+        cert_direct_oncycle_kwh_per_mile,reference (modeled element in analysis timeframe),0,0,0,0
+        footprint_ft2,policy targets ('Alternative 0' only),50.5,54.7,68.5,56.0
+        eng_rated_hp,reference (modeled element in analysis timeframe),268,318,364,296
+        tot_road_load_hp,reference (modeled element in analysis timeframe),12.5,16.1,19.3,17.3
+        etw_lbs,reference (modeled element in analysis timeframe),4035,5095,5518,5000
+        length_in,reference,195.3,201.6,231.6,200.6
+        width_in,reference,73.8,78.0,80.6,78.1
+        height_in,reference,58.2,71.1,77.0,70.4
+        ground_clearance_in,reference,5.2,8.3,,6.5
+        wheelbase_in,reference,114.0,118.4,143.1,119.3
+        interior_volume_cuft,reference,,148.3,,
+        msrp_dollars,reference (modeled element in analysis timeframe),42554,46592,40740,39962
+        passenger_capacity,policy targets ('Alternative 1' only),5.0,6.6,5.5,7.0
+        payload_capacity_lbs,reference,1030,1438,1748,
+        towing_capacity_lbs,reference,1000,5598,10509,3500
+        unibody_structure,reference,1,1,0,1
+
 
 Vehicle Simulation and Cost Inputs
 ------------------------------------------
-One of the most important sets of inputs to the Producer Module is the simulated vehicles file. It contains the vehicles parameters used by OMEGA to generate all possible vehicle technology (and cost) options available to the producers – these production options represent distinct points in what might be considered a point 'cloud'. The use of these vehicle clouds by OMEGA is described in `veh clouds section`_.
+One of the most important sets of inputs to the Producer Module is the simulated vehicles file. It contains the vehicles parameters used by OMEGA to generate all possible vehicle technology (and cost) options available to the producers – these production options represent distinct points in what might be considered a point 'cloud'. The use of these vehicle clouds by OMEGA is described in :numref:`veh clouds section`.
 
 The simulated vehicle file contains the various vehicles of different core attributes (such as vehicle size, weight, powertrain, etc), the CO2-reducing technologies that are applied to each, and their predicted energy consumption, CO2 performance, and cost. While not required by all users, EPA uses its own simulation tool (ALPHA) to predict the energy consumption and CO2 emissions for each vehicle and technology combination. For the demo, these vehicle and technology options (and associated CO2 performance) are consolidated into the simulated_vehicles.csv file.
 The simulated vehicles csv file contains the following fields for use in the Producer Module:
@@ -301,15 +388,21 @@ Each cost curve class includes multiple vehicles and represents the design space
 
 .. _veh clouds section:
 
-Vehicle Clouds, Frontiers, and Aggregation
+Vehicle Cost Clouds, Cost Curves, and Aggregation
 ------------------------------------------
-Description of the process in applying vehicle clouds:
+The technology packages and their application to candidate vehicles are described in the model inputs as a discrete set of options that were generated using tools and approaches external to OMEGA (e.g. vehicle simulation, benchmarking, cost teardowns, etc.) Because the product design problem being solved is multi-dimensional (i.e. an intersection of technology package applications and market share decisions for multiple vehicles), the choice set must be built up from various combinations of vehicle-level decisions that cannot be readily predicted in advance.
 
-* Use of vehicle clouds in establishing frontiers
-* Interpolation method for identifying best producer options
-* Search of discrete points
+The Producer Module uses an approach of aggregating the discrete, vehicle-level decisions at several levels, while retaining the vehicle-specific information that can be accessed later in other stages of the modeling and presented in the results. These processes of aggregation and decomposition are critical for the solution search process. First, aggregation allows the model to efficiently search for a solution without a complete enumeration of all possible choice combinations. Second, decomposition allows the model to draw upon the key vehicle attribute details that have been retained and are required for calculating the compliance emissions values and estimating the consumer response.
 
-.. admonition:: Demo example: Vehicle clouds
+**Vehicle-level technology application options**
+
+In oder to minimize cost, a producer would need to select the minimum cost package available at a given compliance emissions rate (i.e. g CO2/mi.) This subset of cost-minimizing vehicle technology packages is referred to as the *cost curve*, while the broader set of points is the *cost cloud*. Note that ‘cost’ here is referring to the producer generalized cost, as explained in :numref:`producer_compliance_strategy_section`.
+
+.. admonition:: Demo example: Vehicle cost clouds
+
+    An example cost cloud for vehicle #62, a 4WD minivan in MY2025 is shown in :numref:`al_label_pm_vehicle_cloud`. The costs for the blue points are production costs. The orange point costs are producer generalized costs, and include 5 years of fuel costs at 15,000 miles per year that the producer assumes are valued by consumers at the time of purchase (as defined in the analysis context input file ‘producer_generalized_costs.csv’.) Note that the producer generalized costs are higher than the production costs, and also form a cloud with a different shape than the blue production cost cloud. Essentially, the orange cloud is shifted up and rotated counterclockwise relative to the blue cloud because the tech packages with higher emissions rates also have relatively higher fuel costs that are assumed to factor into consumer purchases.
+
+    :numref:`al_label_pm_vehicle_cloud` also contains the resultant cost curve (black line) that represents the cost-minimizing frontier of the cost cloud. The Producer Module automatically generates this piece-wise linear approximation of the frontier using points in the cloud.
 
     .. _al_label_pm_vehicle_cloud:
     .. figure:: _static/al_figures/2025_ICE_Large_Van_truck_minivan_4WD_cost_curve.png
@@ -317,7 +410,15 @@ Description of the process in applying vehicle clouds:
 
         Example vehicle cloud
 
-.. admonition:: Demo example: Vehicle aggregation
+**Compliance options based on design decisions across multiple vehicles**
+
+Because a producer can offer a range of different vehicles, each with distinct costs associated with applying technology packages, it is not likely that the lowest cost compliance solution will be a uniform application of technology to all vehicles. Nor will selecting the lowest cost option for each vehicle likely result in producer compliance, except in cases where a policy is non-binding. In order to consider design options for multiple vehicles simultaneously, the Producer Module aggregates individual vehicles into composites, with one composite vehicle for each market class and reg class combination. It is important that the resultant cost curves (producer generalized cost vs. g CO2/mi emissions rates) are not aggregated further since 1) aggregating emissions rates across market classes would no longer be valid after iteration with the Consumer Module changes the relative shares of market classes, and 2) aggregating emissions rates across reg classes would, under some policy definitions, make it impossible to calculate the Mg CO2 compliance credits (e.g. in policies cases where the lifetime VMT varies by reg class.)
+
+.. admonition:: Demo example: Vehicle aggregation into market class + reg class cost curves
+
+    :numref:`al_label_pm_composite_vehicle` shows the black cost curve of veh #62 as presented in :numref:`al_label_pm_vehicle_cloud`, along with the other vehicles that are in the same combination of market class (ICE nonhauling) and reg class (‘a’.) Note that the simulated_vehicles.csv file for this demo example does not contain distinct costs and emissions rates for every vehicle. As a result, even though there are 12 vehicles are represented here, they overlay into only three distinct cost curves. If a user provided simulated_vehicles.csv inputs defined with greater resolution, every vehicle could be associated with its own distinct cost curve.
+
+    The bold orange line in :numref:`al_label_pm_composite_vehicle` is the MY2025 cost minimizing frontier made by aggregating the individual vehicle cost curves in the same market class and reg class combination. This curve, along with the other composite vehicle cost curves, is used to generate the producer compliance options.
 
     .. _al_label_pm_composite_vehicle:
     .. figure:: _static/al_figures/2025_composite_vehicle_non_hauling_ICE_a_reg_class_cost_curve_composition.png
@@ -325,19 +426,21 @@ Description of the process in applying vehicle clouds:
 
         Example aggregation of vehicles into a composite vehicle
 
+Once composite vehicle cost curves are generated for each market class and reg class combination, the Producer Module creates compliance options from a combination of design choices for the relative shares of composite vehicles and the emissions rate of each composite vehicle. The resulting compliance options are defined in terms of cost vs. Mg CO2 credits rather than g CO2/mi.  See :numref:`Iteration and Convergence` (iteration and convergence) for more discussion of how the model converges on a solution by searching among these compliance options, and generating interpolated compliance options that are successively more refined with each iteration.
+
+**Extracting key vehicle attributes from the composite vehicles through decomposition**
+
+Once a compliance option is selected through the iteration and convergence process, a user will likely want to know how specific vehicle design decisions contributed to that solution.
+
 .. admonition:: Demo example: Decomposition of composite vehicle
 
-    .. _al_label_pm_composite_vehicle:
+    Because the composite vehicle is made up of individual vehicles of fixed sales shares (at least relative to the other vehicles in the same market class, reg class combination), there is one-and-only-one solution for individual vehicle costs and emissions rates that will result in the selected option for the composite vehicle’s costs and emissions rate.  Figure x.x shows the same orange composite vehicle curve from :numref:`al_label_pm_composite_vehicle_decomposition`, along with star symbols to indicate the selected options for the composite vehicle and associated points for the individual vehicles.
+
+    .. _al_label_pm_composite_vehicle_decomposition:
     .. figure:: _static/al_figures/2025_composite_vehicle_non_hauling_ICE_a_reg_class_cost_curve_decomposition.png
         :align: center
 
         Example decomposition of composite vehicle back to individual vehicles
-
-Producer Compliance Strategy
-----------------------------
-With a policy that allows credit banking, the efficient management of compliance credits from year-to-year involves a degree of look-ahead, both in terms of expected changes in regulatory stringency and other policies, and expected changes in generalized costs over time. At this time, OMEGA assumes that producers aim to meet the GHG target in each year, with any banked credits used only to make up small differences between the certification and target values. In a future revision, we plan to consider incorporating producer decisions that are intentionally under- or over-target based on the assumption that producers make strategic decisions looking beyond the immediate present to minimize generalized costs over a longer time horizon.
-
-The producer’s generalized cost is made up of both the monetary expenses of bringing a product to the consumer, and also the value that the producer expects can be recovered from consumers at the time of purchase. The assumption in OMEGA that producers will attempt to minimize their generalized costs is consistent with a producer goal of profit maximization, subject to any modeling constraints defined in the Consumer Module, such as limiting changes in sales volumes, sales mixes, or select vehicle attributes.
 
 .. _Consumer Module:
 
@@ -397,7 +500,7 @@ The Consumer Module works in two phases: first, an iterative new vehicle phase, 
 In general, the Consumer Module uses exogenous inputs from the analysis context, and endogenous inputs from the Producer Module. The exogenous inputs may include data such as fuel prices, existing vehicle stock, and specific modeling parameters, for example, the parameters used in estimations of vehicle ownership and use decisions. The analysis context must also contain the inputs required to define projections of vehicle ownership and use in the absence of any policy alternatives being analyzed. These projections might be provided directly as inputs to the Consumer Module, such as projections of vehicle ownership from the Annual Energy Outlook (AEO), or generated within the Consumer Module based on exogenous inputs, including future demographic or macroeconomic trends. Endogenous inputs are factors determined within the model and passed to the Consumer Module from the Producer Module. They may include vehicle prices and other relevant vehicle attributes, such as fuel consumption rate. Because the Consumer Module’s internal representation of consumer decisions can be defined by the user, the specific exogenous and endogenous inputs required will depend on the models, methods, and assumptions specified by the user. The vehicle attributes needed as inputs to the Consumer Module are determined by the methods used to estimate new vehicle sales, the market shares of vehicles demanded, used vehicle reregistration, and new and used vehicle use. For example, vehicle attributes used to define market classes must be included as inputs from the Producer Module. As an additional example, if the user defines vehicle sales responses to differ based on consumer income, the user must ensure that income is included in the analysis context inputs.
 
 **Outputs of the Consumer Module**
-The Consumer Module produces two categories of outputs: sales estimates during the iterative Phase 1, and stock and use estimates during the non-iterative Phase 2. During the iterative phase, outputs of the Consumer Module, including new vehicle sales and responsive market shares (explained in the following section), are fed back to the Producer Module for iteration and convergence. See `phase1`_ for more information on what happens during Phase 1, and `Iteration and Convergence`_ for more detailed information on how OMEGA estimates iteration and convergence between the Producer and Consumer modules. Once that convergence is achieved, the Consumer Module estimates the outputs of the stock of vehicles, including both new and reregistered used vehicles, and VMT, which are used by the Effects Module.
+The Consumer Module produces two categories of outputs: sales estimates during the iterative Phase 1, and stock and use estimates during the non-iterative Phase 2. During the iterative phase, outputs of the Consumer Module, including new vehicle sales and responsive market shares (explained in the following section), are fed back to the Producer Module for iteration and convergence. See `phase1`_ for more information on what happens during Phase 1, and :numref:`Iteration and Convergence` for more detailed information on how OMEGA estimates iteration and convergence between the Producer and Consumer modules. Once that convergence is achieved, the Consumer Module estimates the outputs of the stock of vehicles, including both new and reregistered used vehicles, and VMT, which are used by the Effects Module.
 
 Market Class Definitions
 ------------------------
@@ -447,7 +550,7 @@ The Consumer Module estimates the total new vehicles sold at the aggregated mark
     In the demo analysis, sales volumes under the no-action alternative are an endogenous input from the analysis context. An elasticity of demand, defined by the user, is used in conjunction with the change in price between a no-action alternative and an action alternative to estimate the change in sales from the no-action alternative level. Demand elasticity is defined as the percent change in the quantity of a good demanded for a 1%  change in the price of that good, where the good demanded in the Consumer Module is new light duty vehicles. They are almost always negative: as the price of a good increases (a positive denominator), the amount of that good purchased falls (a negative numerator). Larger (in absolute value) negative values are associated with more "elastic", or larger, changes in demand for a given change in price. This value represents how responsive consumers are to a change in price. The general elasticity equation is:
 
     .. Math::
-      :label: demand elasticity
+      :label: al_label_eqn_demand_elasticity
 
       E_D=\frac{\frac{\Delta Q} {Q}} {\frac{\Delta P} {P}}
 
@@ -550,54 +653,77 @@ OMEGA finds a solution in each analysis year using an iterative search algorithm
 
 .. admonition:: Demo example: Compliance search
 
+    .. |fig_al_ic_3_a| image:: _static/al_figures/2025_0_producer_compliance_search.png
+        :scale: 50%
+    .. |fig_al_ic_3_b| image:: _static/al_figures/2025_0_producer_compliance_search_colored.png
+        :scale: 50%
+
+    .. csv-table::
+        :widths: auto
+
+        |fig_al_ic_3_a|,|fig_al_ic_3_b|
+
     .. _al_label_ic_3:
-    .. figure:: _static/al_figures/2025_0_producer_compliance_search.png
+    .. figure:: _static/1x1.png
         :align: center
 
-        Example 3
-
-    .. _al_label_ic_4:
-    .. figure:: _static/al_figures/2025_0_producer_compliance_search_colored.png
-        :align: center
-
-        Example 4
+        Initial compliance search
 
     .. _al_label_ic_5:
     .. figure:: _static/al_figures/2025_0_producer_compliance_search_final.png
         :align: center
 
-        Example 5
-
-
-.. admonition:: Demo example: Compliance search
-
-    .. _al_label_ic_1:
-    .. figure:: _static/al_figures/2025_0_average_total_price_absolute_percent_delta.png
-        :align: center
-
-        Example 1
+        Zoom in on producer's initial compliance selection
 
 **'Producer <--> Consumer' Iteration: Market Shares and Pricing**
 
-    .. _al_label_ic_2:
-    .. figure:: _static/al_figures/2025_0_hauling_BEV_abs_market_share_delta.png
+.. admonition:: Demo example: Consumer-Producer iteration
+
+    .. |fig_al_ic_1_a| image:: _static/al_figures/2025_0_average_total_price_absolute_percent_delta.png
+        :scale: 50%
+    .. |fig_al_ic_1_b| image:: _static/al_figures/2025_0_hauling_BEV_abs_market_share_delta.png
+        :scale: 50%
+    .. |fig_al_ic_1_c| image:: _static/al_figures/2025_0_producer_cross_subsidized_prices.png
+        :scale: 50%
+    .. |fig_al_ic_1_d| image:: _static/al_figures/2025_0_producer_cross_subsidy_multipliers.png
+        :scale: 50%
+
+    .. csv-table::
+        :widths: auto
+
+        |fig_al_ic_1_a|,|fig_al_ic_1_b|
+        |fig_al_ic_1_c|,|fig_al_ic_1_d|
+
+    .. _al_label_ic_1:
+    .. figure:: _static/1x1.png
         :align: center
 
-        Example 2
-
-    .. _al_label_ic_6:
-    .. figure:: _static/al_figures/2025_0_producer_cross_subsidized_prices.png
-        :align: center
-
-        Example 6
-
-    .. _al_label_ic_7:
-    .. figure:: _static/al_figures/2025_0_producer_cross_subsidy_multipliers.png
-        :align: center
-
-        Example 7
+        Initial Producer <--> Consumer iteration
 
 **Repeat Iteration of 'Producer <--> Policy' and 'Producer <--> Consumer'**
+
+.. admonition:: Demo example: First iteration beyond '0th' initial iteration
+
+    .. |fig_al_ic_8_a| image:: _static/al_figures/2025_1_average_total_price_absolute_percent_delta.png
+        :scale: 50%
+    .. |fig_al_ic_8_b| image:: _static/al_figures/2025_1_hauling_BEV_abs_market_share_delta.png
+        :scale: 50%
+    .. |fig_al_ic_8_c| image:: _static/al_figures/2025_1_producer_cross_subsidized_prices.png
+        :scale: 50%
+    .. |fig_al_ic_8_d| image:: _static/al_figures/2025_1_producer_cross_subsidy_multipliers.png
+        :scale: 50%
+
+    .. csv-table::
+        :widths: auto
+
+        |fig_al_ic_8_a|,|fig_al_ic_8_b|
+        |fig_al_ic_8_c|,|fig_al_ic_8_d|
+
+    .. _al_label_ic_8:
+    .. figure:: _static/1x1.png
+        :align: center
+
+        Producer <--> Consumer iteration beyond initial iteration
 
 .. _Effects Module:
 

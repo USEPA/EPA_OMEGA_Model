@@ -24,7 +24,7 @@ Candidate Vehicles:
 Consumer Generalized Cost:
  This is part of the Demo Analysis estimation of market shares, and comes from GCAM-USA. It includes capital costs (including candidate vehicle prices fed in from the Producer Module, and the cost of a home charger), fuel costs, maintenance costs, time cost of fueling, and parameter values for amortization period and discount rate
 Context Policy:
- The definition of policies which are consistent with all other analysis context assumptions
+ The vehicle emissions policy (or policies) that is inherent in the analysis context, and consistent with all other analysis context assumptions. This is the first policy alternative session that must be run in order to ensure that the modeled results are consistent with the analysis context.
 Count:
  The number of vehicles registered at a given time. Also known as 'Population'
 Credit:
