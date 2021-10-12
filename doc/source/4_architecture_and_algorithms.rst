@@ -384,7 +384,7 @@ The simulated vehicles csv file contains the following fields for use in the Pro
 * vehicle attributes, such as included technologies, costs
 
 **Significance of the cost curve class:**
-Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class. In the demo, EPA grouped multiple vehicles within a single cost curve class to reduce the number of simulations required to represent the design space and to make the producer decision (manageable). OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class. For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular costs cloud unique to each vehicle. This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
+Each cost curve class includes multiple vehicles and represents the design space for all vehicle options in each class. In the demo, EPA grouped multiple vehicles within a single cost curve class to reduce the number of simulations required to represent the design space. OMEGA producer decisions are made based on discrete vehicle options within each vehicle cost curve class. For possible future consideration, EPA recommends the generation of RSEs (response surface equations) to derive particular cost clouds unique to each vehicle. This would allow for more unique cost and vehicle clouds without excessive simulation calculation burden.
 
 .. _veh clouds section:
 
