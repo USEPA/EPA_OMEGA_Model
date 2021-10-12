@@ -3,7 +3,7 @@
 
 Model Architecture and Algorithms
 =================================
-OMEGA is structured around four main modules which represent the distinct and interrelated actors and system elements that are most important for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for `Iteration and Convergence`_ between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
+OMEGA is structured around four main modules which represent the distinct and interrelated decision-making agents and system elements that are most important for modeling how policy influences the environmental and other effects of the light duty sector. This chapter begins with a description of the simulation process, including the overall flow of an OMEGA run, and fundamental data structures and model inputs. That's followed by descriptions of the algorithms and internal logic of the `Policy Module`_, `Producer Module`_, and `Consumer Module`_, and then by a section on the approach for `Iteration and Convergence`_ between these three modules. Finally, the accounting method is described for the physical and monetary effects in the `Effects Module`_.
 
 Throughout this chapter, references to a demo analysis are included to provide additional specificity to the explanations in the main text. These examples, highlighted in shaded boxes, are also included with the model code. Please refer to  :numref:`ug_run_the_model` for more information on how to view and rerun the demo analysis.
 
@@ -647,11 +647,15 @@ Vehicle use is estimated as the vehicles miles traveled for each vehicle in the 
 
 Iteration and Convergence
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-OMEGA finds a solution in each analysis year using an iterative search algorithm. As shown in the process flow diagram in :numref:`al_label_overallprocessflow`, the model uses two iterative loops; a Producer<-->Policy loop and a Producer<-->Consumer loop. For both loops, convergence criteria must be achieved within a specified tolerance for the simulation to proceed. This section describes those loops in more detail, with additional information from the demo example.
+OMEGA finds a solution in each analysis year using an iterative search algorithm. As shown in the process flow diagram in :numref:`al_label_overallprocessflow`, the model uses two iterative loops; a Producer - Policy loop and a Producer - Consumer loop. For both loops, convergence criteria must be achieved within a specified tolerance for the simulation to proceed. This section describes those loops in more detail, with additional information from the demo example.
 
-**'Producer <--> Policy' Iteration: Compliance Search**
+**'Producer - Policy' Iteration: Compliance Search**
 
-.. admonition:: Demo example: Compliance search
+The iteration process begins with a search for the vehicle design options and market class shares that minimize producer generalized costs, independent of any feedback from the Consumer Module regarding vehicle demand. In this step, individual compliance options are built-up, with each option fully defining the shares of each market class, and the technology package applications on each of the producer’s vehicles. From all these compliance options, a pair of points is selected which are closest, above and below, the strategic GHG target (i.e. Mg CO2e.) In each successive sub-iteration, the search area becomes narrower while also covering the options with greater resolution. Finally, when one of the points in a pair falls below the convergence tolerance for Mg CO2 credits, the closest point is selected as the compliance option for the initial compliance search.
+
+.. admonition:: Demo example: Initial Compliance search
+
+    :numref:`al_label_figure_2025_0_compliance_search` shows the various sub-iterations for the initial compliance search in the demo example for 2025. The left figure shows a number of blue points for the 0th sub-iteration. The two low cost points nearest to 0 Mg CO2e credits form the basis for the search in the next sub-iteration. The right figure show all 15 sub-iterations (0th to 14th), including the points selected in the 0th sub-iteration (blue stars.) Note that the sub-iterations shown by the colored gradient scale have progressively lower costs, and more closely focused around 0 Mg CO2e. The selected compliance option from the initial search is shown by a single red star.
 
     .. |fig_al_ic_3_a| image:: _static/al_figures/2025_0_producer_compliance_search.png
         :scale: 50%
@@ -663,29 +667,41 @@ OMEGA finds a solution in each analysis year using an iterative search algorithm
 
         |fig_al_ic_3_a|,|fig_al_ic_3_b|
 
-    .. _al_label_ic_3:
+    .. _al_label_figure_2025_0_compliance_search:
     .. figure:: _static/1x1.png
         :align: center
 
         Initial compliance search
 
-    .. _al_label_ic_5:
+    :numref:`al_label_figure_2025_0_compliance_search_zoom_in` is another view of the same search, with greater magnification around the selected point and surrounding compliance options,
+
+    .. _al_label_figure_2025_0_compliance_search_zoom_in:
     .. figure:: _static/al_figures/2025_0_producer_compliance_search_final.png
         :align: center
 
         Zoom in on producer's initial compliance selection
 
-**'Producer <--> Consumer' Iteration: Market Shares and Pricing**
+**'Producer - Consumer' Iteration: Market Shares and Pricing**
+
+After a purely cost-minimizing option is selected in the initial compliance search, the Producer Module provides the vehicle attributes and prices, at the market class level, for consideration by the Consumer Module. Within a given Producer-Consumer iteration loop, the vehicle design options are fixed. The search for a solution is based on consideration of various market class share and pricing options. Criteria for convergence include 1) the percent change in average total price, and 2) the difference in the producer and consumer market shares. To achieve convergence, both of these metrics must be close to zero, within the specified tolerance.
 
 .. admonition:: Demo example: Consumer-Producer iteration
 
-    .. |fig_al_ic_1_a| image:: _static/al_figures/2025_0_average_total_price_absolute_percent_delta.png
+    Within a single Producer-Consumer iteration loop, vehicle designs are fixed, but pricing and market class shares vary. :numref:`al_label_figure_2025_0_initial_producer_consumer_iteration` shows the various components of the first Producer-Consumer iteration loop for 2025 in the demo example (context ‘a’, no action policy alternative.)
+
+    The upper left panel shows the range of producer cross-subsidy price multiplier options.  The full range of multipliers in the 0th sub-iteration are dark blue points, which then narrow in range over eight sub-iterations. The final range of multipliers is shown by the red points.
+
+    In the upper right panel, those same pricing options are shown in terms of absolute prices. While the multipliers applied to hauling vehicles cover smaller range than the nonhauling multipliers, the range of absolute prices is similar.
+
+    The two convergence criteria are illustrated in the bottom two panels of :numref:`al_label_figure_2025_0_initial_producer_consumer_iteration` (share delta in the lower left panel, and average total price delta in the lower right panel.) In this Producer-Consumer iteration, the market class shares offered by the producer do not converge with the shares demanded by the consumer over the range of cross-subsidy pricing options available. This is visible in the lower left panel, since the 0.4% share delta value in the final sub-iteration does not meet the convergence criteria. If convergence had been achieved, the iteration process of this analysis year would be complete, and the produced vehicles would be finalized. Otherwise, the iteration with proceed, with a new consideration of vehicle design options offered by the Producer Module.
+
+    .. |fig_al_ic_1_a| image:: _static/al_figures/2025_0_producer_cross_subsidy_multipliers.png
         :scale: 50%
-    .. |fig_al_ic_1_b| image:: _static/al_figures/2025_0_hauling_BEV_abs_market_share_delta.png
+    .. |fig_al_ic_1_b| image:: _static/al_figures/2025_0_producer_cross_subsidized_prices.png
         :scale: 50%
-    .. |fig_al_ic_1_c| image:: _static/al_figures/2025_0_producer_cross_subsidized_prices.png
+    .. |fig_al_ic_1_c| image:: _static/al_figures/2025_0_hauling_BEV_abs_market_share_delta.png
         :scale: 50%
-    .. |fig_al_ic_1_d| image:: _static/al_figures/2025_0_producer_cross_subsidy_multipliers.png
+    .. |fig_al_ic_1_d| image:: _static/al_figures/2025_0_average_total_price_absolute_percent_delta.png
         :scale: 50%
 
     .. csv-table::
@@ -694,7 +710,7 @@ OMEGA finds a solution in each analysis year using an iterative search algorithm
         |fig_al_ic_1_a|,|fig_al_ic_1_b|
         |fig_al_ic_1_c|,|fig_al_ic_1_d|
 
-    .. _al_label_ic_1:
+    .. _al_label_figure_2025_0_initial_producer_consumer_iteration:
     .. figure:: _static/1x1.png
         :align: center
 
@@ -702,15 +718,21 @@ OMEGA finds a solution in each analysis year using an iterative search algorithm
 
 **Repeat Iteration of 'Producer <--> Policy' and 'Producer <--> Consumer'**
 
+When the prior round of iterations is unable to find a converged solution, the process will continue by repeating a series of Producer-Policy compliance searches and Producer-Consumer market share and pricing searches. The process is the same as in the initial iteration, with one exception: that the Producer-Policy compliance search will use the market shares from the prior iteration’s Producer-Consumer search.
+
+These iterations are repeated until the market class share and average total price convergence criteria are met, and the compliance search is complete. At this point, the produced vehicles are logged for consideration in the Consumer Module’s vehicle stock and use submodules, and in the Effects Module.
+
 .. admonition:: Demo example: First iteration beyond '0th' initial iteration
 
-    .. |fig_al_ic_8_a| image:: _static/al_figures/2025_1_average_total_price_absolute_percent_delta.png
+:numref:`al_label_figure_2025_1_further_producer_consumer_iteration` is similar to :numref:`al_label_figure_2025_0_initial_producer_consumer_iteration`, and represents the Producer-Consumer pricing and market class share search in a subsequent round of iteration, after the producer has revised the vehicle design options. Unlike the initial iteration, the range of cross-subsidy pricing flexibility is now sufficient to allow the convergence criteria to be met, as shown in the lower left and lower right panels.
+
+    .. |fig_al_ic_8_a| image:: _static/al_figures/2025_1_producer_cross_subsidy_multipliers.png
         :scale: 50%
-    .. |fig_al_ic_8_b| image:: _static/al_figures/2025_1_hauling_BEV_abs_market_share_delta.png
+    .. |fig_al_ic_8_b| image:: _static/al_figures/2025_1_producer_cross_subsidized_prices.png
         :scale: 50%
-    .. |fig_al_ic_8_c| image:: _static/al_figures/2025_1_producer_cross_subsidized_prices.png
+    .. |fig_al_ic_8_c| image:: _static/al_figures/2025_1_hauling_BEV_abs_market_share_delta.png
         :scale: 50%
-    .. |fig_al_ic_8_d| image:: _static/al_figures/2025_1_producer_cross_subsidy_multipliers.png
+    .. |fig_al_ic_8_d| image:: _static/al_figures/2025_1_average_total_price_absolute_percent_delta.png
         :scale: 50%
 
     .. csv-table::
@@ -719,7 +741,7 @@ OMEGA finds a solution in each analysis year using an iterative search algorithm
         |fig_al_ic_8_a|,|fig_al_ic_8_b|
         |fig_al_ic_8_c|,|fig_al_ic_8_d|
 
-    .. _al_label_ic_8:
+    .. _al_label_figure_2025_1_further_producer_consumer_iteration:
     .. figure:: _static/1x1.png
         :align: center
 
