@@ -626,6 +626,7 @@ After convergence with respect to the sales and shares of new vehicles is achiev
 .. _mo_label_stockflow:
 .. figure:: _static/al_figures/stock_flow.png
     :align: center
+
     Vehicle stock estimation flow diagram
 
 The method of estimating the reregistered fleet is in a user-defined used vehicle reregistration submodule. This method can make use of a static schedule, for example, where a vehicle's age is the only determinant of the proportion of vehicles remaining in the fleet over time, or depend on other vehicle attributes, like VMT. If users update the reregistration submodule to follow a different prescribed static rate, or to allow interdependencies between the rate of reregistration and other vehicle attributes, they need to retain consistency between the reregistration submodule and other submodules, for example the submodules estimating new vehicle sales and total VMT.
