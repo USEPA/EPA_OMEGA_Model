@@ -251,20 +251,8 @@ Emissions standards are defined in OMEGA using a range of policy elements, inclu
         Reg classes, regulatory_classes-alt0[alt1].csv, Regulatory class id's and descriptions.
         Technology mandates, required_sales_share-alt0[alt1].csv, Minimum required production shares as required by the policy.
 
-
-    [add example details]
-
-.. admonition:: Demo example:
-
-    [Off-cycle credits, Certification test procedure, Form of GHG standards, Production incentives, Upstream emissions accounting]
-
 **Policy alternatives requiring specific technologies:**
 This type of policy requires all, or a portion, of a producer’s vehicles to have particular technologies. OMEGA treats these policy requirements as constraints on the producer’s design options. This type of policy alternative input can be defined either separately, or together with a fleet averaging emissions standard; for example, a minimum Zero Emission Vehicle (ZEV) share requirement could be combined with an emissions standard where the certification emissions associated with ZEVs are counted towards the producer’s achieved compliance value.
-
-
-.. admonition:: Demo example: Required sales share
-
-    [add example details]
 
 **Policy representation in the analysis context:**
 Some policies are not modeled in OMEGA as policy alternatives, either because the policy is not aimed directly at the producer as a regulated entity, or because the particular OMEGA analysis is not attempting to evaluate the impact of that policy relative to other alternatives. However, even when a policy is not reflected in any of the analyzed policy alternatives, it may still be appropriate to represent that policy in the Analysis Context inputs. This is especially true when that external policy (or policies) might significantly influence the producer or consumer decisions. Some examples include:
@@ -617,7 +605,7 @@ In addition, the user must specify the price used in the logit equation. This pr
 
 Phase 2: Vehicle Stock and Use
 ------------------------------
-After convergence with respect to the sales and shares of new vehicles is achieved, the Consumer Module estimates total vehicle stock and use. To do so, it needs to keep internal consistency between the number of vehicles demanded and the use of those vehicles. The method of determining total vehicle stock and vehicle use are in user-defined submodules represented by the used vehicle market response element and the new and used vehicle use element in :numref:`al_label_inside_cm`. Vehicle stock is the total onroad registered fleet, including both new vehicles sales and the reregistered (used) vehicles. The data contained in the set of vehicle stock includes both vehicle count, as well as the attributes of the vehicles in the set, including model year and the vehicle features or attributes used to designate market classes. Vehicle use is the measure of how much each vehicle is driven in the analysis year, meaasured in vehicle miles traveled (VMT). VMT is measured at the vehicle level.
+After convergence with respect to the sales and shares of new vehicles is achieved, the Consumer Module estimates total vehicle stock and use. To do so, it needs to keep internal consistency between-  the number of vehicles demanded and the use of those vehicles. The method of determining total vehicle stock and vehicle use are in user-defined submodules represented by the used vehicle market response element and the new and used vehicle use element in :numref:`al_label_inside_cm`. Vehicle stock is the total onroad registered fleet, including both new vehicles sales and the reregistered (used) vehicles. The data contained in the set of vehicle stock includes both vehicle count, as well as the attributes of the vehicles in the set, including model year and the vehicle features or attributes used to designate market classes. Vehicle use is the measure of how much each vehicle is driven in the analysis year, meaasured in vehicle miles traveled (VMT). VMT is measured at the vehicle level.
 
 **Vehicle stock**
 
