@@ -410,14 +410,13 @@ def _unweighted_value(obj, weighted_value, objects, weight_attribute, attribute)
     return (weighted_value * total - weighted_sum) / obj.__getattribute__(weight_attribute)
 
 
-def cartesian_prod(left_df, right_df, drop=False):
+def cartesian_prod(left_df, right_df):
     """
     Calculate cartesian product of the dataframe rows.
 
     Args:
         left_df (DataFrame): 'left' dataframe
         right_df (DataFrame): 'right' dataframe
-        drop (bool): if ``True``, drop join-column '_' from dataframes
 
     Returns:
         Cartesian product of the dataframe rows (the combination of every row in the left dataframe with every row in
@@ -425,25 +424,11 @@ def cartesian_prod(left_df, right_df, drop=False):
 
     """
     import pandas as pd
-    import numpy as np
 
     if left_df.empty:
         return right_df
     else:
-        if '_' not in left_df:
-            left_df['_'] = np.nan
-
-        if '_' not in right_df:
-            right_df['_'] = np.nan
-
-        if drop:
-            leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
-            left_df = left_df.drop('_', axis=1)
-            right_df = right_df.drop('_', axis=1, errors='ignore')
-        else:
-            leftXright = pd.merge(left_df, right_df, on='_')
-
-    return leftXright
+        return pd.merge(left_df, right_df, how='cross')
 
 
 def _generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_level=0.001, verbose=False):
