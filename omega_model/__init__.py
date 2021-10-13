@@ -157,8 +157,8 @@ try:
 
             self.producer_consumer_max_iterations = 2  # recommend 2+
             self.producer_consumer_convergence_tolerance = 1e-3
-            self.producer_compliance_search_min_share_range = 1e-4
-            self.producer_compliance_search_convergence_factor = 0.66
+            self.producer_compliance_search_min_share_range = 1e-5
+            self.producer_compliance_search_convergence_factor = 0.5
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
             self.run_profiler = False

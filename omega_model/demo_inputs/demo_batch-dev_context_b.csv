@@ -1,6 +1,6 @@
 Parameter,Type,Value,
 Batch Settings,,,
-Batch Name,String,demo_batch-context_b,
+Batch Name,String,demo_batch-context_b_dev,
 Analysis Final Year,#,2050,
 Consolidate Manufacturers,TRUE / FALSE,TRUE,
 Cost Accrual,end-of-year / beginning-of-year,end-of-year,
@@ -65,8 +65,8 @@ Verbose Output,TRUE / FALSE,FALSE,FALSE
 Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
 Producer-Consumer Max Iterations,#,2,2
 Producer-Consumer Convergence Tolerance,#,1.00E-03,1.00E-03
-Producer Compliance Search Min Share Range,#,1.00E-04,1.00E-04
-Producer Compliance Search Convergence Factor,#,0.66,0.66
+Producer Compliance Search Min Share Range,#,1.00E-005,1.00E-005
+Producer Compliance Search Convergence Factor,#,0.5,0.5
 Producer Compliance Search Tolerance,#,1.00E-07,1.00E-07
 Producer Cross Subsidy Price Tolerance,#,1.00E-04,1.00E-04
 Run Profiler,TRUE / FALSE,FALSE,FALSE
