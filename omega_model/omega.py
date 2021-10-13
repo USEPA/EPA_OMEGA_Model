@@ -1053,6 +1053,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             if omega_globals.options.run_profiler:
                 # run with profiler
+                omega_log.logwrite('Enabling Profiler...')
                 import cProfile, pstats
                 profiler = cProfile.Profile()
                 profiler.enable()
@@ -1062,6 +1063,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             if omega_globals.options.run_profiler:
                 profiler.disable()
                 stats = pstats.Stats(profiler)
+                omega_log.logwrite('Generating Profiler Dump...')
                 stats.dump_stats('omega_profile.dmp')
 
             postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)

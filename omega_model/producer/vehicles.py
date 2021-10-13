@@ -614,7 +614,7 @@ class CompositeVehicle(OMEGABase):
             vehicle_frontier = v.cost_curve
             vehicle_frontier['veh_%s_market_share' % v.vehicle_id] = v.composite_vehicle_share_frac
 
-            composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier, drop=False)
+            composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier)
 
             prior_market_share_frac = composite_frontier_df['market_share_frac']
             veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_id]
@@ -684,7 +684,7 @@ class CompositeVehicle(OMEGABase):
                                                       , bounds_error=False)
             return cost_dollars(query_co2e_gpmi)
         else:
-            return float(self.cost_curve['new_vehicle_mfr_cost_dollars'])
+            return self.cost_curve['new_vehicle_mfr_cost_dollars'].item()
 
     def get_cert_direct_kwh_pmi_from_cost_curve(self, query_co2e_gpmi):
         """
