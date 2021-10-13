@@ -84,6 +84,8 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
             for cv in market_class_dict[k]:
                 df = pd.DataFrame()
 
+                incremented = False
+
                 if share_range == 1.0:
                     cv.tech_option_iteration_num = 0  # reset vehicle tech option progression
 
@@ -99,8 +101,10 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
                     co2_gpmi_options = np.array([])
                     for idx, combo in candidate_production_decisions.iterrows():
 
-                        if (combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0):
+                        if ((combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
+                                not incremented:
                             cv.tech_option_iteration_num += 1
+                            incremented = True
 
                         tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
                                            cv.tech_option_iteration_num
@@ -115,6 +119,8 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
                         co2_gpmi_options = [veh_max_co2e_gpmi]
                     else:
                         co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
+                        # co2_gpmi_options = np.unique(
+                        #     np.round(co2_gpmi_options, 10))  # filter out redundant tech options
                 else:  # first producer pass, generate full range of options
                     if num_tech_options == 1:
                         co2_gpmi_options = [veh_max_co2e_gpmi]
