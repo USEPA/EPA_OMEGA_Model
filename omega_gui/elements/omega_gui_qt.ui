@@ -56,7 +56,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="iconSize">
      <size>
@@ -173,7 +173,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Input Batch File</string>
+       <string>Select Input Batch File</string>
       </property>
       <property name="placeholderText">
        <string>Select Input Batch File ...</string>
@@ -218,7 +218,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Output Batch Directory</string>
+       <string>Select Output Batch Directory</string>
       </property>
       <property name="placeholderText">
        <string>Select Output Batch Directory ...</string>
