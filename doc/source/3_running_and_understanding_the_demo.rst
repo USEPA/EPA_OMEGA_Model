@@ -75,7 +75,7 @@ The 'Run Model' tab will look similar to :numref:`ug_label3` below.  The display
 
 Existing Configuration File
 ---------------------------
-If a model run configuration was previously saved, the configuration may be reloaded to simplify repeating runs.  From the file menu, select 'Open Configuration File' to launch a standard File Explorer window to load an existing Configuration File.  When properly loaded, the 'Run Model' page will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
+If a model run configuration was previously saved, the configuration may be reloaded to simplify repeating runs.  From the file menu, select 'Open Configuration File' to launch a standard File Explorer window to load an existing Configuration File.  When properly loaded, the 'Run Model' tab will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
 
 .. _ug_label3:
 .. figure:: _static/gui_figures/gui_model_loaded.jpg
@@ -127,7 +127,7 @@ Running The Model
 -----------------
 With all of the model requirements loaded, select the 'Run Model' tab and the 'Model Run' button will be enabled.  Press the 'Model Run' button to start the model run.
 
-As the model is running, the 'Run Model' page will look similar to :numref:`ug_label4` below.
+As the model is running, the 'Run Model' tab will look similar to :numref:`ug_label4` below.
 
 .. _ug_label4:
 .. figure:: _static/gui_figures/gui_model_running.jpg
