@@ -7,9 +7,9 @@ The primary input to OMEGA is the batch definition file which contains rows for 
 
 The line-by-line documentation of the batch definition file is available at :any:`omega_model/omega_batch.py<omega_model.omega_batch>` and won't be repeated here.
 
-Batch definition inputs can be scalar values or input file paths (relative to the batch file and/or absolute).
+Batch definition inputs can be scalar values or input file paths (relative to the location of the batch file and/or absolute).
 
-Several of the input files may dynamically load user-definable modules at runtime.  These files are indicated as ``user_definable`` in the table below.  User-definable inputs and modules are loaded by interpreting the input file ``input_template_name:`` field.  For example, if the input template name of a user-definable input is ``consumer.market_classes`` then the Python module ``omega_model/consumer/market_classes.py`` will be used to load the rest of the input file, which may contain an arbitrary format known to the module.  The process of creating user-definable modules is a topic for :any:`developers<6_developer_guide>`
+Several of the input files may dynamically load user-definable modules at runtime.  These files are indicated as ``user_definable`` in the table below.  User-definable inputs and modules are loaded by interpreting the input file ``input_template_name:`` field. For example, if the input template name of a user-definable input is ``consumer.market_classes`` then the Python module ``omega_model/consumer/market_classes.py`` will be used to load the rest of the input file, which may contain an arbitrary format known to the module. The process of creating user-definable modules is a topic for developers.
 
 Below is a table with links to the modules that load the files and their documentation of the input file formats.
 
