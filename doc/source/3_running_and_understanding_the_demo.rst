@@ -19,15 +19,15 @@ After launching the GUI, the 'Intro' tab will appear as shown in :numref:`ug_lab
 
     GUI 'Intro' Tab
 
-The elements of the GUI 'Run Model' page are shown in :numref:`ug_label2`.
+Selecting the 'Run Model' tab allows the user to set up an OMEGA model run. The elements of the 'Run Model' tab are shown in :numref:`ug_label2`.
 
 .. _ug_label2:
 .. figure:: _static/gui_figures/gui_run_model_page_elements.jpg
     :align: center
 
-    GUI 'Run Model' Page Elements
+    GUI 'Run Model' Tab Elements
 
-Description of the 'Run Model' page elements:
+Description of the 'Run Model' tab elements:
 
 ::
 
@@ -41,7 +41,7 @@ Description of the 'Run Model' page elements:
     Note: The 'Results' tab is not currently active.
 
 *  Element 2 - Input Batch File
-    Allows the user to select the Input Batch File.  The Input Batch File is a standard OMEGA input file that describes the complete parameters for a model run.  The Input Batch File may be selected from the file menu or the "..." button within the element field.  When the Input Batch File is selected, the complete path be displayed.  Hovering the cursor over the complete path will display just the base file name.
+    Allows the user to load the Input Batch File.  The Input Batch File is a standard OMEGA input file that describes the complete parameters for a model run.  The Input Batch File may be selected from the file menu or the "..." button within the element field.  When the Input Batch File is selected, the complete path be displayed.  Hovering the cursor over the complete path will display just the base file name.
 
 *  Element 3 - Output Batch Directory
     Allows the user to select the Output Batch Directory.  The Output Batch Directory instructs OMEGA where to store the results of a model run.  The Output Batch Directory may be selected from the file menu or the folder button within the element field.  When the Output Batch Directory is selected, the complete path be displayed.  Hovering the cursor over the complete path will display just the base file name.
@@ -64,14 +64,14 @@ The elements required to run the model are loaded by creating a new model run, o
     Note: The Event Monitor will provide additional guidance through the model loading process.
 
 Creating a New Model Run From The Demo Example
---------------------------------------------
+----------------------------------------------
 * Select the 'Run Model' tab.
 * Load an existing OMEGA Input Batch File using the file menu or button within the field.  (Required)
 * Select a new or existing OMEGA Output Batch Directory using the file menu or button within the field.  (Required)
 * Add a Project Description.  (Optional)
 * Use the file menu to save the new Configuration File.  (Optional)
 
-The 'Run Model' page will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
+The 'Run Model' tab will look similar to :numref:`ug_label3` below.  The displayed values represent one of the supplied demonstration model configurations.
 
 Existing Configuration File
 ---------------------------
@@ -81,7 +81,7 @@ If a model run configuration was previously saved, the configuration may be relo
 .. figure:: _static/gui_figures/gui_model_loaded.jpg
     :align: center
 
-    GUI Configuration File Loaded
+    Configuration File Loaded
 
 Set Model Run Options
 +++++++++++++++++++++
@@ -91,7 +91,7 @@ Selecting the 'Options' tab will show a display similar to :numref:`ug_label11` 
 .. figure:: _static/gui_figures/gui_options_page.jpg
     :align: center
 
-    GUI Options Page Display
+    GUI Options Tab Display
 
 The OMEGA model can be optionally configured to utilize multiple system processors for true multitasking that significantly reduces model completion time.  Checking the 'Enable Multiprocessor' box instructs OMEGA to use multiprocessor mode.  The 'Multiprocessor Help' button provides additional information.
 
