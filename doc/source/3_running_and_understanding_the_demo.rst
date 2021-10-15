@@ -142,7 +142,7 @@ The GUI provides real time information during the model run:
 * The load on the system CPU and system Memory is monitored in the Windows Status Bar at the bottom of the GUI window.
 * The Event Monitor provides a continuous stream of information gathered from the simultaneous OMEGA processes.
 
-When the model run is completed, the 'Run Model' page will look similar to :numref:`ug_label5` below.
+When the model run is completed, the 'Run Model' tab will look similar to :numref:`ug_label5` below.
 
 .. _ug_label5:
 .. figure:: _static/gui_figures/gui_model_complete.jpg
