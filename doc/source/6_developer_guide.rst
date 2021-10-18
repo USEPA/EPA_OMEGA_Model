@@ -67,3 +67,66 @@ This more advanced installation method has two steps
     pip install -r requirements.txt
 
 ``requirements-conda.txt`` may need to be tailored to the developer's specific operating system and hardware but should serve as a good starting point.
+
+Running From Source Code
+++++++++++++++++++++++++
+
+There are at least three common ways to run OMEGA:
+
+    #. from the GUI (see :any:`2_getting_started` and :any:`3_running_and_understanding_the_demo`)
+    #. as a batch via ``omega_model/omega_batch.py`` (See `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__)
+    #. as a single (default) session via ``omega_model/omega.py`` directly
+
+To run the default session directly from source at the command line:
+
+.. highlight:: none
+
+::
+
+    python omega_model/omega.py
+
+Will produce output such as:
+
+::
+
+    loading omega version X.Y.Z
+    importing XXX.py
+
+    ...
+
+    Initializing OMEGA Demo:
+    importing XYZ.py
+
+    ...
+
+    Running OMEGA Demo:
+
+    Running OMEGA Demo: Manufacturer=OEM_B
+    Running OMEGA Demo:  Year=2020  Iteration=0
+    Running OMEGA Demo:  Year=2020  Iteration=1
+    Running OMEGA Demo:  Year=2021  Iteration=0
+    Running OMEGA Demo:  Year=2021  Iteration=1
+
+    Running OMEGA Demo: Manufacturer=OEM_A
+    Running OMEGA Demo:  Year=2020  Iteration=0
+    Running OMEGA Demo:  Year=2020  Iteration=1
+    Running OMEGA Demo:  Year=2021  Iteration=0
+    Running OMEGA Demo:  Year=2021  Iteration=1
+
+    Calculating tech volumes and shares
+    Saving out/OMEGA Demo_tech_tracking.csv
+
+    Calculating physical effects
+
+    Calculating cost effects
+
+    Discounting costs
+    Saving out/OMEGA Demo_cost_effects.csv
+    Saving out/OMEGA Demo_physical_effects.csv
+
+    Session ended at 2021-10-18 16:27:10
+    Session elapsed time 17.47 seconds
+
+The primary use case for running ``omega.py`` directly is just to confirm the installation or perhaps when it's simpler to debug code without the overhead of the batch process.
+
+For all other development use cases it is recommended to run ``omega_batch.py`` as shown in the :any:`User Guide <5_user_guide>`

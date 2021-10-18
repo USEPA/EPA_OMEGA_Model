@@ -65,7 +65,9 @@ Simulation Sessions
     Policy Alternative Sessions
         Optionally, one or more alternative policy sessions may be defined in subsequent columns. Typically these would be various policies under evaluation via OMEGA or perhaps a single policy with various alternative inputs or assumptions.
 
-OMEGA Batch Command Line Options
+.. _omega_batch_cli:
+
+OMEGA Batch Command Line Interface
     The batch process can be initiated from the OMEGA GUI or from the command line by running ``omega_batch.py`` directly, as in:
 
 ::
