@@ -29,6 +29,8 @@ Selecting the 'Run Model' tab allows the user to set up an OMEGA model run. The 
 
 Description of the 'Run Model' tab elements:
 
+.. highlight:: none
+
 ::
 
     Note: Context help is always available by hovering the cursor over an element.
