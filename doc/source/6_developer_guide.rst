@@ -5,99 +5,65 @@
 Developer Guide
 ===============
 
-Developer Notes
-^^^^^^^^^^^^^^^
+This Developer Guide will assist those interested in the latest (pre-release) version of OMEGA available from source code.  This guide assumes some familiarity with Python programming and development, but also attempts to point newcomers in the right direction where possible.
+
+Github Repository
+-----------------
+
+The development version of OMEGA is available in the ``developer`` branch of the EPA_OMEGA_Model GitHub repository:
+
+https://github.com/USEPA/EPA_OMEGA_Model
+
+The ``developer`` branch contains in-development, pre-release code, subject to change without notice and no guarantees as to stability at any given point in time.  Features may be added or removed and may or may not be used for future rulemakings.
+
+Releases will be available on separate branches that contain only the particular release in question.
+
+The ``developer`` branch can be accessed via ``.zip`` file directly (https://github.com/USEPA/EPA_OMEGA_Model/archive/refs/heads/developer.zip), via GitHub-integrated development environments or via GitHub command-line calls (e.g. ``gh repo clone USEPA/EPA_OMEGA_Model``).
+
+The OMEGA development team uses PyCharm Community Edition to write and debug code, but any Python development environment may be used.
 
 Setup
 -----
 
-``requirements-dev.txt`` contains the packages required for development,
-it will be a superset of the packages required to run ``usepa_omega2``.
+After downloading the source code (via ``.zip`` file or repository cloning), it is necessary to install Python and various required Python packages.
 
-User-required packages will be called out in ``setup.py``.
+Python
+++++++
 
-Set up your environment, virtual or otherwise (such that the desired ``python.exe`` and the Python ``Scripts``
-folder are in your ``PATH``) and run the following commands to get the latest version of ``pip``
-and the required development packages:
+The latest versions of Python are available at https://www.python.org/downloads/
+
+OMEGA has been developed with Python versions 3.6 thru 3.9 and has not been tested with version 3.10 or higher.  If you already have Python installed, there is probably no reason to update to a newer version unless one of the required packges is not compatible with earlier versions of Python.
+
+The recommended practice is to run the source code in a virtual environment, which may be set up manually or via the IDE.  The virtual environment isolates the installation of OMEGA-required Python packages from whatever packages may have already been installed at the system level.  This allows a 'clean' installation that can guarantee no known conflicts between packages.
+
+Required Packages
++++++++++++++++++
+
+In addition to Python, OMEGA requires several publicly available Python packages in order to run.  These are detailed in the ``requirements.txt`` file.
+
+Simple Install
+^^^^^^^^^^^^^^
+
+The simplest way to install the packages is to use ``pip``, the package installer for Python.  Sometimes there is an updated version of ``pip`` available.  The command-line code below updates ``pip`` and installs the packages detailed in ``requirements.txt``.
 
 ::
 
     python -m pip install --upgrade pip setuptools
-    pip install -r requirements-dev.txt
+    pip install -r requirements.txt
 
-You can test your install with the following:
+``conda`` / ``pip`` install
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Many of the most popular Python packages include pre-compiled versions that are intended for specific hardware.  However, depending on your development environment (ARM-based Mac, for example) it may be useful (or necessary) to get some of the pre-compiled packages from other sources, such as `Anaconda <https://anaconda.org>`_ / `Conda <https://docs.conda.io/en/latest/>`_.  A lightweight ``conda`` install is available via `miniforge <https://github.com/conda-forge/miniforge>`_.  The full `Anaconda <https://anaconda.org>`_ installation is quite large, so if it is not already installed then it is recommended to use something like `miniforge <https://github.com/conda-forge/miniforge>`_ instead.
+
+This more advanced installation method has two steps
+
+    * install available pre-compiled packages via ``conda``
+    * install any remaining packages via ``pip``
 
 ::
 
-    bumpversion --help
-    twine --help
+    conda install --file requirements-conda.txt
+    pip install -r requirements.txt
 
-Versioning and Distribution Tools
----------------------------------
-
-The ``versioning`` folder contains batch files for updating code version numbers and
-creating distributions that can be uploaded to PyPi, for example.
-
-Versioning
-++++++++++
-
-``bump_version.bat`` can be used to increment the code version number.  There are three components to the version #.
-The format is major.minor.patch.  So version 1.2.3 would be major version 1, minor version 2, patch version 3.
-
-``bump_version`` can be used as follows to increment the patch, minor and major version numbers respectively::
-
-    bump_version patch
-    bump_version minor
-    bump_version major
-
-``bump_version`` uses the ``bump2version`` Python package to update version numbers
-in ``setup.py`` and ``__init__.py``.
-
-.. note::
-    Once a particular version number has been uploaded (to PyPi, for example) it cannot ever be reused.  So if you
-    accidentally bump the major version and upload it, you have to live with the new version number forever, as far as
-    I can tell!
-
-Distribution
-++++++++++++
-
-``build_dist.bat`` can be used to create source or binary distributions for upload to PyPi, for exmaple.
-
-``build_dist`` takes no arguments and places the latest build in a ``dist`` folder, prior versions are moved to a
-``dist_old`` folder.
-
-.. note::
-
-    Should distributions be put out on the network?  Right now they are only whatever machine runs ``build_dist``.
-
-``build_dist`` uses the ``setuptools`` and ``twine`` Python packages to build the distributable files and upload
-them to the internet.
-
-``twine`` will ask for a username and password in order to upload the files to the appropriate destination site.
-
-Documentation
--------------
-
-Project documentation primarily takes the form of reStructuredText (``.rst``) files.  Here are some helpful references:
-
-http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
-
-https://devguide.python.org/documenting/
-
-https://github.com/ralsina/rst-cheatsheet/blob/master/rst-cheatsheet.rst
-
-FAQ
-^^^
-
-Multiprocessor Mode
--------------------
-
-Dispy and Pycos Versions
-++++++++++++++++++++++++
-
-Some versions of dispy and pycos have proved to be incompatible with each other.  The following versions have been tested together successfully:
-
-* dispy v4.12.2 and pycos v4.18.15
-* dispy v4.12.4 and pycos v4.11.0
-
-
+``requirements-conda.txt`` may need to be tailored to the developer's specific operating system and hardware but should serve as a good starting point.
