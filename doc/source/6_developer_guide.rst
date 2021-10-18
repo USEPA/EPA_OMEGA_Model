@@ -25,7 +25,7 @@ The OMEGA development team uses PyCharm Community Edition to write and debug cod
 Setup
 -----
 
-After downloading the source code (via ``.zip`` file or repository cloning), it is necessary to install Python and various required Python packages.
+After downloading the source code (via ``.zip`` file or cloning the repository), it is necessary to install Python and various required Python packages.
 
 Python
 ++++++
