@@ -465,7 +465,7 @@ def plot_vehicle_cost(calendar_years):
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Cost by Mkt Cls.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s V Cost Mkt Cls.png' % omega_globals.options.session_unique_name)
 
     return average_cost_data
 
@@ -556,7 +556,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
               % (compliance_id, omega_globals.options.session_unique_name))
     # ax1.set_ylim(15e3, 80e3)
     ax1.legend(market_classes)
-    fig.savefig(omega_globals.options.output_folder + '%s V Cost by Mkt Cls %s.png'
+    fig.savefig(omega_globals.options.output_folder + '%s V Cost Mkt Cls %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
     return average_cost_data
