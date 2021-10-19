@@ -19,7 +19,7 @@ New Vehicle Price Elasticity of Demand,#,-1,
 Onroad Fuels File,String,analysis_contexts\context_b\onroad_fuels.csv,
 Onroad Vehicle Calculations File,String,analysis_contexts\context_b\onroad_vehicle_calculations.csv,
 Onroad VMT File,String,analysis_contexts\context_b\annual_vmt_fixed_by_age.csv,
-Producer Cross Subsidy Multiplier Max,#,2.0,
+Producer Cross Subsidy Multiplier Max,#,2,
 Producer Cross Subsidy Multiplier Min,#,0.5,
 Producer Generalized Cost File,String,analysis_contexts\context_b\producer_generalized_cost.csv,
 Production Constraints File,String,analysis_contexts\context_b\production_constraints-cntxt_b.csv,
@@ -54,25 +54,3 @@ Policy Fuels File,String,policy_alternatives\alt0_baseline_policy\policy_fuels-a
 Production Multipliers File,String,policy_alternatives\alt0_baseline_policy\production_multipliers-alt0.csv,policy_alternatives\alt1_action_alternative\production_multipliers-alt1.csv
 Regulatory Classes File,String,policy_alternatives\alt0_baseline_policy\regulatory_classes-alt0.csv,policy_alternatives\alt1_action_alternative\regulatory_classes-alt1.csv
 Required Sales Share File,String,policy_alternatives\alt0_baseline_policy\required_sales_share-alt0.csv,policy_alternatives\alt1_action_alternative\required_sales_share-alt1.csv
-,,,
-Developer Settings,,,
-Num Market Share Options,#,3,3
-Num Tech Options per ICE Vehicle,#,3,3
-Num Tech Options per BEV Vehicle,#,1,1
-Cost Curve Frontier Affinity Factor,#,0.75,0.75
-Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
-Verbose Output,TRUE / FALSE,FALSE,FALSE
-Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
-Producer-Consumer Max Iterations,#,2,2
-Producer-Consumer Convergence Tolerance,#,1.00E-03,1.00E-03
-Producer Compliance Search Min Share Range,#,1.00E-04,1.00E-04
-Producer Compliance Search Convergence Factor,#,0.66,0.66
-Producer Compliance Search Tolerance,#,1.00E-07,1.00E-07
-Producer Cross Subsidy Price Tolerance,#,1.00E-04,1.00E-04
-Run Profiler,TRUE / FALSE,FALSE,FALSE
-Flat Context,TRUE / FALSE,FALSE,FALSE
-Flat Context Year,#,2020,2020
-Verbose Console Modules,"['producer', 'consumer'] or subset or []",['producer'],['producer']
-Log Producer Iteration Years," 'all' or [year, ...] or []",[2025],[2025]
-Log Consumer Iteration Years," 'all' or [year, ...] or []",[2025],[2025]
-Log Producer Decision and Response Years," 'all' or [year, ...] or []",[2025],[2025]

@@ -173,10 +173,10 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Input Batch File</string>
+       <string>Load Input Batch File</string>
       </property>
       <property name="placeholderText">
-       <string>Select Input Batch File ...</string>
+       <string>Load Input Batch File ...</string>
       </property>
      </widget>
      <widget class="QLabel" name="output_batch_directory_1_label">
@@ -218,7 +218,7 @@
        </font>
       </property>
       <property name="toolTip">
-       <string>Output Batch Directory</string>
+       <string>Select Output Batch Directory</string>
       </property>
       <property name="placeholderText">
        <string>Select Output Batch Directory ...</string>
@@ -356,7 +356,7 @@
        <rect>
         <x>90</x>
         <y>295</y>
-        <width>181</width>
+        <width>261</width>
         <height>71</height>
        </rect>
       </property>
@@ -742,7 +742,7 @@
      <x>0</x>
      <y>0</y>
      <width>1121</width>
-     <height>24</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu1">

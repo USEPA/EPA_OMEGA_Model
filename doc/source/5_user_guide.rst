@@ -7,9 +7,9 @@ The primary input to OMEGA is the batch definition file which contains rows for 
 
 The line-by-line documentation of the batch definition file is available at :any:`omega_model/omega_batch.py<omega_model.omega_batch>` and won't be repeated here.
 
-Batch definition inputs can be scalar values or input file paths (relative to the batch file and/or absolute).
+Batch definition inputs can be scalar values or input file paths (relative to the location of the batch file and/or absolute).
 
-Several of the input files may dynamically load user-definable modules at runtime.  These files are indicated as ``user_definable`` in the table below.  User-definable inputs and modules are loaded by interpreting the input file ``input_template_name:`` field.  For example, if the input template name of a user-definable input is ``consumer.market_classes`` then the Python module ``omega_model/consumer/market_classes.py`` will be used to load the rest of the input file, which may contain an arbitrary format known to the module.  The process of creating user-definable modules is a topic for :any:`developers<6_developer_guide>`
+Several of the input files may dynamically load user-definable modules at runtime.  These files are indicated as ``user_definable`` in the table below.  User-definable inputs and modules are loaded by interpreting the input file ``input_template_name:`` field. For example, if the input template name of a user-definable input is ``consumer.market_classes`` then the Python module ``omega_model/consumer/market_classes.py`` will be used to load the rest of the input file, which may contain an arbitrary format known to the module. The process of creating user-definable modules is a topic for developers.
 
 Below is a table with links to the modules that load the files and their documentation of the input file formats.
 
@@ -65,7 +65,9 @@ Simulation Sessions
     Policy Alternative Sessions
         Optionally, one or more alternative policy sessions may be defined in subsequent columns. Typically these would be various policies under evaluation via OMEGA or perhaps a single policy with various alternative inputs or assumptions.
 
-OMEGA Batch Command Line Options
+.. _omega_batch_cli:
+
+OMEGA Batch Command Line Interface
     The batch process can be initiated from the OMEGA GUI or from the command line by running ``omega_batch.py`` directly, as in:
 
 ::
@@ -126,7 +128,7 @@ Selecting Sessions to Run
     Sessions can be enabled or disabled within the batch file by setting the ``Enable Session`` field to ``TRUE`` or ``FALSE``, respectively.  Alternatively, the ``--session_num`` argument can be passed to ``omega_batch``.  The reference session is session number ``0``.  The reference session cannot be disabled, regardless of the ``Enable Session`` field value, as it generates baseline vehicle prices that the other sessions require in order to calculate overall vehicle sales.
 
 Understanding the Batch Process
-    The first step in the batch process is to copy the complete source code to the bundle folder (in the ``omega_model`` directory) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  Also within the bundle folder is the original batch definition file as well as a timestamped batch definition file which is what is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.
+    The first step in the batch process is to copy the complete source code to the bundle folder (in the ``omega_model`` directory) and to create subfolders for each active session.  Within each session folder will be an ``in`` folder (and an ``out`` folder will be created when the session runs).  The bundle folder contains the original batch definition file as well as a timestamped batch definition file that is actually run.  The timestamped file has the original batch settings with new session input file paths relative to the bundle.  The bundle folder contains a ``requirements.txt`` file for reference.  The requirements file indicates the version of Python used to run the batch and contains the list of installed Python packages and their versions at the time, e.g. ``python_3_9_6_requirements.txt``.
 
     The batch itself and each session will have a log file indicating the progress and success or failure of the process.  The batch log file is named ``batch_logfile.txt`` and exists at the top of the bundle folder.  Session logs have the prefix ``o2log_`` and are located in each session's ``out`` folder.
 

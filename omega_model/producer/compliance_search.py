@@ -84,6 +84,8 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
             for cv in market_class_dict[k]:
                 df = pd.DataFrame()
 
+                incremented = False
+
                 if share_range == 1.0:
                     cv.tech_option_iteration_num = 0  # reset vehicle tech option progression
 
@@ -99,8 +101,10 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
                     co2_gpmi_options = np.array([])
                     for idx, combo in candidate_production_decisions.iterrows():
 
-                        if (combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0):
+                        if ((combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
+                                not incremented:
                             cv.tech_option_iteration_num += 1
+                            incremented = True
 
                         tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
                                            cv.tech_option_iteration_num
@@ -115,6 +119,8 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
                         co2_gpmi_options = [veh_max_co2e_gpmi]
                     else:
                         co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
+                        # co2_gpmi_options = np.unique(
+                        #     np.round(co2_gpmi_options, 10))  # filter out redundant tech options
                 else:  # first producer pass, generate full range of options
                     if num_tech_options == 1:
                         co2_gpmi_options = [veh_max_co2e_gpmi]
@@ -464,7 +470,8 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         # populate tree with vehicle objects
         for new_veh in composite_vehicles:
-            omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id, new_veh)
+            omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id,
+                                                                      new_veh)
 
         cache[cache_key] = {'composite_vehicles': composite_vehicles,
                             'market_class_tree': market_class_tree,
@@ -504,8 +511,10 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
         # update sales, which may have changed due to consumer response and iteration
         cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
-            (calendar_year in omega_globals.options.log_producer_iteration_years)) and 'producer' in omega_globals.options.verbose_console_modules:
-            cv.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
+            (calendar_year in omega_globals.options.log_producer_iteration_years)) and \
+                'producer' in omega_globals.options.verbose_console_modules:
+            cv.cost_curve.to_csv(omega_globals.options.output_folder +
+                                 '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
         cv.decompose()  # propagate sales to source vehicles
         for veh in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
@@ -525,7 +534,8 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
                                         compliance_id=compliance_id,
                                         cert_target_co2e_Mg=cert_target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
-                                        manufacturer_vehicle_cost_dollars=selected_production_decision['total_cost_dollars'],
+                                        manufacturer_vehicle_cost_dollars=
+                                            selected_production_decision['total_cost_dollars'],
                                         )
     omega_globals.session.flush()
 
@@ -718,8 +728,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     production_options['producer_search_iteration'] = search_iteration
     production_options['selected_production_option'] = False
-    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'])  # / tech_share_combos_total['total_generalized_cost_dollars']
-    production_options['slope'] = 0
+    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'])
 
     compliant_tech_share_options = mini_df[(mini_df['total_credits_with_offset_co2e_megagrams']) >= 0].copy()
     non_compliant_tech_share_options = mini_df[(mini_df['total_credits_with_offset_co2e_megagrams']) < 0].copy()
@@ -734,23 +743,29 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         # grab best non-compliant option
         non_compliant_tech_share_options['weighted_slope'] = \
             non_compliant_tech_share_options['strategic_compliance_ratio'] * \
-            ((non_compliant_tech_share_options[cost_name] - float(lowest_cost_compliant_tech_share_option[cost_name])) /
-            (non_compliant_tech_share_options['strategic_compliance_ratio'] - float(lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'])))
+            ((non_compliant_tech_share_options[cost_name] - lowest_cost_compliant_tech_share_option[cost_name].item()) /
+            (non_compliant_tech_share_options['strategic_compliance_ratio'] -
+             lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
-        best_non_compliant_tech_share_option = production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
+        best_non_compliant_tech_share_option = \
+            production_options.loc[[non_compliant_tech_share_options['weighted_slope'].idxmin()]]
 
-        if float(best_non_compliant_tech_share_option[cost_name]) > float(lowest_cost_compliant_tech_share_option[cost_name]):
+        if best_non_compliant_tech_share_option[cost_name].item() > \
+                lowest_cost_compliant_tech_share_option[cost_name].item():
             # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
             compliant_tech_share_options['weighted_slope'] = \
                 compliant_tech_share_options['strategic_compliance_ratio'] * \
-                ((compliant_tech_share_options[cost_name] - float(best_non_compliant_tech_share_option[cost_name])) /
-                (compliant_tech_share_options['strategic_compliance_ratio'] - float(best_non_compliant_tech_share_option['strategic_compliance_ratio'])))
+                ((compliant_tech_share_options[cost_name] - best_non_compliant_tech_share_option[cost_name].item()) /
+                (compliant_tech_share_options['strategic_compliance_ratio'] -
+                 best_non_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
-            best_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
+            best_compliant_tech_share_option = \
+                production_options.loc[[compliant_tech_share_options['weighted_slope'].idxmax()]]
         else:
             best_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
-        candidate_production_decisions = pd.DataFrame.append(best_compliant_tech_share_option, best_non_compliant_tech_share_option)
+        candidate_production_decisions = \
+            pd.DataFrame.append(best_compliant_tech_share_option, best_non_compliant_tech_share_option)
 
     elif compliant_tech_share_options.empty:
         # grab best non-compliant option (least under-compliance)

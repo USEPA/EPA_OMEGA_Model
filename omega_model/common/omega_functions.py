@@ -110,27 +110,17 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
                 # calculate frontier factor (more negative is more better) = slope of each point relative
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                cloud = cloud.loc[cloud[x_key] > prior_x] # .copy()
-                cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
-                                           ** omega_globals.options.cost_curve_frontier_affinity_factor
-                # find next frontier point (lowest slope), if there is one, and add to frontier list
+                cloud = cull_cloud(cloud, prior_x, x_key)
+
+                calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
                 min_frontier_factor = cloud['frontier_factor'].min()
 
                 if min_frontier_factor > 0 and allow_upslope:
-                    # frontier factor is different for up-slope (swap x & y and invert "y")
-                    cloud['frontier_factor'] = (prior_x - cloud[x_key]) / (cloud[y_key] - prior_y) \
-                                               ** omega_globals.options.cost_curve_frontier_affinity_factor
+                    calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
                     min_frontier_factor = cloud['frontier_factor'].min()
 
                 if not cloud.empty:
-                    if not np.isinf(min_frontier_factor):
-                        if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
-                            # if multiple points with the same slope, take the one with the highest x-value
-                            idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
-                        else:
-                            idxmin = cloud['frontier_factor'].idxmin()
-                    else:
-                        idxmin = cloud['frontier_factor'].idxmax()
+                    idxmin = get_idxmin(cloud, idxmin, min_frontier_factor, x_key)
 
                     if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                         frontier_pts.append(cloud.loc[idxmin])
@@ -142,6 +132,41 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
     frontier_df['frontier_factor'] = 0
 
     return frontier_df.copy()
+
+
+def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
+    import numpy as np
+
+    if not np.isinf(min_frontier_factor):
+        if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
+            # if multiple points with the same slope, take the one with the highest x-value
+            idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
+        else:
+            idxmin = cloud['frontier_factor'].idxmin()
+    else:
+        idxmin = cloud['frontier_factor'].idxmax()
+    return idxmin
+
+
+def calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
+    import common.omega_globals as omega_globals
+
+    # frontier factor is different for up-slope (swap x & y and invert "y")
+    cloud['frontier_factor'] = (prior_x - cloud[x_key]) / (cloud[y_key] - prior_y) \
+                               ** omega_globals.options.cost_curve_frontier_affinity_factor
+
+
+def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
+    import common.omega_globals as omega_globals
+
+    cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
+                               ** omega_globals.options.cost_curve_frontier_affinity_factor
+    # find next frontier point (lowest slope), if there is one, and add to frontier list
+
+
+def cull_cloud(cloud, prior_x, x_key):
+    cloud = cloud.loc[cloud[x_key] > prior_x]  # .copy()
+    return cloud
 
 
 def print_dict(dict_in, num_tabs=0):
@@ -410,14 +435,13 @@ def _unweighted_value(obj, weighted_value, objects, weight_attribute, attribute)
     return (weighted_value * total - weighted_sum) / obj.__getattribute__(weight_attribute)
 
 
-def cartesian_prod(left_df, right_df, drop=False):
+def cartesian_prod(left_df, right_df):
     """
     Calculate cartesian product of the dataframe rows.
 
     Args:
         left_df (DataFrame): 'left' dataframe
         right_df (DataFrame): 'right' dataframe
-        drop (bool): if ``True``, drop join-column '_' from dataframes
 
     Returns:
         Cartesian product of the dataframe rows (the combination of every row in the left dataframe with every row in
@@ -425,25 +449,11 @@ def cartesian_prod(left_df, right_df, drop=False):
 
     """
     import pandas as pd
-    import numpy as np
 
     if left_df.empty:
         return right_df
     else:
-        if '_' not in left_df:
-            left_df['_'] = np.nan
-
-        if '_' not in right_df:
-            right_df['_'] = np.nan
-
-        if drop:
-            leftXright = pd.merge(left_df, right_df, on='_').drop('_', axis=1)
-            left_df = left_df.drop('_', axis=1)
-            right_df = right_df.drop('_', axis=1, errors='ignore')
-        else:
-            leftXright = pd.merge(left_df, right_df, on='_')
-
-    return leftXright
+        return pd.merge(left_df, right_df, how='cross')
 
 
 def _generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_level=0.001, verbose=False):
@@ -564,7 +574,7 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
             min_val = np.maximum(min_constraints[k], val - half_range_frac)
             max_val = np.minimum(max_constraints[k], val + half_range_frac)
             shares = np.append(np.append(shares, np.linspace(min_val, max_val, num_steps)), val) # create new share spread and include previous value
-        dfs.append(pd.DataFrame({k: unique(shares)}))
+        dfs.append(pd.DataFrame({k: np.unique(np.round(shares, 10))}))
 
     dfx = pd.DataFrame()
     for df in dfs:

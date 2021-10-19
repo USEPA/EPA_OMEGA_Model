@@ -15,3 +15,6 @@ pyinstaller
 
 # for visualizing profiler results
 snakeviz
+
+# for pushing packages to PyPi
+twine

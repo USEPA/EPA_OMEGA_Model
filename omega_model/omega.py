@@ -226,7 +226,8 @@ def run_producer_consumer():
                     producer_consumer_iteration_num += 1
                 else:
                     if producer_consumer_iteration_num >= omega_globals.options.producer_consumer_max_iterations:
-                        omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
+                        if 'producer' in omega_globals.options.verbose_console_modules:
+                            omega_log.logwrite('PRODUCER-CONSUMER MAX ITERATIONS EXCEEDED, ROLLING BACK TO BEST ITERATION',
                                            echo_console=True)
                         producer_decision_and_response = best_winning_combo_with_sales_response
 
@@ -1052,6 +1053,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             if omega_globals.options.run_profiler:
                 # run with profiler
+                omega_log.logwrite('Enabling Profiler...')
                 import cProfile, pstats
                 profiler = cProfile.Profile()
                 profiler.enable()
@@ -1061,16 +1063,10 @@ def run_omega(session_runtime_options, standalone_run=False):
             if omega_globals.options.run_profiler:
                 profiler.disable()
                 stats = pstats.Stats(profiler)
+                omega_log.logwrite('Generating Profiler Dump...')
                 stats.dump_stats('omega_profile.dmp')
 
-            session_summary_results = postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
-
-            # write output files
-            summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
-                               + '_summary_results.csv'
-
-            session_summary_results.to_csv(summary_filename, index=False)
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
 
             from context.new_vehicle_market import NewVehicleMarket
 
