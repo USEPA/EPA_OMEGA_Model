@@ -6,7 +6,7 @@
 # for omega_model:
 numpy
 matplotlib
-pandas<1.3.0
+pandas>=1.2.0,<1.3.0
 scipy
 SQLAlchemy<1.4.0
 treelib
