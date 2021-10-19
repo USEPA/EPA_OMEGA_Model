@@ -32,7 +32,7 @@ Python
 
 The latest versions of Python are available at https://www.python.org/downloads/
 
-OMEGA has been developed with Python versions 3.6 thru 3.9 and has not been tested with version 3.10 or higher.  If you already have Python installed, there is probably no reason to update to a newer version unless one of the required packges is not compatible with earlier versions of Python.
+OMEGA has been developed with Python versions 3.7.1 (the minimum required version) thru 3.9.6 and has not been tested with version 3.10 or higher.  If you already have Python installed, there is probably no reason to update to a newer version unless one of the required packges is not compatible with earlier versions of Python.
 
 The recommended practice is to run the source code in a virtual environment, which may be set up manually or via the IDE.  The virtual environment isolates the installation of OMEGA-required Python packages from whatever packages may have already been installed at the system level.  This allows a 'clean' installation that can guarantee no known conflicts between packages.
 
