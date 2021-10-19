@@ -168,8 +168,8 @@ Each session folder has an ``out`` folder which contains a number of default out
 
     Abbreviated File Name, File Description
     Cert Mg v Year,"compliance including credit transfers, initial and final compliance state"
-    *** Shares,"absolute market share by market category, market class, regulatory class and context size class"
-    V *** CO2e gpmi,"sales-weighted average vehicle cert and target CO2e g/mi by market category / class"
+    ... Shares,"absolute market share by market category, market class, regulatory class and context size class"
+    V ... CO2e gpmi,"sales-weighted average vehicle cert and target CO2e g/mi by market category / class"
     V kWh pmi,"sales-weighted average vehicle cert direct kWh/mi by market category / class"
     V GenCost,"sales-weighted average vehicle producer generalized cost by market category / class"
     V Mg,"sales-weighted average vehicle cert CO2e Mg by market category / class"
