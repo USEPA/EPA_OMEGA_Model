@@ -27,6 +27,14 @@ Setup
 
 After downloading the source code (via ``.zip`` file or cloning the repository), it is necessary to install Python and various required Python packages.
 
+.. sidebar:: Which Python Version Should I Use?
+
+    OMEGA will work with versions at or above 3.7.1, however, some packages may not be readily available for versions at or above 3.9 and might require downloading a compiler (Visual Studio, for example) or disabling certain features.
+
+    For example, at the time of this writing, the ``netifaces`` package used with ``dispy`` requires building from source on Windows when used with Python >= 3.9.  The ``pip`` install process may not complete if it finds a package it cannot download and cannot build from source, in which case other packages may fail to install even though they are readily available.  The workarounds would be to disable the requirement (comment it out in the requirements file), switch to a compatible version of Python, or download the compiler and attempt to compile from source.
+
+    **The currently recommended Python version is** `Python 3.8.10 <https://python.org/downloads/release/python-3810/>`_ **.**
+
 Python
 ++++++
 
@@ -51,7 +59,7 @@ The simplest way to install the packages is to use ``pip``, the package installe
     python -m pip install --upgrade pip setuptools
     pip install -r requirements.txt
 
-``conda`` / ``pip`` install
+``conda`` / ``pip`` Install
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Many of the most popular Python packages include pre-compiled versions that are intended for specific hardware.  However, depending on your development environment (ARM-based Mac, for example) it may be useful (or necessary) to get some of the pre-compiled packages from other sources, such as `Anaconda <https://anaconda.org>`_ / `Conda <https://docs.conda.io/en/latest/>`_.  A lightweight ``conda`` install is available via `miniforge <https://github.com/conda-forge/miniforge>`_.  The full `Anaconda <https://anaconda.org>`_ installation is quite large, so if it is not already installed then it is recommended to use something like `miniforge <https://github.com/conda-forge/miniforge>`_ instead.
