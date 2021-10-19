@@ -110,27 +110,17 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
                 # calculate frontier factor (more negative is more better) = slope of each point relative
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
-                cloud = cloud.loc[cloud[x_key] > prior_x] # .copy()
-                cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
-                                           ** omega_globals.options.cost_curve_frontier_affinity_factor
-                # find next frontier point (lowest slope), if there is one, and add to frontier list
+                cloud = cull_cloud(cloud, prior_x, x_key)
+
+                calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
                 min_frontier_factor = cloud['frontier_factor'].min()
 
                 if min_frontier_factor > 0 and allow_upslope:
-                    # frontier factor is different for up-slope (swap x & y and invert "y")
-                    cloud['frontier_factor'] = (prior_x - cloud[x_key]) / (cloud[y_key] - prior_y) \
-                                               ** omega_globals.options.cost_curve_frontier_affinity_factor
+                    calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
                     min_frontier_factor = cloud['frontier_factor'].min()
 
                 if not cloud.empty:
-                    if not np.isinf(min_frontier_factor):
-                        if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
-                            # if multiple points with the same slope, take the one with the highest x-value
-                            idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
-                        else:
-                            idxmin = cloud['frontier_factor'].idxmin()
-                    else:
-                        idxmin = cloud['frontier_factor'].idxmax()
+                    idxmin = get_idxmin(cloud, idxmin, min_frontier_factor, x_key)
 
                     if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                         frontier_pts.append(cloud.loc[idxmin])
@@ -142,6 +132,41 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
     frontier_df['frontier_factor'] = 0
 
     return frontier_df.copy()
+
+
+def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
+    import numpy as np
+
+    if not np.isinf(min_frontier_factor):
+        if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
+            # if multiple points with the same slope, take the one with the highest x-value
+            idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
+        else:
+            idxmin = cloud['frontier_factor'].idxmin()
+    else:
+        idxmin = cloud['frontier_factor'].idxmax()
+    return idxmin
+
+
+def calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
+    import common.omega_globals as omega_globals
+
+    # frontier factor is different for up-slope (swap x & y and invert "y")
+    cloud['frontier_factor'] = (prior_x - cloud[x_key]) / (cloud[y_key] - prior_y) \
+                               ** omega_globals.options.cost_curve_frontier_affinity_factor
+
+
+def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
+    import common.omega_globals as omega_globals
+
+    cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
+                               ** omega_globals.options.cost_curve_frontier_affinity_factor
+    # find next frontier point (lowest slope), if there is one, and add to frontier list
+
+
+def cull_cloud(cloud, prior_x, x_key):
+    cloud = cloud.loc[cloud[x_key] > prior_x]  # .copy()
+    return cloud
 
 
 def print_dict(dict_in, num_tabs=0):
