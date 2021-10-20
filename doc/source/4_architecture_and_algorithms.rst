@@ -380,7 +380,8 @@ Each cost curve class includes multiple vehicles and represents the design space
 .. _veh clouds section:
 
 Vehicle Cost Clouds, Cost Curves, and Aggregation
-------------------------------------------
+-------------------------------------------------
+
 The technology packages and their application to candidate vehicles are described in the model inputs as a discrete set of options that were generated using tools and approaches external to OMEGA (e.g. vehicle simulation, benchmarking, cost teardowns, etc.) Because the product design problem being solved is multi-dimensional (i.e. an intersection of technology package applications and market share decisions for multiple vehicles), the choice set must be built up from various combinations of vehicle-level decisions that cannot be readily predicted in advance.
 
 The Producer Module uses an approach of aggregating the discrete, vehicle-level decisions at several levels, while retaining the vehicle-specific information that can be accessed later in other stages of the modeling and presented in the results. These processes of vehicle aggregation (also referred to as composition or the creation of “composite vehicles”) and decomposition are critical for the solution search process. First, aggregation allows the model to efficiently search for a solution without a complete enumeration of all possible choice combinations. Second, decomposition allows the model to draw upon the key vehicle attribute details that have been retained and are required for calculating the compliance emissions values and estimating the consumer response.
@@ -478,6 +479,7 @@ Each of these five elements represents a user-definable submodule within the Con
     .. csv-table::
         :widths: auto
         :header-rows: 1
+
         Element,Submodule
         Market class definitions, market_classes.py
         New vehicle sales volume, sales_volume.py
@@ -601,6 +603,7 @@ For responsive market classes, users can define how market shares are responsive
     .. csv-table:: Example of Sales Share Parameters in 'sales_share_params.csv'
         :widths: auto
         :header-rows: 1
+
         market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
         hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
         hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8

@@ -79,13 +79,14 @@ This more advanced installation method has two steps
 Running From Source Code
 ++++++++++++++++++++++++
 
-There are at least three common ways to run OMEGA:
+There are at least four common ways to run OMEGA:
 
-    #. from the GUI (see :any:`2_getting_started` and :any:`3_running_and_understanding_the_demo`)
+    #. from the executable GUI (see :any:`2_getting_started` and :any:`3_running_and_understanding_the_demo`)
     #. as a batch via ``omega_model/omega_batch.py`` (See `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__)
     #. as a single (default) session via ``omega_model/omega.py`` directly
+    #. from the GUI source code
 
-To run the default session directly from source at the command line:
+To run the default session directly from source at the command line from the project top-level folder:
 
 .. highlight:: none
 
@@ -136,5 +137,13 @@ Will produce output such as:
     Session elapsed time 17.47 seconds
 
 The primary use case for running ``omega.py`` directly is just to confirm the installation or perhaps when it's simpler to debug code without the overhead of the batch process.
+
+To run the gui directly from source at the command line from the project top-level folder:
+
+.. highlight:: none
+
+::
+
+    python omega_gui/omega_gui.py
 
 For all other development use cases it is recommended to run ``omega_batch.py`` as shown in the :any:`User Guide <5_user_guide>`
