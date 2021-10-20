@@ -1577,7 +1577,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                        s_index].settings.session_unique_name + '_summary_results.csv'
                         session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
-                batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=True)
+                batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
                 batch_summary_filename = batch.name + '_summary_results.csv'
                 batch_summary_df.to_csv(batch_summary_filename, index=False)
 
