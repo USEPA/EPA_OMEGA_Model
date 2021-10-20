@@ -154,35 +154,37 @@ def plot_cert_co2e_gpmi(calendar_years):
 
     average_cert_co2e_data = dict()
 
-    # tally up total sales weighted co2
+    # tally up total sales- and VMT- weighted co2
     average_cert_co2e_data['total'] = []
     for cy in calendar_years:
         average_cert_co2e_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
-            func.sum(VehicleAnnualData.registered_count)).
+            func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count)).
                                                filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
                                                filter(VehicleFinal.model_year == cy).
                                                filter(VehicleAnnualData.age == 0).scalar())
 
-    # tally up market_category sales weighted co2
+    # tally up market_category sales- and VMT- weighted co2
     for mcat in market_categories:
-        market_category_cost = []
+        market_category_co2e = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_co2 = omega_globals.session.query(VehicleAnnualData.registered_count,
+            registered_count_and_market_id_and_co2_and_VMT = omega_globals.session.query(VehicleAnnualData.registered_count,
                                                                                  VehicleFinal.market_class_id,
-                                                                                 VehicleFinal.cert_co2e_grams_per_mile) \
+                                                                                 VehicleFinal.cert_co2e_grams_per_mile,
+                                                                                 VehicleFinal.lifetime_VMT) \
                 .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_cost = 0
+            sales_weighted_co2e = 0
             mcat_count = 0
-            for result in registered_count_and_market_id_and_co2:
+            for result in registered_count_and_market_id_and_co2_and_VMT:
                 if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_co2e_grams_per_mile)
-            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
+                    mcat_count += float(result.registered_count) * float(result.lifetime_VMT)
+                    sales_weighted_co2e += float(result.registered_count) * \
+                                           float(result.cert_co2e_grams_per_mile) * float(result.lifetime_VMT)
+            market_category_co2e.append(sales_weighted_co2e / max(1, mcat_count))
 
-        average_cert_co2e_data[mcat] = market_category_cost
+        average_cert_co2e_data[mcat] = market_category_co2e
 
     # market category chart
     fig, ax1 = figure()
@@ -319,36 +321,37 @@ def plot_target_co2e_gpmi(calendar_years):
 
     average_target_co2e_data = dict()
 
-    # tally up total sales weighted co2
+    # tally up total sales- and VMT- weighted co2
     average_target_co2e_data['total'] = []
     for cy in calendar_years:
         average_target_co2e_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.target_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
-            func.sum(VehicleAnnualData.registered_count)).
+            func.sum(VehicleFinal.target_co2e_grams_per_mile * VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count) /
+            func.sum(VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count)).
                                                       filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
                                                       filter(VehicleFinal.model_year == cy).
                                                       filter(VehicleAnnualData.age == 0).scalar())
 
-    # tally up market_category sales weighted co2
+    # tally up market_category sales- and VMT- weighted co2
     for mcat in market_categories:
-        market_category_cost = []
+        market_category_co2e = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_co2 = omega_globals.session.query(VehicleAnnualData.registered_count,
+            registered_count_and_market_id_and_co2_and_VMT = omega_globals.session.query(VehicleAnnualData.registered_count,
                                                                                  VehicleFinal.market_class_id,
-                                                                                 VehicleFinal.target_co2e_grams_per_mile) \
+                                                                                 VehicleFinal.target_co2e_grams_per_mile,
+                                                                                 VehicleFinal.lifetime_VMT) \
                 .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
                 .filter(VehicleAnnualData.calendar_year == cy) \
                 .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_cost = 0
+            sales_weighted_co2e = 0
             mcat_count = 0
-            for result in registered_count_and_market_id_and_co2:
+            for result in registered_count_and_market_id_and_co2_and_VMT:
                 if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(
-                        result.target_co2e_grams_per_mile)
-            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
+                    mcat_count += float(result.registered_count) * float(result.lifetime_VMT)
+                    sales_weighted_co2e += float(result.registered_count) * float(
+                        result.target_co2e_grams_per_mile) * float(result.lifetime_VMT)
+            market_category_co2e.append(sales_weighted_co2e / max(1, mcat_count))
 
-        average_target_co2e_data[mcat] = market_category_cost
+        average_target_co2e_data[mcat] = market_category_co2e
 
     # market category chart
     fig, ax1 = figure()
