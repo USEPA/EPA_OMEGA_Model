@@ -227,8 +227,8 @@
      <widget class="QPushButton" name="select_output_batch_directory_button">
       <property name="geometry">
        <rect>
-        <x>1040</x>
-        <y>145</y>
+        <x>1041</x>
+        <y>144</y>
         <width>45</width>
         <height>45</height>
        </rect>
@@ -260,8 +260,8 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>1040</x>
-        <y>45</y>
+        <x>1041</x>
+        <y>44</y>
         <width>45</width>
         <height>45</height>
        </rect>

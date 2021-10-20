@@ -32,8 +32,6 @@ from datetime import datetime
 from omega_gui_functions import *
 from omega_gui_stylesheets import *
 
-from __init__ import *
-
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
 
 # print('omega_gui.py path = %s' % path)
