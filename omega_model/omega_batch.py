@@ -1569,21 +1569,18 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             # if not running a session inside a dispy batch (i.e. we are the top-level batch):
             if options.session_num is None:
                 # post-process sessions (collate summary files)
+                session_summary_dfs = []
                 for idx, s_index in enumerate(session_list):
                     if not batch.sessions[s_index].result or options.dispy:
                         batch.batch_log.logwrite("\nPost-Processing Session %d (%s):" % (s_index, batch.sessions[s_index].name))
                         session_summary_filename = options.batch_path + '_' + batch.sessions[
                             s_index].settings.output_folder + batch.sessions[
                                                        s_index].settings.session_unique_name + '_summary_results.csv'
-                        batch_summary_filename = batch.name + '_summary_results.csv'
-                        if os.access(session_summary_filename, os.F_OK):
-                            if idx == 0:
-                                # copy the first summary verbatim to create batch summary
-                                shutil.copyfile(session_summary_filename, batch_summary_filename)
-                            else:
-                                # add subsequent sessions to batch summary
-                                df = pd.read_csv(session_summary_filename)
-                                df.to_csv(batch_summary_filename, header=False, index=False, mode='a')
+                        session_summary_dfs.append(pd.read_csv(session_summary_filename))
+
+                batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=True)
+                batch_summary_filename = batch.name + '_summary_results.csv'
+                batch_summary_df.to_csv(batch_summary_filename, index=False)
 
 
 if __name__ == '__main__':
