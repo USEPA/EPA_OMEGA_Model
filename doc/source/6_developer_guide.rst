@@ -81,12 +81,14 @@ Running From Source Code
 
 There are at least four common ways to run OMEGA:
 
-    #. from the executable GUI (see :any:`2_getting_started` and :any:`3_running_and_understanding_the_demo`)
-    #. as a batch via ``omega_model/omega_batch.py`` (See `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__)
-    #. as a single (default) session via ``omega_model/omega.py`` directly
-    #. from the GUI source code
+    1) from the executable GUI (see :any:`2_getting_started` and :any:`3_running_and_understanding_the_demo`)
+    2) from source at the command line as a single (default) session via :any:`omega_model.omega`
+    3) from source at the command line as a GUI via :any:`omega_gui.omega_gui`
+    4) from source at the command line as a batch via :any:`omega_model.omega_batch` (See also `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__)
 
-To run the default session directly from source at the command line from the project top-level folder:
+----
+
+**To run the default session directly from source at the command line from the project top-level folder:**
 
 .. highlight:: none
 
@@ -138,7 +140,9 @@ Will produce output such as:
 
 The primary use case for running ``omega.py`` directly is just to confirm the installation or perhaps when it's simpler to debug code without the overhead of the batch process.
 
-To run the gui directly from source at the command line from the project top-level folder:
+----
+
+**To run the gui directly from source at the command line from the project top-level folder:**
 
 .. highlight:: none
 
@@ -146,4 +150,6 @@ To run the gui directly from source at the command line from the project top-lev
 
     python omega_gui/omega_gui.py
 
-For all other development use cases it is recommended to run ``omega_batch.py`` as shown in the :any:`User Guide <5_user_guide>`
+----
+
+**For all other development use cases it is recommended to run** ``omega_batch.py`` **as shown in the** :any:`User Guide <5_user_guide>` **under "OMEGA Batch Command Line Interface"**
