@@ -477,8 +477,8 @@ Each of these five elements represents a user-definable submodule within the Con
 
     .. csv-table::
         :widths: auto
-
-        **Element**, **Submodule**
+        :header-rows: 1
+        Element,Submodule
         Market class definitions, market_classes.py
         New vehicle sales volume, sales_volume.py
         New vehicle sales shares, sales_share.py
@@ -594,6 +594,23 @@ For responsive market classes, users can define how market shares are responsive
     * :math:`\alpha_{i}` is the share weight of market class *i*. This determines how quickly consumers accept new technology.
     * :math:`p_{i}` is the generalized cost of each vehicle in market class *i*
     * :math:`\gamma` represents how sensitive the model is to price.
+
+   The table below shows a subset of input parameters used to estimate sales shares in the demo analysis for Context A. Context B used the same parameters with slightly different values. The full list of parameter values used in the demo analysis for each context can be found in the demo inputs for the contexts in the file 'sales_share_params-cntxt_*.csv', where * is either a or b.
+
+    .. _al_label_table_sales_share_parameter_inputs:
+    .. csv-table:: Example of Sales Share Parameters in 'sales_share_params.csv'
+        :widths: auto
+        :header-rows: 1
+        market_class_id,start_year,annual_vmt,payback_years,price_amortization_period,share_weight,discount_rate,o_m_costs,average_occupancy,logit_exponent_mu
+        hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
+        hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
+        hauling.BEV,2030,12000,5,5,0.5,0.1,1600,1.58,-8
+        hauling.BEV,2031,12000,5,5,0.55,0.1,1600,1.58,-8
+        non_hauling.BEV,2020,12000,5,5,0.142,0.1,1600,1.58,-8
+        non_hauling.BEV,2021,12000,5,5,0.142,0.1,1600,1.58,-8
+        non_hauling.BEV,2030,12000,5,5,0.5,0.1,1600,1.58,-8
+        non_hauling.BEV,2031,12000,5,5,0.55,0.1,1600,1.58,-8
+
 
 If the user retains the demo analysis method of determining responsive BEV shares (using a logit curve as described above), the parameters representing the speed of acceptance, :math:`\alpha_{i}`, and price responsiveness, :math:`\gamma`, are factors the user can modify in the sales share submodule inputs (see :any:`sales share inputs <omega_model.consumer.sales_share>`)
 
