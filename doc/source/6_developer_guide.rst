@@ -152,4 +152,4 @@ The primary use case for running ``omega.py`` directly is just to confirm the in
 
 ----
 
-**For all other development use cases it is recommended to run** ``omega_batch.py`` **as shown in the** :any:`User Guide <5_user_guide>` **under "OMEGA Batch Command Line Interface"**
+**For all other development use cases it is recommended to run** ``omega_batch.py`` **as shown in the** :any:`User Guide <5_user_guide>` **under** `Omega Batch Command Line Interface <5_user_guide.html#omega-batch-cli>`__
