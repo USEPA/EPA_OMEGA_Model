@@ -758,7 +758,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'epa_size_class',
+                       'cert_fuel_id', 'market_class_id', 'epa_size_class', 'lifetime_VMT',
                        'context_size_class', 'base_year_market_share', 'electrification_class'}
 
     # transfer base properties
@@ -840,6 +840,7 @@ class Vehicle(OMEGABase):
         self.base_year_market_share = 0
         self.electrification_class = None
         self.target_co2e_grams_per_mile = 0
+        self.lifetime_VMT = 0
         self.cert_co2e_Mg = 0
         self.target_co2e_Mg = 0
         self.normalized_target_co2e_Mg = 0
@@ -1090,6 +1091,7 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
     target_co2e_grams_per_mile = Column('target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
+    lifetime_VMT = Column('lifetime_vmt', Float) #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
