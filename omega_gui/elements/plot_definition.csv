@@ -5,4 +5,4 @@ Average Vehicle Cost,,Calendar Year,calendar_year,Average Vehicle Cost ($),avera
 Consolidated OEM Cost Total,,Calendar Year,calendar_year,Total Cost (Billion $),consolidated_OEM_total_cost_billions,,,,,,,,,
 Vehicle Share,,Calendar Year,calendar_year,Vehicle Share (%),abs_share_frac_ICE,abs_share_frac_BEV,abs_share_frac_hauling,abs_share_frac_non_hauling,abs_share_frac_hauling.BEV,abs_share_frac_hauling.ICE,abs_share_frac_non_hauling.BEV,abs_share_frac_non_hauling.ICE,,
 Consolidated OEM Sales Total,,Calendar Year,calendar_year,Consolidated OEM Sales Total,consolidated_OEM_sales_total,,,,,,,,,
-Consolidated OEM CERT and Target CO2e,,Calendar Year,calendar_year,CO2e (Mg),consolidated_OEM_cert_target_co2e_Mg,consolidated_OEM_calendar_year_cert_co2e_Mg,consolidated_OEM_model_year_cert_co2e_Mg,,,,,,,
+Consolidated OEM CERT and Target CO2e,,Calendar Year,calendar_year,CO2e (Mg),consolidated_OEM_target_co2e_Mg,consolidated_OEM_calendar_year_cert_co2e_Mg,consolidated_OEM_model_year_cert_co2e_Mg,,,,,,,

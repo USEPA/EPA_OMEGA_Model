@@ -239,8 +239,8 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
             cv.get_weighted_attribute('new_vehicle_mfr_cost_dollars')
         cv.new_vehicle_mfr_generalized_cost_dollars = \
             cv.get_weighted_attribute('new_vehicle_mfr_generalized_cost_dollars')
-        cv.cert_target_co2e_Mg = \
-            cv.get_weighted_attribute('cert_target_co2e_Mg')
+        cv.target_co2e_Mg = \
+            cv.get_weighted_attribute('target_co2e_Mg')
         cv.cert_co2e_Mg = \
             cv.get_weighted_attribute('cert_co2e_Mg')
 
@@ -525,14 +525,14 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
 
     omega_globals.session.add_all(manufacturer_new_vehicles)
 
-    cert_target_co2e_Mg = VehicleFinal.calc_cert_target_co2e_Mg(calendar_year, compliance_id)
+    target_co2e_Mg = VehicleFinal.calc_target_co2e_Mg(calendar_year, compliance_id)
 
     cert_co2e_Mg = VehicleFinal.calc_cert_co2e_Mg(calendar_year, compliance_id)
 
     ManufacturerAnnualData. \
         create_manufacturer_annual_data(model_year=calendar_year,
                                         compliance_id=compliance_id,
-                                        cert_target_co2e_Mg=cert_target_co2e_Mg,
+                                        target_co2e_Mg=target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
                                         manufacturer_vehicle_cost_dollars=
                                             selected_production_decision['total_cost_dollars'],
@@ -615,7 +615,7 @@ def create_production_options(composite_vehicles, tech_and_share_combinations, t
         composite_veh_cert_co2e_Mg = composite_veh.normalized_cert_co2e_Mg * composite_veh_cert_co2_gpmi * \
                                      composite_veh_sales
 
-        composite_veh_target_co2e_Mg = composite_veh.normalized_cert_target_co2e_Mg * composite_veh_sales
+        composite_veh_target_co2e_Mg = composite_veh.normalized_target_co2e_Mg * composite_veh_sales
 
         production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
         production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg

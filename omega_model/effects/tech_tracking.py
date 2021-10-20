@@ -28,7 +28,7 @@ def calc_tech_tracking(calendar_years):
 
     tech_flag_list = DecompositionAttributes.other_values + DecompositionAttributes.offcycle_values
     id_attribute_list = ['name', 'manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
-                         'in_use_fuel_id', 'cert_target_co2e_grams_per_mile']
+                         'in_use_fuel_id', 'target_co2e_grams_per_mile']
 
     new_vehicle_info_dict = dict()
     new_vehicle_tech_flag_dict = dict()
@@ -45,10 +45,10 @@ def calc_tech_tracking(calendar_years):
                 new_vehicle_info_dict[vehicle_id] = VehicleFinal.get_vehicle_attributes(vehicle_id, id_attribute_list)
 
             name, mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
-            cert_target_co2e_grams_per_mile \
+            target_co2e_grams_per_mile \
                 = new_vehicle_info_dict[vehicle_id]
 
-            if cert_target_co2e_grams_per_mile is not None:
+            if target_co2e_grams_per_mile is not None:
 
                 tech_tracking_dict[key] = {'model_year': model_year,
                                            'name': name,

@@ -468,7 +468,7 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             self.total_weight += v.__getattribute__(self.weight_by)
             self.initial_registered_count += v.initial_registered_count
-            v.set_cert_target_co2e_Mg()
+            v.set_target_co2e_Mg()
 
         for v in self.vehicle_list:
             if self.total_weight != 0:
@@ -484,8 +484,8 @@ class CompositeVehicle(OMEGABase):
 
         self.tech_option_iteration_num = 0
 
-        self.normalized_cert_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
-                                                             'normalized_cert_target_co2e_Mg')
+        self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
+                                                             'normalized_target_co2e_Mg')
 
         self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
 
@@ -537,7 +537,7 @@ class CompositeVehicle(OMEGABase):
                     v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, 'cert_co2e_grams_per_mile',
                                                                         self.cert_co2e_grams_per_mile, ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
-            v.set_cert_target_co2e_Mg()  # varies by model year and initial_registered_count
+            v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
 
             if plot_cost_curve:
@@ -772,7 +772,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     for attr in VehicleFinal.dynamic_attributes:
         to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
 
-    to_vehicle.set_cert_target_co2e_grams_per_mile()  # varies by model year
+    to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
 
     if type(from_vehicle) == VehicleFinal:
         # finish transfer from VehicleFinal to Vehicle
@@ -784,7 +784,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
             to_vehicle.cost_cloud = CostCloud.get_cloud(to_vehicle.model_year, to_vehicle.cost_curve_class)
         to_vehicle.cost_curve = to_vehicle.create_frontier_df()  # create frontier, inc. generalized cost and policy effects
 
-        to_vehicle.normalized_cert_target_co2e_Mg = \
+        to_vehicle.normalized_target_co2e_Mg = \
             omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
 
         VehicleAttributeCalculations.perform_attribute_calculations(to_vehicle)
@@ -796,7 +796,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
         for attr in DecompositionAttributes.values:
             to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
 
-        to_vehicle.cert_target_co2e_Mg = from_vehicle.cert_target_co2e_Mg
+        to_vehicle.target_co2e_Mg = from_vehicle.target_co2e_Mg
         to_vehicle.cert_co2e_Mg = from_vehicle.cert_co2e_Mg
 
 
@@ -839,10 +839,10 @@ class Vehicle(OMEGABase):
         self.context_size_class = None
         self.base_year_market_share = 0
         self.electrification_class = None
-        self.cert_target_co2e_grams_per_mile = 0
+        self.target_co2e_grams_per_mile = 0
         self.cert_co2e_Mg = 0
-        self.cert_target_co2e_Mg = 0
-        self.normalized_cert_target_co2e_Mg = 0
+        self.target_co2e_Mg = 0
+        self.normalized_target_co2e_Mg = 0
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
@@ -916,25 +916,25 @@ class Vehicle(OMEGABase):
 
         return co2_emissions_grams_per_unit
 
-    def set_cert_target_co2e_grams_per_mile(self):
+    def set_target_co2e_grams_per_mile(self):
         """
         Set the vehicle cert target CO2e grams per mile based on the current policy and vehicle attributes.
 
         Returns:
-            Nothing, updates ``cert_target_co2e_grams_per_mile``
+            Nothing, updates ``target_co2e_grams_per_mile``
 
         """
-        self.cert_target_co2e_grams_per_mile = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(self)
+        self.target_co2e_grams_per_mile = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(self)
 
-    def set_cert_target_co2e_Mg(self):
+    def set_target_co2e_Mg(self):
         """
         Set the vehicle cert target CO2e megagrams based on the current policy and vehicle attributes.
 
         Returns:
-            Nothing, updates ``cert_target_co2e_Mg``
+            Nothing, updates ``target_co2e_Mg``
 
         """
-        self.cert_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self)
+        self.target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self)
 
     def set_cert_co2e_Mg(self):
         """
@@ -1089,9 +1089,9 @@ class VehicleFinal(SQABase, Vehicle):
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
-    cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
+    target_co2e_grams_per_mile = Column('target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
-    cert_target_co2e_Mg = Column('cert_target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
+    target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
     cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
     market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, as determined by the consumer subpackage
@@ -1190,7 +1190,7 @@ class VehicleFinal(SQABase, Vehicle):
         return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_id == vehicle_id).one()
 
     @staticmethod
-    def calc_cert_target_co2e_Mg(model_year, compliance_id):
+    def calc_target_co2e_Mg(model_year, compliance_id):
         """
         Calculate the total cert target CO2e Mg for the given model year and compliance ID
 
@@ -1202,7 +1202,7 @@ class VehicleFinal(SQABase, Vehicle):
             The sum of vehicle cert target CO2e Mg for the given model year and compliance ID
 
         """
-        return omega_globals.session.query(func.sum(VehicleFinal.cert_target_co2e_Mg)). \
+        return omega_globals.session.query(func.sum(VehicleFinal.target_co2e_Mg)). \
             filter(VehicleFinal.compliance_id == compliance_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
