@@ -1269,6 +1269,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         vehicle_shares_dict = {'total': 0}
 
+        VehicleFinal.compliance_ids = set()
         vehicles_list = []
 
         if verbose:
