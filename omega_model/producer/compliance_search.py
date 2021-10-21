@@ -274,8 +274,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         A tuple of ``composite_vehicles`` (list of CompositeVehicle objects),
         ``selected_production_decision`` (pandas Series containing the result of the serach),
         ``market_class_tree`` (dict of CompositeVehicle object lists hiearchically grouped by market categories
-            into market classes), and ``producer_compliance_possible`` (bool that indicates whether compliance was
-            achievable)
+        into market classes), and ``producer_compliance_possible`` (bool that indicates whether compliance was
+        achievable)
 
     """
     candidate_production_decisions = None
