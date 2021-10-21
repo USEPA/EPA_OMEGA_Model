@@ -140,3 +140,4 @@ composer.lock
 *out*/
 /omega_model/bundle/
 context_new_vehicle_prices.csv
+*.fig
