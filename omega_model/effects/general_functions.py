@@ -94,8 +94,8 @@ def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
     """
 
     Args:
-        dict_to_save: A dictionary having a tuple of args as keys.\n
-        save_path: The path for saving the passed CSV.\n
+        dict_to_save: A dictionary having a tuple of args as keys.
+        save_path: The path for saving the passed CSV.
         row_header: A list of the column names to use a the row header for the preferred structure of the output file.
         args: The arguments contained in the tuple key - these will be pulled out and named according to the passed arguments.
 
@@ -115,5 +115,6 @@ def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
     #     df.insert(0, 'yearID', df[['modelYearID', 'ageID']].sum(axis=1))
     cols = [col for col in df.columns if col not in row_header]
     df = pd.DataFrame(df, columns=row_header + cols)
+
+    df.reindex(sorted(df.columns), axis=1)
     df.to_csv(f'{save_path}.csv', index=False)
-    return
