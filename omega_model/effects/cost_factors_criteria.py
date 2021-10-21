@@ -100,11 +100,11 @@ class CostFactorsCriteria(SQABase, OMEGABase):
         return cache[cache_key]
 
     @staticmethod
-    def init_database_from_file(criteria_cost_factors_file, cpi_deflators_file, verbose=False):
+    def init_database_from_file(criteria_cost_factors_file, verbose=False):
         cache.clear()
 
         if verbose:
-            omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} and {cpi_deflators_file}...')
+            omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} ...')
 
         input_template_name = 'context_cost_factors-criteria'
         input_template_version = 0.3
@@ -125,13 +125,6 @@ class CostFactorsCriteria(SQABase, OMEGABase):
         template_errors = validate_template_version_info(criteria_cost_factors_file, input_template_name,
                                                          input_template_version, verbose=verbose)
 
-        input_template_name = 'context_cpi_price_deflators'
-        input_template_version = 0.2
-        deflators_input_template_columns = {'price_deflator'}
-
-        template_errors += validate_template_version_info(cpi_deflators_file, input_template_name,
-                                                          input_template_version, verbose=verbose)
-
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(criteria_cost_factors_file, skiprows=1)
@@ -142,14 +135,8 @@ class CostFactorsCriteria(SQABase, OMEGABase):
 
             cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
 
-            deflators = pd.read_csv(cpi_deflators_file, skiprows=1, index_col=0)
-
-            template_errors += validate_template_columns(cpi_deflators_file, deflators_input_template_columns,
-                                                         deflators.columns, verbose=verbose)
-            deflators = deflators.to_dict('index')
-
             if not template_errors:
-                df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+                df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
                 obj_list = []
                 # load data into database
