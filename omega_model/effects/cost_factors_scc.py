@@ -131,9 +131,7 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
             cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
 
-            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
-
-            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+            df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
                 obj_list = []

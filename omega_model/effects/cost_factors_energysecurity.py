@@ -110,9 +110,7 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
-            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis,
-                                         'dollars_per_gallon')
+            df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, 'dollars_per_gallon')
 
             if not template_errors:
                 obj_list = []

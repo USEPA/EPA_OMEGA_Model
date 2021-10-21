@@ -1,5 +1,5 @@
-input_template_name:,context_implicit_price_deflators,input_template_version:,0.2
-calendar_year,price_deflator,,
+input_template_name:,context_implicit_price_deflators,input_template_version:,0.21
+start_year,price_deflator,,
 2001,79.79,,
 2002,81.052,,
 2003,82.557,,
