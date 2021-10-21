@@ -158,8 +158,7 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
 
-                MarketClassBase.market_classes = list(df['market_class_id'].unique())
-                MarketClassBase.market_classes.sort()
+                MarketClassBase.market_classes = sorted(list(df['market_class_id'].unique()))
                 for mc in MarketClass.market_classes:
                     MarketClassBase._market_class_dict[mc] = []
 

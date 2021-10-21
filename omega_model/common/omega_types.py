@@ -107,8 +107,7 @@ class OMEGABase:
 
         """
         s = self.__repr__() + '\n'
-        attributes = list(self.__dict__.keys())
-        attributes.sort()
+        attributes = sorted(list(self.__dict__.keys()))
         for k in attributes:
             s = s + k  + ' = ' + str(self.__dict__[k]).replace('\n', ' ') + '\n'
         return s
