@@ -1399,6 +1399,9 @@ class VehicleFinal(SQABase, Vehicle):
                 # calculate manufacturer base year context size class shares
                 from producer.manufacturers import Manufacturer
 
+                VehicleFinal.compliance_ids = list(VehicleFinal.compliance_ids)
+                VehicleFinal.compliance_ids.sort()
+
                 VehicleFinal.mfr_base_year_size_class_share = dict()
                 for compliance_id in VehicleFinal.compliance_ids:
                     for size_class in NewVehicleMarket.context_size_classes:
