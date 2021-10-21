@@ -15,8 +15,9 @@ def adjust_dollars(df, deflators, dollar_basis_year, *args):
     """
 
     Args:
-        df: The DataFrame of values to be converted to a consistent dollar basis.
-        dollar_basis_year: An integer representing the desired dollar basis for the return DataFrame.
+        df (DataFrame): values to be converted to a consistent dollar basis.
+        deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
+        dollar_basis_year (int): the desired dollar basis for the return DataFrame.
         args: The attributes to be converted to a consistent dollar basis.
 
     Returns:
