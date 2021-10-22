@@ -21,6 +21,10 @@ Base Year:
  The last calendar year of the historical input data. Also known as 'Initial Year'
 Candidate Vehicles:
  The set of vehicles, and their prices and attributes, sent from the Producer Module to the Consumer Module for consideration during the market share iteration between the two modules.
+Certification CO2e:
+ The GHG emissions values (g/mi or Mg) assigned to produced vehicles based on policy provisions, such as test cycles and weighting, off-cycle credits, production multipliers, etc. These are used to calculate the credits relative to the targets for use in compliance determination.
+Compliance CO2e:
+ The final CO2e Mg for a producer's model year, including all credit transfers, after any opportunity for credit transfers has expired. A value which exceeds the Mg target for that model year indicates non-compliance.
 Consumer Generalized Cost:
  This is part of the Demo Analysis estimation of market shares, and comes from GCAM-USA. It includes capital costs (including candidate vehicle prices fed in from the Producer Module, and the cost of a home charger), fuel costs, maintenance costs, time cost of fueling, and parameter values for amortization period and discount rate
 Context Policy:
@@ -68,18 +72,3 @@ Vehicle Cost:
  The costs associated with producing a vehicle
 Year:
  Calendar year unless otherwise stated
-
-
-
-Price:
- DEFINITION
-Cert:
- DEFINITION
-On-Road:
- DEFINITION
-Direct:
- DEFINITION
-Indirect:
- DEFINITION
-
-
