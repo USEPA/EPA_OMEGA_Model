@@ -40,8 +40,8 @@ Batch Input Files and Loaders
         Context Powersector Emission Factors File, :any:`omega_model/effects/emission_factors_powersector.py<omega_model.effects.emission_factors_powersector>`
         Context Refinery Emission Factors File, :any:`omega_model/effects/emission_factors_refinery.py<omega_model.effects.emission_factors_refinery>`
         Context Vehicle Emission Factors File, :any:`omega_model/effects/emission_factors_vehicles.py<omega_model.effects.emission_factors_vehicles>`
-        Context Implicit Price Deflators File, *read by multiple effects files*:any:`<>`
-        Context Consumer Price Index File, :any:`omega_model/effects/cost_factors_criteria.py<omega_model.effects.cost_factors_criteria>`
+        Context Implicit Price Deflators File, :any:`omega_model/effects/ip_deflators.py<omega_model.effects.ip_deflators>`
+        Context Consumer Price Index File, :any:`omega_model/effects/cpi_price_deflators<omega_model.effects.cpi_price_deflators>`
         ,
         Session Policy Alternatives Settings,
         Drive Cycle Weights File, :any:`omega_model/policy/drive_cycle_weights.py<omega_model.policy.drive_cycle_weights>`
