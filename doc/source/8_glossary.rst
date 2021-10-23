@@ -21,10 +21,14 @@ Base Year:
  The last calendar year of the historical input data. Also known as 'Initial Year'
 Candidate Vehicles:
  The set of vehicles, and their prices and attributes, sent from the Producer Module to the Consumer Module for consideration during the market share iteration between the two modules.
+
 .. _gl_label_certification_co2e:
+
 Certification Emissions:
  The GHG emissions values (g CO2e/mi or Mg CO2e), prior to any credit transfers, assigned to produced vehicles based on policy provisions, such as test cycles and weighting, off-cycle credits, production multipliers, etc. These are used to calculate the credits relative to the targets for use in compliance determination.
+
 .. _gl_label_compliance_co2e:
+
 Compliance Emissions:
  The final GHG emissions values (Mg CO2e Mg) for a producer's model year, including all credit transfers, after any opportunity for credit transfers has expired. A value which exceeds the Mg target for that model year indicates non-compliance.
 Consumer Generalized Cost:
@@ -57,7 +61,9 @@ Policy Alternatives:
  Encompasses both the No-action Alternative and the Action Alternatives. This is a more generic term than the alternatives. Also known as 'Policy Scenarios'
 Produced Vehicles:
  The set of vehicles and their attributes that lead to convergence in the market share iteration between the Consumer Module and Producer Module. The set of produced vehicles is the final set of candidate vehicles passed from the Producer Module to the Consumer Module.
+
 .. _gl_label_producer_generalized_cost:
+
 Producer Generalized Cost:
  The total of the monetary expenses of bringing a product to the consumer, and the value the producer expects can be recovered from consumers at the time of purchase
 Regulatory Class:
