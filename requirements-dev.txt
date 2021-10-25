@@ -5,7 +5,6 @@
 
 # for building docs from .rst files (optional):
 Sphinx<4.0.0
-sphinx-rtd-theme
 
 # for bumping the version number:
 bumpversion
