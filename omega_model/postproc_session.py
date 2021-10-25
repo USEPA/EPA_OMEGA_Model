@@ -38,11 +38,8 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
     market_classes = omega_globals.options.MarketClass.market_classes
     market_categories = omega_globals.options.MarketClass.market_categories
 
-    # if omega_globals.options.calc_effects:
-    #     from effects.omega_effects import run_effects_calcs
-    #     run_effects_calcs()
-
-    run_effects_calcs() # this runs tech_tracking always and physical/cost effects based on globals.options
+    # this runs tech_tracking always and physical/cost effects based on globals.options:
+    tech_tracking_df, physical_effects_df, cost_effects_df = run_effects_calcs()
 
     if not standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)
@@ -103,6 +100,8 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
 
     average_target_co2e_gpmi_data = plot_target_co2e_gpmi(analysis_years)
 
+    physical_effects = plot_effects(analysis_years, physical_effects_df)
+
     # market share results include base year data, but the rest of the data doesn't, so drop the
     # base year data, otherwise the dataframe at the end will fail due to inconsistent column lengths
 
@@ -116,6 +115,9 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
         session_results['average_%s_cert_direct_kwh_pmi' % cat] = average_cert_direct_kwh_pmi_data[cat]
         session_results['average_%s_target_co2e_gpmi' % cat] = average_target_co2e_gpmi_data[cat]
         session_results['%s_co2e_Mg' % cat] = megagrams_data[cat]
+
+    for k in physical_effects:
+        session_results[k] = physical_effects[k]
 
     # write output files
     summary_filename = omega_globals.options.output_folder + omega_globals.options.session_unique_name \
@@ -136,6 +138,66 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
     dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
                       omega_globals.options.verbose)
+
+
+def plot_effects(calendar_years, physical_effects_df):
+    """
+    Plot physical effects
+    
+    Args:
+        calendar_years: 
+        physical_effects_df: 
+
+    Returns:
+
+    """
+    physical_effects = dict()
+
+    if not physical_effects_df.empty:
+        physical_effects['vehicle_stock_CO2e_megagrams'] = []
+        physical_effects['vehicle_stock_consumption_gallons'] = []
+        physical_effects['vehicle_stock_consumption_kwh'] = []
+        physical_effects['vehicle_stock_vmt'] = []
+
+        for cy in calendar_years:
+            physical_effects['vehicle_stock_CO2e_megagrams'].append(
+                physical_effects_df['co2_total_metrictons'].loc[physical_effects_df['calendar_year'] == cy].sum())
+            physical_effects['vehicle_stock_consumption_gallons'].append(
+                physical_effects_df['fuel_consumption_gallons'].loc[physical_effects_df['calendar_year'] == cy].sum())
+            physical_effects['vehicle_stock_consumption_kwh'].append(
+                physical_effects_df['fuel_consumption_kWh'].loc[physical_effects_df['calendar_year'] == cy].sum())
+            physical_effects['vehicle_stock_vmt'].append(
+                physical_effects_df['vmt'].loc[physical_effects_df['calendar_year'] == cy].sum())
+
+        fig, ax1 = figure()
+        ax1.plot(calendar_years, physical_effects['vehicle_stock_CO2e_megagrams'], '.-')
+        ax1.legend(['Vehicle Stock CO2e Mg'])
+        label_xyt(ax1, 'Year', 'CO2e [Mg]', '%s\nVehicle Stock CO2e Mg' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock CO2e Mg.png'
+                    % omega_globals.options.session_unique_name)
+
+        fig, ax1 = figure()
+        ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_gallons'], '.-')
+        ax1.legend(['Vehicle Stock Fuel Consumption Gallons'])
+        label_xyt(ax1, 'Year', 'Consumption [gallons]', '%s\nVehicle Stock Fuel Consumption Gallons' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock Gallons.png'
+                    % omega_globals.options.session_unique_name)
+
+        fig, ax1 = figure()
+        ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_kwh'], '.-')
+        ax1.legend(['Vehicle Stock Fuel Consumption kWh'])
+        label_xyt(ax1, 'Year', 'Consumption [kWh]', '%s\nVehicle Stock Fuel Consumption kWh' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock kWh.png'
+                    % omega_globals.options.session_unique_name)
+
+        fig, ax1 = figure()
+        ax1.plot(calendar_years, physical_effects['vehicle_stock_vmt'], '.-')
+        ax1.legend(['Vehicle Stock Miles Travelled'])
+        label_xyt(ax1, 'Year', 'Distance Travelled [miles]', '%s\nVehicle Stock Miles Travelled' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock VMT.png'
+                    % omega_globals.options.session_unique_name)
+
+    return physical_effects
 
 
 def plot_cert_co2e_gpmi(calendar_years):
