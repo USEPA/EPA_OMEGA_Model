@@ -152,16 +152,19 @@ def plot_effects(calendar_years, physical_effects_df):
         dict of physical effects data for the vehicle stock aggregated by calendar year
 
     """
+    import numpy as np
+
     physical_effects = dict()
 
     if not physical_effects_df.empty:
-        physical_effects['vehicle_stock_CO2e_megagrams'] = []
+        physical_effects['vehicle_stock_CO2_megagrams'] = []
         physical_effects['vehicle_stock_consumption_gallons'] = []
         physical_effects['vehicle_stock_consumption_kwh'] = []
         physical_effects['vehicle_stock_vmt'] = []
+        physical_effects['registered_count'] = []
 
         for cy in calendar_years:
-            physical_effects['vehicle_stock_CO2e_megagrams'].append(
+            physical_effects['vehicle_stock_CO2_megagrams'].append(
                 physical_effects_df['co2_total_metrictons'].loc[physical_effects_df['calendar_year'] == cy].sum())
             physical_effects['vehicle_stock_consumption_gallons'].append(
                 physical_effects_df['fuel_consumption_gallons'].loc[physical_effects_df['calendar_year'] == cy].sum())
@@ -169,12 +172,14 @@ def plot_effects(calendar_years, physical_effects_df):
                 physical_effects_df['fuel_consumption_kWh'].loc[physical_effects_df['calendar_year'] == cy].sum())
             physical_effects['vehicle_stock_vmt'].append(
                 physical_effects_df['vmt'].loc[physical_effects_df['calendar_year'] == cy].sum())
+            physical_effects['registered_count'].append(
+                physical_effects_df['registered_count'].loc[physical_effects_df['calendar_year'] == cy].sum())
 
         fig, ax1 = figure()
-        ax1.plot(calendar_years, physical_effects['vehicle_stock_CO2e_megagrams'], '.-')
-        ax1.legend(['Vehicle Stock CO2e Mg'])
-        label_xyt(ax1, 'Year', 'CO2e [Mg]', '%s\nVehicle Stock CO2e Mg' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock CO2e Mg.png'
+        ax1.plot(calendar_years, physical_effects['vehicle_stock_CO2_megagrams'], '.-')
+        ax1.legend(['Vehicle Stock CO2 Mg'])
+        label_xyt(ax1, 'Year', 'CO2 [Mg]', '%s\nVehicle Stock CO2 Mg' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock CO2 Mg.png'
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure()
@@ -196,6 +201,13 @@ def plot_effects(calendar_years, physical_effects_df):
         ax1.legend(['Vehicle Stock Miles Travelled'])
         label_xyt(ax1, 'Year', 'Distance Travelled [miles]', '%s\nVehicle Stock Miles Travelled' % omega_globals.options.session_unique_name)
         fig.savefig(omega_globals.options.output_folder + '%s Stock VMT.png'
+                    % omega_globals.options.session_unique_name)
+
+        fig, ax1 = figure()
+        ax1.plot(calendar_years, np.array(physical_effects['registered_count']) / 1e6, '.-')
+        ax1.legend(['Vehicle Stock Registered Count'])
+        label_xyt(ax1, 'Year', 'Registered Count [millions]', '%s\nVehicle Stock Registered Count' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock Count.png'
                     % omega_globals.options.session_unique_name)
 
     return physical_effects
