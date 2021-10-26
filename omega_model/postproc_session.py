@@ -142,13 +142,14 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
 
 def plot_effects(calendar_years, physical_effects_df):
     """
-    Plot physical effects
+    Plot physical effects and aggregate vehicle stock data by calendar year.
     
     Args:
-        calendar_years: 
-        physical_effects_df: 
+        calendar_years ([years]): list of calendar years
+        physical_effects_df (DataFrame): contains physical effects data
 
     Returns:
+        dict of physical effects data for the vehicle stock aggregated by calendar year
 
     """
     physical_effects = dict()
