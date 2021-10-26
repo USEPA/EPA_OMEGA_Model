@@ -106,18 +106,24 @@ if __name__ == '__main__':
         # override reg_classes from __init__.py:
         importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
-        from producer.vehicles import VehicleFinal
+        from producer.vehicles import VehicleFinal, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2e
         from context.new_vehicle_market import NewVehicleMarket
+        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
-        omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
+        omega_globals.options.VehicleTargets = get_module(module_name).VehicleTargets
 
         module_name = get_template_name(omega_globals.options.market_classes_file)
-        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+        omega_globals.options.MarketClass = get_module(module_name).MarketClass
+
+        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
+
+        init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         SQABase.metadata.create_all(omega_globals.engine)
 

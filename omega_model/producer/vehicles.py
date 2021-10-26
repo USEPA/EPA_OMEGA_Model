@@ -424,13 +424,13 @@ class CompositeVehicle(OMEGABase):
     Vehicle reg classes, physical attributes, etc, and the active policy.
 
     """
-    def __init__(self, vehicle_list, vehicle_id, verbose=False, calc_composite_cost_curve=True,
+    def __init__(self, vehicles_list, vehicle_id, calc_composite_cost_curve=True,
                  weight_by='initial_registered_count'):
         """
         Create composite vehicle from list of Vehicle objects.
 
         Args:
-            vehicle_list ([Vehicle, ...]: list of one or more ``Vehicle`` objects
+            vehicles_list ([Vehicle, ...]: list of one or more ``Vehicle`` objects
             verbose (bool): enable additional console and logfile output if ``True``
             calc_composite_cost_curve (bool): if ``True`` then calculate the composite cost curve
             weight_by (str): name of the ``Vehicle`` attribute to weight by, e.g. 'initial_registered_count' or
@@ -439,7 +439,7 @@ class CompositeVehicle(OMEGABase):
         """
         from common.omega_functions import weighted_value
 
-        self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
+        self.vehicle_list = vehicles_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
 
         self.vehicle_id = vehicle_id
@@ -523,7 +523,7 @@ class CompositeVehicle(OMEGABase):
         """
         plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or
                            (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
-                          any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
+            any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
 
         if plot_cost_curve:
             from common.omega_plot import figure, label_xyt
@@ -1094,7 +1094,7 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
     target_co2e_grams_per_mile = Column('target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
-    lifetime_VMT = Column('lifetime_vmt', Float) #: lifetime VMT, used to calculate CO2e Mg
+    lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
@@ -1242,8 +1242,7 @@ class VehicleFinal(SQABase, Vehicle):
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
-                              'base_year_market_share'] + \
-                             VehicleFinal.dynamic_attributes
+                              'base_year_market_share'] + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
         veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
@@ -1447,16 +1446,16 @@ class VehicleFinal(SQABase, Vehicle):
             ``VehicleAttributeCalculations``, ``DecompositionAttributes``
 
         """
-        init_fail = []
+        _init_fail = []
 
         DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
-        init_fail += VehicleFinal.init_vehicles_from_file(vehicles_file, verbose=verbose)
+        _init_fail += VehicleFinal.init_vehicles_from_file(vehicles_file, verbose=verbose)
 
-        init_fail += VehicleAttributeCalculations.init_vehicle_attribute_calculations_from_file(
+        _init_fail += VehicleAttributeCalculations.init_vehicle_attribute_calculations_from_file(
             vehicle_onroad_calculations_file, clear_cache=True, verbose=verbose)
 
-        return init_fail
+        return _init_fail
 
 
 if __name__ == '__main__':
@@ -1498,15 +1497,15 @@ if __name__ == '__main__':
         vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
         VehicleFinal.dynamic_columns = list(
             set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
-        for dc in VehicleFinal.dynamic_columns:
-            VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
+        for vdc in VehicleFinal.dynamic_columns:
+            VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(vdc))
 
-        for attr in VehicleFinal.dynamic_attributes:
-            if attr not in VehicleFinal.__dict__:
+        for attribute in VehicleFinal.dynamic_attributes:
+            if attribute not in VehicleFinal.__dict__:
                 if int(sqlalchemy.__version__.split('.')[1]) > 3:
-                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attribute, Column(attribute, Float))
                 else:
-                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attribute, Column(attribute, Float))
 
         SQABase.metadata.create_all(omega_globals.engine)
 
@@ -1537,15 +1536,15 @@ if __name__ == '__main__':
 
         if not init_fail:
 
-            vehicles_list = VehicleFinal.get_compliance_vehicles(2019, 'OEM_A')
+            vehicle_list = VehicleFinal.get_compliance_vehicles(2019, 'OEM_A')
 
             # update vehicle annual data, registered count must be update first:
-            VehicleAnnualData.update_registered_count(vehicles_list[0], 2020, 54321)
+            VehicleAnnualData.update_registered_count(vehicle_list[0], 2020, 54321)
 
             # dump database with updated vehicle annual data
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
+            weighted_footprint = weighted_value(vehicle_list, 'initial_registered_count', 'footprint_ft2')
 
             # v = vehicles_list[0]
             # v.model_year = 2020

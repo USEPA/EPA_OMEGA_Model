@@ -168,6 +168,8 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        from effects.cpi_price_deflators import CPIPriceDeflators
+
         omega_globals.options = OMEGASessionSettings()
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
@@ -176,8 +178,10 @@ if __name__ == '__main__':
 
         init_fail = []
 
+        init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
+                                                      verbose=omega_globals.options.verbose)
+
         init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                 omega_globals.options.cpi_deflators_file,
                                                                  verbose=omega_globals.options.verbose)
 
         if not init_fail:
