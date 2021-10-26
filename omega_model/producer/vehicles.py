@@ -240,7 +240,7 @@ class DecompositionAttributes(OMEGABase):
                                                         set(DriveCycles.drive_cycle_names)))
 
         cls.offcycle_values = list(set.intersection(set(CostCloud.cost_cloud_data_columns),
-                                                 set(OffCycleCredits.offcycle_credit_names)))
+                                                    set(OffCycleCredits.offcycle_credit_names)))
 
         cls.other_values = list(set(CostCloud.cost_cloud_data_columns).
                                 difference(base_values).
@@ -477,7 +477,7 @@ class CompositeVehicle(OMEGABase):
                 v.composite_vehicle_share_frac = 0
 
         if calc_composite_cost_curve:
-            plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or \
+            plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or
                               (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
                               any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
@@ -987,11 +987,13 @@ class Vehicle(OMEGABase):
         # calculate off cycle credits before calculating upstream and onroad
         self.cost_cloud = OffCycleCredits.calc_off_cycle_credits(self)
 
-        self.cost_cloud['cert_direct_co2e_grams_per_mile'] = self.cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] -\
-                                                            self.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
+        self.cost_cloud['cert_direct_co2e_grams_per_mile'] = \
+            self.cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
+            self.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
 
-        self.cost_cloud['cert_direct_kwh_per_mile'] = self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
-                                                      self.cost_cloud['cert_direct_offcycle_kwh_per_mile']
+        self.cost_cloud['cert_direct_kwh_per_mile'] = \
+            self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
+            self.cost_cloud['cert_direct_offcycle_kwh_per_mile']
 
         # calc onroad gap, etc...
         VehicleAttributeCalculations.perform_attribute_calculations(self, self.cost_cloud)
@@ -1003,9 +1005,10 @@ class Vehicle(OMEGABase):
             upstream_method(self, self.cost_cloud['cert_direct_co2e_grams_per_mile'],
                             self.cost_cloud['cert_direct_kwh_per_mile'])
 
-        self.cost_cloud['cert_co2e_grams_per_mile'] = self.cost_cloud['cert_direct_co2e_grams_per_mile'] + \
-                                                     self.cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
-                                                     self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
+        self.cost_cloud['cert_co2e_grams_per_mile'] = \
+            self.cost_cloud['cert_direct_co2e_grams_per_mile'] + \
+            self.cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
+            self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
 
         # calculate producer generalized cost
         self.cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
@@ -1044,17 +1047,17 @@ class Vehicle(OMEGABase):
             label_xyt(ax1, 'CO2e [g/mi]', 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
             ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
-                 self.cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
-                 label='Production Cost')
+                     self.cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
+                     label='Production Cost')
 
             ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
-                 self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
-                 label='Generalized Cost')
+                     self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
+                     label='Generalized Cost')
 
             ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
-                 cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
-                 color='black',
-                 label='Cost Curve')
+                     cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
+                     color='black',
+                     label='Cost Curve')
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
