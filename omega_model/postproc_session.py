@@ -158,7 +158,7 @@ def plot_effects(calendar_years, physical_effects_df):
 
     if not physical_effects_df.empty:
         physical_effects['vehicle_stock_CO2_megagrams'] = []
-        physical_effects['vehicle_stock_consumption_gallons'] = []
+        physical_effects['vehicle_stock_consumption_gasoline_gallons'] = []
         physical_effects['vehicle_stock_consumption_kwh'] = []
         physical_effects['vehicle_stock_vmt'] = []
         physical_effects['registered_count'] = []
@@ -166,7 +166,7 @@ def plot_effects(calendar_years, physical_effects_df):
         for cy in calendar_years:
             physical_effects['vehicle_stock_CO2_megagrams'].append(
                 physical_effects_df['co2_total_metrictons'].loc[physical_effects_df['calendar_year'] == cy].sum())
-            physical_effects['vehicle_stock_consumption_gallons'].append(
+            physical_effects['vehicle_stock_consumption_gasoline_gallons'].append(
                 physical_effects_df['fuel_consumption_gallons'].loc[physical_effects_df['calendar_year'] == cy].sum())
             physical_effects['vehicle_stock_consumption_kwh'].append(
                 physical_effects_df['fuel_consumption_kWh'].loc[physical_effects_df['calendar_year'] == cy].sum())
@@ -183,10 +183,10 @@ def plot_effects(calendar_years, physical_effects_df):
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure()
-        ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_gallons'], '.-')
+        ax1.plot(calendar_years, physical_effects['vehicle_stock_consumption_gasoline_gallons'], '.-')
         ax1.legend(['Vehicle Stock Fuel Consumption Gallons'])
-        label_xyt(ax1, 'Year', 'Consumption [gallons]', '%s\nVehicle Stock Fuel Consumption Gallons' % omega_globals.options.session_unique_name)
-        fig.savefig(omega_globals.options.output_folder + '%s Stock Gallons.png'
+        label_xyt(ax1, 'Year', 'Fuel Consumption [Gasoline gallons]', '%s\nVehicle Stock Fuel Consumption Gasoline Gallons' % omega_globals.options.session_unique_name)
+        fig.savefig(omega_globals.options.output_folder + '%s Stock Gas Gallons.png'
                     % omega_globals.options.session_unique_name)
 
         fig, ax1 = figure()
