@@ -35,6 +35,8 @@ After downloading the source code (via ``.zip`` file or cloning the repository),
 
     **The currently recommended Python version is** `Python 3.8.10 <https://python.org/downloads/release/python-3810/>`_ **.**
 
+    M1 Mac users should install `the Intel version of Python 3.8.10 <https://www.python.org/ftp/python/3.8.10/python-3.8.10-macosx10.9.pkg>`_ which runs under Rosetta, it prevents compatiblity issues with packages that haven't been updated to run natively, then follow the Simple Install directions.
+
 Python
 ++++++
 
