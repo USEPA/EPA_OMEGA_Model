@@ -1,0 +1,10 @@
+input_template_name:,vehicle_price_modifications,input_template_version:,0.2
+start_year,hauling.BEV:price_modification_dollars,non_hauling.BEV:price_modification_dollars,
+2020,0,0,
+2025,-10000,-10000,
+2027,-5000,-5000,
+2032,-4000,-4000,
+2033,-3000,-3000,
+2034,-2000,-2000,
+2035,-1000,-1000,
+2036,0,0,

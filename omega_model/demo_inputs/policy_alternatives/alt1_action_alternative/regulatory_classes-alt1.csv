@@ -1,0 +1,4 @@
+input_template_name:,policy.regulatory_classes_demo_alt1,input_template_version:,0.1
+reg_class_id,description,,
+1_reg_class,'1' as defined by the regulations,,
+2_reg_class,'2' as defined by the regulations,,

@@ -1,0 +1,78 @@
+Parameter,Type,Value,
+Batch Settings,,,
+Batch Name,String,demo_batch-context_a_dev,
+Analysis Final Year,#,2050,
+Consolidate Manufacturers,TRUE / FALSE,TRUE,
+Cost Accrual,end-of-year / beginning-of-year,end-of-year,
+Discount Values to Year,#,2021,
+Analysis Dollar Basis,#,2020,
+,,,
+Batch Analysis Context Settings,,,
+Context Name,String,AEO2021,
+Context Case,String,Reference case,
+Context Fuel Prices File,String,analysis_contexts\context_a\context_fuel_prices.csv,
+Context New Vehicle Market File,String,analysis_contexts\context_a\context_new_vehicle_market.csv,
+GHG Credits File,String,analysis_contexts\context_a\ghg_credits.csv,
+Manufacturers File,String,analysis_contexts\context_a\manufacturers.csv,
+Market Classes File,String,analysis_contexts\context_a\market_classes.csv,
+New Vehicle Price Elasticity of Demand,#,-1,
+Onroad Fuels File,String,analysis_contexts\context_a\onroad_fuels.csv,
+Onroad Vehicle Calculations File,String,analysis_contexts\context_a\onroad_vehicle_calculations.csv,
+Onroad VMT File,String,analysis_contexts\context_a\annual_vmt_fixed_by_age.csv,
+Producer Cross Subsidy Multiplier Max,#,1.05,
+Producer Cross Subsidy Multiplier Min,#,0.95,
+Producer Generalized Cost File,String,analysis_contexts\context_a\producer_generalized_cost.csv,
+Production Constraints File,String,analysis_contexts\context_a\production_constraints-cntxt_a.csv,
+Sales Share File,String,analysis_contexts\context_a\sales_share_params-cntxt_a.csv,
+Vehicle Price Modifications File,String,analysis_contexts\context_a\vehicle_price_modifications-cntxt_a.csv,
+Vehicle Reregistration File,String,analysis_contexts\context_a\reregistration_fixed_by_age.csv,
+Vehicle Simulation Results and Costs File,String,analysis_contexts\context_a\simulated_vehicles.csv,
+Vehicles File,String,analysis_contexts\context_a\vehicles.csv,
+Context Criteria Cost Factors File,String,analysis_contexts\context_a\cost_factors-criteria.csv,
+Context SCC Cost Factors File,String,analysis_contexts\context_a\cost_factors-scc.csv,
+Context Energy Security Cost Factors File,String,analysis_contexts\context_a\cost_factors-energysecurity.csv,
+Context Congestion-Noise Cost Factors File,String,analysis_contexts\context_a\cost_factors-congestion-noise.csv,
+Context Powersector Emission Factors File,String,analysis_contexts\context_a\emission_factors-powersector.csv,
+Context Refinery Emission Factors File,String,analysis_contexts\context_a\emission_factors-refinery.csv,
+Context Vehicle Emission Factors File,String,analysis_contexts\context_a\emission_factors-vehicles.csv,
+Context Implicit Price Deflators File,String,analysis_contexts\context_a\implicit_price_deflators.csv,
+Context Consumer Price Index File,String,analysis_contexts\context_a\cpi_price_deflators.csv,
+,,,
+,,,
+Session Settings,,,
+Enable Session,TRUE / FALSE,TRUE,TRUE
+Session Name,String,NoActionPolicy,ActionAlternative
+,,,
+Session Policy Alternatives Settings,,,
+Drive Cycle Weights File,String,policy_alternatives\alt0_baseline_policy\drive_cycle_weights-alt0.csv,policy_alternatives\alt1_action_alternative\drive_cycle_weights-alt1.csv
+Drive Cycles File,String,policy_alternatives\alt0_baseline_policy\drive_cycles-alt0.csv,policy_alternatives\alt1_action_alternative\drive_cycles-alt1.csv
+GHG Credit Params File,String,policy_alternatives\alt0_baseline_policy\ghg_credit_params-alt0.csv,policy_alternatives\alt1_action_alternative\ghg_credit_params-alt1.csv
+GHG Standards File,String,policy_alternatives\alt0_baseline_policy\ghg_standards-alt0.csv,policy_alternatives\alt1_action_alternative\ghg_standards-alt1.csv
+Off-Cycle Credits File,String,policy_alternatives\alt0_baseline_policy\offcycle_credits-alt0.csv,policy_alternatives\alt1_action_alternative\offcycle_credits-alt1.csv
+Policy Fuel Upstream Methods File,String,policy_alternatives\alt0_baseline_policy\policy_fuel_upstream_methods-alt0.csv,policy_alternatives\alt1_action_alternative\policy_fuel_upstream_methods-alt1.csv
+Policy Fuels File,String,policy_alternatives\alt0_baseline_policy\policy_fuels-alt0.csv,policy_alternatives\alt1_action_alternative\policy_fuels-alt1.csv
+Production Multipliers File,String,policy_alternatives\alt0_baseline_policy\production_multipliers-alt0.csv,policy_alternatives\alt1_action_alternative\production_multipliers-alt1.csv
+Regulatory Classes File,String,policy_alternatives\alt0_baseline_policy\regulatory_classes-alt0.csv,policy_alternatives\alt1_action_alternative\regulatory_classes-alt1.csv
+Required Sales Share File,String,policy_alternatives\alt0_baseline_policy\required_sales_share-alt0.csv,policy_alternatives\alt1_action_alternative\required_sales_share-alt1.csv
+,,,
+Developer Settings,,,
+Num Market Share Options,#,3,3
+Num Tech Options per ICE Vehicle,#,3,3
+Num Tech Options per BEV Vehicle,#,1,1
+Cost Curve Frontier Affinity Factor,#,0.75,0.75
+Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
+Verbose Output,TRUE / FALSE,FALSE,FALSE
+Iterate Producer-Consumer,TRUE / FALSE,TRUE,TRUE
+Producer-Consumer Max Iterations,#,2,2
+Producer-Consumer Convergence Tolerance,#,1.00E-03,1.00E-03
+Producer Compliance Search Min Share Range,#,1.00E-005,1.00E-005
+Producer Compliance Search Convergence Factor,#,0.5,0.5
+Producer Compliance Search Tolerance,#,1.00E-006,1.00E-006
+Producer Cross Subsidy Price Tolerance,#,1.00E-04,1.00E-04
+Run Profiler,TRUE / FALSE,FALSE,FALSE
+Flat Context,TRUE / FALSE,FALSE,FALSE
+Flat Context Year,#,2020,2020
+Verbose Console Modules,"['producer', 'consumer'] or subset or []",['producer'],['producer']
+Log Producer Iteration Years," 'all' or [year, ...] or []",[2025],[2025]
+Log Consumer Iteration Years," 'all' or [year, ...] or []",[2025],[2025]
+Log Producer Decision and Response Years," 'all' or [year, ...] or []",[2025],[2025]
