@@ -464,7 +464,7 @@ class CreditBank(OMEGABase):
             It's possible to conceive of many different credit/debit strategies (once mandatory credit behavior has been
             handled).  In the case of OMEGA, strategic over- and under-compliance will eventually be handled by the
             year-over-year compliance tree which will allow a search of various "earn and burn" credit paths.  As such,
-            it's important to leave the implentation of such schemes out of this method and the default handling here
+            it's important to leave the implimentation of such schemes out of this method and the default handling here
             allows for that.
 
         Args:

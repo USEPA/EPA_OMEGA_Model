@@ -68,7 +68,7 @@ Data Column Name and Description
 **Optional Columns**
 
 :``reg_class_id:{reg_class_id}``:
-    The value of the credits.  Credits are specificied as positive numbers and are subtracted from the cert results to determine a compliance result
+    The value of the credits.  Credits are specified as positive numbers and are subtracted from the cert results to determine a compliance result
 
 **CODE**
 

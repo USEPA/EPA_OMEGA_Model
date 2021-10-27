@@ -488,7 +488,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
 def finalize_production(calendar_year, compliance_id, composite_vehicles, selected_production_decision):
     """
     Finalize vehicle production at the conclusion of the compliance search and producer-consumer market share
-    iteration.  Source ``Vehicle`` objects from the composite vehicles are are converted to ``VehicleFinal`` objects
+    iteration.  Source ``Vehicle`` objects from the composite vehicles are converted to ``VehicleFinal`` objects
     and stored in the database.  Manufacturer Annual Data is updated with the certification results in CO2e Mg
 
     Args:
