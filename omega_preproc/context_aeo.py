@@ -220,7 +220,7 @@ class SetInputs:
             self.path_outputs.mkdir(exist_ok=True)
         except:
             pass
-        self.path_input_templates = self.path_project / 'omega_model/demo_inputs'
+        self.path_input_templates = self.path_project / 'omega_model/test_inputs'
 
         self.vehicles_context_template = 'context_new_vehicle_market.csv'
         self.fuels_context_template = 'context_fuel_prices.csv'

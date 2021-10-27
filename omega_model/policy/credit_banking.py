@@ -585,7 +585,7 @@ if __name__ == '__main__':
                                                           omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=omega_globals.options.verbose)
 
-        # credit_bank = CreditBank('demo_inputs/ghg_debits.csv', 'consolidated_OEM')
+        # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'consolidated_OEM')
         # credit_bank.update_credit_age(2020)
         # credit_bank.handle_credit(2020, 'consolidated_OEM', 0.55)
         # credit_bank.credit_bank.to_csv('../out/__dump/debit_bank.csv', index=False)

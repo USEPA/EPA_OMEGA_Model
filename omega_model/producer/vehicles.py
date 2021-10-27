@@ -2,7 +2,7 @@
 
 **Routines to load base-year vehicle data, data structures to represent vehicles during compliance modeling
 (transient or ephemeral vehicles), finalized vehicles (manufacturer-produced compliance vehicles), and composite
-vehicles (used to group vehicles by various characterstics during compliance modeling).**
+vehicles (used to group vehicles by various characteristics during compliance modeling).**
 
 Classes are also implemented to handle composition and decomposition of vehicle attributes as part of the composite
 vehicle workflow.  Some vehicle attributes are known and fixed in advance, others are created at runtime (e.g. off-cycle
@@ -702,7 +702,7 @@ class CompositeVehicle(OMEGABase):
 
     def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
         """
-        Get new vehicle manufacturer generalzied cost from the composite cost curve for the provided cert CO2e g/mi
+        Get new vehicle manufacturer generalized cost from the composite cost curve for the provided cert CO2e g/mi
         value(s).
 
         Args:
@@ -956,7 +956,7 @@ class Vehicle(OMEGABase):
         Policy factors that modify the cost cloud and may modify the frontier from year to year include off cycle
         credit values, drive cycle weightings, upstream values, etc.  This method is also where costs could be
         updated dynamically before calculating the frontier (for example, cost reductions due to learning may
-        aready be present in the cost cloud, or could be implemented here instead).
+        already be present in the cost cloud, or could be implemented here instead).
 
         Additionally, each point in the frontier contains the values as determined by ``DecompositionAttributes``.
 

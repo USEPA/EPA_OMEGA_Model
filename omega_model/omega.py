@@ -467,7 +467,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, multiplier_colu
                                  producer_decision, producer_decision_and_response):
     """
     Calculate cross subsidy pricing options based on the allowable multiplier range, within a subsequently smaller
-    range as iteration progresses, until the search collapses (min mutliplier == max multiplier).
+    range as iteration progresses, until the search collapses (min multiplier == max multiplier).
 
     Args:
         calendar_year (int): calendar year of the iteration

@@ -4,7 +4,7 @@
 
 The file consists of several Worksheets within an Excel Workbook and should be saved in a folder named
 "inputs" within the omega_preproc/alpha_package_costs Python package. Note that throughout the input file cost values must be entered with
-a "dollar_basis" term which denotes the doller-year for the cost estimate (i.e., is the cost in 2012 dollars? 2018 dollars?).
+a "dollar_basis" term which denotes the dollar-year for the cost estimate (i.e., is the cost in 2012 dollars? 2018 dollars?).
 
 The individual Worksheets and their contents are:
 
@@ -116,7 +116,7 @@ price_class
     A concept that would allow for different cost scalers depending on the luxury/economy/etc. class of a vehicle package. This is not being used.
 
 engine
-    Cost entries for engine-related technologies (e.g., dollars per cylinder, dollars per liter, direct injection, turbochargning, etc.).
+    Cost entries for engine-related technologies (e.g., dollars per cylinder, dollars per liter, direct injection, turbocharging, etc.).
 
 trans
     Cost entries for transmissions.
@@ -137,7 +137,7 @@ ac
     Cost entries air conditioning related tech needed to earn the full AC credit (both leakage and efficiency).
 
 et_dmc
-    Cost entries for individual techs; some of these costs are pulled in to the sheets above for calculations.
+    Cost entries for individual techs; some of these costs are pulled into the sheets above for calculations.
     These costs are from EPA's past GHG work.
 
 ----
@@ -1130,7 +1130,7 @@ class InputSettings:
         self.path_inputs = self.path_to_file / 'inputs'
         self.path_outputs = self.path_to_file / 'outputs'
         self.path_alpha_inputs = self.path_to_file / 'ALPHA'
-        self.path_input_templates = self.path_project / 'omega_model/demo_inputs'
+        self.path_input_templates = self.path_project / 'omega_model/test_inputs'
 
         self.tech_flag_tracking = ['ac_leakage', 'ac_efficiency', 'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'phev', 'bev',
                                    'weight_reduction', 'curb_weight', 'deac_pd', 'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11',

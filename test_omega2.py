@@ -100,7 +100,7 @@ if __name__ == "__main__":
                 cmd_opts = ''
 
                 if f == 'omega_batch.py':
-                    cmd_opts = '--batch_file omega_model/demo_inputs/demo_batch.csv --verbose --session_num 0 --analysis_final_year 2020'
+                    cmd_opts = '--batch_file omega_model/test_inputs/test_batch.csv --verbose --session_num 0 --analysis_final_year 2020'
 
                 cmd_str = cmd_str + ' %s > %s' % (cmd_opts, console_file_pathname)
 

@@ -31,7 +31,7 @@ class ManufacturerAnnualData(SQABase):
     compliance_id = Column('compliance_id', Integer, ForeignKey('manufacturers.manufacturer_id'))  #: manufacturer id, e..g 'consolidated_OEM'
     model_year = Column(Numeric)  #: model year of the data
     calendar_year_cert_co2e_Mg = Column('calendar_year_cert_co2e_megagrams', Float)  #: certification CO2e (Mg) achieved in the given calendar year (initial compliance state)
-    model_year_cert_co2e_Mg = Column('model_year_cert_co2e_megagrams', Float)  #: certificaiton CO2e (Mg) achieved, including credits transferred to/from other model years
+    model_year_cert_co2e_Mg = Column('model_year_cert_co2e_megagrams', Float)  #: certification CO2e (Mg) achieved, including credits transferred to/from other model years
     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: certification target CO2e (Mg) for the calendar year
     manufacturer_vehicle_cost_dollars = Column('manufacturer_vehicle_cost_dollars', Float)  #: total manufacturer vehicle cost for the model year (sum of vehicle sales X vehicle cost)
 

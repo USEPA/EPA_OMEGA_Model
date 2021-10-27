@@ -152,7 +152,7 @@ Data Row Name and Description
     loaded by ``consumer.market_classes.MarketClass``
 
 :New Vehicle Price Elasticity of Demand *(float, ...)*:
-    Numeric value of the new vehicle price elastiticy of demand, typically <= 0, e.g. ``-0.5``
+    Numeric value of the new vehicle price elasticity of demand, typically <= 0, e.g. ``-0.5``
     Supports multiple comma-separated values
 
 :Onroad Fuels File *(str)*:
@@ -1259,7 +1259,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         bundle_path (str): the full path to the bundle folder, e.g. '/Users/omega_user/Code/GitHub/USEPA_OMEGA2/bundle'
         no_bundle (bool): don't bundle files if ``True``, else bundle
         batch_file (str): the path name of the source (original, non-expanded, non-bundled) batch file,
-            e.g. 'omega_model/demo_inputs/demo_batch.csv'
+            e.g. 'omega_model/test_inputs/test_batch.csv'
         session_num (int): the number of the session to run, if ``None`` all sessions are run
         verbose (bool): enables additional console and logfile output if ``True``
         timestamp (str): optional externally created timestamp (e.g. from the GUI)
@@ -1454,12 +1454,13 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             # write a copy of the original batch definition file to the bundle
             relocate_file(options.batch_path, options.batch_file)
 
-            # write a copy of the expanded, validated batch to the source batch_file directory:
-            if '.csv' in options.batch_file:
-                expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
-            else:
-                expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
-                                                  "Sessions")
+            if options.verbose:
+                # write a copy of the expanded, validated batch to the source batch_file directory:
+                if '.csv' in options.batch_file:
+                    expanded_batch.dataframe.to_csv(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name)
+                else:
+                    expanded_batch.dataframe.to_excel(os.path.dirname(options.batch_file) + os.sep + expanded_batch.name,
+                                                      "Sessions")
 
             if options.session_num is None:
                 session_list = range(0, batch.num_sessions())
