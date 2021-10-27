@@ -33,7 +33,7 @@ Sample Data Columns
 
         Parameter,Type,Value,
         Batch Settings,,,
-        Batch Name,String,demo_batch,
+        Batch Name,String,test_batch,
         Analysis Final Year,#,2050,
         Consolidate Manufacturers,TRUE / FALSE,TRUE,
         Cost Accrual,end-of-year / beginning-of-year,end-of-year,
@@ -60,15 +60,6 @@ Sample Data Columns
         Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
         Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,
         Vehicles File,String,vehicles.csv,
-        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
-        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
-        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
-        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
-        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
-        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
-        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
-        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
-        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
         ,,,
         Session Settings,,,
         Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -77,6 +68,7 @@ Sample Data Columns
         Session Policy Alternatives Settings,,,
         Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
         Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
+        GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
         GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
         GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
         Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
@@ -1164,7 +1156,7 @@ def run_bundled_sessions(options, remote_batchfile, session_list):
 
     Args:
         options (OMEGABatchCLIOptions): the command line arguments, contains the path to the remote batch, etc
-        remote_batchfile (str): the name of the remote batch file, e.g. '2021_08_26_15_35_16_demo_batch.csv'
+        remote_batchfile (str): the name of the remote batch file, e.g. '2021_08_26_15_35_16_test_batch.csv'
         session_list (list): a list containing the session number(s) to run from the remote batch, e.g. ``[0]`` or
             ``[0, 1, 4, ...], etc``
 
