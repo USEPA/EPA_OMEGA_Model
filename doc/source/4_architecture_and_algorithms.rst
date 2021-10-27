@@ -985,4 +985,4 @@ Where:
 Cost Effects Calculations
 -------------------------
 Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarily, the physical effects
-described above. (more to come)
+described above.
