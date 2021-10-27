@@ -11,6 +11,9 @@ scipy
 SQLAlchemy<1.4.0
 treelib
 
+# for readthedocs:
+sphinx-rtd-theme>=1.0.0<=2.0.0
+
 # for dispy parallel processing:
 dispy==4.12.4
 pycos==4.11.0

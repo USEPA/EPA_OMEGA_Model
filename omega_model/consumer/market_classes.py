@@ -178,6 +178,11 @@ if __name__ == '__main__':
 
         import importlib
 
+        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
+        from producer.manufacturers import Manufacturer
+        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicle_annual_data import VehicleAnnualData
+
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
 
@@ -194,8 +199,13 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail = []
-        init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file, verbose=omega_globals.options.verbose)
+        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
+
+        init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
+
+        init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
 
         if not init_fail:
             from common.omega_functions import print_dict

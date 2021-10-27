@@ -71,7 +71,7 @@ Whatever the level of resolution, the detail provided in the inputs 1) must meet
         Vehicle resolution,vehicles.csv,51 2019 base year vehicles differentiated by context size class ('Small Crossover' 'Large Pickup' etc) manufacturer_id and electrification_class ('N' 'HEV' 'EV')
         Technology package resolution:,simulated_vehicles.csv,578088 candidate vehicles for the analysis timeframe 2020 through 2050 with technology packages for ICE and BEV powertrains
         Technology component resolution:,simulated_vehicles.csv,detailed flags for identifying technology package contents of ac_leakage ac_efficiency high_eff_alternator start_stop hev phev bev weight_reduction  deac_pd deac_fc cegr atk2 gdi turb12 turb11
-        Market class resolution,consumer.market_classes.py user-definable submodule and market_classes.csv,4 classes in 2 nested levels with BEV and ICE categories within first tier hauling and nonhauling categories
+        Market class resolution,consumer.market_classes.py user-definable submodule and market_classes.csv,4 classes in 2 nested levels with BEV and ICE categories within first tier hauling and non-hauling categories
         Consumer resolution,consumer.sales_share_gcam.py user-definable submodule,consumer heterogeneity is inherent in share weights used to estimate market class shares
         Producer resolution,demo_batch.csv and manufacturers.csv,2 producers ('OEM_A' and 'OEM_B') and 'Consolidate Manufacturers' run setting set to FALSE
 
@@ -701,7 +701,7 @@ After a purely cost-minimizing option is selected in the initial compliance sear
 
     The upper left panel shows the range of producer cross-subsidy price multiplier options.  The full range of multipliers in the 0th sub-iteration are dark blue points, which then narrow in range over eight sub-iterations. The final range of multipliers is shown by the red points.
 
-    In the upper right panel, those same pricing options are shown in terms of absolute prices. While the multipliers applied to hauling and nonhauling vehicles cover a similar range of values, the lower absolute prices for non hauling vehicles results in a range of prices that is somewhat narrower than the range for hauling vehicles.
+    In the upper right panel, those same pricing options are shown in terms of absolute prices. While the multipliers applied to hauling and non-hauling vehicles cover a similar range of values, the lower absolute prices for non-hauling vehicles results in a range of prices that is somewhat narrower than the range for hauling vehicles.
 
     The two convergence criteria are illustrated in the bottom two panels of :numref:`al_label_figure_2025_0_initial_producer_consumer_iteration` (share delta for hauling BEVs in the lower left panel, and average total price delta in the lower right panel.) In this Producer-Consumer iteration, the market class shares offered by the producer do not converge with the shares demanded by the consumer over the range of cross-subsidy pricing options available. This is visible in the lower left panel, since the 0.4% share delta value in the final sub-iteration does not meet the convergence criteria. If convergence had been achieved, the iteration process of this analysis year would be complete, and the produced vehicles would be finalized. Otherwise, the iteration will proceed, with a new consideration of vehicle design options offered by the Producer Module.
 

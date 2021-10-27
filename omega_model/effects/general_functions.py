@@ -118,3 +118,5 @@ def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
 
     df = df.reindex(sorted(df.columns), axis=1)
     df.to_csv(f'{save_path}.csv', index=False)
+
+    return df
