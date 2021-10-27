@@ -1,0 +1,4 @@
+input_template_name:,context_cost_factors-congestion-noise,input_template_version:,0.1
+reg_class_id,dollar_basis,congestion_cost_dollars_per_mile,noise_cost_dollars_per_mile
+car,2018,0.063390239,0.000940863
+truck,2018,0.056598428,0.000940863
