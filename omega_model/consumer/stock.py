@@ -48,6 +48,9 @@ def update_stock(calendar_year, compliance_id=None):
     """
     from producer.vehicle_annual_data import VehicleAnnualData
 
+    if calendar_year < omega_globals.options.analysis_initial_year:
+        vehicles_cache.clear()
+
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year, compliance_id)
 

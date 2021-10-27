@@ -24,7 +24,7 @@ copyright = '2021, US EPA'
 author = 'US EPA'
 
 # The full version, including alpha/beta/rc tags
-release = '1.9.0'
+release = '1.9.2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -65,7 +65,8 @@ todo_include_todos = True
 
 html_theme_options = {
     'navigation_depth': 5,
-    'style_nav_header_background': '#0071BC'
+    'style_nav_header_background': '#0071BC',
+    'collapse_navigation': False,
 }
 
 # EPA Palette

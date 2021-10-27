@@ -15,24 +15,55 @@ def adjust_dollars(df, deflators, dollar_basis_year, *args):
     """
 
     Args:
-        df: The DataFrame of values to be converted to a consistent dollar basis.
-        deflators: A dictionary of price deflators.
-        dollar_basis_year: An integer representing the desired dollar basis for the return DataFrame.
+        df (DataFrame): values to be converted to a consistent dollar basis.
+        deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
+        dollar_basis_year (int): the desired dollar basis for the return DataFrame.
         args: The attributes to be converted to a consistent dollar basis.
 
     Returns:
         The passed DataFrame with args expressed in a consistent dollar basis.
 
     """
+    if deflators == 'cpi_price_deflators':
+        from effects.cpi_price_deflators import CPIPriceDeflators
+        deflators = CPIPriceDeflators
+    else:
+        from effects.ip_deflators import ImplictPriceDeflators
+        deflators = ImplictPriceDeflators
+
     basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
-    adj_factor_numerator = deflators[dollar_basis_year]['price_deflator']
+    adj_factor_numerator = deflators.get_price_deflator(dollar_basis_year)
     df_return = df.copy()
     for basis_year in basis_years:
         for arg in args:
-            adj_factor = adj_factor_numerator / deflators[basis_year]['price_deflator']
+            adj_factor = adj_factor_numerator / deflators.get_price_deflator(basis_year)
             df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
     df_return['dollar_basis'] = dollar_basis_year
     return df_return
+
+
+# def adjust_dollars(df, deflators, dollar_basis_year, *args):
+#     """
+#
+#     Args:
+#         df: The DataFrame of values to be converted to a consistent dollar basis.
+#         deflators: A dictionary of price deflators.
+#         dollar_basis_year: An integer representing the desired dollar basis for the return DataFrame.
+#         args: The attributes to be converted to a consistent dollar basis.
+#
+#     Returns:
+#         The passed DataFrame with args expressed in a consistent dollar basis.
+#
+#     """
+#     basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+#     adj_factor_numerator = deflators[dollar_basis_year]['price_deflator']
+#     df_return = df.copy()
+#     for basis_year in basis_years:
+#         for arg in args:
+#             adj_factor = adj_factor_numerator / deflators[basis_year]['price_deflator']
+#             df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
+#     df_return['dollar_basis'] = dollar_basis_year
+#     return df_return
 
 
 def round_sig(df, divisor=1, sig=0, *args):
@@ -63,8 +94,8 @@ def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
     """
 
     Args:
-        dict_to_save: A dictionary having a tuple of args as keys.\n
-        save_path: The path for saving the passed CSV.\n
+        dict_to_save: A dictionary having a tuple of args as keys.
+        save_path: The path for saving the passed CSV.
         row_header: A list of the column names to use a the row header for the preferred structure of the output file.
         args: The arguments contained in the tuple key - these will be pulled out and named according to the passed arguments.
 
@@ -84,5 +115,8 @@ def save_dict_to_csv(dict_to_save, save_path, row_header=None, *args):
     #     df.insert(0, 'yearID', df[['modelYearID', 'ageID']].sum(axis=1))
     cols = [col for col in df.columns if col not in row_header]
     df = pd.DataFrame(df, columns=row_header + cols)
+
+    df = df.reindex(sorted(df.columns), axis=1)
     df.to_csv(f'{save_path}.csv', index=False)
-    return
+
+    return df

@@ -12,7 +12,7 @@ Defines class OMEGARuntimeOptions which control an individual simulation session
 """
 
 # OMEGA code version number
-code_version = "1.9.0"
+code_version = "1.9.2"
 print('loading omega version %s' % code_version)
 
 import os, sys

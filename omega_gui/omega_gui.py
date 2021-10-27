@@ -9,6 +9,10 @@ The GUI has been tested to display properly up to 125% text size based on Window
 import os
 import sys
 
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(path, '..'))  # picks up omega_model
+sys.path.insert(0, os.path.join(path, '../omega_model'))  # picks up omega_model sub-packages
+
 if 'darwin' in sys.platform:
     os.environ['QT_MAC_WANTS_LAYER'] = '1'  # for Qt on MacOS
 
@@ -31,8 +35,6 @@ from datetime import datetime
 # Import functions from other files
 from omega_gui_functions import *
 from omega_gui_stylesheets import *
-
-from __init__ import *
 
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
 

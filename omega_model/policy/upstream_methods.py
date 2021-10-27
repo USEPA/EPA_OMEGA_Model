@@ -71,7 +71,7 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
     emissions.  Upstream emissions cannot be negative.
 
     upstream_co2e_g/mi = max(0, kwh_per_mile * upstream_gco2_per_kwh / upstream_efficiency -
-    vehicle.cert_target_co2e_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
+    vehicle.target_co2e_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
 
     Args:
         vehicle (Vehicle): The vehicle to calculate upstream emissions for
@@ -99,7 +99,7 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
             PolicyFuel.get_fuel_attribute(vehicle.model_year, 'gasoline', 'direct_co2e_grams_per_unit')
 
         upstream = np.maximum(0, kwh_per_mile * upstream_gco2_per_kwh / upstream_efficiency -
-                              vehicle.cert_target_co2e_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
+                              vehicle.target_co2e_grams_per_mile * upstream_gco2_per_gal / fuel_gco2_per_gal)
     else:
         upstream = 0
 

@@ -346,8 +346,14 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.cost_clouds import CostCloud
 
-        from producer.vehicles import VehicleFinal
+        from producer.vehicles import VehicleFinal, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
+        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
+
+        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
+
+        init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         SQABase.metadata.create_all(omega_globals.engine)
 

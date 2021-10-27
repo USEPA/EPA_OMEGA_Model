@@ -173,7 +173,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-            lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
+            vehicle.lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
             co2_gpmi = VehicleTargets.calc_target_co2e_gpmi(vehicle)
 
@@ -185,7 +185,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             else:
                 sales = vehicle.initial_registered_count
 
-            return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+            return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
         else:
             raise Exception('Missing GHG target parameters for %s, %d or prior'
                             % (vehicle.reg_class_id, vehicle.model_year))
@@ -218,7 +218,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
-            lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
+            vehicle.lifetime_VMT = VehicleTargets.calc_cert_lifetime_vmt(vehicle.reg_class_id, vehicle_model_year)
 
             if co2_gpmi_variants is not None:
                 if not (type(sales_variants) == pd.Series) or (type(sales_variants) == np.ndarray):
@@ -234,7 +234,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
                 sales = vehicle.initial_registered_count
                 co2_gpmi = vehicle.cert_co2e_grams_per_mile
 
-            return co2_gpmi * lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
+            return co2_gpmi * vehicle.lifetime_VMT * sales * Incentives.get_production_multiplier(vehicle) / 1e6
         else:
             raise Exception('Missing GHG target parameters for %s, %d or prior'
                             % (vehicle.reg_class_id, vehicle.model_year))

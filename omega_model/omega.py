@@ -898,6 +898,8 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_powersector import EmissionFactorsPowersector
     from effects.emission_factors_refinery import EmissionFactorsRefinery
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
+    from effects.cpi_price_deflators import CPIPriceDeflators
+    from effects.ip_deflators import ImplictPriceDeflators
     # from effects.cost_effects_scc import CostEffectsSCC
     # from effects.cost_effects_criteria import CostEffectsCriteria
     # from effects.cost_effects_non_emissions import CostEffectsNonEmissions
@@ -977,12 +979,13 @@ def init_omega(session_runtime_options):
                                                           omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=verbose_init)
 
-        # if omega_globals.options.calc_criteria_emission_costs:
-        #     init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-        #                                                              omega_globals.options.cpi_deflators_file,
-        #                                                              verbose=verbose_init)
-
         if omega_globals.options.calc_effects == 'Physical and Costs':
+            init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
+                                                          verbose=verbose_init)
+
+            init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+                                                          verbose=verbose_init)
+
             init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
                                                                             verbose=verbose_init)
 
@@ -993,7 +996,6 @@ def init_omega(session_runtime_options):
                                                                          verbose=verbose_init)
 
             init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                     omega_globals.options.cpi_deflators_file,
                                                                      verbose=verbose_init)
 
             init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,

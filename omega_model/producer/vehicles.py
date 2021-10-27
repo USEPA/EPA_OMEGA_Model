@@ -240,7 +240,7 @@ class DecompositionAttributes(OMEGABase):
                                                         set(DriveCycles.drive_cycle_names)))
 
         cls.offcycle_values = list(set.intersection(set(CostCloud.cost_cloud_data_columns),
-                                                 set(OffCycleCredits.offcycle_credit_names)))
+                                                    set(OffCycleCredits.offcycle_credit_names)))
 
         cls.other_values = list(set(CostCloud.cost_cloud_data_columns).
                                 difference(base_values).
@@ -424,13 +424,13 @@ class CompositeVehicle(OMEGABase):
     Vehicle reg classes, physical attributes, etc, and the active policy.
 
     """
-    def __init__(self, vehicle_list, vehicle_id, verbose=False, calc_composite_cost_curve=True,
+    def __init__(self, vehicles_list, vehicle_id, calc_composite_cost_curve=True,
                  weight_by='initial_registered_count'):
         """
         Create composite vehicle from list of Vehicle objects.
 
         Args:
-            vehicle_list ([Vehicle, ...]: list of one or more ``Vehicle`` objects
+            vehicles_list ([Vehicle, ...]: list of one or more ``Vehicle`` objects
             verbose (bool): enable additional console and logfile output if ``True``
             calc_composite_cost_curve (bool): if ``True`` then calculate the composite cost curve
             weight_by (str): name of the ``Vehicle`` attribute to weight by, e.g. 'initial_registered_count' or
@@ -439,7 +439,7 @@ class CompositeVehicle(OMEGABase):
         """
         from common.omega_functions import weighted_value
 
-        self.vehicle_list = vehicle_list  # copy.deepcopy(vehicle_list)
+        self.vehicle_list = vehicles_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
 
         self.vehicle_id = vehicle_id
@@ -468,7 +468,7 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             self.total_weight += v.__getattribute__(self.weight_by)
             self.initial_registered_count += v.initial_registered_count
-            v.set_cert_target_co2e_Mg()
+            v.set_target_co2e_Mg()
 
         for v in self.vehicle_list:
             if self.total_weight != 0:
@@ -477,15 +477,15 @@ class CompositeVehicle(OMEGABase):
                 v.composite_vehicle_share_frac = 0
 
         if calc_composite_cost_curve:
-            plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or \
+            plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or
                               (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
                               any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
         self.tech_option_iteration_num = 0
 
-        self.normalized_cert_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
-                                                             'normalized_cert_target_co2e_Mg')
+        self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
+                                                        'normalized_target_co2e_Mg')
 
         self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
 
@@ -521,9 +521,9 @@ class CompositeVehicle(OMEGABase):
             ``producer.vehicles.DecompositionAttributes``
 
         """
-        plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or \
-                          (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
-                          any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
+        plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or
+                           (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
+            any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
 
         if plot_cost_curve:
             from common.omega_plot import figure, label_xyt
@@ -537,11 +537,11 @@ class CompositeVehicle(OMEGABase):
                     v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, 'cert_co2e_grams_per_mile',
                                                                         self.cert_co2e_grams_per_mile, ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
-            v.set_cert_target_co2e_Mg()  # varies by model year and initial_registered_count
+            v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
 
             if plot_cost_curve:
-                if (v.name in omega_globals.options.log_vehicles):
+                if v.name in omega_globals.options.log_vehicles:
                     ax1.plot(v.cost_curve['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
                              v.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
                              color='black',
@@ -572,7 +572,7 @@ class CompositeVehicle(OMEGABase):
                      color=ax1.get_lines()[-1].get_color())
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(1.04, 0), loc="lower left",
-                               borderaxespad=0)
+                       borderaxespad=0)
 
             figname = '%s%s_%s_cost_curve_decomposition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title())
             figname = figname.replace('(', '_').replace(')', '_').replace('.', '_').replace(' ', '_')\
@@ -641,13 +641,13 @@ class CompositeVehicle(OMEGABase):
             composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
 
             if plot:
-                if (v.name in omega_globals.options.log_vehicles):
+                if v.name in omega_globals.options.log_vehicles:
                     ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
                              vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
                              color='black',
                              label='veh %s %s' % (v.vehicle_id, v.name))
                 else:
-                    ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id] ,
+                    ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
                              vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], '.--',
                              linewidth=1, label='veh %s %s' % (v.vehicle_id, v.name))
 
@@ -656,7 +656,7 @@ class CompositeVehicle(OMEGABase):
                      composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '-', linewidth=3,
                      label='Composite Vehicle')
 
-            ax1.legend(fontsize='medium', bbox_to_anchor=(1.04,0), loc="lower left", borderaxespad=0)
+            ax1.legend(fontsize='medium', bbox_to_anchor=(1.04, 0), loc="lower left", borderaxespad=0)
 
             figname = '%s%s_%s_cost_curve_composition.png' % (omega_globals.options.output_folder, self.model_year, ax1.get_title())
             figname = figname.replace('(', '_').replace(')', '_').replace('.', '_').replace(' ', '_')\
@@ -680,8 +680,8 @@ class CompositeVehicle(OMEGABase):
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2e_grams_per_mile'],
                                                       self.cost_curve['new_vehicle_mfr_cost_dollars'],
                                                       fill_value=(self.cost_curve['new_vehicle_mfr_cost_dollars'].min(),
-                                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'].max())
-                                                      , bounds_error=False)
+                                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'].max()),
+                                                      bounds_error=False)
             return cost_dollars(query_co2e_gpmi)
         else:
             return self.cost_curve['new_vehicle_mfr_cost_dollars'].item()
@@ -758,7 +758,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'epa_size_class',
+                       'cert_fuel_id', 'market_class_id', 'epa_size_class', 'lifetime_VMT',
                        'context_size_class', 'base_year_market_share', 'electrification_class'}
 
     # transfer base properties
@@ -772,7 +772,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     for attr in VehicleFinal.dynamic_attributes:
         to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
 
-    to_vehicle.set_cert_target_co2e_grams_per_mile()  # varies by model year
+    to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
 
     if type(from_vehicle) == VehicleFinal:
         # finish transfer from VehicleFinal to Vehicle
@@ -784,7 +784,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
             to_vehicle.cost_cloud = CostCloud.get_cloud(to_vehicle.model_year, to_vehicle.cost_curve_class)
         to_vehicle.cost_curve = to_vehicle.create_frontier_df()  # create frontier, inc. generalized cost and policy effects
 
-        to_vehicle.normalized_cert_target_co2e_Mg = \
+        to_vehicle.normalized_target_co2e_Mg = \
             omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
 
         VehicleAttributeCalculations.perform_attribute_calculations(to_vehicle)
@@ -796,7 +796,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
         for attr in DecompositionAttributes.values:
             to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
 
-        to_vehicle.cert_target_co2e_Mg = from_vehicle.cert_target_co2e_Mg
+        to_vehicle.target_co2e_Mg = from_vehicle.target_co2e_Mg
         to_vehicle.cert_co2e_Mg = from_vehicle.cert_co2e_Mg
 
 
@@ -839,10 +839,11 @@ class Vehicle(OMEGABase):
         self.context_size_class = None
         self.base_year_market_share = 0
         self.electrification_class = None
-        self.cert_target_co2e_grams_per_mile = 0
+        self.target_co2e_grams_per_mile = 0
+        self.lifetime_VMT = 0
         self.cert_co2e_Mg = 0
-        self.cert_target_co2e_Mg = 0
-        self.normalized_cert_target_co2e_Mg = 0
+        self.target_co2e_Mg = 0
+        self.normalized_target_co2e_Mg = 0
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
@@ -916,25 +917,25 @@ class Vehicle(OMEGABase):
 
         return co2_emissions_grams_per_unit
 
-    def set_cert_target_co2e_grams_per_mile(self):
+    def set_target_co2e_grams_per_mile(self):
         """
         Set the vehicle cert target CO2e grams per mile based on the current policy and vehicle attributes.
 
         Returns:
-            Nothing, updates ``cert_target_co2e_grams_per_mile``
+            Nothing, updates ``target_co2e_grams_per_mile``
 
         """
-        self.cert_target_co2e_grams_per_mile = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(self)
+        self.target_co2e_grams_per_mile = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(self)
 
-    def set_cert_target_co2e_Mg(self):
+    def set_target_co2e_Mg(self):
         """
         Set the vehicle cert target CO2e megagrams based on the current policy and vehicle attributes.
 
         Returns:
-            Nothing, updates ``cert_target_co2e_Mg``
+            Nothing, updates ``target_co2e_Mg``
 
         """
-        self.cert_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self)
+        self.target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(self)
 
     def set_cert_co2e_Mg(self):
         """
@@ -986,11 +987,13 @@ class Vehicle(OMEGABase):
         # calculate off cycle credits before calculating upstream and onroad
         self.cost_cloud = OffCycleCredits.calc_off_cycle_credits(self)
 
-        self.cost_cloud['cert_direct_co2e_grams_per_mile'] = self.cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] -\
-                                                            self.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
+        self.cost_cloud['cert_direct_co2e_grams_per_mile'] = \
+            self.cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
+            self.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
 
-        self.cost_cloud['cert_direct_kwh_per_mile'] = self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
-                                                      self.cost_cloud['cert_direct_offcycle_kwh_per_mile']
+        self.cost_cloud['cert_direct_kwh_per_mile'] = \
+            self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
+            self.cost_cloud['cert_direct_offcycle_kwh_per_mile']
 
         # calc onroad gap, etc...
         VehicleAttributeCalculations.perform_attribute_calculations(self, self.cost_cloud)
@@ -1002,9 +1005,10 @@ class Vehicle(OMEGABase):
             upstream_method(self, self.cost_cloud['cert_direct_co2e_grams_per_mile'],
                             self.cost_cloud['cert_direct_kwh_per_mile'])
 
-        self.cost_cloud['cert_co2e_grams_per_mile'] = self.cost_cloud['cert_direct_co2e_grams_per_mile'] + \
-                                                     self.cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
-                                                     self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
+        self.cost_cloud['cert_co2e_grams_per_mile'] = \
+            self.cost_cloud['cert_direct_co2e_grams_per_mile'] + \
+            self.cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
+            self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
 
         # calculate producer generalized cost
         self.cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
@@ -1028,7 +1032,7 @@ class Vehicle(OMEGABase):
 
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
             (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
-            (self.name in omega_globals.options.log_vehicles):
+                (self.name in omega_globals.options.log_vehicles):
 
             logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
             self.cost_cloud['frontier'] = False
@@ -1043,17 +1047,17 @@ class Vehicle(OMEGABase):
             label_xyt(ax1, 'CO2e [g/mi]', 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
             ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
-                 self.cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
-                 label='Production Cost')
+                     self.cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
+                     label='Production Cost')
 
             ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
-                 self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
-                 label='Generalized Cost')
+                     self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
+                     label='Generalized Cost')
 
             ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
-                 cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
-                 color='black',
-                 label='Cost Curve')
+                     cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 's-',
+                     color='black',
+                     label='Cost Curve')
 
             ax1.legend(fontsize='medium', bbox_to_anchor=(0, 1.07), loc="lower left", borderaxespad=0)
 
@@ -1089,9 +1093,10 @@ class VehicleFinal(SQABase, Vehicle):
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
-    cert_target_co2e_grams_per_mile = Column('cert_target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
+    target_co2e_grams_per_mile = Column('target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
+    lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
-    cert_target_co2e_Mg = Column('cert_target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
+    target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
     cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
     market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, as determined by the consumer subpackage
@@ -1190,7 +1195,7 @@ class VehicleFinal(SQABase, Vehicle):
         return omega_globals.session.query(*attrs).filter(VehicleFinal.vehicle_id == vehicle_id).one()
 
     @staticmethod
-    def calc_cert_target_co2e_Mg(model_year, compliance_id):
+    def calc_target_co2e_Mg(model_year, compliance_id):
         """
         Calculate the total cert target CO2e Mg for the given model year and compliance ID
 
@@ -1202,7 +1207,7 @@ class VehicleFinal(SQABase, Vehicle):
             The sum of vehicle cert target CO2e Mg for the given model year and compliance ID
 
         """
-        return omega_globals.session.query(func.sum(VehicleFinal.cert_target_co2e_Mg)). \
+        return omega_globals.session.query(func.sum(VehicleFinal.target_co2e_Mg)). \
             filter(VehicleFinal.compliance_id == compliance_id). \
             filter(VehicleFinal.model_year == model_year).scalar()
 
@@ -1237,8 +1242,7 @@ class VehicleFinal(SQABase, Vehicle):
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
                               'reg_class_id', 'epa_size_class', 'context_size_class',
-                              'base_year_market_share'] + \
-                             VehicleFinal.dynamic_attributes
+                              'base_year_market_share'] + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
         veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
@@ -1267,6 +1271,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         vehicle_shares_dict = {'total': 0}
 
+        VehicleFinal.compliance_ids = set()
         vehicles_list = []
 
         if verbose:
@@ -1397,6 +1402,8 @@ class VehicleFinal(SQABase, Vehicle):
                 # calculate manufacturer base year context size class shares
                 from producer.manufacturers import Manufacturer
 
+                VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
+
                 VehicleFinal.mfr_base_year_size_class_share = dict()
                 for compliance_id in VehicleFinal.compliance_ids:
                     for size_class in NewVehicleMarket.context_size_classes:
@@ -1439,16 +1446,16 @@ class VehicleFinal(SQABase, Vehicle):
             ``VehicleAttributeCalculations``, ``DecompositionAttributes``
 
         """
-        init_fail = []
+        _init_fail = []
 
         DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
-        init_fail += VehicleFinal.init_vehicles_from_file(vehicles_file, verbose=verbose)
+        _init_fail += VehicleFinal.init_vehicles_from_file(vehicles_file, verbose=verbose)
 
-        init_fail += VehicleAttributeCalculations.init_vehicle_attribute_calculations_from_file(
+        _init_fail += VehicleAttributeCalculations.init_vehicle_attribute_calculations_from_file(
             vehicle_onroad_calculations_file, clear_cache=True, verbose=verbose)
 
-        return init_fail
+        return _init_fail
 
 
 if __name__ == '__main__':
@@ -1490,15 +1497,15 @@ if __name__ == '__main__':
         vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
         VehicleFinal.dynamic_columns = list(
             set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
-        for dc in VehicleFinal.dynamic_columns:
-            VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
+        for vdc in VehicleFinal.dynamic_columns:
+            VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(vdc))
 
-        for attr in VehicleFinal.dynamic_attributes:
-            if attr not in VehicleFinal.__dict__:
+        for attribute in VehicleFinal.dynamic_attributes:
+            if attribute not in VehicleFinal.__dict__:
                 if int(sqlalchemy.__version__.split('.')[1]) > 3:
-                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                    sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attribute, Column(attribute, Float))
                 else:
-                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attr, Column(attr, Float))
+                    sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attribute, Column(attribute, Float))
 
         SQABase.metadata.create_all(omega_globals.engine)
 
@@ -1529,15 +1536,15 @@ if __name__ == '__main__':
 
         if not init_fail:
 
-            vehicles_list = VehicleFinal.get_compliance_vehicles(2019, 'OEM_A')
+            vehicle_list = VehicleFinal.get_compliance_vehicles(2019, 'OEM_A')
 
             # update vehicle annual data, registered count must be update first:
-            VehicleAnnualData.update_registered_count(vehicles_list[0], 2020, 54321)
+            VehicleAnnualData.update_registered_count(vehicle_list[0], 2020, 54321)
 
             # dump database with updated vehicle annual data
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
-            weighted_footprint = weighted_value(vehicles_list, 'initial_registered_count', 'footprint_ft2')
+            weighted_footprint = weighted_value(vehicle_list, 'initial_registered_count', 'footprint_ft2')
 
             # v = vehicles_list[0]
             # v.model_year = 2020

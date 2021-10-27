@@ -67,7 +67,7 @@ Producer-Consumer Max Iterations,#,2,2
 Producer-Consumer Convergence Tolerance,#,1.00E-03,1.00E-03
 Producer Compliance Search Min Share Range,#,1.00E-005,1.00E-005
 Producer Compliance Search Convergence Factor,#,0.5,0.5
-Producer Compliance Search Tolerance,#,1.00E-07,1.00E-07
+Producer Compliance Search Tolerance,#,1.00E-006,1.00E-006
 Producer Cross Subsidy Price Tolerance,#,1.00E-04,1.00E-04
 Run Profiler,TRUE / FALSE,FALSE,FALSE
 Flat Context,TRUE / FALSE,FALSE,FALSE

@@ -131,9 +131,7 @@ class CostFactorsSCC(SQABase, OMEGABase):
 
             cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
 
-            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
-
-            df = gen_fxns.adjust_dollars(df, deflators, omega_globals.options.analysis_dollar_basis, *cols_to_convert)
+            df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
                 obj_list = []
@@ -166,6 +164,8 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
+        from effects.ip_deflators import ImplictPriceDeflators
+
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
         init_omega_db(omega_globals.options.verbose)
@@ -174,6 +174,9 @@ if __name__ == '__main__':
         SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
+
+        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+                                                          verbose=omega_globals.options.verbose)
 
         init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
                                                             verbose=omega_globals.options.verbose)

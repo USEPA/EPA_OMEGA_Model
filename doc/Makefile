@@ -6,7 +6,7 @@
 
 SOURCEDIR   = source
 BUILDDIR    = build
-DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 1.9.0 --module-first --tocfile 7_code_details
+DOCOPTS    	= --force --append-syspath --doc-project "Code Details" --doc-version 1.9.2 --module-first --tocfile 7_code_details
 BUILDOPTS   = -v
 EXCLUDES    = ../setup.py ../exe_entry.py
 

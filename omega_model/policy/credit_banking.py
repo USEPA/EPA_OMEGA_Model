@@ -464,7 +464,7 @@ class CreditBank(OMEGABase):
             It's possible to conceive of many different credit/debit strategies (once mandatory credit behavior has been
             handled).  In the case of OMEGA, strategic over- and under-compliance will eventually be handled by the
             year-over-year compliance tree which will allow a search of various "earn and burn" credit paths.  As such,
-            it's important to leave the implentation of such schemes out of this method and the default handling here
+            it's important to leave the implimentation of such schemes out of this method and the default handling here
             allows for that.
 
         Args:
@@ -541,6 +541,11 @@ if __name__ == '__main__':
 
         import importlib
 
+        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
+        from producer.manufacturers import Manufacturer
+        from producer.vehicles import VehicleFinal, DecompositionAttributes
+        from producer.vehicle_annual_data import VehicleAnnualData
+
         omega_globals.options = OMEGASessionSettings()
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
@@ -562,6 +567,11 @@ if __name__ == '__main__':
         from producer.manufacturer_annual_data import ManufacturerAnnualData
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
+
+        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
+        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
+
+        init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         SQABase.metadata.create_all(omega_globals.engine)
 
