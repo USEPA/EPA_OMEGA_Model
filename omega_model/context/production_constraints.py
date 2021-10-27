@@ -47,7 +47,7 @@ Data Column Name and Description
 **Optional Columns**
 
 :``{market_class_id}:{minimum_share or maximum_share}``:
-    Holds the value of the minimum or maximum production contraint, as required, [0..1]
+    Holds the value of the minimum or maximum production constraint, as required, [0..1]
 
 **CODE**
 
@@ -73,7 +73,7 @@ class ProductionConstraints(OMEGABase):
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
         """
-        Get the minimium possible market share for the given calendar year and market class ID
+        Get the minimum possible market share for the given calendar year and market class ID
 
         Args:
             calendar_year (int): calendar year to get minimum production constraint for
@@ -104,7 +104,7 @@ class ProductionConstraints(OMEGABase):
     @staticmethod
     def get_maximum_share(calendar_year, market_class_id):
         """
-        Get the maximium possible market share for the given calendar year and market class ID
+        Get the maximum possible market share for the given calendar year and market class ID
 
         Args:
             calendar_year (int): calendar year to get maximum production constraint for
