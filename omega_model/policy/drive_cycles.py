@@ -2,7 +2,7 @@
 
 **Routines to load, validate, and provide access to drive cycle definition data**
 
-Drive cycles and cycle phasese are defined by a name, a distance and a brief description.
+Drive cycles and cycle phases are defined by a name, a distance and a brief description.
 
 ----
 

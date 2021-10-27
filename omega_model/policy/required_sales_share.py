@@ -2,7 +2,7 @@
 
 **Routines to load and apply (optional) required sales shares by market class.**
 
-This module could be used to investiage the effect of ZEV mandates, for example.
+This module could be used to investigate the effect of ZEV mandates, for example.
 
 ----
 
@@ -11,7 +11,7 @@ This module could be used to investiage the effect of ZEV mandates, for example.
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The data header uses a dynamic column notation, as detailed below.
 
-The data represents required minimum sales shares by by market class ID and start year.  Shares are relative
+The data represents required minimum sales shares by market class ID and start year.  Shares are relative
 to the market category, not absolute.
 
 File Type
