@@ -1,0 +1,7 @@
+input_template_name:,required_sales_share,input_template_version:,0.2
+start_year,hauling.BEV:minimum_share,non_hauling.BEV:minimum_share,
+2020,0,0,
+2030,0.01,0.03,
+2035,0.05,0.1,
+2040,0.1,0.2,
+2045,0,0,
