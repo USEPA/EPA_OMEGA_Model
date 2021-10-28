@@ -2,8 +2,6 @@
 OMEGA Documentation
 ===================
 
-.. image:: _static/epa_logo_1.jpg
-
 .. toctree::
     :maxdepth: 4
     :caption: Contents:
