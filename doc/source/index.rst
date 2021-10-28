@@ -1,5 +1,3 @@
-.. image:: _static/epa_logo_1.jpg
-
 ===================
 OMEGA Documentation
 ===================
