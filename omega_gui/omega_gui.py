@@ -567,7 +567,12 @@ class Form(QObject):
         :return:
         """
 
-        os.system("start \"\" https://omega2.readthedocs.io/en/2.0.0")
+        doc_link = 'https://omega2.readthedocs.io/en/2.0.0'
+
+        if sys.platform.startswith('win'):
+            os.system("start \"\" %s" % doc_link)
+        else:
+            os.system('open %s' % doc_link)
 
     def launch_epa_website(self):
         """
@@ -576,7 +581,12 @@ class Form(QObject):
         :return:
         """
 
-        os.system("start \"\" https://epa.gov")
+        epa_link = 'https://epa.gov'
+
+        if sys.platform.startswith('win'):
+            os.system("start \"\" %s" % epa_link)
+        else:
+            os.system('open %s' % epa_link)
 
     def launch_about(self):
         """
