@@ -93,7 +93,7 @@ Data Column Name and Description
         Sales weighted average battery electric in-use fuel economy (miles per gallon equivalent, MPGe)
 
     :onroad_to_cycle_mpg_ratio:
-        The ratio of in-use to certfication fuel economy
+        The ratio of in-use to certification fuel economy
 
     :ice_price_dollars:
         Sales weighted average internal combustion engine (ICE) vehicle price (dollars)
