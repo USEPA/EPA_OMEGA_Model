@@ -18,10 +18,3 @@ OMEGA Documentation
     7_code_details
     8_glossary
     9_distribution_and_support_policy
-
-Indices and Tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
