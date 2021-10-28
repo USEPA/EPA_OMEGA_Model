@@ -13,8 +13,6 @@ A complete copy of this documentation is available in various formats and is dow
 
 * `OMEGA Documentation in HTML format (preferred) <https://omega2.readthedocs.io/_/downloads/en/v2.0.0/htmlzip/>`_
 
-* `OMEGA Documentation in PDF format <https://omega2.readthedocs.io/_/downloads/en/v2.0.0/pdf/>`_
-
 This documentation is also available online at `omega2.readthedocs.io/en/v2.0.0 <https://omega2.readthedocs.io/en/v2.0.0/>`_
 
 Disclaimer of Liability
