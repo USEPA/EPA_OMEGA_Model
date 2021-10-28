@@ -71,6 +71,7 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
 
         Args:
             calendar_year: calendar year to get emission factors for
+            fuel: the in-use fuel ID
             emission_factors: name of emission factor or list of emission factor attributes to get
 
         Returns: emission factor or list of emission factors
@@ -99,6 +100,18 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
         cache.clear()
 
         if verbose:

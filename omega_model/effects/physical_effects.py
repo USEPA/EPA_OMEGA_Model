@@ -115,7 +115,7 @@ def calc_physical_effects(calendar_years):
     """
 
     Args:
-        calendar_year: The year for which emission inventories and fuel consumptions will be calculated.
+        calendar_years: The years for which emission inventories and fuel consumptions will be calculated.
 
     Returns:
         A dictionary key, value pair where the key is a tuple (vehicle_id, calendar_year, age) and the value is a dictionary of key, value pairs providing

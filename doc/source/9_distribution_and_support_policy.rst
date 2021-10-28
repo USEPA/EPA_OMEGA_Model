@@ -11,9 +11,9 @@ Downloadable Documents
 ----------------------
 A complete copy of this documentation is available in various formats and is downloadable using the following links:
 
-* `OMEGA Documentation in HTML format (preferred) <https://omega2.readthedocs.io/_/downloads/en/2.0.0/htmlzip/>`_
+* `OMEGA Documentation in HTML format (preferred) <https://omega2.readthedocs.io/_/downloads/en/2.0.1/htmlzip/>`_
 
-This documentation is also available online at `omega2.readthedocs.io/en/2.0.0 <https://omega2.readthedocs.io/en/2.0.0/>`_
+This documentation is also available online at `omega2.readthedocs.io/en/2.0.1 <https://omega2.readthedocs.io/en/2.0.1/>`_
 
 Disclaimer of Liability
 -----------------------
