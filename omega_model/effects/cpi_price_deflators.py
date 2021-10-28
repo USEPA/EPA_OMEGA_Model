@@ -2,7 +2,7 @@
 
 **Routines to load CPI price deflators.**
 
-Used to discount costs in the effects module
+Used to discount costs in the ``cost_factors_criteria`` module.
 
 ----
 

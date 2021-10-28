@@ -2,7 +2,7 @@
 
 **Routines to load Implicit Price (IP) deflators.**
 
-Used to discount costs in the effects module
+Used to discount costs throughout the effects calculations.
 
 ----
 

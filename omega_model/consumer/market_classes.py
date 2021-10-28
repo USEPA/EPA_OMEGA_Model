@@ -7,7 +7,7 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The template header uses a dynamic format.
 
-The data represents characteristics of the consumer module's market classes.
+The data represents characteristics of the Consumer Module's market classes.
 
 File Type
     comma-separated values (CSV)
