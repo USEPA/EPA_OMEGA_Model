@@ -567,7 +567,7 @@ class Form(QObject):
         :return:
         """
 
-        os.system("start \"\" https://omega2.readthedocs.io/en/latest/index.html")
+        os.system("start \"\" https://omega2.readthedocs.io/en/2.0.0")
 
     def launch_epa_website(self):
         """
