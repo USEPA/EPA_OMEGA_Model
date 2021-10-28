@@ -20,14 +20,13 @@ setup(
                   'Source Code': 'https://github.com/USEPA/EPA_OMEGA_Model',
     },
     author="US EPA",
-    author_email="newman.kevin@epa.gov",
+    author_email="omega_support@epa.gov",
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
     ],
-    packages=["omega_model"],                # or something like packages=find_packages(exclude=("tests",)),
+    packages=['omega_model', 'omega_gui'], # or something like packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     install_requires=["numpy", "matplotlib", 'PySide2', 'PyYAML', 'multitimer'],
     entry_points={
