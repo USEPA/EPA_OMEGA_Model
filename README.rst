@@ -30,6 +30,6 @@ Documentation
 
 For more information, please see:
 
-https://omega2.readthedocs.io/en/latest/index.html
+https://omega2.readthedocs.io/en/2.0.0
 
 The Developer Guide chapter has notes for those interested in working from the source code.
