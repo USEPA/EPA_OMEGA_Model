@@ -1455,7 +1455,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                       "Sessions")
 
             if options.session_num is None:
-                session_list = range(0, batch.num_sessions())
+                session_list = list({0}.union([s.num for s in batch.sessions if s.enabled]))
             else:
                 session_list = list({0, options.session_num})
 
@@ -1533,7 +1533,7 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
         batch.batch_log.logwrite("Batch name = " + batch.name)
 
         if options.session_num is None:
-            session_list = range(0, batch.num_sessions())
+            session_list = list({0}.union([s.num for s in batch.sessions if s.enabled]))
         else:
             session_list = list({0, options.session_num})
 
