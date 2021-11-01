@@ -772,6 +772,9 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     for attr in VehicleFinal.dynamic_attributes:
         to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
 
+    # assign user-definable reg class
+    to_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(to_vehicle)
+
     to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
 
     if type(from_vehicle) == VehicleFinal:
@@ -1321,8 +1324,6 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
-                    veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
                     veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
 
@@ -1339,6 +1340,9 @@ class VehicleFinal(SQABase, Vehicle):
                     vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
 
                     vehicles_list.append(veh)
+
+                    # assign user-definable market class
+                    veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
 
                     non_responsive_market_category = \
                         omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
