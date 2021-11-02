@@ -12,4 +12,10 @@ pyinstaller exe_entry.py \
     --noconfirm \
     --onefile
 
+# cleanup
+
+mv *.spec versioning
+rm -R __pycache__
+rm -R build
+
 cd versioning
