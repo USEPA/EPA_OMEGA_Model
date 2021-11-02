@@ -3,6 +3,7 @@ REM usage build_dist
 cd ..
 
 REM build executable
+
 pyinstaller exe_entry.py ^
     --name OMEGA-2.0.0-win ^
     --paths omega_model;omega_gui ^
@@ -10,5 +11,11 @@ pyinstaller exe_entry.py ^
     --add-data omega_gui/elements;omega_gui/elements ^
     --noconfirm ^
     --onefile
+
+REM cleanup
+
+move /Y  *.spec versioning
+rmdir /S /Q __pycache__
+rmdir /S /Q build
 
 cd versioning
