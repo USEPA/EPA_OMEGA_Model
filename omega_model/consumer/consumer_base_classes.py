@@ -57,7 +57,7 @@ class AnnualVMTBase:
     """
 
     @staticmethod
-    def get_vmt(market_class_id, age, **kwargs):
+    def get_vmt(market_class_id, age):
         """
         Get vehicle miles travelled by market class and age.
 
