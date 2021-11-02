@@ -63,7 +63,7 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
     index = Column(Integer, primary_key=True)  #: database table index
 
     age = Column(Numeric)  #: vehicle age
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: vehicle market class
+    market_class_id = Column('market_class_id', String)  #: vehicle market class
     annual_vmt = Column(Numeric)  #: vehicle miles travelled
 
     @staticmethod
@@ -130,6 +130,9 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
                         market_class_id=df.loc[i, 'market_class_id'],
                         annual_vmt=df.loc[i, 'annual_vmt'],
                     ))
+                    template_errors += \
+                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
 

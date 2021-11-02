@@ -1102,7 +1102,7 @@ class VehicleFinal(SQABase, Vehicle):
     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
     cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, as determined by the consumer subpackage
+    market_class_id = Column('market_class_id', String)  #: market class ID, as determined by the consumer subpackage
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 

@@ -67,7 +67,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
     index = Column(Integer, primary_key=True)  #: database table index
 
     age = Column(Numeric)  #: vehicle age
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, e.g. 'hauling.ICE'
+    market_class_id = Column('market_class_id', String)  #: market class ID, e.g. 'hauling.ICE'
     reregistered_proportion = Column(Float)  #: re-registered proportion, [0..1]
 
     @staticmethod
@@ -131,6 +131,9 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
                         market_class_id=df.loc[i, 'market_class_id'],
                         reregistered_proportion=df.loc[i, 'reregistered_proportion'],
                     ))
+                    template_errors += \
+                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
 

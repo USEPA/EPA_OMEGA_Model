@@ -88,7 +88,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
     __tablename__ = 'demanded_shares_gcam'
     index = Column(Integer, primary_key=True)  #: database table index
 
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID
+    market_class_id = Column('market_class_id', String)  #: market class ID
     annual_VMT = Column('annual_vmt', Float)  #: annual vehicle miles travelled
     calendar_year = Column(Numeric)  #: the calendar year of the parameters
     payback_years = Column(Numeric)  #: payback period, in years
@@ -304,6 +304,9 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
                         average_occupancy=df.loc[i, 'average_occupancy'],
                         logit_exponent_mu=df.loc[i, 'logit_exponent_mu'],
                     ))
+                    template_errors += \
+                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+
                 omega_globals.session.add_all(obj_list)
                 omega_globals.session.flush()
 
