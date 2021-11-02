@@ -54,21 +54,13 @@ Data Column Name and Description
 
 from omega_model import *
 
-_cache = dict()
 
-
-class Reregistration(OMEGABase, SQABase, ReregistrationBase):
+class Reregistration(OMEGABase, ReregistrationBase):
     """
     **Load and provide access to vehicle re-registration data.**
     """
 
-    # --- database table properties ---
-    __tablename__ = 'reregistration_fixed_by_age'
-    index = Column(Integer, primary_key=True)  #: database table index
-
-    age = Column(Numeric)  #: vehicle age
-    market_class_id = Column('market_class_id', String)  #: market class ID, e.g. 'hauling.ICE'
-    reregistered_proportion = Column(Float)  #: re-registered proportion, [0..1]
+    _data = dict()
 
     @staticmethod
     def get_reregistered_proportion(market_class_id, age):
@@ -83,13 +75,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             Re-registered proportion [0..1]
 
         """
-        cache_key = '%s_%s' % (market_class_id, age)
-
-        if cache_key not in _cache:
-            _cache[cache_key] = float(omega_globals.session.query(Reregistration.reregistered_proportion).
-                                     filter(Reregistration.market_class_id == market_class_id).
-                                     filter(Reregistration.age == age).scalar())
-        return _cache[cache_key]
+        return Reregistration._data[market_class_id, age]['reregistered_proportion']
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -104,7 +90,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             List of template/input errors, else empty list on success
 
         """
-        _cache.clear()
+        Reregistration._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -123,19 +109,13 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
+                # validate data
                 for i in df.index:
-                    obj_list.append(Reregistration(
-                        age=df.loc[i, 'age'],
-                        market_class_id=df.loc[i, 'market_class_id'],
-                        reregistered_proportion=df.loc[i, 'reregistered_proportion'],
-                    ))
                     template_errors += \
                         omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
 
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+            if not template_errors:
+                Reregistration._data = df.set_index(['market_class_id', 'age']).to_dict(orient='index')
 
         return template_errors
 
