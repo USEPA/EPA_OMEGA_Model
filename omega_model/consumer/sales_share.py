@@ -79,25 +79,12 @@ from omega_model import *
 _cache = dict()
 
 
-class SalesShare(OMEGABase, SQABase, SalesShareBase):
+class SalesShare(OMEGABase, SalesShareBase):
     """
     Loads and provides access to GCAM consumer response parameters.
 
     """
-    # --- database table properties ---
-    __tablename__ = 'demanded_shares_gcam'
-    index = Column(Integer, primary_key=True)  #: database table index
-
-    market_class_id = Column('market_class_id', String)  #: market class ID
-    annual_VMT = Column('annual_vmt', Float)  #: annual vehicle miles travelled
-    calendar_year = Column(Numeric)  #: the calendar year of the parameters
-    payback_years = Column(Numeric)  #: payback period, in years
-    price_amortization_period = Column(Numeric)  #: price amorization period, in years
-    discount_rate = Column(Float)  #: discount rate [0..1], e.g. 0.1
-    share_weight = Column(Float)  #: share weight [0..1]
-    o_m_costs = Column(Float)  #: operating and maintenance costs, in dollars
-    average_occupancy = Column(Float)  #: average vehicle occupancy, number of people
-    logit_exponent_mu = Column(Float)  #: logit exponent, mu
+    _data = dict()
 
     @staticmethod
     def get_gcam_params(calendar_year, market_class_id):
@@ -112,19 +99,13 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
             GCAM parameters for the given calendar year and market class
 
         """
-        start_years = _cache[market_class_id]['start_year']
+        start_years = SalesShare._data[market_class_id]['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
-            key = '%s_%s' % (calendar_year, market_class_id)
-            if not key in _cache:
-                _cache[key] = omega_globals.session.query(SalesShare). \
-                    filter(SalesShare.calendar_year == calendar_year). \
-                    filter(SalesShare.market_class_id == market_class_id).one()
+            return SalesShare._data[market_class_id, calendar_year]
         else:
             raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
-
-        return _cache[key]
 
     def calc_shares_gcam(market_class_data, calendar_year, parent_market_class, child_market_classes):
         """
@@ -160,10 +141,10 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
                     gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
 
-                    logit_exponent_mu = gcam_data_cy.logit_exponent_mu
+                    logit_exponent_mu = gcam_data_cy['logit_exponent_mu']
 
-                    price_amortization_period = float(gcam_data_cy.price_amortization_period)
-                    discount_rate = gcam_data_cy.discount_rate
+                    price_amortization_period = float(gcam_data_cy['price_amortization_period'])
+                    discount_rate = gcam_data_cy['discount_rate']
                     annualization_factor = discount_rate + discount_rate / (
                             ((1 + discount_rate) ** price_amortization_period) - 1)
 
@@ -181,7 +162,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
                     recharge_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, 'US electricity',
                                                                         'refuel_efficiency')
 
-                    annual_o_m_costs = gcam_data_cy.o_m_costs
+                    annual_o_m_costs = gcam_data_cy['o_m_costs']
 
                     # TODO: will eventually need utility factor for PHEVs here
                     fuel_cost_per_VMT = fuel_cost * average_kwh_pmi / recharge_efficiency
@@ -189,12 +170,12 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
 
                     # consumer_generalized_cost_dollars = total_capital_costs
                     annualized_capital_costs = annualization_factor * total_capital_costs
-                    annual_VMT = float(gcam_data_cy.annual_VMT)
+                    annual_VMT = float(gcam_data_cy['annual_vmt'])
 
                     total_non_fuel_costs_per_VMT = (annualized_capital_costs + annual_o_m_costs) / 1.383 / annual_VMT
                     total_cost_w_fuel_per_VMT = total_non_fuel_costs_per_VMT + fuel_cost_per_VMT
-                    total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy.average_occupancy
-                    sales_share_numerator[market_class_id] = gcam_data_cy.share_weight * (
+                    total_cost_w_fuel_per_PMT = total_cost_w_fuel_per_VMT / gcam_data_cy['average_occupancy']
+                    sales_share_numerator[market_class_id] = gcam_data_cy['share_weight'] * (
                             total_cost_w_fuel_per_PMT ** logit_exponent_mu)
 
                     market_class_data[
@@ -268,6 +249,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
         import numpy as np
 
         _cache.clear()
+        SalesShare._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -289,29 +271,16 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
+                # validate data
                 for i in df.index:
-                    obj_list.append(SalesShare(
-                        market_class_id=df.loc[i, 'market_class_id'],
-                        calendar_year=df.loc[i, 'start_year'],
-                        annual_VMT=df.loc[i, 'annual_vmt'],
-                        payback_years=df.loc[i, 'payback_years'],
-                        price_amortization_period=df.loc[i, 'price_amortization_period'],
-                        discount_rate=df.loc[i, 'discount_rate'],
-                        share_weight=df.loc[i, 'share_weight'],
-                        o_m_costs=df.loc[i, 'o_m_costs'],
-                        average_occupancy=df.loc[i, 'average_occupancy'],
-                        logit_exponent_mu=df.loc[i, 'logit_exponent_mu'],
-                    ))
                     template_errors += \
                         omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
 
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+            if not template_errors:
+                SalesShare._data = df.set_index(['market_class_id', 'start_year']).to_dict(orient='index')
 
                 for mc in df['market_class_id'].unique():
-                    _cache[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
+                    SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
         return template_errors
 
