@@ -145,7 +145,7 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             List of template/input errors, else empty list on success
 
         """
-        ProducerGeneralizedCost._data = dict()
+        ProducerGeneralizedCost._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
