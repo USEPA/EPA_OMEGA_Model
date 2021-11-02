@@ -1,4 +1,4 @@
-test_omega2_output_folder = 'test_omega2_output'
+test_omega2_output_folder = 'out'
 test_omega2_results_file = '__test_omega2_results.txt'
 
 
@@ -69,12 +69,12 @@ if __name__ == "__main__":
     try:
         init_logfile()
 
-        path = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.dirname(os.path.abspath(__file__)) + os.sep + '..'
 
         if 'darwin' in sys.platform:
             pythonpathstr = 'export PYTHONPATH=%s:%s/omega_model' % (path, path)
         else:
-            pythonpathstr = 'set PYTHONPATH=.;.\\omega_model'
+            pythonpathstr = 'set PYTHONPATH=.;..;..\\omega_model'
         pythoncommand = 'python -u'
 
         results = dict() # {'PASSED': [], 'FAILED': [], 'UNKNOWN': []}
