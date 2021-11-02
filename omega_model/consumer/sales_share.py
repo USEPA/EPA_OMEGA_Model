@@ -376,7 +376,6 @@ if __name__ == '__main__':
         if not init_fail:
             omega_globals.options.analysis_initial_year = 2021
             omega_globals.options.analysis_final_year = 2035
-            omega_globals.options.database_dump_folder = '__dump'
 
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
