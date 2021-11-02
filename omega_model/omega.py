@@ -1043,6 +1043,7 @@ def run_omega(session_runtime_options, standalone_run=False):
     import time
 
     session_runtime_options.start_time = time.time()
+    session_runtime_options.standalone_run = standalone_run
 
     init_fail = None
 
@@ -1068,7 +1069,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                 omega_log.logwrite('Generating Profiler Dump...')
                 stats.dump_stats('omega_profile.dmp')
 
-            postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
+            postproc_session.run_postproc(iteration_log, credit_banks)
 
             from context.new_vehicle_market import NewVehicleMarket
 
@@ -1083,6 +1084,9 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             omega_log.end_logfile("\nSession Complete")
 
+            if 'db' in omega_globals.options.verbose_console_modules:
+                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
 
@@ -1092,6 +1096,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             omega_globals.engine = None
             omega_globals.session = None
             omega_globals.options = None
+
         else:
             omega_log.logwrite(init_fail, echo_console=True)
             omega_log.end_logfile("\nSession Fail")

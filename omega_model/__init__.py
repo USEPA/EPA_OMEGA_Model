@@ -78,6 +78,7 @@ try:
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
             self.session_name = 'OMEGA Demo'
             self.session_unique_name = 'OMEGA Demo'
+            self.standalone_run = False
             self.session_is_reference = True
             self.auto_close_figures = False
             self.output_folder = 'out' + os.sep
