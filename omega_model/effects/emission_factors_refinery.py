@@ -41,7 +41,7 @@ Data Column Name and Description
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class EmissionFactorsRefinery(SQABase, OMEGABase):
@@ -81,7 +81,7 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
 
         cache_key = '%s_%s_%s' % (year, fuel, emission_factors)
 
-        if cache_key not in cache:
+        if cache_key not in _cache:
             if type(emission_factors) is not list:
                 emission_factors = [emission_factors]
             attrs = EmissionFactorsRefinery.get_class_attributes(emission_factors)
@@ -91,15 +91,15 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
                 .filter(EmissionFactorsRefinery.in_use_fuel_id == fuel).all()[0]
 
             if len(emission_factors) == 1:
-                cache[cache_key] = result[0]
+                _cache[cache_key] = result[0]
             else:
-                cache[cache_key] = result
+                _cache[cache_key] = result
 
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')

@@ -52,7 +52,7 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
+_cache = dict()
 
 
 class MarketClass(OMEGABase, SQABase, MarketClassBase):
@@ -125,7 +125,7 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

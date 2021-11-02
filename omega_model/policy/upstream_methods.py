@@ -46,7 +46,7 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
+_cache = dict()
 
 
 def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
@@ -166,7 +166,7 @@ class UpstreamMethods(OMEGABase):
             A callable python function used to calculate upstream cert emissions for the given calendar year
 
         """
-        start_years = cache['start_year']
+        start_years = _cache['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -193,7 +193,7 @@ class UpstreamMethods(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -215,7 +215,7 @@ class UpstreamMethods(OMEGABase):
                 UpstreamMethods._methods['start_year'] = df['start_year']
                 UpstreamMethods._methods['upstream_calculation_method'] = df['upstream_calculation_method']
 
-            cache['start_year'] = np.array(list(df['start_year']))
+            _cache['start_year'] = np.array(list(df['start_year']))
 
         return template_errors
 

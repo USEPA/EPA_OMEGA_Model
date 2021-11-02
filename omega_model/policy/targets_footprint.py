@@ -74,7 +74,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 if __name__ == '__main__':
     import importlib
@@ -121,16 +121,16 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             Vehicle target CO2e in g/mi.
 
         """
-        start_years = cache[vehicle.reg_class_id]['start_year']
+        start_years = _cache[vehicle.reg_class_id]['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
             cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_id)
-            if cache_key not in cache:
-                cache[cache_key] = omega_globals.session.query(VehicleTargets). \
+            if cache_key not in _cache:
+                _cache[cache_key] = omega_globals.session.query(VehicleTargets). \
                     filter(VehicleTargets.reg_class_id == vehicle.reg_class_id). \
                     filter(VehicleTargets.model_year == vehicle_model_year).one()
-            coefficients = cache[cache_key]
+            coefficients = _cache[cache_key]
 
             if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
                 target_co2e_gpmi = coefficients.coeff_a
@@ -158,17 +158,17 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             Lifetime VMT for the regulatory class and model year.
 
         """
-        start_years = cache[reg_class_id]['start_year']
+        start_years = _cache[reg_class_id]['start_year']
         if len(start_years[start_years <= model_year]) > 0:
             model_year = max(start_years[start_years <= model_year])
 
             cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
-            if cache_key not in cache:
-                cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
+            if cache_key not in _cache:
+                _cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
                     filter(VehicleTargets.reg_class_id == reg_class_id). \
                     filter(VehicleTargets.model_year == model_year).scalar()
 
-            return cache[cache_key]
+            return _cache[cache_key]
         else:
             raise Exception('Missing GHG target lifetime VMT parameters for %s, %d or prior'
                             % (reg_class_id, model_year))
@@ -196,7 +196,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         import numpy as np
         from policy.incentives import Incentives
 
-        start_years = cache[vehicle.reg_class_id]['start_year']
+        start_years = _cache[vehicle.reg_class_id]['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -241,7 +241,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         import numpy as np
         from policy.incentives import Incentives
 
-        start_years = cache[vehicle.reg_class_id]['start_year']
+        start_years = _cache[vehicle.reg_class_id]['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -282,7 +282,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         """
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -320,7 +320,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
                 omega_globals.session.flush()
 
                 for rc in df['reg_class_id'].unique():
-                    cache[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
+                    _cache[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
 
         return template_errors
 

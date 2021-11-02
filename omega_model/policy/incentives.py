@@ -52,7 +52,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class Incentives(OMEGABase):
@@ -74,12 +74,12 @@ class Incentives(OMEGABase):
         """
         production_multiplier = 1
 
-        start_years = cache['start_year']
+        start_years = _cache['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             cache_key = max(start_years[start_years <= vehicle.model_year])
 
-            if cache_key in cache:
-                calcs = cache[cache_key]
+            if cache_key in _cache:
+                calcs = _cache[cache_key]
                 for calc, multiplier in calcs.items():
                     select_attribute, select_value = calc.split(':')
                     if vehicle.__getattribute__(select_attribute) == select_value:
@@ -103,7 +103,7 @@ class Incentives(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -127,12 +127,12 @@ class Incentives(OMEGABase):
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 for idx, r in df.iterrows():
-                    if idx not in cache:
-                        cache[idx] = dict()
+                    if idx not in _cache:
+                        _cache[idx] = dict()
 
-                    cache[idx] = r.to_dict()
+                    _cache[idx] = r.to_dict()
 
-                cache['start_year'] = np.array(list(cache.keys()))
+                _cache['start_year'] = np.array(list(_cache.keys()))
 
         return template_errors
 

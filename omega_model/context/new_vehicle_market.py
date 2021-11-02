@@ -111,7 +111,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class NewVehicleMarket(SQABase, OMEGABase):
@@ -299,7 +299,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
         cache_key = '%s_%s_%s_%s_%s_new_vehicle_sales' % (omega_globals.options.context_id, omega_globals.options.context_case_id,
                                                           calendar_year, context_size_class, context_reg_class)
 
-        if cache_key not in cache:
+        if cache_key not in _cache:
             if context_size_class and context_reg_class:
                 projection_sales = (omega_globals.session.query(func.sum(NewVehicleMarket.sales))
                                     .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
@@ -308,22 +308,22 @@ class NewVehicleMarket(SQABase, OMEGABase):
                                     .filter(NewVehicleMarket.context_reg_class_id == context_reg_class)
                                     .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
                 if projection_sales is None:
-                    cache[cache_key] = 0
+                    _cache[cache_key] = 0
                 else:
-                    cache[cache_key] = float(projection_sales)
+                    _cache[cache_key] = float(projection_sales)
             elif context_size_class:
-                cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
+                _cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
                                          .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
                                          .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
                                          .filter(NewVehicleMarket.context_size_class == context_size_class)
                                          .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
             else:
-                cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
+                _cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
                                          .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
                                          .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
                                          .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
 
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -340,7 +340,7 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         """
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

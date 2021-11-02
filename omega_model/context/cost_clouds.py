@@ -99,7 +99,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 # define list of non-numeric columns to ignore during frontier creation since they goof up pandas auto-typing of
 # columns when switching between Series and DataFrame representations
@@ -132,7 +132,7 @@ class CostCloud(OMEGABase):
         """
         from policy.offcycle_credits import OffCycleCredits  # offcycle_credits must be initalized first
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -175,9 +175,9 @@ class CostCloud(OMEGABase):
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class]
                     cloud_model_years = class_cloud['model_year'].unique()
                     # for each model year
-                    cache[cost_curve_class] = dict()
+                    _cache[cost_curve_class] = dict()
                     for model_year in cloud_model_years:
-                        cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
+                        _cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
                         CostCloud._max_year = max(CostCloud._max_year, model_year)
 
                 CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
@@ -198,7 +198,7 @@ class CostCloud(OMEGABase):
             Copy of the requested cost cload data.
 
         """
-        return cache[cost_curve_class][model_year].copy()
+        return _cache[cost_curve_class][model_year].copy()
 
 
 if __name__ == '__main__':

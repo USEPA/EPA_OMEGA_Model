@@ -46,7 +46,7 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
+_cache = dict()
 
 
 class CPIPriceDeflators(OMEGABase):
@@ -68,7 +68,7 @@ class CPIPriceDeflators(OMEGABase):
             The CPI price deflator for the given calendar year.
 
         """
-        start_years = cache['start_year']
+        start_years = _cache['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
@@ -93,7 +93,7 @@ class CPIPriceDeflators(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -114,7 +114,7 @@ class CPIPriceDeflators(OMEGABase):
             if not template_errors:
                 CPIPriceDeflators._data = df
 
-            cache['start_year'] = np.array(list(df['start_year']))
+            _cache['start_year'] = np.array(list(df['start_year']))
 
         return template_errors
 

@@ -52,7 +52,7 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
+_cache = dict()
 
 
 class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
@@ -81,7 +81,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
         """
         cache_key = '%s_%s' % (market_class_id, attribute_types)
 
-        if cache_key not in cache:
+        if cache_key not in _cache:
             if type(attribute_types) is not list:
                 attribute_types = [attribute_types]
 
@@ -91,11 +91,11 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
                 filter(ProducerGeneralizedCost.market_class_id == market_class_id).all()[0]
 
             if len(attribute_types) == 1:
-                cache[cache_key] = result[0]
+                _cache[cache_key] = result[0]
             else:
-                cache[cache_key] = result
+                _cache[cache_key] = result
 
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
@@ -167,7 +167,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

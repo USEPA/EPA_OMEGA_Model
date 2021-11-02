@@ -47,7 +47,7 @@ from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
 
-cache = dict()
+_cache = dict()
 
 class CostFactorsCriteria(SQABase, OMEGABase):
     # --- database table properties ---
@@ -85,7 +85,7 @@ class CostFactorsCriteria(SQABase, OMEGABase):
 
         cache_key = '%s_%s' % (year, cost_factors)
 
-        if cache_key not in cache:
+        if cache_key not in _cache:
             if type(cost_factors) is not list:
                 cost_factors = [cost_factors]
             attrs = CostFactorsCriteria.get_class_attributes(cost_factors)
@@ -93,15 +93,15 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             result = omega_globals.session.query(*attrs).filter(CostFactorsCriteria.calendar_year == year).all()[0]
 
             if len(cost_factors) == 1:
-                cache[cache_key] = result[0]
+                _cache[cache_key] = result[0]
             else:
-                cache[cache_key] = result
+                _cache[cache_key] = result
 
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def init_database_from_file(criteria_cost_factors_file, verbose=False):
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} ...')

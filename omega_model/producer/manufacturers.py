@@ -45,7 +45,7 @@ from omega_model import *
 
 # initial_credit_bank = dict()
 
-# cache = dict()
+# _cache = dict()
 
 
 class Manufacturer(SQABase, OMEGABase):
@@ -76,7 +76,7 @@ class Manufacturer(SQABase, OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        # cache.clear()
+        # _cache.clear()
 
         from policy.credit_banking import CreditBank
         if verbose:

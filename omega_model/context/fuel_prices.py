@@ -63,7 +63,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class FuelPrice(SQABase, OMEGABase):
@@ -113,7 +113,7 @@ class FuelPrice(SQABase, OMEGABase):
         cache_key = '%s_%s_%s_%s_%s' % \
                     (omega_globals.options.context_id, omega_globals.options.context_case_id, calendar_year, price_types, fuel_id)
 
-        if cache_key not in cache:
+        if cache_key not in _cache:
             if type(price_types) is not list:
                 price_types = [price_types]
 
@@ -126,11 +126,11 @@ class FuelPrice(SQABase, OMEGABase):
                 filter(FuelPrice.fuel_id == fuel_id).all()[0]
 
             if len(price_types) == 1:
-                cache[cache_key] = result[0]
+                _cache[cache_key] = result[0]
             else:
-                cache[cache_key] = result
+                _cache[cache_key] = result
 
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -146,7 +146,7 @@ class FuelPrice(SQABase, OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

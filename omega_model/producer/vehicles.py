@@ -312,7 +312,7 @@ class VehicleAttributeCalculations(OMEGABase):
     information.
 
     """
-    cache = dict()
+    _cache = dict()
 
     @staticmethod
     def init_vehicle_attribute_calculations_from_file(filename, clear_cache=False, verbose=False):
@@ -322,7 +322,7 @@ class VehicleAttributeCalculations(OMEGABase):
 
         Args:
             filename (str): name of input file
-            clear_cache (bool): if ``True`` then clear ``VehicleAttributeCalculations.cache``
+            clear_cache (bool): if ``True`` then clear ``VehicleAttributeCalculations._cache``
             verbose (bool): enable additional console and logfile output if ``True``
 
         Returns:
@@ -332,7 +332,7 @@ class VehicleAttributeCalculations(OMEGABase):
         import numpy as np
 
         if clear_cache:
-            VehicleAttributeCalculations.cache = dict()
+            VehicleAttributeCalculations._cache = dict()
 
         if verbose:
             omega_log.logwrite('\nInitializing from %s...' % filename)
@@ -354,13 +354,13 @@ class VehicleAttributeCalculations(OMEGABase):
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 for idx, r in df.iterrows():
-                    if idx not in VehicleAttributeCalculations.cache:
-                        VehicleAttributeCalculations.cache[idx] = dict()
+                    if idx not in VehicleAttributeCalculations._cache:
+                        VehicleAttributeCalculations._cache[idx] = dict()
 
-                    VehicleAttributeCalculations.cache[idx] = r.to_dict()
+                    VehicleAttributeCalculations._cache[idx] = r.to_dict()
 
-                VehicleAttributeCalculations.cache['start_year'] = \
-                    np.array(list(VehicleAttributeCalculations.cache.keys()))
+                VehicleAttributeCalculations._cache['start_year'] = \
+                    np.array(list(VehicleAttributeCalculations._cache.keys()))
 
         return template_errors
 
@@ -379,12 +379,12 @@ class VehicleAttributeCalculations(OMEGABase):
             else they are performed on the cost cloud data
 
         """
-        start_years = VehicleAttributeCalculations.cache['start_year']
+        start_years = VehicleAttributeCalculations._cache['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             cache_key = max(start_years[start_years <= vehicle.model_year])
 
-            if cache_key in VehicleAttributeCalculations.cache:
-                calcs = VehicleAttributeCalculations.cache[cache_key]
+            if cache_key in VehicleAttributeCalculations._cache:
+                calcs = VehicleAttributeCalculations._cache[cache_key]
                 for calc, value in calcs.items():
                     select_attribute, select_value, operator, action = calc.split(':')
                     if vehicle.__getattribute__(select_attribute) == select_value:

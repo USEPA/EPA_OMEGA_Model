@@ -63,7 +63,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class OnroadFuel(OMEGABase):
@@ -92,10 +92,10 @@ class OnroadFuel(OMEGABase):
                     OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
-        start_years = cache[fuel_id]['start_year']
+        start_years = _cache[fuel_id]['start_year']
         year = max(start_years[start_years <= calendar_year])
 
-        return cache[fuel_id][year][attribute]
+        return _cache[fuel_id][year][attribute]
 
     @staticmethod
     def validate_fuel_id(fuel_id):
@@ -109,7 +109,7 @@ class OnroadFuel(OMEGABase):
             True if the fuel ID is valid, False otherwise
 
         """
-        return fuel_id in cache['fuel_id']
+        return fuel_id in _cache['fuel_id']
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -127,7 +127,7 @@ class OnroadFuel(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -148,11 +148,11 @@ class OnroadFuel(OMEGABase):
 
             if not template_errors:
                 for _, r in df.iterrows():
-                    if r.fuel_id not in cache:
-                        cache[r.fuel_id] = {'start_year': np.array(df['start_year'].loc[df['fuel_id'] == r.fuel_id])}
-                    cache[r.fuel_id][r.start_year] = r.drop('start_year').to_dict()
+                    if r.fuel_id not in _cache:
+                        _cache[r.fuel_id] = {'start_year': np.array(df['start_year'].loc[df['fuel_id'] == r.fuel_id])}
+                    _cache[r.fuel_id][r.start_year] = r.drop('start_year').to_dict()
 
-                cache['fuel_id'] = np.array(list(df['fuel_id'].unique()))
+                _cache['fuel_id'] = np.array(list(df['fuel_id'].unique()))
 
         return template_errors
 

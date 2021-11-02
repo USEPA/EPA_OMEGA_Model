@@ -78,7 +78,7 @@ print('importing %s' % __file__)
 from omega_model import *
 from policy.drive_cycles import DriveCycles
 
-cache = dict()
+_cache = dict()
 
 
 class DriveCycleWeights(OMEGABase):
@@ -128,7 +128,7 @@ class DriveCycleWeights(OMEGABase):
 
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -160,17 +160,17 @@ class DriveCycleWeights(OMEGABase):
                                 template_errors = ['weight error %s: %s' %
                                                    (calendar_year, error) for error in weight_errors]
                             else:
-                                if not cache:
+                                if not _cache:
                                     # validate drive cycle names on first tree
                                     cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
                                     if cycle_name_errors:
                                         template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
                                 if not cycle_name_errors:
-                                    if fc not in cache:
-                                        cache[fc] = dict()
-                                    cache[fc][calendar_year] = tree
+                                    if fc not in _cache:
+                                        _cache[fc] = dict()
+                                    _cache[fc][calendar_year] = tree
 
-                    cache[fc]['start_year'] = np.array(list(cache[fc].keys()))
+                    _cache[fc]['start_year'] = np.array(list(_cache[fc].keys()))
 
         return template_errors
 
@@ -192,10 +192,10 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        start_years = cache[fueling_class]['start_year']
+        start_years = _cache[fueling_class]['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
-            return cache[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+            return _cache[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
                                                                   weighted=weighted)
         else:
             raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))

@@ -76,7 +76,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class SalesShare(OMEGABase, SQABase, SalesShareBase):
@@ -112,19 +112,19 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
             GCAM parameters for the given calendar year and market class
 
         """
-        start_years = cache[market_class_id]['start_year']
+        start_years = _cache[market_class_id]['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
             key = '%s_%s' % (calendar_year, market_class_id)
-            if not key in cache:
-                cache[key] = omega_globals.session.query(SalesShare). \
+            if not key in _cache:
+                _cache[key] = omega_globals.session.query(SalesShare). \
                     filter(SalesShare.calendar_year == calendar_year). \
                     filter(SalesShare.market_class_id == market_class_id).one()
         else:
             raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
 
-        return cache[key]
+        return _cache[key]
 
     def calc_shares_gcam(market_class_data, calendar_year, parent_market_class, child_market_classes):
         """
@@ -267,7 +267,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
         """
         import numpy as np
 
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -308,7 +308,7 @@ class SalesShare(OMEGABase, SQABase, SalesShareBase):
                 omega_globals.session.flush()
 
                 for mc in df['market_class_id'].unique():
-                    cache[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
+                    _cache[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
         return template_errors
 

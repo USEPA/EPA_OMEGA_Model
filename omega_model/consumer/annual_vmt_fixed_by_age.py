@@ -50,7 +50,7 @@ Sample Data Columns
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
@@ -82,12 +82,12 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
         """
         cache_key = '%s_%s' % (market_class_id, age)
 
-        if cache_key not in cache:
-            cache[cache_key] = float(omega_globals.session.query(OnroadVMT.annual_vmt).
+        if cache_key not in _cache:
+            _cache[cache_key] = float(omega_globals.session.query(OnroadVMT.annual_vmt).
                                      filter(OnroadVMT.market_class_id == market_class_id).
                                      filter(OnroadVMT.age == age).scalar())
 
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -103,7 +103,7 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')

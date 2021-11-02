@@ -11,7 +11,7 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class VehicleAnnualData(SQABase, OMEGABase):

@@ -54,7 +54,7 @@ Data Column Name and Description
 
 from omega_model import *
 
-cache = dict()
+_cache = dict()
 
 
 class Reregistration(OMEGABase, SQABase, ReregistrationBase):
@@ -85,11 +85,11 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
         """
         cache_key = '%s_%s' % (market_class_id, age)
 
-        if cache_key not in cache:
-            cache[cache_key] = float(omega_globals.session.query(Reregistration.reregistered_proportion).
+        if cache_key not in _cache:
+            _cache[cache_key] = float(omega_globals.session.query(Reregistration.reregistered_proportion).
                                      filter(Reregistration.market_class_id == market_class_id).
                                      filter(Reregistration.age == age).scalar())
-        return cache[cache_key]
+        return _cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -104,7 +104,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        _cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
