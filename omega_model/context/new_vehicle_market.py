@@ -187,6 +187,8 @@ class NewVehicleMarket(SQABase, OMEGABase):
             filename (str): name of file to save new vehicle generalized costs to
 
         """
+        if omega_globals.options.standalone_run:
+            filename = omega_globals.options.output_folder + filename
 
         # wanted to do: pd.DataFrame.from_dict(cls._new_vehicle_generalized_costs, orient='index',
         #       columns=['new_vehicle_price_dollars']).to_csv(filename, index=True)
