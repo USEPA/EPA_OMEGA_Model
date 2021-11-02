@@ -52,19 +52,13 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-_cache = dict()
-
-
-class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
+class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
     """
     Loads producer generalized cost data and provides cost calculation functionality.
 
     """
-    # --- database table properties ---
-    __tablename__ = 'producer_generalized_cost'
-    market_class_id = Column('market_class_id', String, primary_key=True)  #: market class id, e.g. 'non_hauling.ICE'
-    fuel_years = Column(Float)  #: years of fuel consumption, for producer generalized cost calcs
-    annual_vmt = Column(Float)  #: annual vehicle miles travelled, for producer generalized cost calcs
+
+    _data = dict()
 
     @staticmethod
     def get_producer_generalized_cost_attributes(market_class_id, attribute_types):
@@ -79,23 +73,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
             The requested generalized cost attributes.
 
         """
-        cache_key = '%s_%s' % (market_class_id, attribute_types)
-
-        if cache_key not in _cache:
-            if type(attribute_types) is not list:
-                attribute_types = [attribute_types]
-
-            attrs = ProducerGeneralizedCost.get_class_attributes(attribute_types)
-
-            result = omega_globals.session.query(*attrs). \
-                filter(ProducerGeneralizedCost.market_class_id == market_class_id).all()[0]
-
-            if len(attribute_types) == 1:
-                _cache[cache_key] = result[0]
-            else:
-                _cache[cache_key] = result
-
-        return _cache[cache_key]
+        return [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
 
     @staticmethod
     def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
@@ -113,7 +91,6 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
             The vehicle's cost cloud with generalized cost column, e.g. 'new_vehicle_mfr_generalized_cost_dollars'
 
         """
-
         from context.price_modifications import PriceModifications
         from context.onroad_fuels import OnroadFuel
 
@@ -144,7 +121,8 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
         if any(vehicle_direct_kwh_per_mile > 0):
             electric_generalized_fuel_cost = (vehicle_direct_kwh_per_mile *
                                               vehicle.retail_fuel_price_dollars_per_unit(vehicle.model_year) *
-                                              producer_generalized_cost_annual_vmt * producer_generalized_cost_fuel_years)
+                                              producer_generalized_cost_annual_vmt *
+                                              producer_generalized_cost_fuel_years)
 
         generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
@@ -167,7 +145,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
             List of template/input errors, else empty list on success
 
         """
-        _cache.clear()
+        ProducerGeneralizedCost._data = dict()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -176,7 +154,8 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
         input_template_version = 0.1
         input_template_columns = {'market_class_id', 'fuel_years', 'annual_vmt'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
@@ -185,16 +164,7 @@ class ProducerGeneralizedCost(OMEGABase, SQABase, ProducerGeneralizedCostBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(ProducerGeneralizedCost(
-                        market_class_id=df.loc[i, 'market_class_id'],
-                        fuel_years=df.loc[i, 'fuel_years'],
-                        annual_vmt=df.loc[i, 'annual_vmt'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                ProducerGeneralizedCost._data = df.set_index('market_class_id').to_dict(orient='index')
 
         return template_errors
 
