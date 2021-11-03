@@ -47,27 +47,9 @@ from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
 
-_cache = dict()
+class CostFactorsCriteria(OMEGABase):
 
-class CostFactorsCriteria(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'cost_factors_criteria'
-    index = Column(Integer, primary_key=True)
-
-    calendar_year = Column(Numeric)
-    dollar_basis = Column(Numeric)
-    pm25_tailpipe_3 = Column('pm25_tailpipe_3.0_USD_per_uston', Float)
-    pm25_upstream_3 = Column('pm25_upstream_3.0_USD_per_uston', Float)
-    nox_tailpipe_3 = Column('nox_tailpipe_3.0_USD_per_uston', Float)
-    nox_upstream_3 = Column('nox_upstream_3.0_USD_per_uston', Float)
-    so2_tailpipe_3 = Column('so2_tailpipe_3.0_USD_per_uston', Float)
-    so2_upstream_3 = Column('so2_upstream_3.0_USD_per_uston', Float)
-    pm25_tailpipe_7 = Column('pm25_tailpipe_7.0_USD_per_uston', Float)
-    pm25_upstream_7 = Column('pm25_upstream_7.0_USD_per_uston', Float)
-    nox_tailpipe_7 = Column('nox_tailpipe_7.0_USD_per_uston', Float)
-    nox_upstream_7 = Column('nox_upstream_7.0_USD_per_uston', Float)
-    so2_tailpipe_7 = Column('so2_tailpipe_7.0_USD_per_uston', Float)
-    so2_upstream_7 = Column('so2_upstream_7.0_USD_per_uston', Float)
+    _data = dict()
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
@@ -80,28 +62,31 @@ class CostFactorsCriteria(SQABase, OMEGABase):
         Returns: cost factor or list of cost factors
 
         """
-        calendar_years = pd.Series(sql_unpack_result(omega_globals.session.query(CostFactorsCriteria.calendar_year).all())).unique()
+        calendar_years = CostFactorsCriteria._data.keys()
         year = max([yr for yr in calendar_years if yr <= calendar_year])
 
-        cache_key = '%s_%s' % (year, cost_factors)
+        factors = []
+        for cf in cost_factors:
+            factors.append(CostFactorsCriteria._data[year][cf])
 
-        if cache_key not in _cache:
-            if type(cost_factors) is not list:
-                cost_factors = [cost_factors]
-            attrs = CostFactorsCriteria.get_class_attributes(cost_factors)
-
-            result = omega_globals.session.query(*attrs).filter(CostFactorsCriteria.calendar_year == year).all()[0]
-
-            if len(cost_factors) == 1:
-                _cache[cache_key] = result[0]
-            else:
-                _cache[cache_key] = result
-
-        return _cache[cache_key]
+        if len(cost_factors) == 1:
+            return factors[0]
+        else:
+            return factors
 
     @staticmethod
     def init_database_from_file(criteria_cost_factors_file, verbose=False):
-        _cache.clear()
+        """
+
+        Args:
+            criteria_cost_factors_file:
+            verbose:
+
+        Returns:
+
+        """
+
+        CostFactorsCriteria._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} ...')
@@ -138,27 +123,7 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(CostFactorsCriteria(
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        dollar_basis=df.loc[i, 'dollar_basis'],
-                        pm25_tailpipe_3=df.loc[i, 'pm25_tailpipe_3.0_USD_per_uston'],
-                        pm25_upstream_3=df.loc[i, 'pm25_upstream_3.0_USD_per_uston'],
-                        nox_tailpipe_3=df.loc[i, 'nox_tailpipe_3.0_USD_per_uston'],
-                        nox_upstream_3=df.loc[i, 'nox_upstream_3.0_USD_per_uston'],
-                        so2_tailpipe_3=df.loc[i, 'so2_tailpipe_3.0_USD_per_uston'],
-                        so2_upstream_3=df.loc[i, 'so2_upstream_3.0_USD_per_uston'],
-                        pm25_tailpipe_7=df.loc[i, 'pm25_tailpipe_7.0_USD_per_uston'],
-                        pm25_upstream_7=df.loc[i, 'pm25_upstream_7.0_USD_per_uston'],
-                        nox_tailpipe_7=df.loc[i, 'nox_tailpipe_7.0_USD_per_uston'],
-                        nox_upstream_7=df.loc[i, 'nox_upstream_7.0_USD_per_uston'],
-                        so2_tailpipe_7=df.loc[i, 'so2_tailpipe_7.0_USD_per_uston'],
-                        so2_upstream_7=df.loc[i, 'so2_upstream_7.0_USD_per_uston'],
-                        ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
 
         return template_errors
 

@@ -53,19 +53,19 @@ def get_criteria_cf(calendar_year):
     """
     from effects.cost_factors_criteria import CostFactorsCriteria
 
-    cost_factors = ['pm25_tailpipe_3',
-                    'pm25_upstream_3',
-                    'nox_tailpipe_3',
-                    'nox_upstream_3',
-                    'so2_tailpipe_3',
-                    'so2_upstream_3',
-                    'pm25_tailpipe_7',
-                    'pm25_upstream_7',
-                    'nox_tailpipe_7',
-                    'nox_upstream_7',
-                    'so2_tailpipe_7',
-                    'so2_upstream_7',
-                    ]
+    cost_factors = {
+                   'pm25_tailpipe_3.0_USD_per_uston',
+                   'pm25_upstream_3.0_USD_per_uston',
+                   'nox_tailpipe_3.0_USD_per_uston',
+                   'nox_upstream_3.0_USD_per_uston',
+                   'so2_tailpipe_3.0_USD_per_uston',
+                   'so2_upstream_3.0_USD_per_uston',
+                   'pm25_tailpipe_7.0_USD_per_uston',
+                   'pm25_upstream_7.0_USD_per_uston',
+                   'nox_tailpipe_7.0_USD_per_uston',
+                   'nox_upstream_7.0_USD_per_uston',
+                   'so2_tailpipe_7.0_USD_per_uston',
+                   'so2_upstream_7.0_USD_per_uston'}
 
     return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
 
