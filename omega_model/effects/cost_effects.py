@@ -14,9 +14,10 @@ from omega_model import *
 
 def get_scc_cf(calendar_year):
     """
+    Get social cost of carbon cost factors
 
     Args:
-        calendar_year: The calendar year for which social cost of GHG cost factors are needed.
+        calendar_year (int): The calendar year for which social cost of GHG cost factors are needed.
 
     Returns:
         A list of cost factors as specified in the cost_factors list for the given calendar year.
@@ -24,19 +25,20 @@ def get_scc_cf(calendar_year):
     """
     from effects.cost_factors_scc import CostFactorsSCC
 
-    cost_factors = ['co2_global_5',
-                    'co2_global_3',
-                    'co2_global_25',
-                    'co2_global_395',
-                    'ch4_global_5',
-                    'ch4_global_3',
-                    'ch4_global_25',
-                    'ch4_global_395',
-                    'n2o_global_5',
-                    'n2o_global_3',
-                    'n2o_global_25',
-                    'n2o_global_395',
-                    ]
+    cost_factors = [
+        'co2_global_5.0_USD_per_metricton',
+        'co2_global_3.0_USD_per_metricton',
+        'co2_global_2.5_USD_per_metricton',
+        'co2_global_3.95_USD_per_metricton',
+        'ch4_global_5.0_USD_per_metricton',
+        'ch4_global_3.0_USD_per_metricton',
+        'ch4_global_2.5_USD_per_metricton',
+        'ch4_global_3.95_USD_per_metricton',
+        'n2o_global_5.0_USD_per_metricton',
+        'n2o_global_3.0_USD_per_metricton',
+        'n2o_global_2.5_USD_per_metricton',
+        'n2o_global_3.95_USD_per_metricton',
+    ]
 
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
@@ -44,8 +46,10 @@ def get_scc_cf(calendar_year):
 def get_criteria_cf(calendar_year):
     """
 
+    Get criteria cost factors
+
     Args:
-        calendar_year: The calendar year for which criteria cost factors are needed.
+        calendar_year (int): The calendar year for which criteria cost factors are needed.
 
     Returns:
         A list of cost factors as specified in the cost_factors list for the given calendar year.
@@ -72,6 +76,7 @@ def get_criteria_cf(calendar_year):
 
 def get_energysecurity_cf(calendar_year):
     """
+    Get energy security cost factors
 
     Args:
         calendar_year: The calendar year for which energy security related factors are needed.
@@ -90,6 +95,7 @@ def get_energysecurity_cf(calendar_year):
 
 def get_congestion_noise_cf(reg_class_id):
     """
+    Get congestion and noise cost factors
 
     Args:
         calendar_year: The calendar year for which congestion and noise cost factors are needed.
@@ -109,6 +115,7 @@ def get_congestion_noise_cf(reg_class_id):
 
 def calc_cost_effects(physical_effects_dict):
     """
+    Calculate cost effects
 
     Args:
         physical_effects_dict: A dictionary of key, value pairs where the key is a tuple (vehicle_id, calendar_year, age) and the values are a
