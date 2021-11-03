@@ -56,8 +56,9 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
     **Load and provides routines to access to regulatory class descriptive data**
 
     """
-    _data = pd.DataFrame()
     reg_classes = None
+
+    _data = dict()
 
     @staticmethod
     def get_vehicle_reg_class(vehicle):
@@ -81,6 +82,23 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
         return reg_class_id
 
     @staticmethod
+    def validate_reg_class_id(reg_class_id):
+        """
+        Validate market class ID
+
+        Args:
+            reg_class_id (str): regulatory class ID, e.g. 'car'
+
+        Returns:
+            Error message in a list if reg_class_id is not valid
+
+        """
+        if reg_class_id not in RegulatoryClasses.reg_classes:
+            return ['Unexpected reg_class_id "%s"' % reg_class_id]
+        else:
+            return []
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
@@ -94,7 +112,7 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             List of template/input errors, else empty list on success
 
         """
-        RegulatoryClasses._data = pd.DataFrame()
+        RegulatoryClasses._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -113,10 +131,9 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                RegulatoryClasses._data['reg_class_id'] = df['reg_class_id']
-                RegulatoryClasses._data['description'] = df['description']
+                RegulatoryClasses._data = df.set_index('reg_class_id').to_dict(orient='index')
 
-                RegulatoryClasses.reg_classes = OMEGAEnum(RegulatoryClasses._data['reg_class_id'].to_list())
+                RegulatoryClasses.reg_classes = df['reg_class_id'].to_list()
 
         return template_errors
 
