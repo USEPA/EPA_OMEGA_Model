@@ -56,8 +56,8 @@ class CostFactorsCriteria(OMEGABase):
         """
 
         Args:
-            calendar_year: calendar year to get cost factors for
-            cost_factors: name of cost factor or list of cost factor attributes to get
+            calendar_year (int): calendar year to get cost factors for
+            cost_factors (str, [strs]): name of cost factor or list of cost factor attributes to get
 
         Returns: cost factor or list of cost factors
 
@@ -75,21 +75,23 @@ class CostFactorsCriteria(OMEGABase):
             return factors
 
     @staticmethod
-    def init_database_from_file(criteria_cost_factors_file, verbose=False):
+    def init_database_from_file(filename, verbose=False):
         """
+
+        Initialize class data from input file.
 
         Args:
-            criteria_cost_factors_file:
-            verbose:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
 
         Returns:
+            List of template/input errors, else empty list on success
 
         """
-
         CostFactorsCriteria._data.clear()
 
         if verbose:
-            omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} ...')
+            omega_log.logwrite(f'\nInitializing database from {filename} ...')
 
         input_template_name = 'context_cost_factors-criteria'
         input_template_version = 0.3
@@ -107,15 +109,15 @@ class CostFactorsCriteria(OMEGABase):
                                                'so2_tailpipe_7.0_USD_per_uston',
                                                'so2_upstream_7.0_USD_per_uston'}
 
-        template_errors = validate_template_version_info(criteria_cost_factors_file, input_template_name,
+        template_errors = validate_template_version_info(filename, input_template_name,
                                                          input_template_version, verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
-            df = pd.read_csv(criteria_cost_factors_file, skiprows=1)
+            df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(criteria_cost_factors_file, cost_factors_input_template_columns,
+            template_errors = validate_template_columns(filename, cost_factors_input_template_columns,
                                                         df.columns, verbose=verbose)
 
             cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
