@@ -170,7 +170,8 @@ class FuelPrice(OMEGABase):
                     template_errors += OnroadFuel.validate_fuel_id(df.loc[i, 'fuel_id'])
 
             if not template_errors:
-                FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).to_dict(orient='index')
+                FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).sort_index()\
+                    .to_dict(orient='index')
 
         return template_errors
 

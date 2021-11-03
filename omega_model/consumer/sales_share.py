@@ -277,7 +277,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                         omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
 
             if not template_errors:
-                SalesShare._data = df.set_index(['market_class_id', 'start_year']).to_dict(orient='index')
+                SalesShare._data = df.set_index(['market_class_id', 'start_year']).sort_index().to_dict(orient='index')
 
                 for mc in df['market_class_id'].unique():
                     SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}

@@ -114,7 +114,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                         omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
 
             if not template_errors:
-                OnroadVMT._data = df.set_index(['market_class_id','age']).to_dict(orient='index')
+                OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
 
         return template_errors
 

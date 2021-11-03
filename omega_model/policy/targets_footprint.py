@@ -286,7 +286,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
                         omega_globals.options.RegulatoryClasses.validate_reg_class_id(df.loc[i, 'reg_class_id'])
 
             if not template_errors:
-                VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).to_dict(orient='index')
+                VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).sort_index().to_dict(orient='index')
 
                 for rc in df['reg_class_id'].unique():
                     VehicleTargets._data[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
