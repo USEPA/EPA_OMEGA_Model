@@ -51,33 +51,18 @@ Data Column Name and Description
 
 from omega_model import *
 
-_cache = dict()
 
+class EmissionFactorsVehicles(OMEGABase):
+    """
+    Loads and provides access to vehicle emission factors by model year, age, legacy reg class ID and in-use fuel ID
 
-class EmissionFactorsVehicles(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'emission_factors_vehicles'
-    index = Column('index', Integer, primary_key=True)
+    """
 
-    model_year = Column(Numeric)
-    age = Column('age', Numeric)
-    in_use_fuel_id = Column('in_use_fuel_id', String)
-    reg_class_id = Column('reg_class_id', String)
-    voc_grams_per_mile = Column('voc_grams_per_mile', Float)
-    co_grams_per_mile = Column('co_grams_per_mile', Float)
-    nox_grams_per_mile = Column('nox_grams_per_mile', Float)
-    pm25_grams_per_mile = Column('pm25_grams_per_mile', Float)
-    sox_grams_per_gallon = Column('sox_grams_per_gallon', Float)
-    benzene_grams_per_mile = Column('benzene_grams_per_mile', Float)
-    butadiene13_grams_per_mile = Column('butadiene13_grams_per_mile', Float)
-    formaldehyde_grams_per_mile = Column('formaldehyde_grams_per_mile', Float)
-    acetaldehyde_grams_per_mile = Column('acetaldehyde_grams_per_mile', Float)
-    acrolein_grams_per_mile = Column('acrolein_grams_per_mile', Float)
-    ch4_grams_per_mile = Column('ch4_grams_per_mile', Float)
-    n2o_grams_per_mile = Column('n2o_grams_per_mile', Float)
+    _data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
+    _data_iufid_cy = dict()  # private dict, emissions factors vehicles in-use fuel id calendar years
 
     @staticmethod
-    def get_emission_factors(model_year, age, reg_class_id, fuel, emission_factors):
+    def get_emission_factors(model_year, age, reg_class_id, in_use_fuel_id, emission_factors):
         """
 
         Args:
@@ -87,31 +72,35 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
         Returns: emission factor or list of emission factors
 
         """
-        cache_key = '%s_%s_%s_%s_%s' % (model_year, age, reg_class_id, fuel, emission_factors)
 
-        if cache_key not in _cache:
-            if type(emission_factors) is not list:
-                emission_factors = [emission_factors]
-            attrs = EmissionFactorsVehicles.get_class_attributes(emission_factors)
+        calendar_years = EmissionFactorsVehicles._data_iufid_cy['model_year'][in_use_fuel_id]
+        year = max([yr for yr in calendar_years if yr <= model_year])
 
-            result = omega_globals.session.query(*attrs) \
-                .filter(EmissionFactorsVehicles.model_year == model_year) \
-                .filter(EmissionFactorsVehicles.age == age) \
-                .filter(EmissionFactorsVehicles.reg_class_id == reg_class_id) \
-                .filter(EmissionFactorsVehicles.in_use_fuel_id == fuel) \
-                .all()[0]
+        factors = []
+        for ef in emission_factors:
+            factors.append(EmissionFactorsVehicles._data[year, age, reg_class_id, in_use_fuel_id][ef])
 
-            if len(emission_factors) == 1:
-                _cache[cache_key] = result[0]
-            else:
-                _cache[cache_key] = result
-
-        return _cache[cache_key]
-
+        if len(emission_factors) == 1:
+            return factors[0]
+        else:
+            return factors
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
-        _cache.clear()
+    def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        EmissionFactorsVehicles._data.clear()
+        EmissionFactorsVehicles._data_iufid_cy.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -134,29 +123,11 @@ class EmissionFactorsVehicles(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(EmissionFactorsVehicles(
-                        model_year=df.loc[i, 'model_year'],
-                        age=df.loc[i, 'age'],
-                        reg_class_id=df.loc[i, 'reg_class_id'],
-                        in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
-                        voc_grams_per_mile=df.loc[i, 'voc_grams_per_mile'],
-                        co_grams_per_mile=df.loc[i, 'co_grams_per_mile'],
-                        nox_grams_per_mile=df.loc[i, 'nox_grams_per_mile'],
-                        pm25_grams_per_mile=df.loc[i, 'pm25_grams_per_mile'],
-                        sox_grams_per_gallon=df.loc[i, 'sox_grams_per_gallon'],
-                        benzene_grams_per_mile=df.loc[i, 'benzene_grams_per_mile'],
-                        butadiene13_grams_per_mile=df.loc[i, 'butadiene13_grams_per_mile'],
-                        formaldehyde_grams_per_mile=df.loc[i, 'formaldehyde_grams_per_mile'],
-                        acetaldehyde_grams_per_mile=df.loc[i, 'acetaldehyde_grams_per_mile'],
-                        acrolein_grams_per_mile=df.loc[i, 'acrolein_grams_per_mile'],
-                        ch4_grams_per_mile=df.loc[i, 'ch4_grams_per_mile'],
-                        n2o_grams_per_mile=df.loc[i, 'n2o_grams_per_mile'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                EmissionFactorsVehicles._data = \
+                    df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
+                        .to_dict(orient='index')
+                EmissionFactorsVehicles._data_iufid_cy = \
+                    df[['model_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series')
 
         return template_errors
 
@@ -182,8 +153,8 @@ if __name__ == '__main__':
         # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
         #                                                             verbose=o2.options.verbose)
 
-        init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                     verbose=omega_globals.options.verbose)
+        init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                            verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
