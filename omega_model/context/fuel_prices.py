@@ -63,25 +63,14 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-_cache = dict()
 
-
-class FuelPrice(SQABase, OMEGABase):
+class FuelPrice(OMEGABase):
     """
     **Loads and provides access to fuel prices from the analysis context**
 
     """
 
-    # --- database table properties ---
-    __tablename__ = 'context_fuel_prices'  # database table name
-    index = Column('index', Integer, primary_key=True)  #: database table index
-    context_id = Column('context_id', String)  #: str: e.g. 'AEO2020'
-    dollar_basis = Column(Numeric)
-    case_id = Column('case_id', String)  #: str: e.g. 'Reference case'
-    fuel_id = Column('fuel_id', String)  #: str: e.g. 'pump gasoline'
-    calendar_year = Column(Numeric)  #: numeric: calendar year of the price values
-    retail_dollars_per_unit = Column(Float)  #: float: e.g. retail dollars per gallon, dollars per kWh
-    pretax_dollars_per_unit = Column(Float)  #: float: e.g. pre-tax dollars per gallon, dollars per kWh
+    _data = dict()
 
     @staticmethod
     def get_fuel_prices(calendar_year, price_types, fuel_id):
@@ -110,27 +99,20 @@ class FuelPrice(SQABase, OMEGABase):
         if omega_globals.options.flat_context:
             calendar_year = omega_globals.options.flat_context_year
 
-        cache_key = '%s_%s_%s_%s_%s' % \
-                    (omega_globals.options.context_id, omega_globals.options.context_case_id, calendar_year, price_types, fuel_id)
+        if type(price_types) is not list:
+            price_types = [price_types]
 
-        if cache_key not in _cache:
-            if type(price_types) is not list:
-                price_types = [price_types]
+        prices = []
+        for pt in price_types:
+            prices.append(FuelPrice._data[omega_globals.options.context_id,
+                                          omega_globals.options.context_case_id,
+                                          fuel_id,
+                                          calendar_year][pt])
 
-            attrs = FuelPrice.get_class_attributes(price_types)
-
-            result = omega_globals.session.query(*attrs).\
-                filter(FuelPrice.context_id == omega_globals.options.context_id).\
-                filter(FuelPrice.case_id == omega_globals.options.context_case_id).\
-                filter(FuelPrice.calendar_year == calendar_year).\
-                filter(FuelPrice.fuel_id == fuel_id).all()[0]
-
-            if len(price_types) == 1:
-                _cache[cache_key] = result[0]
-            else:
-                _cache[cache_key] = result
-
-        return _cache[cache_key]
+        if len(prices) == 1:
+            return prices[0]
+        else:
+            return prices
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
@@ -146,7 +128,7 @@ class FuelPrice(SQABase, OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        _cache.clear()
+        FuelPrice._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -183,26 +165,12 @@ class FuelPrice(SQABase, OMEGABase):
             if not template_errors:
                 from context.onroad_fuels import OnroadFuel
 
-                obj_list = []
-                # load data into database
+                # validate data
                 for i in df.index:
-                    fuel_id = df.loc[i, 'fuel_id']
-                    if OnroadFuel.validate_fuel_id(fuel_id):
-                        obj_list.append(FuelPrice(
-                            context_id=df.loc[i, 'context_id'],
-                            dollar_basis=df.loc[i, 'dollar_basis'],
-                            case_id=df.loc[i, 'case_id'],
-                            fuel_id=fuel_id,
-                            calendar_year=df.loc[i, 'calendar_year'],
-                            retail_dollars_per_unit=df.loc[i, 'retail_dollars_per_unit'],
-                            pretax_dollars_per_unit=df.loc[i, 'pretax_dollars_per_unit'],
-                        ))
-                    else:
-                        template_errors.append('*** Invalid Context Fuel Price fuel ID "%s" in %s ***' %
-                                               (fuel_id, filename))
+                    template_errors += OnroadFuel.validate_fuel_id(df.loc[i, 'fuel_id'])
 
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+            if not template_errors:
+                FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).to_dict(orient='index')
 
         return template_errors
 
