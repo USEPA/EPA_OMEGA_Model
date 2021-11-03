@@ -45,49 +45,46 @@ Data Column Name and Description
 from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
-_cache = dict()
 
+class CostFactorsEnergySecurity(OMEGABase):
 
-class CostFactorsEnergySecurity(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'cost_factors_energysecurity'
-    index = Column(Integer, primary_key=True)
-    calendar_year = Column(Numeric)
-    dollar_basis = Column(Float)
-    dollars_per_gallon = Column(Float)
-    foreign_oil_fraction = Column(Float)
+    _data = dict()
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
 
         Args:
-            calendar_year: calendar year to get cost factors for
-            cost_factors: name of cost factor or list of cost factor attributes to get
+            calendar_year (int): calendar year to get cost factors for
+            cost_factors (str, [strs]): name of cost factor or list of cost factor attributes to get
 
         Returns: cost factor or list of cost factors
 
         """
-        cache_key = '%s_%s' % (calendar_year, cost_factors)
+        calendar_years = CostFactorsEnergySecurity._data.keys()
+        year = max([yr for yr in calendar_years if yr <= calendar_year])
 
-        if cache_key not in _cache:
-            if type(cost_factors) is not list:
-                cost_factors = [cost_factors]
-            attrs = CostFactorsEnergySecurity.get_class_attributes(cost_factors)
+        factors = []
+        for cf in cost_factors:
+            factors.append(CostFactorsEnergySecurity._data[year][cf])
 
-            result = omega_globals.session.query(*attrs).filter(CostFactorsEnergySecurity.calendar_year == calendar_year).all()[0]
-
-            if len(cost_factors) == 1:
-                _cache[cache_key] = result[0]
-            else:
-                _cache[cache_key] = result
-
-        return _cache[cache_key]
-
+        if len(cost_factors) == 1:
+            return factors[0]
+        else:
+            return factors
 
     @staticmethod
     def init_database_from_file(filename, verbose=False):
-        _cache.clear()
+        """
+
+        Args:
+            filename (str):
+            verbose (bool):
+
+        Returns:
+
+        """
+        CostFactorsEnergySecurity._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -110,20 +107,11 @@ class CostFactorsEnergySecurity(SQABase, OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, 'dollars_per_gallon')
-
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(CostFactorsEnergySecurity(
-                        calendar_year = df.loc[i, 'calendar_year'],
-                        dollar_basis = df.loc[i, 'dollar_basis'],
-                        dollars_per_gallon = df.loc[i, 'dollars_per_gallon'],
-                        foreign_oil_fraction = df.loc[i, 'foreign_oil_fraction'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis,
+                                             'dollars_per_gallon')
+
+                CostFactorsEnergySecurity._data = df.set_index('calendar_year').to_dict(orient='index')
 
         return template_errors
 
