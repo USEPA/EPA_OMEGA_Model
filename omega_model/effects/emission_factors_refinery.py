@@ -43,6 +43,10 @@ from omega_model import *
 
 
 class EmissionFactorsRefinery(OMEGABase):
+    """
+    Loads and provides access to refinery emission factors by calendar year and in-use fuel id.
+
+    """
 
     _data = dict()  # private dict, emissions factors refinery by calendar year and in-use fuel id
     _data_iufid_cy = dict()  # private dict, emissions factors refinery in-use fuel id calendar years
@@ -51,11 +55,14 @@ class EmissionFactorsRefinery(OMEGABase):
     def get_emission_factors(calendar_year, in_use_fuel_id, emission_factors):
         """
 
+        Get emission factors by calendar year and in-use fuel ID
+
         Args:
             calendar_year (int): calendar year to get emission factors for
             emission_factors (str, [strs]): name of emission factor or list of emission factor attributes to get
 
-        Returns: emission factor or list of emission factors
+        Returns:
+            Emission factor or list of emission factors
 
         """
         calendar_years = EmissionFactorsRefinery._data_iufid_cy['calendar_year'][in_use_fuel_id]
@@ -71,7 +78,7 @@ class EmissionFactorsRefinery(OMEGABase):
             return factors
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -124,23 +131,15 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        import importlib
-
-        module_name = get_template_name(omega_globals.options.market_classes_file)
-        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
-        init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                     verbose=omega_globals.options.verbose)
+        init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                            verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

@@ -48,18 +48,24 @@ import omega_model.effects.general_functions as gen_fxns
 
 
 class CostFactorsCriteria(OMEGABase):
+    """
+    Loads and provides access to criteria emissions cost factors by calendar year.
 
-    _data = dict()
+    """
+    _data = dict()  # private dict, cost factors criteria by calendar year
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
 
+        Get cost factors by calendar year
+
         Args:
             calendar_year (int): calendar year to get cost factors for
             cost_factors (str, [strs]): name of cost factor or list of cost factor attributes to get
 
-        Returns: cost factor or list of cost factors
+        Returns:
+            Cost factor or list of cost factors
 
         """
         calendar_years = CostFactorsCriteria._data.keys()
@@ -75,7 +81,7 @@ class CostFactorsCriteria(OMEGABase):
             return factors
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -138,21 +144,18 @@ if __name__ == '__main__':
         from effects.cpi_price_deflators import CPIPriceDeflators
 
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
         init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
                                                       verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                 verbose=omega_globals.options.verbose)
+        init_fail += CostFactorsCriteria.init_from_file(omega_globals.options.criteria_cost_factors_file,
+                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
             print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

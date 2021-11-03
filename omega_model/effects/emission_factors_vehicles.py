@@ -54,7 +54,7 @@ from omega_model import *
 
 class EmissionFactorsVehicles(OMEGABase):
     """
-    Loads and provides access to vehicle emission factors by model year, age, legacy reg class ID and in-use fuel ID
+    Loads and provides access to vehicle emission factors by model year, age, legacy reg class ID and in-use fuel ID.
 
     """
 

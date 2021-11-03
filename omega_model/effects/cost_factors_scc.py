@@ -46,12 +46,18 @@ import omega_model.effects.general_functions as gen_fxns
 
 
 class CostFactorsSCC(OMEGABase):
+    """
+    Loads and provides access to social cost of carbon cost factors by calendar year.
+
+    """
 
     _data = dict()  # private dict, cost factors social cost of carbon by calendar year
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
+
+        Get cost factors by calendar year
 
         Args:
             calendar_year (int): calendar year to get cost factors for
@@ -73,24 +79,8 @@ class CostFactorsSCC(OMEGABase):
         else:
             return factors
 
-        # cache_key = '%s_%s' % (calendar_year, cost_factors)
-        #
-        # if cache_key not in _cache:
-        #     if type(cost_factors) is not list:
-        #         cost_factors = [cost_factors]
-        #     attrs = CostFactorsSCC.get_class_attributes(cost_factors)
-        #
-        #     result = omega_globals.session.query(*attrs).filter(CostFactorsSCC.calendar_year == calendar_year).all()[0]
-        #
-        #     if len(cost_factors) == 1:
-        #         _cache[cache_key] = result[0]
-        #     else:
-        #         _cache[cache_key] = result
-        #
-        # return _cache[cache_key]
-
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -165,8 +155,8 @@ if __name__ == '__main__':
         init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
-                                                            verbose=omega_globals.options.verbose)
+        init_fail += CostFactorsSCC.init_from_file(omega_globals.options.scc_cost_factors_file,
+                                                   verbose=omega_globals.options.verbose)
 
 
         if not init_fail:

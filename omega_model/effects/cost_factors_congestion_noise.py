@@ -51,6 +51,10 @@ import omega_model.effects.general_functions as gen_fxns
 
 
 class CostFactorsCongestionNoise(OMEGABase):
+    """
+    Loads and provides access to congestion and noise cost factors by legacy reg class id.
+
+    """
 
     _data = dict()  # private dict, cost factor congestion and noise by legacy reg class id
 
@@ -58,11 +62,14 @@ class CostFactorsCongestionNoise(OMEGABase):
     def get_cost_factors(reg_class_id, cost_factors):
         """
 
+        Get cost factors by legacy reg class id
+
         Args:
             reg_class_id: reg class to get cost factors for
             cost_factors: name of cost factor or list of cost factor attributes to get
 
-        Returns: cost factor or list of cost factors
+        Returns:
+            Cost factor or list of cost factors
 
         """
         factors = []
@@ -75,7 +82,7 @@ class CostFactorsCongestionNoise(OMEGABase):
             return factors
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -88,7 +95,6 @@ class CostFactorsCongestionNoise(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-
         CostFactorsCongestionNoise._data.clear()
 
         if verbose:
@@ -139,8 +145,8 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += \
-            CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                               verbose=omega_globals.options.verbose)
+            CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
+                                                      verbose=omega_globals.options.verbose)
 
         if not init_fail:
             pass
