@@ -159,7 +159,7 @@ class MarketClass(OMEGABase, MarketClassBase):
             if not template_errors:
                 MarketClass._data = df.set_index('market_class_id').to_dict(orient='index')
 
-                MarketClassBase.market_classes = list(MarketClass._data.keys())
+                MarketClassBase.market_classes = df['market_class_id'].to_list()
                 for mc in MarketClass.market_classes:
                     MarketClassBase._market_class_dict[mc] = []
 
