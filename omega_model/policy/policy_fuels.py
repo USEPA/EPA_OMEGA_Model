@@ -107,10 +107,13 @@ class PolicyFuel(OMEGABase):
             fuel_id (str): e.g. 'pump gasoline')
 
         Returns:
-            True if the fuel ID is valid, False otherwise
+            Error message in a list if fuel_id is not valid
 
         """
-        return fuel_id in _cache['fuel_id']
+        if fuel_id not in _cache['fuel_id']:
+            return ['Unexpected fuel_id "%s"' % fuel_id]
+        else:
+            return []
 
     @staticmethod
     def init_from_file(filename, verbose=False):
