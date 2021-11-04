@@ -60,15 +60,13 @@ from omega_model import *
 min_share_units = 'minimum_share'
 max_share_units = 'maximum_share'
 
-_cache = dict()
-
 
 class ProductionConstraints(OMEGABase):
     """
     **Loads and provides access to production constraint data.**
 
     """
-    _values = pd.DataFrame()
+    _data = pd.DataFrame()
 
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
@@ -89,15 +87,15 @@ class ProductionConstraints(OMEGABase):
         """
         minimum_share = 0
 
-        start_years = _cache['start_year']
+        start_years = ProductionConstraints._data['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
             min_key = '%s:%s' % (market_class_id, min_share_units)
 
-            if min_key in ProductionConstraints._values:
-                minimum_share = ProductionConstraints._values[min_key].loc[
-                    ProductionConstraints._values['start_year'] == calendar_year].item()
+            if min_key in ProductionConstraints._data:
+                minimum_share = ProductionConstraints._data[min_key].loc[
+                    ProductionConstraints._data['start_year'] == calendar_year].item()
 
         return minimum_share
 
@@ -119,15 +117,15 @@ class ProductionConstraints(OMEGABase):
         """
         maximum_share = 1
 
-        start_years = _cache['start_year']
+        start_years = ProductionConstraints._data['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
             max_key = '%s:%s' % (market_class_id, max_share_units)
 
-            if max_key in ProductionConstraints._values:
-                maximum_share = ProductionConstraints._values[max_key].loc[
-                    ProductionConstraints._values['start_year'] == calendar_year].item()
+            if max_key in ProductionConstraints._data:
+                maximum_share = ProductionConstraints._data[max_key].loc[
+                    ProductionConstraints._data['start_year'] == calendar_year].item()
 
         return maximum_share
 
@@ -147,7 +145,7 @@ class ProductionConstraints(OMEGABase):
         """
         import numpy as np
 
-        _cache.clear()
+        ProductionConstraints._data = pd.DataFrame()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -166,19 +164,15 @@ class ProductionConstraints(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                ProductionConstraints._values['start_year'] = df['start_year']
 
                 share_columns = [c for c in df.columns if (min_share_units in c) or (max_share_units in c)]
 
                 for sc in share_columns:
-                    market_class = sc.split(':')[0]
-                    if market_class in omega_globals.options.MarketClass.market_classes:
-                        ProductionConstraints._values[sc] = df[sc]
-                    else:
-                        template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
+                    # validate data
+                    template_errors += omega_globals.options.MarketClass.validate_market_class_id(sc.split(':')[0])
 
-                _cache['start_year'] = np.array(list(df['start_year']))
-
+            if not template_errors:
+                ProductionConstraints._data = df
 
         return template_errors
 
@@ -192,31 +186,28 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
+
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            ProductionConstraints._values.to_csv(
+            ProductionConstraints._data.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'production_constraints.csv', index=False)
 
             print(ProductionConstraints.get_minimum_share(2020, 'hauling.BEV'))
@@ -225,8 +216,8 @@ if __name__ == '__main__':
             print(ProductionConstraints.get_maximum_share(2020, 'non_hauling.ICE'))
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

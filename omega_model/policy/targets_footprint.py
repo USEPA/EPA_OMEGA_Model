@@ -95,7 +95,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
     """
 
-    _data = dict()
+    _data = dict()  # private dict, footprint-based GHG target parameters by reg class ID and start year
 
     @staticmethod
     def calc_target_co2e_gpmi(vehicle):
@@ -196,7 +196,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
                             % (vehicle.reg_class_id, vehicle.model_year))
 
     @staticmethod
-    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
         """
         Calculate vehicle cert CO2e Mg as a function of the vehicle, the standards, CO2e g/mi options and optional sales
         options.
@@ -209,6 +209,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
         Args:
             vehicle (Vehicle): the vehicle
+            co2_gpmi_variants (numeric list-like): optional co2 g/mi variants
             sales_variants (numeric list-like): optional sales variants
 
         Returns:
@@ -303,12 +304,6 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         from policy.incentives import Incentives
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)
 
@@ -316,10 +311,8 @@ if __name__ == '__main__':
                                                    verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             omega_globals.options.VehicleTargets = VehicleTargets
-
 
             class dummyVehicle:
                 model_year = None
@@ -330,18 +323,19 @@ if __name__ == '__main__':
                 def get_initial_registered_count(self):
                     return self.initial_registered_count
 
-
             car_vehicle = dummyVehicle()
             car_vehicle.model_year = 2021
-            car_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.reg_classes.car
+            car_vehicle.reg_class_id = 'car'
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
+            car_vehicle.fueling_class = 'BEV'
 
             truck_vehicle = dummyVehicle()
             truck_vehicle.model_year = 2021
-            truck_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.reg_classes.truck
+            truck_vehicle.reg_class_id = 'truck'
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
+            truck_vehicle.fueling_class = 'ICE'
 
             car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
             car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
@@ -358,9 +352,8 @@ if __name__ == '__main__':
                                                                                              sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

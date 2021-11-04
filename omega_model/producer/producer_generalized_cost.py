@@ -164,6 +164,12 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
+                # validate data
+                for i in df.index:
+                    template_errors += \
+                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+
+            if not template_errors:
                 ProducerGeneralizedCost._data = df.set_index('market_class_id').to_dict(orient='index')
 
         return template_errors
@@ -181,6 +187,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
 
         init_fail = []
 
@@ -190,25 +197,21 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
+        # pull in market classes before initializing classes that check market class validity
+        module_name = get_template_name(omega_globals.options.market_classes_file)
+        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
+        init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
+                                                verbose=omega_globals.options.verbose)
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
-        init_fail = []
         init_fail += ProducerGeneralizedCost.init_from_file(
             omega_globals.options.producer_generalized_cost_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            from common.omega_functions import print_dict
-
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

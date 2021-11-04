@@ -930,11 +930,11 @@ def init_omega(session_runtime_options):
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=verbose_init)
 
-        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
-                                                       verbose=verbose_init)
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=verbose_init)
 
-        init_fail += NewVehicleMarket.init_database_from_file(omega_globals.options.context_new_vehicle_market_file,
-                                                              verbose=verbose_init)
+        init_fail += NewVehicleMarket.init_from_file(omega_globals.options.context_new_vehicle_market_file,
+                                                     verbose=verbose_init)
 
         NewVehicleMarket.init_context_new_vehicle_generalized_costs(
             omega_globals.options.context_new_vehicle_generalized_costs_file)
@@ -1001,8 +1001,8 @@ def init_omega(session_runtime_options):
             init_fail += CostFactorsSCC.init_from_file(omega_globals.options.scc_cost_factors_file,
                                                        verbose=verbose_init)
 
-            init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
-                                                                           verbose=verbose_init)
+            init_fail += CostFactorsEnergySecurity.init_from_file(omega_globals.options.energysecurity_cost_factors_file,
+                                                                  verbose=verbose_init)
 
             init_fail += CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
                                                                    verbose=verbose_init)

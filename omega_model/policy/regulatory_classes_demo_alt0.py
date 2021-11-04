@@ -151,28 +151,23 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        init_fail = []
 
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
 
-        init_fail = []
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(omega_globals.options.policy_reg_classes_file,
                                                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
-            omega_globals.options.RegulatoryClasses._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'reg_class_data.csv', index=False)
-
             print(omega_globals.options.RegulatoryClasses.reg_classes)
 
         else:
             print(init_fail)
-
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

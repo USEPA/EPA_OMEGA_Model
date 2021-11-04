@@ -62,7 +62,7 @@ class PriceModifications(OMEGABase):
     **Loads and provides access to price modification data by model year and market class ID.**
 
     """
-    _values = pd.DataFrame()  #: holds the price modification data
+    _data = pd.DataFrame()  #: holds the price modification data
 
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
@@ -79,14 +79,14 @@ class PriceModifications(OMEGABase):
         """
         price_modification = 0
 
-        start_years = PriceModifications._values['start_year']
+        start_years = PriceModifications._data['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
             mod_key = '%s:%s' % (market_class_id, price_modification_str)
-            if mod_key in PriceModifications._values:
-                price_modification = PriceModifications._values['%s:%s' % (market_class_id, price_modification_str)].loc[
-                    PriceModifications._values['start_year'] == calendar_year].item()
+            if mod_key in PriceModifications._data:
+                price_modification = PriceModifications._data['%s:%s' % (market_class_id, price_modification_str)].loc[
+                    PriceModifications._data['start_year'] == calendar_year].item()
 
         return price_modification
 
@@ -106,7 +106,7 @@ class PriceModifications(OMEGABase):
         """
         import numpy as np
 
-        PriceModifications._values = pd.DataFrame()
+        PriceModifications._data = pd.DataFrame()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -125,16 +125,14 @@ class PriceModifications(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                PriceModifications._values['start_year'] = np.array(df['start_year'])
 
                 share_columns = [c for c in df.columns if (price_modification_str in c)]
 
                 for sc in share_columns:
-                    market_class = sc.split(':')[0]
-                    if market_class in omega_globals.options.MarketClass.market_classes:
-                        PriceModifications._values[sc] = df[sc]
-                    else:
-                        template_errors.append('*** Invalid Market Class "%s" in %s ***' % (market_class, filename))
+                    template_errors += omega_globals.options.MarketClass.validate_market_class_id(sc.split(':')[0])
+
+            if not template_errors:
+                PriceModifications._data = df
 
         return template_errors
 
@@ -148,31 +146,28 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
+
         init_fail += PriceModifications.init_from_file(omega_globals.options.vehicle_price_modifications_file,
                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            PriceModifications._values.to_csv(
+            PriceModifications._data.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'vehicle_price_modifications.csv', index=False)
 
             print(PriceModifications.get_price_modification(2020, 'hauling.BEV'))
@@ -182,8 +177,8 @@ if __name__ == '__main__':
 
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

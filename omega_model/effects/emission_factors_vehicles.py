@@ -59,7 +59,6 @@ class EmissionFactorsVehicles(OMEGABase):
     """
 
     _data = dict()  # private dict, emission factors vehicles by model year, age, legacy reg class ID and in-use fuel ID
-    _data_iufid_cy = dict()  # private dict, emissions factors vehicles in-use fuel id calendar years
 
     @staticmethod
     def get_emission_factors(model_year, age, reg_class_id, in_use_fuel_id, emission_factors):
@@ -72,8 +71,9 @@ class EmissionFactorsVehicles(OMEGABase):
         Returns: emission factor or list of emission factors
 
         """
+        import pandas as pd
 
-        calendar_years = EmissionFactorsVehicles._data_iufid_cy['model_year'][in_use_fuel_id]
+        calendar_years = pd.Series(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
         year = max([yr for yr in calendar_years if yr <= model_year])
 
         factors = []
@@ -100,7 +100,6 @@ class EmissionFactorsVehicles(OMEGABase):
 
         """
         EmissionFactorsVehicles._data.clear()
-        EmissionFactorsVehicles._data_iufid_cy.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -126,7 +125,7 @@ class EmissionFactorsVehicles(OMEGABase):
                 EmissionFactorsVehicles._data = \
                     df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
                         .to_dict(orient='index')
-                EmissionFactorsVehicles._data_iufid_cy = \
+                EmissionFactorsVehicles._data |= \
                     df[['model_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series')
 
         return template_errors
@@ -139,30 +138,19 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        import importlib
-
-        module_name = get_template_name(omega_globals.options.market_classes_file)
-        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
-        # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
-        #                                                             verbose=o2.options.verbose)
 
         init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
                                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

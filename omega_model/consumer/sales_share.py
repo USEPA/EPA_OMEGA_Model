@@ -76,8 +76,6 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-_cache = dict()
-
 
 class SalesShare(OMEGABase, SalesShareBase):
     """
@@ -107,6 +105,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         else:
             raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
 
+    @staticmethod
     def calc_shares_gcam(market_class_data, calendar_year, parent_market_class, child_market_classes):
         """
         Determine consumer desired ICE/BEV market shares for the given vehicles, their costs, etc.
@@ -185,14 +184,15 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                 else:
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
-                    demanded_absolute_share = demanded_share * \
-                                              market_class_data['consumer_abs_share_frac_%s' % parent_market_class]
+                    demanded_absolute_share = \
+                        demanded_share * market_class_data['consumer_abs_share_frac_%s' % parent_market_class]
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
         return market_class_data.copy()
 
+    @staticmethod
     def calc_shares(market_class_data, calendar_year):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
@@ -248,7 +248,6 @@ class SalesShare(OMEGABase, SalesShareBase):
         """
         import numpy as np
 
-        _cache.clear()
         SalesShare._data.clear()
 
         if verbose:
@@ -297,59 +296,32 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        module_name = get_template_name(omega_globals.options.policy_targets_file)
-        omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
-
-        from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from context.cost_clouds import CostCloud
-
-        from producer.vehicles import VehicleFinal, DecompositionAttributes
-        from producer.vehicle_annual_data import VehicleAnnualData
-        from omega_model.omega import init_user_definable_decomposition_attributes, get_module
-
-        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
-        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
-
-        init_fail += init_user_definable_decomposition_attributes(omega_globals.options.verbose)
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
-                                                          verbose=omega_globals.options.verbose)
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
-                                                verbose=omega_globals.options.verbose)
-        init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
-                                               verbose=omega_globals.options.verbose)
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
-                                                          verbose=omega_globals.options.verbose)
-        init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
-                                                          verbose=omega_globals.options.verbose)
+                                                                      verbose=omega_globals.options.verbose)
+
+        from context.onroad_fuels import OnroadFuel  # needed for in-use fuel ID
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+
+        init_fail += SalesShare.init_from_file(omega_globals.options.sales_share_file,
+                                               verbose=omega_globals.options.verbose)
 
         if not init_fail:
             omega_globals.options.analysis_initial_year = 2021
             omega_globals.options.analysis_final_year = 2035
-
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             # test market shares at different CO2e and price levels
             mcd = pd.DataFrame()
@@ -365,9 +337,8 @@ if __name__ == '__main__':
 
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

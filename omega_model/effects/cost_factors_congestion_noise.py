@@ -133,14 +133,13 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        from effects.ip_deflators import ImplictPriceDeflators
-
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
         omega_log.init_logfile()
 
         init_fail = []
 
+        from effects.ip_deflators import ImplictPriceDeflators
         init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=omega_globals.options.verbose)
 
@@ -152,9 +151,8 @@ if __name__ == '__main__':
             pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -141,31 +141,25 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        from effects.ip_deflators import ImplictPriceDeflators
-
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
+        from effects.ip_deflators import ImplictPriceDeflators
         init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=omega_globals.options.verbose)
 
         init_fail += CostFactorsSCC.init_from_file(omega_globals.options.scc_cost_factors_file,
                                                    verbose=omega_globals.options.verbose)
 
-
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

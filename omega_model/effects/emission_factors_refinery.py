@@ -49,7 +49,6 @@ class EmissionFactorsRefinery(OMEGABase):
     """
 
     _data = dict()  # private dict, emissions factors refinery by calendar year and in-use fuel id
-    _data_iufid_cy = dict()  # private dict, emissions factors refinery in-use fuel id calendar years
 
     @staticmethod
     def get_emission_factors(calendar_year, in_use_fuel_id, emission_factors):
@@ -65,7 +64,9 @@ class EmissionFactorsRefinery(OMEGABase):
             Emission factor or list of emission factors
 
         """
-        calendar_years = EmissionFactorsRefinery._data_iufid_cy['calendar_year'][in_use_fuel_id]
+        import pandas as pd
+
+        calendar_years = pd.Series(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
         year = max([yr for yr in calendar_years if yr <= calendar_year])
 
         factors = []
@@ -92,7 +93,6 @@ class EmissionFactorsRefinery(OMEGABase):
 
         """
         EmissionFactorsRefinery._data.clear()
-        EmissionFactorsRefinery._data_iufid_cy.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -118,7 +118,7 @@ class EmissionFactorsRefinery(OMEGABase):
             if not template_errors:
                 EmissionFactorsRefinery._data = \
                     df.set_index(['calendar_year', 'in_use_fuel_id']).sort_index().to_dict(orient='index')
-                EmissionFactorsRefinery._data_iufid_cy = \
+                EmissionFactorsRefinery._data |= \
                     df[['calendar_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series')
 
         return template_errors
@@ -142,9 +142,8 @@ if __name__ == '__main__':
             pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

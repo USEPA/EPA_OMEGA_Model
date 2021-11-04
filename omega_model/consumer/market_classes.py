@@ -148,7 +148,8 @@ class MarketClass(OMEGABase, MarketClassBase):
         input_template_version = 0.32
         input_template_columns = {'market_class_id', 'fueling_class', 'ownership_class'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
@@ -164,7 +165,8 @@ class MarketClass(OMEGABase, MarketClassBase):
                     MarketClassBase._market_class_dict[mc] = []
 
                 MarketClassBase._market_class_tree_dict = MarketClass.parse_market_classes(df['market_class_id'])
-                MarketClassBase._market_class_tree_dict_rc = MarketClass.parse_market_classes(df['market_class_id'], by_reg_class=True)
+                MarketClassBase._market_class_tree_dict_rc = MarketClass.parse_market_classes(df['market_class_id'],
+                                                                                              by_reg_class=True)
 
         return template_errors
 
@@ -199,11 +201,6 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
-
-        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
-        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
-
-        init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
@@ -253,9 +250,8 @@ if __name__ == '__main__':
 
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -131,23 +131,19 @@ if __name__ == '__main__':
         import importlib
 
         omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
 
@@ -155,12 +151,11 @@ if __name__ == '__main__':
             omega_globals.options.vehicle_reregistration_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

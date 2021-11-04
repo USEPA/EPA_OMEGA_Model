@@ -294,7 +294,7 @@ class NewVehicleMarket(OMEGABase):
                                                     calendar_year].sum()
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -349,24 +349,19 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
-        init_fail += NewVehicleMarket.init_database_from_file(
+
+        init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
             print(NewVehicleMarket.new_vehicle_sales(2021))
-            # print(ContextNewVehicleMarket.get_new_vehicle_sales_weighted_price(2021))
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

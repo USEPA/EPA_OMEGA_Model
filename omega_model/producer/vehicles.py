@@ -353,11 +353,7 @@ class VehicleAttributeCalculations(OMEGABase):
                 df = df.set_index('start_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
-                for idx, r in df.iterrows():
-                    if idx not in VehicleAttributeCalculations._cache:
-                        VehicleAttributeCalculations._cache[idx] = dict()
-
-                    VehicleAttributeCalculations._cache[idx] = r.to_dict()
+                VehicleAttributeCalculations._cache = df.to_dict(orient='index')
 
                 VehicleAttributeCalculations._cache['start_year'] = \
                     np.array(list(VehicleAttributeCalculations._cache.keys()))
@@ -487,7 +483,8 @@ class CompositeVehicle(OMEGABase):
         self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                         'normalized_target_co2e_Mg')
 
-        self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
+        self.normalized_cert_co2e_Mg = \
+            omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, co2_gpmi_variants=1, sales_variants=1)
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
@@ -1522,8 +1519,8 @@ if __name__ == '__main__':
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
 
-        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
-                                                       verbose=omega_globals.options.verbose)
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=omega_globals.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
@@ -1550,15 +1547,10 @@ if __name__ == '__main__':
 
             weighted_footprint = weighted_value(vehicle_list, 'initial_registered_count', 'footprint_ft2')
 
-            # v = vehicles_list[0]
-            # v.model_year = 2020
-            # VehicleAttributeCalculations.perform_attribute_calculations(v)
-
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

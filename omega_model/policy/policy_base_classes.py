@@ -127,7 +127,7 @@ class VehicleTargetsBase:
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
-    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
         """
         Calculate vehicle cert CO2e Mg as a function of the vehicle, the standards, CO2e g/mi options and optional sales
         options.
@@ -140,6 +140,7 @@ class VehicleTargetsBase:
 
         Args:
             vehicle (Vehicle): the vehicle
+            co2_gpmi_variants (numeric list-like): optional co2 g/mi variants
             sales_variants (numeric list-like): optional sales variants
 
         Returns:

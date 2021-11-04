@@ -141,6 +141,12 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
+        if not init_fail:
+            pass
+        else:
+            print(init_fail)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

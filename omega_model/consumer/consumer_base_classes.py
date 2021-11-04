@@ -96,6 +96,7 @@ class SalesShareBase:
 
     """
 
+    @staticmethod
     def calc_shares(market_class_data, calendar_year):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
