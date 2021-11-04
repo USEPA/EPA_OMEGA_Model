@@ -33,7 +33,7 @@ class ProducerGeneralizedCostBase:
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
-    def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
+    def calc_generalized_cost(vehicle, cost_cloud, co2_name, kwh_name, cost_name):
         """
         Calculate generalized cost (vehicle cost plus other costs such as fuel costs) for the given vehicle's
         cost cloud.

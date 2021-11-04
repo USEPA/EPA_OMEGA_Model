@@ -92,15 +92,16 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
     offcycle_credit_names = []  #: list of credit names, populated during init, used to track credits across composition/decomposition and into the database, also used to check simulated vehicles for necessary columns
 
     @staticmethod
-    def calc_off_cycle_credits(vehicle):
+    def calc_off_cycle_credits(vehicle, cost_cloud):
         """
         Calculate vehicle off-cycle credits for the vehicle's cost cloud
 
         Args:
             vehicle (Vehicle): the vehicle to apply off-cycle credits to
+            cost_cloud (DataFrame): vehicle cost cloud
 
         Returns:
-            vehicle.cost_cloud with off-cycle credits calculated
+            cost_cloud with off-cycle credits calculated
 
         """
         # TODO: off cycle groups can be used to apply credit limits by credit group
@@ -108,9 +109,9 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
         for ocg in OffCycleCredits._offcycle_credit_groups:
             group_totals[ocg] = 0
 
-        vehicle.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile'] = 0
-        vehicle.cost_cloud['cert_direct_offcycle_kwh_per_mile'] = 0
-        vehicle.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile'] = 0
+        cost_cloud['cert_direct_offcycle_co2e_grams_per_mile'] = 0
+        cost_cloud['cert_direct_offcycle_kwh_per_mile'] = 0
+        cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile'] = 0
 
         for credit_column in OffCycleCredits._offcycle_credit_value_columns:
             attribute, value = credit_column.split(':')
@@ -124,9 +125,9 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
                         credit_destination = \
                             OffCycleCredits._data[offcycle_credit, year]['credit_destination']
 
-                        vehicle.cost_cloud[credit_destination] += credit_value * vehicle.cost_cloud[offcycle_credit]
+                        cost_cloud[credit_destination] += credit_value * cost_cloud[offcycle_credit]
 
-        return vehicle.cost_cloud
+        return cost_cloud
 
     @staticmethod
     def init_from_file(filename, verbose=False):

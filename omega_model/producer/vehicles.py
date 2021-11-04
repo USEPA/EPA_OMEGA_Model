@@ -779,10 +779,10 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
         from context.cost_clouds import CostCloud
 
         if omega_globals.options.flat_context:
-            to_vehicle.cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, to_vehicle.cost_curve_class)
+            cost_cloud = CostCloud.get_cloud(omega_globals.options.flat_context_year, to_vehicle.cost_curve_class)
         else:
-            to_vehicle.cost_cloud = CostCloud.get_cloud(to_vehicle.model_year, to_vehicle.cost_curve_class)
-        to_vehicle.cost_curve = to_vehicle.create_frontier_df()  # create frontier, inc. generalized cost and policy effects
+            cost_cloud = CostCloud.get_cloud(to_vehicle.model_year, to_vehicle.cost_curve_class)
+        to_vehicle.cost_curve = to_vehicle.create_frontier_df(cost_cloud)  # create frontier, inc. generalized cost and policy effects
 
         to_vehicle.normalized_target_co2e_Mg = \
             omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
@@ -848,7 +848,6 @@ class Vehicle(OMEGABase):
         self.cert_fuel_id = None
         self.market_class_id = None
         self.initial_registered_count = 0
-        self.cost_cloud = None
         self.cost_curve = None
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
@@ -947,7 +946,7 @@ class Vehicle(OMEGABase):
         """
         self.cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self)
 
-    def create_frontier_df(self):
+    def create_frontier_df(self, cost_cloud):
         """
         Create a frontier ("cost curve") from a vehicle's cloud of simulated vehicle points ("cost cloud") based
         on the current policy and vehicle attributes.  The cost values are a function of the producer generalized cost
@@ -960,6 +959,9 @@ class Vehicle(OMEGABase):
 
         Additionally, each point in the frontier contains the values as determined by ``DecompositionAttributes``.
 
+        Args:
+            cost_cloud (DataFrame): vehicle cost cloud
+
         Returns:
             The vehicle frontier / cost curve as a DataFrame.
 
@@ -969,60 +971,60 @@ class Vehicle(OMEGABase):
         from policy.drive_cycle_weights import DriveCycleWeights
         from policy.offcycle_credits import OffCycleCredits
 
-        self.cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
-            DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
+        cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
+            DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class, cost_cloud)
 
-        self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
-            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, self.cost_cloud)
+        cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
+            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cost_cloud)
 
         # initialize onroad values
-        self.cost_cloud['onroad_direct_co2e_grams_per_mile'] = 0
-        self.cost_cloud['onroad_direct_kwh_per_mile'] = 0
+        cost_cloud['onroad_direct_co2e_grams_per_mile'] = 0
+        cost_cloud['onroad_direct_kwh_per_mile'] = 0
 
         # drop extraneous columns
-        self.cost_cloud = self.cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
+        cost_cloud = cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
 
         # TODO: update dynamic costs, if any
 
         # calculate off cycle credits before calculating upstream and onroad
-        self.cost_cloud = OffCycleCredits.calc_off_cycle_credits(self)
+        cost_cloud = OffCycleCredits.calc_off_cycle_credits(self, cost_cloud)
 
-        self.cost_cloud['cert_direct_co2e_grams_per_mile'] = \
-            self.cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
-            self.cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
+        cost_cloud['cert_direct_co2e_grams_per_mile'] = \
+            cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
+            cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
 
-        self.cost_cloud['cert_direct_kwh_per_mile'] = \
-            self.cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
-            self.cost_cloud['cert_direct_offcycle_kwh_per_mile']
+        cost_cloud['cert_direct_kwh_per_mile'] = \
+            cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
+            cost_cloud['cert_direct_offcycle_kwh_per_mile']
 
         # calc onroad gap, etc...
-        VehicleAttributeCalculations.perform_attribute_calculations(self, self.cost_cloud)
+        VehicleAttributeCalculations.perform_attribute_calculations(self, cost_cloud)
 
         # add upstream calcs
         upstream_method = UpstreamMethods.get_upstream_method(self.model_year)
 
-        self.cost_cloud['cert_indirect_co2e_grams_per_mile'] = \
-            upstream_method(self, self.cost_cloud['cert_direct_co2e_grams_per_mile'],
-                            self.cost_cloud['cert_direct_kwh_per_mile'])
+        cost_cloud['cert_indirect_co2e_grams_per_mile'] = \
+            upstream_method(self, cost_cloud['cert_direct_co2e_grams_per_mile'],
+                            cost_cloud['cert_direct_kwh_per_mile'])
 
-        self.cost_cloud['cert_co2e_grams_per_mile'] = \
-            self.cost_cloud['cert_direct_co2e_grams_per_mile'] + \
-            self.cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
-            self.cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
+        cost_cloud['cert_co2e_grams_per_mile'] = \
+            cost_cloud['cert_direct_co2e_grams_per_mile'] + \
+            cost_cloud['cert_indirect_co2e_grams_per_mile'] - \
+            cost_cloud['cert_indirect_offcycle_co2e_grams_per_mile']
 
         # calculate producer generalized cost
-        self.cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
-            calc_generalized_cost(self, 'onroad_direct_co2e_grams_per_mile',
+        cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
+            calc_generalized_cost(self, cost_cloud, 'onroad_direct_co2e_grams_per_mile',
                                   'onroad_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars')
 
         # cull cost_cloud points here, based on producer constraints or whatever #
 
         # calculate frontier from updated cloud
         allow_upslope = True
-        cost_curve = calc_frontier(self.cost_cloud, 'cert_co2e_grams_per_mile',
+        cost_curve = calc_frontier(cost_cloud, 'cert_co2e_grams_per_mile',
                                    'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
-        # CostCloud.plot_frontier(self.cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, o2.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
+        # CostCloud.plot_frontier(cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, o2.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
         # rename generic columns to vehicle-specific columns
         cost_curve = DecompositionAttributes.rename_decomposition_columns(self, cost_curve)
@@ -1035,9 +1037,9 @@ class Vehicle(OMEGABase):
                 (self.name in omega_globals.options.log_vehicles):
 
             logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
-            self.cost_cloud['frontier'] = False
-            self.cost_cloud.loc[cost_curve.index, 'frontier'] = True
-            self.cost_cloud.to_csv(logfile_name)
+            cost_cloud['frontier'] = False
+            cost_cloud.loc[cost_curve.index, 'frontier'] = True
+            cost_cloud.to_csv(logfile_name)
             logfile_name = '%s%d_%s_cost_curve.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
             cost_curve.to_csv(logfile_name)
 
@@ -1046,12 +1048,12 @@ class Vehicle(OMEGABase):
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e [g/mi]', 'Cost [$]', 'veh %s %s' % (self.vehicle_id, self.name))
 
-            ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
-                     self.cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
+            ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
+                     cost_cloud['new_vehicle_mfr_cost_dollars'], '.',
                      label='Production Cost')
 
-            ax1.plot(self.cost_cloud['cert_co2e_grams_per_mile'],
-                     self.cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
+            ax1.plot(cost_cloud['cert_co2e_grams_per_mile'],
+                     cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
                      label='Generalized Cost')
 
             ax1.plot(cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id],
