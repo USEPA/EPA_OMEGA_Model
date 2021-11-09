@@ -2,7 +2,7 @@
 
 **Routines to load base-year vehicle data, data structures to represent vehicles during compliance modeling
 (transient or ephemeral vehicles), finalized vehicles (manufacturer-produced compliance vehicles), and composite
-vehicles (used to group vehicles by various characterstics during compliance modeling).**
+vehicles (used to group vehicles by various characteristics during compliance modeling).**
 
 Classes are also implemented to handle composition and decomposition of vehicle attributes as part of the composite
 vehicle workflow.  Some vehicle attributes are known and fixed in advance, others are created at runtime (e.g. off-cycle
@@ -312,7 +312,7 @@ class VehicleAttributeCalculations(OMEGABase):
     information.
 
     """
-    cache = dict()
+    _cache = dict()
 
     @staticmethod
     def init_vehicle_attribute_calculations_from_file(filename, clear_cache=False, verbose=False):
@@ -322,7 +322,7 @@ class VehicleAttributeCalculations(OMEGABase):
 
         Args:
             filename (str): name of input file
-            clear_cache (bool): if ``True`` then clear ``VehicleAttributeCalculations.cache``
+            clear_cache (bool): if ``True`` then clear ``VehicleAttributeCalculations._cache``
             verbose (bool): enable additional console and logfile output if ``True``
 
         Returns:
@@ -332,7 +332,7 @@ class VehicleAttributeCalculations(OMEGABase):
         import numpy as np
 
         if clear_cache:
-            VehicleAttributeCalculations.cache = dict()
+            VehicleAttributeCalculations._cache = dict()
 
         if verbose:
             omega_log.logwrite('\nInitializing from %s...' % filename)
@@ -353,14 +353,10 @@ class VehicleAttributeCalculations(OMEGABase):
                 df = df.set_index('start_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
-                for idx, r in df.iterrows():
-                    if idx not in VehicleAttributeCalculations.cache:
-                        VehicleAttributeCalculations.cache[idx] = dict()
+                VehicleAttributeCalculations._cache = df.to_dict(orient='index')
 
-                    VehicleAttributeCalculations.cache[idx] = r.to_dict()
-
-                VehicleAttributeCalculations.cache['start_year'] = \
-                    np.array(list(VehicleAttributeCalculations.cache.keys()))
+                VehicleAttributeCalculations._cache['start_year'] = \
+                    np.array(list(VehicleAttributeCalculations._cache.keys()))
 
         return template_errors
 
@@ -379,12 +375,12 @@ class VehicleAttributeCalculations(OMEGABase):
             else they are performed on the cost cloud data
 
         """
-        start_years = VehicleAttributeCalculations.cache['start_year']
+        start_years = VehicleAttributeCalculations._cache['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             cache_key = max(start_years[start_years <= vehicle.model_year])
 
-            if cache_key in VehicleAttributeCalculations.cache:
-                calcs = VehicleAttributeCalculations.cache[cache_key]
+            if cache_key in VehicleAttributeCalculations._cache:
+                calcs = VehicleAttributeCalculations._cache[cache_key]
                 for calc, value in calcs.items():
                     select_attribute, select_value, operator, action = calc.split(':')
                     if vehicle.__getattribute__(select_attribute) == select_value:
@@ -487,7 +483,8 @@ class CompositeVehicle(OMEGABase):
         self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
                                                         'normalized_target_co2e_Mg')
 
-        self.normalized_cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, 1, 1)
+        self.normalized_cert_co2e_Mg = \
+            omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, co2_gpmi_variants=1, sales_variants=1)
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
@@ -702,7 +699,7 @@ class CompositeVehicle(OMEGABase):
 
     def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
         """
-        Get new vehicle manufacturer generalzied cost from the composite cost curve for the provided cert CO2e g/mi
+        Get new vehicle manufacturer generalized cost from the composite cost curve for the provided cert CO2e g/mi
         value(s).
 
         Args:
@@ -771,6 +768,9 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     # transfer dynamic attributes
     for attr in VehicleFinal.dynamic_attributes:
         to_vehicle.__setattr__(attr, from_vehicle.__getattribute__(attr))
+
+    # assign user-definable reg class
+    to_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(to_vehicle)
 
     to_vehicle.set_target_co2e_grams_per_mile()  # varies by model year
 
@@ -956,7 +956,7 @@ class Vehicle(OMEGABase):
         Policy factors that modify the cost cloud and may modify the frontier from year to year include off cycle
         credit values, drive cycle weightings, upstream values, etc.  This method is also where costs could be
         updated dynamically before calculating the frontier (for example, cost reductions due to learning may
-        aready be present in the cost cloud, or could be implemented here instead).
+        already be present in the cost cloud, or could be implemented here instead).
 
         Additionally, each point in the frontier contains the values as determined by ``DecompositionAttributes``.
 
@@ -1099,7 +1099,7 @@ class VehicleFinal(SQABase, Vehicle):
     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
     cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, as determined by the consumer subpackage
+    market_class_id = Column('market_class_id', String)  #: market class ID, as determined by the consumer subpackage
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 
@@ -1321,8 +1321,6 @@ class VehicleFinal(SQABase, Vehicle):
                     else:
                         veh.fueling_class = 'ICE'
 
-                    veh.reg_class_id = omega_globals.options.RegulatoryClasses.get_vehicle_reg_class(veh)
-                    veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                     veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
                     veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
 
@@ -1339,6 +1337,9 @@ class VehicleFinal(SQABase, Vehicle):
                     vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
 
                     vehicles_list.append(veh)
+
+                    # assign user-definable market class
+                    veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
 
                     non_responsive_market_category = \
                         omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
@@ -1518,8 +1519,8 @@ if __name__ == '__main__':
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=omega_globals.options.verbose)
 
-        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
-                                                       verbose=omega_globals.options.verbose)
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=omega_globals.options.verbose)
 
         init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                           verbose=omega_globals.options.verbose)
@@ -1546,15 +1547,10 @@ if __name__ == '__main__':
 
             weighted_footprint = weighted_value(vehicle_list, 'initial_registered_count', 'footprint_ft2')
 
-            # v = vehicles_list[0]
-            # v.model_year = 2020
-            # VehicleAttributeCalculations.perform_attribute_calculations(v)
-
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

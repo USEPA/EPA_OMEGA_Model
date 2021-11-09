@@ -7,7 +7,7 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The template header uses a dynamic format.
 
-The data represents characteristics of the consumer module's market classes.
+The data represents characteristics of the Consumer Module's market classes.
 
 File Type
     comma-separated values (CSV)
@@ -52,19 +52,13 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
-
-
-class MarketClass(OMEGABase, SQABase, MarketClassBase):
+class MarketClass(OMEGABase, MarketClassBase):
     """
     Loads market class definition data and provides market-class-related functionality.
 
     """
-    # --- database table properties ---
-    __tablename__ = 'market_classes'
-    market_class_id = Column('market_class_id', String, primary_key=True)  #: market class id, e.g. 'non_hauling.ICE'
-    fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'ICE', 'BEV'
-    ownership_class = Column(Enum(*ownership_classes, validate_strings=True))  #: ownership class, e.g. 'private'
+
+    _data = dict()
 
     market_categories = ['ICE', 'BEV', 'hauling', 'non_hauling']  #: overall market categories
     responsive_market_categories = ['ICE', 'BEV']  #: market categories that have consumer response (i.e. price -> sales)
@@ -94,7 +88,6 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
         return market_class_id
 
     @staticmethod
-    # override this method in the user-defined MarketClass
     def get_non_responsive_market_category(market_class_id):
         """
         Returns the non-responsive market category of the given market class ID
@@ -112,6 +105,23 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
             return 'hauling'
 
     @staticmethod
+    def validate_market_class_id(market_class_id):
+        """
+        Validate market class ID
+
+        Args:
+            market_class_id (str): market class ID, e.g. 'hauling.ICE'
+
+        Returns:
+            Error message in a list if market_class_id is not valid
+
+        """
+        if market_class_id not in MarketClass._data:
+            return ['Unexpected market_class_id "%s"' % market_class_id]
+        else:
+            return []
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
@@ -125,7 +135,7 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        MarketClass._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -138,7 +148,8 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
         input_template_version = 0.32
         input_template_columns = {'market_class_id', 'fueling_class', 'ownership_class'}
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
@@ -147,23 +158,15 @@ class MarketClass(OMEGABase, SQABase, MarketClassBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(MarketClass(
-                        market_class_id=df.loc[i, 'market_class_id'],
-                        fueling_class=df.loc[i, 'fueling_class'],
-                        ownership_class=df.loc[i, 'ownership_class'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                MarketClass._data = df.set_index('market_class_id').to_dict(orient='index')
 
-                MarketClassBase.market_classes = sorted(list(df['market_class_id'].unique()))
+                MarketClassBase.market_classes = df['market_class_id'].to_list()
                 for mc in MarketClass.market_classes:
                     MarketClassBase._market_class_dict[mc] = []
 
                 MarketClassBase._market_class_tree_dict = MarketClass.parse_market_classes(df['market_class_id'])
-                MarketClassBase._market_class_tree_dict_rc = MarketClass.parse_market_classes(df['market_class_id'], by_reg_class=True)
+                MarketClassBase._market_class_tree_dict_rc = MarketClass.parse_market_classes(df['market_class_id'],
+                                                                                              by_reg_class=True)
 
         return template_errors
 
@@ -198,11 +201,6 @@ if __name__ == '__main__':
         omega_log.init_logfile()
 
         SQABase.metadata.create_all(omega_globals.engine)
-
-        module_name = get_template_name(omega_globals.options.offcycle_credits_file)
-        omega_globals.options.OffCycleCredits = get_module(module_name).OffCycleCredits
-
-        init_fail = init_user_definable_decomposition_attributes(omega_globals.options.verbose)
 
         init_fail += MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
@@ -252,9 +250,8 @@ if __name__ == '__main__':
 
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

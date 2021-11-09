@@ -15,7 +15,7 @@ from omega_model import *
 import numpy as np
 import consumer
 
-cache = dict()
+_cache = dict()
 
 
 def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
@@ -282,7 +282,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     producer_compliance_possible = False
 
     if (calendar_year == omega_globals.options.analysis_initial_year) and (producer_consumer_iteration_num == 0):
-        cache.clear()
+        _cache.clear()
 
     producer_iteration_log = \
         omega_log.IterationLog('%s%d_%d_producer_compliance_search.csv' % (
@@ -392,7 +392,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     from context.new_vehicle_market import NewVehicleMarket
 
     cache_key = calendar_year
-    if cache_key not in cache:
+    if cache_key not in _cache:
         # pull in last year's vehicles:
         manufacturer_prior_vehicles = VehicleFinal.get_compliance_vehicles(calendar_year - 1, compliance_id)
 
@@ -473,14 +473,14 @@ def create_composite_vehicles(calendar_year, compliance_id):
             omega_globals.options.MarketClass.populate_market_classes(market_class_tree, new_veh.market_class_id,
                                                                       new_veh)
 
-        cache[cache_key] = {'composite_vehicles': composite_vehicles,
+        _cache[cache_key] = {'composite_vehicles': composite_vehicles,
                             'market_class_tree': market_class_tree,
                             'context_based_total_sales': context_based_total_sales}
     else:
         # pull cached composite vehicles (avoid recompute of composite frontiers, etc)
-        composite_vehicles = cache[cache_key]['composite_vehicles']
-        market_class_tree = cache[cache_key]['market_class_tree']
-        context_based_total_sales = cache[cache_key]['context_based_total_sales']
+        composite_vehicles = _cache[cache_key]['composite_vehicles']
+        market_class_tree = _cache[cache_key]['market_class_tree']
+        context_based_total_sales = _cache[cache_key]['context_based_total_sales']
 
     return composite_vehicles, market_class_tree, context_based_total_sales
 

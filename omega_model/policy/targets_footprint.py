@@ -74,7 +74,6 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
 
 if __name__ == '__main__':
     import importlib
@@ -90,23 +89,13 @@ if __name__ == '__main__':
         omega_globals.options.policy_reg_classes_file)
 
 
-class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
+class VehicleTargets(OMEGABase, VehicleTargetsBase):
     """
     **Implements vehicle footprint-based GHG targets (CO2e g/mi).**
 
     """
-    # --- database table properties ---
-    __tablename__ = 'targets_footprint'
-    index = Column(Integer, primary_key=True)  #: database index
-    model_year = Column(Numeric)  #: model year (or start year of the applied parameters)
-    reg_class_id = Column(String)  # , Enum(*omega_globals.options.RegulatoryClasses.reg_classes, validate_strings=True))  #: reg class name, e.g. 'car','truck'
-    footprint_min_sqft = Column('footprint_min_sqft', Float)  #: minimum footprint (square feet) of curve
-    footprint_max_sqft = Column('footprint_max_sqft', Float)  #: maximum footprint (square feet) of curve
-    coeff_a = Column('coeff_a', Float)  #: footprint curve A coefficient
-    coeff_b = Column('coeff_b', Float)  #: footprint curve B coefficient
-    coeff_c = Column('coeff_c', Float)  #: footprint curve C coefficient
-    coeff_d = Column('coeff_d', Float)  #: footprint curve D coefficient
-    lifetime_VMT = Column('lifetime_vmt', Float)  #: regulatory lifetime VMT (in miles) of the given reg class
+
+    _data = dict()  # private dict, footprint-based GHG target parameters by reg class ID and start year
 
     @staticmethod
     def calc_target_co2e_gpmi(vehicle):
@@ -121,23 +110,18 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             Vehicle target CO2e in g/mi.
 
         """
-        start_years = cache[vehicle.reg_class_id]['start_year']
+        start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
-            vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
+            model_year = max(start_years[start_years <= vehicle.model_year])
 
-            cache_key = '%s_%s_coefficients' % (vehicle_model_year, vehicle.reg_class_id)
-            if cache_key not in cache:
-                cache[cache_key] = omega_globals.session.query(VehicleTargets). \
-                    filter(VehicleTargets.reg_class_id == vehicle.reg_class_id). \
-                    filter(VehicleTargets.model_year == vehicle_model_year).one()
-            coefficients = cache[cache_key]
+            coefficients = VehicleTargets._data[vehicle.reg_class_id, model_year]
 
-            if vehicle.footprint_ft2 <= coefficients.footprint_min_sqft:
-                target_co2e_gpmi = coefficients.coeff_a
-            elif vehicle.footprint_ft2 > coefficients.footprint_max_sqft:
-                target_co2e_gpmi = coefficients.coeff_b
+            if vehicle.footprint_ft2 <= coefficients['fp_min']:
+                target_co2e_gpmi = coefficients['a_coeff']
+            elif vehicle.footprint_ft2 > coefficients['fp_max']:
+                target_co2e_gpmi = coefficients['b_coeff']
             else:
-                target_co2e_gpmi = vehicle.footprint_ft2 * coefficients.coeff_c + coefficients.coeff_d
+                target_co2e_gpmi = vehicle.footprint_ft2 * coefficients['c_coeff'] + coefficients['d_coeff']
 
             return target_co2e_gpmi
         else:
@@ -158,17 +142,11 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             Lifetime VMT for the regulatory class and model year.
 
         """
-        start_years = cache[reg_class_id]['start_year']
+        start_years = VehicleTargets._data[reg_class_id]['start_year']
         if len(start_years[start_years <= model_year]) > 0:
             model_year = max(start_years[start_years <= model_year])
 
-            cache_key = '%s_%s_lifetime_vmt' % (model_year, reg_class_id)
-            if cache_key not in cache:
-                cache[cache_key] = omega_globals.session.query(VehicleTargets.lifetime_VMT). \
-                    filter(VehicleTargets.reg_class_id == reg_class_id). \
-                    filter(VehicleTargets.model_year == model_year).scalar()
-
-            return cache[cache_key]
+            return VehicleTargets._data[reg_class_id, model_year]['lifetime_vmt']
         else:
             raise Exception('Missing GHG target lifetime VMT parameters for %s, %d or prior'
                             % (reg_class_id, model_year))
@@ -196,7 +174,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         import numpy as np
         from policy.incentives import Incentives
 
-        start_years = cache[vehicle.reg_class_id]['start_year']
+        start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -218,7 +196,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
                             % (vehicle.reg_class_id, vehicle.model_year))
 
     @staticmethod
-    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=[1]):
+    def calc_cert_co2e_Mg(vehicle, co2_gpmi_variants=None, sales_variants=1):
         """
         Calculate vehicle cert CO2e Mg as a function of the vehicle, the standards, CO2e g/mi options and optional sales
         options.
@@ -231,6 +209,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
 
         Args:
             vehicle (Vehicle): the vehicle
+            co2_gpmi_variants (numeric list-like): optional co2 g/mi variants
             sales_variants (numeric list-like): optional sales variants
 
         Returns:
@@ -241,7 +220,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         import numpy as np
         from policy.incentives import Incentives
 
-        start_years = cache[vehicle.reg_class_id]['start_year']
+        start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             vehicle_model_year = max(start_years[start_years <= vehicle.model_year])
 
@@ -282,7 +261,7 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
         """
         import numpy as np
 
-        cache.clear()
+        VehicleTargets._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -302,25 +281,16 @@ class VehicleTargets(OMEGABase, SQABase, VehicleTargetsBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
+                # validate data
                 for i in df.index:
-                    obj_list.append(VehicleTargets(
-                        model_year=df.loc[i, 'start_year'],
-                        reg_class_id=df.loc[i, 'reg_class_id'],
-                        footprint_min_sqft=df.loc[i, 'fp_min'],
-                        footprint_max_sqft=df.loc[i, 'fp_max'],
-                        coeff_a=df.loc[i, 'a_coeff'],
-                        coeff_b=df.loc[i, 'b_coeff'],
-                        coeff_c=df.loc[i, 'c_coeff'],
-                        coeff_d=df.loc[i, 'd_coeff'],
-                        lifetime_VMT=df.loc[i, 'lifetime_vmt'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                    template_errors += \
+                        omega_globals.options.RegulatoryClasses.validate_reg_class_id(df.loc[i, 'reg_class_id'])
+
+            if not template_errors:
+                VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).sort_index().to_dict(orient='index')
 
                 for rc in df['reg_class_id'].unique():
-                    cache[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
+                    VehicleTargets._data[rc] = {'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
 
         return template_errors
 
@@ -334,12 +304,6 @@ if __name__ == '__main__':
             print(file_io.get_filenameext(__file__))
 
         from policy.incentives import Incentives
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)
 
@@ -347,10 +311,8 @@ if __name__ == '__main__':
                                                    verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
             omega_globals.options.VehicleTargets = VehicleTargets
-
 
             class dummyVehicle:
                 model_year = None
@@ -361,18 +323,19 @@ if __name__ == '__main__':
                 def get_initial_registered_count(self):
                     return self.initial_registered_count
 
-
             car_vehicle = dummyVehicle()
             car_vehicle.model_year = 2021
-            car_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.reg_classes.car
+            car_vehicle.reg_class_id = 'car'
             car_vehicle.footprint_ft2 = 41
             car_vehicle.initial_registered_count = 1
+            car_vehicle.fueling_class = 'BEV'
 
             truck_vehicle = dummyVehicle()
             truck_vehicle.model_year = 2021
-            truck_vehicle.reg_class_id = omega_globals.options.RegulatoryClasses.reg_classes.truck
+            truck_vehicle.reg_class_id = 'truck'
             truck_vehicle.footprint_ft2 = 41
             truck_vehicle.initial_registered_count = 1
+            truck_vehicle.fueling_class = 'ICE'
 
             car_target_co2e_gpmi = omega_globals.options.VehicleTargets.calc_target_co2e_gpmi(car_vehicle)
             car_target_co2e_Mg = omega_globals.options.VehicleTargets.calc_target_co2e_Mg(car_vehicle)
@@ -389,9 +352,8 @@ if __name__ == '__main__':
                                                                                              sales_variants=[1, 2, 3, 4])
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

@@ -45,7 +45,7 @@ from omega_model import *
 
 # initial_credit_bank = dict()
 
-# cache = dict()
+# _cache = dict()
 
 
 class Manufacturer(SQABase, OMEGABase):
@@ -76,7 +76,7 @@ class Manufacturer(SQABase, OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        # cache.clear()
+        # _cache.clear()
 
         from policy.credit_banking import CreditBank
         if verbose:
@@ -147,14 +147,15 @@ if __name__ == '__main__':
 
         SQABase.metadata.create_all(omega_globals.engine)
 
-        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, verbose=omega_globals.options.verbose)
+        init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file, 
+                                                          verbose=omega_globals.options.verbose)
 
         if not init_fail:
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

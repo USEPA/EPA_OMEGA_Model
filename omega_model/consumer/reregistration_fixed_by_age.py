@@ -54,21 +54,13 @@ Data Column Name and Description
 
 from omega_model import *
 
-cache = dict()
 
-
-class Reregistration(OMEGABase, SQABase, ReregistrationBase):
+class Reregistration(OMEGABase, ReregistrationBase):
     """
     **Load and provide access to vehicle re-registration data.**
     """
 
-    # --- database table properties ---
-    __tablename__ = 'reregistration_fixed_by_age'
-    index = Column(Integer, primary_key=True)  #: database table index
-
-    age = Column(Numeric)  #: vehicle age
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: market class ID, e.g. 'hauling.ICE'
-    reregistered_proportion = Column(Float)  #: re-registered proportion, [0..1]
+    _data = dict()
 
     @staticmethod
     def get_reregistered_proportion(market_class_id, age):
@@ -83,13 +75,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             Re-registered proportion [0..1]
 
         """
-        cache_key = '%s_%s' % (market_class_id, age)
-
-        if cache_key not in cache:
-            cache[cache_key] = float(omega_globals.session.query(Reregistration.reregistered_proportion).
-                                     filter(Reregistration.market_class_id == market_class_id).
-                                     filter(Reregistration.age == age).scalar())
-        return cache[cache_key]
+        return Reregistration._data[market_class_id, age]['reregistered_proportion']
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -104,7 +90,7 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        Reregistration._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -123,16 +109,13 @@ class Reregistration(OMEGABase, SQABase, ReregistrationBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
+                # validate data
                 for i in df.index:
-                    obj_list.append(Reregistration(
-                        age=df.loc[i, 'age'],
-                        market_class_id=df.loc[i, 'market_class_id'],
-                        reregistered_proportion=df.loc[i, 'reregistered_proportion'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                    template_errors += \
+                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+
+            if not template_errors:
+                Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
 
         return template_errors
 
@@ -148,23 +131,19 @@ if __name__ == '__main__':
         import importlib
 
         omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
 
@@ -172,12 +151,11 @@ if __name__ == '__main__':
             omega_globals.options.vehicle_reregistration_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

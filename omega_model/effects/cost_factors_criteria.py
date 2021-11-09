@@ -47,64 +47,57 @@ from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
 
-cache = dict()
+class CostFactorsCriteria(OMEGABase):
+    """
+    Loads and provides access to criteria emissions cost factors by calendar year.
 
-class CostFactorsCriteria(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'cost_factors_criteria'
-    index = Column(Integer, primary_key=True)
-
-    calendar_year = Column(Numeric)
-    dollar_basis = Column(Numeric)
-    pm25_tailpipe_3 = Column('pm25_tailpipe_3.0_USD_per_uston', Float)
-    pm25_upstream_3 = Column('pm25_upstream_3.0_USD_per_uston', Float)
-    nox_tailpipe_3 = Column('nox_tailpipe_3.0_USD_per_uston', Float)
-    nox_upstream_3 = Column('nox_upstream_3.0_USD_per_uston', Float)
-    so2_tailpipe_3 = Column('so2_tailpipe_3.0_USD_per_uston', Float)
-    so2_upstream_3 = Column('so2_upstream_3.0_USD_per_uston', Float)
-    pm25_tailpipe_7 = Column('pm25_tailpipe_7.0_USD_per_uston', Float)
-    pm25_upstream_7 = Column('pm25_upstream_7.0_USD_per_uston', Float)
-    nox_tailpipe_7 = Column('nox_tailpipe_7.0_USD_per_uston', Float)
-    nox_upstream_7 = Column('nox_upstream_7.0_USD_per_uston', Float)
-    so2_tailpipe_7 = Column('so2_tailpipe_7.0_USD_per_uston', Float)
-    so2_upstream_7 = Column('so2_upstream_7.0_USD_per_uston', Float)
+    """
+    _data = dict()  # private dict, cost factors criteria by calendar year
 
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
 
-        Args:
-            calendar_year: calendar year to get cost factors for
-            cost_factors: name of cost factor or list of cost factor attributes to get
+        Get cost factors by calendar year
 
-        Returns: cost factor or list of cost factors
+        Args:
+            calendar_year (int): calendar year to get cost factors for
+            cost_factors (str, [strs]): name of cost factor or list of cost factor attributes to get
+
+        Returns:
+            Cost factor or list of cost factors
 
         """
-        calendar_years = pd.Series(sql_unpack_result(omega_globals.session.query(CostFactorsCriteria.calendar_year).all())).unique()
+        calendar_years = CostFactorsCriteria._data.keys()
         year = max([yr for yr in calendar_years if yr <= calendar_year])
 
-        cache_key = '%s_%s' % (year, cost_factors)
+        factors = []
+        for cf in cost_factors:
+            factors.append(CostFactorsCriteria._data[year][cf])
 
-        if cache_key not in cache:
-            if type(cost_factors) is not list:
-                cost_factors = [cost_factors]
-            attrs = CostFactorsCriteria.get_class_attributes(cost_factors)
-
-            result = omega_globals.session.query(*attrs).filter(CostFactorsCriteria.calendar_year == year).all()[0]
-
-            if len(cost_factors) == 1:
-                cache[cache_key] = result[0]
-            else:
-                cache[cache_key] = result
-
-        return cache[cache_key]
+        if len(cost_factors) == 1:
+            return factors[0]
+        else:
+            return factors
 
     @staticmethod
-    def init_database_from_file(criteria_cost_factors_file, verbose=False):
-        cache.clear()
+    def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        CostFactorsCriteria._data.clear()
 
         if verbose:
-            omega_log.logwrite(f'\nInitializing database from {criteria_cost_factors_file} ...')
+            omega_log.logwrite(f'\nInitializing database from {filename} ...')
 
         input_template_name = 'context_cost_factors-criteria'
         input_template_version = 0.3
@@ -122,15 +115,15 @@ class CostFactorsCriteria(SQABase, OMEGABase):
                                                'so2_tailpipe_7.0_USD_per_uston',
                                                'so2_upstream_7.0_USD_per_uston'}
 
-        template_errors = validate_template_version_info(criteria_cost_factors_file, input_template_name,
+        template_errors = validate_template_version_info(filename, input_template_name,
                                                          input_template_version, verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
-            df = pd.read_csv(criteria_cost_factors_file, skiprows=1)
+            df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(criteria_cost_factors_file, cost_factors_input_template_columns,
+            template_errors = validate_template_columns(filename, cost_factors_input_template_columns,
                                                         df.columns, verbose=verbose)
 
             cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
@@ -138,27 +131,7 @@ class CostFactorsCriteria(SQABase, OMEGABase):
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, 'cpi_price_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(CostFactorsCriteria(
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        dollar_basis=df.loc[i, 'dollar_basis'],
-                        pm25_tailpipe_3=df.loc[i, 'pm25_tailpipe_3.0_USD_per_uston'],
-                        pm25_upstream_3=df.loc[i, 'pm25_upstream_3.0_USD_per_uston'],
-                        nox_tailpipe_3=df.loc[i, 'nox_tailpipe_3.0_USD_per_uston'],
-                        nox_upstream_3=df.loc[i, 'nox_upstream_3.0_USD_per_uston'],
-                        so2_tailpipe_3=df.loc[i, 'so2_tailpipe_3.0_USD_per_uston'],
-                        so2_upstream_3=df.loc[i, 'so2_upstream_3.0_USD_per_uston'],
-                        pm25_tailpipe_7=df.loc[i, 'pm25_tailpipe_7.0_USD_per_uston'],
-                        pm25_upstream_7=df.loc[i, 'pm25_upstream_7.0_USD_per_uston'],
-                        nox_tailpipe_7=df.loc[i, 'nox_tailpipe_7.0_USD_per_uston'],
-                        nox_upstream_7=df.loc[i, 'nox_upstream_7.0_USD_per_uston'],
-                        so2_tailpipe_7=df.loc[i, 'so2_tailpipe_7.0_USD_per_uston'],
-                        so2_upstream_7=df.loc[i, 'so2_upstream_7.0_USD_per_uston'],
-                        ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                CostFactorsCriteria._data = df.set_index('calendar_year').to_dict(orient='index')
 
         return template_errors
 
@@ -168,29 +141,24 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        from effects.cpi_price_deflators import CPIPriceDeflators
-
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
+        from effects.cpi_price_deflators import CPIPriceDeflators
         init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
                                                       verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                 verbose=omega_globals.options.verbose)
+        init_fail += CostFactorsCriteria.init_from_file(omega_globals.options.criteria_cost_factors_file,
+                                                        verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

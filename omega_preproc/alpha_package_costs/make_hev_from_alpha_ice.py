@@ -5,7 +5,7 @@ from omega_preproc.alpha_package_costs.alpha_package_costs import InputSettings,
 class SelectICEforHEV:
     """
 
-    Select ICE packges from ICE ALPHA files for "conversion" to HEV given specific selection parameters defined by the init.
+    Select ICE packages from ICE ALPHA files for "conversion" to HEV given specific selection parameters defined by the init.
 
     """
     def __init__(self, df):

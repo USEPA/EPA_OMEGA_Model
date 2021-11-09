@@ -56,8 +56,9 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
     **Load and provides routines to access to regulatory class descriptive data**
 
     """
-    _data = pd.DataFrame()
     reg_classes = None
+
+    _data = dict()
 
     @staticmethod
     def get_vehicle_reg_class(vehicle):
@@ -77,6 +78,23 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
         return reg_class_id
 
     @staticmethod
+    def validate_reg_class_id(reg_class_id):
+        """
+        Validate market class ID
+
+        Args:
+            reg_class_id (str): regulatory class ID, e.g. 'car'
+
+        Returns:
+            Error message in a list if reg_class_id is not valid
+
+        """
+        if reg_class_id not in RegulatoryClasses.reg_classes:
+            return ['Unexpected reg_class_id "%s"' % reg_class_id]
+        else:
+            return []
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
@@ -90,8 +108,7 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             List of template/input errors, else empty list on success
 
         """
-        RegulatoryClasses._data = pd.DataFrame()
-
+        RegulatoryClasses._data.clear()
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
@@ -109,10 +126,9 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                RegulatoryClasses._data['reg_class_id'] = df['reg_class_id']
-                RegulatoryClasses._data['description'] = df['description']
+                RegulatoryClasses._data = df.set_index('reg_class_id').to_dict(orient='index')
 
-                RegulatoryClasses.reg_classes = OMEGAEnum(RegulatoryClasses._data['reg_class_id'].to_list())
+                RegulatoryClasses.reg_classes = df['reg_class_id'].to_list()
 
         return template_errors
 
@@ -130,28 +146,23 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
+        init_fail = []
 
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
 
-        init_fail = []
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(omega_globals.options.policy_reg_classes_file,
                                                                             verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
-            omega_globals.options.RegulatoryClasses._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'reg_class_data.csv', index=False)
-
             print(omega_globals.options.RegulatoryClasses.reg_classes)
 
         else:
             print(init_fail)
-
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

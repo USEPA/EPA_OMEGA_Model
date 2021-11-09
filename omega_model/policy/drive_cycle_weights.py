@@ -78,8 +78,6 @@ print('importing %s' % __file__)
 from omega_model import *
 from policy.drive_cycles import DriveCycles
 
-cache = dict()
-
 
 class DriveCycleWeights(OMEGABase):
     """
@@ -87,6 +85,9 @@ class DriveCycleWeights(OMEGABase):
     cycle results.**
 
     """
+    
+    _data = dict()  # private dict, drive cycle weights by fuel class and calendar year
+    
     @staticmethod
     def validate_drive_cycle_names(tree, filename):
         """
@@ -128,7 +129,7 @@ class DriveCycleWeights(OMEGABase):
 
         import numpy as np
 
-        cache.clear()
+        DriveCycleWeights._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -160,17 +161,17 @@ class DriveCycleWeights(OMEGABase):
                                 template_errors = ['weight error %s: %s' %
                                                    (calendar_year, error) for error in weight_errors]
                             else:
-                                if not cache:
+                                if not DriveCycleWeights._data:
                                     # validate drive cycle names on first tree
                                     cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
                                     if cycle_name_errors:
                                         template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
                                 if not cycle_name_errors:
-                                    if fc not in cache:
-                                        cache[fc] = dict()
-                                    cache[fc][calendar_year] = tree
+                                    if fc not in DriveCycleWeights._data:
+                                        DriveCycleWeights._data[fc] = dict()
+                                    DriveCycleWeights._data[fc][calendar_year] = tree
 
-                    cache[fc]['start_year'] = np.array(list(cache[fc].keys()))
+                    DriveCycleWeights._data[fc]['start_year'] = np.array(list(DriveCycleWeights._data[fc].keys()))
 
         return template_errors
 
@@ -192,10 +193,10 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        start_years = cache[fueling_class]['start_year']
+        start_years = DriveCycleWeights._data[fueling_class]['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
-            return cache[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+            return DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
                                                                   weighted=weighted)
         else:
             raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
@@ -244,10 +245,7 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
@@ -276,8 +274,8 @@ if __name__ == '__main__':
 
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -93,7 +93,7 @@ Data Column Name and Description
         Sales weighted average battery electric in-use fuel economy (miles per gallon equivalent, MPGe)
 
     :onroad_to_cycle_mpg_ratio:
-        The ratio of in-use to certfication fuel economy
+        The ratio of in-use to certification fuel economy
 
     :ice_price_dollars:
         Sales weighted average internal combustion engine (ICE) vehicle price (dollars)
@@ -111,10 +111,8 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
 
-
-class NewVehicleMarket(SQABase, OMEGABase):
+class NewVehicleMarket(OMEGABase):
     """
     **Loads, provides access to and saves new vehicle market data from/relative to the analysis context**
 
@@ -123,28 +121,9 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
     """
 
-    # --- database table properties ---
-    __tablename__ = 'context_new_vehicle_market'  # database table name
-    index = Column(Integer, primary_key=True)  #: database table index
-    context_id = Column('context_id', String)  #: str: e.g. 'AEO2020'
-    dollar_basis = Column(Numeric)
-    case_id = Column('case_id', String)  #: str: e.g. 'Reference case'
-    context_size_class = Column(String)   #: str: e.g. 'Small Crossover'
-    calendar_year = Column(Numeric)  #: numeric: calendar year of the market data
-    context_reg_class_id = Column('context_reg_class_id', Enum(*legacy_reg_classes, validate_strings=True))  #: str: e.g. 'car', 'truck'
-    # sales_share_of_regclass = Column(Float)   #: float: percent of reg class represented by the context size class
-    # sales_share_of_total = Column(Float)  #: float: percent of total sales represented by the context size class
-    sales = Column(Float)  #: float:  size class new vehicle sales
-    # weight_lbs = Column(Float)  #: float: sales-weighted average weight (lbs) of a vehicle in the size class
-    # horsepower = Column(Float)  #: float: sales-weighted average horsepower of a vehicle in the size class
-    # horsepower_to_weight_ratio = Column(Float)  #: float: sales-weighted average horsepower to weight ratio of a vehicle in the size class
-    # mpg_conventional = Column(Float)  #: float: sales-weighted average miles per gallon (mpg) of a vehicle in the size class
-    # mpg_conventional_onroad = Column(Float)  #: float: sales-weighted average on-road miles per gallon (mpg) of a vehicle in the size class
-    # mpg_alternative = Column(Float)  #: float: sales-weighted average MPGe of a vehicle in the size class
-    # mpg_alternative_onroad = Column(Float)  #: float: sales-weighted average onroad MPGe of a vehicle in the size class
-    # onroad_to_cycle_mpg_ratio = Column(Float)  #: float: ratio of on-road to 2-cycle miles per gallon
-    # ice_price_dollars = Column(Float)  #: float: sales-weighted average price of an internal combustion engine (ICE) vehicle in the size class
-    # bev_price_dollars = Column(Float)  #: float: sales-weighted average price of an battery-electric vehicle (BEV) in the size class
+    _data_by_csc_rc = dict()  # private dict, sales by context size class and reg class
+    _data_by_csc = dict()  # private dict, sales by context size class
+    _data_by_total = dict()  # private dict, total sales
 
     context_size_class_info_by_nrmc = dict()  #: dict of dicts: information about which context size classes are in which non-responsive market categories as well as what share of the size class is within the non-responsive category.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
     context_size_classes = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
@@ -187,6 +166,8 @@ class NewVehicleMarket(SQABase, OMEGABase):
             filename (str): name of file to save new vehicle generalized costs to
 
         """
+        if omega_globals.options.standalone_run:
+            filename = omega_globals.options.output_folder + filename
 
         # wanted to do: pd.DataFrame.from_dict(cls._new_vehicle_generalized_costs, orient='index',
         #       columns=['new_vehicle_price_dollars']).to_csv(filename, index=True)
@@ -294,37 +275,26 @@ class NewVehicleMarket(SQABase, OMEGABase):
         if omega_globals.options.flat_context:
             calendar_year = omega_globals.options.flat_context_year
 
-        cache_key = '%s_%s_%s_%s_%s_new_vehicle_sales' % (omega_globals.options.context_id, omega_globals.options.context_case_id,
-                                                          calendar_year, context_size_class, context_reg_class)
-
-        if cache_key not in cache:
-            if context_size_class and context_reg_class:
-                projection_sales = (omega_globals.session.query(func.sum(NewVehicleMarket.sales))
-                                    .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
-                                    .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
-                                    .filter(NewVehicleMarket.context_size_class == context_size_class)
-                                    .filter(NewVehicleMarket.context_reg_class_id == context_reg_class)
-                                    .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
-                if projection_sales is None:
-                    cache[cache_key] = 0
-                else:
-                    cache[cache_key] = float(projection_sales)
-            elif context_size_class:
-                cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
-                                         .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
-                                         .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
-                                         .filter(NewVehicleMarket.context_size_class == context_size_class)
-                                         .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
+        if context_size_class and context_reg_class:
+            if (omega_globals.options.context_id, omega_globals.options.context_case_id,
+                    context_size_class, context_reg_class, calendar_year) in NewVehicleMarket._data_by_csc_rc:
+                return NewVehicleMarket._data_by_csc_rc[omega_globals.options.context_id,
+                                                        omega_globals.options.context_case_id,
+                                                        context_size_class, context_reg_class, calendar_year]['sales']
             else:
-                cache[cache_key] = float(omega_globals.session.query(func.sum(NewVehicleMarket.sales))
-                                         .filter(NewVehicleMarket.context_id == omega_globals.options.context_id)
-                                         .filter(NewVehicleMarket.case_id == omega_globals.options.context_case_id)
-                                         .filter(NewVehicleMarket.calendar_year == calendar_year).scalar())
+                return 0
 
-        return cache[cache_key]
+        elif context_size_class:
+            return NewVehicleMarket._data_by_csc['sales'][omega_globals.options.context_id,
+                                                    omega_globals.options.context_case_id,
+                                                    context_size_class, calendar_year].sum()
+        else:
+            return NewVehicleMarket._data_by_total['sales'][omega_globals.options.context_id,
+                                                    omega_globals.options.context_case_id,
+                                                    calendar_year].sum()
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -338,7 +308,9 @@ class NewVehicleMarket(SQABase, OMEGABase):
 
         """
 
-        cache.clear()
+        NewVehicleMarket._data_by_csc_rc.clear()
+        NewVehicleMarket._data_by_csc.clear()
+        NewVehicleMarket._data_by_total.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -363,32 +335,9 @@ class NewVehicleMarket(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(NewVehicleMarket(
-                        context_id=df.loc[i, 'context_id'],
-                        dollar_basis=df.loc[i, 'dollar_basis'],
-                        case_id=df.loc[i, 'case_id'],
-                        context_size_class=df.loc[i, 'context_size_class'],
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        context_reg_class_id=df.loc[i, 'reg_class_id'],
-                        # sales_share_of_regclass=df.loc[i, 'sales_share_of_regclass'],
-                        # sales_share_of_total=df.loc[i, 'sales_share_of_total'],
-                        sales=df.loc[i, 'sales'],
-                        # weight_lbs=df.loc[i, 'weight_lbs'],
-                        # horsepower=df.loc[i, 'horsepower'],
-                        # horsepower_to_weight_ratio=df.loc[i, 'horsepower_to_weight_ratio'],
-                        # mpg_conventional=df.loc[i, 'mpg_conventional'],
-                        # mpg_conventional_onroad=df.loc[i, 'mpg_conventional_onroad'],
-                        # mpg_alternative=df.loc[i, 'mpg_alternative'],
-                        # mpg_alternative_onroad=df.loc[i, 'mpg_alternative_onroad'],
-                        # onroad_to_cycle_mpg_ratio=df.loc[i, 'onroad_to_cycle_mpg_ratio'],
-                        # ice_price_dollars=df.loc[i, 'ice_price_dollars'],
-                        # bev_price_dollars=df.loc[i, 'bev_price_dollars'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
+                NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
+                NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
 
         return template_errors
 
@@ -400,24 +349,19 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
-        init_fail += NewVehicleMarket.init_database_from_file(
+
+        init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
             print(NewVehicleMarket.new_vehicle_sales(2021))
-            # print(ContextNewVehicleMarket.get_new_vehicle_sales_weighted_price(2021))
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

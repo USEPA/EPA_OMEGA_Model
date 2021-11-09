@@ -1,0 +1,10 @@
+input_template_name:,policy-fuels,input_template_version:,0.1,,
+fuel_id,start_year,unit,direct_co2e_grams_per_unit,upstream_co2e_grams_per_unit,transmission_efficiency
+electricity,2020,kWh,0,280,0.935
+gasoline,2020,gallon,8887,2478,0
+diesel,2020,gallon,10180,2839,0
+electricity,2036,kWh,0,250,0.935
+electricity,2037,kWh,0,230,0.935
+electricity,2038,kWh,0,210,0.935
+electricity,2039,kWh,0,190,0.935
+electricity,2040,kWh,0,170,0.935

@@ -2,7 +2,7 @@
 
 **Routines to load CPI price deflators.**
 
-Used to discount costs in the effects module
+Used to discount costs in the ``cost_factors_criteria`` module.
 
 ----
 
@@ -46,15 +46,12 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
-
-
 class CPIPriceDeflators(OMEGABase):
     """
     **Loads and provides access to CPI price deflators by calendar year.**
 
     """
-    _data = pd.DataFrame()
+    _data = dict()  # private dict, CPI price deflators by calendar year
 
     @staticmethod
     def get_price_deflator(calendar_year):
@@ -68,12 +65,13 @@ class CPIPriceDeflators(OMEGABase):
             The CPI price deflator for the given calendar year.
 
         """
-        start_years = cache['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
+        import pandas as pd
 
-            return CPIPriceDeflators._data['price_deflator'].loc[
-                CPIPriceDeflators._data['start_year'] == calendar_year].item()
+        start_years = pd.Series(CPIPriceDeflators._data.keys())
+        if len(start_years[start_years <= calendar_year]) > 0:
+            year = max(start_years[start_years <= calendar_year])
+
+            return CPIPriceDeflators._data[year]['price_deflator']
         else:
             raise Exception('Missing CPI price deflator for %d or prior' % calendar_year)
 
@@ -93,7 +91,7 @@ class CPIPriceDeflators(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        CPIPriceDeflators._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -112,9 +110,7 @@ class CPIPriceDeflators(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                CPIPriceDeflators._data = df
-
-            cache['start_year'] = np.array(list(df['start_year']))
+                CPIPriceDeflators._data = df.set_index('start_year').to_dict(orient='index')
 
         return template_errors
 
@@ -128,27 +124,21 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
+
         init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
-            CPIPriceDeflators._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
-
             print(CPIPriceDeflators.get_price_deflator(2010))
             print(CPIPriceDeflators.get_price_deflator(2020))
             print(CPIPriceDeflators.get_price_deflator(2050))
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

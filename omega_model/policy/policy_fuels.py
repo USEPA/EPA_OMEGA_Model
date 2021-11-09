@@ -61,14 +61,14 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
-
 
 class PolicyFuel(OMEGABase):
     """
     **Loads and provides methods to access onroad fuel attribute data.**
 
     """
+
+    _data = dict()  # private dict, policy fuel properties
 
     @staticmethod
     def get_fuel_attribute(calendar_year, fuel_id, attribute):
@@ -90,11 +90,13 @@ class PolicyFuel(OMEGABase):
                     PolicyFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
-        start_years = cache[fuel_id]['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max(start_years[start_years <= calendar_year])
+        import pandas as pd
 
-            return cache[fuel_id][year][attribute]
+        start_years = pd.Series(PolicyFuel._data['start_year'][fuel_id])
+        if len(start_years[start_years <= calendar_year]) > 0:
+            year = max([yr for yr in start_years if yr <= calendar_year])
+
+            return PolicyFuel._data[fuel_id, year][attribute]
         else:
             raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
 
@@ -107,10 +109,13 @@ class PolicyFuel(OMEGABase):
             fuel_id (str): e.g. 'pump gasoline')
 
         Returns:
-            True if the fuel ID is valid, False otherwise
+            Error message in a list if fuel_id is not valid
 
         """
-        return fuel_id in cache['fuel_id']
+        if fuel_id not in PolicyFuel._data['start_year'].keys():
+            return ['Unexpected fuel_id "%s"' % fuel_id]
+        else:
+            return []
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -128,7 +133,7 @@ class PolicyFuel(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        PolicyFuel._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -147,13 +152,9 @@ class PolicyFuel(OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                for _, r in df.iterrows():
-                    if r.fuel_id not in cache:
-                        cache[r.fuel_id] = {'start_year': np.array(df['start_year'].loc[df['fuel_id'] == r.fuel_id])}
-                    cache[r.fuel_id][r.start_year] = r.drop('start_year').to_dict()
-
-                cache['fuel_id'] = np.array(list(df['fuel_id'].unique()))
+        if not template_errors:
+            PolicyFuel._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
+            PolicyFuel._data |= df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='series')
 
         return template_errors
 
@@ -179,7 +180,8 @@ if __name__ == '__main__':
             print(PolicyFuel.get_fuel_attribute(2020, 'electricity', 'transmission_efficiency'))
         else:
             print(init_fail)
-
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

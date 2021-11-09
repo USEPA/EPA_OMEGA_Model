@@ -46,9 +46,6 @@ print('importing %s' % __file__)
 from omega_model import *
 
 
-cache = dict()
-
-
 def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
     """
     Calculate upstream cert emissions under a "zero-upstream" policy.
@@ -149,10 +146,11 @@ upstream_method_dict = {'upstream_zero': upstream_zero, 'upstream_xev_ice_delta'
 
 class UpstreamMethods(OMEGABase):
     """
-    **Loads and provides access to upstream calculation methods by calendar year.**
+    **Loads and provides access to upstream calculation methods by start year.**
 
     """
-    _methods = pd.DataFrame()
+
+    _data = pd.DataFrame()  # private Dataframe, upstream methods by start year
 
     @staticmethod
     def get_upstream_method(calendar_year):
@@ -166,12 +164,12 @@ class UpstreamMethods(OMEGABase):
             A callable python function used to calculate upstream cert emissions for the given calendar year
 
         """
-        start_years = cache['start_year']
+        start_years = UpstreamMethods._data['start_year']
         if len(start_years[start_years <= calendar_year]) > 0:
             calendar_year = max(start_years[start_years <= calendar_year])
 
-            method = UpstreamMethods._methods['upstream_calculation_method'].loc[
-                UpstreamMethods._methods['start_year'] == calendar_year].item()
+            method = UpstreamMethods._data['upstream_calculation_method'].loc[
+                UpstreamMethods._data['start_year'] == calendar_year].item()
 
             return upstream_method_dict[method]
         else:
@@ -191,9 +189,9 @@ class UpstreamMethods(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+        import pandas as pd
 
-        cache.clear()
+        UpstreamMethods._data = pd.DataFrame()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
@@ -212,10 +210,7 @@ class UpstreamMethods(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                UpstreamMethods._methods['start_year'] = df['start_year']
-                UpstreamMethods._methods['upstream_calculation_method'] = df['upstream_calculation_method']
-
-            cache['start_year'] = np.array(list(df['start_year']))
+                UpstreamMethods._data = df
 
         return template_errors
 
@@ -229,18 +224,16 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
+
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=omega_globals.options.verbose)
 
         if not init_fail:
             file_io.validate_folder(omega_globals.options.database_dump_folder)
-            UpstreamMethods._methods.to_csv(
+            UpstreamMethods._data.to_csv(
                 omega_globals.options.database_dump_folder + os.sep + 'policy_fuel_upstream_values.csv', index=False)
 
             print(UpstreamMethods.get_upstream_method(2020))
@@ -248,8 +241,8 @@ if __name__ == '__main__':
             print(UpstreamMethods.get_upstream_method(2050))
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

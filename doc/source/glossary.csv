@@ -4,7 +4,7 @@ Nameplate,,,Model,"Consumer recognizable name of historical vehicles (e.g. ""Cru
 Make,,,Brand,"Consumer recognizable brand of a historical vehicle (e.g. ""Chevrolet"")"
 Manufacturer,,,,"Company that is treated as a regulated entity (e.g. ""General Motors"")"
 Baseline Scenarios,,,BAU/Reference,"Ths is too ambiguous without further clarification. See ""Policy Alternatives"" and ""Context Scenarios"" instead."
-No-action Alternative,,,,"Within any given baseline scenario, the decision to adopt no new OTAQ regulatory actions beyond the existing regulations"
+No-action Alternative,,,,"Within any given scenario, the decision to adopt no new OTAQ regulatory actions beyond the existing regulations"
 Action Alternative,,,,A set of definitions that fully describe the OTAQ regulations under consideration
 Historical Fleet,,,,"The vehicles and their attributes that have already been produced in reality, up to and including the base model year"
 Legacy Fleet,,,,The set of historical vehicles as they are modeled beyond the base year

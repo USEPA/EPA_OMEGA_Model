@@ -467,7 +467,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, multiplier_colu
                                  producer_decision, producer_decision_and_response):
     """
     Calculate cross subsidy pricing options based on the allowable multiplier range, within a subsequently smaller
-    range as iteration progresses, until the search collapses (min mutliplier == max multiplier).
+    range as iteration progresses, until the search collapses (min multiplier == max multiplier).
 
     Args:
         calendar_year (int): calendar year of the iteration
@@ -930,11 +930,11 @@ def init_omega(session_runtime_options):
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=verbose_init)
 
-        init_fail += FuelPrice.init_database_from_file(omega_globals.options.context_fuel_prices_file,
-                                                       verbose=verbose_init)
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=verbose_init)
 
-        init_fail += NewVehicleMarket.init_database_from_file(omega_globals.options.context_new_vehicle_market_file,
-                                                              verbose=verbose_init)
+        init_fail += NewVehicleMarket.init_from_file(omega_globals.options.context_new_vehicle_market_file,
+                                                     verbose=verbose_init)
 
         NewVehicleMarket.init_context_new_vehicle_generalized_costs(
             omega_globals.options.context_new_vehicle_generalized_costs_file)
@@ -986,36 +986,36 @@ def init_omega(session_runtime_options):
             init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=verbose_init)
 
-            init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                            verbose=verbose_init)
+            init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                                   verbose=verbose_init)
 
-            init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                         verbose=verbose_init)
-
-            init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                         verbose=verbose_init)
-
-            init_fail += CostFactorsCriteria.init_database_from_file(omega_globals.options.criteria_cost_factors_file,
-                                                                     verbose=verbose_init)
-
-            init_fail += CostFactorsSCC.init_database_from_file(omega_globals.options.scc_cost_factors_file,
+            init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
                                                                 verbose=verbose_init)
 
-            init_fail += CostFactorsEnergySecurity.init_database_from_file(omega_globals.options.energysecurity_cost_factors_file,
-                                                                           verbose=verbose_init)
+            init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                                verbose=verbose_init)
 
-            init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                            verbose=verbose_init)
+            init_fail += CostFactorsCriteria.init_from_file(omega_globals.options.criteria_cost_factors_file,
+                                                            verbose=verbose_init)
+
+            init_fail += CostFactorsSCC.init_from_file(omega_globals.options.scc_cost_factors_file,
+                                                       verbose=verbose_init)
+
+            init_fail += CostFactorsEnergySecurity.init_from_file(omega_globals.options.energysecurity_cost_factors_file,
+                                                                  verbose=verbose_init)
+
+            init_fail += CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
+                                                                   verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical':
-            init_fail += EmissionFactorsPowersector.init_database_from_file(omega_globals.options.emission_factors_powersector_file,
-                                                                            verbose=verbose_init)
+            init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
+                                                                   verbose=verbose_init)
 
-            init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                         verbose=verbose_init)
+            init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                                verbose=verbose_init)
 
-            init_fail += EmissionFactorsVehicles.init_database_from_file(omega_globals.options.emission_factors_vehicles_file,
-                                                                         verbose=verbose_init)
+            init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
+                                                                verbose=verbose_init)
 
         # initial year = initial fleet model year (latest year of data)
         omega_globals.options.analysis_initial_year = \
@@ -1043,6 +1043,7 @@ def run_omega(session_runtime_options, standalone_run=False):
     import time
 
     session_runtime_options.start_time = time.time()
+    session_runtime_options.standalone_run = standalone_run
 
     init_fail = None
 
@@ -1068,7 +1069,7 @@ def run_omega(session_runtime_options, standalone_run=False):
                 omega_log.logwrite('Generating Profiler Dump...')
                 stats.dump_stats('omega_profile.dmp')
 
-            postproc_session.run_postproc(iteration_log, credit_banks, standalone_run)
+            postproc_session.run_postproc(iteration_log, credit_banks)
 
             from context.new_vehicle_market import NewVehicleMarket
 
@@ -1083,6 +1084,9 @@ def run_omega(session_runtime_options, standalone_run=False):
 
             omega_log.end_logfile("\nSession Complete")
 
+            if 'db' in omega_globals.options.verbose_console_modules:
+                dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+
             if omega_globals.options.run_profiler:
                 os.system('snakeviz omega_profile.dmp')
 
@@ -1092,6 +1096,7 @@ def run_omega(session_runtime_options, standalone_run=False):
             omega_globals.engine = None
             omega_globals.session = None
             omega_globals.options = None
+
         else:
             omega_log.logwrite(init_fail, echo_console=True)
             omega_log.end_logfile("\nSession Fail")

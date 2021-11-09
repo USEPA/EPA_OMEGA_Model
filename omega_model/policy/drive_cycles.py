@@ -58,7 +58,7 @@ class DriveCycles(OMEGABase):
 
     """
 
-    _data = pd.DataFrame()
+    _data = dict()  # private dict, drive cycle descriptions
 
     drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
 
@@ -74,7 +74,7 @@ class DriveCycles(OMEGABase):
             True if drive cycle name is in the list of known drive cycles.
 
         """
-        return drive_cycle_id in DriveCycles._data['drive_cycle_id'].values
+        return drive_cycle_id in DriveCycles._data
 
     @staticmethod
     def get_drive_cycle_distance_miles(drive_cycle_id):
@@ -88,7 +88,7 @@ class DriveCycles(OMEGABase):
             Drive cycle distance in miles
 
         """
-        return DriveCycles._data['drive_cycle_distance_miles'].loc[DriveCycles._data['drive_cycle_id'] == drive_cycle_id].item()
+        return DriveCycles._data[drive_cycle_id]['drive_cycle_distance_miles']
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -104,7 +104,7 @@ class DriveCycles(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        DriveCycles._data = pd.DataFrame()
+        DriveCycles._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -123,11 +123,9 @@ class DriveCycles(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                DriveCycles._data['drive_cycle_id'] = df['drive_cycle_id']
-                DriveCycles._data['drive_cycle_distance_miles'] = df['drive_cycle_distance_miles']
-                DriveCycles._data['description'] = df['description']
+                DriveCycles._data = df.set_index('drive_cycle_id').to_dict(orient='index')
 
-            DriveCycles.drive_cycle_names = DriveCycles._data['drive_cycle_id'].to_list()
+            DriveCycles.drive_cycle_names = list(DriveCycles._data.keys())
 
         return template_errors
 
@@ -141,27 +139,21 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
+
         init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
                                                 verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            file_io.validate_folder(omega_globals.options.database_dump_folder)
-            DriveCycles._data.to_csv(
-                omega_globals.options.database_dump_folder + os.sep + 'drive_cycle_data.csv', index=False)
-
             print(DriveCycles.validate_drive_cycle_id('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
             print(DriveCycles.validate_drive_cycle_id('cd_hwfet:cert_direct_oncycle_kwh_per_mile'))
             print(DriveCycles.get_drive_cycle_distance_miles('cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile'))
-
         else:
             print(init_fail)
-
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

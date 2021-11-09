@@ -57,7 +57,7 @@ class AnnualVMTBase:
     """
 
     @staticmethod
-    def get_vmt(market_class_id, age, **kwargs):
+    def get_vmt(market_class_id, age):
         """
         Get vehicle miles travelled by market class and age.
 
@@ -96,6 +96,7 @@ class SalesShareBase:
 
     """
 
+    @staticmethod
     def calc_shares(market_class_data, calendar_year):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
@@ -291,6 +292,23 @@ class MarketClassBase:
         """
         raise Exception('**Attempt to call abstract method MarketClassBase.%s() without child class override**' %
                         inspect.currentframe().f_code.co_name)
+
+    @staticmethod
+    # override this method in the user-defined MarketClass
+    def validate_market_class_id(market_class_id):
+        """
+        Validate market class ID
+
+        Args:
+            market_class_id (str): market class ID, e.g. 'hauling.ICE'
+
+        Returns:
+            Error message in a list if market_class_id is not valid
+
+        """
+        raise Exception('**Attempt to call abstract method MarketClassBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
 
     @staticmethod
     # override this method in the user-defined MarketClass

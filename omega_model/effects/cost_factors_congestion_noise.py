@@ -49,48 +49,53 @@ Data Column Name and Description
 from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
-cache = dict()
 
+class CostFactorsCongestionNoise(OMEGABase):
+    """
+    Loads and provides access to congestion and noise cost factors by legacy reg class id.
 
-class CostFactorsCongestionNoise(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'cost_factors_congestion_noise'
-    index = Column('index', Integer, primary_key=True)
-    reg_class_id = Column(String)
-    dollar_basis = Column(Float)
-    congestion_cost_dollars_per_mile = Column(Float)
-    noise_cost_dollars_per_mile = Column(Float)
+    """
+
+    _data = dict()  # private dict, cost factor congestion and noise by legacy reg class id
 
     @staticmethod
     def get_cost_factors(reg_class_id, cost_factors):
         """
 
+        Get cost factors by legacy reg class id
+
         Args:
             reg_class_id: reg class to get cost factors for
             cost_factors: name of cost factor or list of cost factor attributes to get
 
-        Returns: cost factor or list of cost factors
+        Returns:
+            Cost factor or list of cost factors
 
         """
-        cache_key = '%s_%s' % (reg_class_id, cost_factors)
+        factors = []
+        for cf in cost_factors:
+            factors.append(CostFactorsCongestionNoise._data[reg_class_id][cf])
 
-        if cache_key not in cache:
-            if type(cost_factors) is not list:
-                cost_factors = [cost_factors]
-            attrs = CostFactorsCongestionNoise.get_class_attributes(cost_factors)
-
-            result = omega_globals.session.query(*attrs).filter(CostFactorsCongestionNoise.reg_class_id == reg_class_id).all()[0]
-
-            if len(cost_factors) == 1:
-                cache[cache_key] = result[0]
-            else:
-                cache[cache_key] = result
-
-        return cache[cache_key]
+        if len(cost_factors) == 1:
+            return factors[0]
+        else:
+            return factors
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
-        cache.clear()
+    def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        CostFactorsCongestionNoise._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -118,17 +123,7 @@ class CostFactorsCongestionNoise(SQABase, OMEGABase):
             df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(CostFactorsCongestionNoise(
-                        reg_class_id = df.loc[i, 'reg_class_id'],
-                        dollar_basis = df.loc[i, 'dollar_basis'],
-                        congestion_cost_dollars_per_mile = df.loc[i, 'congestion_cost_dollars_per_mile'],
-                        noise_cost_dollars_per_mile = df.loc[i, 'noise_cost_dollars_per_mile'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                CostFactorsCongestionNoise._data = df.set_index('reg_class_id').to_dict(orient='index')
 
         return template_errors
 
@@ -138,30 +133,26 @@ if __name__ == '__main__':
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
 
-        from effects.ip_deflators import ImplictPriceDeflators
-
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
 
         init_fail = []
 
+        from effects.ip_deflators import ImplictPriceDeflators
         init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += CostFactorsCongestionNoise.init_database_from_file(omega_globals.options.congestion_noise_cost_factors_file,
-                                                                        verbose=omega_globals.options.verbose)
+        init_fail += \
+            CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
+                                                      verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

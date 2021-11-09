@@ -142,7 +142,7 @@ if __name__ == '__main__':
                                                           omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += NewVehicleMarket.init_database_from_file(
+        init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
@@ -151,9 +151,8 @@ if __name__ == '__main__':
             sales_demand = context_new_vehicle_sales(omega_globals.options.analysis_initial_year)
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

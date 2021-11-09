@@ -52,14 +52,15 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
-cache = dict()
-
 
 class Incentives(OMEGABase):
     """
     **Loads and provides access to GHG incentives.**
 
     """
+    
+    _data = dict()
+    
     @staticmethod
     def get_production_multiplier(vehicle):
         """
@@ -74,12 +75,12 @@ class Incentives(OMEGABase):
         """
         production_multiplier = 1
 
-        start_years = cache['start_year']
+        start_years = Incentives._data['start_year']
         if len(start_years[start_years <= vehicle.model_year]) > 0:
             cache_key = max(start_years[start_years <= vehicle.model_year])
 
-            if cache_key in cache:
-                calcs = cache[cache_key]
+            if cache_key in Incentives._data:
+                calcs = Incentives._data[cache_key]
                 for calc, multiplier in calcs.items():
                     select_attribute, select_value = calc.split(':')
                     if vehicle.__getattribute__(select_attribute) == select_value:
@@ -103,7 +104,7 @@ class Incentives(OMEGABase):
         """
         import numpy as np
 
-        cache.clear()
+        Incentives._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
@@ -126,13 +127,8 @@ class Incentives(OMEGABase):
                 df = df.set_index('start_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
-                for idx, r in df.iterrows():
-                    if idx not in cache:
-                        cache[idx] = dict()
-
-                    cache[idx] = r.to_dict()
-
-                cache['start_year'] = np.array(list(cache.keys()))
+                Incentives._data = df.to_dict(orient='index')
+                Incentives._data['start_year'] = np.array(list(Incentives._data.keys()))
 
         return template_errors
 
@@ -144,10 +140,10 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
         init_fail = []
+
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=omega_globals.options.verbose)
 
@@ -161,8 +157,8 @@ if __name__ == '__main__':
 
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
-            os._exit(-1)
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
+            os._exit(-1)            
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

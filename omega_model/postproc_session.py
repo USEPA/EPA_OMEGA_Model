@@ -17,14 +17,13 @@ market_classes = []
 market_categories = []
 
 
-def run_postproc(iteration_log, credit_banks, standalone_run):
+def run_postproc(iteration_log, credit_banks):
     """
     Generate charts and output files for a single simulation
 
     Args:
         iteration_log (DataFrame): dataframe storing information on producer-consumer iteration
         credit_banks (dict of CreditBanks): credit banking information per compliance_id
-        standalone_run (bool): True if session is run outside of the batch process
 
     Returns:
         Results summary DataFrame
@@ -41,7 +40,7 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
     # this runs tech_tracking always and physical/cost effects based on globals.options:
     tech_tracking_df, physical_effects_df, cost_effects_df = run_effects_calcs()
 
-    if not standalone_run:
+    if not omega_globals.options.standalone_run:
         omega_log.logwrite('%s: Post Processing ...' % omega_globals.options.session_name)
 
     vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
@@ -124,8 +123,6 @@ def run_postproc(iteration_log, credit_banks, standalone_run):
                        + '_summary_results.csv'
 
     session_results.to_csv(summary_filename, index=False)
-
-    # dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
     dump_table_to_csv(omega_globals.options.output_folder, 'vehicles',
                       omega_globals.options.session_unique_name + '_vehicles',

@@ -41,65 +41,58 @@ Data Column Name and Description
 
 from omega_model import *
 
-cache = dict()
 
+class EmissionFactorsRefinery(OMEGABase):
+    """
+    Loads and provides access to refinery emission factors by calendar year and in-use fuel id.
 
-class EmissionFactorsRefinery(SQABase, OMEGABase):
-    # --- database table properties ---
-    __tablename__ = 'emission_factors_refinery'
-    index = Column('index', Integer, primary_key=True)
+    """
 
-    calendar_year = Column(Numeric)
-    in_use_fuel_id = Column('in_use_fuel_id', String)
-    voc_grams_per_gallon = Column('voc_grams_per_gallon', Float)
-    co_grams_per_gallon = Column('co_grams_per_gallon', Float)
-    nox_grams_per_gallon = Column('nox_grams_per_gallon', Float)
-    pm25_grams_per_gallon = Column('pm25_grams_per_gallon', Float)
-    sox_grams_per_gallon = Column('sox_grams_per_gallon', Float)
-    benzene_grams_per_gallon = Column('benzene_grams_per_gallon', Float)
-    butadiene13_grams_per_gallon = Column('butadiene13_grams_per_gallon', Float)
-    formaldehyde_grams_per_gallon = Column('formaldehyde_grams_per_gallon', Float)
-    acetaldehyde_grams_per_gallon = Column('acetaldehyde_grams_per_gallon', Float)
-    acrolein_grams_per_gallon = Column('acrolein_grams_per_gallon', Float)
-    co2_grams_per_gallon = Column('co2_grams_per_gallon', Float)
-    ch4_grams_per_gallon = Column('ch4_grams_per_gallon', Float)
-    n2o_grams_per_gallon = Column('n2o_grams_per_gallon', Float)
+    _data = dict()  # private dict, emissions factors refinery by calendar year and in-use fuel id
 
     @staticmethod
-    def get_emission_factors(calendar_year, fuel, emission_factors):
+    def get_emission_factors(calendar_year, in_use_fuel_id, emission_factors):
         """
+
+        Get emission factors by calendar year and in-use fuel ID
 
         Args:
-            calendar_year: calendar year to get emission factors for
-            emission_factors: name of emission factor or list of emission factor attributes to get
+            calendar_year (int): calendar year to get emission factors for
+            emission_factors (str, [strs]): name of emission factor or list of emission factor attributes to get
 
-        Returns: emission factor or list of emission factors
+        Returns:
+            Emission factor or list of emission factors
 
         """
-        calendar_years = pd.Series(sql_unpack_result(omega_globals.session.query(EmissionFactorsRefinery.calendar_year).all())).unique()
+        import pandas as pd
+
+        calendar_years = pd.Series(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
         year = max([yr for yr in calendar_years if yr <= calendar_year])
 
-        cache_key = '%s_%s_%s' % (year, fuel, emission_factors)
+        factors = []
+        for ef in emission_factors:
+            factors.append(EmissionFactorsRefinery._data[year, in_use_fuel_id][ef])
 
-        if cache_key not in cache:
-            if type(emission_factors) is not list:
-                emission_factors = [emission_factors]
-            attrs = EmissionFactorsRefinery.get_class_attributes(emission_factors)
-
-            result = omega_globals.session.query(*attrs) \
-                .filter(EmissionFactorsRefinery.calendar_year == year) \
-                .filter(EmissionFactorsRefinery.in_use_fuel_id == fuel).all()[0]
-
-            if len(emission_factors) == 1:
-                cache[cache_key] = result[0]
-            else:
-                cache[cache_key] = result
-
-        return cache[cache_key]
+        if len(emission_factors) == 1:
+            return factors[0]
+        else:
+            return factors
 
     @staticmethod
-    def init_database_from_file(filename, verbose=False):
-        cache.clear()
+    def init_from_file(filename, verbose=False):
+        """
+
+        Initialize class data from input file.
+
+        Args:
+            filename (str): name of input file
+            verbose (bool): enable additional console and logfile output if True
+
+        Returns:
+            List of template/input errors, else empty list on success
+
+        """
+        EmissionFactorsRefinery._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -107,8 +100,9 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
         input_template_name = 'context_emission_factors-refinery'
         input_template_version = 0.2
         input_template_columns = {'calendar_year', 'in_use_fuel_id',
-                                  'voc_grams_per_gallon', 'co_grams_per_gallon', 'nox_grams_per_gallon', 'pm25_grams_per_gallon', 'sox_grams_per_gallon',
-                                  'benzene_grams_per_gallon', 'butadiene13_grams_per_gallon', 'formaldehyde_grams_per_gallon',
+                                  'voc_grams_per_gallon', 'co_grams_per_gallon', 'nox_grams_per_gallon',
+                                  'pm25_grams_per_gallon', 'sox_grams_per_gallon', 'benzene_grams_per_gallon',
+                                  'butadiene13_grams_per_gallon', 'formaldehyde_grams_per_gallon',
                                   'acetaldehyde_grams_per_gallon', 'acrolein_grams_per_gallon',
                                   'ch4_grams_per_gallon', 'n2o_grams_per_gallon', 'co2_grams_per_gallon'}
 
@@ -122,28 +116,10 @@ class EmissionFactorsRefinery(SQABase, OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
-                for i in df.index:
-                    obj_list.append(EmissionFactorsRefinery(
-                        calendar_year=df.loc[i, 'calendar_year'],
-                        in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
-                        voc_grams_per_gallon=df.loc[i, 'voc_grams_per_gallon'],
-                        co_grams_per_gallon=df.loc[i, 'co_grams_per_gallon'],
-                        nox_grams_per_gallon=df.loc[i, 'nox_grams_per_gallon'],
-                        pm25_grams_per_gallon=df.loc[i, 'pm25_grams_per_gallon'],
-                        sox_grams_per_gallon=df.loc[i, 'sox_grams_per_gallon'],
-                        benzene_grams_per_gallon=df.loc[i, 'benzene_grams_per_gallon'],
-                        butadiene13_grams_per_gallon=df.loc[i, 'butadiene13_grams_per_gallon'],
-                        formaldehyde_grams_per_gallon=df.loc[i, 'formaldehyde_grams_per_gallon'],
-                        acetaldehyde_grams_per_gallon=df.loc[i, 'acetaldehyde_grams_per_gallon'],
-                        acrolein_grams_per_gallon=df.loc[i, 'acrolein_grams_per_gallon'],
-                        co2_grams_per_gallon=df.loc[i, 'co2_grams_per_gallon'],
-                        ch4_grams_per_gallon=df.loc[i, 'ch4_grams_per_gallon'],
-                        n2o_grams_per_gallon=df.loc[i, 'n2o_grams_per_gallon'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                EmissionFactorsRefinery._data = \
+                    df.set_index(['calendar_year', 'in_use_fuel_id']).sort_index().to_dict(orient='index')
+                EmissionFactorsRefinery._data |= \
+                    df[['calendar_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series')
 
         return template_errors
 
@@ -155,30 +131,19 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
-        init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        import importlib
-
-        module_name = get_template_name(omega_globals.options.market_classes_file)
-        omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail = []
-        # init_fail += MarketClass.init_database_from_file(o2.options.market_classes_file,
-        #                                                             verbose=o2.options.verbose)
 
-        init_fail += EmissionFactorsRefinery.init_database_from_file(omega_globals.options.emission_factors_refinery_file,
-                                                                     verbose=omega_globals.options.verbose)
+        init_fail += EmissionFactorsRefinery.init_from_file(omega_globals.options.emission_factors_refinery_file,
+                                                            verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

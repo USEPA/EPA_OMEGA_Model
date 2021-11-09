@@ -50,29 +50,21 @@ Sample Data Columns
 
 from omega_model import *
 
-cache = dict()
 
-
-class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
+class OnroadVMT(OMEGABase, AnnualVMTBase):
     """
     Loads and provides access to VMT by market class and age.
 
     """
-    # --- database table properties ---
-    __tablename__ = 'annual_vmt_fixed_by_age'
-    index = Column(Integer, primary_key=True)  #: database table index
 
-    age = Column(Numeric)  #: vehicle age
-    market_class_id = Column('market_class_id', String, ForeignKey('market_classes.market_class_id'))  #: vehicle market class
-    annual_vmt = Column(Numeric)  #: vehicle miles travelled
+    _data = dict()  # private dict, on-road VMT by market class ID and age
 
     @staticmethod
-    def get_vmt(market_class_id, age, **kwargs):
+    def get_vmt(market_class_id, age):
         """
         Get vehicle miles travelled by market class and age.
 
         Args:
-            **kwargs:
             market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age in years
 
@@ -80,14 +72,7 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
             (float) Vehicle miles travelled.
 
         """
-        cache_key = '%s_%s' % (market_class_id, age)
-
-        if cache_key not in cache:
-            cache[cache_key] = float(omega_globals.session.query(OnroadVMT.annual_vmt).
-                                     filter(OnroadVMT.market_class_id == market_class_id).
-                                     filter(OnroadVMT.age == age).scalar())
-
-        return cache[cache_key]
+        return OnroadVMT._data[market_class_id, age]['annual_vmt']
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -103,7 +88,7 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
             List of template/input errors, else empty list on success
 
         """
-        cache.clear()
+        OnroadVMT._data.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
@@ -122,16 +107,13 @@ class OnroadVMT(OMEGABase, SQABase, AnnualVMTBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                obj_list = []
-                # load data into database
+                # validate data
                 for i in df.index:
-                    obj_list.append(OnroadVMT(
-                        age=df.loc[i, 'age'],
-                        market_class_id=df.loc[i, 'market_class_id'],
-                        annual_vmt=df.loc[i, 'annual_vmt'],
-                    ))
-                omega_globals.session.add_all(obj_list)
-                omega_globals.session.flush()
+                    template_errors += \
+                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+
+            if not template_errors:
+                OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
 
         return template_errors
 
@@ -148,23 +130,19 @@ if __name__ == '__main__':
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
+        omega_log.init_logfile()
 
         init_fail = []
 
-        # pull in reg classes before building database tables (declaring classes) that check reg class validity
+        # pull in reg classes before initializing classes that check reg class validity
         module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
         omega_globals.options.RegulatoryClasses = importlib.import_module(module_name).RegulatoryClasses
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
+        # pull in market classes before initializing classes that check market class validity
         module_name = get_template_name(omega_globals.options.market_classes_file)
         omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-
-        init_omega_db(omega_globals.options.verbose)
-        omega_log.init_logfile()
-
-        SQABase.metadata.create_all(omega_globals.engine)
-
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                 verbose=omega_globals.options.verbose)
 
@@ -172,12 +150,11 @@ if __name__ == '__main__':
                                               verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
+            pass
         else:
             print(init_fail)
-            print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
+            print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
-
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

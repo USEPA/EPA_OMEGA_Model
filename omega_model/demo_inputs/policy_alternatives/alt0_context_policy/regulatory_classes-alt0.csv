@@ -1,0 +1,5 @@
+input_template_name:,policy.regulatory_classes_demo_alt0,input_template_version:,0.1
+reg_class_id,description,,
+a_reg_class,'a' as defined by the demo,,
+b_reg_class,'b' as defined by the demo,,
+c_reg_class,'c' as defined by the demo,,
