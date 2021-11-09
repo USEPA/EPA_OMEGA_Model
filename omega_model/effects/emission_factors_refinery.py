@@ -118,8 +118,8 @@ class EmissionFactorsRefinery(OMEGABase):
             if not template_errors:
                 EmissionFactorsRefinery._data = \
                     df.set_index(['calendar_year', 'in_use_fuel_id']).sort_index().to_dict(orient='index')
-                EmissionFactorsRefinery._data |= \
-                    df[['calendar_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series')
+                EmissionFactorsRefinery._data.update(
+                    df[['calendar_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
 
         return template_errors
 
