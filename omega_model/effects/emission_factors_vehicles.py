@@ -125,8 +125,8 @@ class EmissionFactorsVehicles(OMEGABase):
                 EmissionFactorsVehicles._data = \
                     df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
                         .to_dict(orient='index')
-                EmissionFactorsVehicles._data |= \
-                    df[['model_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series')
+                EmissionFactorsVehicles._data.update(
+                    df[['model_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
 
         return template_errors
 
