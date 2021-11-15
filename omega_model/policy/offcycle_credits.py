@@ -175,8 +175,8 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
                     OffCycleCredits.offcycle_credit_names = list(df['credit_name'].unique())
                     OffCycleCredits._offcycle_credit_groups = list(df['credit_group'].unique())
                     OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
-                    OffCycleCredits._data |= \
-                        df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series')
+                    OffCycleCredits._data.update(
+                        df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series'))
 
         return template_errors
 
