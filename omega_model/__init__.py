@@ -119,7 +119,7 @@ try:
             self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
-            self.consumer_pricing_num_options = 4
+            self.consumer_pricing_num_options = 10
             self.consumer_pricing_multiplier_min = 0.95
             self.consumer_pricing_multiplier_max = 1.05
 
@@ -156,7 +156,7 @@ try:
             self.iterate_producer_consumer = True
 
             self.producer_consumer_max_iterations = 2  # recommend 2+
-            self.producer_consumer_convergence_tolerance = 1e-3
+            self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.5
             self.producer_compliance_search_tolerance = 1e-6
@@ -165,7 +165,7 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.verbose_console_modules = []  # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console_modules = ['consumerx']  # list of modules to allow verbose console output, or empty to disable
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
