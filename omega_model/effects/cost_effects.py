@@ -98,7 +98,7 @@ def get_congestion_noise_cf(reg_class_id):
     Get congestion and noise cost factors
 
     Args:
-        calendar_year: The calendar year for which congestion and noise cost factors are needed.
+        reg_class_id: The (legacy) regulatory class ID for which congestion and noise cost factors are needed.
 
     Returns:
         A list of cost factors as specified in the cost_factors list for the given calendar year.
