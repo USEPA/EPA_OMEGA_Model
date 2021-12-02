@@ -82,13 +82,13 @@ def logwrite_shares_and_costs(calendar_year, convergence_error, cross_subsidy_pr
 
     omega_log.logwrite('', echo_console=True)
 
-    for cat in omega_globals.options.MarketClass.market_categories:
+    for mcat in omega_globals.options.MarketClass.market_categories:
         omega_log.logwrite(
-            ('cross subsidized price / cost %s' % cat).ljust(50) + '$%d / $%d R:%f' % (
-                producer_decision_and_response['average_cross_subsidized_price_%s' % cat],
-                producer_decision_and_response['average_cost_%s' % cat],
-                producer_decision_and_response['average_cross_subsidized_price_%s' % cat] /
-                producer_decision_and_response['average_cost_%s' % cat]
+            ('cross subsidized price / cost %s' % mcat).ljust(50) + '$%d / $%d R:%f' % (
+                producer_decision_and_response['average_cross_subsidized_price_%s' % mcat],
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat],
+                producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat]
             ), echo_console=True)
 
     omega_log.logwrite(
@@ -312,8 +312,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     producer_decision = producer_decision.to_frame().transpose()
 
-    for mc_parent in ['non_hauling', 'hauling']:
-        mc_pair = ['%s.%s' % (mc_parent, mc) for mc in ['ICE', 'BEV']]
+    for mcat in ['non_hauling', 'hauling']:
+        mc_pair = ['%s.%s' % (mcat, mc) for mc in ['ICE', 'BEV']]
         multiplier_columns = ['cost_multiplier_%s' % mc for mc in mc_pair]
 
         prev_multiplier_range = dict()
@@ -329,39 +329,72 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                                                   producer_decision_and_response)
 
             producer_decision_and_response = \
-                omega_globals.options.SalesShare.calc_shares(cross_subsidy_options, calendar_year, mc_parent, mc_pair)
+                omega_globals.options.SalesShare.calc_shares(cross_subsidy_options, calendar_year, mcat, mc_pair)
 
             # calc share deltas
-            producer_decision_and_response['abs_share_delta_total'] = 0
+            producer_decision_and_response['abs_share_delta_%s' % mcat] = 0
 
             for mc in mc_pair:
                 producer_decision_and_response['abs_share_delta_%s' % mc] = abs(
                     producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
                     producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
 
-                producer_decision_and_response['abs_share_delta_total'] += \
+                producer_decision_and_response['abs_share_delta_%s' % mcat] += \
                     0.5*producer_decision_and_response['abs_share_delta_%s' % mc]
 
-            # calc average_cross_subsidized_price and average_cost
-            calc_market_category_data(producer_decision_and_response)
+            # # calc average_cross_subsidized_price and average_cost
+            # calc_market_category_data(producer_decision_and_response)
 
-            pricing_abs_share_delta_total = producer_decision_and_response['abs_share_delta_total']
+            ####
+
+
+
+            ###############################################################################################################
+            calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict,
+                                     producer_decision_and_response)
+            # propagate total sales down to composite vehicles by market class share and reg class share,
+            # calculate new compliance status for each producer-technology / consumer response combination
+            compliance_search.create_production_options(candidate_mfr_composite_vehicles,
+                                                        producer_decision_and_response,
+                                                        total_sales=producer_decision_and_response['new_vehicle_sales'])
+            # propagate vehicle sales up to market class sales
+            calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
+            ###############################################################################################################
+
+            producer_decision_and_response['strategic_compliance_ratio'] = \
+                (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
+                producer_decision_and_response['total_target_co2e_megagrams']
+
+            producer_decision_and_response['price_cost_ratio_total'] = \
+                (producer_decision_and_response['average_cross_subsidized_price_total'] /
+                 producer_decision_and_response['average_new_vehicle_mfr_cost'])
+
+
+
+            ###
+
+            price_weight = 0.95
+
+            pricing_abs_share_delta_total = producer_decision_and_response['abs_share_delta_%s' % mcat]
 
             pricing_price_ratio_delta = \
-                1 * abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % mc_parent] /
-                        producer_decision_and_response['average_cost_%s' % mc_parent]) ** 1
+                abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
+                        producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
 
             # calculate score
-            producer_decision_and_response['pricing_price_ratio_delta_%s' % mc_parent] = pricing_price_ratio_delta
-            producer_decision_and_response['pricing_abs_share_delta_total'] = pricing_abs_share_delta_total
+            producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat] = pricing_price_ratio_delta
+            producer_decision_and_response['abs_share_delta_%s' % mcat] = pricing_abs_share_delta_total
             # calculate distance to the origin
             producer_decision_and_response['pricing_score'] = \
-                (pricing_abs_share_delta_total**2 + pricing_price_ratio_delta**2)**0.5
+                ((1- price_weight) * pricing_abs_share_delta_total**2 +
+                 price_weight * pricing_price_ratio_delta**2)**0.5
 
             # select best score
             selected_cross_subsidy_index = producer_decision_and_response['pricing_score'].idxmin()
             producer_decision_and_response['selected_cross_subsidy_option'] = 0
             producer_decision_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
+
+            producer_decision_and_response['cross_subsidy_iteration_num'] = cross_subsidy_iteration_num
 
             # update cross subsidy iteration log, if desired
             if omega_globals.options.log_producer_decision_and_response_years == 'all' or \
@@ -377,17 +410,22 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             # select best cross subsidy option
             producer_decision_and_response = producer_decision_and_response.loc[selected_cross_subsidy_index].copy()
 
-            producer_decision_and_response['cross_subsidy_iteration_num'] = cross_subsidy_iteration_num
-
-            converged = producer_decision_and_response['pricing_price_ratio_delta_%s' % mc_parent] <= \
+            converged = producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat] <= \
                         omega_globals.options.producer_cross_subsidy_price_tolerance
 
-            converged = converged and producer_decision_and_response['abs_share_delta_total'] <= \
+            converged = converged and producer_decision_and_response['abs_share_delta_%s' % mcat] <= \
                         omega_globals.options.producer_consumer_convergence_tolerance
 
-            # # detect convergence... (NEEDS UPDATE)
-            # converged, convergence_error, cross_subsidy_pricing_error = \
-            #     detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
+            if 'multipliers' in omega_globals.options.verbose_console_modules:
+                convergence_error = producer_decision_and_response['abs_share_delta_%s' % mcat]
+                cross_subsidy_pricing_error = producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat]
+
+                if converged:
+                    omega_log.logwrite('%s PRODUCER-CONSUMER CONVERGED CE:%f, CSPE:%f' %
+                                       (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
+                else:
+                    omega_log.logwrite('** %s PRODUCER-CONSUMER CONVERGENCE FAIL CE:%f, CSPE:%f **' %
+                                       (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
 
             # track best result so far
             if (best_producer_decision_and_response is None) or \
@@ -399,7 +437,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
             # # write data to log, if desired
             # if 'consumer' in omega_globals.options.verbose_console_modules:
-            #     logwrite_shares_and_costs(calendar_year, producer_decision_and_response['pricing_abs_share_delta_total'],
+            #     logwrite_shares_and_costs(calendar_year, producer_decision_and_response['abs_share_delta_%s' % mcat],
             #                               producer_decision_and_response['pricing_price_ratio_delta'],
             #                               producer_decision_and_response, producer_consumer_iteration_num,
             #                               cross_subsidy_iteration_num)
@@ -407,7 +445,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             # update iteration log
             update_iteration_log(iteration_log, calendar_year, compliance_id, converged, producer_consumer_iteration_num,
                                  cross_subsidy_iteration_num, None,
-                                 producer_decision_and_response['pricing_abs_share_delta_total'])
+                                 producer_decision_and_response['abs_share_delta_%s' % mcat])
 
             cross_subsidy_iteration_num += 1
 
@@ -415,114 +453,50 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
             continue_search = continue_search and not converged
 
+    # # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
+    # # any slight offset during the convergence process:
+    # # ###############################################################################################################
+    # # if o2.options.session_is_reference:
+    # #     calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
+    # #     # propagate total sales down to composite vehicles by market class share and reg class share,
+    # #     # calculate new compliance status for each producer-technology / consumer response combination
+    # #     compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
+    # #                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
+    # #
+    # #     # propagate vehicle sales up to market class sales
+    # #     calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
+    # # ###############################################################################################################
 
+    converged, convergence_error, cross_subsidy_pricing_error = \
+        detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
 
-            # ###############################################################################################################
-            # calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
-            # # propagate total sales down to composite vehicles by market class share and reg class share,
-            # # calculate new compliance status for each producer-technology / consumer response combination
-            # compliance_search.create_production_options(candidate_mfr_composite_vehicles,
-            #                                             producer_decision_and_response,
-            #                                             total_sales=producer_decision_and_response['new_vehicle_sales'])
-            # # propagate vehicle sales up to market class sales
-            # calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
-            # ###############################################################################################################
-            #
-            # producer_decision_and_response['strategic_compliance_ratio'] = \
-            #     (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
-            #     producer_decision_and_response['total_target_co2e_megagrams']
-            #
-            # producer_decision_and_response['price_cost_ratio_total'] = \
-            #     (producer_decision_and_response['average_cross_subsidized_price_total'] /
-            #      producer_decision_and_response['average_new_vehicle_mfr_cost'])
-            #
-            # # calculate "distance to origin" (minimal price and market share errors):
-            # # pricing_convergence_score = 10*np.maximum(omega_globals.options.producer_consumer_convergence_tolerance,
-            # #     producer_decision_and_response['abs_share_delta_total'])**1
-            #
-            # pricing_convergence_score = 0.525*producer_decision_and_response['abs_share_delta_total']**1
-            #
-            # pricing_convergence_score += 0.525*producer_decision_and_response['max_abs_share_delta']**1
-            #
-            # # pricing_convergence_score += 0*1/3*abs(1-producer_decision_and_response['price_cost_ratio_total'])**0.8
-            #
-            # # add terms to maintain prices of non-responsive market categories during convergence:
-            # for mcat in omega_globals.options.MarketClass.non_responsive_market_categories:
-            #     pricing_convergence_score += \
-            #         1*abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
-            #             producer_decision_and_response['average_cost_%s' % mcat])**0.8  # 0.775->0.8
-            #
-            # producer_decision_and_response['pricing_convergence_score'] = pricing_convergence_score**1
-            #
-            # producer_decision_and_response['cross_subsidy_iteration_num'] = cross_subsidy_iteration_num
-            #
-            # selected_cross_subsidy_index = producer_decision_and_response['pricing_convergence_score'].idxmin()
-            #
-            # producer_decision_and_response['selected_cross_subsidy_option'] = 0
-            # producer_decision_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
-            #
-            # if omega_globals.options.log_producer_decision_and_response_years == 'all' or \
-            #         calendar_year in omega_globals.options.log_producer_decision_and_response_years:
-            #     logfilename = '%s%s_%s_producer_cross_subsidy_iteration.csv' % (omega_globals.options.output_folder,
-            #                                                                     calendar_year,
-            #                                                                     producer_consumer_iteration_num)
-            #     if file_io.file_exists(logfilename):
-            #         producer_decision_and_response.to_csv(logfilename, mode='a', header=False)
-            #     else:
-            #         producer_decision_and_response.to_csv(logfilename, header=True)
-            #
-            # producer_decision_and_response = producer_decision_and_response.loc[selected_cross_subsidy_index]
-            #
-            # # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
-            # # any slight offset during the convergence process:
-            # # ###############################################################################################################
-            # # if o2.options.session_is_reference:
-            # #     calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
-            # #     # propagate total sales down to composite vehicles by market class share and reg class share,
-            # #     # calculate new compliance status for each producer-technology / consumer response combination
-            # #     compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-            # #                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
-            # #
-            # #     # propagate vehicle sales up to market class sales
-            # #     calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
-            # # ###############################################################################################################
-            #
-            # converged, convergence_error, cross_subsidy_pricing_error = \
-            #     detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
-            #
-            # if (best_producer_decision_and_response is None) or \
-            #         (producer_decision_and_response['pricing_convergence_score']
-            #          < best_producer_decision_and_response['pricing_convergence_score']):
-            #     best_producer_decision_and_response = producer_decision_and_response.copy()
-            #
-            # iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
-            #
-            # if 'consumer' in omega_globals.options.verbose_console_modules:
-            #     logwrite_shares_and_costs(calendar_year, convergence_error, cross_subsidy_pricing_error,
-            #                               producer_decision_and_response, producer_consumer_iteration_num,
-            #                               cross_subsidy_iteration_num)
-            #
-            # update_iteration_log(iteration_log, calendar_year, compliance_id, converged, producer_consumer_iteration_num,
-            #                      cross_subsidy_iteration_num, converged, convergence_error)
-            #
-            # cross_subsidy_iteration_num += 1
-            #
-            # continue_search = continue_search and not converged
+    # if (best_producer_decision_and_response is None) or \
+    #         (producer_decision_and_response['pricing_convergence_score']
+    #          < best_producer_decision_and_response['pricing_convergence_score']):
+    #     best_producer_decision_and_response = producer_decision_and_response.copy()
+    #
+    # iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
+    #
+    # if 'consumer' in omega_globals.options.verbose_console_modules:
+    #     logwrite_shares_and_costs(calendar_year, convergence_error, cross_subsidy_pricing_error,
+    #                               producer_decision_and_response, producer_consumer_iteration_num,
+    #                               cross_subsidy_iteration_num)
+    #
+    # update_iteration_log(iteration_log, calendar_year, compliance_id, converged, producer_consumer_iteration_num,
+    #                      cross_subsidy_iteration_num, converged, convergence_error)
+    #
+
+    # convergence_error = 0
+    # for mc in omega_globals.options.MarketClass.market_classes:
+    #     convergence_error = max(convergence_error, abs(
+    #                 producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
+    #                 producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
+    #
+    # cross_subsidy_pricing_error = abs(1 - producer_decision_and_response['price_cost_ratio_total'])
 
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in omega_globals.options.MarketClass.market_classes]
 
-    convergence_error = 0
-    for mc in omega_globals.options.MarketClass.market_classes:
-        convergence_error = max(convergence_error, abs(
-                    producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
-                    producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-
-    producer_decision_and_response['pricing_price_ratio_delta'] = abs(1-producer_decision_and_response[''] /
-                                                                      producer_decision_and_response[''])
-
-    cross_subsidy_pricing_error = producer_decision_and_response['pricing_price_ratio_delta']
-
-    if 'consumer' in omega_globals.options.verbose_console_modules:
+    if 'final_multipliers' in omega_globals.options.verbose_console_modules:
         for mc, cc in zip(omega_globals.options.MarketClass.market_classes, multiplier_columns):
             omega_log.logwrite(('FINAL %s' % cc).ljust(50) + '= %.5f' % producer_decision_and_response[cc],
                                echo_console=True)
@@ -562,34 +536,18 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
     """
     import numpy as np
     import consumer
+    from context.price_modifications import PriceModifications
 
-    # producer_decision_and_response['abs_share_delta_total'] = 0
+    producer_decision_and_response['average_cross_subsidized_price_total'] = 0
+    producer_decision_and_response['average_modified_cross_subsidized_price_total'] = 0
+    producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
+    producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] = 0
 
-    # max_abs_share_delta = 0
     for mc in market_class_vehicle_dict:
         if 'consumer_abs_share_frac_%s' % mc in producer_decision_and_response:
-            producer_decision_and_response['abs_share_delta_%s' % mc] = abs(
-                producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
-                producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
-
-            # producer_decision_and_response['abs_share_delta_total'] += \
-            #     producer_decision_and_response['abs_share_delta_%s' % mc]
-
-            # producer_decision_and_response['max_abs_share_delta'] = \
-            #     np.maximum(max_abs_share_delta, abs(producer_decision_and_response['abs_share_delta_%s' % mc]))
-
-    # calc totals if all market classes have consumer shares
-    if all(['consumer_abs_share_frac_%s' % mc in producer_decision_and_response for mc in market_class_vehicle_dict]):
-        producer_decision_and_response['average_cross_subsidized_price_total'] = 0
-        producer_decision_and_response['average_modified_cross_subsidized_price_total'] = 0
-        producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
-        producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] = 0
-
-        for mc in market_class_vehicle_dict:
-
             producer_decision_and_response['average_cross_subsidized_price_total'] += \
-            producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+                producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
+                producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
 
             producer_decision_and_response['average_modified_cross_subsidized_price_total'] += \
                 producer_decision_and_response['average_modified_cross_subsidized_price_%s' % mc] * \
@@ -602,12 +560,32 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
             producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] += \
                 producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
                 producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
+        else:
+            producer_decision_and_response['average_cross_subsidized_price_total'] += \
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
+                producer_decision_and_response['producer_abs_share_frac_%s' % mc]
 
-        producer_decision_and_response['new_vehicle_sales'] = \
-            producer_decision_and_response['total_sales'] * \
-            consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                                             producer_decision_and_response[
-                                                                 'average_new_vehicle_mfr_generalized_cost'])
+            price_modification = PriceModifications.get_price_modification(calendar_year, mc)
+
+            producer_decision_and_response['average_modified_cross_subsidized_price_total'] += \
+                (producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] + price_modification) * \
+                producer_decision_and_response['producer_abs_share_frac_%s' % mc]
+
+            producer_decision_and_response['average_new_vehicle_mfr_cost'] += \
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
+                producer_decision_and_response['producer_abs_share_frac_%s' % mc]
+
+            producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] += \
+                producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
+                producer_decision_and_response['producer_abs_share_frac_%s' % mc]
+
+
+    # TODO: should this be 'average_cross_subsidized_price_total' instead of 'average_new_vehicle_mfr_generalized_cost'??
+    producer_decision_and_response['new_vehicle_sales'] = \
+        producer_decision_and_response['total_sales'] * \
+        consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
+                                                         producer_decision_and_response[
+                                                             'average_new_vehicle_mfr_generalized_cost'])
 
 
 def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multiplier_columns, prev_multiplier_range,
@@ -646,15 +624,15 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
         price_options_df = price_options_df.drop(multiplier_columns, axis=1, errors='ignore')
 
     if first_pass:
-        # first time through, span full range
-        # multiplier_range = \
-        #     np.unique(np.append(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
-        #                                     omega_globals.options.consumer_pricing_multiplier_max,
-        #                                     omega_globals.options.consumer_pricing_num_options), 1.0))
+        # first time through, span full range, including all 1's
         multiplier_range = \
-            np.unique(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
-                                    omega_globals.options.consumer_pricing_multiplier_max,
-                                    omega_globals.options.consumer_pricing_num_options))
+            np.unique(np.append(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
+                                            omega_globals.options.consumer_pricing_multiplier_max,
+                                            omega_globals.options.consumer_pricing_num_options), 1.0))
+        # multiplier_range = \
+        #     np.unique(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
+        #                             omega_globals.options.consumer_pricing_multiplier_max,
+        #                             omega_globals.options.consumer_pricing_num_options))
 
     search_collapsed = True
     for mc, mcc in zip(mc_pair, multiplier_columns):
@@ -665,7 +643,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
                                                                           producer_decision_and_response,
                                                                           search_collapsed)
         else:
-            if 'consumer' in omega_globals.options.verbose_console_modules:
+            if 'multipliers' in omega_globals.options.verbose_console_modules:
                 omega_log.logwrite(('%s' % mcc).ljust(35) + '= MR:%s' % multiplier_range,
                                    echo_console=True)
 
@@ -675,6 +653,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
             price_options_df['average_new_vehicle_mfr_cost_%s' % mc] * price_options_df[mcc]
 
         price_modification = PriceModifications.get_price_modification(calendar_year, mc)
+
         price_options_df['average_modified_cross_subsidized_price_%s' % mc] = \
             price_options_df['average_cross_subsidized_price_%s' % mc] + price_modification
 
@@ -682,7 +661,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
 
     if not first_pass and search_collapsed:
         continue_search = False
-        if 'consumer' in omega_globals.options.verbose_console_modules:
+        if 'multipliers' in omega_globals.options.verbose_console_modules:
             omega_log.logwrite('SEARCH COLLAPSED', echo_console=True)
 
     return continue_search, price_options_df
@@ -708,42 +687,44 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
     """
     import numpy as np
 
-    # prev_multiplier_span_frac = \
-    #     prev_multiplier_range[multiplier_column][-1] / prev_multiplier_range[multiplier_column][0] - 1
-    index = \
-        np.nonzero(prev_multiplier_range[multiplier_column] == producer_decision_and_response[multiplier_column])[0][0]
-    # if index == 0:
-    #     min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-    #                   producer_decision_and_response[multiplier_column] - prev_multiplier_span_frac *
-    #                   producer_decision_and_response[multiplier_column])
-    # else:
-    #     min_val = prev_multiplier_range[multiplier_column][index - 1]
-    # if index == len(prev_multiplier_range[multiplier_column]) - 1:
-    #     max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-    #                   producer_decision_and_response[multiplier_column] + prev_multiplier_span_frac *
-    #                   producer_decision_and_response[multiplier_column])
-    # else:
-    #     max_val = prev_multiplier_range[multiplier_column][index + 1]
-
-    new_multiplier_range = 0.75**(producer_decision_and_response['cross_subsidy_iteration_num'] + 1) * \
-                                (prev_multiplier_range[multiplier_column][-1] -
-                                 prev_multiplier_range[multiplier_column][0])
-
     prev_multiplier = producer_decision_and_response[multiplier_column]
 
-    if index == len(prev_multiplier_range[multiplier_column]) - 1:
-        min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-                      prev_multiplier - new_multiplier_range)
-    else:
-        min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-                      prev_multiplier - new_multiplier_range/2)
+    prev_multiplier_span_frac = \
+        prev_multiplier_range[multiplier_column][-1] / prev_multiplier_range[multiplier_column][0] - 1
+
+    index = np.nonzero(prev_multiplier_range[multiplier_column] == prev_multiplier)[0][0]
 
     if index == 0:
-        max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-                      prev_multiplier + new_multiplier_range)
+        min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
+                      prev_multiplier - prev_multiplier_span_frac *
+                      prev_multiplier)
     else:
+        min_val = prev_multiplier_range[multiplier_column][index - 1]
+
+    if index == len(prev_multiplier_range[multiplier_column]) - 1:
         max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-                      prev_multiplier + new_multiplier_range/2)
+                      prev_multiplier + prev_multiplier_span_frac *
+                      prev_multiplier)
+    else:
+        max_val = prev_multiplier_range[multiplier_column][index + 1]
+
+    # new_multiplier_range = 0.75**(producer_decision_and_response['cross_subsidy_iteration_num'] + 1) * \
+    #                             (prev_multiplier_range[multiplier_column][-1] -
+    #                              prev_multiplier_range[multiplier_column][0])
+    #
+    # if index == len(prev_multiplier_range[multiplier_column]) - 1:
+    #     min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
+    #                   prev_multiplier - new_multiplier_range)
+    # else:
+    #     min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
+    #                   prev_multiplier - new_multiplier_range/2)
+    #
+    # if index == 0:
+    #     max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
+    #                   prev_multiplier + new_multiplier_range)
+    # else:
+    #     max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
+    #                   prev_multiplier + new_multiplier_range/2)
 
     # try new range, include prior value in range...
     multiplier_range = np.unique(np.append(
@@ -752,7 +733,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
 
     # search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or ((max_val / min_val - 1) <= 1e-3))
     search_collapsed = search_collapsed and ((len(multiplier_range) == 2) or (max_val - min_val <= 1e-4))
-    if 'consumer' in omega_globals.options.verbose_console_modules:
+    if 'multipliers' in omega_globals.options.verbose_console_modules:
         mr_str = str(['%.8f' % m for m in multiplier_range]).replace("'", '')
         omega_log.logwrite(('%s' % multiplier_column).ljust(35) + '= %.5f MR:%s R:%f' % (
             prev_multiplier, mr_str, max_val - min_val), echo_console=True)
@@ -850,19 +831,19 @@ def calc_market_category_data(producer_decision):
     import numpy as np
 
     for mcat in omega_globals.options.MarketClass.market_categories:
-        producer_decision['average_cost_%s' % mcat] = 0
-        producer_decision['average_generalized_cost_%s' % mcat] = 0
+        producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] = 0
+        producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mcat] = 0
         producer_decision['average_cross_subsidized_price_%s' % mcat] = 0
         producer_decision['sales_%s' % mcat] = 0
         producer_decision['producer_abs_share_frac_%s' % mcat] = 0
 
         for mc in omega_globals.options.MarketClass.market_classes:
             if mcat in mc.split('.'):
-                producer_decision['average_cost_%s' % mcat] += \
+                producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] += \
                     producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
                     np.maximum(1, producer_decision['sales_%s' % mc])
 
-                producer_decision['average_generalized_cost_%s' % mcat] += \
+                producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mcat] += \
                     producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
                     np.maximum(1, producer_decision['sales_%s' % mc])
 
@@ -877,14 +858,16 @@ def calc_market_category_data(producer_decision):
                 producer_decision['producer_abs_share_frac_%s' % mcat] += \
                     producer_decision['producer_abs_share_frac_%s' % mc]
 
-        producer_decision['average_cost_%s' % mcat] = \
-            producer_decision['average_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
+        producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] = \
+            producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
 
-        producer_decision['average_generalized_cost_%s' % mcat] = \
-            producer_decision['average_generalized_cost_%s' % mcat] / producer_decision['sales_%s' % mcat]
+        producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mcat] = \
+            (producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mcat] /
+             producer_decision['sales_%s' % mcat])
 
         producer_decision['average_cross_subsidized_price_%s' % mcat] = \
-            producer_decision['average_cross_subsidized_price_%s' % mcat] / producer_decision['sales_%s' % mcat]
+            (producer_decision['average_cross_subsidized_price_%s' % mcat] /
+             producer_decision['sales_%s' % mcat])
 
 
 def detect_convergence(producer_decision_and_response, market_class_dict):
@@ -900,15 +883,16 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
         tuple of convergence bool and convergence error, (converged, convergence_error)
 
     """
-    cross_subsidy_pricing_error = producer_decision_and_response['pricing_price_ratio_delta']
+    cross_subsidy_pricing_error = abs(1-producer_decision_and_response['price_cost_ratio_total'])
     converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance
 
     convergence_error = 0
     for mc in market_class_dict:
-        convergence_error = \
-            max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
-                                       producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
-        converged = converged and (convergence_error <= omega_globals.options.producer_consumer_convergence_tolerance)
+        if 'consumer_abs_share_frac_%s' % mc in producer_decision_and_response:
+            convergence_error = \
+                max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
+                                           producer_decision_and_response['consumer_abs_share_frac_%s' % mc]))
+            converged = converged and (convergence_error <= omega_globals.options.producer_consumer_convergence_tolerance)
 
     return converged, convergence_error, cross_subsidy_pricing_error
 

@@ -119,9 +119,9 @@ try:
             self.onroad_vmt_file = path + 'test_inputs/annual_vmt_fixed_by_age.csv'
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
-            self.consumer_pricing_num_options = 10
-            self.consumer_pricing_multiplier_min = 0.95
-            self.consumer_pricing_multiplier_max = 1.05
+            self.consumer_pricing_num_options = 4
+            self.consumer_pricing_multiplier_min = 0.5
+            self.consumer_pricing_multiplier_max = 2.0
 
             self.new_vehicle_price_elasticity_of_demand = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
@@ -165,7 +165,7 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.verbose_console_modules = ['db', 'consumer']  # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console_modules = ['db', 'consumer', 'multipliers_', 'final_multipliers_']  # list of modules to allow verbose console output, or empty to disable
             self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging

@@ -353,7 +353,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     selected_production_decision = pd.to_numeric(best_candidate_production_decision)
 
     selected_production_decision = \
-        selected_production_decision.rename({'strategic_compliance_ratio': 'initial_strategic_compliance_ratio'})
+        selected_production_decision.rename({'strategic_compliance_ratio': 'strategic_compliance_ratio_initial',
+                                             'strategic_compliance_error': 'strategic_compliance_error_initial'})
 
     # log the final iteration, as opposed to the winning iteration:
     selected_production_decision['producer_search_iteration'] = search_iteration - 1
