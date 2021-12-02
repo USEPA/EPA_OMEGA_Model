@@ -193,7 +193,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_shares(market_class_data, calendar_year):
+    def calc_shares(market_class_data, calendar_year, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
 
@@ -224,11 +224,7 @@ class SalesShare(OMEGABase, SalesShareBase):
             market_class_data['producer_abs_share_frac_non_hauling']
 
         # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
-        market_class_data = SalesShare.calc_shares_gcam(market_class_data, calendar_year, 'hauling',
-                                                        ['hauling.ICE', 'hauling.BEV'])
-
-        market_class_data = SalesShare.calc_shares_gcam(market_class_data, calendar_year, 'non_hauling',
-                                                        ['non_hauling.ICE', 'non_hauling.BEV'])
+        market_class_data = SalesShare.calc_shares_gcam(market_class_data, calendar_year, mc_parent, mc_pair)
 
         return market_class_data
 

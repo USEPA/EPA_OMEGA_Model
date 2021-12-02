@@ -97,7 +97,7 @@ class SalesShareBase:
     """
 
     @staticmethod
-    def calc_shares(market_class_data, calendar_year):
+    def calc_shares(market_class_data, calendar_year, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
         calculated within non-responsive market categories then converted to absolute shares.
