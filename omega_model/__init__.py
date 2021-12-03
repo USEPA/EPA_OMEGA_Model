@@ -120,8 +120,8 @@ try:
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
             self.consumer_pricing_num_options = 4
-            self.consumer_pricing_multiplier_min = 0.5
-            self.consumer_pricing_multiplier_max = 2.0
+            self.consumer_pricing_multiplier_min = 0.95
+            self.consumer_pricing_multiplier_max = 1.05
 
             self.new_vehicle_price_elasticity_of_demand = -0.5
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
