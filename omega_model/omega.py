@@ -296,16 +296,18 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     producer_decision['winning_combo_share_weighted_cost'] = 0
     producer_decision['winning_combo_share_weighted_generalized_cost'] = 0
     for mc in market_class_vehicle_dict:
-        producer_decision['winning_combo_share_weighted_cost'] += producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
-                                                                  producer_decision['producer_abs_share_frac_%s' % mc]
+        producer_decision['winning_combo_share_weighted_cost'] += \
+            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
+            producer_decision['producer_abs_share_frac_%s' % mc]
 
         producer_decision['winning_combo_share_weighted_generalized_cost'] += \
-            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * producer_decision['producer_abs_share_frac_%s' % mc]
+            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
+            producer_decision['producer_abs_share_frac_%s' % mc]
+
+    producer_decision['context_new_vehicle_sales'] = producer_decision['total_sales']
 
     consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
                                                      producer_decision['winning_combo_share_weighted_generalized_cost'])
-
-    # multiplier_columns = ['cost_multiplier_%s' % mc for mc in omega_globals.options.MarketClass.market_classes]
 
     cross_subsidy_iteration_num = 0
     producer_decision_and_response = pd.DataFrame()
@@ -319,9 +321,6 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         prev_multiplier_range = dict()
         continue_search = True
         while continue_search:
-
-            ##### missing 'average_cross_subsidized_price_%s' % mc on second pass?? first pass?? ######
-
             continue_search, cross_subsidy_options = create_cross_subsidy_options(calendar_year, continue_search,
                                                                                   mc_pair, multiplier_columns,
                                                                                   prev_multiplier_range,
@@ -342,14 +341,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                 producer_decision_and_response['abs_share_delta_%s' % mcat] += \
                     0.5*producer_decision_and_response['abs_share_delta_%s' % mc]
 
-            # # calc average_cross_subsidized_price and average_cost
-            # calc_market_category_data(producer_decision_and_response)
-
-            ####
-
-
-
-            ###############################################################################################################
+            ###########################################################################################################
             calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict,
                                      producer_decision_and_response)
             # propagate total sales down to composite vehicles by market class share and reg class share,
@@ -359,7 +351,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                         total_sales=producer_decision_and_response['new_vehicle_sales'])
             # propagate vehicle sales up to market class sales
             calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
-            ###############################################################################################################
+            ###########################################################################################################
 
             producer_decision_and_response['strategic_compliance_ratio'] = \
                 (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
@@ -369,11 +361,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                 (producer_decision_and_response['average_cross_subsidized_price_total'] /
                  producer_decision_and_response['average_new_vehicle_mfr_cost'])
 
-
-
-            ###
-
-            price_weight = 0.95
+            price_weight = 0.925
 
             pricing_abs_share_delta_total = producer_decision_and_response['abs_share_delta_%s' % mcat]
 
@@ -579,10 +567,8 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
                 producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
                 producer_decision_and_response['producer_abs_share_frac_%s' % mc]
 
-
-    # TODO: should this be 'average_cross_subsidized_price_total' instead of 'average_new_vehicle_mfr_generalized_cost'??
     producer_decision_and_response['new_vehicle_sales'] = \
-        producer_decision_and_response['total_sales'] * \
+        producer_decision_and_response['context_new_vehicle_sales'] * \
         consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
                                                          producer_decision_and_response[
                                                              'average_new_vehicle_mfr_generalized_cost'])
@@ -667,14 +653,14 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
     return continue_search, price_options_df
 
 
-def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_decision_and_response,
+def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer_decision_and_response,
                              search_collapsed):
     """
     Tighten cross subsidy multiplier range.
 
     Args:
         multiplier_column (str): name of the multiplier range to tighten, e.g. 'cost_multiplier_hauling.BEV'
-        prev_multiplier_range (dict): empty on first pass then contains a dict of previous multiplier ranges by market
+        prev_multiplier_ranges (dict): empty on first pass then contains a dict of previous multiplier ranges by market
             class, e.g. {'cost_multiplier_hauling.BEV': array([0.95, 0.98333333, 1.0, 1.01666667, 1.05]), ...}
         producer_decision_and_response (Series): contains producer compliance search result and most-convergent
             consumer response to previous cross subsidy options
@@ -688,31 +674,41 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_range, producer_
     import numpy as np
 
     prev_multiplier = producer_decision_and_response[multiplier_column]
+    prev_multiplier_range = prev_multiplier_ranges[multiplier_column]
+    span_frac_gain = 6
 
     prev_multiplier_span_frac = \
-        prev_multiplier_range[multiplier_column][-1] / prev_multiplier_range[multiplier_column][0] - 1
+        prev_multiplier_range[-1] / prev_multiplier_range[0] - 1
 
-    index = np.nonzero(prev_multiplier_range[multiplier_column] == prev_multiplier)[0][0]
+    index = np.nonzero(prev_multiplier_range == prev_multiplier)[0][0]
 
     if index == 0:
         min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-                      prev_multiplier - prev_multiplier_span_frac *
-                      prev_multiplier)
-    else:
-        min_val = prev_multiplier_range[multiplier_column][index - 1]
+                      prev_multiplier * (1 - prev_multiplier_span_frac * span_frac_gain))
 
-    if index == len(prev_multiplier_range[multiplier_column]) - 1:
-        max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-                      prev_multiplier + prev_multiplier_span_frac *
-                      prev_multiplier)
+        if prev_multiplier > omega_globals.options.consumer_pricing_multiplier_min and \
+                'multipliers' in omega_globals.options.verbose_console_modules:
+            print('%d hit minimum %s %f : %f' % (producer_decision_and_response['cross_subsidy_iteration_num'],
+                                             multiplier_column, prev_multiplier, min_val))
     else:
-        max_val = prev_multiplier_range[multiplier_column][index + 1]
+        min_val = prev_multiplier_range[index - 1]
+
+    if index == len(prev_multiplier_range) - 1:
+        max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
+                      prev_multiplier * (1 + prev_multiplier_span_frac * span_frac_gain))
+
+        if prev_multiplier > omega_globals.options.consumer_pricing_multiplier_max and \
+                'multipliers' in omega_globals.options.verbose_console_modules:
+            print('%d hit maximum %s %f : %f' % (producer_decision_and_response['cross_subsidy_iteration_num'],
+                                             multiplier_column, prev_multiplier, max_val))
+    else:
+        max_val = prev_multiplier_range[index + 1]
 
     # new_multiplier_range = 0.75**(producer_decision_and_response['cross_subsidy_iteration_num'] + 1) * \
-    #                             (prev_multiplier_range[multiplier_column][-1] -
-    #                              prev_multiplier_range[multiplier_column][0])
+    #                             (prev_multiplier_range[-1] -
+    #                              prev_multiplier_range[0])
     #
-    # if index == len(prev_multiplier_range[multiplier_column]) - 1:
+    # if index == len(prev_multiplier_range) - 1:
     #     min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
     #                   prev_multiplier - new_multiplier_range)
     # else:
