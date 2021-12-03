@@ -572,10 +572,10 @@ def create_production_options(composite_vehicles, tech_and_share_combinations, t
         market_class = composite_veh.market_class_id
 
         if ('consumer_abs_share_frac_%s' % market_class) in production_options:
-            composite_veh_sales = total_sales * production_options['consumer_abs_share_frac_%s' % market_class]
+            market_class_sales = total_sales * production_options['consumer_abs_share_frac_%s' % market_class]
 
         elif ('producer_abs_share_frac_%s' % market_class) in production_options:
-            composite_veh_sales = total_sales * production_options['producer_abs_share_frac_%s' % market_class]
+            market_class_sales = total_sales * production_options['producer_abs_share_frac_%s' % market_class]
 
         else:
             substrs = market_class.split('.')
@@ -587,36 +587,36 @@ def create_production_options(composite_vehicles, tech_and_share_combinations, t
                     str = str + substrs[j] + '.' * (j != i)
                 chain.append(str)
 
-            composite_veh_sales = total_sales
+            market_class_sales = total_sales
 
             for c in chain:
-                composite_veh_sales = composite_veh_sales * production_options[c]
+                market_class_sales = market_class_sales * production_options[c]
 
             if ('producer_abs_share_frac_%s' % market_class) not in production_options:
-                production_options['producer_abs_share_frac_%s' % market_class] = composite_veh_sales / total_sales
+                production_options['producer_abs_share_frac_%s' % market_class] = market_class_sales / total_sales
             else:
-                production_options['producer_abs_share_frac_%s' % market_class] += composite_veh_sales / total_sales
+                production_options['producer_abs_share_frac_%s' % market_class] += market_class_sales / total_sales
 
-        composite_veh_sales = composite_veh_sales * composite_veh.composite_vehicle_share_frac
+        composite_veh_sales = market_class_sales * composite_veh.composite_vehicle_share_frac
         production_options['veh_%s_sales' % composite_veh.vehicle_id] = composite_veh_sales
 
         # calculate vehicle total cost
-        composite_veh_total_cost_dollars = composite_veh_sales * \
-                                           production_options['veh_%s_cost_dollars' % composite_veh.vehicle_id]
+        composite_veh_total_cost_dollars = \
+            composite_veh_sales * production_options['veh_%s_cost_dollars' % composite_veh.vehicle_id]
 
         production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
 
-        composite_veh_total_generalized_cost_dollars = composite_veh_sales * \
-                                                       production_options['veh_%s_generalized_cost_dollars' %
-                                                                          composite_veh.vehicle_id]
+        composite_veh_total_generalized_cost_dollars = \
+            composite_veh_sales * production_options['veh_%s_generalized_cost_dollars' % composite_veh.vehicle_id]
 
         # calculate cert and target Mg for the vehicle
         composite_veh_cert_co2_gpmi = production_options['veh_%s_co2e_gpmi' % composite_veh.vehicle_id]
 
-        composite_veh_cert_co2e_Mg = composite_veh.normalized_cert_co2e_Mg * composite_veh_cert_co2_gpmi * \
-                                     composite_veh_sales
+        composite_veh_cert_co2e_Mg = \
+            composite_veh_sales * composite_veh.normalized_cert_co2e_Mg * composite_veh_cert_co2_gpmi
 
-        composite_veh_target_co2e_Mg = composite_veh.normalized_target_co2e_Mg * composite_veh_sales
+        composite_veh_target_co2e_Mg = \
+            composite_veh_sales * composite_veh.normalized_target_co2e_Mg
 
         production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
         production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg

@@ -549,6 +549,7 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
                 producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
                 producer_decision_and_response['consumer_abs_share_frac_%s' % mc]
         else:
+            # use producer shares instead of consumer shares
             producer_decision_and_response['average_cross_subsidized_price_total'] += \
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
                 producer_decision_and_response['producer_abs_share_frac_%s' % mc]
@@ -615,11 +616,6 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
             np.unique(np.append(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
                                             omega_globals.options.consumer_pricing_multiplier_max,
                                             omega_globals.options.consumer_pricing_num_options), 1.0))
-        # multiplier_range = \
-        #     np.unique(np.linspace(omega_globals.options.consumer_pricing_multiplier_min,
-        #                             omega_globals.options.consumer_pricing_multiplier_max,
-        #                             omega_globals.options.consumer_pricing_num_options))
-
     search_collapsed = True
     for mc, mcc in zip(mc_pair, multiplier_columns):
 
@@ -703,24 +699,6 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
                                              multiplier_column, prev_multiplier, max_val))
     else:
         max_val = prev_multiplier_range[index + 1]
-
-    # new_multiplier_range = 0.75**(producer_decision_and_response['cross_subsidy_iteration_num'] + 1) * \
-    #                             (prev_multiplier_range[-1] -
-    #                              prev_multiplier_range[0])
-    #
-    # if index == len(prev_multiplier_range) - 1:
-    #     min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-    #                   prev_multiplier - new_multiplier_range)
-    # else:
-    #     min_val = max(omega_globals.options.consumer_pricing_multiplier_min,
-    #                   prev_multiplier - new_multiplier_range/2)
-    #
-    # if index == 0:
-    #     max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-    #                   prev_multiplier + new_multiplier_range)
-    # else:
-    #     max_val = min(omega_globals.options.consumer_pricing_multiplier_max,
-    #                   prev_multiplier + new_multiplier_range/2)
 
     # try new range, include prior value in range...
     multiplier_range = np.unique(np.append(
