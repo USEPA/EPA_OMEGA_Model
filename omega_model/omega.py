@@ -322,6 +322,22 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                 omega_globals.options.SalesShare.calc_shares(cross_subsidy_options, calendar_year, mcat,
                                                              cross_subsidy_pair)
 
+            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
+            producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] = 0
+
+            for mc in cross_subsidy_pair:
+                producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
+                    producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
+                        producer_decision_and_response['consumer_abs_share_frac_%s' % mc] / \
+                    producer_decision_and_response['consumer_abs_share_frac_%s' % mcat]
+
+                producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] += \
+                    producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
+                        producer_decision_and_response['consumer_abs_share_frac_%s' % mc] / \
+                    producer_decision_and_response['consumer_abs_share_frac_%s' % mcat]
+
+            price_weight = 0.925
+
             # calc share deltas
             producer_decision_and_response['abs_share_delta_%s' % mcat] = 0
 
@@ -333,44 +349,15 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                 producer_decision_and_response['abs_share_delta_%s' % mcat] += \
                     0.5*producer_decision_and_response['abs_share_delta_%s' % mc]
 
-            ###########################################################################################################
-            calc_sales_and_cost_data(calendar_year, compliance_id, producer_market_classes,
-                                     producer_decision_and_response)
-            # propagate total sales down to composite vehicles by market class share and reg class share,
-            # calculate new compliance status for each producer-technology / consumer response combination
-            compliance_search.create_production_options(candidate_mfr_composite_vehicles,
-                                                        producer_decision_and_response,
-                                                        total_sales=producer_decision_and_response['new_vehicle_sales'])
-            # compliance_search.create_production_options(candidate_mfr_composite_vehicles,
-            #                                             producer_decision_and_response,
-            #                                             total_sales=1)
-            # propagate vehicle sales up to market class sales
-            calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
-            ###########################################################################################################
-
-            producer_decision_and_response['strategic_compliance_ratio'] = \
-                (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
-                producer_decision_and_response['total_target_co2e_megagrams']
-
-            producer_decision_and_response['price_cost_ratio_total'] = \
-                (producer_decision_and_response['average_cross_subsidized_price_total'] /
-                 producer_decision_and_response['average_new_vehicle_mfr_cost'])
-
-            price_weight = 0.925
-
-            pricing_abs_share_delta_total = producer_decision_and_response['abs_share_delta_%s' % mcat]
-
-            pricing_price_ratio_delta = \
+            producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat] = \
                 abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
                         producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
 
             # calculate score
-            producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat] = pricing_price_ratio_delta
-            producer_decision_and_response['abs_share_delta_%s' % mcat] = pricing_abs_share_delta_total
             # calculate distance to the origin
             producer_decision_and_response['pricing_score'] = \
-                ((1- price_weight) * pricing_abs_share_delta_total**2 +
-                 price_weight * pricing_price_ratio_delta**2)**0.5
+                ((1- price_weight) * producer_decision_and_response['abs_share_delta_%s' % mcat]**2 +
+                 price_weight * producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat]**2)**0.5
 
             # select best score
             selected_cross_subsidy_index = producer_decision_and_response['pricing_score'].idxmin()
@@ -436,13 +423,21 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
             continue_search = continue_search and not converged
 
-    calc_sales_and_cost_data(calendar_year, compliance_id, producer_market_classes, producer_decision_and_response)
+    calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes, producer_decision_and_response)
 
-    compliance_search.create_production_options(candidate_mfr_composite_vehicles,
-                                                producer_decision_and_response,
-                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
+    compliance_search.create_production_options_from_shares(candidate_mfr_composite_vehicles,
+                                                            producer_decision_and_response,
+                                                            total_sales=producer_decision_and_response['new_vehicle_sales'])
 
     calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
+
+    producer_decision_and_response['strategic_compliance_ratio'] = \
+        (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
+        producer_decision_and_response['total_target_co2e_megagrams']
+
+    producer_decision_and_response['price_cost_ratio_total'] = \
+        (producer_decision_and_response['average_cross_subsidized_price_total'] /
+         producer_decision_and_response['average_new_vehicle_mfr_cost'])
 
     converged, convergence_error, cross_subsidy_pricing_error = \
         detect_convergence(producer_decision_and_response, producer_market_classes)
@@ -503,8 +498,8 @@ def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_cla
     return average_new_vehicle_mfr_generalized_cost
 
 
-def calc_sales_and_cost_data(calendar_year, compliance_id, producer_market_classes, producer_decision_and_response,
-                             calc_sales=True, update_context_new_vehicle_generalized_cost=False):
+def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes, producer_decision_and_response,
+                                         calc_sales=True, update_context_new_vehicle_generalized_cost=False):
     """
     Calculate sales and cost/price data.  Namely, the absolute share delta between producer and consumer
     absolute market shares, the share weighted average cross subsidized price by market class, the total share weighted 
@@ -724,7 +719,7 @@ def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
     data via ``calc_market_class_data()`` and ``calc_market_category_data()``
 
     Args:
-        candidate_mfr_composite_vehicles: list of candidate composite vehicles that minimize producer compliance cost
+        candidate_mfr_composite_vehicles (list): list of candidate composite vehicles that minimize producer compliance cost
         producer_decision (Series): Series that corresponds with candidate_mfr_composite_vehicles, has producer market
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
@@ -763,6 +758,7 @@ def calc_market_class_data(market_class_vehicle_dict, producer_decision):
 
     """
     # calculate sales-weighted co2 g/mi and cost by market class
+
     for mc in omega_globals.options.MarketClass.market_classes:
         market_class_vehicles = market_class_vehicle_dict[mc]
         if market_class_vehicles:
