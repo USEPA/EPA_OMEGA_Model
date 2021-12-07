@@ -302,8 +302,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                              candidate_production_decisions, share_range,
                                                              producer_decision_and_response)
 
-        production_options = create_production_options(composite_vehicles, tech_and_share_sweeps,
-                                                       context_based_total_sales)
+        production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
+                                                                   context_based_total_sales)
 
         # insert code to cull production options based on policy here #
 
@@ -541,7 +541,7 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
     omega_globals.session.flush()
 
 
-def create_production_options(composite_vehicles, tech_and_share_combinations, total_sales):
+def create_production_options_from_shares(composite_vehicles, tech_and_share_combinations, total_sales):
     """
     Create a set of production options, including compliance outcomes, based on the given tech and share combinations.
 
