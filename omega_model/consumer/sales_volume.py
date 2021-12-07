@@ -45,7 +45,7 @@ def context_new_vehicle_sales(calendar_year):
     return sales_dict
 
 
-def new_vehicle_sales_response(calendar_year, compliance_id, P):
+def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_new_vehicle_generalized_cost=True):
     """
     Calculate new vehicle sales fraction relative to a reference sales volume and average new vehicle generalized cost.
     Updates generalized cost table associated with the reference session so those costs can become the reference
@@ -55,6 +55,7 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
         calendar_year (int): the calendar year to calculate sales in
         compliance_id (str): manufacturer name, or 'consolidated_OEM'
         P ($, [$]): a single price or a list/vector of prices
+        update_context_new_vehicle_generalized_cost (bool): update context new vehicle generalized cost (P0) if ``True``
 
     Returns:
         Relative new vehicle sales volume at each price, e.g. ``0.97``, ``1.03``, etc
@@ -66,7 +67,8 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P):
         import numpy as np
         P = np.array(P)
 
-    if omega_globals.options.session_is_reference and isinstance(P, float):
+    if omega_globals.options.session_is_reference and isinstance(P, float) and \
+            update_context_new_vehicle_generalized_cost:
         NewVehicleMarket.set_context_new_vehicle_generalized_cost(calendar_year, compliance_id, P)
 
     if isinstance(P, float):

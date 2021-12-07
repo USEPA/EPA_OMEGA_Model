@@ -204,16 +204,16 @@ def run_producer_consumer():
                                                                 producer_consumer_iteration_num,
                                                                 strategic_target_offset_Mg)
 
-                market_class_vehicle_dict = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
+                producer_market_classes = calc_market_data(candidate_mfr_composite_vehicles, producer_decision)
 
                 best_winning_combo_with_sales_response, iteration_log, producer_decision_and_response = \
                     iterate_producer_cross_subsidy(calendar_year, compliance_id, best_winning_combo_with_sales_response,
                                                    candidate_mfr_composite_vehicles, iteration_log,
-                                                   producer_consumer_iteration_num, market_class_vehicle_dict,
+                                                   producer_consumer_iteration_num, producer_market_classes,
                                                    producer_decision, strategic_target_offset_Mg)
 
                 converged, convergence_error, cross_subsidy_pricing_error = \
-                    detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
+                    detect_convergence(producer_decision_and_response, producer_market_classes)
 
                 iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
@@ -261,7 +261,7 @@ def run_producer_consumer():
 
 def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_decision_and_response,
                                    candidate_mfr_composite_vehicles, iteration_log, producer_consumer_iteration_num,
-                                   market_class_vehicle_dict, producer_decision, strategic_target_offset_Mg):
+                                   producer_market_classes, producer_decision, strategic_target_offset_Mg):
     """
     Perform producer pricing cross-subsidy iteration.  Cross-subsidy maintains the total average price, as well
     as average price by non-responsive market categories.  The goal is to achieve convergence between producer and
@@ -279,7 +279,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             candidates
         iteration_log (DataFrame): DataFrame of producer-consumer and cross-subsidy iteration data
         producer_consumer_iteration_num (int): producer-consumer iteration number
-        market_class_vehicle_dict (dict): dict of candidate_mfr_composite_vehicles grouped by market class
+        producer_market_classes (list): list of candidate_mfr_composite_vehicles grouped by market class
         producer_decision (Series): result of producer compliance search, *without* consumer response
         strategic_target_offset_Mg (float): desired producer distance from compliance, in CO2e Mg, zero for compliance,
             > 0 for under-compliance, < 0 for over-compliance
@@ -293,21 +293,14 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     from producer import compliance_search
     import consumer
 
-    producer_decision['winning_combo_share_weighted_cost'] = 0
-    producer_decision['winning_combo_share_weighted_generalized_cost'] = 0
-    for mc in market_class_vehicle_dict:
-        producer_decision['winning_combo_share_weighted_cost'] += \
-            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
-            producer_decision['producer_abs_share_frac_%s' % mc]
-
-        producer_decision['winning_combo_share_weighted_generalized_cost'] += \
-            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
-            producer_decision['producer_abs_share_frac_%s' % mc]
+    producer_decision['average_new_vehicle_mfr_generalized_cost_initial'] = \
+        calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes, share_basis='producer')
 
     producer_decision['context_new_vehicle_sales'] = producer_decision['total_sales']
 
     consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                                     producer_decision['winning_combo_share_weighted_generalized_cost'])
+                                                     producer_decision['average_new_vehicle_mfr_generalized_cost_initial'],
+                                                     update_context_new_vehicle_generalized_cost=True)
 
     cross_subsidy_iteration_num = 0
     producer_decision_and_response = pd.DataFrame()
@@ -315,25 +308,24 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     producer_decision = producer_decision.to_frame().transpose()
 
     for mcat in ['non_hauling', 'hauling']:
-        mc_pair = ['%s.%s' % (mcat, mc) for mc in ['ICE', 'BEV']]
-        multiplier_columns = ['cost_multiplier_%s' % mc for mc in mc_pair]
+        cross_subsidy_pair = ['%s.%s' % (mcat, mc) for mc in ['ICE', 'BEV']]
+        multiplier_columns = ['cost_multiplier_%s' % mc for mc in cross_subsidy_pair]
 
         prev_multiplier_range = dict()
         continue_search = True
         while continue_search:
-            continue_search, cross_subsidy_options = create_cross_subsidy_options(calendar_year, continue_search,
-                                                                                  mc_pair, multiplier_columns,
-                                                                                  prev_multiplier_range,
-                                                                                  producer_decision,
-                                                                                  producer_decision_and_response)
+            continue_search, cross_subsidy_options = \
+                create_cross_subsidy_options(calendar_year, continue_search, cross_subsidy_pair, multiplier_columns,
+                                             prev_multiplier_range, producer_decision, producer_decision_and_response)
 
             producer_decision_and_response = \
-                omega_globals.options.SalesShare.calc_shares(cross_subsidy_options, calendar_year, mcat, mc_pair)
+                omega_globals.options.SalesShare.calc_shares(cross_subsidy_options, calendar_year, mcat,
+                                                             cross_subsidy_pair)
 
             # calc share deltas
             producer_decision_and_response['abs_share_delta_%s' % mcat] = 0
 
-            for mc in mc_pair:
+            for mc in cross_subsidy_pair:
                 producer_decision_and_response['abs_share_delta_%s' % mc] = abs(
                     producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
                     producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
@@ -342,13 +334,16 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                     0.5*producer_decision_and_response['abs_share_delta_%s' % mc]
 
             ###########################################################################################################
-            calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict,
+            calc_sales_and_cost_data(calendar_year, compliance_id, producer_market_classes,
                                      producer_decision_and_response)
             # propagate total sales down to composite vehicles by market class share and reg class share,
             # calculate new compliance status for each producer-technology / consumer response combination
             compliance_search.create_production_options(candidate_mfr_composite_vehicles,
                                                         producer_decision_and_response,
                                                         total_sales=producer_decision_and_response['new_vehicle_sales'])
+            # compliance_search.create_production_options(candidate_mfr_composite_vehicles,
+            #                                             producer_decision_and_response,
+            #                                             total_sales=1)
             # propagate vehicle sales up to market class sales
             calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
             ###########################################################################################################
@@ -441,22 +436,16 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
             continue_search = continue_search and not converged
 
-    # # if this code is uncommented, the reference case sales will match context sales EXACTLY, by compensating for
-    # # any slight offset during the convergence process:
-    # # ###############################################################################################################
-    # # if o2.options.session_is_reference:
-    # #     calc_sales_totals(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response)
-    # #     # propagate total sales down to composite vehicles by market class share and reg class share,
-    # #     # calculate new compliance status for each producer-technology / consumer response combination
-    # #     compliance_strategy.calc_tech_share_combos_total(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response,
-    # #                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
-    # #
-    # #     # propagate vehicle sales up to market class sales
-    # #     calc_market_class_data(calendar_year, candidate_mfr_composite_vehicles, producer_decision_and_response)
-    # # ###############################################################################################################
+    calc_sales_and_cost_data(calendar_year, compliance_id, producer_market_classes, producer_decision_and_response)
+
+    compliance_search.create_production_options(candidate_mfr_composite_vehicles,
+                                                producer_decision_and_response,
+                                                total_sales=producer_decision_and_response['new_vehicle_sales'])
+
+    calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
     converged, convergence_error, cross_subsidy_pricing_error = \
-        detect_convergence(producer_decision_and_response, market_class_vehicle_dict)
+        detect_convergence(producer_decision_and_response, producer_market_classes)
 
     # if (best_producer_decision_and_response is None) or \
     #         (producer_decision_and_response['pricing_convergence_score']
@@ -504,7 +493,18 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
     return best_producer_decision_and_response, iteration_log, producer_decision_and_response
 
 
-def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_dict, producer_decision_and_response):
+def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes, share_basis):
+    average_new_vehicle_mfr_generalized_cost = 0
+    for mc in producer_market_classes:
+        average_new_vehicle_mfr_generalized_cost += \
+            producer_decision['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
+            producer_decision['%s_abs_share_frac_%s' % (share_basis, mc)]
+
+    return average_new_vehicle_mfr_generalized_cost
+
+
+def calc_sales_and_cost_data(calendar_year, compliance_id, producer_market_classes, producer_decision_and_response,
+                             calc_sales=True, update_context_new_vehicle_generalized_cost=False):
     """
     Calculate sales and cost/price data.  Namely, the absolute share delta between producer and consumer
     absolute market shares, the share weighted average cross subsidized price by market class, the total share weighted 
@@ -515,7 +515,7 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
     Args:
         calendar_year (int): calendar year of the iteration
         compliance_id (str): manufacturer name, or 'consolidated_OEM'
-        market_class_vehicle_dict (dict): dict of candidate_mfr_composite_vehicles grouped by market class
+        producer_market_classes (list): list of producer market classes
         producer_decision_and_response (Series): producer compliance search result with consumer share response
 
     Returns:
@@ -531,7 +531,7 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
     producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
     producer_decision_and_response['average_new_vehicle_mfr_generalized_cost'] = 0
 
-    for mc in market_class_vehicle_dict:
+    for mc in producer_market_classes:
         if 'consumer_abs_share_frac_%s' % mc in producer_decision_and_response:
             producer_decision_and_response['average_cross_subsidized_price_total'] += \
                 producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
@@ -568,11 +568,14 @@ def calc_sales_and_cost_data(calendar_year, compliance_id, market_class_vehicle_
                 producer_decision_and_response['average_new_vehicle_mfr_generalized_cost_%s' % mc] * \
                 producer_decision_and_response['producer_abs_share_frac_%s' % mc]
 
-    producer_decision_and_response['new_vehicle_sales'] = \
-        producer_decision_and_response['context_new_vehicle_sales'] * \
-        consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                                         producer_decision_and_response[
-                                                             'average_new_vehicle_mfr_generalized_cost'])
+    if calc_sales:
+        producer_decision_and_response['new_vehicle_sales'] = \
+            producer_decision_and_response['context_new_vehicle_sales'] * \
+            consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
+                                                             producer_decision_and_response[
+                                                                 'average_new_vehicle_mfr_generalized_cost'],
+                                                             update_context_new_vehicle_generalized_cost=
+                                                             update_context_new_vehicle_generalized_cost)
 
 
 def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multiplier_columns, prev_multiplier_range,
@@ -726,7 +729,8 @@ def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
             shares, costs, compliance data (Mg CO2e), may also contain consumer response
 
     Returns:
-        dict of candidate vehicles binned by market class, updates producer_decision with calculated market data
+        list of producer market classes (market classes with candidate vehicles),
+        updates producer_decision with calculated market data
 
     See Also:
         ``calc_market_class_data()``, ``calc_market_category_data()``
@@ -741,7 +745,7 @@ def calc_market_data(candidate_mfr_composite_vehicles, producer_decision):
 
     calc_market_category_data(producer_decision)
 
-    return market_class_vehicle_dict
+    return list(market_class_vehicle_dict.keys())
 
 
 def calc_market_class_data(market_class_vehicle_dict, producer_decision):
@@ -844,14 +848,14 @@ def calc_market_category_data(producer_decision):
              producer_decision['sales_%s' % mcat])
 
 
-def detect_convergence(producer_decision_and_response, market_class_dict):
+def detect_convergence(producer_decision_and_response, producer_market_classes):
     """
     Detect producer-consumer market share convergence.
 
     Args:
         producer_decision_and_response (Series): contains producer compliance search result and most-convergent
             consumer response to previous cross subsidy options
-        market_class_dict (dict): dict of candidate vehicles binned by market class
+        producer_market_classes (list): list of producer market classes
 
     Returns:
         tuple of convergence bool and convergence error, (converged, convergence_error)
@@ -861,7 +865,7 @@ def detect_convergence(producer_decision_and_response, market_class_dict):
     converged = cross_subsidy_pricing_error <= omega_globals.options.producer_cross_subsidy_price_tolerance
 
     convergence_error = 0
-    for mc in market_class_dict:
+    for mc in producer_market_classes:
         if 'consumer_abs_share_frac_%s' % mc in producer_decision_and_response:
             convergence_error = \
                 max(convergence_error, abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
