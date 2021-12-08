@@ -45,7 +45,7 @@ def context_new_vehicle_sales(calendar_year):
     return sales_dict
 
 
-def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_new_vehicle_generalized_cost=True):
+def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_new_vehicle_generalized_cost=False):
     """
     Calculate new vehicle sales fraction relative to a reference sales volume and average new vehicle generalized cost.
     Updates generalized cost table associated with the reference session so those costs can become the reference
