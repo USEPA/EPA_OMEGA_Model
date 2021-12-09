@@ -70,8 +70,9 @@ def run_postproc(iteration_log, credit_banks):
             session_results['%s_model_year_cert_co2e_Mg' % compliance_id] = model_year_cert_co2e_Mg
             session_results['%s_total_cost_billions' % compliance_id] = total_cost_billions
 
+            plot_iteration(iteration_log, compliance_id)
+
             if not omega_globals.options.consolidate_manufacturers:
-                # plot_iteration(iteration_log, compliance_id)
 
                 mfr_market_share_results = plot_manufacturer_market_shares(vehicle_years, compliance_id,
                                                                            manufacturer_sales[compliance_id])
@@ -1261,9 +1262,9 @@ def plot_iteration(iteration_log, compliance_id):
 
     plt.figure()
     for mc in market_classes:
-        plt.plot(first_logged['calendar_year'], first_logged['average_co2e_gpmi_%s' % mc], '.-')
+        plt.plot(first_logged['calendar_year'], first_logged['average_onroad_direct_co2e_gpmi_%s' % mc], '.-')
     plt.title('%s Producer Initial CO2e g/mi' % compliance_id)
     plt.grid()
-    plt.legend(['average_co2e_gpmi_%s' % mc for mc in market_classes])
+    plt.legend(['average_onroad_direct_co2e_gpmi_%s' % mc for mc in market_classes])
     plt.savefig('%s%s %s Producer Initial CO2e gpmi.png' % (omega_globals.options.output_folder,
                                                             omega_globals.options.session_unique_name, compliance_id))
