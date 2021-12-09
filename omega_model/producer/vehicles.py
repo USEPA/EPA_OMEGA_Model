@@ -457,7 +457,7 @@ class CompositeVehicle(OMEGABase):
 
         # calc weighted values
         for wv in self.weighted_values:
-            self.__setattr__(wv, weighted_value(self.vehicle_list, weight_by, wv))
+            self.__setattr__(wv, weighted_value(self.vehicle_list, self.weight_by, wv))
 
         self.total_weight = 0
         self.initial_registered_count = 0
@@ -557,6 +557,11 @@ class CompositeVehicle(OMEGABase):
                     ax1.plot(v.cert_co2e_grams_per_mile,
                              v.new_vehicle_mfr_generalized_cost_dollars, '*',
                              color=ax1.get_lines()[-1].get_color(), markersize=10)
+
+        # calc weighted values
+        for wv in self.weighted_values:
+            self.__setattr__(wv, weighted_value(self.vehicle_list, self.weight_by, wv))
+
         if plot_cost_curve:
             ax1.relim()
             ax1.autoscale()
