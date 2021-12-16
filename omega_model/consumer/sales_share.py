@@ -106,12 +106,14 @@ class SalesShare(OMEGABase, SalesShareBase):
             raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
 
     @staticmethod
-    def calc_shares_gcam(market_class_data, calendar_year, parent_market_class, child_market_classes):
+    def calc_shares_gcam(producer_decision, market_class_data, calendar_year,
+                         parent_market_class, child_market_classes):
         """
         Determine consumer desired ICE/BEV market shares for the given vehicles, their costs, etc.
         Relative shares are calculated within the parent market class and then converted to absolute shares.
 
         Args:
+            producer_decision (Series): selected producer compliance option
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
@@ -136,7 +138,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         for pass_num in [0, 1]:
             for market_class_id in child_market_classes:
                 if pass_num == 0:
-                    fuel_cost = market_class_data['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
+                    fuel_cost = producer_decision['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
 
                     gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
 
@@ -149,8 +151,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                     total_capital_costs = market_class_data[
                         'average_modified_cross_subsidized_price_%s' % market_class_id]
-                    average_co2e_gpmi = market_class_data['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
-                    average_kwh_pmi = market_class_data['average_onroad_direct_kwh_pmi_%s' % market_class_id]
+                    average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
+                    average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
 
                     carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
                                                                               'direct_co2e_grams_per_unit')
@@ -193,11 +195,12 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_shares(market_class_data, calendar_year, mc_parent, mc_pair):
+    def calc_shares(producer_decision, market_class_data, calendar_year, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
 
         Args:
+            producer_decision (Series): selected producer compliance option
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
@@ -218,13 +221,14 @@ class SalesShare(OMEGABase, SalesShareBase):
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
         market_class_data['consumer_abs_share_frac_hauling'] = \
-            market_class_data['producer_abs_share_frac_hauling']
+            producer_decision['producer_abs_share_frac_hauling']
 
         market_class_data['consumer_abs_share_frac_non_hauling'] = \
-            market_class_data['producer_abs_share_frac_non_hauling']
+            producer_decision['producer_abs_share_frac_non_hauling']
 
         # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
-        market_class_data = SalesShare.calc_shares_gcam(market_class_data, calendar_year, mc_parent, mc_pair)
+        market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
+                                                        mc_parent, mc_pair)
 
         return market_class_data
 

@@ -290,30 +290,41 @@ def run_producer_consumer():
     return iteration_log, credit_banks
 
 
-def calc_cross_subsidy_metrics(cross_subsidy_pair, mcat, producer_decision_and_response):
-    producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
-    producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] = 0
-    producer_decision_and_response['abs_share_delta_%s' % mcat] = 0
+def calc_cross_subsidy_metrics(producer_decision, cross_subsidy_options_and_response, cross_subsidy_pair, mcat):
+    """
+
+    Args:
+        producer_decision:
+        cross_subsidy_options_and_response:
+        cross_subsidy_pair:
+        mcat:
+
+    Returns:
+
+    """
+    cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
+    cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] = 0
+    cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] = 0
     for mc in cross_subsidy_pair:
-        producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
-            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc] / \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mcat]
+        cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
+            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
+            cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc] / \
+            cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
 
-        producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] += \
-            producer_decision_and_response['average_cross_subsidized_price_%s' % mc] * \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc] / \
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mcat]
+        cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] += \
+            cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mc] * \
+            cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc] / \
+            cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat]
 
-        producer_decision_and_response['abs_share_delta_%s' % mc] = abs(
-            producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
-            producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
+        cross_subsidy_options_and_response['abs_share_delta_%s' % mc] = abs(
+            producer_decision['producer_abs_share_frac_%s' % mc] -
+            cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc])
 
-        producer_decision_and_response['abs_share_delta_%s' % mcat] += \
-            0.5 * producer_decision_and_response['abs_share_delta_%s' % mc]
-    producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat] = \
-        abs(1 - producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
-            producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
+        cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] += \
+            0.5 * cross_subsidy_options_and_response['abs_share_delta_%s' % mc]
+    cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] = \
+        abs(1 - cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] /
+            cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
 
 
 def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_decision_and_response,
@@ -343,7 +354,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     Returns:
         tuple of best producer decision and response, the iteration log, and last producer decision and response
-        (best_producer_decision_and_response, iteration_log, producer_decision_and_response)
+        (best_producer_decision_and_response, iteration_log, cross_subsidy_options_and_response)
 
     """
     import numpy as np
@@ -359,9 +370,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                      producer_decision['average_new_vehicle_mfr_generalized_cost_initial'],
                                                      update_context_new_vehicle_generalized_cost=True)
 
-    producer_decision_and_response = pd.DataFrame()
+    cross_subsidy_options_and_response = pd.DataFrame()
 
-    producer_decision = producer_decision.to_frame().transpose()
+    # producer_decision = producer_decision.to_frame().transpose()
 
     for mcat in ['non_hauling', 'hauling']:
         cross_subsidy_iteration_num = 0
@@ -374,46 +385,46 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         while continue_search:
             continue_search, cross_subsidy_options = \
                 create_cross_subsidy_options(calendar_year, continue_search, cross_subsidy_pair, multiplier_columns,
-                                             prev_multiplier_range, producer_decision, producer_decision_and_response)
+                                             prev_multiplier_range, producer_decision, cross_subsidy_options_and_response)
 
-            producer_decision_and_response = \
-                omega_globals.options.SalesShare.calc_shares(cross_subsidy_options, calendar_year, mcat,
-                                                             cross_subsidy_pair)
+            cross_subsidy_options_and_response = \
+                omega_globals.options.SalesShare.calc_shares(producer_decision, cross_subsidy_options, calendar_year,
+                                                             mcat, cross_subsidy_pair)
 
-            calc_cross_subsidy_metrics(cross_subsidy_pair, mcat, producer_decision_and_response)
+            calc_cross_subsidy_metrics(producer_decision, cross_subsidy_options_and_response, cross_subsidy_pair, mcat)
 
             price_weight = 0.925
 
             # calculate score, weighted distance to the origin
-            producer_decision_and_response['pricing_score'] = \
-                ((1- price_weight) * producer_decision_and_response['abs_share_delta_%s' % mcat]**2 +
-                 price_weight * producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat]**2)**0.5
+            cross_subsidy_options_and_response['pricing_score'] = \
+                ((1- price_weight) * cross_subsidy_options_and_response['abs_share_delta_%s' % mcat]**2 +
+                 price_weight * cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat]**2)**0.5
 
             # select best score
-            selected_cross_subsidy_index = producer_decision_and_response['pricing_score'].idxmin()
+            selected_cross_subsidy_index = cross_subsidy_options_and_response['pricing_score'].idxmin()
 
             # note selected option
-            producer_decision_and_response['selected_cross_subsidy_option'] = 0
-            producer_decision_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
+            cross_subsidy_options_and_response['selected_cross_subsidy_option'] = 0
+            cross_subsidy_options_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
 
-            producer_decision_and_response['cross_subsidy_iteration_num_%s' % mcat] = cross_subsidy_iteration_num
+            cross_subsidy_options_and_response['cross_subsidy_iteration_num_%s' % mcat] = cross_subsidy_iteration_num
 
             # select best cross subsidy option
-            producer_decision_and_response = producer_decision_and_response.loc[selected_cross_subsidy_index]
+            cross_subsidy_options_and_response = cross_subsidy_options_and_response.loc[selected_cross_subsidy_index]
 
-            mcat_converged = (producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat] <=
+            mcat_converged = (cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] <=
                               omega_globals.options.producer_cross_subsidy_price_tolerance) \
                             and \
-                             (producer_decision_and_response['abs_share_delta_%s' % mcat] <=
+                             (cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] <=
                               omega_globals.options.producer_consumer_convergence_tolerance)
 
             cross_subsidy_iteration_num += 1
 
-            # producer_decision_and_response = producer_decision_and_response.copy()
+            # cross_subsidy_options_and_response = cross_subsidy_options_and_response.copy()
 
             if 'multipliers' in omega_globals.options.verbose_console_modules:
-                convergence_error = producer_decision_and_response['abs_share_delta_%s' % mcat]
-                cross_subsidy_pricing_error = producer_decision_and_response['pricing_price_ratio_delta_%s' % mcat]
+                convergence_error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat]
+                cross_subsidy_pricing_error = cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat]
 
                 if mcat_converged:
                     omega_log.logwrite('%s PRODUCER-CONSUMER CONVERGED CE:%f, CSPE:%f' %
@@ -423,21 +434,23 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                        (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
 
             # # update iteration log
-            # iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
+            # iteration_log = iteration_log.append(cross_subsidy_options_and_response, ignore_index=True)
 
             # update_iteration_log(iteration_log, calendar_year, compliance_id, converged, producer_consumer_iteration_num,
             #                      cross_subsidy_iteration_num, None,
-            #                      producer_decision_and_response['abs_share_delta_%s' % mcat])
+            #                      cross_subsidy_options_and_response['abs_share_delta_%s' % mcat])
 
             # # write data to log/console, if desired
             # if 'consumer' in omega_globals.options.verbose_console_modules:
-            #     logwrite_shares_and_costs(calendar_year, producer_decision_and_response['abs_share_delta_%s' % mcat],
-            #                               producer_decision_and_response['pricing_price_ratio_delta'],
-            #                               producer_decision_and_response, producer_consumer_iteration_num,
+            #     logwrite_shares_and_costs(calendar_year, cross_subsidy_options_and_response['abs_share_delta_%s' % mcat],
+            #                               cross_subsidy_options_and_response['pricing_price_ratio_delta'],
+            #                               cross_subsidy_options_and_response, producer_consumer_iteration_num,
             #                               cross_subsidy_iteration_num)
             #
 
             continue_search = continue_search and not mcat_converged
+
+    producer_decision_and_response = producer_decision.append(cross_subsidy_options_and_response)
 
     cross_subsidy_iteration_num = 0
 
@@ -592,7 +605,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
     first_pass = not all([mc in producer_decision_and_response for mc in multiplier_columns])
 
     if first_pass and producer_decision_and_response.empty:
-        price_options_df = producer_decision
+        price_options_df = pd.DataFrame()
     else:
         price_options_df = producer_decision_and_response.to_frame().transpose()
         # drop multiplier columns to prevent duplicates during cartesian product:
@@ -620,7 +633,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
         price_options_df = cartesian_prod(price_options_df, pd.DataFrame(multiplier_range, columns=[mcc]))
 
         price_options_df['average_cross_subsidized_price_%s' % mc] = \
-            price_options_df['average_new_vehicle_mfr_cost_%s' % mc] * price_options_df[mcc]
+            producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * price_options_df[mcc]
 
         price_modification = PriceModifications.get_price_modification(calendar_year, mc)
 
