@@ -274,8 +274,10 @@ def run_producer_consumer():
         if (omega_globals.options.log_consumer_iteration_years == 'all') or \
                 (calendar_year in omega_globals.options.log_consumer_iteration_years)\
                 or (calendar_year == analysis_end_year-1):
-            iteration_log.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name +
-                                 '_producer_consumer_iteration_log.csv', index=False)
+            iteration_log.set_index('calendar_year', inplace=True)
+            iteration_log.to_csv(
+                omega_globals.options.output_folder + omega_globals.options.session_unique_name +
+                '_producer_consumer_iteration_log.csv', columns=sorted(iteration_log.columns))
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
                                                        omega_globals.options.session_unique_name +
@@ -357,12 +359,13 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
                                                      producer_decision['average_new_vehicle_mfr_generalized_cost_initial'],
                                                      update_context_new_vehicle_generalized_cost=True)
 
-    cross_subsidy_iteration_num = 0
     producer_decision_and_response = pd.DataFrame()
 
     producer_decision = producer_decision.to_frame().transpose()
 
     for mcat in ['non_hauling', 'hauling']:
+        cross_subsidy_iteration_num = 0
+
         cross_subsidy_pair = ['%s.%s' % (mcat, mc) for mc in ['ICE', 'BEV']]
         multiplier_columns = ['cost_multiplier_%s' % mc for mc in cross_subsidy_pair]
 
@@ -388,10 +391,12 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
             # select best score
             selected_cross_subsidy_index = producer_decision_and_response['pricing_score'].idxmin()
+
+            # note selected option
             producer_decision_and_response['selected_cross_subsidy_option'] = 0
             producer_decision_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
 
-            producer_decision_and_response['cross_subsidy_iteration_num'] = cross_subsidy_iteration_num
+            producer_decision_and_response['cross_subsidy_iteration_num_%s' % mcat] = cross_subsidy_iteration_num
 
             # select best cross subsidy option
             producer_decision_and_response = producer_decision_and_response.loc[selected_cross_subsidy_index]
@@ -433,6 +438,8 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             #
 
             continue_search = continue_search and not mcat_converged
+
+    cross_subsidy_iteration_num = 0
 
     calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_market_classes,
                                          producer_decision_and_response)
