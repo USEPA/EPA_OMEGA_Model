@@ -457,7 +457,7 @@ class CompositeVehicle(OMEGABase):
 
         # calc weighted values
         for wv in self.weighted_values:
-            self.__setattr__(wv, weighted_value(self.vehicle_list, weight_by, wv))
+            self.__setattr__(wv, weighted_value(self.vehicle_list, self.weight_by, wv))
 
         self.total_weight = 0
         self.initial_registered_count = 0

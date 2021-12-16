@@ -136,7 +136,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         for pass_num in [0, 1]:
             for market_class_id in child_market_classes:
                 if pass_num == 0:
-                    fuel_cost = market_class_data['average_fuel_price_%s' % market_class_id]
+                    fuel_cost = market_class_data['average_retail_fuel_price_dollars_per_unit_%s' % market_class_id]
 
                     gcam_data_cy = SalesShare.get_gcam_params(calendar_year, market_class_id)
 
@@ -149,8 +149,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
                     total_capital_costs = market_class_data[
                         'average_modified_cross_subsidized_price_%s' % market_class_id]
-                    average_co2e_gpmi = market_class_data['average_co2e_gpmi_%s' % market_class_id]
-                    average_kwh_pmi = market_class_data['average_kwh_pmi_%s' % market_class_id]
+                    average_co2e_gpmi = market_class_data['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
+                    average_kwh_pmi = market_class_data['average_onroad_direct_kwh_pmi_%s' % market_class_id]
 
                     carbon_intensity_gasoline = OnroadFuel.get_fuel_attribute(calendar_year, 'pump gasoline',
                                                                               'direct_co2e_grams_per_unit')
@@ -323,9 +323,9 @@ if __name__ == '__main__':
             mcd = pd.DataFrame()
             for mc in omega_globals.options.MarketClass.market_classes:
                 mcd['average_modified_cross_subsidized_price_%s' % mc] = [35000, 25000]
-                mcd['average_kwh_pmi_%s' % mc] = [0, 0]
-                mcd['average_co2e_gpmi_%s' % mc] = [125, 150]
-                mcd['average_fuel_price_%s' % mc] = [2.75, 3.25]
+                mcd['average_onroad_direct_kwh_pmi_%s' % mc] = [0, 0]
+                mcd['average_onroad_direct_co2e_gpmi_%s' % mc] = [125, 150]
+                mcd['average_retail_fuel_price_dollars_per_unit_%s' % mc] = [2.75, 3.25]
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 

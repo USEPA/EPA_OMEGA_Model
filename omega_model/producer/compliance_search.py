@@ -302,8 +302,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                                                              candidate_production_decisions, share_range,
                                                              producer_decision_and_response)
 
-        production_options = create_production_options(composite_vehicles, tech_and_share_sweeps,
-                                                       context_based_total_sales)
+        production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
+                                                                   context_based_total_sales)
 
         # insert code to cull production options based on policy here #
 
@@ -486,7 +486,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
     return composite_vehicles, market_class_tree, context_based_total_sales
 
 
-def finalize_production(calendar_year, compliance_id, composite_vehicles, selected_production_decision):
+def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles, producer_decision):
     """
     Finalize vehicle production at the conclusion of the compliance search and producer-consumer market share
     iteration.  Source ``Vehicle`` objects from the composite vehicles are converted to ``VehicleFinal`` objects
@@ -495,8 +495,8 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
     Args:
         calendar_year (int): the year of the compliance search
         compliance_id (str): manufacturer name, or 'consolidated_OEM'
-        composite_vehicles (list): list of ``CompositeVehicle`` objects
-        selected_production_decision (Series): the production decision as a result of the compliance search
+        candidate_mfr_composite_vehicles (list): list of ``CompositeVehicle`` objects
+        producer_decision (Series): the production decision as a result of the compliance search
 
     Returns:
         Nothing, updates the OMEGA database with the finalized vehicles
@@ -508,15 +508,15 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
     manufacturer_new_vehicles = []
 
     # pull final vehicles from composite vehicles
-    for cv in composite_vehicles:
-        # update sales, which may have changed due to consumer response and iteration
-        cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
+    decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision)
+
+    for cv in candidate_mfr_composite_vehicles:
         if ((omega_globals.options.log_producer_iteration_years == 'all') or
             (calendar_year in omega_globals.options.log_producer_iteration_years)) and \
                 'producer' in omega_globals.options.verbose_console_modules:
             cv.cost_curve.to_csv(omega_globals.options.output_folder +
                                  '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
-        cv.decompose()  # propagate sales to source vehicles
+
         for veh in cv.vehicle_list:
             # if 'producer' in o2.options.verbose_console:
             #     veh.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (veh.model_year, veh.vehicle_id))
@@ -536,12 +536,19 @@ def finalize_production(calendar_year, compliance_id, composite_vehicles, select
                                         target_co2e_Mg=target_co2e_Mg,
                                         calendar_year_cert_co2e_Mg=cert_co2e_Mg,
                                         manufacturer_vehicle_cost_dollars=
-                                            selected_production_decision['total_cost_dollars'],
+                                            producer_decision['total_cost_dollars'],
                                         )
     omega_globals.session.flush()
 
 
-def create_production_options(composite_vehicles, tech_and_share_combinations, total_sales):
+def decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision):
+    for cv in candidate_mfr_composite_vehicles:
+        # update sales, which may have changed due to consumer response and iteration
+        cv.initial_registered_count = producer_decision['veh_%s_sales' % cv.vehicle_id]
+        cv.decompose()  # propagate sales to source vehicles and interpolate cost curve data
+
+
+def create_production_options_from_shares(composite_vehicles, tech_and_share_combinations, total_sales):
     """
     Create a set of production options, including compliance outcomes, based on the given tech and share combinations.
 

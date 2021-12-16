@@ -165,11 +165,11 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.verbose_console_modules = ['db', 'consumer_', 'multipliers_', 'final_multipliers_']  # list of modules to allow verbose console output, or empty to disable
-            self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.verbose_console_modules = ['db', 'producer_', 'consumer_', 'multipliers_', 'final_multipliers_']  # list of modules to allow verbose console output, or empty to disable
+            self.log_producer_iteration_years = [2020]  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_vehicles = ['ICE Large Van truck minivan 4WD'] # list of vehicles to log in producer_iteration_years
+            self.log_vehicles = [] # ['ICE Large Van truck minivan 4WD'] # list of vehicles to log in producer_iteration_years
 
             # dynamic modules / classes
             self.RegulatoryClasses = None
