@@ -377,14 +377,15 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             # select best score
             selected_cross_subsidy_index = cross_subsidy_options_and_response['pricing_score'].idxmin()
 
-            # # note selected option
-            # cross_subsidy_options_and_response['selected_cross_subsidy_option'] = 0
-            # cross_subsidy_options_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
+            # note selected option
+            cross_subsidy_options_and_response['selected_cross_subsidy_option'] = 0
+            cross_subsidy_options_and_response.loc[selected_cross_subsidy_index, 'selected_cross_subsidy_option'] = 1
 
             cross_subsidy_options_and_response['cross_subsidy_iteration_num_%s' % mcat] = \
                 mcat_cross_subsidy_iteration_num
 
-            # TODO: add option to save cross_subsidy_options_and_response here, with all possible results
+            if 'cross_subsidy_search' in omega_globals.options.verbose_log_modules:
+                iteration_log = iteration_log.append(cross_subsidy_options_and_response, ignore_index=True)
 
             # select best cross subsidy option
             cross_subsidy_options_and_response = \
@@ -398,16 +399,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
             mcat_cross_subsidy_iteration_num += 1
 
-            if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
-                convergence_error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat]
-                cross_subsidy_pricing_error = cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat]
-
-                if mcat_converged:
-                    omega_log.logwrite('%s PRODUCER-CONSUMER CONVERGED CE:%f, CSPE:%f' %
-                                       (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
-                else:
-                    omega_log.logwrite('** %s PRODUCER-CONSUMER CONVERGENCE FAIL CE:%f, CSPE:%f **' %
-                                       (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
+            update_market_category_console_log(cross_subsidy_options_and_response, mcat, mcat_converged)
 
             # update iteration log
             update_iteration_log(cross_subsidy_options_and_response, calendar_year, compliance_id, mcat_converged,
@@ -417,6 +409,9 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             iteration_log = iteration_log.append(cross_subsidy_options_and_response, ignore_index=True)
 
             continue_search = continue_search and not mcat_converged
+
+        if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
+            omega_log.logwrite('', echo_console=True)
 
     duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
     producer_decision = producer_decision.drop(duplicate_columns)
@@ -454,11 +449,44 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
 
+    update_market_classes_console_log(calendar_year, convergence_error, cross_subsidy_pricing_error, mcat_converged,
+                                      producer_consumer_iteration_num, producer_decision_and_response)
+
+    return best_producer_decision_and_response, iteration_log, producer_decision_and_response
+
+
+def update_market_category_console_log(cross_subsidy_options_and_response, mcat, mcat_converged):
+    if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
+        convergence_error = cross_subsidy_options_and_response['abs_share_delta_%s' % mcat]
+        cross_subsidy_pricing_error = cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat]
+
+        if mcat_converged:
+            omega_log.logwrite('%s PRODUCER-CONSUMER CONVERGED CE:%f, CSPE:%f' %
+                               (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
+        else:
+            omega_log.logwrite('** %s PRODUCER-CONSUMER CONVERGENCE FAIL CE:%f, CSPE:%f **' %
+                               (mcat, convergence_error, cross_subsidy_pricing_error), echo_console=True)
+
+
+def update_market_classes_console_log(calendar_year, convergence_error, cross_subsidy_pricing_error, mcat_converged,
+                                      producer_consumer_iteration_num, producer_decision_and_response):
+    """
+
+    Args:
+        calendar_year:
+        convergence_error:
+        cross_subsidy_pricing_error:
+        mcat_converged:
+        producer_consumer_iteration_num:
+        producer_decision_and_response:
+
+    Returns:
+
+    """
     if 'p-c_shares_and_costs' in omega_globals.options.verbose_console_modules:
         logwrite_shares_and_costs(calendar_year, convergence_error, cross_subsidy_pricing_error,
-                              producer_decision_and_response, producer_consumer_iteration_num,
-                              producer_consumer_iteration_num)
-
+                                  producer_decision_and_response, producer_consumer_iteration_num,
+                                  producer_consumer_iteration_num)
     multiplier_columns = ['cost_multiplier_%s' % mc for mc in omega_globals.options.MarketClass.market_classes]
 
     if 'cross_subsidy_multipliers' in omega_globals.options.verbose_console_modules:
@@ -479,10 +507,17 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
             omega_log.logwrite('** PRODUCER-CONSUMER CONVERGENCE FAIL CE:%f, CSPE:%f **' %
                                (convergence_error, cross_subsidy_pricing_error), echo_console=True)
 
-    return best_producer_decision_and_response, iteration_log, producer_decision_and_response
-
 
 def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes):
+    """
+
+    Args:
+        producer_decision:
+        producer_market_classes:
+
+    Returns:
+
+    """
     average_new_vehicle_mfr_generalized_cost = 0
     for mc in producer_market_classes:
         average_new_vehicle_mfr_generalized_cost += \

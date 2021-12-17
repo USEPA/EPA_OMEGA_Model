@@ -166,12 +166,13 @@ try:
             self.flat_context_year = 2021
 
             # list of modules to allow verbose log files, or empty to disable:
-            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cv_cost_curves_', 'v_cost_curves_']
+            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
+                                        'cv_cost_curves_', 'v_cost_curves_']
 
             # list of modules to allow verbose console output, or empty to disable
             self.verbose_console_modules = ['producer_compliance_search_',
                                             'p-c_shares_and_costs_', 'p-c_max_iterations_',
-                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
+                                            'cross_subsidy_search', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
             self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
