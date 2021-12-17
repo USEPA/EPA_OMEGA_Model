@@ -215,13 +215,6 @@ def run_producer_consumer():
                 converged, convergence_error, cross_subsidy_pricing_error = \
                     detect_convergence(producer_decision_and_response, producer_market_classes)
 
-                # update_iteration_log(producer_decision_and_response, calendar_year, compliance_id, converged,
-                #                      producer_consumer_iteration_num, producer_compliant, convergence_error)
-                #
-                # producer_decision_and_response['cross_subsidy_iteration_num'] = -1  # tag final result
-                #
-                # iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
-
                 # decide whether to continue iterating or not
                 iterate_producer_consumer = omega_globals.options.iterate_producer_consumer \
                                             and producer_consumer_iteration_num < omega_globals.options.producer_consumer_max_iterations \
@@ -281,6 +274,7 @@ def calc_cross_subsidy_metrics(producer_decision, cross_subsidy_options_and_resp
     cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
     cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] = 0
     cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] = 0
+
     for mc in cross_subsidy_pair:
         cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
@@ -298,6 +292,7 @@ def calc_cross_subsidy_metrics(producer_decision, cross_subsidy_options_and_resp
 
         cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] += \
             0.5 * cross_subsidy_options_and_response['abs_share_delta_%s' % mc]
+
     cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] = \
         abs(1 - cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] /
             cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
