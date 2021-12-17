@@ -325,7 +325,7 @@ applied.
     List of year(s) to log producer decision and consumer response data (costs, market shares and tech decision).
     Default value is ``[]``
 
-:Log Producer Iteration Years *(['all'] or [int(s)])*:
+:Log Producer Compliance Search Years *(['all'] or [int(s)])*:
     List of year(s) to log detailed producer iteration data, including composite vehicle cost curves and compliance
     search data (cost clouds).  Default value is ``[]``
 
@@ -371,8 +371,10 @@ applied.
     If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
 
 :Verbose Console Modules *([strs])*:
-    List of modules to activate detailed console output, may contain ``'producer'`` or ``'consumer'`` or both.
-    Default value is ``[]``
+    List of modules to activate detailed console output, may contain ``'producer_compliance_search'``,
+                                            ``'p-c_shares_and_costs'``, ``'p-c_max_iterations'``,
+                                            ``'cross_subsidy_search'``, ``'cross_subsidy_multipliers'``,
+                                            ``'cross_subsidy_convergence'``. Default value is ``[]``
 
 :Verbose Output *(TRUE or FALSE, ...)*:
     Enables detailed console and logfile output if ``TRUE``
@@ -981,9 +983,9 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Log Producer Decision and Response Years',
                                 self.settings.log_producer_decision_and_response_years)
 
-        self.settings.log_producer_iteration_years = \
+        self.settings.log_producer_compliance_search_years = \
             self.read_parameter('Log Producer Iteration Years',
-                                self.settings.log_producer_iteration_years)
+                                self.settings.log_producer_compliance_search_years)
 
         self.settings.producer_num_market_share_options = \
             int(self.read_parameter('Num Market Share Options',

@@ -165,11 +165,21 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.verbose_console_modules = ['db', 'producer_', 'consumer_', 'multipliers_', 'final_multipliers_']  # list of modules to allow verbose console output, or empty to disable
-            self.log_producer_iteration_years = [2020]  # = 'all' or list of years to log, empty list to disable logging
+            # list of modules to allow verbose log files, or empty to disable:
+            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cv_cost_curves_', 'v_cost_curves_']
+
+            # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console_modules = ['producer_compliance_search_',
+                                            'p-c_shares_and_costs_', 'p-c_max_iterations_',
+                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
+                                            'cross_subsidy_convergence_']
+
+            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_vehicles = [] # ['ICE Large Van truck minivan 4WD'] # list of vehicles to log in producer_iteration_years
+
+            # list of vehicles to plot in log_producer_compliance_search_years:
+            self.plot_and_log_vehicles = [] # ['ICE Large Van truck minivan 4WD']
 
             # dynamic modules / classes
             self.RegulatoryClasses = None

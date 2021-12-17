@@ -327,7 +327,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
             best_candidate_production_decision = \
                 candidate_production_decisions.loc[candidate_production_decisions['strategic_compliance_error'].idxmin()]
 
-        if 'producer' in omega_globals.options.verbose_console_modules:
+        if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
                                               search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
                                     best_candidate_production_decision['strategic_compliance_ratio']), echo_console=True)
@@ -338,7 +338,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
                            omega_globals.options.producer_compliance_search_tolerance) and \
                           (share_range > omega_globals.options.producer_compliance_search_min_share_range)
 
-    if 'producer' in omega_globals.options.verbose_console_modules:
+    if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
         omega_log.logwrite('PRODUCER FINAL COMPLIANCE DELTA %f' % abs(1 - best_candidate_production_decision['strategic_compliance_ratio']),
                            echo_console=True)
 
@@ -359,7 +359,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     # log the final iteration, as opposed to the winning iteration:
     selected_production_decision['producer_search_iteration'] = search_iteration - 1
 
-    if 'producer' in omega_globals.options.verbose_console_modules:
+    if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
         for mc in omega_globals.options.MarketClass.market_classes:
             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' %
                                (selected_production_decision['producer_abs_share_frac_%s' % mc]), echo_console=True)
@@ -511,15 +511,16 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
     decompose_candidate_vehicles(calendar_year, candidate_mfr_composite_vehicles, producer_decision)
 
     for cv in candidate_mfr_composite_vehicles:
-        if ((omega_globals.options.log_producer_iteration_years == 'all') or
-            (calendar_year in omega_globals.options.log_producer_iteration_years)) and \
-                'producer' in omega_globals.options.verbose_console_modules:
+        if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
+            (calendar_year in omega_globals.options.log_producer_compliance_search_years)) and \
+                'cv_cost_curves' in omega_globals.options.verbose_log_modules:
             cv.cost_curve.to_csv(omega_globals.options.output_folder +
                                  '%s_%s_cost_curve.csv' % (cv.model_year, cv.vehicle_id))
 
         for veh in cv.vehicle_list:
-            # if 'producer' in o2.options.verbose_console:
-            #     veh.cost_cloud.to_csv(o2.options.output_folder + '%s_%s_cost_cloud.csv' % (veh.model_year, veh.vehicle_id))
+            if 'v_cost_curves' in omega_globals.options.verbose_log_modules:
+                veh.cost_curve.to_csv(omega_globals.options.output_folder + '%s_%s_cost_curve.csv' %
+                                      (veh.model_year, veh.vehicle_id))
             veh_final = VehicleFinal()
             transfer_vehicle_data(veh, veh_final)
             manufacturer_new_vehicles.append(veh_final)
@@ -792,9 +793,9 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     candidate_production_decisions['selected_production_option'] = candidate_production_decisions.index
 
-    if (omega_globals.options.log_producer_iteration_years == 'all') or \
-            (calendar_year in omega_globals.options.log_producer_iteration_years):
-        if 'producer' in omega_globals.options.verbose_console_modules:
+    if (omega_globals.options.log_producer_compliance_search_years == 'all') or \
+            (calendar_year in omega_globals.options.log_producer_compliance_search_years):
+        if 'producer_compliance_search' in omega_globals.options.verbose_log_modules:
             # log (some or all) production options cloud and tag selected points
             production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True
             if omega_globals.options.slice_tech_combo_cloud_tables:
