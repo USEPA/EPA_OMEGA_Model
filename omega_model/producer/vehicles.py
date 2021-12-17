@@ -473,9 +473,9 @@ class CompositeVehicle(OMEGABase):
                 v.composite_vehicle_share_frac = 0
 
         if calc_composite_cost_curve:
-            plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or
-                              (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
-                              any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
+            plot_cost_curve = ((omega_globals.options.log_producer_compliance_search_years == 'all') or
+                              (self.model_year in omega_globals.options.log_producer_compliance_search_years)) and \
+                              any([v.name in omega_globals.options.plot_and_log_vehicles for v in self.vehicle_list])
             self.cost_curve = self.calc_composite_cost_curve(plot=plot_cost_curve)
 
         self.tech_option_iteration_num = 0
@@ -518,9 +518,9 @@ class CompositeVehicle(OMEGABase):
             ``producer.vehicles.DecompositionAttributes``
 
         """
-        plot_cost_curve = ((omega_globals.options.log_producer_iteration_years == 'all') or
-                           (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
-            any([v.name in omega_globals.options.log_vehicles for v in self.vehicle_list])
+        plot_cost_curve = ((omega_globals.options.log_producer_compliance_search_years == 'all') or
+                           (self.model_year in omega_globals.options.log_producer_compliance_search_years)) and \
+            any([v.name in omega_globals.options.plot_and_log_vehicles for v in self.vehicle_list])
 
         if plot_cost_curve:
             from common.omega_plot import figure, label_xyt
@@ -538,7 +538,7 @@ class CompositeVehicle(OMEGABase):
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
 
             if plot_cost_curve:
-                if v.name in omega_globals.options.log_vehicles:
+                if v.name in omega_globals.options.plot_and_log_vehicles:
                     ax1.plot(v.cost_curve['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
                              v.cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
                              color='black',
@@ -643,7 +643,7 @@ class CompositeVehicle(OMEGABase):
             composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
 
             if plot:
-                if v.name in omega_globals.options.log_vehicles:
+                if v.name in omega_globals.options.plot_and_log_vehicles:
                     ax1.plot(vehicle_frontier['veh_%s_cert_co2e_grams_per_mile' % v.vehicle_id],
                              vehicle_frontier['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % v.vehicle_id], 's-',
                              color='black',
@@ -1037,9 +1037,9 @@ class Vehicle(OMEGABase):
         # drop frontier factor
         cost_curve = cost_curve.drop(columns=['frontier_factor'])
 
-        if ((omega_globals.options.log_producer_iteration_years == 'all') or
-            (self.model_year in omega_globals.options.log_producer_iteration_years)) and \
-                (self.name in omega_globals.options.log_vehicles):
+        if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
+            (self.model_year in omega_globals.options.log_producer_compliance_search_years)) and \
+                (self.name in omega_globals.options.plot_and_log_vehicles):
 
             logfile_name = '%s%d_%s_cost_cloud.csv' % (omega_globals.options.output_folder, self.model_year, self.name)
             cost_cloud['frontier'] = False

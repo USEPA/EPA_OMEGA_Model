@@ -1214,8 +1214,8 @@ def plot_iteration(iteration_log, compliance_id):
                 omega_globals.options.output_folder, omega_globals.options.session_unique_name, compliance_id,
                 mc, iteration_label))
 
-        first_logged = iteration_log.drop_duplicates('calendar_year', keep='first')
-        last_logged = iteration_log.drop_duplicates('calendar_year', keep='last')
+        first_logged = iteration_log.loc[iteration_log['cross_subsidy_iteration_num'] == 0]
+        last_logged = iteration_log.loc[iteration_log['cross_subsidy_iteration_num'] == -1]
 
         plt.figure()
         if iteration == -1:
