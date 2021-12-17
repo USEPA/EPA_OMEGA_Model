@@ -370,6 +370,10 @@ applied.
 :Slice Tech Combo Tables *(TRUE or FALSE)*:
     If ``TRUE`` then partial clouds are saved as part of debugging the producer search convergence
 
+:Verbose Log Modules *([strs])*:
+    List of modules to activate detailed logfile output, may contain ``'database'``, ``'producer_compliance_search'``,
+        ``'cv_cost_curves'``, ``'v_cost_curves'``. Default value is ``[]``
+
 :Verbose Console Modules *([strs])*:
     List of modules to activate detailed console output, may contain ``'producer_compliance_search'``,
                                             ``'p-c_shares_and_costs'``, ``'p-c_max_iterations'``,
@@ -1030,6 +1034,10 @@ class OMEGASessionObject(OMEGABase):
         self.settings.slice_tech_combo_cloud_tables = validate_predefined_input(
             self.read_parameter('Slice Tech Combo Tables', self.settings.slice_tech_combo_cloud_tables),
             true_false_dict)
+
+        self.settings.verbose_log_modules = \
+            self.read_parameter('Verbose Log Modules',
+                                self.settings.verbose_log_modules)
 
         self.settings.verbose_console_modules = \
             self.read_parameter('Verbose Console Modules',
