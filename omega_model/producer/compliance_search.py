@@ -18,7 +18,7 @@ import consumer
 _cache = dict()
 
 
-def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
+def create_tech_and_share_sweeps(calendar_year, market_class_tree, candidate_production_decisions, share_range,
                                  consumer_response, node_name='', verbose=False):
     """
     Create tech and share sweeps is responsible for combining tech (CO2e g/mi levels) and market share options to
@@ -48,7 +48,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
 
     Args:
         calendar_year (int): the year in which the compliance calculations take place
-        market_class_dict (dict): a dict of CompositeVehicle object lists hiearchically grouped by market categories
+        market_class_tree (dict): a dict of CompositeVehicle object lists hiearchically grouped by market categories
             into market classes
         candidate_production_decisions (None, DataFrame): zero or 1 or 2 candidate production decisions chosen from the
             results of the previous search iteration
@@ -66,22 +66,22 @@ def create_tech_and_share_sweeps(calendar_year, market_class_dict, candidate_pro
     """
     child_df_list = []
 
-    children = list(market_class_dict)
+    children = list(market_class_tree)
 
     # Generate tech options (CO2e g/mi levels)
-    for k in market_class_dict:
+    for k in market_class_tree:
         if verbose:
             print('processing ' + k)
-        if type(market_class_dict[k]) is dict:
+        if type(market_class_tree[k]) is dict:
             # process subtree
             child_df_list.append(
-                create_tech_and_share_sweeps(calendar_year, market_class_dict[k],
+                create_tech_and_share_sweeps(calendar_year, market_class_tree[k],
                                              candidate_production_decisions, share_range,
                                              consumer_response,
                                              node_name=k))
         else:
             # process leaf, loop over composite vehicles
-            for cv in market_class_dict[k]:
+            for cv in market_class_tree[k]:
                 df = pd.DataFrame()
 
                 incremented = False
