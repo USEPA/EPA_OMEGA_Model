@@ -131,8 +131,8 @@ class SalesShare(OMEGABase, SalesShareBase):
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
             calendar_year (int): calendar year to calculate market shares in
-            parent_market_class (str):
-            child_market_classes ([strs]):
+            parent_market_class (str): e.g. 'non_hauling'
+            child_market_classes ([strs]): e.g. ['non_hauling.BEV', 'non_hauling.ICE']
 
         Returns:
             A copy of ``market_class_data`` with demanded ICE/BEV share columns by market class, e.g.
