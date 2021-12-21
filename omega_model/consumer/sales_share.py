@@ -85,6 +85,19 @@ class SalesShare(OMEGABase, SalesShareBase):
     _data = dict()
 
     @staticmethod
+    def gcam_supports_market_class(market_class_id):
+        """
+        Determine if gcam supports the given market class ID.
+
+        Args:
+            market_class_id (str): market class id, e.g. 'hauling.ICE'
+
+        Returns:
+            ``True`` if gcam has parameters for the given market class ID
+        """
+        return market_class_id in SalesShare._data
+
+    @staticmethod
     def get_gcam_params(calendar_year, market_class_id):
         """
         Get GCAM parameters for the given calendar year and market class.
@@ -195,16 +208,18 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_shares(producer_decision, market_class_data, calendar_year, mc_parent, mc_pair):
+    def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.
 
         Args:
+            calendar_year (int): calendar year to calculate market shares in
             producer_decision (Series): selected producer compliance option
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
-            calendar_year (int): calendar year to calculate market shares in
+            mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
+            mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
 
         Returns:
             A copy of ``market_class_data`` with demanded share columns by market class, e.g.
@@ -220,14 +235,16 @@ class SalesShare(OMEGABase, SalesShareBase):
         # which gets them from the context size class projections and the makeup of the base year fleet.
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
+
         market_class_data['consumer_abs_share_frac_hauling'] = \
             producer_decision['producer_abs_share_frac_hauling']
 
         market_class_data['consumer_abs_share_frac_non_hauling'] = \
             producer_decision['producer_abs_share_frac_non_hauling']
 
-        # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
-        market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
+        if all([SalesShare.gcam_supports_market_class(mc) for mc in mc_pair]):
+            # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
+            market_class_data = SalesShare.calc_shares_gcam(producer_decision, market_class_data, calendar_year,
                                                         mc_parent, mc_pair)
 
         return market_class_data
@@ -333,7 +350,8 @@ if __name__ == '__main__':
                 mcd['producer_abs_share_frac_non_hauling'] = [0.8, 0.85]
                 mcd['producer_abs_share_frac_hauling'] = [0.2, 0.15]
 
-            share_demand = SalesShare.calc_shares(mcd, omega_globals.options.analysis_initial_year)
+            share_demand = SalesShare.calc_shares(omega_globals.options.analysis_initial_year, mcd, 'hauling',
+                                                  ['hauling.ICE', 'hauling.BEV'])
 
         else:
             print(init_fail)
