@@ -2,7 +2,7 @@
 
 **Routines to load Implicit Price (IP) deflators.**
 
-Used to discount costs throughout the effects calculations.
+Used to convert monetary inputs to a consistent dollar basis, e.g., in the ``cost_factors_congestion_noise`` module.
 
 ----
 
@@ -11,7 +11,7 @@ Used to discount costs throughout the effects calculations.
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represents the price deflator by start year.
+The data represents the price deflator by calendar year.
 
 File Type
     comma-separated values (CSV)
@@ -19,20 +19,20 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_implicit_price_deflators,input_template_version:,0.21
+       input_template_name:,context_implicit_price_deflators,input_template_version:,0.22
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,price_deflator,,
+        calendar_year,price_deflator,,
         2001,79.79,,
         2002,81.052,,
 
 Data Column Name and Description
 
-:start_year:
-    Start year of the price deflator, applies until the next available start year
+:calendar_year:
+    Calendar year of the price deflator
 
 :price_deflator:
     Implicit price deflator
@@ -65,13 +65,13 @@ class ImplictPriceDeflators(OMEGABase):
             The implicit price deflator for the given calendar year.
 
         """
-        start_years = pd.Series(ImplictPriceDeflators._data.keys())
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max(start_years[start_years <= calendar_year])
+        calendar_years = pd.Series(ImplictPriceDeflators._data.keys())
+        if len(calendar_years[calendar_years <= calendar_year]) > 0:
+            year = max(calendar_years[calendar_years <= calendar_year])
 
             return ImplictPriceDeflators._data[year]['price_deflator']
         else:
-            raise Exception('Missing implicit price deflator for %d or prior' % calendar_year)
+            raise Exception(f'Missing implicit price deflator for {calendar_year} or prior')
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -95,8 +95,8 @@ class ImplictPriceDeflators(OMEGABase):
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'context_implicit_price_deflators'
-        input_template_version = 0.21
-        input_template_columns = {'start_year', 'price_deflator'}
+        input_template_version = 0.22
+        input_template_columns = {'calendar_year', 'price_deflator'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -108,7 +108,7 @@ class ImplictPriceDeflators(OMEGABase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                ImplictPriceDeflators._data = df.set_index('start_year').to_dict(orient='index')
+                ImplictPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')
 
         return template_errors
 

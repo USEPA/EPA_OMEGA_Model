@@ -1,5 +1,5 @@
-input_template_name:,context_cpi_price_deflators,input_template_version:,0.21
-start_year,price_deflator,,
+input_template_name:,context_cpi_price_deflators,input_template_version:,0.22
+calendar_year,price_deflator,,
 2010,218.056,,
 2011,224.939,,
 2012,229.594,,
