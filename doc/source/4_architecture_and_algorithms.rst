@@ -986,3 +986,171 @@ Cost Effects Calculations
 -------------------------
 Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarily, the physical effects
 described above.
+
+ALPHA Package Costs Module
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ALPHA package costs module generates the simulated_vehicles.csv file used as an input to OMEGA. This section describes the calculations done in the module to generated the simulated_vehicles.csv
+file. The module uses, as an input, the alpha_package_costs_module_inputs.xlsx file, described in SECTION 7.3.1.1.2 (insert a code pointer to this) and individual ALPHA files which provide CO2 g/mi
+results over EPA test cycles for each of six ALPHA classes of vehicles and hundreds of technology packages applied to each.
+
+In general, individual technology costs are read from the alpha_package_costs_module_inputs file and already include markups to cover indirect costs. The markups are controllable via user input with the
+file on the inputs_workbook sheet (ICE powertrain and all vehicle roadload markups), the pev_metrics sheet (plug-in electric vehicle powertrain markups) and the hev_metrics sheet (HEV powertrain markups).
+The inputs_code sheet contains learning rate inputs for various technologies. These learning rates are applied year-over-year to technologies with the category beginning with the start_year setting on
+the inputs_code sheet. Every cost within the alpha_package_costs_module_inputs file has an associated dollar basis to specify the dollar valuation of the given cost (i.e., is the cost in 2016 dollars, 2020 dollars, etc.).
+On the inputs_code sheet, the user can specify the dollar basis for the module's output file. Running the module generates a simulated_vehicles.csv file, along with other output files, will all cost values
+converted to the dollar_basis specified on the inputs_code sheet. When the simulated_vehicles.csv file is subsequently read into OMEGA, the simulated_vehicles.csv costs will again be converted to be
+consistent with the dollar_basis specified for the given OMEGA run. So the alpha_package_costs_module_inputs file dollar_basis (set via the dollar_basis_for_output_file setting) does not need to be
+consistent with the desired OMEGA-run dollar basis value.
+
+ICE Powertrain Costs
+--------------------
+ICE powertrain costs consist of engine-related costs, the transmission, accessories, and air conditioning. In the case of hybrid electric vehicles (HEV),
+the HEV-related costs (battery and non-battery components) are also included.
+
+ICE Engine-Related Costs
+++++++++++++++++++++++++
+To estimate engine-related costs, the module starts first with the engine name which is read directly from the package description in the ALPHA input file. Those engine names and the pertinent technologies on
+those engines are shown in :numref:`engines_and_techs`.
+
+.. _engines_and_techs:
+.. csv-table:: Engines and Associated Technologies
+    :widths: auto
+    :header-rows: 1
+
+    Engine Name, Technologies
+    engine_2013_GM_Ecotec_LCV_2L5_PFI_Tier3, "PFI"
+    engine_2013_GM_Ecotec_LCV_2L5_Tier3, "DI"
+    engine_2014_GM_EcoTec3_LV3_4L3_Tier2_PFI_no_deac, "PFI"
+    engine_2014_GM_EcoTec3_LV3_4L3_Tier2_no_deac, "DI"
+    engine_2015_Ford_EcoBoost_2L7_Tier2, "TURB11, DI"
+    engine_2013_Ford_EcoBoost_1L6_Tier2, "TURB11, DI"
+    engine_2016_Honda_L15B7_1L5_Tier2, "TURB12, DI, CEGR"
+    engine_2014_Mazda_Skyactiv_US_2L0_Tier2, "DI, ATK2"
+    engine_2016_toyota_TNGA_2L5_paper_image, "DI, ATK2, CEGR"
+    engine_future_EPA_Atkinson_r2_2L5, "DI, ATK2, CEGR"
+
+Where,
+
+* :math:`PFI` is port fuel-injection
+* :math:`DI` is direct fuel injection
+* :math:`TURB` refers to turbocharging while the number represents a level-vintage (i.e., 11=level1, vintage1, 12=level1, vintage2)
+* :math:`CEGR` is cooled EGR
+* :math:`ATK` refers to Atkinson cycle (high compression ratio) while the number refers to a compression level
+
+To calculate engine-related costs, the tool makes use of the input table on the engines worksheet of the alpha_package_costs_module_inputs.xlsx file. That table is shown in :numref:`engine_cost_sheet`.
+
+.. _engine_cost_sheet:
+.. csv-table:: Engine Tech Costs
+    :widths: auto
+    :header-rows: 1
+
+    item,item_cost,dmc,dollar_basis
+    dollars_per_cyl_8,750,500,2019
+    dollars_per_cyl_6,825,550,2019
+    dollars_per_cyl_4,900,600,2019
+    dollars_per_cyl_3,975,650,2019
+    dollars_per_liter,600,400,2019
+    DI_3,366,244,2012
+    DI_4,366,244,2012
+    DI_6,551,368,2012
+    DI_8,663,442,2012
+    TURB11_3,694,463,2012
+    TURB11_4,694,463,2012
+    TURB11_6,1170,780,2012
+    TURB11_8,1170,780,2012
+    TURB12_3,694,463,2012
+    TURB12_4,694,463,2012
+    TURB12_6,1170,780,2012
+    TURB12_8,1170,780,2012
+    TURB21_3,1110,740,2012
+    TURB21_4,1110,740,2012
+    TURB21_6,1892,1261,2012
+    TURB21_8,1892,1261,2012
+    CEGR,170,114,2012
+    DeacPD_3,114,76,2006
+    DeacPD_4,114,76,2006
+    DeacPD_6,204,136,2006
+    DeacPD_8,228,152,2006
+    DeacFC,231,154,2017
+    ATK2_3,129,86,2010
+    ATK2_4,129,86,2010
+    ATK2_6,194,129,2010
+    ATK2_8,306,204,2010
+
+
+The tool determines the displacement of the engine and the number of cylinders from the package description in the ALPHA input file. Engine displacement and cylinder count costs are calculated as
+shown in equation :math:numref:`cyl_count_and_displ_cost`.
+
+.. Math::
+    :label: cyl_count_and_displ_cost
+
+    EngineCost_{Displacement, Cylinders} = Displacement \times \frac{$} {liter} + CylinderCount \times \frac{$} {cylinder}
+
+Where,
+
+* :math:`Displacement` comes from the package description in the ALPHA input file
+* :math:`CylinderCount` comes from the package description in the ALPHA input file
+* :math:`\frac{$} {liter}` comes from :numref:`engine_cost_sheet`
+* :math:`\frac{$} {cylinder}` comes from :numref:`engine_cost_sheet`
+
+If the engine is turbocharged (see :numref:`engines_and_techs`), the costs associated with turbocharging are calculated as shown in equation :math:numref:`turbo_cost`.
+
+.. Math::
+    :label: turbo_cost
+
+    & TurboCost \\
+    & = \small EngineCost_{Displacement, Cylinders} \times (BoostMultiplier - 1) + TurboCost_{Level-Vintage, CylinderCount}
+
+Where,
+
+* :math:`EngineCost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
+* :math:`BoostMultiplier` is from the inputs_code worksheet of the alpha_package_costs_module_inputs.xlsx file
+* :math:`Level-Vintage` associated with the turbo is from :numref:`engines_and_techs`
+* :math:`CylinderCount` comes from the package description in the ALPHA input file
+* :math:`TurboCost_{Level-Vintage, CylinderCount}` comes from :numref:`engine_cost_sheet`
+
+If the engine is equipped with cooled EGR (see :numref:`engines_and_techs`), the costs associated with that technology are read directly from :numref:`engine_cost_sheet`.
+
+If the engine is equipped with direct fuel-injection (see :numref:`engines_and_techs`), the costs associated with that technology are read directly from :numref:`engine_cost_sheet` and making use of the
+cylinder count data read from the package description in the ALPHA input file.
+
+The presence of cylinder deactivation is read directly from the package description of the ALHPA input file where "DEAC D" refers to <DEFINE DeacPD> (DeacPD) and "DEAC C" refers to <Define DeacFC> (DeacFC).
+The cylinder count data is read directly from the package description of the ALPHA input file.
+
+The presence of Atkinson cycle technology is taken from :numref:`engines_and_techs` and the cylinder count data is read directly from the package description of the ALPHA input file.
+
+Stop-start technology is also included in the engine-related costs and makes use of the start_stop worksheet of the alpha_package_costs_module_inputs. That table is shown in :numref:`start_stop_sheet`.
+
+.. _start_stop_sheet:
+.. csv-table:: Start-Stop System Costs
+    :widths: auto
+    :header-rows: 1
+
+    index,curb_weight_min,curb_weight_max,item_cost,dmc,dollar_basis
+    0,0,3800,481.5,321,2015
+    1,3800.1,4800,546,364,2015
+    2,4800.1,8500,600,400,2015
+
+The tool determines curb weight using the test weight information from the package description in the ALPHA input file, less 300 pounds (test weight is defined as curb weight plus 300 pounds). Based on
+the curb weight, the start-stop system costs are added based on the values in :numref:`start_stop_sheet`.
+
+The engine-related costs can then be summed as shown in :math:numref:`engine_costs`.
+
+.. Math::
+    :label: engine_costs
+
+    & EngineCosts \\
+    & = \small EngineCost_{Displacement, Cylinders} + TurboCost + CEGRCost \\
+    & + \small FuelSystemCost + DeacCost + ATKCost + StartStopCost
+
+Where,
+
+* :math:`EngineCost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
+* :math:`TurboCost` is from equation :math:numref:`turbo_cost` (note: this might be $0)
+* :math:`CEGRCost` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`FuelSystemCost` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`DeacCost` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`ATKCost` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`StartStopCost` is from :numref:`start_stop_sheet` (note: this might be $0)
+

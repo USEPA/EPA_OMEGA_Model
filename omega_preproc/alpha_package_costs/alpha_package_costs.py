@@ -623,8 +623,9 @@ class Engine:
     The Engine class defines specific technologies on each ALPHA engine benchmarked by EPA and calculates the cost of the engine.
 
     """
-    def __init__(self, key):
-        self.engine_key, self.weight_key, self.fuel_key = PackageCost(key).get_object_attributes(['engine_key', 'weight_key', 'fuel_key'])
+    def __init__(self, key=None):
+        if key:
+            self.engine_key, self.weight_key, self.fuel_key = PackageCost(key).get_object_attributes(['engine_key', 'weight_key', 'fuel_key'])
         self._engines = {'engine_2013_GM_Ecotec_LCV_2L5_PFI_Tier3': {'turb': '',
                                                                      'finj': 'PFI',
                                                                      'atk': '',
@@ -682,14 +683,19 @@ class Engine:
                                                                   },
                          }
 
-    def get_engine_techs(self):
+    def get_engine_techs(self, name=None):
         """
 
+        Args:
+            name (string): Optional engine_name, used for the make_hev_from_alpha_ice module.
         Returns:
             The technology cost codes for specific engine technologies.
 
         """
-        engine_name = self.engine_key[0]
+        if name:
+            engine_name = name
+        else:
+            engine_name = self.engine_key[0]
         turb, finj, atk, cegr = self._engines.get(engine_name).values()
 
         return turb, finj, atk, cegr

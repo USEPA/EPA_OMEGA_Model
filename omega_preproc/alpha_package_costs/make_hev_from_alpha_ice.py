@@ -1,5 +1,5 @@
 import pandas as pd
-from omega_preproc.alpha_package_costs.alpha_package_costs import InputSettings, Engines, clean_alpha_data
+from omega_preproc.alpha_package_costs.alpha_package_costs import InputSettings, Engine, AlphaData
 
 
 class SelectICEforHEV:
@@ -30,7 +30,7 @@ class SelectICEforHEV:
         """
         list_with_turb = list()
         for name in self.df['Engine']:
-            turb, finj, atk, cegr = Engines().get_techs(name)
+            turb, finj, atk, cegr = Engine().get_engine_techs(name)
             list_with_turb.append(turb)
         self.df.insert(0, 'turb', list_with_turb)
         if self.df.iloc[0]['Vehicle Type'] != 'Truck':
@@ -158,7 +158,7 @@ def main():
             sub_header = pd.DataFrame(alpha_file_df.iloc[0, :]).transpose()
             alpha_file_df = pd.read_csv(alpha_file, skiprows=range(1, 2))
         else: alpha_file_df = pd.read_csv(alpha_file, skiprows=range(1, 2))
-        alpha_file_df = clean_alpha_data(alpha_file_df, 'Aero Improvement %', 'Crr Improvement %', 'Weight Reduction %')
+        alpha_file_df = AlphaData().clean_alpha_data(alpha_file_df, 'Aero Improvement %', 'Crr Improvement %', 'Weight Reduction %')
         df = SelectICEforHEV(alpha_file_df).return_df()
         hev_packages_df = pd.concat([hev_packages_df, df], axis=0, ignore_index=True)
 
