@@ -1293,9 +1293,13 @@ def calc_year_over_year_costs(df, arg, years, learning_rate):
         A DataFrame of ALPHA packages with costs for all years passed.
 
     """
+    df_return = df.copy()
+    arg_dict = dict()
     for year in years:
-        df.insert(len(df.columns), f'{arg}_{year}', df[arg] * (1 - learning_rate) ** (year - years[0]))
-    return df
+        arg_dict[year] = pd.Series(df[arg] * (1 - learning_rate) ** (year - years[0]), name=f'{arg}_{year}')
+    for year in years:
+        df_return = pd.concat([df_return, arg_dict[year]], axis=1)
+    return df_return
 
 
 def sum_vehicle_parts(df, years, new_arg, *args):
