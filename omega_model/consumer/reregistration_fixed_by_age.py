@@ -7,7 +7,7 @@ Vehicle re-registration, fixed by age.
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The template header uses a dynamic format.
 
-The data represents the re-registered proportion of vehicles by age and market class.
+The data represents the re-registered proportion of vehicles by model year, age and market class.
 
 File Type
     comma-separated values (CSV)
@@ -15,26 +15,29 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.1
+       input_template_name:,``[module_name]``,input_template_version:,0.2
 
 Sample Header
     .. csv-table::
 
-       input_template_name:, consumer.reregistration_fixed_by_age, input_template_version:, 0.1
+       input_template_name:,consumer.reregistration_fixed_by_age,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        age,market_class_id,reregistered_proportion,
-        0,non_hauling.BEV,1,
-        1,non_hauling.BEV,0.987841531,
-        2,non_hauling.BEV,0.976587217,
-        0,hauling.ICE,1,
-        1,hauling.ICE,0.977597055,
-        2,hauling.ICE,0.962974697,
+        start_model_year,age,market_class_id,reregistered_proportion
+        1970,0,non_hauling.BEV,1
+        1970,1,non_hauling.BEV,0.987841531
+        1970,2,non_hauling.BEV,0.976587217
+        1970,0,hauling.ICE,1
+        1970,1,hauling.ICE,0.977597055
+        1970,2,hauling.ICE,0.962974697
 
 Data Column Name and Description
+
+:start_model_year:
+    The start vehicle model year of the re-registration data, values apply until next available start year
 
 :age:
     Vehicle age, in years
@@ -57,17 +60,18 @@ from omega_model import *
 
 class Reregistration(OMEGABase, ReregistrationBase):
     """
-    **Load and provide access to vehicle re-registration data.**
-    """
+    **Load and provide access to vehicle re-registration data by model year, market class ID and age.**
 
+    """
     _data = dict()
 
     @staticmethod
-    def get_reregistered_proportion(market_class_id, age):
+    def get_reregistered_proportion(model_year, market_class_id, age):
         """
         Get vehicle re-registered proportion [0..1] by market class and age.
 
         Args:
+            model_year (int): the model year of the re-registration data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age
 
@@ -75,7 +79,14 @@ class Reregistration(OMEGABase, ReregistrationBase):
             Re-registered proportion [0..1]
 
         """
-        return Reregistration._data[market_class_id, age]['reregistered_proportion']
+        start_years = pd.Series(Reregistration._data['start_model_year'][market_class_id])
+
+        if len(start_years[start_years <= model_year]) > 0:
+            year = max(start_years[start_years <= model_year])
+            return Reregistration._data[market_class_id, age, year]['reregistered_proportion']
+        else:
+            raise Exception('Missing registration fixed by age parameters for %s, %d or prior' %
+                            (market_class_id, calendar_year))
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -96,8 +107,8 @@ class Reregistration(OMEGABase, ReregistrationBase):
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = __name__
-        input_template_version = 0.1
-        input_template_columns = {'age', 'market_class_id', 'reregistered_proportion'}
+        input_template_version = 0.2
+        input_template_columns = {'start_model_year', 'age', 'market_class_id', 'reregistered_proportion'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -115,7 +126,15 @@ class Reregistration(OMEGABase, ReregistrationBase):
                         omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
 
             if not template_errors:
-                Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
+                # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
+
+                # convert dataframe to dict keyed by market class ID, age, and start year
+                Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
+                    sort_index().to_dict(orient='index')
+                # add 'start_year' key which returns start years by market class ID
+                Reregistration._data.update(
+                    df[['market_class_id', 'age', 'start_model_year']].set_index('market_class_id').
+                        to_dict(orient='series'))
 
         return template_errors
 

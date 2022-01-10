@@ -9,7 +9,7 @@ The data represents a fixed VMT schedule by age.
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The template header uses a dynamic format.
 
-The data represents the re-registered proportion of vehicles by age and market class.
+The data represents the re-registered proportion of vehicles by calendar year, age and market class.
 
 File Type
     comma-separated values (CSV)
@@ -17,21 +17,27 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.1
+       input_template_name:,``[module_name]``,input_template_version:,0.2
 
 Sample Header
     .. csv-table::
 
-       input_template_name:, consumer.annual_vmt_fixed_by_age, input_template_version:, 0.1
+        input_template_name:,consumer.annual_vmt_fixed_by_age,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        age,market_class_id,annual_vmt
-        0,non_hauling.BEV,14699.55515
-        1,non_hauling.BEV,14251.70373
-        2,non_hauling.BEV,14025.35397
+        start_year,age,market_class_id,annual_vmt
+        2019,0,non_hauling.BEV,14699.55515
+        2019,1,non_hauling.BEV,14251.70373
+        2019,2,non_hauling.BEV,14025.35397
+        2019,0,hauling.ICE,15973.88982
+        2019,1,hauling.ICE,15404.1216
+        2019,2,hauling.ICE,14840.93011
+
+:start_year:
+    Start year of annual VMT data, values apply until the next available start year
 
 :age:
     Vehicle age, in years
@@ -40,7 +46,7 @@ Sample Data Columns
     Vehicle market class ID, e.g. 'hauling.ICE'
 
 :annual_vmt:
-    Vehicle miles travelled per year at the given age
+    Vehicle miles travelled per year at the given age for the given market class ID
 
 ----
 
@@ -53,26 +59,34 @@ from omega_model import *
 
 class OnroadVMT(OMEGABase, AnnualVMTBase):
     """
-    Loads and provides access to VMT by market class and age.
+    **Loads and provides access to annual Vehicle Miles Travelled by calendar year, market class, and age.**
 
     """
 
     _data = dict()  # private dict, on-road VMT by market class ID and age
 
     @staticmethod
-    def get_vmt(market_class_id, age):
+    def get_vmt(calendar_year, market_class_id, age):
         """
-        Get vehicle miles travelled by market class and age.
+        Get vehicle miles travelled by calendar year, market class and age.
 
         Args:
+            calendar_year (int): calendar year of the VMT data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age in years
 
         Returns:
-            (float) Vehicle miles travelled.
+            (float) Annual vehicle miles travelled.
 
         """
-        return OnroadVMT._data[market_class_id, age]['annual_vmt']
+        start_years = pd.Series(OnroadVMT._data['start_year'][market_class_id])
+
+        if len(start_years[start_years <= calendar_year]) > 0:
+            year = max(start_years[start_years <= calendar_year])
+            return OnroadVMT._data[market_class_id, age, year]['annual_vmt']
+        else:
+            raise Exception('Missing onroad VMT fixed by age parameters for %s, %d or prior' %
+                            (market_class_id, calendar_year))
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -94,8 +108,8 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = __name__
-        input_template_version = 0.1
-        input_template_columns = {'age', 'market_class_id', 'annual_vmt'}
+        input_template_version = 0.2
+        input_template_columns = {'start_year', 'age', 'market_class_id', 'annual_vmt'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -113,7 +127,15 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                         omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
 
             if not template_errors:
-                OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
+                # OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
+
+                # convert dataframe to dict keyed by market class ID, age, and start year
+                OnroadVMT._data = df.set_index(['market_class_id', 'age', 'start_year']).sort_index().to_dict(
+                    orient='index')
+                # add 'start_year' key which returns start years by market class ID
+                OnroadVMT._data.update(
+                    df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='series'))
+
 
         return template_errors
 
