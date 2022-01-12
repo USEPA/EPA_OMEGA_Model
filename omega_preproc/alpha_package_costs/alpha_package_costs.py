@@ -70,8 +70,6 @@ bev_curves and hev_curves
 
     These entries are curves according to the equation x * (Ax^3 +Bx^2 + Cx + D), where the capital letters are the entries in the worksheet and x is the attribute.
 
-    :kW_DCDC_converter:
-        DC to DC converter power in kW.
     :dollars_per_kWh_curve:
         The battery cost per kWh.
     :kWh_pack_per_kg_pack_curve:
@@ -90,7 +88,10 @@ bev_nonbattery_single, bev_nonbattery_dual, and hev_nonbattery
 
     :induction_inverter:
 
-    :DCDC_converter:
+    :kW_DCDC_converter:
+        DC to DC converter power in kW.
+
+    :OBC_and_DCDC_converter:
 
     :HV_orange_cables:
 
@@ -174,7 +175,7 @@ class RuntimeSettings:
 
         """
         # set what to run (i.e., what outputs to generate)
-        self.run_ice = True
+        self.run_ice = False
         self.run_bev = True
         self.run_phev = False
         self.run_hev = True
@@ -793,10 +794,10 @@ class NonBattery:
 
         """
         motor_power = motor_power_divisor = dcdc_converter_plus_obc = size_scaler = markup = 0
-        curves_dict = nonbattery_dict = dict()
+        # curves_dict = nonbattery_dict = dict()
         if self.fuel_key == 'bev':
             range, energy_rate, soc, gap, battery_kwh_gross, motor_power, number_of_motors, onboard_charger_kw, size_scaler = self.pev_key
-            curves_dict = input_settings.bev_curves_dict
+            # curves_dict = input_settings.bev_curves_dict
             if number_of_motors == 'single':
                 nonbattery_dict = input_settings.bev_nonbattery_single_dict
                 motor_power_divisor = 1
@@ -804,22 +805,22 @@ class NonBattery:
                 nonbattery_dict = input_settings.bev_nonbattery_dual_dict
                 motor_power_divisor = 2
             markup = input_settings.bev_powertrain_markup
-            dcdc_converter_plus_obc = curves_dict['kW_DCDC_converter']['constant'] + onboard_charger_kw
+            dcdc_converter_plus_obc = nonbattery_dict['kW_DCDC_converter']['intercept'] + onboard_charger_kw
 
         elif self.fuel_key == 'hev':
             soc, gap, battery_kwh_gross, motor_power, size_scaler = self.hev_key
-            curves_dict = input_settings.hev_curves_dict
+            # curves_dict = input_settings.hev_curves_dict
             nonbattery_dict = input_settings.hev_nonbattery_dict
             markup = input_settings.hev_metrics_dict['powertrain_markup_hev']['value']
             onboard_charger_kw = 0
             motor_power_divisor = 1
-            dcdc_converter_plus_obc = curves_dict['kW_DCDC_converter']['constant'] + onboard_charger_kw
+            dcdc_converter_plus_obc = nonbattery_dict['kW_DCDC_converter']['intercept'] + onboard_charger_kw
 
         motor_cost = nonbattery_dict['motor']['quantity'] * (nonbattery_dict['motor']['slope'] * motor_power / motor_power_divisor + nonbattery_dict['motor']['intercept'])
         inverter_cost = nonbattery_dict['inverter']['quantity'] * (nonbattery_dict['inverter']['slope'] * motor_power / motor_power_divisor + nonbattery_dict['inverter']['intercept'])
         induction_motor_cost = nonbattery_dict['induction_motor']['quantity'] * nonbattery_dict['induction_motor']['slope'] * motor_power / motor_power_divisor
         induction_inverter_cost = nonbattery_dict['induction_inverter']['quantity'] * nonbattery_dict['induction_inverter']['slope'] * motor_power / motor_power_divisor
-        dcdc_converter_cost = nonbattery_dict['DCDC_converter']['quantity'] * nonbattery_dict['DCDC_converter']['slope'] * dcdc_converter_plus_obc
+        obc_and_dcdc_converter_cost = nonbattery_dict['OBC_and_DCDC_converter']['quantity'] * nonbattery_dict['OBC_and_DCDC_converter']['slope'] * dcdc_converter_plus_obc
         hv_orange_cables_cost = nonbattery_dict['HV_orange_cables']['quantity'] * nonbattery_dict['HV_orange_cables']['slope'] * size_scaler + nonbattery_dict['HV_orange_cables']['intercept']
         lv_battery_cost = nonbattery_dict['LV_battery']['quantity'] * nonbattery_dict['LV_battery']['slope'] * size_scaler + nonbattery_dict['LV_battery']['intercept']
         hvac_cost = nonbattery_dict['HVAC']['quantity'] * nonbattery_dict['HVAC']['slope'] * size_scaler + nonbattery_dict['HVAC']['intercept']
@@ -832,7 +833,7 @@ class NonBattery:
         brake_sensors_actuators_cost = nonbattery_dict['brake_sensors_actuators']['quantity'] * nonbattery_dict['brake_sensors_actuators']['intercept']
 
         non_battery_cost = motor_cost + inverter_cost + induction_motor_cost + induction_inverter_cost \
-                           + dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost + hvac_cost \
+                           + obc_and_dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost + hvac_cost \
                            + single_speed_gearbox_cost + powertrain_cooling_loop_cost + charging_cord_kit_cost \
                            + DC_fast_charge_circuitry_cost + power_management_and_distribution_cost \
                            + additional_pair_of_half_shafts_cost + brake_sensors_actuators_cost

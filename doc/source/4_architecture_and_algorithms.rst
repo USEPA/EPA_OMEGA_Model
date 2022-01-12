@@ -406,7 +406,7 @@ In oder to minimize cost, a producer would need to select the minimum cost packa
 
 Because a producer can offer a range of different vehicles, each with distinct costs associated with applying technology packages, it is not likely that the lowest cost compliance solution will be a uniform application of technology to all vehicles. Nor will selecting the lowest cost option for each vehicle likely result in producer compliance, except in cases where a policy is non-binding. In order to consider design options for multiple vehicles simultaneously, the Producer Module aggregates individual vehicles into composites, with one composite vehicle for each market class and reg class combination. It is important that the resultant cost curves (producer generalized cost vs. g CO2/mi emissions rates) are not aggregated further since 1) aggregating emissions rates across market classes would no longer be valid after iteration when the Consumer Module changes the relative shares of market classes, and 2) aggregating emissions rates across regulatory classes would, under some policy definitions, make it impossible to calculate the Mg CO2 compliance credits (e.g. in policy cases where there are limits to the transfer of credits between regulatory classes.)
 
-.. admonition:: Demo example: Vehicle aggregation into market class + reg class cost curves
+.. admonition:: Demo example: Vehicle aggregation into market class - reg class cost curves
 
     :numref:`al_label_pm_composite_vehicle` shows the black cost curve of veh #62 as presented in :numref:`al_label_pm_vehicle_cloud`, along with the other vehicles that are in the same combination of market class (ICE non-hauling) and reg class (‘a’.) Note that the simulated_vehicles.csv file for this demo example does not contain distinct costs and emissions rates for every vehicle. As a result, even though there are 12 vehicles are represented here, they overlay into only three distinct cost curves. If a user provided simulated_vehicles.csv inputs defined with greater resolution, every vehicle could be associated with its own distinct cost curve.
 
@@ -829,7 +829,7 @@ Physical Effects Calculations
 Physical effects are calculated at the vehicle level for all calendar years included in the analysis. Vehicle_ID and VMT driven by the given vehicle are pulled from the VehicleAnnualData class. Vehicle attributes are pulled from VehicleFinal class. Fuel attributes are pulled from the OnroadFuel class which draws them from the onroad_fuels input file.
 
 Fuel Consumption
-++++++++++++++++
+----------------
 Liquid fuel consumption and electricity consumption are calculated for a given Vehicle ID as:
 
 **Liquid fuel consumption**
@@ -865,7 +865,7 @@ Where:
     as upstream and tailpipe emissions are calculated uniquely for both fuels.
 
 Emission Inventories
-++++++++++++++++++++
+--------------------
 Emission inventories are calculated for a given Vehicle ID as:
 
 **Tailpipe Criteria Emissions (except for SO2)**
@@ -928,7 +928,7 @@ Where:
     :label: upstream_criteria_tons
 
     & UpstreamEmissions_{Pollutant, US tons} \\
-    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} + FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/US ton}
+    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} - FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/US ton}
 
 Where:
 
@@ -945,7 +945,7 @@ Where:
     :label: upstream_ghg_tons
 
     & UpstreamEmissions_{Pollutant, Metric tons} \\
-    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} + FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/Metric ton}
+    & =\frac{FC_{kWh} * (grams/kWh)_{Pollutant, EGU} - FC_{gallons} * (grams/gallon)_{Pollutant, Refinery}} {grams/Metric ton}
 
 Where:
 
@@ -962,7 +962,7 @@ Where:
     :label: total_criteria_tons
 
     & TotalEmissions_{Pollutant, US tons} \\
-    & = TailpipeEmissions_{Pollutant, US tons} + UpstreamEmissions_{Pollutant, US tons}
+    & = TailpipeEmissions_{Pollutant, US tons} - UpstreamEmissions_{Pollutant, US tons}
 
 Where:
 
@@ -975,7 +975,7 @@ Where:
     :label: total_ghg_tons
 
     & TotalEmissions_{Pollutant, Metric tons} \\
-    & = TailpipeEmissions_{Pollutant, Metric tons} + UpstreamEmissions_{Pollutant, Metric tons}
+    & = TailpipeEmissions_{Pollutant, Metric tons} - UpstreamEmissions_{Pollutant, Metric tons}
 
 Where:
 
@@ -984,34 +984,37 @@ Where:
 
 Cost Effects Calculations
 -------------------------
-Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarily, the physical effects
-described above.
+Cost effects are calculated at the vehicle level for all calendar years included in the analysis and for, primarily,
+the physical effects described above.
 
 ALPHA Package Costs Module
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ALPHA package costs module generates the simulated_vehicles.csv file used as an input to OMEGA. This section describes the calculations done in the module to generated the simulated_vehicles.csv
-file. The module uses, as an input, the alpha_package_costs_module_inputs.xlsx file, described in SECTION 7.3.1.1.2 (insert a code pointer to this) and individual ALPHA files which provide CO2 g/mi
-results over EPA test cycles for each of six ALPHA classes of vehicles and hundreds of technology packages applied to each.
+The ALPHA package costs module generates the simulated_vehicles.csv file used as an input to OMEGA. This section describes
+the calculations done in the module to generate the simulated_vehicles.csv file. The module uses, as an input, the
+alpha_package_costs_module_inputs.xlsx file, described in SECTION 7.3.1.1.2 (insert a code pointer to this?) and individual
+ALPHA files which provide CO2 g/mi results over EPA test cycles for various classes of vehicles and hundreds
+of technology packages applied to each.
 
-In general, individual technology costs are read from the alpha_package_costs_module_inputs file and already include markups to cover indirect costs. The markups are controllable via user input with the
-file on the inputs_workbook sheet (ICE powertrain and all vehicle roadload markups), the pev_metrics sheet (plug-in electric vehicle powertrain markups) and the hev_metrics sheet (HEV powertrain markups).
-The inputs_code sheet contains learning rate inputs for various technologies. These learning rates are applied year-over-year to technologies with the category beginning with the start_year setting on
-the inputs_code sheet. Every cost within the alpha_package_costs_module_inputs file has an associated dollar basis to specify the dollar valuation of the given cost (i.e., is the cost in 2016 dollars, 2020 dollars, etc.).
-On the inputs_code sheet, the user can specify the dollar basis for the module's output file. Running the module generates a simulated_vehicles.csv file, along with other output files, will all cost values
-converted to the dollar_basis specified on the inputs_code sheet. When the simulated_vehicles.csv file is subsequently read into OMEGA, the simulated_vehicles.csv costs will again be converted to be
-consistent with the dollar_basis specified for the given OMEGA run. So the alpha_package_costs_module_inputs file dollar_basis (set via the dollar_basis_for_output_file setting) does not need to be
+In general, individual technology costs are read from the alpha_package_costs_module_inputs file inclusive of
+markups to cover indirect costs. The markups are controllable via user input with the file on the inputs_workbook worksheet
+(ICE powertrain and all vehicle roadload markups), the pev_metrics worksheet (plug-in electric vehicle powertrain markups)
+and the hev_metrics worksheet (HEV powertrain markups). The inputs_code worksheet contains learning rate inputs for various
+technologies. These learning rates are applied year-over-year to technologies within the category beginning with the start_year
+setting on the inputs_code worksheet. Every cost within the alpha_package_costs_module_inputs file has an associated dollar
+basis to specify the dollar valuation of the given cost (i.e., is the cost in 2016 dollars, 2020 dollars, etc.). On the
+inputs_code worksheet, the user can specify the dollar basis for the module's output file. Running the module generates a
+simulated_vehicles.csv file, along with other output files, with all cost values converted to the dollar_basis specified
+on the inputs_code worksheet. When the simulated_vehicles.csv file is subsequently read into OMEGA, the simulated_vehicles.csv
+costs will again be converted to be consistent with the dollar_basis specified for the given OMEGA run. So the
+alpha_package_costs_module_inputs file dollar_basis (set via the dollar_basis_for_output_file setting) does not need to be
 consistent with the desired OMEGA-run dollar basis value.
 
-ICE Powertrain Costs
---------------------
-ICE powertrain costs consist of engine-related costs, the transmission, accessories, and air conditioning. In the case of hybrid electric vehicles (HEV),
-the HEV-related costs (battery and non-battery components) are also included.
-
 ICE Engine-Related Costs
-++++++++++++++++++++++++
-To estimate engine-related costs, the module starts first with the engine name which is read directly from the package description in the ALPHA input file. Those engine names and the pertinent technologies on
-those engines are shown in :numref:`engines_and_techs`.
+------------------------
+To estimate ICE engine-related costs, the module starts first with the engine name which is read directly from the "Engine"
+column of the ALPHA input file. The engine names included in the ALPHA runs, and the pertinent technologies on those
+engines, are shown in :numref:`engines_and_techs`.
 
 .. _engines_and_techs:
 .. csv-table:: Engines and Associated Technologies
@@ -1034,11 +1037,12 @@ Where,
 
 * :math:`PFI` is port fuel-injection
 * :math:`DI` is direct fuel injection
-* :math:`TURB` refers to turbocharging while the number represents a level-vintage (i.e., 11=level1, vintage1, 12=level1, vintage2)
+* :math:`TURB` refers to turbocharging while the number represents a boost level and vintage combination (i.e., 11=level1, vintage1; 12=level1, vintage2)
 * :math:`CEGR` is cooled EGR
 * :math:`ATK` refers to Atkinson cycle (high compression ratio) while the number refers to a compression level
 
-To calculate engine-related costs, the tool makes use of the input table on the engines worksheet of the alpha_package_costs_module_inputs.xlsx file. That table is shown in :numref:`engine_cost_sheet`.
+To calculate engine-related costs, the module makes use of the table on the engines worksheet of the alpha_package_costs_module_inputs
+file. That table is shown in :numref:`engine_cost_sheet`.
 
 .. _engine_cost_sheet:
 .. csv-table:: Engine Tech Costs
@@ -1078,14 +1082,19 @@ To calculate engine-related costs, the tool makes use of the input table on the 
     ATK2_6,194,129,2010
     ATK2_8,306,204,2010
 
+Where,
 
-The tool determines the displacement of the engine and the number of cylinders from the package description in the ALPHA input file. Engine displacement and cylinder count costs are calculated as
-shown in equation :math:numref:`cyl_count_and_displ_cost`.
+* :math:`dmc` refers to Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+The module determines the displacement of the engine and the number of cylinders from the "Engine Displacement L" and "Engine Cylinders"
+columns, respectively, of the ALPHA input file. Engine displacement and cylinder count costs are calculated as shown
+in equation :math:numref:`cyl_count_and_displ_cost`.
 
 .. Math::
     :label: cyl_count_and_displ_cost
 
-    EngineCost_{Displacement, Cylinders} = Displacement \times \frac{$} {liter} + CylinderCount \times \frac{$} {cylinder}
+    EngineCost_{Displacement, Cylinders} = Displacement \times \frac{$} {liter} - CylinderCount \times \frac{$} {cylinder}
 
 Where,
 
@@ -1094,33 +1103,39 @@ Where,
 * :math:`\frac{$} {liter}` comes from :numref:`engine_cost_sheet`
 * :math:`\frac{$} {cylinder}` comes from :numref:`engine_cost_sheet`
 
-If the engine is turbocharged (see :numref:`engines_and_techs`), the costs associated with turbocharging are calculated as shown in equation :math:numref:`turbo_cost`.
+If the engine is turbocharged (see :numref:`engines_and_techs`), the costs associated with turbocharging are calculated
+as shown in equation :math:numref:`turbo_cost`.
 
 .. Math::
     :label: turbo_cost
 
     & TurboCost \\
-    & = \small EngineCost_{Displacement, Cylinders} \times (BoostMultiplier - 1) + TurboCost_{Level-Vintage, CylinderCount}
+    & = \small EngineCost_{Displacement, Cylinders} \times (BoostMultiplier - 1) - TurboCost_{Level-Vintage, CylinderCount}
 
 Where,
 
 * :math:`EngineCost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
-* :math:`BoostMultiplier` is from the inputs_code worksheet of the alpha_package_costs_module_inputs.xlsx file
+* :math:`BoostMultiplier` is from the inputs_code worksheet of the alpha_package_costs_module_inputs file
 * :math:`Level-Vintage` associated with the turbo is from :numref:`engines_and_techs`
 * :math:`CylinderCount` comes from the package description in the ALPHA input file
 * :math:`TurboCost_{Level-Vintage, CylinderCount}` comes from :numref:`engine_cost_sheet`
 
-If the engine is equipped with cooled EGR (see :numref:`engines_and_techs`), the costs associated with that technology are read directly from :numref:`engine_cost_sheet`.
+If the engine is equipped with cooled EGR (see :numref:`engines_and_techs`), the costs associated with that technology
+are read directly from :numref:`engine_cost_sheet`.
 
-If the engine is equipped with direct fuel-injection (see :numref:`engines_and_techs`), the costs associated with that technology are read directly from :numref:`engine_cost_sheet` and making use of the
-cylinder count data read from the package description in the ALPHA input file.
+If the engine is equipped with direct fuel-injection (see :numref:`engines_and_techs`), the costs associated with that
+technology are read directly from :numref:`engine_cost_sheet` along with the "Engine Cylinders" column of the ALPHA input file.
 
-The presence of cylinder deactivation is read directly from the package description of the ALHPA input file where "DEAC D" refers to <DEFINE DeacPD> (DeacPD) and "DEAC C" refers to <Define DeacFC> (DeacFC).
-The cylinder count data is read directly from the package description of the ALPHA input file.
+The presence of cylinder deactivation is read directly from the "DEAC D Cyl." and "DEAC C Cyl." columns of the ALHPA
+input file where "DEAC D Cyl." refers to "Cylinder Deactivation: Partial Discrete," or DeacPD, and "DEAC C Cyl." refers
+to "Cylinder Deactivation: Full Continuous," or DeacFC. The cylinder count data is read directly from the "Engine Cylinders"
+column of the ALPHA input file.
 
-The presence of Atkinson cycle technology is taken from :numref:`engines_and_techs` and the cylinder count data is read directly from the package description of the ALPHA input file.
+The presence of Atkinson cycle technology is taken from :numref:`engines_and_techs` and the cylinder count data is read
+directly from the "Engine Cylinders" column of the ALPHA input file.
 
-Stop-start technology is also included in the engine-related costs and makes use of the start_stop worksheet of the alpha_package_costs_module_inputs. That table is shown in :numref:`start_stop_sheet`.
+Stop-start technology is also included in the engine-related costs and makes use of the table on the start_stop worksheet of the
+alpha_package_costs_module_inputs file. That table is shown in :numref:`start_stop_sheet`.
 
 .. _start_stop_sheet:
 .. csv-table:: Start-Stop System Costs
@@ -1132,17 +1147,24 @@ Stop-start technology is also included in the engine-related costs and makes use
     1,3800.1,4800,546,364,2015
     2,4800.1,8500,600,400,2015
 
-The tool determines curb weight using the test weight information from the package description in the ALPHA input file, less 300 pounds (test weight is defined as curb weight plus 300 pounds). Based on
-the curb weight, the start-stop system costs are added based on the values in :numref:`start_stop_sheet`.
+Where,
 
-The engine-related costs can then be summed as shown in :math:numref:`engine_costs`.
+* :math:`curb\_weight\_min` and :math:`curb\_weight\_max` are in pounds
+* :math:`dmc` refers to Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+The module determines the presence of start-stop from the "Start Stop" column of the ALPHA input file and determines curb
+weight using the "Test Weight lbs" column of the ALPHA input file less 300 pounds (test weight is defined as curb weight
+plus 300 pounds). Based on the curb weight, the start-stop system costs are determined based on the values in :numref:`start_stop_sheet`.
+
+The engine-related costs can then be summed as shown in equation :math:numref:`engine_costs`.
 
 .. Math::
     :label: engine_costs
 
     & EngineCosts \\
-    & = \small EngineCost_{Displacement, Cylinders} + TurboCost + CEGRCost \\
-    & + \small FuelSystemCost + DeacCost + ATKCost + StartStopCost
+    & = \small EngineCost_{Displacement, Cylinders} - TurboCost - CEGRCost \\
+    & - \small FuelSystemCost - DeacCost - ATKCost - StartStopCost
 
 Where,
 
@@ -1154,3 +1176,565 @@ Where,
 * :math:`ATKCost` is from :numref:`engines_and_techs` (note: this might be $0)
 * :math:`StartStopCost` is from :numref:`start_stop_sheet` (note: this might be $0)
 
+ICE Transmission Costs
+----------------------
+To estimate ICE transmission costs, the module makes use of the "Transmission" column of the ALPHA input file and the
+table on the trans worksheet of the alpha_package_costs_module_inputs file. That table is shown in :numref:`trans_sheet`.
+
+.. _trans_sheet:
+.. csv-table:: Transmission Costs
+    :widths: auto
+    :header-rows: 1
+
+    trans_key,trans,drive,alpha_class,item_cost,dmc,dmc_increment,dollar_basis
+    TRX10_FWD_LPW_LRL,TRX10,FWD,LPW_LRL,1200,800,0,2012
+    TRX10_FWD_LPW_HRL,TRX10,FWD,LPW_HRL,1200,800,0,2012
+    TRX10_FWD_MPW_LRL,TRX10,FWD,MPW_LRL,1200,800,0,2012
+    TRX10_FWD_MPW_HRL,TRX10,FWD,MPW_HRL,1200,800,0,2012
+    TRX10_FWD_HPW,TRX10,FWD,HPW,1200,800,0,2012
+    TRX10_FWD_Truck,TRX10,FWD,Truck,1200,800,0,2012
+    TRX11_FWD_LPW_LRL,TRX11,FWD,LPW_LRL,1261.5,841,41,2012
+    TRX11_FWD_LPW_HRL,TRX11,FWD,LPW_HRL,1261.5,841,41,2012
+    TRX11_FWD_MPW_LRL,TRX11,FWD,MPW_LRL,1261.5,841,41,2012
+    TRX11_FWD_MPW_HRL,TRX11,FWD,MPW_HRL,1261.5,841,41,2012
+    TRX11_FWD_HPW,TRX11,FWD,HPW,1261.5,841,41,2012
+    TRX11_FWD_Truck,TRX11,FWD,Truck,1261.5,841,41,2012
+    TRX12_FWD_LPW_LRL,TRX12,FWD,LPW_LRL,1594.5,1063,263,2012
+    TRX12_FWD_LPW_HRL,TRX12,FWD,LPW_HRL,1594.5,1063,263,2012
+    TRX12_FWD_MPW_LRL,TRX12,FWD,MPW_LRL,1594.5,1063,263,2012
+    TRX12_FWD_MPW_HRL,TRX12,FWD,MPW_HRL,1594.5,1063,263,2012
+    TRX12_FWD_HPW,TRX12,FWD,HPW,1594.5,1063,263,2012
+    TRX12_FWD_Truck,TRX12,FWD,Truck,1594.5,1063,263,2012
+    TRX21_FWD_LPW_LRL,TRX21,FWD,LPW_LRL,1467,978,178,2012
+    TRX21_FWD_LPW_HRL,TRX21,FWD,LPW_HRL,1467,978,178,2012
+    TRX21_FWD_MPW_LRL,TRX21,FWD,MPW_LRL,1467,978,178,2012
+    TRX21_FWD_MPW_HRL,TRX21,FWD,MPW_HRL,1467,978,178,2012
+    TRX21_FWD_HPW,TRX21,FWD,HPW,1467,978,178,2012
+    TRX21_FWD_Truck,TRX21,FWD,Truck,1467,978,178,2012
+    TRX22_FWD_LPW_LRL,TRX22,FWD,LPW_LRL,1801.5,1201,401,2012
+    TRX22_FWD_LPW_HRL,TRX22,FWD,LPW_HRL,1801.5,1201,401,2012
+    TRX22_FWD_MPW_LRL,TRX22,FWD,MPW_LRL,1801.5,1201,401,2012
+    TRX22_FWD_MPW_HRL,TRX22,FWD,MPW_HRL,1801.5,1201,401,2012
+    TRX22_FWD_HPW,TRX22,FWD,HPW,1801.5,1201,401,2012
+    TRX22_FWD_Truck,TRX22,FWD,Truck,1801.5,1201,401,2012
+    TRX10_AWD_LPW_LRL,TRX10,AWD,LPW_LRL,1440,960,0,2012
+    TRX10_AWD_LPW_HRL,TRX10,AWD,LPW_HRL,1440,960,0,2012
+    TRX10_AWD_MPW_LRL,TRX10,AWD,MPW_LRL,1440,960,0,2012
+    TRX10_AWD_MPW_HRL,TRX10,AWD,MPW_HRL,1440,960,0,2012
+    TRX10_AWD_HPW,TRX10,AWD,HPW,1440,960,0,2012
+    TRX10_AWD_Truck,TRX10,AWD,Truck,1440,960,0,2012
+    TRX11_AWD_LPW_LRL,TRX11,AWD,LPW_LRL,1513.8,1009.2,41,2012
+    TRX11_AWD_LPW_HRL,TRX11,AWD,LPW_HRL,1513.8,1009.2,41,2012
+    TRX11_AWD_MPW_LRL,TRX11,AWD,MPW_LRL,1513.8,1009.2,41,2012
+    TRX11_AWD_MPW_HRL,TRX11,AWD,MPW_HRL,1513.8,1009.2,41,2012
+    TRX11_AWD_HPW,TRX11,AWD,HPW,1513.8,1009.2,41,2012
+    TRX11_AWD_Truck,TRX11,AWD,Truck,1513.8,1009.2,41,2012
+    TRX12_AWD_LPW_LRL,TRX12,AWD,LPW_LRL,1913.4,1275.6,263,2012
+    TRX12_AWD_LPW_HRL,TRX12,AWD,LPW_HRL,1913.4,1275.6,263,2012
+    TRX12_AWD_MPW_LRL,TRX12,AWD,MPW_LRL,1913.4,1275.6,263,2012
+    TRX12_AWD_MPW_HRL,TRX12,AWD,MPW_HRL,1913.4,1275.6,263,2012
+    TRX12_AWD_HPW,TRX12,AWD,HPW,1913.4,1275.6,263,2012
+    TRX12_AWD_Truck,TRX12,AWD,Truck,1913.4,1275.6,263,2012
+    TRX21_AWD_LPW_LRL,TRX21,AWD,LPW_LRL,1760.4,1173.6,178,2012
+    TRX21_AWD_LPW_HRL,TRX21,AWD,LPW_HRL,1760.4,1173.6,178,2012
+    TRX21_AWD_MPW_LRL,TRX21,AWD,MPW_LRL,1760.4,1173.6,178,2012
+    TRX21_AWD_MPW_HRL,TRX21,AWD,MPW_HRL,1760.4,1173.6,178,2012
+    TRX21_AWD_HPW,TRX21,AWD,HPW,1760.4,1173.6,178,2012
+    TRX21_AWD_Truck,TRX21,AWD,Truck,1760.4,1173.6,178,2012
+    TRX22_AWD_LPW_LRL,TRX22,AWD,LPW_LRL,2161.8,1441.2,401,2012
+    TRX22_AWD_LPW_HRL,TRX22,AWD,LPW_HRL,2161.8,1441.2,401,2012
+    TRX22_AWD_MPW_LRL,TRX22,AWD,MPW_LRL,2161.8,1441.2,401,2012
+    TRX22_AWD_MPW_HRL,TRX22,AWD,MPW_HRL,2161.8,1441.2,401,2012
+    TRX22_AWD_HPW,TRX22,AWD,HPW,2161.8,1441.2,401,2012
+    TRX22_AWD_Truck,TRX22,AWD,Truck,2161.8,1441.2,401,2012
+    TRX10_RWD_LPW_LRL,TRX10,RWD,LPW_LRL,1200,800,0,2012
+    TRX10_RWD_LPW_HRL,TRX10,RWD,LPW_HRL,1200,800,0,2012
+    TRX10_RWD_MPW_LRL,TRX10,RWD,MPW_LRL,1200,800,0,2012
+    TRX10_RWD_MPW_HRL,TRX10,RWD,MPW_HRL,1200,800,0,2012
+    TRX10_RWD_HPW,TRX10,RWD,HPW,1200,800,0,2012
+    TRX10_RWD_Truck,TRX10,RWD,Truck,1200,800,0,2012
+    TRX11_RWD_LPW_LRL,TRX11,RWD,LPW_LRL,1261.5,841,41,2012
+    TRX11_RWD_LPW_HRL,TRX11,RWD,LPW_HRL,1261.5,841,41,2012
+    TRX11_RWD_MPW_LRL,TRX11,RWD,MPW_LRL,1261.5,841,41,2012
+    TRX11_RWD_MPW_HRL,TRX11,RWD,MPW_HRL,1261.5,841,41,2012
+    TRX11_RWD_HPW,TRX11,RWD,HPW,1261.5,841,41,2012
+    TRX11_RWD_Truck,TRX11,RWD,Truck,1261.5,841,41,2012
+    TRX12_RWD_LPW_LRL,TRX12,RWD,LPW_LRL,1594.5,1063,263,2012
+    TRX12_RWD_LPW_HRL,TRX12,RWD,LPW_HRL,1594.5,1063,263,2012
+    TRX12_RWD_MPW_LRL,TRX12,RWD,MPW_LRL,1594.5,1063,263,2012
+    TRX12_RWD_MPW_HRL,TRX12,RWD,MPW_HRL,1594.5,1063,263,2012
+    TRX12_RWD_HPW,TRX12,RWD,HPW,1594.5,1063,263,2012
+    TRX12_RWD_Truck,TRX12,RWD,Truck,1594.5,1063,263,2012
+    TRX21_RWD_LPW_LRL,TRX21,RWD,LPW_LRL,1467,978,178,2012
+    TRX21_RWD_LPW_HRL,TRX21,RWD,LPW_HRL,1467,978,178,2012
+    TRX21_RWD_MPW_LRL,TRX21,RWD,MPW_LRL,1467,978,178,2012
+    TRX21_RWD_MPW_HRL,TRX21,RWD,MPW_HRL,1467,978,178,2012
+    TRX21_RWD_HPW,TRX21,RWD,HPW,1467,978,178,2012
+    TRX21_RWD_Truck,TRX21,RWD,Truck,1467,978,178,2012
+    TRX22_RWD_LPW_LRL,TRX22,RWD,LPW_LRL,1801.5,1201,401,2012
+    TRX22_RWD_LPW_HRL,TRX22,RWD,LPW_HRL,1801.5,1201,401,2012
+    TRX22_RWD_MPW_LRL,TRX22,RWD,MPW_LRL,1801.5,1201,401,2012
+    TRX22_RWD_MPW_HRL,TRX22,RWD,MPW_HRL,1801.5,1201,401,2012
+    TRX22_RWD_HPW,TRX22,RWD,HPW,1801.5,1201,401,2012
+    TRX22_RWD_Truck,TRX22,RWD,Truck,1801.5,1201,401,2012
+
+Where,
+
+* :math:`trans\_key` corresponds to the "Transmission" column of the ALPHA input file
+* :math:`dmc\_increment` refers to the incremental cost relative to the TRX10 level transmission
+* :math:`TRX10` refers to a base-level or "Null" transmission (nominally a 4 speed automatic transmission with no efficiency improvements)
+* :math:`FWD`, :math:`AWD` and :math:`RWD` refer to front, all and rear wheel drive, respectively
+* :math:`AWD` transmissions include a multiplicative scaler as specified via the user-defined "AWD_scaler" input on the inputs_workbook worksheet
+* :math:`dmc` refers to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+Accessories Costs
+-----------------
+To estimate ICE accessories costs, the module makes use of the "Accessory" column of the ALPHA input file and the
+table on the accessories worksheet of the alpha_package_costs_module_inputs file. That table is shown in :numref:`accessories_sheet`.
+
+.. _accessories_sheet:
+.. csv-table:: Accessories Costs
+    :widths: auto
+    :header-rows: 1
+
+    Accessory,item_cost,dmc,dollar_basis
+    EPS,150,100,2015
+    IACC1,0,0,2015
+    IACC2,75,50,2015
+    electric_EPS_LPW_LRL,150,100,2015
+    electric_EPS_LPW_HRL,150,100,2015
+    electric_EPS_MPW_LRL,150,100,2015
+    electric_EPS_MPW_HRL,150,100,2015
+    electric_EPS_HPW,150,100,2015
+    electric_EPS_Truck,150,100,2015
+    electric_HPS_LPW_LRL,150,100,2015
+    electric_HPS_LPW_HRL,150,100,2015
+    electric_HPS_MPW_LRL,150,100,2015
+    electric_HPS_MPW_HRL,150,100,2015
+    electric_HPS_HPW,150,100,2015
+    electric_HPS_Truck,150,100,2015
+    electric_EPS_HEA_REGEN_LPW_LRL,225,150,2015
+    electric_EPS_HEA_REGEN_LPW_HRL,225,150,2015
+    electric_EPS_HEA_REGEN_MPW_LRL,225,150,2015
+    electric_EPS_HEA_REGEN_MPW_HRL,225,150,2015
+    electric_EPS_HEA_REGEN_HPW,225,150,2015
+    electric_EPS_HEA_REGEN_Truck,225,150,2015
+
+Where,
+
+* :math:`EPS` refers to electric power steering
+* :math:`HPS` refers to hydraulic power steering
+* :math:`IACC1` and :math:`IACC2` refer to levels of improved accessories with IACC2 including some level of regeneration
+* :math:`HEA\_REGEN` refers to high efficiency alternator with regeneration (i.e., IACC2).
+* :math:`dmc` refers to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+Aerodynamic Roadload Reduction Costs
+------------------------------------
+To estimate aerodynamic-related costs, the module makes use of the "Aero Improvement %" column of the ALPHA input file and the
+table on the aero worksheet of the alpha_package_costs_module_inputs file. That table is shown in :numref:`aero_sheet`.
+
+.. _aero_sheet:
+.. csv-table:: Aerodynamic Roadload Reduction Costs
+    :widths: auto
+    :header-rows: 1
+
+    aero_class,structure_class,Tech,aero,item_cost,dmc,dollar_basis
+    unibody_0,unibody,Aero00,0,0,0,2015
+    unibody_5,unibody,Aero05,5,15,10,2015
+    unibody_10,unibody,Aero10,10,45,30,2015
+    unibody_15,unibody,Aero15,15,111,74,2015
+    unibody_20,unibody,Aero20,20,201,134,2015
+    ladder_0,ladder,Aero00,0,0,0,2015
+    ladder_5,ladder,Aero05,5,22.5,15,2015
+    ladder_10,ladder,Aero10,10,45,30,2015
+    ladder_15,ladder,Aero15,15,187.5,125,2015
+    ladder_20,ladder,Aero20,20,292.5,195,2015
+
+Where,
+
+* :math:`structure\_class` refers to the basic structure of the package
+* :math:`unibody` and :math:`ladder` are determined by the module where ALPHA class "Truck" is ladder and all other ALPHA classes are unibody
+* :math:`aero` refers to varying levels of aerodynamic drag coefficient improvements (0% through 20% drag coefficient improvements)
+* :math:`dmc` refers to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+Non-Aerodynamic Roadload Reduction Costs
+----------------------------------------
+To estimate aerodynamic-related costs, the module makes use of the "Aero Improvement %" column of the ALPHA input file and the
+table on the aero worksheet of the alpha_package_costs_module_inputs file. That table is shown in :numref:`nonaero_sheet`.
+
+.. _nonaero_sheet:
+.. csv-table:: Non-Aerodynamic Roadload Reduction Costs
+    :widths: auto
+    :header-rows: 1
+
+    nonaero_class,structure_class,Tech,nonaero,item_cost,dmc,dollar_basis
+    LDB,,LDB,99,82.5,55,2006
+    LRRT1,,LRRT1,99,7.5,5,2006
+    LRRT2,,LRRT2,99,60,40,2009
+    unibody_0,unibody,NADR0,0,0,0,2015
+    unibody_5,unibody,NADR1,5,7.5,5,2006
+    unibody_10,unibody,NADR2,10,60,40,2009
+    unibody_15,unibody,NADR3,15,90,60,2009
+    unibody_20,unibody,NADR4,20,142.5,95,2009
+    ladder_0,ladder,NADR0,0,0,0,2015
+    ladder_5,ladder,NADR1,5,7.5,5,2006
+    ladder_10,ladder,NADR2,10,60,40,2009
+    ladder_15,ladder,NADR3,15,90,60,2009
+    ladder_20,ladder,NADR4,20,142.5,95,2009
+
+Where,
+
+* :math:`LDB` refers to low-drag brakes
+* :math:`LRRT1` and :math:`LRRT2` refer to low rolling resistence tires, level1 and level2
+* :math:`NADR` refers to non-aero drag reduction at varying levels 0% through 20%
+* :math:`structure\_class` refers to the basic structure of the package
+* :math:`unibody` and :math:`ladder` are determined by the module where ALPHA class "Truck" is ladder and all other ALPHA classes are unibody
+* :math:`aero` refers to varying levels of aerodynamic drag coefficient improvements (0% through 20% drag coefficient improvements)
+* :math:`dmc` refers to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+Air Conditioning Costs
+----------------------
+Air condition costs are added to all packages using the table on the ac worksheet of the alpha_package_costs_module_inputs
+file. That table is shown in :numref:`ac_sheet`.
+
+.. _ac_sheet:
+.. csv-table:: Air Conditioning Costs
+    :widths: auto
+    :header-rows: 1
+
+    structure_class,item_cost,dmc,dollar_basis
+    unibody,171,114,2010
+    ladder,171,114,2010
+
+Where,
+
+* :math:`structure\_class` refers to the basic structure of the package
+* :math:`unibody` and :math:`ladder` are determined by the module where ALPHA class "Truck" is ladder and all other ALPHA classes are unibody
+* :math:`dmc` refers to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
+Electrified Vehicle Costs
+-------------------------
+For any plug-in electric vehicle (PEV, which includes both battery electric vehicle (BEV) and plug-in hybrid electric
+vehicle (PHEV)), or hybrid electric vehicle (HEV), battery costs are estimated using the tables from the appropriate
+pev_metrics or hev_metrics worksheets of the alpha_package_costs_module_inputs file. Those tables are shown in
+:numref:`pev_metrics_sheet` and :numref:`hev_metrics_sheet`, respectively.
+
+.. _pev_metrics_sheet:
+.. csv-table:: PEV Cost Metrics
+    :widths: auto
+    :header-rows: 1
+
+    item,value
+    usable_soc_bev, 0.9
+    gap_bev,0.3
+    powertrain_markup_bev,1.5
+    usable_soc_phev
+    gap_phev
+    powertrain_markup_phev
+
+Where,
+
+* :math:`usable\_soc\_bev` and :math:`usable\_soc\_phev` refer to the usable state-of-charge of the battery pack
+* :math:`gap\_bev` and :math:`gap\_phev` refer to the 2-cycle to onroad "gap"
+* :math:`powertrain\_markup\_bev` and :math:`powertrain\_markup\_phev` refer to the markup factors applied to direct manufacturing costs to cover indirect costs
+
+.. _hev_metrics_sheet:
+.. csv-table:: HEV Cost Metrics
+    :widths: auto
+    :header-rows: 1
+
+    item,value
+    usable_soc_hev,0.4
+    gap_hev,0.2
+    powertrain_markup_hev,1.5
+    co2_reduction_cycle_hev,0.2
+    co2_reduction_city_hev,0.244
+    co2_reduction_hwy_hev,0.164
+
+Where,
+
+* :math:`usable\_soc\_hev` refers to the usable state-of-charge of the battery pack
+* :math:`gap\_hev` refers to the 2-cycle to onroad "gap"
+* :math:`powertrain\_markup\_hev` refers to the markup factor applied to direct manufacturing costs to cover indirect costs
+* :math:`co2\_reduction\_cycle\_hev` refers to the 2-cycle CO2 reduction provided by the hybridization (user define)
+* :math:`co2\_reduction\_city\_hev` refers to the city-cycle CO2 reduction (calculated as 55/45 times the 2-cycle value)
+* :math:`co2\_reduction\_hwy\_hev` refers to the highway-cycle CO2 reduction (calculated as 45/55 times the 2-cycle value)
+
+Battery costs also make use of the tables from the appropriate bev_curves and hev_curves worksheets of the
+alpha_package_costs_module_inputs file. Those tables and how they are used are discussed below for BEV batteries, HEV
+batteries and then PHEV batteries.
+
+BEV Battery Costs
++++++++++++++++++
+For BEV battery costs, the module first determines the gross energy content of the BEV battery pack. This is done using the
+"Combined Consumption Rate" column of the ALPHA input file which is expressed in kWh/100 miles. The gross energy content
+of the BEV battery pack is then calculated as shown in equation :math:numref:`bev_kwh_gross`.
+
+.. Math::
+    :label: bev_kwh_gross
+
+    kWh_{Gross} = \frac{(\frac{kWh} {100 miles} \times \frac{OnroadRange} {bev\_usable\_soc})} {(1 - gap\_bev)}
+
+Where,
+
+* :math:`kWh_{Gross}` refers to the gross energy content of the BEV battery pack
+* :math:`\frac{kWh} {100 miles}` is from the "Combined Consumption Rate" column of the ALPHA input file
+* :math:`OnroadRange` is in miles and is currently set via the InputSettings class of the alpha_package_costs module
+* :math:`bev\_usable\_soc` and :math:`gap\_bev` are from :numref:`pev_metrics_sheet`
+
+The module then uses the table on the bev_curves worksheet of the alpha_package_costs_module_inputs
+file. That table is shown in :numref:`bev_curves_sheet`.
+
+.. _bev_curves_sheet:
+.. csv-table:: BEV Battery Cost Curves
+    :widths: auto
+    :header-rows: 1
+
+    item,x_cubed_factor,x_squared_factor,x_factor,constant,dollar_basis
+    dollars_per_kWh_curve,-0.00009556,0.02652171,-2.56085176,193.1905512,2019
+    kWh_pack_per_kg_pack_curve,8.47E-08,-2.49011E-05,0.002368641,0.124566816,0
+
+The BEV battery cost is then calculated as shown in equation :math:numref:`battery_cost_equation`.
+
+HEV Battery Costs
++++++++++++++++++
+For HEV battery costs, the module first determines the gross energy content of the HEV battery pack. This is done by first
+creating HEV packages from the ICE packages via the make_hev_from_alpha_ice module. The make_hev_from_alpha_ice module
+selects specific ICE packages for use as HEVs using the "Vehicle Type" and "Start Stop" columns of the ALPHA input file
+and applying the following logic:
+
+    - if "Vehicle Type" is "Truck" use only turbocharged packages;
+    - if "Vehicle Type" is not "Truck" use only non-turbocharged packages;
+    - if "Start Stop" is TRUE (value=1) then eliminate the package
+
+This logic leaves only turbocharged Truck packages without start-stop and non-turbocharged non-Truck packages without
+start-stop. Start-stop packages are eliminated in this process because the costs of start-stop technologies are included
+in the HEV non-battery costs, and the GHG reducing impacts of the start-stop technologies are included in the CO2_reduction entries
+shown in :numref:`hev_metrics_sheet`. Turbocharged truck packages are chosen since trucks are assumed to require the towing
+capability provided by turbocharing.
+
+The make_hev_from_alpha_ice module then makes use of the "Test Weight lbs" column of the chosen packages less 300 pounds
+to determine the curb weight of the package and converts that to kg by dividing by 2.2 pounds/kg. The make_hev_from_alpha_ice module
+then makes use of the table on the hev_curves worksheet of the alpha_package_costs_module_inputs file. That table is
+shown in :numref:`hev_curves_sheet`.
+
+.. _hev_curves_sheet:
+.. csv-table:: HEV Battery Cost Curves
+    :widths: auto
+    :header-rows: 1
+
+    item,x_cubed_factor,x_squared_factor,x_factor,constant,dollar_basis
+    kWh_pack_per_kg_curbwt_curve,0,0,0.001,0.141,0
+    kW_motor_per_kg_curbwt_curve,0,0,0.0279,-13.269,0
+    kWh_pack_per_kg_pack_curve,0,0,0.0142,0.0648,0
+    dollars_per_kWh_curve,0,0,-250.72,1058.2,2017
+
+With the curb weight of the package and the kWh_pack_per_kg_curbwt_curve entries shown in :numref:`hev_curves_sheet`, the
+HEV battery energy content is then calculated as shown in equation :math:numref:`hev_kwh_gross`.
+
+.. Math::
+    :label: hev_kwh_gross
+
+    kWh_{Gross} = A \times CurbWeight^3 + B \times CurbWeight^2 + C \times CurbWeight + D
+
+Where,
+
+* :math:`A` refers to the x_cubed_factor of the kWh_pack_per_kg_curbwt_curve from :numref:`hev_curves_sheet`
+* :math:`B` refers to the x_squared_factor of the kWh_pack_per_kg_curbwt_curve from :numref:`hev_curves_sheet`
+* :math:`C` refers to the x_factor of the kWh_pack_per_kg_curbwt_curve from :numref:`hev_curves_sheet`
+* :math:`D` refers to the constant factor of the kWh_pack_per_kg_curbwt_curve from :numref:`hev_curves_sheet`
+
+The HEV battery cost is then calculated as shown in equation :math:numref:`battery_cost_equation`.
+
+PHEV Battery Costs
+++++++++++++++++++
+For PHEV battery costs, the module makes use of the table on the phev_curves worksheet of the alpha_package_costs_module_inputs
+file. That table is shown in :numref:`phev_curves_sheet`.
+
+.. _phev_curves_sheet:
+.. csv-table:: PHEV Battery Cost Curves
+    :widths: auto
+    :header-rows: 1
+
+    item,x_cubed_factor,x_squared_factor,x_factor,constant,dollar_basis
+    kW_DCDC_converter,0,0,0,3.5,0
+    dollars_per_kWh_curve,-0.00009556,0.02652171,-2.56085176,193.1905512,2019
+    kWh_pack_per_kg_pack_curve,8.47E-08,-2.49011E-05,0.002368641,0.124566816,0
+
+With the gross energy content of the battery pack and the dollars_per_kWh_curve entries of :numref:`bev_curves_sheet`
+or :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`, depending on the package
+being considered, the battery pack cost is calculated as shown in equation :math:numref:`battery_cost_equation`.
+
+.. Math::
+    :label: battery_cost_equation
+
+    BatteryCost = \small kWh_{Gross} \times (A \times kWh_{Gross}^3 + B \times kWh_{Gross}^2 + C \times kWh_{Gross} + D) \times Markup
+
+Where,
+
+* :math:`kWh_{Gross}` refers to the gross energy content of the battery pack
+* :math:`A` refers to the x_cubed_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
+* :math:`B` refers to the x_squared_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
+* :math:`C` refers to the x_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
+* :math:`D` refers to the constant factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
+* :math:`Markup` refers to the applicable powertrain markup factor from :numref:`pev_metrics_sheet` or :numref:`hev_metrics_sheet`
+
+BEV Non-Battery Costs
++++++++++++++++++++++
+For BEV non-battery costs (motors, inverters, etc.), the module makes use of the tables on the bev_nonbattery_single or
+bev_nonbattery_dual worksheets of the alpha_package_costs_module_inputs file. These two tables are shown in
+:numref:`bev_nonbattery_single_sheet` and :numref:`bev_nonbattery_dual_sheet`.
+
+.. _bev_nonbattery_single_sheet:
+.. csv-table:: BEV Non-Battery Cost Curves for Single Motor Systems
+    :widths: auto
+    :header-rows: 1
+
+    item,quantity,slope,intercept,scale_by,dollar_basis
+    motor,1,4.29,0,Vehicle kW,2019
+    inverter,1,2.5,0,Vehicle kW,2019
+    induction_motor,0,0,0,,0
+    induction_inverter,0,0,0,,0
+    kW_DCDC_converter,1,0,3.5,kW value to be added to OBC kW value,0
+    OBC_and_DCDC_converter,1,39.7537931,0,"DC-DC kW (3.5) + OBC kW (7,11,19)",2019
+    HV_orange_cables,1,9.5,161.5,Vehicle size class (1-7),2019
+    LV_battery,1,3,51,Vehicle size class (1-7),2019
+    HVAC,1,11.5,195.5,Vehicle size class (1-7),2019
+    single_speed_gearbox,1,0,410,none at this time,2019
+    powertrain_cooling_loop,1,0,300,none at this time,2019
+    charging_cord_kit,1,0,200,none at this time,2019
+    DC_fast_charge_circuitry,1,0,160,none at this time,2019
+    power_management_and_distribution,1,0,720,none at this time,2019
+    brake_sensors_actuators,0,0,0,,0
+    additional_pair_of_half_shafts,0,0,0,,0
+
+
+.. _bev_nonbattery_dual_sheet:
+.. csv-table:: BEV Non-Battery Cost Curves for Dual Motor Systems
+    :widths: auto
+    :header-rows: 1
+
+    item,quantity,slope,intercept,scale_by,dollar_basis
+    motor,1,4.29,0,Vehicle kW / 2,2019
+    inverter,1,2.5,0,Vehicle kW / 2,2019
+    induction_motor,1,3.12,0,Vehicle kW / 2,0
+    induction_inverter,1,4,0,Vehicle kW / 2,0
+    kW_DCDC_converter,1,0,3.5,kW value to be added to OBC kW value,0
+    OBC_and_DCDC_converter,1,39.7537931,0,"DC-DC kW (3.5) + OBC kW (7,11,19)",2019
+    HV_orange_cables,1,9.5,161.5,Vehicle size class (1-7),2019
+    LV_battery,1,3,51,Vehicle size class (1-7),2019
+    HVAC,1,11.5,195.5,Vehicle size class (1-7),2019
+    single_speed_gearbox,2,0,410,none at this time,2019
+    powertrain_cooling_loop,2,0,300,none at this time,2019
+    charging_cord_kit,1,0,200,none at this time,2019
+    DC_fast_charge_circuitry,1,0,160,none at this time,2019
+    power_management_and_distribution,1,0,720,none at this time,2019
+    brake_sensors_actuators,0,0,0,,0
+    additional_pair_of_half_shafts,1,0,190,none at this time,0
+
+The first step makes use of the structure_class determination for the given package and specifies that unibody packages
+have a single motor system while ladder-frame packages have a dual motor system. The motor power is currently set in the
+InputSettings class of the alpha_package_costs module (the current setting is 150 kW). The motor cost is then calculated
+as shown in :math:numref:`motor_cost_equation`.
+
+.. Math::
+    :label: motor_cost_equation
+
+    Cost_{motor} = Quantity_{motor} \times Slope_{motor} \times \frac{Power_{motor}} {PowerDivisor_{motor}} + Intercept_{motor}
+
+Where,
+
+* :math:`Cost_{motor}` is the cost of motors in the system
+* :math:`Quantity_{motor}` and :math:`Slope_{motor}` and :math:`Intercept_{motor}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+* :math:`Power_{motor}` is from the InputSettings class (currently set at 150 kW)
+* :math:`PowerDivisor_{motor}` is 1 for single motor systems and 2 for dual motor systems
+
+The inverter cost is then calculated as shown in :math:numref:`inverter_cost_equation`.
+
+.. Math::
+    :label: inverter_cost_equation
+
+    Cost_{inverter} = Quantity_{inverter} \times Slope_{inverter} \times \frac{Power_{inverter}} {PowerDivisor_{inverter}} + Intercept_{inverter}
+
+Where,
+
+* :math:`Cost_{inverter}` is the cost of motors in the system
+* :math:`Quantity_{inverter}` and :math:`Slope_{inverter}` and :math:`Intercept_{inverter}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+* :math:`Power_{inverter}` is from the InputSettings class (currently set at 150 kW)
+* :math:`PowerDivisor_{inverter}` is 1 for single motor systems and 2 for dual motor systems
+
+The induction motor cost is then calculated as shown in :math:numref:`induction_motor_cost_equation`.
+
+.. Math::
+    :label: induction_motor_cost_equation
+
+    & \small Cost_{induction\_motor} = Quantity_{induction\_motor} \times Slope_{induction\_motor} \times \frac{Power_{induction\_motor}} {PowerDivisor_{induction\_motor}} \\
+    & \small + Intercept_{induction\_motor}
+
+Where,
+
+* :math:`Cost_{induction\_motor}` is the cost of motors in the system
+* :math:`Quantity_{induction\_motor}` and :math:`Slope_{induction\_motor}` and :math:`Intercept_{induction\_motor}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+* :math:`Power_{induction\_motor}` is from the InputSettings class (currently set at 150 kW)
+* :math:`PowerDivisor_{induction\_motor}` is 1 for single motor systems and 2 for dual motor systems
+
+The induction inverter cost is then calculated as shown in :math:numref:`induction_inverter_cost_equation`.
+
+.. Math::
+    :label: induction_inverter_cost_equation
+
+    & \small Cost_{induction\_inverter} = Quantity_{induction\_inverter} \times Slope_{induction\_inverter} \times \frac{Power_{induction\_inverter}} {PowerDivisor_{induction\_inverter}} \\
+    & \small + Intercept_{induction\_inverter}
+
+Where,
+
+* :math:`Cost_{induction\_inverter}` is the cost of motors in the system
+* :math:`Quantity_{induction\_inverter}` and :math:`Slope_{induction\_inverter}` and :math:`Intercept_{induction\_inverter}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+* :math:`Power_{induction\_inverter}` is from the InputSettings class (currently set at 150 kW)
+* :math:`PowerDivisor_{induction\_inverter}` is 1 for single motor systems and 2 for dual motor systems
+
+To estimate the onboard charger and DC-DC converter cost, the module first determines the onboard charger power
+based on the energy content of the battery pack (see equation :math:numref:`bev_kwh_gross`). The onboard charger power is
+then determined according to the parameters shown in :numref:`onboard_charger_table`.
+
+.. _onboard_charger_table:
+.. csv-table:: Onboard Charger Power Table
+    :widths: auto
+    :header-rows: 1
+
+    battery pack gross energy content (kWh),onboard charger power (kW)
+    <70,7
+    70 to <100,11
+    >=100,19
+
+The cost of the onboard charger (OBD) and DC-DC converter are then calculated as shown in :math:numref:`obc_and_dcdc_converter_cost_equation`.
+
+.. Math::
+    :label: obc_and_dcdc_converter_cost_equation
+
+    & \small Cost_{OBC\_and\_DCDC\_converter} = Quantity_{OBC\_and\_DCDC\_converter} \times Slope_{OBC\_and\_DCDC\_converter} \\
+    & \small \times (Power_{OBC} + Power_{DC-DC\_converter})
+
+Where,
+
+* :math:`Cost_{OBC\_and\_DCDC\_converter}` is the cost of onboard charger (OBC) plus the DC-DC converter
+* :math:`Quantity_{OBC\_and\_DCDC\_converter}` and :math:`Slope_{OBC\_and\_DCDC\_converter}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+* :math:`Power_{OBC}` is the power of the OBC from :numref:`onboard_charger_table`
+* :math:`Power_{DC-DC\_converter}` is from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+
+
+The module then
+
+
+
+
+
+ICE Powertrain Costs
+--------------------
+ICE powertrain costs consist of engine-related costs, the transmission, accessories, and air conditioning. In the case of
+hybrid electric vehicles (HEV), the HEV-related costs (battery and non-battery components) are also included.
