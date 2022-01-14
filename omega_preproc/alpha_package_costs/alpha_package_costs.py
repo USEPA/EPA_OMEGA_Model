@@ -175,7 +175,7 @@ class RuntimeSettings:
 
         """
         # set what to run (i.e., what outputs to generate)
-        self.run_ice = False
+        self.run_ice = True
         self.run_bev = True
         self.run_phev = False
         self.run_hev = True
