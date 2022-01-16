@@ -55,11 +55,15 @@ def adjust_co2(metrics_dict, df):
         A DataFrame of packages with ICE-based CO2 values adjusted to reflect electrification.
 
     """
-    df['EPA_FTP_1 gCO2e/mi'] = df['EPA_FTP_1 gCO2e/mi'] * (1 - metrics_dict['co2_reduction_city']['value'])
-    df['EPA_FTP_2 gCO2e/mi'] = df['EPA_FTP_2 gCO2e/mi'] * (1 - metrics_dict['co2_reduction_city']['value'])
-    df['EPA_FTP_3 gCO2e/mi'] = df['EPA_FTP_3 gCO2e/mi'] * (1 - metrics_dict['co2_reduction_city']['value'])
-    df['EPA_HWFET gCO2e/mi'] = df['EPA_HWFET gCO2e/mi'] * (1 - metrics_dict['co2_reduction_hwy']['value'])
-    df['Combined GHG gCO2e/mi'] = df['Combined GHG gCO2e/mi'] * (1 - metrics_dict['co2_reduction_cycle']['value'])
+    factor = 1 - metrics_dict['co2_reduction_cycle']['value']
+    factor_city = 1 - metrics_dict['co2_reduction_city']['value']
+    factor_hwy = 1 - metrics_dict['co2_reduction_hwy']['value']
+
+    df['EPA_FTP_1 gCO2e/mi'] = df['EPA_FTP_1 gCO2e/mi'] * factor_city
+    df['EPA_FTP_2 gCO2e/mi'] = df['EPA_FTP_2 gCO2e/mi'] * factor_city
+    df['EPA_FTP_3 gCO2e/mi'] = df['EPA_FTP_3 gCO2e/mi'] * factor_city
+    df['EPA_HWFET gCO2e/mi'] = df['EPA_HWFET gCO2e/mi'] * factor_hwy
+    df['Combined GHG gCO2e/mi'] = df['Combined GHG gCO2e/mi'] * factor
     return df
 
 
@@ -74,9 +78,9 @@ def add_kwh_per_mile(metrics_dict, df):
         A DataFrame of packages with ICE-based kWh values adjusted to reflect electrification.
 
     """
-    factor = 1 - metrics_dict['co2_reduction_cycle']['value']
-    factor_city = 1 - metrics_dict['co2_reduction_city']['value']
-    factor_hwy = 1- metrics_dict['co2_reduction_hwy']['value']
+    factor = metrics_dict['co2_reduction_cycle']['value']
+    factor_city = metrics_dict['co2_reduction_city']['value']
+    factor_hwy = metrics_dict['co2_reduction_hwy']['value']
 
     kwh_per_mile_1 = pd.Series(df['EPA_FTP_1 Crankshaft Work kWh'] / df['EPA_FTP_1dist. mi'] * factor_city,
                                name='EPA_FTP_1_kWhr/100mi')
@@ -84,16 +88,15 @@ def add_kwh_per_mile(metrics_dict, df):
                                name='EPA_FTP_2_kWhr/100mi')
     kwh_per_mile_3 = pd.Series(df['EPA_FTP_3 Crankshaft Work kWh'] / df['EPA_FTP_3dist. mi'] * factor_city,
                                name='EPA_FTP_3_kWhr/100mi')
-    kwh_per_mile_4 = pd.Series(df['EPA_FTP_2 Crankshaft Work kWh'] / df['EPA_FTP_2dist. mi'] * factor_city,
-                               name='EPA_FTP_4_kWhr/100mi')
     kwh_per_mile_hwy = pd.Series(df['EPA_HWFET Crankshaft Work kWh'] / df['EPA_HWFETdist. mi'] * factor_hwy,
-                                name='EPA_HWFET_kWhr/100mi')
+                                 name='EPA_HWFET_kWhr/100mi')
     combined = pd.Series(df['Combined FE CFR MPG'] * factor, name='Combined Consumption Rate')
 
-    for s in [kwh_per_mile_1, kwh_per_mile_2, kwh_per_mile_3, kwh_per_mile_4, kwh_per_mile_hwy, combined]:
+    for s in [kwh_per_mile_1, kwh_per_mile_2, kwh_per_mile_3, kwh_per_mile_hwy, combined]:
         df = pd.concat([df, s], axis=1)
 
     return df
+
 
 def add_battery(input_settings, df, curves_dict):
     """
@@ -108,11 +111,14 @@ def add_battery(input_settings, df, curves_dict):
 
     """
     df.insert(len(df.columns), 'battery_kwh_gross', 0)
-    df['battery_kwh_gross'] \
-        = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_cubed_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 3 \
-          + curves_dict['kWh_pack_per_kg_curbwt_curve']['x_squared_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 2 \
-          + curves_dict['kWh_pack_per_kg_curbwt_curve']['x_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) \
-          + curves_dict['kWh_pack_per_kg_curbwt_curve']['constant']
+    a = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_cubed_factor']
+    b = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_squared_factor']
+    c = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_factor']
+    d = curves_dict['kWh_pack_per_kg_curbwt_curve']['constant']
+    curb_weight = (df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg
+
+    df['battery_kwh_gross'] = a * curb_weight ** 3 + b * curb_weight ** 2 + c * curb_weight + d
+
     return df
 
 
@@ -129,11 +135,14 @@ def add_motor(input_settings, df, curves_dict):
 
     """
     df.insert(len(df.columns), 'motor_kw', 0)
-    df['motor_kw'] \
-        = curves_dict['kW_motor_per_kg_curbwt_curve']['x_cubed_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 3 \
-          + curves_dict['kW_motor_per_kg_curbwt_curve']['x_squared_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) ** 2 \
-          + curves_dict['kW_motor_per_kg_curbwt_curve']['x_factor'] * ((df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg) \
-          + curves_dict['kW_motor_per_kg_curbwt_curve']['constant']
+    a = curves_dict['kW_motor_per_kg_curbwt_curve']['x_cubed_factor']
+    b = curves_dict['kW_motor_per_kg_curbwt_curve']['x_squared_factor']
+    c = curves_dict['kW_motor_per_kg_curbwt_curve']['x_factor']
+    d = curves_dict['kW_motor_per_kg_curbwt_curve']['constant']
+    curb_weight = (df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg
+
+    df['motor_kw'] = a * curb_weight ** 3 + b * curb_weight ** 2 + c * curb_weight + d
+
     return df
 
 

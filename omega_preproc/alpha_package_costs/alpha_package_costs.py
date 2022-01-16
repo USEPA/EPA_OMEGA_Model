@@ -22,60 +22,50 @@ inputs_code
     :learning_rate_weight:
         The year-over-year learning rate to be applied to weight-related technologies.
     :learning_rate_ice_powertrain:
-        The year-over-year learning rate to be applied to ICE powertrain technologies.
+        The year-over-year learning rate to be applied to ICE and HEV powertrain technologies.
     :learning_rate_roadload:
         The year-over-year learning rate to be applied to roadload related technologies.
     :learning_rate_bev:
         The year-over-year learning rate to be applied to BEV related technologies (battery/motor).
+    :learning_rate_phev:
+        The year-over-year learning rate to be applied to PHEV related technologies (battery/motor).
     :boost_multiplier:
         The cost multiplier to be applied to ICE engine cylinder and displacement costs to reflect the extra costs associated with boost.
 
 inputs_workbook
     :Markup:
-        The indirect cost markup factor to use.
-    :TRX10:
-        The cost estimate associated with a TRX10 transmission (i.e., a 4 speed automatic transmission without modern efficiency elements).
+        The indirect cost markup factor to use within the workbook.
     :AWD_scaler:
         The multiplier to be applied to transmission costs for any vehicle with AWD.
 
-pev_metrics
-    :usable_soc_bev:
-        The usable state-of-charge for a BEV battery.
-    :gap_bev:
-        The on-road "gap" for a BEV.
-    :powertrain_markup_bev:
-        The indirect cost multiplier to be used for BEV related costs (battery/motor)
-    :usable_soc_phev:
-        The usable state-of-charge for a PHEV battery.
-    :gap_phev:
-        The on-road "gap" for a PHEV.
-    :powertrain_markup_phev:
-        The indirect cost multiplier to be used for PHEV related costs (battery/motor).
-
-hev_metrics
-    :usable_soc_hev:
-        The usable state-of-charge for a HEV battery.
-    :gap_hev:
-        The on-road "gap" for a HEV.
-    :powertrain_markup_hev:
-        The indirect cost multiplier to be used for HEV related costs (battery/motor).
+electrified_metrics
+    :usable_soc:
+        The usable state-of-charge for a BEV/PHEV/HEV battery.
+    :gap:
+        The on-road "gap" for a BEV/PHEV/HEV.
+    :electrification_markup:
+        The indirect cost multiplier to be used for BEV/PHEV/HEV related costs (battery/motor)
     :co2_reduction_cycle_hev:
-        The 2-cycle CO2 reduction provided by adding HEV tech.
+        The 2-cycle CO2 reduction provided by adding electrification tech.
     :co2_reduction_city_hev:
-        The city-cycle CO2 reduction provided by adding HEV tech.
+        The city-cycle CO2 reduction provided by adding electrification tech.
     :co2_reduction_hwy_hev:
-        The highway-cycle CO2 reduction provided by adding HEV tech.
+        The highway-cycle CO2 reduction provided by adding electrification tech.
 
 bev_curves and hev_curves
 
     These entries are curves according to the equation x * (Ax^3 +Bx^2 + Cx + D), where the capital letters are the entries in the worksheet and x is the attribute.
 
+    :kWh_pack_per_kg_curbwt_curve:
+        The gross energy content per kilogram of curb weight.
+    :kW_motor_per_kg_curbwt_curve:
+        The motor power per kilogram of curb weight.
     :dollars_per_kWh_curve:
         The battery cost per kWh.
     :kWh_pack_per_kg_pack_curve:
         The energy density of the battery pack.
 
-bev_nonbattery_single, bev_nonbattery_dual, and hev_nonbattery
+bev_nonbattery_single, bev_nonbattery_dual, phev_nonbattery_single, phev_nonbattery_dual, and hev_nonbattery
 
     The quantity, cost curve slopes and intercepts, the cost scalers (e.g., vehicle/motor power, vehicle size) and dollar-basis can be
     set for each of the following "non-battery" components
@@ -128,8 +118,8 @@ accessory
 start-stop
     Cost entries for start-stop technology; these vary by curb weight.
 
-weight_ice and weight_pev
-    Cost entries associated with weight for ICE and for PEV; these vary by ladder-frame vs. unibody.
+weight_ice and weight_bev
+    Cost entries associated with weight for ICE/PHEV/HEV and for BEV; these vary by ladder-frame vs. unibody.
 
 aero and nonaero
     Cost entries for roadload aero and nonaero tech, respectively; these vary by ladder-frame and unibody.
@@ -175,10 +165,10 @@ class RuntimeSettings:
 
         """
         # set what to run (i.e., what outputs to generate)
-        self.run_ice = False
-        self.run_bev = False
+        self.run_ice = True
+        self.run_bev = True
         self.run_phev = True
-        self.run_hev = False
+        self.run_hev = True
         self.generate_simulated_vehicles_file = True
         self.generate_simulated_vehicles_verbose_file = False
 
@@ -338,9 +328,7 @@ class InputSettings:
                                                                  'hev_nonbattery',
                                                                  'slope', 'intercept').to_dict('index')
 
-            self.bev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='bev_metrics', index_col=0).to_dict('index')
-            self.phev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='phev_metrics', index_col=0).to_dict('index')
-            self.hev_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='hev_metrics', index_col=0).to_dict('index')
+            self.electrified_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='electrified_metrics', index_col=0).to_dict('index')
 
             self.ice_glider_share = 0.85
 
@@ -350,7 +338,7 @@ class InputSettings:
             self.bev_weight_reduction = 0
 
             self.onroad_phev_range_miles = 40
-            self.phev_weight_reduction = 0
+            # self.phev_weight_reduction = 0
 
             self.pev_size_bins = 7
             # for now, set HEV size bins here
@@ -501,9 +489,8 @@ class AlphaData:
             pev_keys = pd.Series([0] * len(df))
 
         if fuel_key == 'bev':
-            metrics_dict = input_settings.bev_metrics_dict
             hev_keys = pd.Series([0] * len(df))
-            battery_kwh_gross_list = key_methods.calc_battery_kwh_gross(input_settings, df, metrics_dict)
+            battery_kwh_gross_list = key_methods.calc_battery_kwh_gross(input_settings, df, fuel_key)
             # determine onboard charger specs
             onboard_charger_kw_list = list()
             for battery_kwh_gross in battery_kwh_gross_list:
@@ -524,18 +511,22 @@ class AlphaData:
             # add size scaler to key where size scaler is based on curb weight and scales non-battery costs for PEV and HEV packages
             size_scaler_list = pd.cut(df['Test Weight lbs'] - 300, input_settings.pev_size_bins,
                                       labels=list(range(1, input_settings.pev_size_bins + 1)))
-            pev_keys = pd.Series(zip(pd.Series([input_settings.onroad_bev_range_miles] * len(df)),
+
+            range_list = [input_settings.onroad_bev_range_miles] * len(df)
+            usable_soc_list = [input_settings.electrified_metrics_dict['usable_soc'][fuel_key]] * len(df)
+            gap_list = [input_settings.electrified_metrics_dict['gap'][fuel_key]] * len(df)
+            motor_power_list = [input_settings.bev_motor_power] * len(df)
+            pev_keys = pd.Series(zip(range_list,
                                      df['Combined Consumption Rate'] / 100,
-                                     pd.Series([metrics_dict['usable_soc']['value']] * len(df)),
-                                     pd.Series([metrics_dict['gap']['value']] * len(df)),
+                                     usable_soc_list,
+                                     gap_list,
                                      battery_kwh_gross_list,
-                                     pd.Series([input_settings.bev_motor_power] * len(df)),
+                                     motor_power_list,
                                      number_of_motors_list,
                                      onboard_charger_kw_list,
                                      size_scaler_list))
 
         if fuel_key == 'hev':
-            metrics_dict = input_settings.hev_metrics_dict
             pev_keys = pd.Series([0] * len(df))
             battery_kwh_gross_list = df['battery_kwh_gross']
             motor_kw_list = df['motor_kw']
@@ -543,14 +534,16 @@ class AlphaData:
             # add size scaler to key where size scaler is based on curb weight and scales non-battery costs for PEV and HEV packages
             size_scaler_list = pd.cut(df['Test Weight lbs'] - 300, input_settings.hev_size_bins,
                                       labels=list(range(1, input_settings.hev_size_bins + 1)))
-            hev_keys = pd.Series(zip(pd.Series([metrics_dict['usable_soc']['value']] * len(df)),
-                                     pd.Series([metrics_dict['gap']['value']] * len(df)),
+
+            usable_soc_list = [input_settings.electrified_metrics_dict['usable_soc'][fuel_key]] * len(df)
+            gap_list = [input_settings.electrified_metrics_dict['gap'][fuel_key]] * len(df)
+            hev_keys = pd.Series(zip(usable_soc_list,
+                                     gap_list,
                                      battery_kwh_gross_list,
                                      motor_kw_list,
                                      size_scaler_list))
 
         if fuel_key == 'phev':
-            metrics_dict = input_settings.phev_metrics_dict
             hev_keys = pd.Series([0] * len(df))
             battery_kwh_gross_list = df['battery_kwh_gross']
             motor_kw_list = df['motor_kw']
@@ -574,10 +567,14 @@ class AlphaData:
             # add size scaler to key where size scaler is based on curb weight and scales non-battery costs for PEV and HEV packages
             size_scaler_list = pd.cut(df['Test Weight lbs'] - 300, input_settings.pev_size_bins,
                                       labels=list(range(1, input_settings.pev_size_bins + 1)))
-            pev_keys = pd.Series(zip(pd.Series([input_settings.onroad_phev_range_miles] * len(df)),
+
+            range_list = [input_settings.onroad_phev_range_miles] * len(df)
+            usable_soc_list = [input_settings.electrified_metrics_dict['usable_soc'][fuel_key]] * len(df)
+            gap_list = [input_settings.electrified_metrics_dict['gap'][fuel_key]] * len(df)
+            pev_keys = pd.Series(zip(range_list,
                                      df['Combined Consumption Rate'] / 100,
-                                     pd.Series([metrics_dict['usable_soc']['value']] * len(df)),
-                                     pd.Series([metrics_dict['gap']['value']] * len(df)),
+                                     usable_soc_list,
+                                     gap_list,
                                      battery_kwh_gross_list,
                                      motor_kw_list,
                                      number_of_motors_list,
@@ -619,12 +616,11 @@ class AlphaData:
             battery_weight_list = key_methods.calc_battery_weight(input_settings, battery_kwh_gross_list, input_settings.bev_curves_dict)
             glider_weight_list = key_methods.calc_glider_weight(fuel_key, input_settings, battery_weight_list, curb_weights_series)
             weight_keys = pd.Series(zip(curb_weights_series, glider_weight_list, battery_weight_list,
-                                        pd.Series([input_settings.bev_weight_reduction] * len(df))))
+                                        [input_settings.bev_weight_reduction] * len(df)))
         if fuel_key == 'phev':
             battery_weight_list = key_methods.calc_battery_weight(input_settings, battery_kwh_gross_list, input_settings.phev_curves_dict)
             glider_weight_list = key_methods.calc_glider_weight(fuel_key, input_settings, battery_weight_list, curb_weights_series)
-            weight_keys = pd.Series(zip(curb_weights_series, glider_weight_list, battery_weight_list,
-                                        pd.Series([input_settings.phev_weight_reduction] * len(df))))
+            weight_keys = pd.Series(zip(curb_weights_series, glider_weight_list, battery_weight_list, df['Weight Reduction %']))
         if fuel_key == 'hev':
             battery_weight_list = key_methods.calc_battery_weight(input_settings, battery_kwh_gross_list, input_settings.hev_curves_dict)
             glider_weight_list = key_methods.calc_glider_weight(fuel_key, input_settings, battery_weight_list, curb_weights_series)
@@ -656,7 +652,7 @@ class AlphaData:
 class PackageKeyMethods:
 
     @staticmethod
-    def calc_battery_kwh_gross(input_settings, input_df, metrics_dict):
+    def calc_battery_kwh_gross(input_settings, input_df, fuel_key):
         """
 
         The calc_battery_kwy_gross method is used by the package dict function to create needed battery characteristics from the ALPHA file.
@@ -664,15 +660,18 @@ class PackageKeyMethods:
         Args:
             input_settings: The InputSettings class.
             input_df: A DataFrame of plug-in vehicles for which battery gross kWh is to be calculated based on values set in the module's input file.
+            fuel_key: A string designating whether the package is ICE/HEV/PHEV/BEV.
 
         Returns:
             A list of gross kWh values indexed exactly as the input_df.
 
         """
+        range = input_settings.onroad_bev_range_miles
+        usable_soc = input_settings.electrified_metrics_dict['usable_soc'][fuel_key]
+        gap = input_settings.electrified_metrics_dict['gap'][fuel_key]
         battery_kwh_list = list()
         for kwh_per_100_miles in input_df['Combined Consumption Rate']:
-            battery_kwh = (input_settings.onroad_bev_range_miles / metrics_dict['usable_soc']['value']) \
-                          * (kwh_per_100_miles / 100) / (1 - metrics_dict['gap']['value'])
+            battery_kwh = (range / usable_soc) * (kwh_per_100_miles / 100) / (1 - gap)
             battery_kwh_list.append(battery_kwh)
         return battery_kwh_list
 
@@ -692,11 +691,13 @@ class PackageKeyMethods:
 
         """
         battery_weight_list = list()
+        a = curves_dict['kWh_pack_per_kg_pack_curve']['x_cubed_factor']
+        b = curves_dict['kWh_pack_per_kg_pack_curve']['x_squared_factor']
+        c = curves_dict['kWh_pack_per_kg_pack_curve']['x_factor']
+        d = curves_dict['kWh_pack_per_kg_pack_curve']['constant']
         for battery_kwh in battery_kwh_list:
-            battery_weight = input_settings.lbs_per_kg * battery_kwh / (curves_dict['kWh_pack_per_kg_pack_curve']['x_cubed_factor'] * battery_kwh ** 3
-                                                                        + curves_dict['kWh_pack_per_kg_pack_curve']['x_squared_factor'] * battery_kwh ** 2
-                                                                        + curves_dict['kWh_pack_per_kg_pack_curve']['x_factor'] * battery_kwh
-                                                                        + curves_dict['kWh_pack_per_kg_pack_curve']['constant'])
+            battery_weight = input_settings.lbs_per_kg * battery_kwh \
+                             / (a * battery_kwh ** 3 + b * battery_kwh ** 2 + c * battery_kwh + d)
             battery_weight_list.append(battery_weight)
 
         return battery_weight_list
@@ -705,6 +706,7 @@ class PackageKeyMethods:
     def calc_glider_weight(fuel_key, input_settings, battery_weight_list, curb_weight_series):
         """
         Args:
+            fuel_key: A string indicating whether the package is ICE/HEV/PHEV/BEV.
             input_settings: The InputSettings class.
             battery_weight_list: A list of battery weights.
             curb_weight_series: A Series of curb weights.
@@ -873,22 +875,25 @@ class Battery:
         if self.fuel_key == 'bev':
             range, energy_rate, soc, gap, battery_kwh_gross, motor_power, number_of_motors, onboard_charger_kw, size_scaler = self.pev_key
             curves_dict = input_settings.bev_curves_dict
-            markup = input_settings.bev_metrics_dict['powertrain_markup']['value']
+            markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
 
         if self.fuel_key == 'phev':
             range, energy_rate, soc, gap, battery_kwh_gross, motor_power, number_of_motors, onboard_charger_kw, size_scaler = self.pev_key
             curves_dict = input_settings.phev_curves_dict
-            markup = input_settings.phev_metrics_dict['powertrain_markup']['value']
+            markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
 
         elif self.fuel_key == 'hev':
             soc, gap, battery_kwh_gross, motor_power, size_scaler = self.hev_key
             curves_dict = input_settings.hev_curves_dict
-            markup = input_settings.hev_metrics_dict['powertrain_markup']['value']
+            markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
 
-        battery_cost = battery_kwh_gross * (curves_dict['dollars_per_kWh_curve']['x_cubed_factor'] * battery_kwh_gross ** 3
-                                            + curves_dict['dollars_per_kWh_curve']['x_squared_factor'] * battery_kwh_gross ** 2
-                                            + curves_dict['dollars_per_kWh_curve']['x_factor'] * battery_kwh_gross
-                                            + curves_dict['dollars_per_kWh_curve']['constant'])
+        a = curves_dict['dollars_per_kWh_curve']['x_cubed_factor']
+        b = curves_dict['dollars_per_kWh_curve']['x_squared_factor']
+        c = curves_dict['dollars_per_kWh_curve']['x_factor']
+        d = curves_dict['dollars_per_kWh_curve']['constant']
+
+        battery_cost = battery_kwh_gross \
+                       * (a * battery_kwh_gross ** 3 + b * battery_kwh_gross ** 2 + c * battery_kwh_gross + d)
         battery_cost = battery_cost * markup
 
         return battery_cost
@@ -907,7 +912,7 @@ class NonBattery:
             input_settings: The InputSettings class.
 
         Returns:
-            The non-battery electrification cost for the given package.
+            The non-battery electrification cost (motors, inverters, etc.) for the given package.
 
         """
         motor_power = motor_power_divisor = dcdc_converter_plus_obc = size_scaler = markup = 0
@@ -919,7 +924,7 @@ class NonBattery:
             else:
                 nonbattery_dict = input_settings.bev_nonbattery_dual_dict
                 motor_power_divisor = 2
-            markup = input_settings.bev_metrics_dict['powertrain_markup']['value']
+            markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
             dcdc_converter_plus_obc = nonbattery_dict['kW_DCDC_converter']['intercept'] + onboard_charger_kw
 
         elif self.fuel_key == 'phev':
@@ -930,42 +935,93 @@ class NonBattery:
             else:
                 nonbattery_dict = input_settings.phev_nonbattery_dual_dict
                 motor_power_divisor = 2
-            markup = input_settings.phev_metrics_dict['powertrain_markup']['value']
+            markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
             dcdc_converter_plus_obc = nonbattery_dict['kW_DCDC_converter']['intercept'] + onboard_charger_kw
 
         elif self.fuel_key == 'hev':
             soc, gap, battery_kwh_gross, motor_power, size_scaler = self.hev_key
             nonbattery_dict = input_settings.hev_nonbattery_dict
-            markup = input_settings.hev_metrics_dict['powertrain_markup']['value']
+            markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
             onboard_charger_kw = 0
             motor_power_divisor = 1
             dcdc_converter_plus_obc = nonbattery_dict['kW_DCDC_converter']['intercept'] + onboard_charger_kw
 
-        motor_cost = nonbattery_dict['motor']['quantity'] * (nonbattery_dict['motor']['slope'] * motor_power / motor_power_divisor + nonbattery_dict['motor']['intercept'])
-        inverter_cost = nonbattery_dict['inverter']['quantity'] * (nonbattery_dict['inverter']['slope'] * motor_power / motor_power_divisor + nonbattery_dict['inverter']['intercept'])
-        induction_motor_cost = nonbattery_dict['induction_motor']['quantity'] * nonbattery_dict['induction_motor']['slope'] * motor_power / motor_power_divisor
-        induction_inverter_cost = nonbattery_dict['induction_inverter']['quantity'] * nonbattery_dict['induction_inverter']['slope'] * motor_power / motor_power_divisor
-        obc_and_dcdc_converter_cost = nonbattery_dict['OBC_and_DCDC_converter']['quantity'] * nonbattery_dict['OBC_and_DCDC_converter']['slope'] * dcdc_converter_plus_obc
-        hv_orange_cables_cost = nonbattery_dict['HV_orange_cables']['quantity'] * nonbattery_dict['HV_orange_cables']['slope'] * size_scaler + nonbattery_dict['HV_orange_cables']['intercept']
-        lv_battery_cost = nonbattery_dict['LV_battery']['quantity'] * nonbattery_dict['LV_battery']['slope'] * size_scaler + nonbattery_dict['LV_battery']['intercept']
-        hvac_cost = nonbattery_dict['HVAC']['quantity'] * nonbattery_dict['HVAC']['slope'] * size_scaler + nonbattery_dict['HVAC']['intercept']
-        single_speed_gearbox_cost = nonbattery_dict['single_speed_gearbox']['quantity'] * nonbattery_dict['single_speed_gearbox']['intercept']
-        powertrain_cooling_loop_cost = nonbattery_dict['powertrain_cooling_loop']['quantity'] * nonbattery_dict['powertrain_cooling_loop']['intercept']
-        charging_cord_kit_cost = nonbattery_dict['charging_cord_kit']['quantity'] * nonbattery_dict['charging_cord_kit']['intercept']
-        DC_fast_charge_circuitry_cost = nonbattery_dict['DC_fast_charge_circuitry']['quantity'] * nonbattery_dict['DC_fast_charge_circuitry']['intercept']
-        power_management_and_distribution_cost = nonbattery_dict['power_management_and_distribution']['quantity'] * nonbattery_dict['power_management_and_distribution']['intercept']
-        additional_pair_of_half_shafts_cost = nonbattery_dict['additional_pair_of_half_shafts']['quantity'] * nonbattery_dict['additional_pair_of_half_shafts']['intercept']
-        brake_sensors_actuators_cost = nonbattery_dict['brake_sensors_actuators']['quantity'] * nonbattery_dict['brake_sensors_actuators']['intercept']
+        # get quantity, slope and intercept values from nonbattery_dict
+        motor_quantity, inverter_quantity, induction_motor_quantity, induction_inverter_quantity, obc_and_dcdc_converter_quantity, \
+        hv_orange_cables_quantity, lv_battery_quantity, hvac_quantity, single_speed_gearbox_quantity, powertrain_cooling_loop_quantity, \
+        charging_cord_kit_quantity, dc_fast_charge_circuitry_quantity, power_management_and_distribution_quantity, \
+        additional_pair_of_half_shafts_quantity, brake_sensors_actuators_quantity \
+            = self.get_attribute_values(nonbattery_dict, 'quantity')
+
+        motor_slope, inverter_slope, induction_motor_slope, induction_inverter_slope, obc_and_dcdc_converter_slope, \
+        hv_orange_cables_slope, lv_battery_slope, hvac_slope, single_speed_gearbox_slope, powertrain_cooling_loop_slope, \
+        charging_cord_kit_slope, dc_fast_charge_circuitry_slope, power_management_and_distribution_slope, \
+        additional_pair_of_half_shafts_slope, brake_sensors_actuators_slope \
+            = self.get_attribute_values(nonbattery_dict, 'slope')
+
+        motor_intercept, inverter_intercept, induction_motor_intercept, induction_inverter_intercept, obc_and_dcdc_converter_intercept, \
+        hv_orange_cables_intercept, lv_battery_intercept, hvac_intercept, single_speed_gearbox_intercept, powertrain_cooling_loop_intercept, \
+        charging_cord_kit_intercept, dc_fast_charge_circuitry_intercept, power_management_and_distribution_intercept, \
+        additional_pair_of_half_shafts_intercept, brake_sensors_actuators_intercept \
+            = self.get_attribute_values(nonbattery_dict, 'intercept')
+        
+        motor_cost = motor_quantity * (motor_slope * motor_power / motor_power_divisor + motor_intercept)
+        inverter_cost = inverter_quantity * (inverter_slope * motor_power / motor_power_divisor + inverter_intercept)
+        induction_motor_cost = induction_motor_quantity * induction_motor_slope * motor_power / motor_power_divisor
+        induction_inverter_cost = induction_inverter_quantity * induction_motor_slope * motor_power / motor_power_divisor
+        obc_and_dcdc_converter_cost = obc_and_dcdc_converter_quantity * obc_and_dcdc_converter_slope * dcdc_converter_plus_obc
+        hv_orange_cables_cost = hv_orange_cables_quantity * hv_orange_cables_slope * size_scaler + hv_orange_cables_intercept
+        lv_battery_cost = lv_battery_quantity * lv_battery_slope * size_scaler + lv_battery_intercept
+        hvac_cost = hvac_quantity * hvac_slope * size_scaler + hvac_intercept
+        single_speed_gearbox_cost = single_speed_gearbox_quantity * single_speed_gearbox_intercept
+        powertrain_cooling_loop_cost = powertrain_cooling_loop_quantity * powertrain_cooling_loop_intercept
+        charging_cord_kit_cost = charging_cord_kit_quantity * charging_cord_kit_intercept
+        dc_fast_charge_circuitry_cost = dc_fast_charge_circuitry_quantity * dc_fast_charge_circuitry_intercept
+        power_management_and_distribution_cost = power_management_and_distribution_quantity * power_management_and_distribution_intercept
+        additional_pair_of_half_shafts_cost = additional_pair_of_half_shafts_quantity * additional_pair_of_half_shafts_intercept
+        brake_sensors_actuators_cost = brake_sensors_actuators_quantity * brake_sensors_actuators_intercept
 
         non_battery_cost = motor_cost + inverter_cost + induction_motor_cost + induction_inverter_cost \
                            + obc_and_dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost + hvac_cost \
                            + single_speed_gearbox_cost + powertrain_cooling_loop_cost + charging_cord_kit_cost \
-                           + DC_fast_charge_circuitry_cost + power_management_and_distribution_cost \
+                           + dc_fast_charge_circuitry_cost + power_management_and_distribution_cost \
                            + additional_pair_of_half_shafts_cost + brake_sensors_actuators_cost
         non_battery_cost = non_battery_cost * markup
 
         return non_battery_cost
+    
+    @staticmethod
+    def get_attribute_values(nonbattery_dict, attribute):
+        """
 
+        Args:
+            nonbattery_dict: Dictionary of non-battery curves.
+            attribute: A string ('quantity', 'slope' or 'intercept')
+
+        Returns:
+            The attribute values of the requested attribute.
+            
+        """
+        motor = nonbattery_dict['motor'][attribute]
+        inverter = nonbattery_dict['inverter'][attribute]
+        induction_motor = nonbattery_dict['induction_motor'][attribute]
+        induction_inverter = nonbattery_dict['induction_inverter'][attribute]
+        obc_and_dcdc_converter = nonbattery_dict['OBC_and_DCDC_converter'][attribute]
+        hv_orange_cables = nonbattery_dict['HV_orange_cables'][attribute]
+        lv_battery = nonbattery_dict['LV_battery'][attribute]
+        hvac = nonbattery_dict['HVAC'][attribute]
+        single_speed_gearbox = nonbattery_dict['single_speed_gearbox'][attribute]
+        powertrain_cooling_loop = nonbattery_dict['powertrain_cooling_loop'][attribute]
+        charging_cord_kit = nonbattery_dict['charging_cord_kit'][attribute]
+        dc_fast_charge_circuitry = nonbattery_dict['DC_fast_charge_circuitry'][attribute]
+        power_management_and_distribution = nonbattery_dict['power_management_and_distribution'][attribute]
+        additional_pair_of_half_shafts = nonbattery_dict['additional_pair_of_half_shafts'][attribute]
+        brake_sensors_actuators = nonbattery_dict['brake_sensors_actuators'][attribute]
+        
+        return motor, inverter, induction_motor, induction_inverter, obc_and_dcdc_converter, hv_orange_cables, lv_battery, \
+               hvac, single_speed_gearbox, powertrain_cooling_loop, charging_cord_kit, dc_fast_charge_circuitry, \
+               power_management_and_distribution, additional_pair_of_half_shafts, brake_sensors_actuators 
+    
 
 class Weight:
 
@@ -1141,13 +1197,16 @@ class PackageCost:
         else:
             hev_cost = 0
         
-        powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost + hev_cost
-        powertrain_cost_df = pd.DataFrame(powertrain_cost, columns=['ice_powertrain'], index=[self.alpha_key])
+        ice_powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost
+        ice_powertrain_cost_df = pd.DataFrame(ice_powertrain_cost, columns=['ice_powertrain'], index=[self.alpha_key])
+
+        electrification_cost = hev_cost
+        electrification_cost_df = pd.DataFrame(electrification_cost, columns=['hev_powertrain'], index=[self.alpha_key])
 
         weight_cost = Weight(self.key).calc_weight_cost(input_settings)
         body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[self.alpha_key])
 
-        package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
+        package_cost_df = ice_powertrain_cost_df.join(electrification_cost_df).join(roadload_cost_df).join(body_cost_df)
         
         package_cost_df.insert(0, 'cs_cert_direct_oncycle_co2e_grams_per_mile', combined_co2)
         package_cost_df.insert(0, 'cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile', hwy_co2)
@@ -1206,22 +1265,27 @@ class PackageCost:
             engine_cost = Engine(self.key).calc_engine_cost(input_settings)
             trans_cost = self.calc_trans_cost(input_settings)
             accessories_cost = self.calc_accessories_cost(input_settings)
+            ice_powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost
+            battery_cost = Battery(self.key).calc_battery_cost(input_settings)
+            non_battery_cost = NonBattery(self.key).calc_nonbattery_cost(input_settings)
+            electrification_cost = battery_cost + non_battery_cost
         else:
             engine_cost = 0
             trans_cost = 0
             accessories_cost = 0
+            ice_powertrain_cost = engine_cost + trans_cost + accessories_cost
+            battery_cost = Battery(self.key).calc_battery_cost(input_settings)
+            non_battery_cost = NonBattery(self.key).calc_nonbattery_cost(input_settings)
+            electrification_cost = battery_cost + non_battery_cost + ac_cost
 
-        battery_cost = Battery(self.key).calc_battery_cost(input_settings)
-        non_battery_cost = NonBattery(self.key).calc_nonbattery_cost(input_settings)
-        pev_cost = battery_cost + non_battery_cost
+        ice_powertrain_cost_df = pd.DataFrame(ice_powertrain_cost, columns=['ice_powertrain'], index=[self.alpha_key])
 
-        powertrain_cost = engine_cost + trans_cost + accessories_cost + pev_cost + ac_cost
-        powertrain_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_nonbattery': non_battery_cost, 'pev_powertrain': powertrain_cost}, index=[self.alpha_key])
+        electrification_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_nonbattery': non_battery_cost, 'pev_powertrain': electrification_cost}, index=[self.alpha_key])
 
         weight_cost = Weight(self.key).calc_weight_cost(input_settings)
         body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[self.alpha_key])
 
-        package_cost_df = powertrain_cost_df.join(roadload_cost_df).join(body_cost_df)
+        package_cost_df = ice_powertrain_cost_df.join(electrification_cost_df).join(roadload_cost_df).join(body_cost_df)
 
         package_cost_df.insert(0, 'cd_cert_direct_oncycle_kwh_per_mile', combined_kwh)
         package_cost_df.insert(0, 'cd_hwfet:cert_direct_oncycle_kwh_per_mile', hwy_kwh)
@@ -1482,7 +1546,7 @@ def calc_year_over_year_costs(df, arg, years, learning_rate):
         learning_rate: The learning rate to apply to start year costs to calculated year-over-year costs.
 
     Returns:
-        A DataFrame of ALPHA packages with costs for all years passed.
+        A DataFrame of ALPHA packages with costs for all years.
 
     """
     df_return = df.copy()
@@ -1621,11 +1685,16 @@ def main():
 
     # calculate YoY bev costs with learning
     if runtime_settings.run_bev:
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_battery', input_settings.years, input_settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_nonbattery', input_settings.years, input_settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_powertrain', input_settings.years, input_settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'roadload', input_settings.years, input_settings.learning_rate_roadload)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'body', input_settings.years, input_settings.learning_rate_weight)
+        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_battery', input_settings.years,
+                                                    input_settings.learning_rate_bev)
+        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_nonbattery', input_settings.years,
+                                                    input_settings.learning_rate_bev)
+        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_powertrain', input_settings.years,
+                                                    input_settings.learning_rate_bev)
+        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'roadload', input_settings.years,
+                                                    input_settings.learning_rate_roadload)
+        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'body', input_settings.years,
+                                                    input_settings.learning_rate_weight)
         bev_packages_df.reset_index(drop=False, inplace=True)
         bev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'bev_{idx}' for idx in range(1, len(bev_packages_df) + 1)]
@@ -1636,6 +1705,8 @@ def main():
 
     # calculate YoY phev costs with learning
     if runtime_settings.run_phev:
+        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'ice_powertrain', input_settings.years,
+                                                     input_settings.learning_rate_ice_powertrain)
         phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_battery', input_settings.years,
                                                      input_settings.learning_rate_phev)
         phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_nonbattery', input_settings.years,
@@ -1652,20 +1723,25 @@ def main():
         phev_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         phev_packages_df = sum_vehicle_parts(phev_packages_df, input_settings.years,
                                              'new_vehicle_mfr_cost_dollars',
-                                             'pev_powertrain', 'roadload', 'body')
+                                             'ice_powertrain', 'pev_powertrain', 'roadload', 'body')
 
     # calculate YoY hev costs with learning
     if runtime_settings.run_hev:
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'ice_powertrain', input_settings.years, input_settings.learning_rate_ice_powertrain)
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'roadload', input_settings.years, input_settings.learning_rate_roadload)
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'body', input_settings.years, input_settings.learning_rate_weight)
+        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'ice_powertrain', input_settings.years,
+                                                    input_settings.learning_rate_ice_powertrain)
+        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'hev_powertrain', input_settings.years,
+                                                    input_settings.learning_rate_ice_powertrain)
+        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'roadload', input_settings.years,
+                                                    input_settings.learning_rate_roadload)
+        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'body', input_settings.years,
+                                                    input_settings.learning_rate_weight)
         hev_packages_df.reset_index(drop=False, inplace=True)
         hev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'hev_{idx}' for idx in range(1, len(hev_packages_df) + 1)]
         hev_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         hev_packages_df = sum_vehicle_parts(hev_packages_df, input_settings.years,
                                             'new_vehicle_mfr_cost_dollars',
-                                            'ice_powertrain', 'roadload', 'body')
+                                            'ice_powertrain', 'hev_powertrain', 'roadload', 'body')
 
     # calculate YoY ice costs with learning
     if runtime_settings.run_ice:
