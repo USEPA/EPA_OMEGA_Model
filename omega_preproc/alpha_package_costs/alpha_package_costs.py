@@ -52,9 +52,9 @@ electrified_metrics
     :co2_reduction_hwy_hev:
         The highway-cycle CO2 reduction provided by adding electrification tech.
 
-bev_curves and hev_curves
+bev_curves, phev_curves and hev_curves
 
-    These entries are curves according to the equation x * (Ax^3 +Bx^2 + Cx + D), where the capital letters are the entries in the worksheet and x is the attribute.
+    These entries are curves according to the equation (Ax^3 +Bx^2 + Cx + D), where the capital letters are the entries in the worksheet and x is the attribute.
 
     :kWh_pack_per_kg_curbwt_curve:
         The gross energy content per kilogram of curb weight.
@@ -331,6 +331,7 @@ class InputSettings:
             self.electrified_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='electrified_metrics', index_col=0).to_dict('index')
 
             self.ice_glider_share = 0.85
+            self.bev_glider_share = 1
 
             # for now, set a BEV range and motor power here
             self.onroad_bev_range_miles = 300
@@ -666,13 +667,15 @@ class PackageKeyMethods:
             A list of gross kWh values indexed exactly as the input_df.
 
         """
-        range = input_settings.onroad_bev_range_miles
+        onroad_range = input_settings.onroad_bev_range_miles
         usable_soc = input_settings.electrified_metrics_dict['usable_soc'][fuel_key]
         gap = input_settings.electrified_metrics_dict['gap'][fuel_key]
         battery_kwh_list = list()
+
         for kwh_per_100_miles in input_df['Combined Consumption Rate']:
-            battery_kwh = (range / usable_soc) * (kwh_per_100_miles / 100) / (1 - gap)
+            battery_kwh = (onroad_range / usable_soc) * (kwh_per_100_miles / 100) / (1 - gap)
             battery_kwh_list.append(battery_kwh)
+
         return battery_kwh_list
 
     @staticmethod
@@ -690,11 +693,14 @@ class PackageKeyMethods:
             A list of battery weights for each of the batteries in the passed battery_kwh_list.
 
         """
+        attribute = 'kWh_pack_per_kg_pack_curve'
+
         battery_weight_list = list()
-        a = curves_dict['kWh_pack_per_kg_pack_curve']['x_cubed_factor']
-        b = curves_dict['kWh_pack_per_kg_pack_curve']['x_squared_factor']
-        c = curves_dict['kWh_pack_per_kg_pack_curve']['x_factor']
-        d = curves_dict['kWh_pack_per_kg_pack_curve']['constant']
+        a = curves_dict[attribute]['x_cubed_factor']
+        b = curves_dict[attribute]['x_squared_factor']
+        c = curves_dict[attribute]['x_factor']
+        d = curves_dict[attribute]['constant']
+
         for battery_kwh in battery_kwh_list:
             battery_weight = input_settings.lbs_per_kg * battery_kwh \
                              / (a * battery_kwh ** 3 + b * battery_kwh ** 2 + c * battery_kwh + d)
@@ -716,18 +722,15 @@ class PackageKeyMethods:
 
         """
         glider_weight_list = list()
-        if fuel_key == 'ice':
-            for idx, battery_weight in enumerate(battery_weight_list):
-                glider_wt = curb_weight_series[idx] * input_settings.ice_glider_share
-                glider_weight_list.append(glider_wt)
+
         if fuel_key == 'bev':
-            for idx, battery_weight in enumerate(battery_weight_list):
-                glider_wt = curb_weight_series[idx] - battery_weight
-                glider_weight_list.append(glider_wt)
-        if fuel_key == 'hev' or fuel_key == 'phev':
-            for idx, battery_weight in enumerate(battery_weight_list):
-                glider_wt = curb_weight_series[idx] * input_settings.ice_glider_share - battery_weight
-                glider_weight_list.append(glider_wt)
+            glider_share = input_settings.bev_glider_share
+        else:
+            glider_share = input_settings.ice_glider_share
+
+        for idx, battery_weight in enumerate(battery_weight_list):
+            glider_wt = curb_weight_series[idx] * glider_share - battery_weight
+            glider_weight_list.append(glider_wt)
 
         return glider_weight_list
 
@@ -887,10 +890,11 @@ class Battery:
             curves_dict = input_settings.hev_curves_dict
             markup = input_settings.electrified_metrics_dict['electrification_markup'][self.fuel_key]
 
-        a = curves_dict['dollars_per_kWh_curve']['x_cubed_factor']
-        b = curves_dict['dollars_per_kWh_curve']['x_squared_factor']
-        c = curves_dict['dollars_per_kWh_curve']['x_factor']
-        d = curves_dict['dollars_per_kWh_curve']['constant']
+        attribute = 'dollars_per_kWh_curve'
+        a = curves_dict[attribute]['x_cubed_factor']
+        b = curves_dict[attribute]['x_squared_factor']
+        c = curves_dict[attribute]['x_factor']
+        d = curves_dict[attribute]['constant']
 
         battery_cost = battery_kwh_gross \
                        * (a * battery_kwh_gross ** 3 + b * battery_kwh_gross ** 2 + c * battery_kwh_gross + d)

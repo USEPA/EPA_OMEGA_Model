@@ -44,20 +44,21 @@ class SelectICEforHEV:
         return return_df
 
 
-def adjust_co2(metrics_dict, df):
+def adjust_co2(metrics_dict, df, fuel_key):
     """
 
     Args:
         metrics_dict: Dictionary of HEV or PHEV metrics.
         df: A DataFrame of ICE-based ALPHA packages that are being "converted" to electrified packages.
+        fuel_key: String indicating whether the package is a PHEV or HEV ('phev' or 'hev').
 
     Returns:
         A DataFrame of packages with ICE-based CO2 values adjusted to reflect electrification.
 
     """
-    factor = 1 - metrics_dict['co2_reduction_cycle']['value']
-    factor_city = 1 - metrics_dict['co2_reduction_city']['value']
-    factor_hwy = 1 - metrics_dict['co2_reduction_hwy']['value']
+    factor = 1 - metrics_dict['co2_reduction_cycle'][fuel_key]
+    factor_city = 1 - metrics_dict['co2_reduction_city'][fuel_key]
+    factor_hwy = 1 - metrics_dict['co2_reduction_hwy'][fuel_key]
 
     df['EPA_FTP_1 gCO2e/mi'] = df['EPA_FTP_1 gCO2e/mi'] * factor_city
     df['EPA_FTP_2 gCO2e/mi'] = df['EPA_FTP_2 gCO2e/mi'] * factor_city
@@ -67,20 +68,21 @@ def adjust_co2(metrics_dict, df):
     return df
 
 
-def add_kwh_per_mile(metrics_dict, df):
+def add_kwh_per_mile(metrics_dict, df, fuel_key):
     """
 
     Args:
         metrics_dict: Dictionary of HEV or PHEV metrics.
         df: A DataFrame of ICE-based ALPHA packages that are being "converted" to electrified packages.
+        fuel_key: String indicating whether the package is a PHEV or HEV ('phev' or 'hev').
 
     Returns:
         A DataFrame of packages with ICE-based kWh values adjusted to reflect electrification.
 
     """
-    factor = metrics_dict['co2_reduction_cycle']['value']
-    factor_city = metrics_dict['co2_reduction_city']['value']
-    factor_hwy = metrics_dict['co2_reduction_hwy']['value']
+    factor = metrics_dict['co2_reduction_cycle'][fuel_key]
+    factor_city = metrics_dict['co2_reduction_city'][fuel_key]
+    factor_hwy = metrics_dict['co2_reduction_hwy'][fuel_key]
 
     kwh_per_mile_1 = pd.Series(df['EPA_FTP_1 Crankshaft Work kWh'] / df['EPA_FTP_1dist. mi'] * factor_city,
                                name='EPA_FTP_1_kWhr/100mi')
@@ -111,10 +113,14 @@ def add_battery(input_settings, df, curves_dict):
 
     """
     df.insert(len(df.columns), 'battery_kwh_gross', 0)
-    a = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_cubed_factor']
-    b = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_squared_factor']
-    c = curves_dict['kWh_pack_per_kg_curbwt_curve']['x_factor']
-    d = curves_dict['kWh_pack_per_kg_curbwt_curve']['constant']
+
+    attribute = 'kWh_pack_per_kg_curbwt_curve'
+
+    a = curves_dict[attribute]['x_cubed_factor']
+    b = curves_dict[attribute]['x_squared_factor']
+    c = curves_dict[attribute]['x_factor']
+    d = curves_dict[attribute]['constant']
+
     curb_weight = (df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg
 
     df['battery_kwh_gross'] = a * curb_weight ** 3 + b * curb_weight ** 2 + c * curb_weight + d
@@ -135,10 +141,14 @@ def add_motor(input_settings, df, curves_dict):
 
     """
     df.insert(len(df.columns), 'motor_kw', 0)
-    a = curves_dict['kW_motor_per_kg_curbwt_curve']['x_cubed_factor']
-    b = curves_dict['kW_motor_per_kg_curbwt_curve']['x_squared_factor']
-    c = curves_dict['kW_motor_per_kg_curbwt_curve']['x_factor']
-    d = curves_dict['kW_motor_per_kg_curbwt_curve']['constant']
+
+    attribute = 'kW_motor_per_kg_curbwt_curve'
+
+    a = curves_dict[attribute]['x_cubed_factor']
+    b = curves_dict[attribute]['x_squared_factor']
+    c = curves_dict[attribute]['x_factor']
+    d = curves_dict[attribute]['constant']
+
     curb_weight = (df['Test Weight lbs'] - 300)/input_settings.lbs_per_kg
 
     df['motor_kw'] = a * curb_weight ** 3 + b * curb_weight ** 2 + c * curb_weight + d
@@ -224,7 +234,7 @@ def main():
         folder_path = hev_folder_path
         packages_df = add_battery(input_settings, packages_df, curves_dict)
         packages_df = add_motor(input_settings, packages_df, curves_dict)
-        packages_df = adjust_co2(metrics_dict, packages_df)
+        packages_df = adjust_co2(metrics_dict, packages_df, 'hev')
         # packages_df = add_size_scalers(input_settings, packages_df)
         packages_df = pd.concat([sub_header, packages_df], axis=0, ignore_index=True)
         packages_df.to_csv(folder_path / 'HEV.csv', index=False)
@@ -237,8 +247,8 @@ def main():
         folder_path = phev_folder_path
         packages_df = add_battery(input_settings, packages_df, curves_dict)
         packages_df = add_motor(input_settings, packages_df, curves_dict)
-        packages_df = adjust_co2(metrics_dict, packages_df)
-        packages_df = add_kwh_per_mile(metrics_dict, packages_df)
+        packages_df = adjust_co2(metrics_dict, packages_df, 'phev')
+        packages_df = add_kwh_per_mile(metrics_dict, packages_df, 'phev')
         # packages_df = add_size_scalers(input_settings, packages_df)
         packages_df = pd.concat([sub_header, packages_df], axis=0, ignore_index=True)
         packages_df.to_csv(folder_path / 'PHEV.csv', index=False)
