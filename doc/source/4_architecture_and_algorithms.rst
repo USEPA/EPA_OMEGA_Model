@@ -997,18 +997,52 @@ ALPHA files which provide CO2 g/mi results over EPA test cycles for various clas
 of technology packages applied to each.
 
 In general, individual technology costs are read from the alpha_package_costs_module_inputs file inclusive of
-markups to cover indirect costs. The markups are controllable via user input with the file on the inputs_workbook worksheet
-(ICE powertrain and all vehicle roadload markups), the pev_metrics worksheet (plug-in electric vehicle powertrain markups)
-and the hev_metrics worksheet (HEV powertrain markups). The inputs_code worksheet contains learning rate inputs for various
-technologies. These learning rates are applied year-over-year to technologies within the category beginning with the start_year
-setting on the inputs_code worksheet. Every cost within the alpha_package_costs_module_inputs file has an associated dollar
-basis to specify the dollar valuation of the given cost (i.e., is the cost in 2016 dollars, 2020 dollars, etc.). On the
-inputs_code worksheet, the user can specify the dollar basis for the module's output file. Running the module generates a
-simulated_vehicles.csv file, along with other output files, with all cost values converted to the dollar_basis specified
-on the inputs_code worksheet. When the simulated_vehicles.csv file is subsequently read into OMEGA, the simulated_vehicles.csv
-costs will again be converted to be consistent with the dollar_basis specified for the given OMEGA run. So the
-alpha_package_costs_module_inputs file dollar_basis (set via the dollar_basis_for_output_file setting) does not need to be
-consistent with the desired OMEGA-run dollar basis value.
+markups to cover indirect costs. The markups applied within the alpha_package_costs_module_inputs file, which are applied
+to ICE engine-related and all aero, non-aero and weight-related costs, are controllable via user input on the inputs_workbook
+worksheet. The markups to be applied to electrification technology (battery and non-battery costs for HEVs, PHEVs and BEVs)
+is controllable via user input on the electrified_metrics worksheet. Importantly, the electrification markups are applied
+"in-code" via the alpha_package_costs module so their application is not reflected within the alpha_package_costs_module_inputs
+file. The inputs_code worksheet contains learning rate inputs for various technologies. These learning rates are applied
+year-over-year to technologies within the category beginning with the start_year setting on the inputs_code worksheet.
+Every cost within the alpha_package_costs_module_inputs file has an associated dollar basis to specify the dollar valuation
+of the given cost (i.e., is the cost in 2016 dollars, 2020 dollars, etc.). On the inputs_code worksheet, the user can
+specify the dollar basis for the module's output file. Running the module generates a simulated_vehicles.csv file, along
+with other output files, with all cost values converted to the dollar_basis specified on the inputs_code worksheet. When
+the simulated_vehicles.csv file is subsequently read into OMEGA, the simulated_vehicles.csv costs will again be converted
+to be consistent with the dollar_basis specified for the given OMEGA run. So the alpha_package_costs_module_inputs file
+dollar_basis (set via the dollar_basis_for_output_file setting) does not need to be consistent with the desired OMEGA-run
+dollar basis value. All of the inputs applied in-code, as just discussed, are shown in :numref:`inputs_code_sheet`.
+
+.. _inputs_code_sheet:
+.. csv-table:: Inputs Applied "In-code"
+    :widths: auto
+    :header-rows: 1
+
+    item,value
+    run_ID,0
+    optional_run_description,
+    dollar_basis_for_output_file,2020
+    start_year,2020
+    end_year,2050
+    learning_rate_weight,0.005
+    learning_rate_ice_powertrain,0.01
+    learning_rate_roadload,0.015
+    learning_rate_bev,0.025
+    learning_rate_phev,0.025
+    boost_multiplier,1.2
+
+Where,
+
+* :math:`run\_ID` will be added to output filenames (leave as "0" to include nothing but a date and time stamp)
+* :math:`optional\_run\_description` is optional and is simply included in the copy/paste version of the input file into the output file
+* :math:`dollar\_basis\_for\_output\_file` sets the desired dollar basis for outputs of the alpha_package_costs module
+* :math:`start\_year` sets the start year for cost calculations and application of learning effects
+* :math:`end\_year` sets the final year for cost calculations
+* :math:`learning\_rate\_weight` sets the learning rate for weight-related costs
+* :math:`learning\_rate\_ice\_powertrain` sets the learning rate for ICE powertrain technologies applied to ICE, HEV and PHEV packages and HEV battery and non-battery components
+* :math:`learning\_rate\_roadload` sets the learning rate for aero and non-aero roadload reduction technolgies
+* :math:`learning\_rate\_bev` and :math:`learning_rate_phev` set the learning rates for battery and non-battery components on BEV and PHEV packages
+* :math:`boost\_multiplier` sets the multiplier applied to boosted packages
 
 ICE Engine-Related Costs
 ------------------------
@@ -1094,10 +1128,11 @@ in equation :math:numref:`cyl_count_and_displ_cost`.
 .. Math::
     :label: cyl_count_and_displ_cost
 
-    EngineCost_{Displacement, Cylinders} = Displacement \times \frac{$} {liter} - CylinderCount \times \frac{$} {cylinder}
+    Cost_{Displacement, Cylinders} = Displacement \times \frac{$} {liter} + CylinderCount \times \frac{$} {cylinder}
 
 Where,
 
+* :math:`Cost_{Displacement, Cylinders}` is the cost of the engine block
 * :math:`Displacement` comes from the package description in the ALPHA input file
 * :math:`CylinderCount` comes from the package description in the ALPHA input file
 * :math:`\frac{$} {liter}` comes from :numref:`engine_cost_sheet`
@@ -1109,12 +1144,13 @@ as shown in equation :math:numref:`turbo_cost`.
 .. Math::
     :label: turbo_cost
 
-    & TurboCost \\
-    & = \small EngineCost_{Displacement, Cylinders} \times (BoostMultiplier - 1) - TurboCost_{Level-Vintage, CylinderCount}
+    & Cost_{turbocharging} \\
+    & = \small Cost_{Displacement, Cylinders} \times (BoostMultiplier - 1) + TurboCost_{Level-Vintage, CylinderCount}
 
 Where,
 
-* :math:`EngineCost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
+* :math:`Cost_{turbocharging}` is the cost associated with turbocharging including costs to improve robustness
+* :math:`Cost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
 * :math:`BoostMultiplier` is from the inputs_code worksheet of the alpha_package_costs_module_inputs file
 * :math:`Level-Vintage` associated with the turbo is from :numref:`engines_and_techs`
 * :math:`CylinderCount` comes from the package description in the ALPHA input file
@@ -1157,24 +1193,25 @@ The module determines the presence of start-stop from the "Start Stop" column of
 weight using the "Test Weight lbs" column of the ALPHA input file less 300 pounds (test weight is defined as curb weight
 plus 300 pounds). Based on the curb weight, the start-stop system costs are determined based on the values in :numref:`start_stop_sheet`.
 
-The engine-related costs can then be summed as shown in equation :math:numref:`engine_costs`.
+The engine-related costs can then be summed as shown in equation :math:numref:`engine_cost_equation`.
 
 .. Math::
-    :label: engine_costs
+    :label: engine_cost_equation
 
-    & EngineCosts \\
-    & = \small EngineCost_{Displacement, Cylinders} - TurboCost - CEGRCost \\
-    & - \small FuelSystemCost - DeacCost - ATKCost - StartStopCost
+    & Cost_{engine} \\
+    & = \small Cost_{Displacement, Cylinders} + Cost_{turbocharging} + Cost_{cegr} \\
+    & + \small Cost_{fuel\ system} + Cost_{cylinder\ deactivation} + Cost_{atk} + Cost_{start-stop}
 
 Where,
 
-* :math:`EngineCost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
-* :math:`TurboCost` is from equation :math:numref:`turbo_cost` (note: this might be $0)
-* :math:`CEGRCost` is from :numref:`engines_and_techs` (note: this might be $0)
-* :math:`FuelSystemCost` is from :numref:`engines_and_techs` (note: this might be $0)
-* :math:`DeacCost` is from :numref:`engines_and_techs` (note: this might be $0)
-* :math:`ATKCost` is from :numref:`engines_and_techs` (note: this might be $0)
-* :math:`StartStopCost` is from :numref:`start_stop_sheet` (note: this might be $0)
+* :math:`Cost_{engine}` is the cost of the ICE engine
+* :math:`Cost_{Displacement, Cylinders}` is from equation :math:numref:`cyl_count_and_displ_cost`
+* :math:`Cost_{turbocharging}` is from equation :math:numref:`turbo_cost` (note: this might be $0)
+* :math:`Cost_{cegr}` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`Cost_{fuel\ system}` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`Cost_{cylinder\ deactivation}` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`Cost_{atk}` is from :numref:`engines_and_techs` (note: this might be $0)
+* :math:`Cost_{start-stop}` is from :numref:`start_stop_sheet` (note: this might be $0)
 
 ICE Transmission Costs
 ----------------------
@@ -1330,6 +1367,27 @@ Where,
 * :math:`dmc` refers to the Direct Manufacturing Cost
 * :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
 
+Air Conditioning Costs
+----------------------
+Air conditioning costs are added to all packages using the table on the ac worksheet of the alpha_package_costs_module_inputs
+file. That table is shown in :numref:`ac_sheet`.
+
+.. _ac_sheet:
+.. csv-table:: Air Conditioning Costs
+    :widths: auto
+    :header-rows: 1
+
+    structure_class,item_cost,dmc,dollar_basis
+    unibody,171,114,2010
+    ladder,171,114,2010
+
+Where,
+
+* :math:`structure\_class` refers to the basic structure of the package
+* :math:`unibody` and :math:`ladder` are determined by the module where ALPHA class "Truck" is ladder and all other ALPHA classes are unibody
+* :math:`dmc` refers to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+
 Aerodynamic Roadload Reduction Costs
 ------------------------------------
 To estimate aerodynamic-related costs, the module makes use of the "Aero Improvement %" column of the ALPHA input file and the
@@ -1396,76 +1454,51 @@ Where,
 * :math:`dmc` refers to the Direct Manufacturing Cost
 * :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
 
-Air Conditioning Costs
-----------------------
-Air condition costs are added to all packages using the table on the ac worksheet of the alpha_package_costs_module_inputs
-file. That table is shown in :numref:`ac_sheet`.
+Roadload Reduction Costs
+------------------------
+Roadload reduction costs are calculated as the sum of Aerodynamic Roadload Reduction and Non-Aerodynamic Roadload Reduction Costs
+as shown in equation :math:numref:`roadload_reduction_cost_equation`.
 
-.. _ac_sheet:
-.. csv-table:: Air Conditioning Costs
-    :widths: auto
-    :header-rows: 1
+.. Math::
+    :label: roadload_reduction_cost_equation
 
-    structure_class,item_cost,dmc,dollar_basis
-    unibody,171,114,2010
-    ladder,171,114,2010
+    Cost_{roadload\_reduction} = Cost_{aero\_roadload\_reduction} + Cost_{nonaero\_roadload\_reduction}
 
 Where,
 
-* :math:`structure\_class` refers to the basic structure of the package
-* :math:`unibody` and :math:`ladder` are determined by the module where ALPHA class "Truck" is ladder and all other ALPHA classes are unibody
-* :math:`dmc` refers to the Direct Manufacturing Cost
-* :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
+* :math:`Cost_{roadload\_reduction}` are costs associated with roadload reduction
+* :math:`Cost_{aero\_roadload\_reduction}` is from :numref:`aero_sheet`
+* :math:`Cost_{nonaero\_roadload\_reduction}` is from :numref:`nonaero_sheet`
 
 Electrified Vehicle Costs
 -------------------------
-For any plug-in electric vehicle (PEV, which includes both battery electric vehicle (BEV) and plug-in hybrid electric
-vehicle (PHEV)), or hybrid electric vehicle (HEV), battery costs are estimated using the tables from the appropriate
-pev_metrics or hev_metrics worksheets of the alpha_package_costs_module_inputs file. Those tables are shown in
-:numref:`pev_metrics_sheet` and :numref:`hev_metrics_sheet`, respectively.
+For any battery electric vehicle (BEV), plug-in hybrid electric vehicle (PHEV), or hybrid electric vehicle (HEV), battery
+costs are estimated using the table on the electrification metrics worksheet worksheet of the alpha_package_costs_module_inputs file.
+That table is shown in :numref:`electrified_metrics_sheet`.
 
-.. _pev_metrics_sheet:
-.. csv-table:: PEV Cost Metrics
+.. _electrified_metrics_sheet:
+.. csv-table:: Electrification Metrics
     :widths: auto
     :header-rows: 1
 
-    item,value
-    usable_soc_bev, 0.9
-    gap_bev,0.3
-    powertrain_markup_bev,1.5
-    usable_soc_phev
-    gap_phev
-    powertrain_markup_phev
+    item,bev,phev,hev
+    usable_soc,0.9,0.8,0.4
+    gap,0.3,0.25,0.2
+    electrification_markup,1.5,1.5,1.5
+    co2_reduction_cycle,1,0.6,0.2
+    co2_reduction_city,1,0.733333333,0.244444444
+    co2_reduction_hwy,1,0.490909091,0.163636364
 
 Where,
 
-* :math:`usable\_soc\_bev` and :math:`usable\_soc\_phev` refer to the usable state-of-charge of the battery pack
-* :math:`gap\_bev` and :math:`gap\_phev` refer to the 2-cycle to onroad "gap"
-* :math:`powertrain\_markup\_bev` and :math:`powertrain\_markup\_phev` refer to the markup factors applied to direct manufacturing costs to cover indirect costs
+* :math:`usable\_soc` refers to the usable state-of-charge of the battery pack
+* :math:`gap` refers to the 2-cycle to onroad "gap"
+* :math:`powertrain\_markup` refers to the markup factors applied to direct manufacturing costs to cover indirect costs
+* :math:`co2\_reduction\_cycle` refers to the 2-cycle CO2 reduction provided by the electrification (user defined)
+* :math:`co2\_reduction\_city` refers to the city-cycle CO2 reduction (calculated as 55/45 times the 2-cycle value)
+* :math:`co2\_reduction\_hwy` refers to the highway-cycle CO2 reduction (calculated as 45/55 times the 2-cycle value)
 
-.. _hev_metrics_sheet:
-.. csv-table:: HEV Cost Metrics
-    :widths: auto
-    :header-rows: 1
-
-    item,value
-    usable_soc_hev,0.4
-    gap_hev,0.2
-    powertrain_markup_hev,1.5
-    co2_reduction_cycle_hev,0.2
-    co2_reduction_city_hev,0.244
-    co2_reduction_hwy_hev,0.164
-
-Where,
-
-* :math:`usable\_soc\_hev` refers to the usable state-of-charge of the battery pack
-* :math:`gap\_hev` refers to the 2-cycle to onroad "gap"
-* :math:`powertrain\_markup\_hev` refers to the markup factor applied to direct manufacturing costs to cover indirect costs
-* :math:`co2\_reduction\_cycle\_hev` refers to the 2-cycle CO2 reduction provided by the hybridization (user define)
-* :math:`co2\_reduction\_city\_hev` refers to the city-cycle CO2 reduction (calculated as 55/45 times the 2-cycle value)
-* :math:`co2\_reduction\_hwy\_hev` refers to the highway-cycle CO2 reduction (calculated as 45/55 times the 2-cycle value)
-
-Battery costs also make use of the tables from the appropriate bev_curves and hev_curves worksheets of the
+Battery costs also make use of the tables from the appropriate bev_curves, phev_curves and hev_curves worksheets of the
 alpha_package_costs_module_inputs file. Those tables and how they are used are discussed below for BEV batteries, HEV
 batteries and then PHEV batteries.
 
@@ -1473,25 +1506,25 @@ BEV Battery Costs
 +++++++++++++++++
 For BEV battery costs, the module first determines the gross energy content of the BEV battery pack. This is done using the
 "Combined Consumption Rate" column of the ALPHA input file which is expressed in kWh/100 miles. The gross energy content
-of the BEV battery pack is then calculated as shown in equation :math:numref:`bev_kwh_gross`.
+of the BEV battery pack is then calculated as shown in equation :math:numref:`bev_kwh_gross_equation`.
 
 .. Math::
-    :label: bev_kwh_gross
+    :label: bev_kwh_gross_equation
 
-    kWh_{Gross} = \frac{(\frac{kWh} {100 miles} \times \frac{OnroadRange} {bev\_usable\_soc})} {(1 - gap\_bev)}
+    kWh_{gross} = \frac{(\frac{kWh} {100 miles} \times \frac{OnroadRange} {usable\_soc})} {(1 - gap)}
 
 Where,
 
-* :math:`kWh_{Gross}` refers to the gross energy content of the BEV battery pack
+* :math:`kWh_{gross}` refers to the gross energy content of the BEV battery pack
 * :math:`\frac{kWh} {100 miles}` is from the "Combined Consumption Rate" column of the ALPHA input file
-* :math:`OnroadRange` is in miles and is currently set via the InputSettings class of the alpha_package_costs module
-* :math:`bev\_usable\_soc` and :math:`gap\_bev` are from :numref:`pev_metrics_sheet`
+* :math:`OnroadRange` is in miles and is currently set via the InputSettings class of the alpha_package_costs module (currently=300)
+* :math:`usable\_soc` and :math:`gap` are from the "bev" column of :numref:`electrified_metrics_sheet`
 
 The module then uses the table on the bev_curves worksheet of the alpha_package_costs_module_inputs
 file. That table is shown in :numref:`bev_curves_sheet`.
 
 .. _bev_curves_sheet:
-.. csv-table:: BEV Battery Cost Curves
+.. csv-table:: BEV Battery Curves
     :widths: auto
     :header-rows: 1
 
@@ -1504,19 +1537,19 @@ The BEV battery cost is then calculated as shown in equation :math:numref:`batte
 HEV Battery Costs
 +++++++++++++++++
 For HEV battery costs, the module first determines the gross energy content of the HEV battery pack. This is done by first
-creating HEV packages from the ICE packages via the make_hev_from_alpha_ice module. The make_hev_from_alpha_ice module
+creating HEV packages from the ALPHA ICE packages via the make_hev_from_alpha_ice module. The make_hev_from_alpha_ice module
 selects specific ICE packages for use as HEVs using the "Vehicle Type" and "Start Stop" columns of the ALPHA input file
 and applying the following logic:
 
-    - if "Vehicle Type" is "Truck" use only turbocharged packages;
-    - if "Vehicle Type" is not "Truck" use only non-turbocharged packages;
+    - if "Vehicle Type" is "Truck" select only turbocharged packages;
+    - if "Vehicle Type" is not "Truck" select only non-turbocharged packages;
     - if "Start Stop" is TRUE (value=1) then eliminate the package
 
 This logic leaves only turbocharged Truck packages without start-stop and non-turbocharged non-Truck packages without
 start-stop. Start-stop packages are eliminated in this process because the costs of start-stop technologies are included
-in the HEV non-battery costs, and the GHG reducing impacts of the start-stop technologies are included in the CO2_reduction entries
-shown in :numref:`hev_metrics_sheet`. Turbocharged truck packages are chosen since trucks are assumed to require the towing
-capability provided by turbocharing.
+in the HEV non-battery costs, and the GHG reducing impacts of the start-stop technologies are included in the co2_reduction entries
+shown in :numref:`electrified_metrics_sheet`. Turbocharged truck packages are chosen since trucks are assumed to
+require the hauling capability provided by turbocharging.
 
 The make_hev_from_alpha_ice module then makes use of the "Test Weight lbs" column of the chosen packages less 300 pounds
 to determine the curb weight of the package and converts that to kg by dividing by 2.2 pounds/kg. The make_hev_from_alpha_ice module
@@ -1524,7 +1557,7 @@ then makes use of the table on the hev_curves worksheet of the alpha_package_cos
 shown in :numref:`hev_curves_sheet`.
 
 .. _hev_curves_sheet:
-.. csv-table:: HEV Battery Cost Curves
+.. csv-table:: HEV Battery & Motor Curves
     :widths: auto
     :header-rows: 1
 
@@ -1538,9 +1571,9 @@ With the curb weight of the package and the kWh_pack_per_kg_curbwt_curve entries
 HEV battery energy content is then calculated as shown in equation :math:numref:`hev_kwh_gross`.
 
 .. Math::
-    :label: hev_kwh_gross
+    :label: hev_kwh_gross_equation
 
-    kWh_{Gross} = A \times CurbWeight^3 + B \times CurbWeight^2 + C \times CurbWeight + D
+    kWh_{gross} = A \times CurbWeight^3 + B \times CurbWeight^2 + C \times CurbWeight + D
 
 Where,
 
@@ -1553,19 +1586,40 @@ The HEV battery cost is then calculated as shown in equation :math:numref:`batte
 
 PHEV Battery Costs
 ++++++++++++++++++
-For PHEV battery costs, the module makes use of the table on the phev_curves worksheet of the alpha_package_costs_module_inputs
-file. That table is shown in :numref:`phev_curves_sheet`.
+For PHEV battery costs, the make_hev_from_alpha_ice module uses the same packages chosen for conversion to HEV, but makes
+use of the table on the phev_curves worksheet of the alpha_package_costs_module_inputs file. That table is
+shown in :numref:`phev_curves_sheet`.
 
 .. _phev_curves_sheet:
-.. csv-table:: PHEV Battery Cost Curves
+.. csv-table:: PHEV Battery & Motor Curves
     :widths: auto
     :header-rows: 1
 
     item,x_cubed_factor,x_squared_factor,x_factor,constant,dollar_basis
-    kW_DCDC_converter,0,0,0,3.5,0
+    kWh_pack_per_kg_curbwt_curve,0,0,0.004,3.525,0
+    kW_motor_per_kg_curbwt_curve,0,0,0.0279,-13.269,0
     dollars_per_kWh_curve,-0.00009556,0.02652171,-2.56085176,193.1905512,2019
     kWh_pack_per_kg_pack_curve,8.47E-08,-2.49011E-05,0.002368641,0.124566816,0
 
+With the curb weight of the package and the kWh_pack_per_kg_curbwt_curve entries shown in :numref:`phev_curves_sheet`, the
+PHEV battery energy content is then calculated as shown in equation :math:numref:`phev_kwh_gross`.
+
+.. Math::
+    :label: phev_kwh_gross_equation
+
+    kWh_{gross} = A \times CurbWeight^3 + B \times CurbWeight^2 + C \times CurbWeight + D
+
+Where,
+
+* :math:`A` refers to the x_cubed_factor of the kWh_pack_per_kg_curbwt_curve from :numref:`phev_curves_sheet`
+* :math:`B` refers to the x_squared_factor of the kWh_pack_per_kg_curbwt_curve from :numref:`phev_curves_sheet`
+* :math:`C` refers to the x_factor of the kWh_pack_per_kg_curbwt_curve from :numref:`phev_curves_sheet`
+* :math:`D` refers to the constant factor of the kWh_pack_per_kg_curbwt_curve from :numref:`phev_curves_sheet`
+
+The PHEV battery cost is then calculated as shown in equation :math:numref:`battery_cost_equation`.
+
+Battery Cost Equation
++++++++++++++++++++++
 With the gross energy content of the battery pack and the dollars_per_kWh_curve entries of :numref:`bev_curves_sheet`
 or :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`, depending on the package
 being considered, the battery pack cost is calculated as shown in equation :math:numref:`battery_cost_equation`.
@@ -1573,25 +1627,28 @@ being considered, the battery pack cost is calculated as shown in equation :math
 .. Math::
     :label: battery_cost_equation
 
-    BatteryCost = \small kWh_{Gross} \times (A \times kWh_{Gross}^3 + B \times kWh_{Gross}^2 + C \times kWh_{Gross} + D) \times Markup
+    Cost_{battery} = \small kWh_{gross} \times (A \times kWh_{gross}^3 + B \times kWh_{gross}^2 + C \times kWh_{gross} + D) \times Markup
 
 Where,
 
-* :math:`kWh_{Gross}` refers to the gross energy content of the battery pack
-* :math:`A` refers to the x_cubed_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
-* :math:`B` refers to the x_squared_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
-* :math:`C` refers to the x_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
-* :math:`D` refers to the constant factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`phev_curves_sheet` or :numref:`hev_curves_sheet`
-* :math:`Markup` refers to the applicable powertrain markup factor from :numref:`pev_metrics_sheet` or :numref:`hev_metrics_sheet`
+* :math:`Cost_{battery}` is the cost of the battery pack
+* :math:`kWh_{gross}` refers to the gross energy content of the battery pack from equation :math:numref:`bev_kwh_gross_equation` or :math:numref:`hev_kwh_gross_equation` or :math:numref:`phev_kwh_gross_equation`
+* :math:`A` refers to the x_cubed_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`B` refers to the x_squared_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`C` refers to the x_factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`D` refers to the constant factor of the dollars_per_kWh_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`Markup` refers to the applicable electrification markup factor from :numref:`electrified_metrics_sheet`
 
-BEV Non-Battery Costs
-+++++++++++++++++++++
-For BEV non-battery costs (motors, inverters, etc.), the module makes use of the tables on the bev_nonbattery_single or
-bev_nonbattery_dual worksheets of the alpha_package_costs_module_inputs file. These two tables are shown in
-:numref:`bev_nonbattery_single_sheet` and :numref:`bev_nonbattery_dual_sheet`.
+BEV, PHEV and HEV Non-Battery Costs
++++++++++++++++++++++++++++++++++++
+For BEV, PHEV and HEV non-battery costs (motors, inverters, etc.), the alpha_package_costs module makes use of the tables on
+the bev_nonbattery_single, bev_nonbattery_dual, phev_nonbattery_single, or phev_nonbattery_dual or hev_nonbattery worksheets
+of the alpha_package_costs_module_inputs file. These four tables are shown in :numref:`bev_nonbattery_single_sheet`
+and :numref:`bev_nonbattery_dual_sheet` and :numref:`phev_nonbattery_single_sheet` and :numref:`phev_nonbattery_dual_sheet`
+and :numref:`hev_nonbattery_sheet`.
 
 .. _bev_nonbattery_single_sheet:
-.. csv-table:: BEV Non-Battery Cost Curves for Single Motor Systems
+.. csv-table:: BEV Non-Battery Curves for Single Motor Systems
     :widths: auto
     :header-rows: 1
 
@@ -1613,9 +1670,8 @@ bev_nonbattery_dual worksheets of the alpha_package_costs_module_inputs file. Th
     brake_sensors_actuators,0,0,0,,0
     additional_pair_of_half_shafts,0,0,0,,0
 
-
 .. _bev_nonbattery_dual_sheet:
-.. csv-table:: BEV Non-Battery Cost Curves for Dual Motor Systems
+.. csv-table:: BEV Non-Battery Curves for Dual Motor Systems
     :widths: auto
     :header-rows: 1
 
@@ -1637,104 +1693,626 @@ bev_nonbattery_dual worksheets of the alpha_package_costs_module_inputs file. Th
     brake_sensors_actuators,0,0,0,,0
     additional_pair_of_half_shafts,1,0,190,none at this time,0
 
+.. _phev_nonbattery_single_sheet:
+.. csv-table:: PHEV Non-Battery Curves for Single Motor Systems
+    :widths: auto
+    :header-rows: 1
+
+    item,quantity,slope,intercept,scale_by,dollar_basis
+    motor,1,4.29,0,Vehicle kW,2019
+    inverter,1,2.5,0,Vehicle kW,2019
+    induction_motor,0,0,0,,0
+    induction_inverter,0,0,0,,0
+    kW_DCDC_converter,1,0,3.5,kW value to be added to OBC kW value,0
+    OBC_and_DCDC_converter,1,39.7537931,0,"DC-DC kW (3.5) + OBC kW (0.7,1.1,1.9)",2019
+    HV_orange_cables,1,9.5,161.5,Vehicle size class (1-7),2019
+    LV_battery,1,3,51,Vehicle size class (1-7),2019
+    HVAC,1,11.5,195.5,Vehicle size class (1-7),2019
+    single_speed_gearbox,1,0,410,none at this time,2019
+    powertrain_cooling_loop,1,0,300,none at this time,2019
+    charging_cord_kit,1,0,200,none at this time,2019
+    DC_fast_charge_circuitry,1,0,160,none at this time,2019
+    power_management_and_distribution,1,0,720,none at this time,2019
+    brake_sensors_actuators,0,0,0,,0
+    additional_pair_of_half_shafts,0,0,0,,0
+
+.. _phev_nonbattery_dual_sheet:
+.. csv-table:: PHEV Non-Battery Curves for Dual Motor Systems
+    :widths: auto
+    :header-rows: 1
+
+    item,quantity,slope,intercept,scale_by,dollar_basis
+    motor,1,4.29,0,Vehicle kW / 2,2019
+    inverter,1,2.5,0,Vehicle kW / 2,2019
+    induction_motor,1,3.12,0,Vehicle kW / 2,0
+    induction_inverter,1,4,0,Vehicle kW / 2,0
+    kW_DCDC_converter,1,0,3.5,kW value to be added to OBC kW value,0
+    OBC_and_DCDC_converter,1,39.7537931,0,"DC-DC kW (3.5) + OBC kW (0.7,1.1,1.9)",2019
+    HV_orange_cables,1,9.5,161.5,Vehicle size class (1-7),2019
+    LV_battery,1,3,51,Vehicle size class (1-7),2019
+    HVAC,1,11.5,195.5,Vehicle size class (1-7),2019
+    single_speed_gearbox,2,0,410,none at this time,2019
+    powertrain_cooling_loop,2,0,300,none at this time,2019
+    charging_cord_kit,1,0,200,none at this time,2019
+    DC_fast_charge_circuitry,1,0,160,none at this time,2019
+    power_management_and_distribution,1,0,720,none at this time,2019
+    brake_sensors_actuators,0,0,0,,0
+    additional_pair_of_half_shafts,1,0,190,none at this time,0
+
+.. _hev_nonbattery_sheet:
+.. csv-table:: HEV Non-Battery Curves
+    :widths: auto
+    :header-rows: 1
+
+    item,quantity,slope,intercept,scale_by,dollar_basis
+    motor,1,6.91,-8.64,Motor kW,2019
+    inverter,1,2.4,231,Motor kW,2019
+    induction_motor,0,0,0,,0
+    induction_inverter,0,0,0,,0
+    kW_DCDC_converter,1,0,3.5,kW value,0
+    OBC_and_DCDC_converter,1,39.7537931,0,DCDC converter kW (3.5),2019
+    HV_orange_cables,1,9.5,161.5,Vehicle size class (1-7),2019
+    LV_battery,1,3,51,Vehicle size class (1-7),2019
+    HVAC,1,11.5,195.5,Vehicle size class (1-7),2019
+    single_speed_gearbox,0,0,0,,0
+    powertrain_cooling_loop,0,0,0,,0
+    charging_cord_kit,0,0,0,,0
+    DC_fast_charge_circuitry,0,0,0,,0
+    power_management_and_distribution,0,0,0,,0
+    brake_sensors_actuators,1,0,200,none at this time,2019
+    additional_pair_of_half_shafts,0,0,0,,0
+
 The first step makes use of the structure_class determination for the given package and specifies that unibody packages
-have a single motor system while ladder-frame packages have a dual motor system. The motor power is currently set in the
-InputSettings class of the alpha_package_costs module (the current setting is 150 kW). The motor cost is then calculated
-as shown in :math:numref:`motor_cost_equation`.
+have a single motor system while ladder-frame packages have a dual motor system for hauling. For BEV packages, the motor power is
+currently set in the InputSettings class of the alpha_package_costs module (the current setting is 150 kW). For HEV and
+PHEV packages, the motor power is determined in the make_hev_from_alpha_ice module using the kW_motor_per_kg_curbwt_curve
+entries shown in :numref:`hev_curves_sheet` and :numref:`phev_curves_sheet`, respectively, according to equation :math:numref:`motor_power_equation`.
+
+.. Math::
+    :label: motor_power_equation
+
+    kW_{motor} = A \times CurbWeight^3 + B \times CurbWeight^2 + C \times CurbWeight + D
+
+Where,
+
+* :math:`kW_{motor}` is the motor power of the electrified system
+* :math:`A` refers to the x_cubed_factor of the kW_motor_per_kg_curbwt_curve from :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`B` refers to the x_squared_factor of the kW_motor_per_kg_curbwt_curve from :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`C` refers to the x_factor of the kW_motor_per_kg_curbwt_curve from :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`D` refers to the constant factor of the kW_motor_per_kg_curbwt_curve from :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+
+The motor cost for BEV, PHEV and HEV packages is then calculated as shown in equation :math:numref:`motor_cost_equation`.
 
 .. Math::
     :label: motor_cost_equation
 
-    Cost_{motor} = Quantity_{motor} \times Slope_{motor} \times \frac{Power_{motor}} {PowerDivisor_{motor}} + Intercept_{motor}
+    Cost_{motor} = Quantity_{motor} \times Slope_{motor} \times \frac{kW_{motor}} {PowerDivisor_{motor}} + Intercept_{motor}
 
 Where,
 
-* :math:`Cost_{motor}` is the cost of motors in the system
-* :math:`Quantity_{motor}` and :math:`Slope_{motor}` and :math:`Intercept_{motor}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
-* :math:`Power_{motor}` is from the InputSettings class (currently set at 150 kW)
+* :math:`Cost_{motor}` is the cost of the motor(s) in the electrified system
+* :math:`Quantity_{motor}` and :math:`Slope_{motor}` and :math:`Intercept_{motor}` are from the applicable Non-Battery Curve table
+* :math:`kW_{motor}` is from the InputSettings class for BEVs (currently set at 150 kW) or from equation :math:numref:`motor_power_equation` for PHEVs and HEVs
 * :math:`PowerDivisor_{motor}` is 1 for single motor systems and 2 for dual motor systems
 
-The inverter cost is then calculated as shown in :math:numref:`inverter_cost_equation`.
+The inverter cost is then calculated as shown in equation :math:numref:`inverter_cost_equation`.
 
 .. Math::
     :label: inverter_cost_equation
 
-    Cost_{inverter} = Quantity_{inverter} \times Slope_{inverter} \times \frac{Power_{inverter}} {PowerDivisor_{inverter}} + Intercept_{inverter}
+    Cost_{inverter} = Quantity_{inverter} \times Slope_{inverter} \times \frac{kW_{motor}} {PowerDivisor_{motor}} + Intercept_{inverter}
 
 Where,
 
 * :math:`Cost_{inverter}` is the cost of motors in the system
-* :math:`Quantity_{inverter}` and :math:`Slope_{inverter}` and :math:`Intercept_{inverter}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
-* :math:`Power_{inverter}` is from the InputSettings class (currently set at 150 kW)
-* :math:`PowerDivisor_{inverter}` is 1 for single motor systems and 2 for dual motor systems
+* :math:`Quantity_{inverter}` and :math:`Slope_{inverter}` and :math:`Intercept_{inverter}` are from the applicable Non-Battery Curve table
+* :math:`kW_{motor}` is from the InputSettings class for BEVs (currently set at 150 kW) or from equation :math:numref:`motor_power_equation` for PHEVs and HEVs
+* :math:`PowerDivisor_{motor}` is 1 for single motor systems and 2 for dual motor systems
 
-The induction motor cost is then calculated as shown in :math:numref:`induction_motor_cost_equation`.
+The induction motor cost is then calculated as shown in equation :math:numref:`induction_motor_cost_equation`.
 
 .. Math::
     :label: induction_motor_cost_equation
 
-    & \small Cost_{induction\_motor} = Quantity_{induction\_motor} \times Slope_{induction\_motor} \times \frac{Power_{induction\_motor}} {PowerDivisor_{induction\_motor}} \\
+    & \small Cost_{induction\_motor} = Quantity_{induction\_motor} \times Slope_{induction\_motor} \times \frac{kW_{motor}} {PowerDivisor_{motor}} \\
     & \small + Intercept_{induction\_motor}
 
 Where,
 
 * :math:`Cost_{induction\_motor}` is the cost of motors in the system
-* :math:`Quantity_{induction\_motor}` and :math:`Slope_{induction\_motor}` and :math:`Intercept_{induction\_motor}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
-* :math:`Power_{induction\_motor}` is from the InputSettings class (currently set at 150 kW)
-* :math:`PowerDivisor_{induction\_motor}` is 1 for single motor systems and 2 for dual motor systems
+* :math:`Quantity_{induction\_motor}` and :math:`Slope_{induction\_motor}` and :math:`Intercept_{induction\_motor}` are from the applicable Non-Battery Curve table
+* :math:`kW_{motor}` is from the InputSettings class for BEVs (currently set at 150 kW) or from equation :math:numref:`motor_power_equation` for PHEVs and HEVs
+* :math:`PowerDivisor_{motor}` is 1 for single motor systems and 2 for dual motor systems
 
-The induction inverter cost is then calculated as shown in :math:numref:`induction_inverter_cost_equation`.
+The induction inverter cost is then calculated as shown in equation :math:numref:`induction_inverter_cost_equation`.
 
 .. Math::
     :label: induction_inverter_cost_equation
 
-    & \small Cost_{induction\_inverter} = Quantity_{induction\_inverter} \times Slope_{induction\_inverter} \times \frac{Power_{induction\_inverter}} {PowerDivisor_{induction\_inverter}} \\
+    & \small Cost_{induction\_inverter} = Quantity_{induction\_inverter} \times Slope_{induction\_inverter} \times \frac{kW_{motor}} {PowerDivisor_{motor}} \\
     & \small + Intercept_{induction\_inverter}
 
 Where,
 
 * :math:`Cost_{induction\_inverter}` is the cost of motors in the system
-* :math:`Quantity_{induction\_inverter}` and :math:`Slope_{induction\_inverter}` and :math:`Intercept_{induction\_inverter}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
-* :math:`Power_{induction\_inverter}` is from the InputSettings class (currently set at 150 kW)
-* :math:`PowerDivisor_{induction\_inverter}` is 1 for single motor systems and 2 for dual motor systems
+* :math:`Quantity_{induction\_inverter}` and :math:`Slope_{induction\_inverter}` and :math:`Intercept_{induction\_inverter}` are from the applicable Non-Battery Curve table
+* :math:`kW_{motor}` is from the InputSettings class for BEVs (currently set at 150 kW) or from equation :math:numref:`motor_power_equation` for PHEVs and HEVs
+* :math:`PowerDivisor_{motor}` is 1 for single motor systems and 2 for dual motor systems
 
 To estimate the onboard charger and DC-DC converter cost, the module first determines the onboard charger power
-based on the energy content of the battery pack (see equation :math:numref:`bev_kwh_gross`). The onboard charger power is
-then determined according to the parameters shown in :numref:`onboard_charger_table`.
+based on the energy content of the battery pack (see equation :math:numref:`bev_kwh_gross` or equation :math:numref:`hev_kwh_gross`
+or equation :math:numref:`phev_kwh_gross`). The onboard charger power is then determined according to the parameters shown
+in :numref:`onboard_charger_table`.
 
 .. _onboard_charger_table:
 .. csv-table:: Onboard Charger Power Table
     :widths: auto
     :header-rows: 1
 
-    battery pack gross energy content (kWh),onboard charger power (kW)
-    <70,7
-    70 to <100,11
-    >=100,19
+    type,battery pack gross energy content (kWh),onboard charger power (kW)
+    bev,<70,7
+     ,70 to <100,11
+     ,>=100,19
+    phev,<7,0.7
+     ,7 to <10,1.1
+     ,>=10,1.9
 
-The cost of the onboard charger (OBD) and DC-DC converter are then calculated as shown in :math:numref:`obc_and_dcdc_converter_cost_equation`.
+The cost of the onboard charger (OBD) and DC-DC converter are then calculated as shown in equation :math:numref:`obc_and_dcdc_converter_cost_equation`.
 
 .. Math::
     :label: obc_and_dcdc_converter_cost_equation
 
     & \small Cost_{OBC\_and\_DCDC\_converter} = Quantity_{OBC\_and\_DCDC\_converter} \times Slope_{OBC\_and\_DCDC\_converter} \\
-    & \small \times (Power_{OBC} + Power_{DC-DC\_converter})
+    & \small \times (kW_{OBC} + kW_{DC-DC\_converter})
 
 Where,
 
 * :math:`Cost_{OBC\_and\_DCDC\_converter}` is the cost of onboard charger (OBC) plus the DC-DC converter
-* :math:`Quantity_{OBC\_and\_DCDC\_converter}` and :math:`Slope_{OBC\_and\_DCDC\_converter}` are from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
-* :math:`Power_{OBC}` is the power of the OBC from :numref:`onboard_charger_table`
-* :math:`Power_{DC-DC\_converter}` is from :numref:`bev_nonbattery_single_sheet` or :numref:`bev_nonbattery_dual_sheet`
+* :math:`Quantity_{OBC\_and\_DCDC\_converter}` and :math:`Slope_{OBC\_and\_DCDC\_converter}` are from are from the applicable Non-Battery Curve table
+* :math:`kW_{OBC}` is the power of the OBC from :numref:`onboard_charger_table`
+* :math:`kW_{DC-DC\_converter}` is from the applicable Non-Battery Curve table
+
+Costs associated with high voltage orange cables (hv_orange_cables) are calculated as shown in equation :math:numref:`hv_orange_cables_cost_equation`
+which includes a "SizeScaler" parameter. The size scaler considers the full range of curb weights within the given electrified
+vehicle category (BEV, PHEV, HEV) and breaks that range into a number of equal sized bins where the number of bins is
+currently controlled via the InputSettings class of the alpha_package_costs module. Currently the number of bins is set to
+seven for each electrified vehicle category. This results in an integer scaler value from 1 to the number of bins (currently 7).
+Depending on the curb weight of the given package, the applicable SizeScaler will be applied within equation :math:numref:`hv_orange_cables_cost_equation`.
+
+.. Math::
+    :label: hv_orange_cables_cost_equation
+
+    & Cost_{hv\_orange\_cables} = Quantity_{hv\_orange\_cables} \times Slope_{hv\_orange\_cables} \times SizeScaler \\
+    & + Intercept_{hv\_orange\_cables}
+
+Where,
+
+* :math:`Cost_{hv\_orange\_cables}` is the cost of the high voltage orange cables
+* :math:`Quantity_{hv\_orange\_cables}` and :math:`Slope_{hv\_orange\_cables}` and :math:`Intercept_{hv\_orange\_cables}` are from the applicable Non-Battery Curve table
+* :math:`SizeScaler` is determined within the alpha_package_costs module (see explanation above)
+
+The low voltage battery (lv_battery) cost is then calculated as shown in equation :math:numref:`low_voltage_battery_cost_equation`.
+
+.. Math::
+    :label: low_voltage_battery_cost_equation
+
+    Cost_{lv\_battery} = Quantity_{lv\_battery} \times Slope_{lv\_battery} \times SizeScaler + Intercept_{lv\_battery}
+
+Where,
+
+* :math:`Cost_{lv\_battery}` is the cost of the low voltage battery
+* :math:`Quantity_{lv\_battery}` and :math:`Slope_{lv\_battery}` and :math:`Intercept_{lv\_battery}` are from the applicable Non-Battery Curve table
+* :math:`SizeScaler` is determined within the alpha_package_costs module (see explanation above).
+
+The heating-ventilation-air conditioning (hvac) associated costs are then calculated as shown in equation :math:numref:`hvac_cost_equation`.
+
+.. Math::
+    :label: hvac_cost_equation
+
+    Cost_{hvac} = Quantity_{hvac} \times Slope_{hvac} \times SizeScaler + Intercept_{hvac}
+
+Where,
+
+* :math:`Cost_{hvac}` is the cost associated with heating-ventilation-air conditioning (hvac)
+* :math:`Quantity_{hvac}` and :math:`Slope_{hvac}` and :math:`Intercept_{hvac}` are from the applicable Non-Battery Curve table
+
+The single-speed gearbox costs are then calculated as shown in equation :math:numref:`single_speed_gearbox_cost_equation`.
+
+.. Math::
+    :label: single_speed_gearbox_cost_equation
+
+    Cost_{single\_speed\_gearbox} = Quantity_{single\_speed\_gearbox} \times Intercept_{single\_speed\_gearbox}
+
+Where,
+
+* :math:`Cost_{single\_speed\_gearbox}` is the cost of the single-speed gearbox
+* :math:`Quantity_{single\_speed\_gearbox}` and :math:`Intercept_{single\_speed\_gearbox}` are from the applicable Non-Battery Curve table
+
+The powertrain cooling loop costs are then calculated as shown in equation :math:numref:`powertrain_cooling_loop_cost_equation`.
+
+.. Math::
+    :label: powertrain_cooling_loop_cost_equation
+
+    Cost_{powertrain\_cooling\_loop} = Quantity_{powertrain\_cooling\_loop} \times Intercept_{powertrain\_cooling\_loop}
+
+Where,
+
+* :math:`Cost_{powertrain\_cooling\_loop}` is the cost of the powertrain cooling loop
+* :math:`Quantity_{powertrain\_cooling\_loop}` and :math:`Intercept_{powertrain\_cooling\_loop}` are from the applicable Non-Battery Curve table
+
+The charging cord kit costs are then calculated as shown in equation :math:numref:`charging_cord_kit_cost_equation`.
+
+.. Math::
+    :label: charging_cord_kit_cost_equation
+
+    Cost_{charging\_cord\_kit} = Quantity_{charging\_cord\_kit} \times Intercept_{charging\_cord\_kit}
+
+Where,
+
+* :math:`Cost_{charging\_cord\_kit}` is the cost of the charging cord kit
+* :math:`Quantity_{charging\_cord\_kit}` and :math:`Intercept_{charging\_cord\_kit}` are from the applicable Non-Battery Curve table
+
+The DC fast charge circuitry costs are then calculated as shown in equation :math:numref:`dc_fast_charge_circuitry_cost_equation`.
+
+.. Math::
+    :label: dc_fast_charge_circuitry_cost_equation
+
+    Cost_{DC\_fast\_charge\_circuitry} = Quantity_{DC\_fast\_charge\_circuitry} \times Intercept_{DC\_fast\_charge\_circuitry}
+
+Where,
+
+* :math:`Cost_{DC\_fast\_charge\_circuitry}` is the cost of the DC fast charge circuitry
+* :math:`Quantity_{DC\_fast\_charge\_circuitry}` and :math:`Intercept_{DC\_fast\_charge\_circuitry}` are from the applicable Non-Battery Curve table
+
+The power management and distribution (power_mgmt_dist) costs are then calculated as shown in equation :math:numref:`power_mgmt_dist_cost_equation`.
+
+.. Math::
+    :label: power_mgmt_dist_cost_equation
+
+    Cost_{power\_mgmt\_dist} = Quantity_{power\_mgmt\_dist} \times Intercept_{power\_mgmt\_dist}
+
+Where,
+
+* :math:`Cost_{power\_mgmt\_dist}` is the cost of power management and distribution
+* :math:`Quantity_{power\_mgmt\_dist}` and :math:`Intercept_{power\_mgmt\_dist}` are from the applicable Non-Battery Curve table
+
+The cost of an additional pair of half-shafts (on dual motor PEVs) are then calculated as shown in equation :math:numref:`half_shaft_cost_equation`.
+
+.. Math::
+    :label: half_shaft_cost_equation
+
+    Cost_{additional\_half\_shafts} = Quantity_{additional\_half\_shafts} \times Intercept_{additional\_half\_shafts}
+
+Where,
+
+* :math:`Cost_{additional\_half\_shafts}` is the cost of an additional pair of half-shafts on dual motor PEVs
+* :math:`Quantity_{additional\_half\_shafts}` and :math:`Intercept_{additional\_half\_shafts}` are from the applicable Non-Battery Curve table
+
+The cost of brake sensors and actuators (on HEVs) are then calculated as shown in equation :math:numref:`brake_sensors_cost_equation`.
+
+.. Math::
+    :label: brake_sensors_cost_equation
+
+    \small Cost_{brake\_sensors\_and\_actuators} = Quantity_{brake\_sensors\_and\_actuators} \times Intercept_{brake\_sensors\_and\_actuators}
+
+Where,
+
+* :math:`Cost_{brake\_sensors\_and\_actuators}` is the cost of brake sensors and actuators on HEVs
+* :math:`Quantity_{brake\_sensors\_and\_actuators}` and :math:`Intercept_{brake\_sensors\_and\_actuators}` are from the applicable Non-Battery Curve table
+
+The non-battery system costs can then be calculated by summing the above as shown in equation :math:numref:`non_battery_cost_equation`.
+
+.. Math::
+    :label: non_battery_cost_equation
+
+    & \small Cost_{non\_battery} = Markup \times (Cost_{motor} + Cost_{inverter} + Cost_{induction\_motor} \\
+    & \small + Cost_{induction\_inverter} + Cost_{OBC\_and\_DCDC\_converter} + Cost_{hv\_orange\_cables} + Cost_{low\_voltage\_battery} \\
+    & \small + Cost_{hvac} + Cost_{single\_speed\_gearbox} + Cost_{powertrain\_cooling\_loop} + Cost_{charging\_cord\_kit} \\
+    & \small + Cost_{DC\_fast\_charge\_circuitry} + Cost_{power\_mgmt\_dist} + Cost_{additional\_half\_shafts} + Cost_{brake\_sensors\_and\_actuators})
+
+Where,
+
+* :math:`Cost_{non\_battery}` is the cost of the non-battery elements of electrified vehicles
+* :math:`Markup` is from :numref:`electrified_metrics_sheet`
+* :math:`Cost_{motor}` is from equation :math:numref:`motor_cost_equation`
+* :math:`Cost_{inverter}` is from equation :math:numref:`inverter_cost_equation`
+* :math:`Cost_{induction\_motor}` is from equation :math:numref:`induction_motor_cost_equation`
+* :math:`Cost_{induction\_inverter}` is from equation :math:numref:`induction_inverter_cost_equation`
+* :math:`Cost_{OBC\_and\_DCDC\_converter}` is from equation :math:numref:`obc_and_dcdc_converter_cost_equation`
+* :math:`Cost_{hv\_orange\_cables}` is from equation :math:numref:`hv_orange_cables_cost_equation`
+* :math:`Cost_{lv\_battery}` is from equation :math:numref:`low_voltage_battery_cost_equation`
+* :math:`Cost_{hvac}` is from equation :math:numref:`hvac_cost_equation`
+* :math:`Cost_{single\_speed\_gearbox}` is from equation :math:numref:`single_speed_gearbox_cost_equation`
+* :math:`Cost_{powertrain\_cooling\_loop}` is from equation :math:numref:`powertrain_cooling_loop_cost_equation`
+* :math:`Cost_{charging\_cord\_kit}` is from equation :math:numref:`charging_cord_kit_cost_equation`
+* :math:`Cost_{DC\_fast\_charge\_circuitry}` is from equation :math:numref:`dc_fast_charge_circuitry_cost_equation`
+* :math:`Cost_{power\_mgmt\_dist}` is from equation :math:numref:`power_mgmt_dist_cost_equation`
+* :math:`Cost_{additional\_half\_shafts}` is from equation :math:numref:`half_shaft_cost_equation`
+* :math:`Cost_{brake\_sensors\_and\_actuators}` is from equation :math:numref:`brake_sensors_cost_equation`
+
+Weight Costs
+------------
+Weight-related costs rely on four primary weight-related parameters: the curb weight of the package; the glider weight of
+the package; the battery weight of the package (if electrified); and, the weight removed via application of weight reduction
+applied to the package. Note that weight reduction is applied to the glider and not the full curb weight of the vehicle.
+A secondary factor is applied to some weight-related costs which is referred to as the "price class." The price class is
+meant to be a means of scaling costs for luxury or upscale versus mainstream vehicles. The price class values come from
+the price_class worksheet of the alpha_package_cost_module_inputs file and are shown in :numref:`price_class_sheet`. As
+shown, currently all packages are designated as having a price class scaler of 1 (and all packages are designated as price
+class 1).
+
+.. _price_class_sheet:
+.. csv-table:: Price Classes and Scalers
+    :widths: auto
+    :header-rows: 1
+
+    price_class,scaler
+    0,1
+    1,1
+    2,1
+    3,1
+
+The curb weight of the package is determined from "Test Weight lbs." column of the ALPHA input file, less 300 pounds. The
+percentage weight reduction applied to any package is determined from the "Weight Reduction %" column of the ALPHA input
+file. The other needed weights are calculated differently for different types of packages as described below.
+
+Battery Weight Calculation
+++++++++++++++++++++++++++
+For electrified packages, the curb weight and weight reduction values are as described above. To calculate the battery weight, the
+kWh_pack_per_kg_pack_curve entries of :numref:`bev_curves_sheet` or :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+are used as shown in equation :math:numref:`battery_weight_equation`.
+
+.. Math::
+    :label: battery_weight_equation
+
+    Weight_{battery} = 2.2 \frac {pounds} {kg} \times \frac{kWh_{gross}} {(A \times kWh_{gross}^3 + B \times kWh_{gross}^2 + C \times kWh_{gross} + D)}
+
+Where,
+
+* :math:`Weight_{battery}` is the weight of the battery in pounds (this would be 0 for a non-electrified ICE package)
+* :math:`kWh_{gross}` is the gross energy content of the battery pack from equation :math:numref:`bev_kwh_gross_equation` or :math:numref:`hev_kwh_gross_equation` or :math:numref:`phev_kwh_gross_equation`
+* :math:`A` refers to the x_cubed_factor of the kWh_pack_per_kg_pack_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`B` refers to the x_squared_factor of the kWh_pack_per_kg_pack_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`C` refers to the x_factor of the kWh_pack_per_kg_pack_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+* :math:`D` refers to the constant factor of the kWh_pack_per_kg_pack_curve from :numref:`bev_curves_sheet`, :numref:`hev_curves_sheet` or :numref:`phev_curves_sheet`
+
+Glider Weight Calculation
++++++++++++++++++++++++++
+The glider weight of is calculated as shown in equation :math:numref:`glider_weight_equation`.
+
+.. Math::
+    :label: glider_weight_equation
+
+    Weight_{glider} = CurbWeight \times GliderShare - Weight_{battery}
+
+Where,
+
+* :math:`Weight_{glider}` is the weight of the glider
+* :math:`CurbWeight` is the curb weight, equal to the TestWeight - 300, in pounds
+* :math:`GliderShare` is the glider weight as a share of the curb weight and is set via the InputSettings class (current settings are 0.85 for non-BEV, 1 for BEV)
+* :math:`Weight_{battery}` is from equation :math:numref:`battery_weight_equation`
+
+Weight Removed Calculation
+++++++++++++++++++++++++++
+With the glider weight, the pounds removed via weight reduction are calculated as shown in equation :math:numref:`weight_removed_equation`.
+
+.. Math::
+    :label: weight_removed_equation
+
+    Weight_{removed} = \frac{Weight_{glider}} {(1 - Weight_{reduction})} - Weight_{glider}
+
+Where,
+
+* :math:`Weight_{removed}` is the weight removed from the glider, in pounds
+* :math:`Weight_{glider}` is from equation :math:numref:`glider_weight_equation`
+* :math:`Weight_{reduction}` is from the "Weight Reduction %" column of the ALPHA input file
+
+Base Weight Calculation
++++++++++++++++++++++++
+The base weight of any package is determined as shown in equation :math:numref:`base_weight_equation`. In other words,
+the base weight is the glider weight of the package before any weight reduction being applied.
+
+.. Math::
+    :label: base_weight_equation
+
+    Weight_{base} = Weight_{glider} + Weight_{removed}
+
+Where,
+
+* :math:`Weight_{base}` is the base weight of the glider (i.e., before any weight reduction applied to the glider)
+* :math:`Weight_{glider}` is from equation :math:numref:`glider_weight_equation`
+* :math:`Weight_{removed}` is from equation :math:numref:`weight_removed_equation`
+
+Weight Cost Calculation
++++++++++++++++++++++++
+With the weight-related parameters calculated as above, the weight-related costs can then be calculated as shown in equation
+:math:numref:`weight_cost_equation`. To do this, the alpha_package_costs module makes use of the tables on the weight_ice and weight_bev
+worksheets of the alpha_package_costs_module_inputs file. Those tables are shown in :numref:`weight_ice_sheet` and :numref:`weight_bev_sheet`.
+
+.. _weight_ice_sheet:
+.. csv-table:: Weight Cost Curves for ICE Vehicles, HEVs and PHEVs
+    :widths: auto
+    :header-rows: 1
+
+    structure_class,item_cost,dmc_per_pound,DMC_ln_coefficient,DMC_constant,IC_slope,dollar_basis
+    unibody,5.25,3.5,0.921371846,1.673159093,5.062263982,2016
+    ladder,6,4,1.64895973,3.942416562,7.618568107,2016
+
+.. _weight_bev_sheet:
+.. csv-table:: Weight Cost Curves for BEVs
+    :widths: auto
+    :header-rows: 1
+
+    structure_class,item_cost,dmc_per_pound,DMC_ln_coefficient,DMC_constant,IC_slope,dollar_basis
+    unibody,5.25,3.5,0.921371846,1.673159093,5.062263982,2016
+    ladder,6,4,1.64895973,3.942416562,7.618568107,2016
+
+Where,
+
+* :math:`structure\_class` refers to the basic structure of the package
+* :math:`unibody` and :math:`ladder` are determined by the module where ALPHA class "Truck" is ladder and all other ALPHA classes are unibody
+* :math:`dmc` and :math:`DMC` refer to the Direct Manufacturing Cost
+* :math:`item\_cost` refers to the dmc_per_pound cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet (applied to :math:`Weight_{base}`, see below)
+* :math:`DMC\_ln\_coefficient` and :math:`DMC\_constant` and :math:`IC\_slope` (or indirect cost slope) are applied to weight reduction (%) (see below)
+
+The item_cost value is applied to the base weight of any package while the DMC_ln_coefficient, DMC_constant and IC_slope
+values are applied to the weight reduction levels.
+
+The costs associated with the base weight are calculated as shown in equation :math:numref:`base_weight_cost_equation`.
+
+.. Math::
+    :label: base_weight_cost_equation
+
+    Cost_{base\_weight} = Weight_{base} \times \frac{cost} {pound} \times PriceScaler_{price\_class}
+
+Where,
+
+* :math:`Cost_{base\_weight}` is the cost of the glider prior to any weight reduction
+* :math:`Weight_{base}` is from equation :math:numref:`base_weight_equation`
+* :math:`\frac{cost} {pound}` is the :math:`item\_cost` value from :numref:`weight_ice_sheet` or :numref:`weight_bev_sheet` for the applicable :math:`structure\_class`
+* :math:`PriceScaler_{price\_class}` is from :numref:`price_class_sheet`
+
+The costs associated with weight reduction are calculated as shown in equation :math:numref:`weight_removed_cost_equation`.
+
+.. Math::
+    :label: weight_removed_cost_equation
+
+    & Cost_{weight\_reduction} \\
+    & \small = Weight_{removed} \times [DMC_{ln\_coefficient} \times ln(Weight_{reduction}) + DMC_{constant} + IC_{slope} \times Weight_{reduction}] \\
+
+Where,
+
+* :math:`Cost_{weight\_reduction}` is the cost associated with weight reduction
+* :math:`Weight_{removed}` is the number of pounds removed as determined by equation :math:numref:`weight_removed_equation`
+* :math:`DMC_{ln\_coefficient}` and :math:`DMC_{constant}` and :math:`IC_{slope}` are from :numref:`weight_ice_sheet` or :numref:`weight_bev_sheet` for the applicable :math:`structure\_class`
+* :math:`Weight_{reduction}` is from the "Weight Reduction %" column of the ALPHA input file
+
+The final weight-related cost is the sum of the base weight cost and the cost of weight reduction as shown in equation
+:math:numref:`weight_cost_equation`.
+
+.. Math::
+    :label: weight_cost_equation
+
+    Cost_{weight} = Cost_{base\_weight} + Cost_{weight\_reduction}
+
+Where,
+
+* :math:`Cost_{weight}` is the cost for weight-related elements of the package
+* :math:`Cost_{base\_weight}` is from equation :math:numref:`base_weight_cost_equation`
+* :math:`Cost_{weight\_reduction}` is from equation :math:numref:`weight_removed_cost_equation`
 
 
-The module then
-
-
-
-
+Package Costs
+-------------
+ICE package costs consist of the ICE powertrain and the weight-related costs as described here.
 
 ICE Powertrain Costs
---------------------
-ICE powertrain costs consist of engine-related costs, the transmission, accessories, and air conditioning. In the case of
-hybrid electric vehicles (HEV), the HEV-related costs (battery and non-battery components) are also included.
+++++++++++++++++++++
+ICE powertrain costs consist of engine-related costs, the transmission, accessories, and air conditioning as shown in equation
+:math:numref:`ice_powertrain_cost_equation`. Year-over-year costs then apply the learning_rate_ice_powertrain entry from
+:numref:`inputs_code_sheet`.
+
+.. Math::
+    :label: ice_powertrain_cost_equation
+
+    Cost_{ICE\_powertrain} = Cost_{engine} + Cost_{transmission} + Cost_{accessories} + Cost_{air\_conditioning}
+
+Where,
+
+* :math:`Cost_{ICE\_powertrain}` is the cost of the ICE powertrain
+* :math:`Cost_{engine}` is from equation :math:numref:`engine_cost_equation`
+* :math:`Cost_{transmission}` is the :math:`item\_cost` entry for the applicable transmission from :numref:`trans_sheet`
+* :math:`Cost_{accessories}` is the :math:`item\_cost` entry for the applicable accessory from :numref:`accessories_sheet`
+* :math:`Cost_{air\_conditioning}` is the :math:`item\_cost` entry for the applicable :math:`structure\_class` from :numref:`ac_sheet`
+
+Roadload Costs
+++++++++++++++
+Roadload costs (i.e., costs associated with non-weight related roadload reductions) are the sum of the aero and non-aero
+related costs as shown in equation :math:numref:`roadload_cost_equation`. Year-over-year costs then apply the learning_rate_roadload
+entry from :numref:`inputs_code_sheet`.
+
+.. Math::
+    :label: roadload_cost_equation
+
+    Cost_{roadload} = Cost_{aero} + Cost_{non\_aero}
+
+Where,
+
+* :math:`Cost_{roadload}` is the cost associated with aero and non-aero roadload reductions
+* :math:`Cost_{aero}` is the :math:`item\_cost` entry for the applicable aero technology from :numref:`aero_sheet`
+* :math:`Cost_{non\_aero}` is the :math:`item\_cost` entry for the applicable non-aero technology from :numref:`nonaero_sheet`
+
+Weight Costs
+++++++++++++
+The weight costs are taken directly from equation :math:numref:`weight_cost_equation`. Year-over-year costs then apply
+the learning_rate_weight entry from :numref:`inputs_code_sheet`.
+
+Electrification Costs
++++++++++++++++++++++
+Electrification costs are the sum of the battery and the non-battery costs as shown in equation :math:numref:`electrification_cost_equation`.
+Year-over-year costs then apply the learning_rate_ice_powertrain entry, the learning_rate_bev entry or the learning_rate_phev
+entry for HEVs, BEVs and PHEVs, respectively, from :numref:`inputs_code_sheet`.
+
+.. Math::
+    :label: electrification_cost_equation
+
+    Cost_{electrification} = Cost_{battery} + Cost_{non\_battery}
+
+Where,
+
+* :math:`Cost_{electrification}` is the cost associated with battery and non-battery elements of electrified packages
+* :math:`Cost_{battery}` is from equation :math:numref:`battery_cost_equation`
+* :math:`Cost_{non\_battery}` is from equation :math:numref:`non_battery_cost_equation`
+
+ICE Package Costs
++++++++++++++++++
+The ICE package costs are the sum of the ICE powertrain, roadload and weight costs as shown in equation :math:numref:`ice_package_cost_equation`.
+
+.. Math::
+    :label: ice_package_cost_equation
+
+    Cost_{package} = Cost_{powertrain} + Cost_{roadload} + Cost_{weight}
+
+Where,
+
+* :math:`Cost_{package}` is the total cost of the ICE package
+* :math:`Cost_{powertrain}` is the cost of the ICE powertrain from equation :math:numref:`ice_powertrain_cost_equation`
+* :math:`Cost_{roadload}` is from equation :math:numref:`roadload_cost_equation`
+* :math:`Cost_{weight}` is from equation :math:numref:`weight_cost_equation`
+
+HEV & PHEV Package Costs
+++++++++++++++++++++++++
+The HEV and PHEV package costs are the sum of the ICE powertrain, roadload, weight and electrification costs as shown in
+equation :math:numref:`hev_package_cost_equation`.
+
+.. Math::
+    :label: hev_package_cost_equation
+
+    Cost_{package} = Cost_{powertrain} + Cost_{roadload} + Cost_{weight} + Cost_{electrification}
+
+Where,
+
+* :math:`Cost_{package}` is the total cost of the HEV or PHEV package
+* :math:`Cost_{powertrain}` is the cost of the ICE powertrain from equation :math:numref:`ice_powertrain_cost_equation`
+* :math:`Cost_{roadload}` is from equation :math:numref:`roadload_cost_equation`
+* :math:`Cost_{weight}` is from equation :math:numref:`weight_cost_equation`
+* :math:`Cost_{electrification}` is from equation :math:numref:`electrification_cost_equation`
+
+
+BEV Package Costs
++++++++++++++++++
+BEVs do not have an ICE engine or powertrain. For BEVs, the package costs are the sum of the roadload, weight, electrification
+and the air conditioning costs as shown in :math:numref:`bev_package_cost_equation`.
+
+.. Math::
+    :label: bev_package_cost_equation
+
+    Cost_{package} = Cost_{roadload} + Cost_{weight} + Cost_{electrification} + Cost_{air\_conditioning}
+
+Where,
+
+* :math:`Cost_{package}` is the cost of the BEV package
+* :math:`Cost_{roadload}` is from equation :math:numref:`roadload_cost_equation`
+* :math:`Cost_{weight}` is from equation :math:numref:`weight_cost_equation`
+* :math:`Cost_{electrification}` is from equation :math:numref:`electrification_cost_equation`
+* :math:`Cost_{air\_conditioning}` is the :math:`item\_cost` entry for the applicable :math:`structure\_class` from :numref:`ac_sheet`
