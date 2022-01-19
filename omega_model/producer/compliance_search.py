@@ -747,7 +747,8 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
         compliance_possible = True
 
         # grab lowest-cost compliant option
-        lowest_cost_compliant_tech_share_option = production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
+        lowest_cost_compliant_tech_share_option = \
+            production_options.loc[[compliant_tech_share_options[cost_name].idxmin()]]
 
         # grab best non-compliant option
         non_compliant_tech_share_options['weighted_slope'] = \
