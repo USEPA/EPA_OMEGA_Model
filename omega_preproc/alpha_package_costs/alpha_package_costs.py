@@ -219,6 +219,10 @@ class InputSettings:
             self.learning_rate_roadload = self.inputs_code['learning_rate_roadload']['value']
             self.learning_rate_bev = self.inputs_code['learning_rate_bev']['value']
             self.learning_rate_phev = self.inputs_code['learning_rate_phev']['value']
+            self.learning_rate_aftertreatment = self.inputs_code['learning_rate_aftertreatment']['value']
+            self.pt_dollars_per_troy_oz = self.inputs_code['Pt_dollars_per_troy_oz']['value']
+            self.pd_dollars_per_troy_oz = self.inputs_code['Pd_dollars_per_troy_oz']['value']
+            self.rh_dollars_per_troy_oz = self.inputs_code['Rh_dollars_per_troy_oz']['value']
             self.boost_multiplier = self.inputs_code['boost_multiplier']['value']
             self.run_id = self.inputs_code['run_ID']['value']
             if self.run_id != 0:
@@ -330,6 +334,13 @@ class InputSettings:
 
             self.electrified_metrics_dict = pd.read_excel(self.techcosts_file, sheet_name='electrified_metrics', index_col=0).to_dict('index')
 
+            self.aftertreatment_dict \
+                = self.create_cost_df_in_consistent_dollar_basis(self.gdp_deflators,
+                                                                 self.dollar_basis_for_output_file,
+                                                                 self.techcosts_file,
+                                                                 'aftertreatment',
+                                                                 'dmc_slope', 'dmc_intercept').to_dict('index')
+
             self.ice_glider_share = 0.85
             self.bev_glider_share = 1
 
@@ -349,6 +360,7 @@ class InputSettings:
 
             # set constants
             self.lbs_per_kg = 2.2
+            self.grams_per_troy_oz = 31.1
 
         except:
             import traceback
@@ -1075,6 +1087,44 @@ class Weight:
         return cost
 
 
+class Aftertreatment:
+
+    def __init__(self, key):
+        self.engine_key, self.fuel_key = PackageCost(key).get_object_attributes(['engine_key', 'fuel_key'])
+
+    def calc_aftertreatment_cost(self, input_settings, device):
+        """
+
+        Args:
+            input_settings: The InputSettings class.
+            device: String designating the device for which costs are calculated (e.g., 'twc', 'gpf')
+
+        Returns:
+
+        """
+        disp = self.engine_key[1]
+        swept_volume = input_settings.aftertreatment_dict[f'swept_volume_{device}']['value']
+        twc_volume = disp * swept_volume
+        factor = twc_volume / input_settings.grams_per_troy_oz
+
+        pt_cost = factor * input_settings.pt_dollars_per_troy_oz * input_settings.aftertreatment_dict[f'Pt_grams_per_liter_{device}']['value']
+        pd_cost = factor * input_settings.pd_dollars_per_troy_oz * input_settings.aftertreatment_dict[f'Pd_grams_per_liter_{device}']['value']
+        rh_cost = factor * input_settings.rh_dollars_per_troy_oz * input_settings.aftertreatment_dict[f'Rh_grams_per_liter_{device}']['value']
+
+        substrate = twc_volume * input_settings.aftertreatment_dict[f'substrate_{device}']['dmc_slope'] \
+                    + input_settings.aftertreatment_dict[f'substrate_{device}']['dmc_intercept']
+        washcoat = twc_volume * input_settings.aftertreatment_dict[f'washcoat_{device}']['dmc_slope'] \
+                   + input_settings.aftertreatment_dict[f'washcoat_{device}']['dmc_intercept']
+        canning = twc_volume * input_settings.aftertreatment_dict[f'canning_{device}']['dmc_slope'] \
+                  + input_settings.aftertreatment_dict[f'canning_{device}']['dmc_intercept']
+
+        cost = pt_cost + pd_cost + rh_cost + substrate + washcoat + canning
+
+        cost = input_settings.aftertreatment_dict[f'markup_{device}']['value'] * cost
+
+        return cost
+
+
 class PackageCost:
     """
 
@@ -1194,6 +1244,10 @@ class PackageCost:
 
         engine_cost = Engine(self.key).calc_engine_cost(input_settings)
 
+        twc_cost = Aftertreatment(self.key).calc_aftertreatment_cost(input_settings, 'twc')
+        gpf_cost = Aftertreatment(self.key).calc_aftertreatment_cost(input_settings, 'gpf')
+        aftertreatment_cost = twc_cost + gpf_cost
+
         if self.fuel_key == 'hev':
             battery_cost = Battery(self.key).calc_battery_cost(input_settings)
             non_battery_cost = NonBattery(self.key).calc_nonbattery_cost(input_settings)
@@ -1204,13 +1258,15 @@ class PackageCost:
         ice_powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost
         ice_powertrain_cost_df = pd.DataFrame(ice_powertrain_cost, columns=['ice_powertrain'], index=[self.alpha_key])
 
+        aftertreatment_cost_df = pd.DataFrame(aftertreatment_cost, columns=['aftertreatment'], index=[self.alpha_key])
+
         electrification_cost = hev_cost
         electrification_cost_df = pd.DataFrame(electrification_cost, columns=['hev_powertrain'], index=[self.alpha_key])
 
         weight_cost = Weight(self.key).calc_weight_cost(input_settings)
         body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[self.alpha_key])
 
-        package_cost_df = ice_powertrain_cost_df.join(electrification_cost_df).join(roadload_cost_df).join(body_cost_df)
+        package_cost_df = ice_powertrain_cost_df.join(aftertreatment_cost_df).join(electrification_cost_df).join(roadload_cost_df).join(body_cost_df)
         
         package_cost_df.insert(0, 'cs_cert_direct_oncycle_co2e_grams_per_mile', combined_co2)
         package_cost_df.insert(0, 'cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile', hwy_co2)
@@ -1269,6 +1325,9 @@ class PackageCost:
             engine_cost = Engine(self.key).calc_engine_cost(input_settings)
             trans_cost = self.calc_trans_cost(input_settings)
             accessories_cost = self.calc_accessories_cost(input_settings)
+            twc_cost = Aftertreatment(self.key).calc_aftertreatment_cost(input_settings, 'twc')
+            gpf_cost = Aftertreatment(self.key).calc_aftertreatment_cost(input_settings, 'gpf')
+            aftertreatment_cost = twc_cost + gpf_cost
             ice_powertrain_cost = engine_cost + trans_cost + accessories_cost + ac_cost
             battery_cost = Battery(self.key).calc_battery_cost(input_settings)
             non_battery_cost = NonBattery(self.key).calc_nonbattery_cost(input_settings)
@@ -1277,6 +1336,7 @@ class PackageCost:
             engine_cost = 0
             trans_cost = 0
             accessories_cost = 0
+            aftertreatment_cost = 0
             ice_powertrain_cost = engine_cost + trans_cost + accessories_cost
             battery_cost = Battery(self.key).calc_battery_cost(input_settings)
             non_battery_cost = NonBattery(self.key).calc_nonbattery_cost(input_settings)
@@ -1284,12 +1344,14 @@ class PackageCost:
 
         ice_powertrain_cost_df = pd.DataFrame(ice_powertrain_cost, columns=['ice_powertrain'], index=[self.alpha_key])
 
+        aftertreatment_cost_df = pd.DataFrame(aftertreatment_cost, columns=['aftertreatment'], index=[self.alpha_key])
+
         electrification_cost_df = pd.DataFrame({'pev_battery': battery_cost, 'pev_nonbattery': non_battery_cost, 'pev_powertrain': electrification_cost}, index=[self.alpha_key])
 
         weight_cost = Weight(self.key).calc_weight_cost(input_settings)
         body_cost_df = pd.DataFrame(weight_cost, columns=['body'], index=[self.alpha_key])
 
-        package_cost_df = ice_powertrain_cost_df.join(electrification_cost_df).join(roadload_cost_df).join(body_cost_df)
+        package_cost_df = ice_powertrain_cost_df.join(aftertreatment_cost_df).join(electrification_cost_df).join(roadload_cost_df).join(body_cost_df)
 
         package_cost_df.insert(0, 'cd_cert_direct_oncycle_kwh_per_mile', combined_kwh)
         package_cost_df.insert(0, 'cd_hwfet:cert_direct_oncycle_kwh_per_mile', hwy_kwh)
@@ -1711,6 +1773,8 @@ def main():
     if runtime_settings.run_phev:
         phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'ice_powertrain', input_settings.years,
                                                      input_settings.learning_rate_ice_powertrain)
+        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'aftertreatment', input_settings.years,
+                                                     input_settings.learning_rate_aftertreatment)
         phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_battery', input_settings.years,
                                                      input_settings.learning_rate_phev)
         phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_nonbattery', input_settings.years,
@@ -1727,12 +1791,14 @@ def main():
         phev_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         phev_packages_df = sum_vehicle_parts(phev_packages_df, input_settings.years,
                                              'new_vehicle_mfr_cost_dollars',
-                                             'ice_powertrain', 'pev_powertrain', 'roadload', 'body')
+                                             'ice_powertrain', 'aftertreatment', 'pev_powertrain', 'roadload', 'body')
 
     # calculate YoY hev costs with learning
     if runtime_settings.run_hev:
         hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'ice_powertrain', input_settings.years,
                                                     input_settings.learning_rate_ice_powertrain)
+        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'aftertreatment', input_settings.years,
+                                                     input_settings.learning_rate_aftertreatment)
         hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'hev_powertrain', input_settings.years,
                                                     input_settings.learning_rate_ice_powertrain)
         hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'roadload', input_settings.years,
@@ -1745,20 +1811,25 @@ def main():
         hev_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         hev_packages_df = sum_vehicle_parts(hev_packages_df, input_settings.years,
                                             'new_vehicle_mfr_cost_dollars',
-                                            'ice_powertrain', 'hev_powertrain', 'roadload', 'body')
+                                            'ice_powertrain', 'aftertreatment', 'hev_powertrain', 'roadload', 'body')
 
     # calculate YoY ice costs with learning
     if runtime_settings.run_ice:
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'ice_powertrain', input_settings.years, input_settings.learning_rate_ice_powertrain)
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'roadload', input_settings.years, input_settings.learning_rate_roadload)
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'body', input_settings.years, input_settings.learning_rate_weight)
+        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'ice_powertrain', input_settings.years,
+                                                    input_settings.learning_rate_ice_powertrain)
+        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'aftertreatment', input_settings.years,
+                                                    input_settings.learning_rate_aftertreatment)
+        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'roadload', input_settings.years,
+                                                    input_settings.learning_rate_roadload)
+        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'body', input_settings.years,
+                                                    input_settings.learning_rate_weight)
         ice_packages_df.reset_index(drop=False, inplace=True)
         ice_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'ice_{idx}' for idx in range(1, len(ice_packages_df) + 1)]
         ice_packages_df.insert(0, 'simulated_vehicle_id', simulated_vehicle_id)
         ice_packages_df = sum_vehicle_parts(ice_packages_df, input_settings.years,
                                             'new_vehicle_mfr_cost_dollars',
-                                            'ice_powertrain', 'roadload', 'body')
+                                            'ice_powertrain', 'aftertreatment', 'roadload', 'body')
 
     input_settings.path_outputs.mkdir(exist_ok=True)
     input_settings.path_of_run_folder = input_settings.path_outputs / f'{input_settings.name_id}'
