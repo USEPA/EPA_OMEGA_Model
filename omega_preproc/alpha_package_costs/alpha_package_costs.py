@@ -1100,6 +1100,7 @@ class Aftertreatment:
             device: String designating the device for which costs are calculated (e.g., 'twc', 'gpf')
 
         Returns:
+            The aftertreatment cost (TWC system or GPF system) for the given package.
 
         """
         disp = self.engine_key[1]

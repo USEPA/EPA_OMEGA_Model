@@ -1029,6 +1029,10 @@ dollar basis value. All of the inputs applied in-code, as just discussed, are sh
     learning_rate_roadload,0.015
     learning_rate_bev,0.025
     learning_rate_phev,0.025
+    learning_rate_aftertreatment,0.01
+    Pt_dollars_per_troy_oz,990.58
+    Pd_dollars_per_troy_oz,1952.23
+    Rh_dollars_per_troy_oz,16328.67
     boost_multiplier,1.2
 
 Where,
@@ -1076,9 +1080,9 @@ Where,
 * :math:`ATK` refers to Atkinson cycle (high compression ratio) while the number refers to a compression level
 
 To calculate engine-related costs, the module makes use of the table on the engines worksheet of the alpha_package_costs_module_inputs
-file. That table is shown in :numref:`engine_cost_sheet`.
+file. That table is shown in :numref:`engine_sheet`.
 
-.. _engine_cost_sheet:
+.. _engine_sheet:
 .. csv-table:: Engine Tech Costs
     :widths: auto
     :header-rows: 1
@@ -1135,8 +1139,8 @@ Where,
 * :math:`Cost_{Displacement, Cylinders}` is the cost of the engine block
 * :math:`Displacement` comes from the package description in the ALPHA input file
 * :math:`CylinderCount` comes from the package description in the ALPHA input file
-* :math:`\frac{$} {liter}` comes from :numref:`engine_cost_sheet`
-* :math:`\frac{$} {cylinder}` comes from :numref:`engine_cost_sheet`
+* :math:`\frac{$} {liter}` comes from :numref:`engine_sheet`
+* :math:`\frac{$} {cylinder}` comes from :numref:`engine_sheet`
 
 If the engine is turbocharged (see :numref:`engines_and_techs`), the costs associated with turbocharging are calculated
 as shown in equation :math:numref:`turbo_cost`.
@@ -1154,13 +1158,13 @@ Where,
 * :math:`BoostMultiplier` is from the inputs_code worksheet of the alpha_package_costs_module_inputs file
 * :math:`Level-Vintage` associated with the turbo is from :numref:`engines_and_techs`
 * :math:`CylinderCount` comes from the package description in the ALPHA input file
-* :math:`TurboCost_{Level-Vintage, CylinderCount}` comes from :numref:`engine_cost_sheet`
+* :math:`TurboCost_{Level-Vintage, CylinderCount}` comes from :numref:`engine_sheet`
 
 If the engine is equipped with cooled EGR (see :numref:`engines_and_techs`), the costs associated with that technology
-are read directly from :numref:`engine_cost_sheet`.
+are read directly from :numref:`engine_sheet`.
 
 If the engine is equipped with direct fuel-injection (see :numref:`engines_and_techs`), the costs associated with that
-technology are read directly from :numref:`engine_cost_sheet` along with the "Engine Cylinders" column of the ALPHA input file.
+technology are read directly from :numref:`engine_sheet` along with the "Engine Cylinders" column of the ALPHA input file.
 
 The presence of cylinder deactivation is read directly from the "DEAC D Cyl." and "DEAC C Cyl." columns of the ALHPA
 input file where "DEAC D Cyl." refers to "Cylinder Deactivation: Partial Discrete," or DeacPD, and "DEAC C Cyl." refers
@@ -2201,6 +2205,103 @@ Where,
 * :math:`Cost_{base\_weight}` is from equation :math:numref:`base_weight_cost_equation`
 * :math:`Cost_{weight\_reduction}` is from equation :math:numref:`weight_removed_cost_equation`
 
+Aftertreatment Costs
+--------------------
+To estimate aftertreatment costs, the alpha_package_costs module makes use of the "Engine Displacement L" column of the
+ALPHA input file and the table on the aftertreatment worksheet of the alpha_package_costs_module_inputs file. That table is
+shown in :numref:`aftertreatment_sheet`.
+
+.. _aftertreatment_sheet:
+.. csv-table:: Aftertreatment System Costs
+    :widths: auto
+    :header-rows: 1
+
+    item,value,dmc_slope,dmc_intercept,dollar_basis
+    substrate_twc,0,6.108,1.95456,2012
+    washcoat_twc,0,5.09,0,2012
+    canning_twc,0,2.4432,0,2012
+    swept_volume_twc,1.2,0,0,0
+    Pt_grams_per_liter_twc,0,,,
+    Pd_grams_per_liter_twc,2,,,
+    Rh_grams_per_liter_twc,0.11,,,
+    markup_twc,1.5,,,
+    substrate_gpf,0,1,1,2020
+    washcoat_gpf,0,1,0,2020
+    canning_gpf,0,1,0,2020
+    swept_volume_gpf,1.2,0,0,0
+    Pt_grams_per_liter_gpf,1,,,
+    Pd_grams_per_liter_gpf,0,,,
+    Rh_grams_per_liter_gpf,0,,,
+    markup_gpf,1.5,,,
+
+Where,
+
+* :math:`twc` and :math:`gpf` refer to 3-way catalyst (TWC) and gasoline particulate filter (GPF), respectively
+* :math:`Pt` and :math:`Pd` and :math:`Rh` refer to Platinum, Palladium and Rhodium, respectively
+
+The module treats the TWC and GPF systems separately, and treats each of those separate systems as a whole, not as individual
+devices (i.e., a V8 engine that might have two close coupled catalysts and one underbody catalyst is treated as a single TWC
+system in the calculations described here. In the descriptions that follow, a "system" or "device" is meant to refer to
+the TWC system as a whole, or the GPF system as a whole, and not the combination of the two until they are summed as shown
+in equation :math:numref:`aftertreatment_cost_equation`.
+
+To do this, the module first determines the total volume of the aftertreatment system (TWC or GPF) as shown in equation
+:math:numref:`aftertreatment_volume_equation`.
+
+.. Math::
+    :label: aftertreatment_volume_equation
+
+    Volume_{system} = Displacement_{engine} \times SweptVolume_{system}
+
+Where,
+
+* :math:`Volume_{system}` is the volume of the TWC or GPF system, in Liters
+* :math:`Displacement_{engine}` is from the "Engine Displacement L" column of the ALPHA input file
+* :math:`SweptVolume_{system}` is from :numref:`aftertreatment_sheet` for the appropriate device (TWC or GPF)
+
+The module then calculates the total cost of each precious group metal (PGM) in the TWC or GPF system as shown in equation
+:math:numref:`pgm_cost_equation`.
+
+.. Math::
+    :label: pgm_cost_equation
+
+    Cost_{PGM} = Volume_{system} \times (\frac{$} {TroyOz})_{PGM} \times \frac{TroyOz} {gram} \times (\frac{grams} {Liter})_{PGM}
+
+Where,
+
+* :math:`Cost_{PGM}` is the cost ($) of Platinum or Palladium or Rhodium in the applicable system (TWC or GPF)
+* :math:`Volume_{system}` in Liters is from equation :math:numref:`aftertreatment_volume_equation`
+* :math:`\frac{$} {TroyOz}` is from :numref:`inputs_code_sheet` for the applicable PGM
+* :math:`\frac{TroyOz} {gram}` converts Troy ounces to grams, equal to 0.032 Troy ounce per gram, or 31.1 grams per Troy ounce
+* :math:`\frac{grams} {Liter}` is from :numref:`aftertreatment_sheet` for the applicable system (TWC or GPF) and PGM
+
+The cost of Platinum, Palladium and Rhodium are calculated separately as shown equation :math:numref:`pgm_cost_equation`
+and separately for the TWC and the GPF system.
+
+The cost of the substrate(s), washcoat and canning in the applicable TWC or GPF system is then calculated as shown in equation
+:math:numref:`substrate_cost_equation`.
+
+.. Math::
+    :label: substrate_cost_equation
+
+    & Cost_{substrate;washcoat;canning} = Volume_{system} \times dmc\_slope_{substrate} + dmc\_intercept_{substrate} \\
+    & + Volume_{system} \times dmc\_slope_{washcoat} + dmc\_intercept_{washcoat} \\
+    & + Volume_{system} \times dmc\_slope_{canning} + dmc\_intercept_{canning}
+
+The cost of the full aftertreatment system -- TWC and GPF combined -- is then calculated as shown in equation
+:math:numref:`aftertreatment_cost_equation`.
+
+.. Math::
+    :label: aftertreatment_cost_equation
+
+    & Cost_{aftertreatment} = (Cost_{Pt} + Cost_{Pd} + Cost_{Rh} + Cost_{substrate;washcoat;canning})_{TWC} \\
+    & + (Cost_{Pt} + Cost_{Pd} + Cost_{Rh} + Cost_{substrate;washcoat;canning})_{GPF}
+
+Where,
+
+* :math:`Cost_{aftertreatment}` is the cost of the full aftertreatment system (TWC and GPF combined)
+* :math:`Cost_{Pt}` and :math:`Cost_{Pd}` and :math:`Cost_{Rh}` are calculated using equation :math:numref:`pgm_cost_equation`
+* :math:`Cost_{substrate;washcoat;canning}` is calculated using equation :math:numref:`aftertreatment_cost_equation`
 
 Package Costs
 -------------
@@ -2271,14 +2372,15 @@ The ICE package costs are the sum of the ICE powertrain, roadload and weight cos
 .. Math::
     :label: ice_package_cost_equation
 
-    Cost_{package} = Cost_{powertrain} + Cost_{roadload} + Cost_{weight}
+    Cost_{package} = Cost_{powertrain} + Cost_{roadload} + Cost_{weight} + Cost_{aftertreatment}
 
 Where,
 
 * :math:`Cost_{package}` is the total cost of the ICE package
-* :math:`Cost_{powertrain}` is the cost of the ICE powertrain from equation :math:numref:`ice_powertrain_cost_equation`
+* :math:`Cost_{powertrain}` is the cost of the ICE powertrain, which includes air conditioning, from equation :math:numref:`ice_powertrain_cost_equation`
 * :math:`Cost_{roadload}` is from equation :math:numref:`roadload_cost_equation`
 * :math:`Cost_{weight}` is from equation :math:numref:`weight_cost_equation`
+* :math:`Cost_{aftertreatment}` is from equation :math:numref:`aftertreatment_cost_equation`
 
 HEV & PHEV Package Costs
 ++++++++++++++++++++++++
@@ -2288,14 +2390,15 @@ equation :math:numref:`hev_package_cost_equation`.
 .. Math::
     :label: hev_package_cost_equation
 
-    Cost_{package} = Cost_{powertrain} + Cost_{roadload} + Cost_{weight} + Cost_{electrification}
+    Cost_{package} = Cost_{powertrain} + Cost_{roadload} + Cost_{weight} + Cost_{aftertreatment} + Cost_{electrification}
 
 Where,
 
 * :math:`Cost_{package}` is the total cost of the HEV or PHEV package
-* :math:`Cost_{powertrain}` is the cost of the ICE powertrain from equation :math:numref:`ice_powertrain_cost_equation`
+* :math:`Cost_{powertrain}` is the cost of the ICE powertrain, which includes air conditioning, from equation :math:numref:`ice_powertrain_cost_equation`
 * :math:`Cost_{roadload}` is from equation :math:numref:`roadload_cost_equation`
 * :math:`Cost_{weight}` is from equation :math:numref:`weight_cost_equation`
+* :math:`Cost_{aftertreatment}` is from equation :math:numref:`aftertreatment_cost_equation`
 * :math:`Cost_{electrification}` is from equation :math:numref:`electrification_cost_equation`
 
 
