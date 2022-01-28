@@ -14,15 +14,16 @@ from omega_model import *
 
 class ReregistrationBase:
     """
-    **Load and provide access to vehicle re-registration data.**
+    **Load and provide access to vehicle re-registration data by model year, market class ID and age.**
 
     """
     @staticmethod
-    def get_reregistered_proportion(market_class_id, age):
+    def get_reregistered_proportion(model_year, market_class_id, age):
         """
         Get vehicle re-registered proportion [0..1] by market class and age.
 
         Args:
+            model_year (int): the model year of the re-registration data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age
 
@@ -52,21 +53,22 @@ class ReregistrationBase:
 
 class AnnualVMTBase:
     """
-    Loads and provides access to annual Vehicle Miles Travelled by market class, age and potentially other factors.
+    **Loads and provides access to annual Vehicle Miles Travelled by calendar year, market class, and age.**
 
     """
 
     @staticmethod
-    def get_vmt(market_class_id, age):
+    def get_vmt(calendar_year, market_class_id, age):
         """
-        Get vehicle miles travelled by market class and age.
+        Get vehicle miles travelled by calendar year, market class and age.
 
         Args:
+            calendar_year (int): calendar year of the VMT data
             market_class_id (str): market class id, e.g. 'hauling.ICE'
             age (int): vehicle age in years
 
         Returns:
-            (float) Vehicle miles travelled.
+            (float) Annual vehicle miles travelled.
 
         """
         raise Exception('**Attempt to call abstract method OnroadVMT.%s() without child class override**' %
@@ -97,16 +99,19 @@ class SalesShareBase:
     """
 
     @staticmethod
-    def calc_shares(market_class_data, calendar_year):
+    def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
         """
         Determine consumer desired market shares for the given vehicles, their costs, etc.  Relative shares are first
         calculated within non-responsive market categories then converted to absolute shares.
 
         Args:
+            calendar_year (int): calendar year to calculate market shares in
+            producer_decision (Series): selected producer compliance option
             market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
                 'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
                 columns, where MC = market class ID
-            calendar_year (int): calendar year to calculate market shares in
+            mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
+            mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
 
         Returns:
             A copy of ``market_class_data`` with demanded ICE/BEV share columns by market class, e.g.

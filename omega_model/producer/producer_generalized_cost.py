@@ -76,13 +76,14 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
         return [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
 
     @staticmethod
-    def calc_generalized_cost(vehicle, co2_name, kwh_name, cost_name):
+    def calc_generalized_cost(vehicle, cost_cloud, co2_name, kwh_name, cost_name):
         """
         Calculate generalized cost (vehicle cost plus other costs such as fuel costs) for the given vehicle's
         cost cloud.
 
         Args:
             vehicle (Vehicle): the vehicle to calculate generalized costs for
+            cost_cloud (DataFrame): vehicle cost cloud
             co2_name (str): CO2 column name, e.g. 'onroad_direct_co2e_grams_per_mile'
             kwh_name (str): kWh/mi column name, e.g. 'onroad_direct_kwh_per_mile'
             cost_name (str): vehicle cost column name, e.g. 'new_vehicle_mfr_cost_dollars'
@@ -98,7 +99,7 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             ProducerGeneralizedCost. \
                 get_producer_generalized_cost_attributes(vehicle.market_class_id, ['fuel_years', 'annual_vmt'])
 
-        cost_cloud = vehicle.cost_cloud
+        # cost_cloud = vehicle.cost_cloud
         vehicle_cost = cost_cloud[cost_name]
         vehicle_co2e_grams_per_mile = cost_cloud[co2_name]
         vehicle_direct_kwh_per_mile = cost_cloud[kwh_name] / OnroadFuel.get_fuel_attribute(vehicle.model_year,

@@ -16,6 +16,17 @@ import sys, os, shutil
 from common import omega_log
 
 
+def get_user_home():
+    """
+        Get user home directory, works cross-platform
+
+    Returns:
+        User home directory as a string
+
+    """
+    return os.path.expanduser('~')
+
+
 def validate_folder(dstfolder):
     """
     Verify the existence of dstfolder and try to create it if doesn't exist

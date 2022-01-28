@@ -47,7 +47,7 @@ def sysprint(message):
 
     """
     import os
-    os.system('echo {}'.format(message))
+    os.system('echo "%s"' % message)
 
 
 def dispy_node_setup():

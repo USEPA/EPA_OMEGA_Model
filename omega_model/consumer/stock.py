@@ -60,9 +60,10 @@ def update_stock(calendar_year, compliance_id=None):
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_id)
         age = calendar_year - model_year
 
-        reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
+        reregistration_factor = omega_globals.options.Reregistration.\
+            get_reregistered_proportion(model_year, market_class_id, age)
 
-        annual_vmt = omega_globals.options.OnroadVMT.get_vmt(market_class_id, age)
+        annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
 
         registered_count = initial_registered_count * reregistration_factor
 
@@ -80,9 +81,10 @@ def update_stock(calendar_year, compliance_id=None):
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
             age = calendar_year - model_year
 
-            reregistration_factor = omega_globals.options.Reregistration.get_reregistered_proportion(market_class_id, age)
+            reregistration_factor = omega_globals.options.Reregistration.\
+                get_reregistered_proportion(model_year, market_class_id, age)
 
-            annual_vmt = omega_globals.options.OnroadVMT.get_vmt(market_class_id, age)
+            annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
 
             registered_count = initial_registered_count * reregistration_factor
 

@@ -12,7 +12,7 @@ Defines class OMEGARuntimeOptions which control an individual simulation session
 """
 
 # OMEGA code version number
-code_version = "2.0.0"
+code_version = "2.0.1"
 print('loading omega version %s' % code_version)
 
 import os, sys
@@ -78,7 +78,6 @@ try:
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
             self.session_name = 'OMEGA Demo'
             self.session_unique_name = 'OMEGA Demo'
-            self.standalone_run = False
             self.session_is_reference = True
             self.auto_close_figures = False
             self.output_folder = 'out' + os.sep
@@ -156,8 +155,8 @@ try:
             self.verbose = False
             self.iterate_producer_consumer = True
 
-            self.producer_consumer_max_iterations = 2  # recommend 2+
-            self.producer_consumer_convergence_tolerance = 1e-3
+            self.producer_consumer_max_iterations = 20  # recommend 2+
+            self.producer_consumer_convergence_tolerance = 5e-4
             self.producer_compliance_search_min_share_range = 1e-5
             self.producer_compliance_search_convergence_factor = 0.5
             self.producer_compliance_search_tolerance = 1e-6
@@ -166,11 +165,22 @@ try:
             self.flat_context = False
             self.flat_context_year = 2021
 
-            self.verbose_console_modules = ['db']  # list of modules to allow verbose console output, or empty to disable
-            self.log_producer_iteration_years = []  # = 'all' or list of years to log, empty list to disable logging
+            # list of modules to allow verbose log files, or empty to disable:
+            self.verbose_log_modules = ['database_', 'producer_compliance_search_', 'cross_subsidy_search_',
+                                        'cv_cost_curves_', 'v_cost_curves_']
+
+            # list of modules to allow verbose console output, or empty to disable
+            self.verbose_console_modules = ['producer_compliance_search_',
+                                            'p-c_shares_and_costs_', 'p-c_max_iterations_',
+                                            'cross_subsidy_search_', 'cross_subsidy_multipliers_',
+                                            'cross_subsidy_convergence_']
+
+            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_vehicles = ['ICE Large Van truck minivan 4WD'] # list of vehicles to log in producer_iteration_years
+
+            # list of vehicles to plot in log_producer_compliance_search_years:
+            self.plot_and_log_vehicles = [] # ['ICE Large Van truck minivan 4WD']
 
             # dynamic modules / classes
             self.RegulatoryClasses = None

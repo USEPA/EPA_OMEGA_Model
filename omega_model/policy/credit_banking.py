@@ -24,18 +24,18 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,ghg_credit_params,input_template_version:,0.1
+       input_template_name:,ghg_credit_params,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        start_year,credit_carryforward_years,credit_carryback_years
+        start_model_year,credit_carryforward_years,credit_carryback_years
         2020,5,3
 
 Data Column Name and Description
 
-:start_year:
+:start_model_year:
     Start model year of the credit parameter
 
 :credit_carryforward_years:
@@ -161,7 +161,7 @@ class CreditBank(OMEGABase):
             omega_log.logwrite('\nInitializing credit params from %s...' % ghg_credit_params_filename)
 
         # read in the data portion of the input file
-        credit_params = pd.read_csv(ghg_credit_params_filename, skiprows=1).set_index('start_year')
+        credit_params = pd.read_csv(ghg_credit_params_filename, skiprows=1).set_index('start_model_year')
 
         return credit_params
 
@@ -208,8 +208,8 @@ class CreditBank(OMEGABase):
 
         """
         input_template_name = 'ghg_credit_params'
-        input_template_version = 0.1
-        input_template_columns = {'start_year', 'credit_carryforward_years', 'credit_carryback_years'}
+        input_template_version = 0.2
+        input_template_columns = {'start_model_year', 'credit_carryforward_years', 'credit_carryback_years'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -291,12 +291,12 @@ class CreditBank(OMEGABase):
         new_credit_transaction = pd.DataFrame(new_credit_transaction, columns=new_credit_transaction.keys(), index=[0])
         return new_credit_transaction
 
-    def get_credit_param(self, calendar_year, param):
+    def get_credit_param(self, model_year, param):
         start_years = self.credit_params.index
 
-        calendar_year = max(start_years[start_years <= calendar_year])
+        model_year = max(start_years[start_years <= model_year])
 
-        return self.credit_params.loc[calendar_year, param]
+        return self.credit_params.loc[model_year, param]
 
     def get_credit_info(self, calendar_year):
         """
