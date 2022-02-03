@@ -73,6 +73,8 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     for i in range(len(mpg_unit_columns)):
         Edmunds_data_cleaned[mpg_unit_columns[i]] = Edmunds_data_cleaned[mpg_unit_columns[i]].replace(np.nan, '').str.replace(' mpg', '').str.replace('no', '')
 
+    Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['GROSS WEIGHT'] = Edmunds_data_cleaned['GROSS WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Most Popular)')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Discontinued)')
