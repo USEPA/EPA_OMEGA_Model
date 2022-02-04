@@ -34,13 +34,13 @@ Note:
 **CODE**
 
 """
-import pandas as pd
 
 from omega_model import *
 from omega_model.effects.physical_effects import calc_physical_effects
 from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
+from omega_model.effects.present_and_annualized_values import calc_present_and_annualized_values
 from omega_model.effects.tech_tracking import calc_tech_tracking
 
 
@@ -52,7 +52,7 @@ def run_effects_calcs():
     """
     from producer.vehicle_annual_data import VehicleAnnualData
 
-    tech_tracking_df = physical_effects_df = cost_effects_df = pd.DataFrame()
+    physical_effects_df = cost_effects_df = present_and_annualized_cost_df = pd.DataFrame()
 
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
     calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
@@ -61,14 +61,18 @@ def run_effects_calcs():
     tech_tracking_dict = calc_tech_tracking(calendar_years)
 
     tech_tracking_filename = f'{omega_globals.options.output_folder}' + \
-                             f'{omega_globals.options.session_unique_name}_tech_tracking'
+                             f'{omega_globals.options.session_unique_name}_tech_tracking.csv'
 
-    tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename,
-                     list(), 'vehicle_id', 'calendar_year', 'age')
+    tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
 
     if omega_globals.options.calc_effects.__contains__('Physical'):
         omega_log.logwrite('\nCalculating physical effects', echo_console=True)
         physical_effects_dict = calc_physical_effects(calendar_years)
+
+        physical_effects_filename = f'{omega_globals.options.output_folder}' + \
+                                    f'{omega_globals.options.session_unique_name}_physical_effects.csv'
+
+        physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
 
         if omega_globals.options.calc_effects.__contains__('Costs'):
             cost_effects_dict = dict()
@@ -79,16 +83,17 @@ def run_effects_calcs():
             omega_log.logwrite('\nDiscounting costs', echo_console=True)
             cost_effects_dict = discount_values(cost_effects_dict)
 
-            cost_effects_filename =f'{omega_globals.options.output_folder}' + \
-                              f'{omega_globals.options.session_unique_name}_cost_effects'
+            cost_effects_filename = f'{omega_globals.options.output_folder}' + \
+                                    f'{omega_globals.options.session_unique_name}_cost_effects.csv'
 
-            cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename,
-                             list(), 'vehicle_id', 'calendar_year', 'age', 'discount_rate')
+            cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
 
-        physical_effects_filename = f'{omega_globals.options.output_folder}' + \
-                               f'{omega_globals.options.session_unique_name}_physical_effects'
+            omega_log.logwrite('\nCalculating annual, present and annualized values', echo_console=True)
+            present_and_annualized_dict = calc_present_and_annualized_values(cost_effects_dict, calendar_years)
 
-        physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename,
-                         list(), 'vehicle_id', 'calendar_year', 'age')
+            present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
+                                              f'{omega_globals.options.session_unique_name}_annual_present_and_annualized_cost_effects.csv'
 
-    return tech_tracking_df, physical_effects_df, cost_effects_df
+            present_and_annualized_cost_df = save_dict_to_csv(present_and_annualized_dict, present_and_annualized_filename, index=False)
+
+    return tech_tracking_df, physical_effects_df, cost_effects_df, present_and_annualized_cost_df

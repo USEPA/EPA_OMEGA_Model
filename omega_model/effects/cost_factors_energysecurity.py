@@ -19,22 +19,22 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        calendar_year,dollar_basis,dollars_per_gallon,foreign_oil_fraction
-        2020,2018,0.081357143,0.9
+        calendar_year,dollar_basis,dollars_per_bbl,oil_import_reduction_as_percent_of_total_oil_demand_reduction
+        2020,2020,3.21703991758471,0.91
 
 Data Column Name and Description
     :calendar_year:
-        The calendar year for which $/gallon values are applicable.
+        The calendar year for which $/barrel values are applicable.
 
     :dollar_basis:
         The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
         implicit_price_deflators input file.
 
-    :dollars_per_gallon:
-        The cost (in US dollars) per gallon of liquid fuel associated with energy security.
+    :dollars_per_bbl:
+        The cost (in US dollars) per barrel of oil associated with energy security.
 
-    :foreign_oil_fraction:
-        A legacy parameter that is not used currently.
+    :oil_import_reduction_as_percent_of_total_oil_demand_reduction:
+        The reduction in imported oil as a percent of the total oil demand reduction.
 
 ----
 
@@ -99,11 +99,11 @@ class CostFactorsEnergySecurity(OMEGABase):
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
         input_template_name = 'context_cost_factors-energysecurity'
-        input_template_version = 0.2
+        input_template_version = 0.3
         input_template_columns = {'calendar_year',
                                   'dollar_basis',
-                                  'dollars_per_gallon',
-                                  'foreign_oil_fraction',
+                                  'dollars_per_bbl',
+                                  'oil_import_reduction_as_percent_of_total_oil_demand_reduction',
                                   }
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -118,7 +118,7 @@ class CostFactorsEnergySecurity(OMEGABase):
 
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis,
-                                             'dollars_per_gallon')
+                                             'dollars_per_bbl')
 
                 CostFactorsEnergySecurity._data = df.set_index('calendar_year').to_dict(orient='index')
 

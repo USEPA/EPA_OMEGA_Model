@@ -1130,6 +1130,7 @@ def init_omega(session_runtime_options):
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
 
+    from effects.general_inputs_for_effects import GeneralInputsForEffects
     from effects.cost_factors_criteria import CostFactorsCriteria
     from effects.cost_factors_scc import CostFactorsSCC
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
@@ -1139,9 +1140,6 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
-    # from effects.cost_effects_scc import CostEffectsSCC
-    # from effects.cost_effects_criteria import CostEffectsCriteria
-    # from effects.cost_effects_non_emissions import CostEffectsNonEmissions
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
@@ -1219,6 +1217,9 @@ def init_omega(session_runtime_options):
                                                           verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical and Costs':
+            init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
+                                                          verbose=verbose_init)
+
             init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
                                                           verbose=verbose_init)
 
@@ -1247,6 +1248,9 @@ def init_omega(session_runtime_options):
                                                                    verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical':
+            init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
+                                                          verbose=verbose_init)
+
             init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
                                                                    verbose=verbose_init)
 
