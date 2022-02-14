@@ -45,6 +45,7 @@ Sample Data Columns
         Context Case,String,Reference case,
         Context Fuel Prices File,String,context_fuel_prices.csv,
         Context New Vehicle Market File,String,context_new_vehicle_market.csv,
+        Maintenance Cost File,String,maintenance_cost_inputs.csv,
         Manufacturers File,String,manufacturers.csv,
         Market Classes File,String,market_classes.csv,
         New Vehicle Price Elasticity of Demand,#,-0.5,
@@ -79,6 +80,7 @@ Sample Data Columns
         Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
         ,,,
         Session Postproc Settings,,,
+        General Inputs for Effects File,String,general_inputs_for_effects.csv,general_inputs_for_effects.csv
         Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
         Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
         Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
@@ -134,6 +136,10 @@ Data Row Name and Description
 :Context New Vehicle Market File *(str)*:
     The relative or absolute path to the context new vehicle market file,
     loaded by ``context.new_vehicle_market.NewVehicleMarket``
+
+:Maintenance Costs File *(str)*:
+    The relative or absolute path to the maintenance cost inputs file,
+    loaded by ``context.maintenance_cost_inputs.MaintenanceCostInputs``
 
 :Manufacturers File *(str)*:
     The relative or absolute path to the manufacturers file,
@@ -198,6 +204,10 @@ Data Row Name and Description
 :Vehicles File *(str)*:
     The relative or absolute path to the vehicles (base year fleet) file,
     loaded by ``producer.vehicles.VehicleFinal``
+
+:General Inputs for Effects File *(str)*:
+    The relative or absolute path to the general inputs used for effects calculations,
+    loaded by ``effects.general_inputs_for_effects.GeneralInputsForEffects``
 
 :Context Criteria Cost Factors File *(str)*:
     The relative or absolute path to the criteria pollutant costs file,
@@ -759,6 +769,7 @@ class OMEGABatchObject(OMEGABase):
         # read context file settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
+        self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
@@ -774,6 +785,7 @@ class OMEGABatchObject(OMEGABase):
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
         # read postproc settings
+        self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
         self.settings.energysecurity_cost_factors_file = \
@@ -912,6 +924,7 @@ class OMEGASessionObject(OMEGABase):
         # read context settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
+        self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
@@ -927,6 +940,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
 
         # read postproc settings
+        self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
         self.settings.criteria_cost_factors_file = self.read_parameter('Context Criteria Cost Factors File')
         self.settings.scc_cost_factors_file = self.read_parameter('Context SCC Cost Factors File')
         self.settings.energysecurity_cost_factors_file = \

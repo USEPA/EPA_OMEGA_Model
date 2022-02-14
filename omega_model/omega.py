@@ -1140,6 +1140,7 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
+    from omega_model.context.maintenance_cost_inputs import MaintenanceCostInputs
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
@@ -1247,9 +1248,12 @@ def init_omega(session_runtime_options):
             init_fail += CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
                                                                    verbose=verbose_init)
 
+            init_fail += MaintenanceCostInputs.init_from_file(omega_globals.options.maintenance_cost_inputs_file,
+                                                              verbose=verbose_init)
+
         if omega_globals.options.calc_effects == 'Physical':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
-                                                          verbose=verbose_init)
+                                                                verbose=verbose_init)
 
             init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
                                                                    verbose=verbose_init)

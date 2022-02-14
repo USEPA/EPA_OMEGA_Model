@@ -12,6 +12,7 @@ Context Name,String,AEO2021,
 Context Case,String,Reference case,
 Context Fuel Prices File,String,context_fuel_prices.csv,
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,
+Maintenance Costs File,String,maintenance_cost_inputs.csv,
 Manufacturers File,String,manufacturers.csv,
 Market Classes File,String,market_classes.csv,
 New Vehicle Price Elasticity of Demand,#,-0.5,
@@ -45,6 +46,7 @@ Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
 Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
 ,,,
 Session Postproc Settings,,,
+General Inputs for Effects File,String,general_inputs_for_effects.csv,general_inputs_for_effects.csv
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
 Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
 Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
@@ -60,5 +62,5 @@ Num Market Share Options,#,5,3
 Num Tech Options per ICE Vehicle,#,5,3
 Num Tech Options per BEV Vehicle,#,1,1
 Verbose Console Modules,"['producer', 'consumer'] or subset or []",['producer'],['producer']
-Producer Compliance Search Min Share Range,#,1.00E-004,1.00E-004
+Producer Compliance Search Min Share Range,#,1.00E-04,1.00E-04
 Producer Compliance Search Convergence Factor,#,0.33,0.66

@@ -8,7 +8,6 @@ other functions here are called from within the calc_cost_effects function.
 **CODE**
 
 """
-
 from omega_model import *
 
 
@@ -282,7 +281,8 @@ def calc_cost_effects(physical_effects_dict):
             criteria_3_cost_dollars = criteria_tailpipe_3_cost_dollars + criteria_upstream_3_cost_dollars
             criteria_7_cost_dollars = criteria_tailpipe_7_cost_dollars + criteria_upstream_7_cost_dollars
 
-            veh_effects_dict.update({'vehicle_id': vehicle_id,
+            veh_effects_dict.update({'session_name': omega_globals.options.session_name,
+                                     'vehicle_id': vehicle_id,
                                      'manufacturer_id': mfr_id,
                                      'calendar_year': calendar_year,
                                      'model_year': calendar_year - age,

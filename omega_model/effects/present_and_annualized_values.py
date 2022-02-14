@@ -71,7 +71,8 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     social_discrate = 0
     series = 'AnnualValue'
     for calendar_year in calendar_years:
-        calcs_dict.update({(calendar_year, social_discrate, series): {'calendar_year': calendar_year,
+        calcs_dict.update({(calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
+                                                                      'calendar_year': calendar_year,
                                                                       'discount_rate': social_discrate,
                                                                       'series': series,
                                                                       'periods': 1,
@@ -83,7 +84,8 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
     for series in ['AnnualValue', 'PresentValue', 'AnnualizedValue']:
         for social_discrate in social_discrates:
             for calendar_year in calendar_years:
-                calcs_dict.update({(calendar_year, social_discrate, series): {'calendar_year': calendar_year,
+                calcs_dict.update({(calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
+                                                                              'calendar_year': calendar_year,
                                                                               'discount_rate': social_discrate,
                                                                               'series': series,
                                                                               'periods': 1,

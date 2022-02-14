@@ -10,6 +10,7 @@ and then to calculate from them the pollutant inventories, including fuel consum
 **CODE**
 
 """
+from omega_model import *
 
 
 def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
@@ -317,7 +318,8 @@ def calc_physical_effects(calendar_years):
                 if vmt_liquid_fuel > 0 or vmt_electricity > 0:
                     flag = 1
 
-                vehicle_effects_dict.update({'vehicle_id': int(vad.vehicle_id),
+                vehicle_effects_dict.update({'session_name': omega_globals.options.session_name,
+                                             'vehicle_id': int(vad.vehicle_id),
                                              'manufacturer_id': mfr_id,
                                              'calendar_year': int(calendar_year),
                                              'model_year': calendar_year - vad.age,
