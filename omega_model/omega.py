@@ -1140,7 +1140,7 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
-    from omega_model.context.maintenance_cost_inputs import MaintenanceCostInputs
+    from context.maintenance_cost_inputs import MaintenanceCostInputs
 
     file_io.validate_folder(omega_globals.options.output_folder)
 

@@ -181,15 +181,16 @@ def calc_physical_effects(calendar_years):
         calendar_year_effects_dict = dict()
         for vad in vads:
 
-            attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
-                              'in_use_fuel_id', 'target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile',
+            attribute_list = ['manufacturer_id', 'name', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
+                              'in_use_fuel_id', 'fueling_class',
+                              'target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile',
                               'onroad_direct_kwh_per_mile']
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             if vad.vehicle_id not in vehicle_info_dict:
                 vehicle_info_dict[vad.vehicle_id] = VehicleFinal.get_vehicle_attributes(vad.vehicle_id, attribute_list)
 
-            mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
             target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vad.vehicle_id]
 
@@ -321,12 +322,14 @@ def calc_physical_effects(calendar_years):
                 vehicle_effects_dict.update({'session_name': omega_globals.options.session_name,
                                              'vehicle_id': int(vad.vehicle_id),
                                              'manufacturer_id': mfr_id,
+                                             'name': name,
                                              'calendar_year': int(calendar_year),
                                              'model_year': calendar_year - vad.age,
                                              'age': int(vad.age),
                                              'base_year_reg_class_id': base_year_reg_class_id,
                                              'reg_class_id': reg_class_id,
                                              'in_use_fuel_id': in_use_fuel_id,
+                                             'fueling_class': fueling_class,
                                              'registered_count': vad.registered_count,
                                              'annual_vmt': vad.annual_vmt,
                                              'vmt': vad.vmt,

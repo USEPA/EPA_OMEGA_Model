@@ -111,6 +111,22 @@ def get_congestion_noise_cf(reg_class_id):
     return CostFactorsCongestionNoise.get_cost_factors(reg_class_id, cost_factors)
 
 
+def get_maintenance_cost(attribute, veh_type):
+    """
+
+    Args:
+        attribute: (str) the maintenance cost attribute for which cost/mi is needed (i.e., 'total_maintenance')
+        veh_type: (str) 'BEV', 'PHEV', 'ICE', 'HEV'
+
+    Returns:
+        Numerical cost per mile value for the given attribute.
+
+    """
+    from context.maintenance_cost_inputs import MaintenanceCostInputs
+
+    return MaintenanceCostInputs.get_value(attribute, veh_type)
+
+
 def calc_cost_effects(physical_effects_dict):
     """
     Calculate cost effects
@@ -161,9 +177,9 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, base_year_reg_class_id, reg_class_id, in_use_fuel_id, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
-                = physical['manufacturer_id'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
-                  physical['in_use_fuel_id'], \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
+                = physical['manufacturer_id'], physical['name'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
+                  physical['in_use_fuel_id'], physical['fueling_class'], \
                   physical['registered_count'], physical['annual_vmt'], physical['vmt'], \
                   physical['vmt_liquid_fuel'], physical['vmt_electricity']
 
@@ -186,6 +202,19 @@ def calc_cost_effects(physical_effects_dict):
                     fuel_pretax_cost_dollars += price * physical['fuel_consumption_kWh']
                 elif fuel != 'US electricity' and physical['fuel_consumption_gallons']:
                     fuel_pretax_cost_dollars += price * physical['fuel_consumption_gallons']
+
+            # maintenance costs
+            if fueling_class == 'BEV':
+                maintenance_veh_type = 'BEV'
+            elif name.__contains__('PHEV'):
+                maintenance_veh_type = 'PHEV'
+            elif name.__contains__('HEV'):
+                maintenance_veh_type = 'HEV'
+            else:
+                maintenance_veh_type = 'ICE'
+
+            maintenance_cost_per_mile = get_maintenance_cost('total_maintenance', maintenance_veh_type)
+            maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
             # get energy security cost factors
             energy_security_cf = get_energysecurity_cf(calendar_year)
@@ -284,6 +313,7 @@ def calc_cost_effects(physical_effects_dict):
             veh_effects_dict.update({'session_name': omega_globals.options.session_name,
                                      'vehicle_id': vehicle_id,
                                      'manufacturer_id': mfr_id,
+                                     'name': name,
                                      'calendar_year': calendar_year,
                                      'model_year': calendar_year - age,
                                      'age': age,
@@ -291,6 +321,7 @@ def calc_cost_effects(physical_effects_dict):
                                      'base_year_reg_class_id': base_year_reg_class_id,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
+                                     'fueling_class': fueling_class,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
                                      'vmt': vmt,

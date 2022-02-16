@@ -17,13 +17,13 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,maintenance_cost_inputs,input_template_version:,0.1
+       input_template_name:,maintenance_cost_inputs,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        item,miles_per_event_ice,miles_per_event_hev,miles_per_event_phev,miles_per_event_bev,USD_per_event,dollar_basis
+        item,miles_per_event_ICE,miles_per_event_HEV,miles_per_event_PHEV,miles_per_event_BEV,dollars_per_event,dollar_basis
         Engine Oil,7500,7500,9000,0,65,2019
         Oil Filter,7500,7500,9000,0,20,2019
         Tire Rotation,7500,7500,7500,7500,50,2019
@@ -33,20 +33,20 @@ Data Column Name and Description
 :item:
     The maintenance attribute name.
 
-:miles_per_event_ice:
+:miles_per_event_ICE:
     The attribute value for ICE vehicles.
 
-:miles_per_event_hev:
+:miles_per_event_HEV:
     The attribute value for HEVs.
 
-:miles_per_event_phev:
+:miles_per_event_PHEV:
     The attribute value for PHEVs.
 
-:miles_per_event_bev:
+:miles_per_event_BEV:
     The attribute value for BEVs.
 
-:USD_per_event:
-    The cost per maintenance event.
+:dollars_per_event:
+    The cost in US dollars per maintenance event.
 
 :dollar_basis:
         The dollar basis of values within the table. Values are converted in-code to 'analysis_dollar_basis' using the
@@ -79,10 +79,11 @@ class MaintenanceCostInputs(OMEGABase):
             veh_type (str): the vehicle type (ICE, HEV, PHEV, BEV).
 
         Returns:
-            The value of the given attribute for the given veh_type.
+            The value of the given attribute for the given veh_type; the attribute for total maintenance cost per mile
+            would be 'total_maintenance'.
 
         """
-        attribute_value = MaintenanceCostInputs._data[attribute][f'usd_per_mile_{veh_type}']
+        attribute_value = MaintenanceCostInputs._data[attribute][f'dollars_per_mile_{veh_type}']
 
         return attribute_value
 
@@ -108,13 +109,13 @@ class MaintenanceCostInputs(OMEGABase):
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'maintenance_cost_inputs'
-        input_template_version = 0.1
+        input_template_version = 0.2
         input_template_columns = {'item',
-                                  'miles_per_event_ice',
-                                  'miles_per_event_hev',
-                                  'miles_per_event_phev',
-                                  'miles_per_event_bev',
-                                  'USD_per_event',
+                                  'miles_per_event_ICE',
+                                  'miles_per_event_HEV',
+                                  'miles_per_event_PHEV',
+                                  'miles_per_event_BEV',
+                                  'dollars_per_event',
                                   'dollar_basis',
                                   }
 
@@ -128,14 +129,13 @@ class MaintenanceCostInputs(OMEGABase):
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
 
-            cols_to_convert = [col for col in df.columns if 'USD_' in col]
+            cols_to_convert = [col for col in df.columns if 'dollars_per_event' in col]
 
             df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
-                working_dict = df.set_index('item').to_dict(orient='index')
-                working_dict = MaintenanceCostInputs.calc_maintenance_cost_per_mile(working_dict)
-                MaintenanceCostInputs._data = working_dict
+                MaintenanceCostInputs._data = df.set_index('item').to_dict(orient='index')
+                MaintenanceCostInputs._data = MaintenanceCostInputs.calc_maintenance_cost_per_mile(MaintenanceCostInputs._data)
 
         return template_errors
 
@@ -150,28 +150,28 @@ class MaintenanceCostInputs(OMEGABase):
             The input_dict with the total maintenance cost per mile added.
 
         """
-        veh_types = ['ice', 'hev', 'phev', 'bev']
+        veh_types = ['ICE', 'HEV', 'PHEV', 'BEV']
 
         # calc cost per mile for each maintenance event
         for key in input_dict.keys():
-            cost_per_event = input_dict[key]['USD_per_event']
+            cost_per_event = input_dict[key]['dollars_per_event']
             for veh_type in veh_types:
                 miles_per_event = input_dict[key][f'miles_per_event_{veh_type}']
                 try: # protect against divide by zero
-                    input_dict[key].update({f'cost_per_mile_{veh_type}': cost_per_event / miles_per_event})
+                    input_dict[key].update({f'dollars_per_mile_{veh_type}': cost_per_event / miles_per_event})
                 except:
-                    input_dict[key].update({f'cost_per_mile_{veh_type}': 0})
+                    input_dict[key].update({f'dollars_per_mile_{veh_type}': 0})
 
         # calc total cost per mile for each veh_type, first add a new key and nested dict to hold totals
         input_dict.update({'total_maintenance': {}})
         for veh_type in veh_types:
-            input_dict['total_maintenance'].update({f'cost_per_mile_{veh_type}': 0})
+            input_dict['total_maintenance'].update({f'dollars_per_mile_{veh_type}': 0})
 
         for veh_type in veh_types:
             total = 0
             for key in input_dict.keys():
-                total += input_dict[key][f'cost_per_mile_{veh_type}']
-            input_dict['total_maintenance'].update({f'cost_per_mile_{veh_type}': total})
+                total += input_dict[key][f'dollars_per_mile_{veh_type}']
+            input_dict['total_maintenance'].update({f'dollars_per_mile_{veh_type}': total})
 
         return input_dict
 
@@ -193,10 +193,10 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(MaintenanceCostInputs.get_value('total_cost_per_mile', 'ice'))
-            print(MaintenanceCostInputs.get_value('total_cost_per_mile', 'hev'))
-            print(MaintenanceCostInputs.get_value('total_cost_per_mile', 'phev'))
-            print(MaintenanceCostInputs.get_value('total_cost_per_mile', 'bev'))
+            print(MaintenanceCostInputs.get_value('total_maintenance', 'ICE'))
+            print(MaintenanceCostInputs.get_value('total_maintenance', 'HEV'))
+            print(MaintenanceCostInputs.get_value('total_maintenance', 'PHEV'))
+            print(MaintenanceCostInputs.get_value('total_maintenance', 'BEV'))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
