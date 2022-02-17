@@ -143,6 +143,7 @@ try:
             self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors-vehicles.csv'
             self.emission_factors_powersector_file = path + 'test_inputs/emission_factors-powersector.csv'
             self.emission_factors_refinery_file = path + 'test_inputs/emission_factors-refinery.csv'
+            self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost_inputs.csv'
 
             self.start_time = 0
             self.end_time = 0

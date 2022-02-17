@@ -111,7 +111,7 @@ def get_congestion_noise_cf(reg_class_id):
     return CostFactorsCongestionNoise.get_cost_factors(reg_class_id, cost_factors)
 
 
-def get_maintenance_cost(attribute, veh_type):
+def get_maintenance_cost(veh_type):
     """
 
     Args:
@@ -123,8 +123,9 @@ def get_maintenance_cost(attribute, veh_type):
 
     """
     from context.maintenance_cost_inputs import MaintenanceCostInputs
+    miles_squared_factor, miles_factor = MaintenanceCostInputs.get_maintenance_cost_curve_coefficients(veh_type)
 
-    return MaintenanceCostInputs.get_value(attribute, veh_type)
+    return miles_squared_factor, miles_factor
 
 
 def calc_cost_effects(physical_effects_dict):
@@ -213,13 +214,13 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 maintenance_veh_type = 'ICE'
 
-            maintenance_cost_per_mile = get_maintenance_cost('total_maintenance', maintenance_veh_type)
-            maintenance_cost_dollars = maintenance_cost_per_mile * vmt
+            miles_squared_factor, miles_factor = get_maintenance_cost(maintenance_veh_type)
+            maintenance_cost_dollars = miles_squared_factor * vmt ** 2 + miles_factor * vmt
 
             # get energy security cost factors
             energy_security_cf = get_energysecurity_cf(calendar_year)
 
-            # energy security # TODO the import/domestic fraction element should come from an as yet created input file with domestic vs import data
+            # energy security
             if fuel == 'US electricity':
                 pass
             elif fuel != 'US electricity' and physical['fuel_consumption_gallons']:
