@@ -115,17 +115,17 @@ def get_maintenance_cost(veh_type):
     """
 
     Args:
-        attribute: (str) the maintenance cost attribute for which cost/mi is needed (i.e., 'total_maintenance')
         veh_type: (str) 'BEV', 'PHEV', 'ICE', 'HEV'
 
     Returns:
-        Numerical cost per mile value for the given attribute.
+        Curve coefficient values to calculate maintenance costs per mile at any odometer value.
 
     """
     from context.maintenance_cost_inputs import MaintenanceCostInputs
-    miles_squared_factor, miles_factor = MaintenanceCostInputs.get_maintenance_cost_curve_coefficients(veh_type)
 
-    return miles_squared_factor, miles_factor
+    d = MaintenanceCostInputs.get_maintenance_cost_curve_coefficients(veh_type)
+
+    return d['slope'], d['intercept']
 
 
 def calc_cost_effects(physical_effects_dict):
@@ -178,10 +178,10 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec \
                 = physical['manufacturer_id'], physical['name'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
                   physical['in_use_fuel_id'], physical['fueling_class'], \
-                  physical['registered_count'], physical['annual_vmt'], physical['vmt'], \
+                  physical['registered_count'], physical['annual_vmt'], physical['odometer'], physical['vmt'], \
                   physical['vmt_liquid_fuel'], physical['vmt_electricity']
 
             # tech costs, only for age=0
@@ -214,8 +214,9 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 maintenance_veh_type = 'ICE'
 
-            miles_squared_factor, miles_factor = get_maintenance_cost(maintenance_veh_type)
-            maintenance_cost_dollars = miles_squared_factor * vmt ** 2 + miles_factor * vmt
+            slope, intercept = get_maintenance_cost(maintenance_veh_type)
+            maintenance_cost_per_mile = slope * odometer + intercept
+            maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
             # get energy security cost factors
             energy_security_cf = get_energysecurity_cf(calendar_year)
@@ -312,19 +313,20 @@ def calc_cost_effects(physical_effects_dict):
             criteria_7_cost_dollars = criteria_tailpipe_7_cost_dollars + criteria_upstream_7_cost_dollars
 
             veh_effects_dict.update({'session_name': omega_globals.options.session_name,
+                                     'discount_rate': 0,
                                      'vehicle_id': vehicle_id,
                                      'manufacturer_id': mfr_id,
                                      'name': name,
                                      'calendar_year': calendar_year,
                                      'model_year': calendar_year - age,
                                      'age': age,
-                                     'discount_rate': 0,
                                      'base_year_reg_class_id': base_year_reg_class_id,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
                                      'fueling_class': fueling_class,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
+                                     'odometer': odometer,
                                      'vmt': vmt,
                                      'vmt_liquid_fuel': vmt_liquid,
                                      'vmt_electricity': vmt_elec,

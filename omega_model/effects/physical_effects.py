@@ -332,6 +332,7 @@ def calc_physical_effects(calendar_years):
                                              'fueling_class': fueling_class,
                                              'registered_count': vad.registered_count,
                                              'annual_vmt': vad.annual_vmt,
+                                             'odometer': vad.odometer,
                                              'vmt': vad.vmt,
                                              'vmt_liquid_fuel': vmt_liquid_fuel,
                                              'vmt_electricity': vmt_electricity,

@@ -65,9 +65,16 @@ def update_stock(calendar_year, compliance_id=None):
 
         annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
 
+        if age == 0:
+            odometer = annual_vmt
+        else:
+            odometer = VehicleAnnualData.get_odometer(vad.vehicle_id, calendar_year - 1)
+            odometer += annual_vmt
+
         registered_count = initial_registered_count * reregistration_factor
 
         vad.annual_vmt = annual_vmt
+        vad.odometer = odometer
         vad.vmt = annual_vmt * registered_count
 
     prior_year_vehicle_ids = \
@@ -86,6 +93,9 @@ def update_stock(calendar_year, compliance_id=None):
 
             annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
 
+            odometer = VehicleAnnualData.get_odometer(vehicle_id, calendar_year - 1)
+            odometer += annual_vmt
+
             registered_count = initial_registered_count * reregistration_factor
 
             vad_list.append(VehicleAnnualData(vehicle_id=vehicle_id,
@@ -93,6 +103,7 @@ def update_stock(calendar_year, compliance_id=None):
                                               registered_count=registered_count,
                                               age=calendar_year-model_year,
                                               annual_vmt=annual_vmt,
+                                              odometer=odometer,
                                               vmt=annual_vmt * registered_count)
                             )
 

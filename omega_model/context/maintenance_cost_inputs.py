@@ -9,7 +9,7 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.
 
-The data represent various inputs for use in effects calculations.
+The data represent various inputs for use in maintenance cost calculations.
 
 File Type
     comma-separated values (CSV)
@@ -24,8 +24,8 @@ Sample Data Columns
         :widths: auto
 
         item,miles_per_event_ICE,miles_per_event_HEV,miles_per_event_PHEV,miles_per_event_BEV,dollars_per_event,dollar_basis
-        Engine Oil,7500,7500,9000,0,65,2019
-        Oil Filter,7500,7500,9000,0,20,2019
+        Engine Oil,7500,7500,9000,,65,2019
+        Oil Filter,7500,7500,9000,,20,2019
         Tire Rotation,7500,7500,7500,7500,50,2019
 
 Data Column Name and Description
@@ -58,8 +58,9 @@ Data Column Name and Description
 
 print('importing %s' % __file__)
 
-from scipy.optimize import curve_fit
-from matplotlib import pyplot
+# reactivate these imports for QA/QC of this module
+# from scipy.optimize import curve_fit
+# from matplotlib import pyplot
 
 from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
@@ -72,28 +73,10 @@ class MaintenanceCostInputs(OMEGABase):
     """
     _data = dict()  # private dict of general input attributes and values
 
-    # @staticmethod
-    # def get_value(attribute, veh_type):
-    #     """
-    #     Get the attribute value for the given attribute.
-    #
-    #     Args:
-    #         attribute (str): the attribute(s) for which value(s) are sought.
-    #         veh_type (str): the vehicle type (ICE, HEV, PHEV, BEV).
-    #
-    #     Returns:
-    #         The value of the given attribute for the given veh_type; the attribute for total maintenance cost per mile
-    #         would be 'total_maintenance'.
-    #
-    #     """
-    #     attribute_value = MaintenanceCostInputs._data[attribute][f'dollars_per_mile_{veh_type}']
-    #
-    #     return attribute_value
     @staticmethod
     def get_maintenance_cost_curve_coefficients(veh_type):
 
-        return MaintenanceCostInputs._data[veh_type]['miles_squared_factor'], \
-               MaintenanceCostInputs._data[veh_type]['miles_factor']
+        return MaintenanceCostInputs._data[veh_type]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -109,8 +92,6 @@ class MaintenanceCostInputs(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        # import numpy as np
-
         MaintenanceCostInputs._data.clear()
 
         if verbose:
@@ -145,8 +126,6 @@ class MaintenanceCostInputs(OMEGABase):
 
             if not template_errors:
                 MaintenanceCostInputs._data = maintenance_cost_curve_dict.copy()
-                # MaintenanceCostInputs._data = df.set_index('item').to_dict(orient='index')
-                # MaintenanceCostInputs._data = MaintenanceCostInputs.calc_maintenance_cost_per_mile(MaintenanceCostInputs._data)
 
         return template_errors
 
@@ -158,14 +137,19 @@ class MaintenanceCostInputs(OMEGABase):
             input_df: DataFrame reflecting the maintenance_cost_inputs.csv file with costs updated to analysis_basis_dollars.
 
         Returns:
-            A dictionary of maintenance cost curve coefficients (2-order polynomial curve with the constant value=0) having
-            keys of 'ICE', 'HEV', 'PHEV', 'BEV'.
+            A dictionary of maintenance cost curve coefficients (slope with intercept=0) having keys of 'ICE', 'HEV', 'PHEV', 'BEV'.
+
+        Notes:
+            Dividing the cumulative_cost by miles gives a constant cost/mile for every mile. However, costs/mile should
+            be lower early and higher later, so this method determines a triangular area that equates to the cumulative
+            cost. With the slope of that triangular area, a cost/mile at any odometer value can be calculated and the
+            cost of maintenance in any year can then be calculated as that cost/mile multiplied by miles driven in that
+            year.
 
         """
         # create a dictionary in which to place curve coefficients
         veh_types = ['ICE', 'HEV', 'PHEV', 'BEV']
-        nested_dict = {'miles_squared_factor': 0,
-                       'miles_factor': 0}
+        nested_dict = {'slope': 0, 'intercept': 0}
         maint_cost_curve_dict = dict.fromkeys(veh_types, nested_dict)
 
         # generate curve coefficients for each of the veh_types in a for loop and store in maint_cost_curve_dict
@@ -176,28 +160,36 @@ class MaintenanceCostInputs(OMEGABase):
             for interval in intervals:
                 cost_at_interval = input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
                 df.insert(1, f'cost_for_{int(interval)}', 0)
-                events = list()
-                for odo in df['miles'].iteritems():
-                    if odo[1] !=0 and odo[1] / interval % 1 == 0:
-                        events.append(odo[1])
+
+                # determine miles for all events in this interval series
+                events = [odo[1] for odo in df['miles'].iteritems() if odo[1] != 0 and odo[1] / interval % 1 == 0]
+
                 for event in events:
                     df.loc[df['miles'] == event, f'cost_for_{int(interval)}'] = cost_at_interval
+
             cols = df.columns[1:]
             df.insert(0, f'rollup', df[cols].sum(axis=1))
             df.insert(0, f'rollup_cumulative', df['rollup'].cumsum(axis=0))
 
-            x, y = df['miles'], df['rollup_cumulative']
+            cumulative_cost = max(df['rollup_cumulative'])
+            max_miles = max(df['miles'])
 
-            def objective(x, a, b):
-                return a * x + b * x ** 2
+            # calc cost/mile at max miles to that gives a triangular area equal to cumulative costs
+            cost_per_mile_at_max_miles = cumulative_cost / (0.5 * max_miles)
+            cost_per_mile_slope = cost_per_mile_at_max_miles / max_miles
 
-            popt, _ = curve_fit(objective, x, y)
-            a, b = popt
+            maint_cost_curve_dict[veh_type] = {'slope': cost_per_mile_slope,
+                                               'intercept': 0}
 
-            maint_cost_curve_dict[veh_type] = {'miles_squared_factor': b,
-                                               'miles_factor': a}
+            # plot the curve (uncomment lines to see plots for QA/QC of rollup_cumulative)
+            # x, y = df['miles'], df['rollup_cumulative']
+            #
+            # def objective1(x, a, b):
+            #     return a * x + b * x ** 2
+            #
+            # popt, _ = curve_fit(objective1, x, y)
+            # miles_factor, miles_squared_factor = popt
 
-            # plot the curve (uncomment lines to see plots for QA/QC)
             # pyplot.scatter(x, y)
             # x_line = x
             # y_line = objective(x, a, b)
@@ -215,7 +207,8 @@ class MaintenanceCostInputs(OMEGABase):
             input_dict: Dictionary of the maintenance cost inputs.
 
         Returns:
-            The input_dict with the total maintenance cost per mile added.
+            The input_dict with the total maintenance cost per mile added; this cost per mile would be a constant for all
+            miles.
 
         Notes:
             This method is not being used currently in favor of the calc_maintenance_cost_per_mile_curve method within
@@ -265,10 +258,10 @@ if __name__ == '__main__':
                                                           verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(MaintenanceCostInputs.get_value('total_maintenance', 'ICE'))
-            print(MaintenanceCostInputs.get_value('total_maintenance', 'HEV'))
-            print(MaintenanceCostInputs.get_value('total_maintenance', 'PHEV'))
-            print(MaintenanceCostInputs.get_value('total_maintenance', 'BEV'))
+            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('ICE'))
+            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('HEV'))
+            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('PHEV'))
+            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('BEV'))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
