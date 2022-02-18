@@ -147,7 +147,7 @@ def get_inputs_for_effects(*args):
 
     return values
 
-# TODO add cumulative VMT (odometer) based on annual VMT and then use that for maintenance costs in cost_effects
+
 def calc_physical_effects(calendar_years):
     """
 

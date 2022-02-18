@@ -45,7 +45,8 @@ Sample Data Columns
         Context Case,String,Reference case,
         Context Fuel Prices File,String,context_fuel_prices.csv,
         Context New Vehicle Market File,String,context_new_vehicle_market.csv,
-        Maintenance Cost File,String,maintenance_cost_inputs.csv,
+        Maintenance Costs File,String,maintenance_cost_inputs.csv,
+        Repair Costs File,String,repair_cost_inputs.csv,
         Manufacturers File,String,manufacturers.csv,
         Market Classes File,String,market_classes.csv,
         New Vehicle Price Elasticity of Demand,#,-0.5,
@@ -140,6 +141,10 @@ Data Row Name and Description
 :Maintenance Costs File *(str)*:
     The relative or absolute path to the maintenance cost inputs file,
     loaded by ``context.maintenance_cost_inputs.MaintenanceCostInputs``
+
+:Repair Costs File *(str)*:
+    The relative or absolute path to the repair cost inputs file,
+    loaded by ``context.repair_cost_inputs.RepairCostInputs``
 
 :Manufacturers File *(str)*:
     The relative or absolute path to the manufacturers file,
@@ -770,6 +775,7 @@ class OMEGABatchObject(OMEGABase):
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
+        self.settings.repair_cost_inputs_file = self.read_parameter('Repair Costs File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')
@@ -925,6 +931,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
         self.settings.context_new_vehicle_market_file = self.read_parameter('Context New Vehicle Market File')
         self.settings.maintenance_cost_inputs_file = self.read_parameter('Maintenance Costs File')
+        self.settings.repair_cost_inputs_file = self.read_parameter('Repair Costs File')
         self.settings.manufacturers_file = self.read_parameter('Manufacturers File')
         self.settings.market_classes_file = self.read_parameter('Market Classes File')
         self.settings.onroad_fuels_file = self.read_parameter('Onroad Fuels File')

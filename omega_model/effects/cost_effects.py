@@ -128,6 +128,23 @@ def get_maintenance_cost(veh_type):
     return d['slope'], d['intercept']
 
 
+def get_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, repair_veh_type, age):
+    """
+    Args:
+            veh_cost: (Numeric) The value of the vehicle when sold as new
+            pt_type: (String) The powertrain type (ICE, HEV, PHEV, BEV)
+            repair_type: (String) The vehicle repair type (car, suv, truck)
+            age: (Integer) The age of the vehicle where age=0 is year 1 in operation.
+
+        Returns:
+            A single repair cost per mile for the given vehicle at the given age.
+
+    """
+    from context.repair_cost_inputs import RepairCostInputs
+
+    return RepairCostInputs.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, repair_veh_type, age)
+
+
 def calc_cost_effects(physical_effects_dict):
     """
     Calculate cost effects
@@ -206,17 +223,28 @@ def calc_cost_effects(physical_effects_dict):
 
             # maintenance costs
             if fueling_class == 'BEV':
-                maintenance_veh_type = 'BEV'
+                powertrain_veh_type = 'BEV'
             elif name.__contains__('PHEV'):
-                maintenance_veh_type = 'PHEV'
+                powertrain_veh_type = 'PHEV'
             elif name.__contains__('HEV'):
-                maintenance_veh_type = 'HEV'
+                powertrain_veh_type = 'HEV'
             else:
-                maintenance_veh_type = 'ICE'
+                powertrain_veh_type = 'ICE'
 
-            slope, intercept = get_maintenance_cost(maintenance_veh_type)
+            slope, intercept = get_maintenance_cost(powertrain_veh_type)
             maintenance_cost_per_mile = slope * odometer + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * vmt
+
+            # repair costs
+            if name.__contains__('car'):
+                repair_veh_type = 'car'
+            elif name.__contains__('Pickup'):
+                repair_veh_type = 'truck'
+            else:
+                repair_veh_type = 'suv'
+
+            repair_cost_per_mile = get_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, repair_veh_type, age)
+            repair_cost_dollars = repair_cost_per_mile * vmt
 
             # get energy security cost factors
             energy_security_cf = get_energysecurity_cf(calendar_year)
@@ -338,6 +366,7 @@ def calc_cost_effects(physical_effects_dict):
                                      'congestion_cost_dollars': congestion_cost_dollars,
                                      'noise_cost_dollars': noise_cost_dollars,
                                      'maintenance_cost_dollars': maintenance_cost_dollars,
+                                     'repair_cost_dollars': repair_cost_dollars,
                                      'refueling_cost_dollars': refueling_cost_dollars,
                                      'driving_cost_dollars': driving_cost_dollars,
 
