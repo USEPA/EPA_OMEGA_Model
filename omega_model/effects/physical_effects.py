@@ -343,11 +343,11 @@ def calc_physical_effects(calendar_years):
                                              'fuel_consumption_kWh': fuel_consumption_kWh,
 
                                              f'share_of_{year_for_compares}_US_gasoline': share_of_us_annual_gasoline,
+                                             f'share_of_{year_for_compares}_US_kWh': share_of_us_annual_kwh,
                                              'barrels_of_oil': oil_bbl,
                                              f'share_of_{year_for_compares}_US_oil': share_of_us_annual_oil,
                                              'barrels_of_imported_oil': imported_oil_bbl,
                                              'barrels_of_imported_oil_per_day': imported_oil_bbl_per_day,
-                                             f'share_of_{year_for_compares}_US_kWh': share_of_us_annual_kwh,
 
                                              'voc_tailpipe_ustons': voc_tailpipe_ustons,
                                              'co_tailpipe_ustons': co_tailpipe_ustons,
@@ -399,3 +399,41 @@ def calc_physical_effects(calendar_years):
                 calendar_year_effects_dict[key] = vehicle_effects_dict
         physical_effects_dict.update(calendar_year_effects_dict)
     return physical_effects_dict
+
+
+def calc_annual_physical_effects(input_df):
+    """
+
+    Args:
+        input_df: DataFrame of physical effects by vehicle.
+
+    Returns:
+        A DataFrame of physical effects by calendar year.
+
+    """
+    attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
+    additional_attributes = ['count', 'consumption', 'barrels', 'tons']
+    for additional_attribute in additional_attributes:
+        for col in input_df:
+            if col.__contains__(additional_attribute):
+                attributes.append(col)
+
+    groupby_cols = ['session_name', 'calendar_year', 'reg_class_id', 'fueling_class']
+    return_df = input_df[[*groupby_cols, *attributes]]
+    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+
+    # calc additional attributes
+    input_attributes_list = ['gallons_of_gasoline_us_annual', 'bbl_oil_us_annual', 'kwh_us_annual', 'year_for_compares']
+
+    gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = get_inputs_for_effects(*input_attributes_list)
+    year_for_compares = int(year_for_compares)
+
+    share_of_us_annual_gasoline = return_df['fuel_consumption_gallons'] / gallons_of_gasoline_us_annual
+    share_of_us_annual_oil = return_df['barrels_of_oil'] / bbl_oil_us_annual
+    share_of_us_annual_kwh = return_df['fuel_consumption_kWh'] / kwh_us_annual
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
+    return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
+
+    return return_df

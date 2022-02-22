@@ -36,7 +36,7 @@ Note:
 """
 
 from omega_model import *
-from omega_model.effects.physical_effects import calc_physical_effects
+from omega_model.effects.physical_effects import calc_physical_effects, calc_annual_physical_effects
 from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
@@ -73,6 +73,12 @@ def run_effects_calcs():
                                     f'{omega_globals.options.session_unique_name}_physical_effects.csv'
 
         physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
+
+        annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
+                                           f'{omega_globals.options.session_unique_name}_annual_physical_effects.csv'
+
+        annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
+        annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
 
         if omega_globals.options.calc_effects.__contains__('Costs'):
             cost_effects_dict = dict()
