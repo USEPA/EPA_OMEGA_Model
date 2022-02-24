@@ -152,16 +152,23 @@ class MaintenanceCostInputs(OMEGABase):
         nested_dict = {'slope': 0, 'intercept': 0}
         maint_cost_curve_dict = dict.fromkeys(veh_types, nested_dict)
 
+        # determine the max odometer included in the input table
+        max_series = input_df[[col for col in input_df.columns if 'miles' in col]].max()
+        max_value = 0
+        for max in max_series:
+            if max > max_value:
+                max_value = int(max)
+
         # generate curve coefficients for each of the veh_types in a for loop and store in maint_cost_curve_dict
         for veh_type in veh_types:
             df = pd.DataFrame()
-            df.insert(0, 'miles', pd.Series(range(0, 225001, 100)))
+            df.insert(0, 'miles', pd.Series(range(0, max_value + 1, 100)))
             intervals = pd.Series(input_df[f'miles_per_event_{veh_type}'].dropna().unique())
             for interval in intervals:
                 cost_at_interval = input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
                 df.insert(1, f'cost_for_{int(interval)}', 0)
 
-                # determine miles for all events in this interval series
+                # determine miles for all events in this interval series (%1=0 divides by 1 and looks for a remainder of 0)
                 events = [odo[1] for odo in df['miles'].iteritems() if odo[1] != 0 and odo[1] / interval % 1 == 0]
 
                 for event in events:
