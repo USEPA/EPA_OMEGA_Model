@@ -178,8 +178,8 @@ class MaintenanceCostInputs(OMEGABase):
             df.insert(0, f'rollup', df[cols].sum(axis=1))
             df.insert(0, f'rollup_cumulative', df['rollup'].cumsum(axis=0))
 
-            cumulative_cost = max(df['rollup_cumulative'])
-            max_miles = max(df['miles'])
+            cumulative_cost = df['rollup_cumulative'].max()
+            max_miles = df['miles'].max()
 
             # calc cost/mile at max miles to that gives a triangular area equal to cumulative costs
             cost_per_mile_at_max_miles = cumulative_cost / (0.5 * max_miles)
