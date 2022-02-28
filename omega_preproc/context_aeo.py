@@ -138,8 +138,8 @@ def round_floats_to_100(percents, decimals):
         A list of percents rounded to 'decimals' number of decimal places and summing to 100.
 
     """
-    if not np.isclose(sum(percents), 100):
-        raise ValueError
+    # if not np.isclose(sum(percents), 100):
+    #     raise ValueError
     n = len(percents)
     scaler = 10 ** decimals
     rounded = [int(x * scaler) for x in percents]
@@ -188,12 +188,13 @@ class GetContext:
         usd_loc = self.table.at[0, 'units'].find(' $')
         return int(self.table.at[0, 'units'][0: usd_loc])
 
-    def select_table_rows(self, col_id, arg, replace=None):
+    def select_table_rows(self, col_id, arg, desired_final_year, replace=None):
         """
 
         Args:
             col_id: The column of data in which to look for arg.
             arg: The identifying string used to determine what rows to be included in the returned DataFrame.
+            desired_final_year: The value of the create_results_thru variable in the SetInputs class.
             replace: Any string elements that are to be removed from the entries containing 'metric'.
 
         Returns:
@@ -205,12 +206,42 @@ class GetContext:
         if replace:
             df_rows.replace({col_id: replace}, {col_id: ''}, regex=True, inplace=True)
         df_rows = df_rows.iloc[:, :-1]
+
+        # get growth in case results are needed for years > aeo table max years
+        # growth_col_name = df_rows.columns.tolist()[-1]
+        # df_rows.rename(columns={growth_col_name: 'growth_rate'}, inplace=True)
+
+        # clean data so that growth rates are floats
+        # df_rows['growth_rate'].replace({'- -': '0%'}, inplace=True)
+        # df_rows = df_rows.join(df_rows['growth_rate'].str.split('%', expand=True))
+        # df_rows.drop(columns=['growth_rate', 1], inplace=True)
+        # df_rows.rename(columns={0: 'growth_rate'}, inplace=True)
+        # df_rows['growth_rate'] = pd.to_numeric(df_rows['growth_rate'])
+
+        # growth_df = df_rows.iloc[:, -1:]
+        final_aeo_year = int(df_rows.columns.tolist()[-1])
+
+        # grow results if necessary
+        # if desired_final_year > final_aeo_year:
+        #     for yr in range(final_aeo_year + 1, desired_final_year + 1):
+        #         prior_yr = yr - 1
+        #         df_rows.insert(len(df_rows.columns), f'{yr}', (df_rows['growth_rate'] / 100) * df_rows[f'{prior_yr}'] + df_rows[f'{prior_yr}'])
+
+        if desired_final_year > final_aeo_year:
+            for yr in range(final_aeo_year + 1, desired_final_year + 1):
+                prior_yr, two_prior_yr = yr - 1, yr - 2
+                df_rows.insert(len(df_rows.columns), f'{yr}', ((df_rows[f'{prior_yr}'] - df_rows[f'{two_prior_yr}']) / df_rows[f'{two_prior_yr}']) * df_rows[f'{prior_yr}'] + df_rows[f'{prior_yr}'])
+
+        # df_rows.drop(columns=['growth_rate'], inplace=True)
+
         return df_rows
 
 
 class SetInputs:
 
     def __init__(self):
+
+        # set paths
         self.path_preproc = Path(__file__).parent
         self.path_project = self.path_preproc.parent
         self.path_aeo_tables = self.path_preproc / 'aeo_tables'
@@ -222,11 +253,14 @@ class SetInputs:
             pass
         self.path_input_templates = self.path_project / 'omega_model/test_inputs'
 
+        # specify templates to use
         self.vehicles_context_template = 'context_new_vehicle_market.csv'
         self.fuels_context_template = 'context_fuel_prices.csv'
         self.price_deflators_template = 'implicit_price_deflators.csv'
         self.cpiu_deflators_template = 'cpi_price_deflators.csv'
 
+        # some run settings
+        self.create_results_thru = 2060
         self.aeo_cases = ['Reference case', 'High oil price', 'Low oil price']
         self.gasoline_upstream = 2478  # 77 FR 63181
         self.electricity_upstream = 534  # 77 FR 63182
@@ -271,13 +305,13 @@ def main():
 
             usd_basis = aeo_table_obj.aeo_dollars()
 
-            gasoline_retail_prices = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price')
+            gasoline_retail_prices = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price', settings.create_results_thru)
             # the above selects all rows but all we want is the true end user price row, so now get that alone
             gasoline_retail_prices = gasoline_retail_prices.loc[gasoline_retail_prices['full name'] == 'Price Components: Motor Gasoline: End-User Price', :]
 
-            gasoline_distribution = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Distribution Costs')
+            gasoline_distribution = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Distribution Costs', settings.create_results_thru)
 
-            gasoline_wholesale = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Wholesale Price')
+            gasoline_wholesale = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Wholesale Price', settings.create_results_thru)
 
             gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
             gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline')
@@ -298,8 +332,8 @@ def main():
             # electricity prices
             case_df = return_df(aeo_electricity_fuel_prices_table, 'full name', aeo_case)
             aeo_table_obj = GetContext(case_df)
-            electricity_prices_residential = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: Residential')
-            electricity_prices_allsecavg = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: All Sectors Average')
+            electricity_prices_residential = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: Residential', settings.create_results_thru)
+            electricity_prices_allsecavg = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: All Sectors Average', settings.create_results_thru)
             # the above gets prices in constant and nominal cents so nominal need to be removed
             electricity_prices_residential = electricity_prices_residential.loc[~electricity_prices_residential['units'].str.contains('nom'), :]
             electricity_prices_allsecavg = electricity_prices_allsecavg.loc[~electricity_prices_allsecavg['units'].str.contains('nom'), :]
@@ -329,12 +363,12 @@ def main():
             attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case)
             aeo_table_obj = GetContext(attributes_df)
 
-            attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', replace='New Vehicle Attributes: Horsepower: Conventional ')
-            attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', replace='New Vehicle Attributes: Weight: Conventional ')
-            attribute['percent'] = aeo_table_obj.select_table_rows('full name', 'Sales Shares', replace='New Vehicle Attributes: Sales Shares: ')
-            attribute['mpg_conventional'] = aeo_table_obj.select_table_rows('full name', 'EPA Efficiency', replace='New Vehicle Attributes: EPA Efficiency: Conventional ')
-            attribute['mpg_alternative'] = aeo_table_obj.select_table_rows('full name', 'Fuel Efficiency', replace='New Vehicle Attributes: Fuel Efficiency: Alternative-Fuel ')
-            attribute['ratio'] = aeo_table_obj.select_table_rows('full name', 'Degradation Factors', replace='New Vehicle Attributes: Degradation Factors: ')
+            attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', settings.create_results_thru, replace='New Vehicle Attributes: Horsepower: Conventional ')
+            attribute['lb'] = aeo_table_obj.select_table_rows('full name', 'Weight', settings.create_results_thru, replace='New Vehicle Attributes: Weight: Conventional ')
+            attribute['percent'] = aeo_table_obj.select_table_rows('full name', 'Sales Shares', settings.create_results_thru, replace='New Vehicle Attributes: Sales Shares: ')
+            attribute['mpg_conventional'] = aeo_table_obj.select_table_rows('full name', 'EPA Efficiency', settings.create_results_thru, replace='New Vehicle Attributes: EPA Efficiency: Conventional ')
+            attribute['mpg_alternative'] = aeo_table_obj.select_table_rows('full name', 'Fuel Efficiency', settings.create_results_thru, replace='New Vehicle Attributes: Fuel Efficiency: Alternative-Fuel ')
+            attribute['ratio'] = aeo_table_obj.select_table_rows('full name', 'Degradation Factors', settings.create_results_thru, replace='New Vehicle Attributes: Degradation Factors: ')
 
             # merge things together; start with shares since that metric excludes any averages which makes for a better merge
             aeo_veh_context = melt_df(attribute['percent'], 'full name', 'sales_share_of_regclass')
@@ -370,9 +404,9 @@ def main():
             sales_df = return_df(aeo_sales_table, 'full name', aeo_case)
             aeo_table_obj = GetContext(sales_df)
             print(f'Working on market context vehicle sales for the AEO {aeo_case}')
-            sales_fleet = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total Vehicles Sales')
-            sales_car = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Car')
-            sales_truck = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Truck')
+            sales_fleet = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total Vehicles Sales', settings.create_results_thru)
+            sales_car = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Car', settings.create_results_thru)
+            sales_truck = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total New Truck', settings.create_results_thru)
 
             # merge individual sales into a new DF
             sales = melt_df(sales_fleet, 'full name', 'sales_fleet')\
@@ -412,8 +446,8 @@ def main():
             aeo_table_obj = GetContext(prices_df)
             print(f'Working on market context vehicle prices for the AEO {aeo_case}')
             vehicle_prices = dict()
-            vehicle_prices['gasoline'] = aeo_table_obj.select_table_rows('full name', 'Gasoline: ', replace='New Light-Duty Vehicle Prices: Gasoline: ')
-            vehicle_prices['electric'] = aeo_table_obj.select_table_rows('full name', '300 Mile Electric Vehicle: ', replace='New Light-Duty Vehicle Prices: 300 Mile Electric Vehicle: ')
+            vehicle_prices['gasoline'] = aeo_table_obj.select_table_rows('full name', 'Gasoline: ', settings.create_results_thru, replace='New Light-Duty Vehicle Prices: Gasoline: ')
+            vehicle_prices['electric'] = aeo_table_obj.select_table_rows('full name', '300 Mile Electric Vehicle: ', settings.create_results_thru, replace='New Light-Duty Vehicle Prices: 300 Mile Electric Vehicle: ')
 
             vehicle_prices['gasoline'] = melt_df(vehicle_prices['gasoline'], 'full name', 'ice_price_dollars')
             vehicle_prices['electric'] = melt_df(vehicle_prices['electric'], 'full name', 'bev_price_dollars')
