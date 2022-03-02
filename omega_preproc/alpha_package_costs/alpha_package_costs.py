@@ -167,7 +167,7 @@ class RuntimeSettings:
         # set what to run (i.e., what outputs to generate)
         self.run_ice = True
         self.run_bev = True
-        self.run_phev = True
+        self.run_phev = False
         self.run_hev = True
         self.generate_simulated_vehicles_file = True
         self.generate_simulated_vehicles_verbose_file = False
@@ -214,12 +214,22 @@ class InputSettings:
             self.start_year = int(self.inputs_code['start_year']['value'])
             self.end_year = int(self.inputs_code['end_year']['value'])
             self.years = range(self.start_year, self.end_year + 1)
-            self.learning_rate_weight = self.inputs_code['learning_rate_weight']['value']
-            self.learning_rate_ice_powertrain = self.inputs_code['learning_rate_ice_powertrain']['value']
-            self.learning_rate_roadload = self.inputs_code['learning_rate_roadload']['value']
-            self.learning_rate_bev = self.inputs_code['learning_rate_bev']['value']
-            self.learning_rate_phev = self.inputs_code['learning_rate_phev']['value']
-            self.learning_rate_aftertreatment = self.inputs_code['learning_rate_aftertreatment']['value']
+            self.learning_dict = {'learning_rate': self.inputs_code['learning_rate']['value'],
+                                  'weight_scaler': self.inputs_code['weight_scaler']['value'],
+                                  'roadload_scaler': self.inputs_code['roadload_scaler']['value'],
+                                  'ice_scaler': self.inputs_code['ice_scaler']['value'],
+                                  'pev_scaler': self.inputs_code['pev_scaler']['value'],
+                                  'weight_sales_scaler': self.inputs_code['weight_sales_scaler']['value'],
+                                  'roadload_sales_scaler': self.inputs_code['roadload_sales_scaler']['value'],
+                                  'ice_sales_scaler': self.inputs_code['ice_sales_scaler']['value'],
+                                  'pev_sales_scaler': self.inputs_code['pev_sales_scaler']['value'],
+                                  }
+            # self.learning_rate_weight = self.inputs_code['learning_rate_weight']['value']
+            # self.learning_rate_ice_powertrain = self.inputs_code['learning_rate_ice_powertrain']['value']
+            # self.learning_rate_roadload = self.inputs_code['learning_rate_roadload']['value']
+            # self.learning_rate_bev = self.inputs_code['learning_rate_bev']['value']
+            # self.learning_rate_phev = self.inputs_code['learning_rate_phev']['value']
+            # self.learning_rate_aftertreatment = self.inputs_code['learning_rate_aftertreatment']['value']
             self.pt_dollars_per_troy_oz = self.inputs_code['Pt_dollars_per_troy_oz']['value']
             self.pd_dollars_per_troy_oz = self.inputs_code['Pd_dollars_per_troy_oz']['value']
             self.rh_dollars_per_troy_oz = self.inputs_code['Rh_dollars_per_troy_oz']['value']
@@ -1603,14 +1613,14 @@ def cost_vs_plot(input_settings, df, path, *years):
             plt.savefig(path / f'hev_{year}_{input_settings.name_id}.png')
 
 
-def calc_year_over_year_costs(df, arg, years, learning_rate):
+def calc_year_over_year_costs(input_settings, df, arg, learning_type):
     """
 
     Args:
+        input_settings: The InputSettings class.
         df: A DataFrame of ALPHA packages with costs for a single start year.
-        arg: The argument for which year-over-year costs are to be calculated.
-        years: The years for which year-over-year costs are to be calculated.
-        learning_rate: The learning rate to apply to start year costs to calculated year-over-year costs.
+        arg (string): The argument for which year-over-year costs are to be calculated.
+        learning_type (string): The learning type to apply (e.g., powertrain, bev, roadload).
 
     Returns:
         A DataFrame of ALPHA packages with costs for all years.
@@ -1618,8 +1628,15 @@ def calc_year_over_year_costs(df, arg, years, learning_rate):
     """
     df_return = df.copy()
     arg_dict = dict()
+    learn_rate = input_settings.learning_dict['learning_rate']
+    years = input_settings.years
     for year in years:
-        arg_dict[year] = pd.Series(df[arg] * (1 - learning_rate) ** (year - years[0]), name=f'{arg}_{year}')
+        legacy_sales_scaler = input_settings.learning_dict[f'{learning_type}_scaler']
+        sales_scaler = input_settings.learning_dict[f'{learning_type}_sales_scaler']
+        cumulative_sales = sales_scaler * (year - years[0])
+        arg_dict[year] = pd.Series(df[arg]
+                                   * ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learn_rate,
+                                   name=f'{arg}_{year}')
     for year in years:
         df_return = pd.concat([df_return, arg_dict[year]], axis=1)
     return df_return
@@ -1752,16 +1769,11 @@ def main():
 
     # calculate YoY bev costs with learning
     if runtime_settings.run_bev:
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_battery', input_settings.years,
-                                                    input_settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_nonbattery', input_settings.years,
-                                                    input_settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'pev_powertrain', input_settings.years,
-                                                    input_settings.learning_rate_bev)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'roadload', input_settings.years,
-                                                    input_settings.learning_rate_roadload)
-        bev_packages_df = calc_year_over_year_costs(bev_packages_df, 'body', input_settings.years,
-                                                    input_settings.learning_rate_weight)
+        bev_packages_df = calc_year_over_year_costs(input_settings, bev_packages_df, 'pev_battery', 'pev')
+        bev_packages_df = calc_year_over_year_costs(input_settings, bev_packages_df, 'pev_nonbattery', 'pev')
+        bev_packages_df = calc_year_over_year_costs(input_settings, bev_packages_df, 'pev_powertrain', 'pev')
+        bev_packages_df = calc_year_over_year_costs(input_settings, bev_packages_df, 'roadload', 'roadload')
+        bev_packages_df = calc_year_over_year_costs(input_settings, bev_packages_df, 'body', 'weight')
         bev_packages_df.reset_index(drop=False, inplace=True)
         bev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'bev_{idx}' for idx in range(1, len(bev_packages_df) + 1)]
@@ -1772,20 +1784,13 @@ def main():
 
     # calculate YoY phev costs with learning
     if runtime_settings.run_phev:
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'ice_powertrain', input_settings.years,
-                                                     input_settings.learning_rate_ice_powertrain)
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'aftertreatment', input_settings.years,
-                                                     input_settings.learning_rate_aftertreatment)
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_battery', input_settings.years,
-                                                     input_settings.learning_rate_phev)
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_nonbattery', input_settings.years,
-                                                     input_settings.learning_rate_phev)
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'pev_powertrain', input_settings.years,
-                                                     input_settings.learning_rate_phev)
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'roadload', input_settings.years,
-                                                     input_settings.learning_rate_roadload)
-        phev_packages_df = calc_year_over_year_costs(phev_packages_df, 'body', input_settings.years,
-                                                     input_settings.learning_rate_weight)
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'ice_powertrain', 'ice')
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'aftertreatment', 'ice')
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'pev_battery', 'pev')
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'pev_nonbattery', 'pev')
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'pev_powertrain', 'pev')
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'roadload', 'roadload')
+        phev_packages_df = calc_year_over_year_costs(input_settings, phev_packages_df, 'body', 'weight')
         phev_packages_df.reset_index(drop=False, inplace=True)
         phev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'phev_{idx}' for idx in range(1, len(phev_packages_df) + 1)]
@@ -1796,16 +1801,11 @@ def main():
 
     # calculate YoY hev costs with learning
     if runtime_settings.run_hev:
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'ice_powertrain', input_settings.years,
-                                                    input_settings.learning_rate_ice_powertrain)
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'aftertreatment', input_settings.years,
-                                                     input_settings.learning_rate_aftertreatment)
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'hev_powertrain', input_settings.years,
-                                                    input_settings.learning_rate_ice_powertrain)
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'roadload', input_settings.years,
-                                                    input_settings.learning_rate_roadload)
-        hev_packages_df = calc_year_over_year_costs(hev_packages_df, 'body', input_settings.years,
-                                                    input_settings.learning_rate_weight)
+        hev_packages_df = calc_year_over_year_costs(input_settings, hev_packages_df, 'ice_powertrain', 'ice')
+        hev_packages_df = calc_year_over_year_costs(input_settings, hev_packages_df, 'aftertreatment', 'ice')
+        hev_packages_df = calc_year_over_year_costs(input_settings, hev_packages_df, 'hev_powertrain', 'ice')
+        hev_packages_df = calc_year_over_year_costs(input_settings, hev_packages_df, 'roadload', 'roadload')
+        hev_packages_df = calc_year_over_year_costs(input_settings, hev_packages_df, 'body', 'weight')
         hev_packages_df.reset_index(drop=False, inplace=True)
         hev_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'hev_{idx}' for idx in range(1, len(hev_packages_df) + 1)]
@@ -1816,14 +1816,10 @@ def main():
 
     # calculate YoY ice costs with learning
     if runtime_settings.run_ice:
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'ice_powertrain', input_settings.years,
-                                                    input_settings.learning_rate_ice_powertrain)
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'aftertreatment', input_settings.years,
-                                                    input_settings.learning_rate_aftertreatment)
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'roadload', input_settings.years,
-                                                    input_settings.learning_rate_roadload)
-        ice_packages_df = calc_year_over_year_costs(ice_packages_df, 'body', input_settings.years,
-                                                    input_settings.learning_rate_weight)
+        ice_packages_df = calc_year_over_year_costs(input_settings, ice_packages_df, 'ice_powertrain', 'ice')
+        ice_packages_df = calc_year_over_year_costs(input_settings, ice_packages_df, 'aftertreatment', 'ice')
+        ice_packages_df = calc_year_over_year_costs(input_settings, ice_packages_df, 'roadload', 'roadload')
+        ice_packages_df = calc_year_over_year_costs(input_settings, ice_packages_df, 'body', 'weight')
         ice_packages_df.reset_index(drop=False, inplace=True)
         ice_packages_df.rename(columns={'index': 'alpha_key'}, inplace=True)
         simulated_vehicle_id = [f'ice_{idx}' for idx in range(1, len(ice_packages_df) + 1)]
