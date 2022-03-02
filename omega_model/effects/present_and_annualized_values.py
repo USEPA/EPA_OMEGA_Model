@@ -20,6 +20,16 @@ def calc_annualized_value(present_value, rate, periods, annualized_offset):
     return annlzd_value
 
 
+def calc_present_values(input_df, args):
+
+    groupby_cols = [col for col in input_df.columns if col not in args and 'periods' not in col and 'calendar_year' not in col]
+    temp_df = input_df.loc[input_df['discount_rate'] != 0, :]
+    present_values_df = temp_df.groupby(by=groupby_cols).cumsum()
+    present_values_df['series'] = 'PresentValue'
+    return_df = pd.concat([input_df, present_values_df], ignore_index=True)
+    return return_df
+
+
 def calc_present_and_annualized_values(dict_of_values, calendar_years):
     """
 
@@ -81,7 +91,7 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
                           )
 
     # then for discounted values
-    for series in ['AnnualValue', 'PresentValue', 'AnnualizedValue']:
+    for series in ['AnnualValue']: #, 'PresentValue', 'AnnualizedValue']:
         for social_discrate in social_discrates:
             for calendar_year in calendar_years:
                 calcs_dict.update({(calendar_year, social_discrate, series): {'session_name': omega_globals.options.session_name,
@@ -102,6 +112,9 @@ def calc_present_and_annualized_values(dict_of_values, calendar_years):
                                        if v['calendar_year'] == calendar_year
                                        and v['discount_rate'] == social_discrate)
                 calcs_dict[(calendar_year, social_discrate, series)][arg] = arg_annual_value
+
+    calcs_df = pd.DataFrame(calcs_dict).transpose()
+    new_df = calc_present_values(calcs_df, all_costs)
 
     # now do a cumulative sum year-over-year for each cost arg in calcs_dict - these will be present values (note removal of rate=0)
     series = 'PresentValue'
