@@ -8,6 +8,7 @@ Functions to track vehicle technology use.
 **CODE**
 
 """
+from omega_model import *
 
 
 def calc_tech_tracking(calendar_years):
@@ -50,7 +51,10 @@ def calc_tech_tracking(calendar_years):
 
             if target_co2e_grams_per_mile is not None:
 
-                tech_tracking_dict[key] = {'model_year': model_year,
+                tech_tracking_dict[key] = {'session_name': omega_globals.options.session_name,
+                                           'calendar_year': int(calendar_year),
+                                           'model_year': model_year,
+                                           'age': int(age),
                                            'name': name,
                                            'manufacturer_id': mfr_id,
                                            'base_year_reg_class_id': base_year_reg_class_id,

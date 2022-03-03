@@ -65,7 +65,10 @@ class EmissionFactorsVehicles(OMEGABase):
         """
 
         Args:
-            model_year: vehicle model year to get emission factors for
+            model_year (int): vehicle model year for which to get emission factors
+            age (int): the vehicle age
+            reg_class_id (string): the regulatory class, e.g., 'car' or 'truck'
+            in_use_fuel_id (string): the liquid fuel ID, e.g., 'pump gasoline'
             emission_factors: name of emission factor or list of emission factor attributes to get
 
         Returns: emission factor or list of emission factors
@@ -74,11 +77,14 @@ class EmissionFactorsVehicles(OMEGABase):
         import pandas as pd
 
         calendar_years = pd.Series(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
+        ages = pd.Series(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
+
         year = max([yr for yr in calendar_years if yr <= model_year])
+        age_use = max([a for a in ages if a <= age])
 
         factors = []
         for ef in emission_factors:
-            factors.append(EmissionFactorsVehicles._data[year, age, reg_class_id, in_use_fuel_id][ef])
+            factors.append(EmissionFactorsVehicles._data[year, age_use, reg_class_id, in_use_fuel_id][ef])
 
         if len(emission_factors) == 1:
             return factors[0]
@@ -126,7 +132,7 @@ class EmissionFactorsVehicles(OMEGABase):
                     df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
                         .to_dict(orient='index')
                 EmissionFactorsVehicles._data.update(
-                    df[['model_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
+                    df[['model_year', 'age', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
 
         return template_errors
 

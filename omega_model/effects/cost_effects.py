@@ -8,7 +8,6 @@ other functions here are called from within the calc_cost_effects function.
 **CODE**
 
 """
-
 from omega_model import *
 
 
@@ -25,20 +24,19 @@ def get_scc_cf(calendar_year):
     """
     from effects.cost_factors_scc import CostFactorsSCC
 
-    cost_factors = [
-        'co2_global_5.0_USD_per_metricton',
-        'co2_global_3.0_USD_per_metricton',
-        'co2_global_2.5_USD_per_metricton',
-        'co2_global_3.95_USD_per_metricton',
-        'ch4_global_5.0_USD_per_metricton',
-        'ch4_global_3.0_USD_per_metricton',
-        'ch4_global_2.5_USD_per_metricton',
-        'ch4_global_3.95_USD_per_metricton',
-        'n2o_global_5.0_USD_per_metricton',
-        'n2o_global_3.0_USD_per_metricton',
-        'n2o_global_2.5_USD_per_metricton',
-        'n2o_global_3.95_USD_per_metricton',
-    ]
+    cost_factors = ['co2_global_5.0_USD_per_metricton',
+                    'co2_global_3.0_USD_per_metricton',
+                    'co2_global_2.5_USD_per_metricton',
+                    'co2_global_3.95_USD_per_metricton',
+                    'ch4_global_5.0_USD_per_metricton',
+                    'ch4_global_3.0_USD_per_metricton',
+                    'ch4_global_2.5_USD_per_metricton',
+                    'ch4_global_3.95_USD_per_metricton',
+                    'n2o_global_5.0_USD_per_metricton',
+                    'n2o_global_3.0_USD_per_metricton',
+                    'n2o_global_2.5_USD_per_metricton',
+                    'n2o_global_3.95_USD_per_metricton',
+                    ]
 
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
@@ -57,19 +55,19 @@ def get_criteria_cf(calendar_year):
     """
     from effects.cost_factors_criteria import CostFactorsCriteria
 
-    cost_factors = {
-                   'pm25_tailpipe_3.0_USD_per_uston',
-                   'pm25_upstream_3.0_USD_per_uston',
-                   'nox_tailpipe_3.0_USD_per_uston',
-                   'nox_upstream_3.0_USD_per_uston',
-                   'so2_tailpipe_3.0_USD_per_uston',
-                   'so2_upstream_3.0_USD_per_uston',
-                   'pm25_tailpipe_7.0_USD_per_uston',
-                   'pm25_upstream_7.0_USD_per_uston',
-                   'nox_tailpipe_7.0_USD_per_uston',
-                   'nox_upstream_7.0_USD_per_uston',
-                   'so2_tailpipe_7.0_USD_per_uston',
-                   'so2_upstream_7.0_USD_per_uston'}
+    cost_factors = ['pm25_tailpipe_3.0_USD_per_uston',
+                    'pm25_upstream_3.0_USD_per_uston',
+                    'nox_tailpipe_3.0_USD_per_uston',
+                    'nox_upstream_3.0_USD_per_uston',
+                    'so2_tailpipe_3.0_USD_per_uston',
+                    'so2_upstream_3.0_USD_per_uston',
+                    'pm25_tailpipe_7.0_USD_per_uston',
+                    'pm25_upstream_7.0_USD_per_uston',
+                    'nox_tailpipe_7.0_USD_per_uston',
+                    'nox_upstream_7.0_USD_per_uston',
+                    'so2_tailpipe_7.0_USD_per_uston',
+                    'so2_upstream_7.0_USD_per_uston',
+                    ]
 
     return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
 
@@ -87,7 +85,7 @@ def get_energysecurity_cf(calendar_year):
     """
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
-    cost_factors = ['dollars_per_gallon',
+    cost_factors = ['dollars_per_bbl',
                     ]
 
     return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
@@ -111,6 +109,40 @@ def get_congestion_noise_cf(reg_class_id):
                     ]
 
     return CostFactorsCongestionNoise.get_cost_factors(reg_class_id, cost_factors)
+
+
+def get_maintenance_cost(veh_type):
+    """
+
+    Args:
+        veh_type: (str) 'BEV', 'PHEV', 'ICE', 'HEV'
+
+    Returns:
+        Curve coefficient values to calculate maintenance costs per mile at any odometer value.
+
+    """
+    from context.maintenance_cost_inputs import MaintenanceCostInputs
+
+    d = MaintenanceCostInputs.get_maintenance_cost_curve_coefficients(veh_type)
+
+    return d['slope'], d['intercept']
+
+
+def get_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, repair_veh_type, age):
+    """
+    Args:
+            veh_cost: (Numeric) The value of the vehicle when sold as new
+            pt_type: (String) The powertrain type (ICE, HEV, PHEV, BEV)
+            repair_type: (String) The vehicle repair type (car, suv, truck)
+            age: (Integer) The age of the vehicle where age=0 is year 1 in operation.
+
+        Returns:
+            A single repair cost per mile for the given vehicle at the given age.
+
+    """
+    from context.repair_cost_inputs import RepairCostInputs
+
+    return RepairCostInputs.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, repair_veh_type, age)
 
 
 def calc_cost_effects(physical_effects_dict):
@@ -163,10 +195,10 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, base_year_reg_class_id, reg_class_id, in_use_fuel_id, vehicle_count, annual_vmt, vmt, vmt_liquid, vmt_elec \
-                = physical['manufacturer_id'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
-                  physical['in_use_fuel_id'], \
-                  physical['registered_count'], physical['annual_vmt'], physical['vmt'], \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec \
+                = physical['manufacturer_id'], physical['name'], physical['base_year_reg_class_id'], physical['reg_class_id'], \
+                  physical['in_use_fuel_id'], physical['fueling_class'], \
+                  physical['registered_count'], physical['annual_vmt'], physical['odometer'], physical['vmt'], \
                   physical['vmt_liquid_fuel'], physical['vmt_electricity']
 
             # tech costs, only for age=0
@@ -189,14 +221,39 @@ def calc_cost_effects(physical_effects_dict):
                 elif fuel != 'US electricity' and physical['fuel_consumption_gallons']:
                     fuel_pretax_cost_dollars += price * physical['fuel_consumption_gallons']
 
+            # maintenance costs
+            if fueling_class == 'BEV':
+                powertrain_veh_type = 'BEV'
+            elif name.__contains__('PHEV'):
+                powertrain_veh_type = 'PHEV'
+            elif name.__contains__('HEV'):
+                powertrain_veh_type = 'HEV'
+            else:
+                powertrain_veh_type = 'ICE'
+
+            slope, intercept = get_maintenance_cost(powertrain_veh_type)
+            maintenance_cost_per_mile = slope * odometer + intercept
+            maintenance_cost_dollars = maintenance_cost_per_mile * vmt
+
+            # repair costs
+            if name.__contains__('car'):
+                repair_veh_type = 'car'
+            elif name.__contains__('Pickup'):
+                repair_veh_type = 'truck'
+            else:
+                repair_veh_type = 'suv'
+
+            repair_cost_per_mile = get_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, repair_veh_type, age)
+            repair_cost_dollars = repair_cost_per_mile * vmt
+
             # get energy security cost factors
             energy_security_cf = get_energysecurity_cf(calendar_year)
 
-            # energy security # TODO the import/domestic fraction element should come from an as yet created input file with domestic vs import data
+            # energy security
             if fuel == 'US electricity':
                 pass
             elif fuel != 'US electricity' and physical['fuel_consumption_gallons']:
-                energy_security_cost_dollars += physical['fuel_consumption_gallons'] * energy_security_cf
+                energy_security_cost_dollars += physical['barrels_of_imported_oil'] * energy_security_cf
 
             # get congestion and noise cost factors
             congestion_cf, noise_cf = get_congestion_noise_cf(base_year_reg_class_id)
@@ -283,13 +340,21 @@ def calc_cost_effects(physical_effects_dict):
             criteria_3_cost_dollars = criteria_tailpipe_3_cost_dollars + criteria_upstream_3_cost_dollars
             criteria_7_cost_dollars = criteria_tailpipe_7_cost_dollars + criteria_upstream_7_cost_dollars
 
-            veh_effects_dict.update({'manufacturer_id': mfr_id,
+            veh_effects_dict.update({'session_name': omega_globals.options.session_name,
+                                     'discount_rate': 0,
+                                     'vehicle_id': vehicle_id,
+                                     'manufacturer_id': mfr_id,
+                                     'name': name,
+                                     'calendar_year': calendar_year,
                                      'model_year': calendar_year - age,
+                                     'age': age,
                                      'base_year_reg_class_id': base_year_reg_class_id,
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
+                                     'fueling_class': fueling_class,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
+                                     'odometer': odometer,
                                      'vmt': vmt,
                                      'vmt_liquid_fuel': vmt_liquid,
                                      'vmt_electricity': vmt_elec,
@@ -301,44 +366,45 @@ def calc_cost_effects(physical_effects_dict):
                                      'congestion_cost_dollars': congestion_cost_dollars,
                                      'noise_cost_dollars': noise_cost_dollars,
                                      'maintenance_cost_dollars': maintenance_cost_dollars,
+                                     'repair_cost_dollars': repair_cost_dollars,
                                      'refueling_cost_dollars': refueling_cost_dollars,
                                      'driving_cost_dollars': driving_cost_dollars,
 
-                                     'co2_global_5_cost_dollars': co2_global_5_cost_dollars,
-                                     'co2_global_3_cost_dollars': co2_global_3_cost_dollars,
-                                     'co2_global_25_cost_dollars': co2_global_25_cost_dollars,
-                                     'co2_global_395_cost_dollars': co2_global_395_cost_dollars,
-                                     'ch4_global_5_cost_dollars': ch4_global_5_cost_dollars,
-                                     'ch4_global_3_cost_dollars': ch4_global_3_cost_dollars,
-                                     'ch4_global_25_cost_dollars': ch4_global_25_cost_dollars,
-                                     'ch4_global_395_cost_dollars': ch4_global_395_cost_dollars,
-                                     'n2o_global_5_cost_dollars': n2o_global_5_cost_dollars,
-                                     'n2o_global_3_cost_dollars': n2o_global_3_cost_dollars,
-                                     'n2o_global_25_cost_dollars': n2o_global_25_cost_dollars,
-                                     'n2o_global_395_cost_dollars': n2o_global_395_cost_dollars,
-                                     'ghg_global_5_cost_dollars': ghg_global_5_cost_dollars,
-                                     'ghg_global_3_cost_dollars': ghg_global_3_cost_dollars,
-                                     'ghg_global_25_cost_dollars': ghg_global_25_cost_dollars,
-                                     'ghg_global_395_cost_dollars': ghg_global_395_cost_dollars,
+                                     'co2_global_5.0_cost_dollars': co2_global_5_cost_dollars,
+                                     'co2_global_3.0_cost_dollars': co2_global_3_cost_dollars,
+                                     'co2_global_2.5_cost_dollars': co2_global_25_cost_dollars,
+                                     'co2_global_3.95_cost_dollars': co2_global_395_cost_dollars,
+                                     'ch4_global_5.0_cost_dollars': ch4_global_5_cost_dollars,
+                                     'ch4_global_3.0_cost_dollars': ch4_global_3_cost_dollars,
+                                     'ch4_global_2.5_cost_dollars': ch4_global_25_cost_dollars,
+                                     'ch4_global_3.95_cost_dollars': ch4_global_395_cost_dollars,
+                                     'n2o_global_5.0_cost_dollars': n2o_global_5_cost_dollars,
+                                     'n2o_global_3.0_cost_dollars': n2o_global_3_cost_dollars,
+                                     'n2o_global_2.5_cost_dollars': n2o_global_25_cost_dollars,
+                                     'n2o_global_3.95_cost_dollars': n2o_global_395_cost_dollars,
+                                     'ghg_global_5.0_cost_dollars': ghg_global_5_cost_dollars,
+                                     'ghg_global_3.0_cost_dollars': ghg_global_3_cost_dollars,
+                                     'ghg_global_2.5_cost_dollars': ghg_global_25_cost_dollars,
+                                     'ghg_global_3.95_cost_dollars': ghg_global_395_cost_dollars,
 
-                                     'pm25_tailpipe_3_cost_dollars': pm25_tailpipe_3_cost_dollars,
-                                     'pm25_upstream_3_cost_dollars': pm25_upstream_3_cost_dollars,
-                                     'nox_tailpipe_3_cost_dollars': nox_tailpipe_3_cost_dollars,
-                                     'nox_upstream_3_cost_dollars': nox_upstream_3_cost_dollars,
-                                     'so2_tailpipe_3_cost_dollars': so2_tailpipe_3_cost_dollars,
-                                     'so2_upstream_3_cost_dollars': so2_upstream_3_cost_dollars,
-                                     'pm25_tailpipe_7_cost_dollars': pm25_tailpipe_7_cost_dollars,
-                                     'pm25_upstream_7_cost_dollars': pm25_upstream_7_cost_dollars,
-                                     'nox_tailpipe_7_cost_dollars': nox_tailpipe_7_cost_dollars,
-                                     'nox_upstream_7_cost_dollars': nox_upstream_7_cost_dollars,
-                                     'so2_tailpipe_7_cost_dollars': so2_tailpipe_7_cost_dollars,
-                                     'so2_upstream_7_cost_dollars': so2_upstream_7_cost_dollars,
-                                     'criteria_tailpipe_3_cost_dollars': criteria_tailpipe_3_cost_dollars,
-                                     'criteria_upstream_3_cost_dollars': criteria_upstream_3_cost_dollars,
-                                     'criteria_tailpipe_7_cost_dollars': criteria_tailpipe_7_cost_dollars,
-                                     'criteria_upstream_7_cost_dollars': criteria_upstream_7_cost_dollars,
-                                     'criteria_3_cost_dollars': criteria_3_cost_dollars,
-                                     'criteria_7_cost_dollars': criteria_7_cost_dollars,
+                                     'pm25_tailpipe_3.0_cost_dollars': pm25_tailpipe_3_cost_dollars,
+                                     'pm25_upstream_3.0_cost_dollars': pm25_upstream_3_cost_dollars,
+                                     'nox_tailpipe_3.0_cost_dollars': nox_tailpipe_3_cost_dollars,
+                                     'nox_upstream_3.0_cost_dollars': nox_upstream_3_cost_dollars,
+                                     'so2_tailpipe_3.0_cost_dollars': so2_tailpipe_3_cost_dollars,
+                                     'so2_upstream_3.0_cost_dollars': so2_upstream_3_cost_dollars,
+                                     'pm25_tailpipe_7.0_cost_dollars': pm25_tailpipe_7_cost_dollars,
+                                     'pm25_upstream_7.0_cost_dollars': pm25_upstream_7_cost_dollars,
+                                     'nox_tailpipe_7.0_cost_dollars': nox_tailpipe_7_cost_dollars,
+                                     'nox_upstream_7.0_cost_dollars': nox_upstream_7_cost_dollars,
+                                     'so2_tailpipe_7.0_cost_dollars': so2_tailpipe_7_cost_dollars,
+                                     'so2_upstream_7.0_cost_dollars': so2_upstream_7_cost_dollars,
+                                     'criteria_tailpipe_3.0_cost_dollars': criteria_tailpipe_3_cost_dollars,
+                                     'criteria_upstream_3.0_cost_dollars': criteria_upstream_3_cost_dollars,
+                                     'criteria_tailpipe_7.0_cost_dollars': criteria_tailpipe_7_cost_dollars,
+                                     'criteria_upstream_7.0_cost_dollars': criteria_upstream_7_cost_dollars,
+                                     'criteria_3.0_cost_dollars': criteria_3_cost_dollars,
+                                     'criteria_7.0_cost_dollars': criteria_7_cost_dollars,
                                      }
                                     )
 

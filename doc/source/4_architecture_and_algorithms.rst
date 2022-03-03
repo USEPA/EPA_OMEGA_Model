@@ -1125,7 +1125,7 @@ Where,
 * :math:`dmc` refers to Direct Manufacturing Cost
 * :math:`item\_cost` refers to the cost inclusive of indirect costs using the "Markup" value on the inputs_workbook worksheet
 
-The module determines the displacement of the engine and the number of cylinders from the "Engine Displacement L" and "Engine Cylinders"
+The module reads the displacement of the engine and the number of cylinders from the "Engine Displacement L" and "Engine Cylinders"
 columns, respectively, of the ALPHA input file. Engine displacement and cylinder count costs are calculated as shown
 in equation :math:numref:`cyl_count_and_displ_cost`.
 

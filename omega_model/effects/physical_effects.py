@@ -10,9 +10,7 @@ and then to calculate from them the pollutant inventories, including fuel consum
 **CODE**
 
 """
-
-grams_per_us_ton = 907185
-grams_per_metric_ton = 1_000_000
+from omega_model import *
 
 
 def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
@@ -110,7 +108,46 @@ def get_refinery_ef(calendar_year, fuel):
     return EmissionFactorsRefinery.get_emission_factors(calendar_year, fuel, emission_factors)
 
 
-# TODO when calculating refinery inventory, we need to consider where fuel is refined so we'll need a new input file for that
+def get_energysecurity_cf(calendar_year):
+    """
+    Get energy security cost factors
+
+    Args:
+        calendar_year: The calendar year for which energy security related factors are needed.
+
+    Returns:
+        A list of cost factors as specified in the cost_factors list for the given calendar year.
+
+    """
+    from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
+
+    cost_factors = ['oil_import_reduction_as_percent_of_total_oil_demand_reduction',
+                    ]
+
+    return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
+
+
+def get_inputs_for_effects(*args):
+
+    """
+    Get general inputs needed for effects calculations.
+
+    Args:
+        args: The attributes for which attribute values are needed.
+
+    Returns:
+        A list of necessary input values; use index=[0] if passing a single attribute.
+
+    """
+    from effects.general_inputs_for_effects import GeneralInputsForEffects
+
+    values = list()
+    for arg in args:
+        values.append(GeneralInputsForEffects.get_value(arg))
+
+    return values
+
+
 def calc_physical_effects(calendar_years):
     """
 
@@ -126,6 +163,15 @@ def calc_physical_effects(calendar_years):
     from producer.vehicles import VehicleFinal
     from context.onroad_fuels import OnroadFuel
 
+    input_attributes_list = ['grams_per_us_ton', 'grams_per_metric_ton', 'gal_per_bbl',
+                             'e0_in_retail_gasoline', 'e0_energy_density_ratio',
+                             'gallons_of_gasoline_us_annual', 'bbl_oil_us_annual', 'kwh_us_annual', 'year_for_compares']
+
+    grams_per_us_ton, grams_per_metric_ton, gal_per_bbl, e0_share, e0_energy_density_ratio, \
+    gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = get_inputs_for_effects(*input_attributes_list)
+
+    year_for_compares = int(year_for_compares)
+
     physical_effects_dict = dict()
     vehicle_info_dict = dict()
     for calendar_year in calendar_years:
@@ -133,18 +179,18 @@ def calc_physical_effects(calendar_years):
 
         # UPDATE physical effects data
         calendar_year_effects_dict = dict()
-        # vehicle_info_dict = dict()
         for vad in vads:
 
-            attribute_list = ['manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
-                              'in_use_fuel_id', 'target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile',
+            attribute_list = ['manufacturer_id', 'name', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
+                              'in_use_fuel_id', 'fueling_class',
+                              'target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile',
                               'onroad_direct_kwh_per_mile']
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
             if vad.vehicle_id not in vehicle_info_dict:
                 vehicle_info_dict[vad.vehicle_id] = VehicleFinal.get_vehicle_attributes(vad.vehicle_id, attribute_list)
 
-            mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
             target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vad.vehicle_id]
 
@@ -228,29 +274,22 @@ def calc_physical_effects(calendar_years):
                         n2o_tailpipe_metrictons += vmt_liquid_fuel * n2o / grams_per_metric_ton
                         co2_tailpipe_metrictons += vmt_liquid_fuel * onroad_direct_co2e_grams_per_mile / grams_per_metric_ton
 
-                # # upstream inventory
-                # if electric_fuel:
-                #     voc_ps, co_ps, nox_ps, pm25_ps, sox_ps, benzene_ps, butadiene13_ps, formaldehyde_ps, acetaldehyde_ps, acrolein_ps, co2_ps, ch4_ps, n2o_ps \
-                #         = get_powersector_ef(calendar_year)
-                # if liquid_fuel:
-                #     voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
-                #         = get_refinery_ef(calendar_year, liquid_fuel)
-
                 # calc upstream emissions for both liquid and electric fuel operation
-                voc_upstream_ustons = (fuel_consumption_kWh * voc_ps + fuel_consumption_gallons * voc_ref) / grams_per_us_ton
-                co_upstream_ustons = (fuel_consumption_kWh * co_ps + fuel_consumption_gallons * co_ref) / grams_per_us_ton
-                nox_upstream_ustons = (fuel_consumption_kWh * nox_ps + fuel_consumption_gallons * nox_ref) / grams_per_us_ton
-                pm25_upstream_ustons = (fuel_consumption_kWh * pm25_ps + fuel_consumption_gallons * pm25_ref) / grams_per_us_ton
-                so2_upstream_ustons = (fuel_consumption_kWh * sox_ps + fuel_consumption_gallons * sox_ref) / grams_per_us_ton
-                benzene_upstream_ustons = (fuel_consumption_kWh * benzene_ps + fuel_consumption_gallons * benzene_ref) / grams_per_us_ton
-                butadiene13_upstream_ustons = (fuel_consumption_kWh * butadiene13_ps + fuel_consumption_gallons * butadiene13_ref) / grams_per_us_ton
-                formaldehyde_upstream_ustons = (fuel_consumption_kWh * formaldehyde_ps + fuel_consumption_gallons * formaldehyde_ref) / grams_per_us_ton
-                acetaldehyde_upstream_ustons = (fuel_consumption_kWh * acetaldehyde_ps + fuel_consumption_gallons * acetaldehyde_ref) / grams_per_us_ton
-                acrolein_upstream_ustons = (fuel_consumption_kWh * acrolein_ps + fuel_consumption_gallons * acrolein_ref) / grams_per_us_ton
+                kwhs, gallons = fuel_consumption_kWh, fuel_consumption_gallons
+                voc_upstream_ustons = (kwhs * voc_ps + gallons * voc_ref) / grams_per_us_ton
+                co_upstream_ustons = (kwhs * co_ps + gallons * co_ref) / grams_per_us_ton
+                nox_upstream_ustons = (kwhs * nox_ps + gallons * nox_ref) / grams_per_us_ton
+                pm25_upstream_ustons = (kwhs * pm25_ps + gallons * pm25_ref) / grams_per_us_ton
+                so2_upstream_ustons = (kwhs * sox_ps + gallons * sox_ref) / grams_per_us_ton
+                benzene_upstream_ustons = (kwhs * benzene_ps + gallons * benzene_ref) / grams_per_us_ton
+                butadiene13_upstream_ustons = (kwhs * butadiene13_ps + gallons * butadiene13_ref) / grams_per_us_ton
+                formaldehyde_upstream_ustons = (kwhs * formaldehyde_ps + gallons * formaldehyde_ref) / grams_per_us_ton
+                acetaldehyde_upstream_ustons = (kwhs * acetaldehyde_ps + gallons * acetaldehyde_ref) / grams_per_us_ton
+                acrolein_upstream_ustons = (kwhs * acrolein_ps + gallons * acrolein_ref) / grams_per_us_ton
 
-                co2_upstream_metrictons = (fuel_consumption_kWh * co2_ps + fuel_consumption_gallons * co2_ref) / grams_per_metric_ton
-                ch4_upstream_metrictons = (fuel_consumption_kWh * ch4_ps + fuel_consumption_gallons * ch4_ref) / grams_per_metric_ton
-                n2o_upstream_metrictons = (fuel_consumption_kWh * n2o_ps + fuel_consumption_gallons * n2o_ref) / grams_per_metric_ton
+                co2_upstream_metrictons = (kwhs * co2_ps + gallons * co2_ref) / grams_per_metric_ton
+                ch4_upstream_metrictons = (kwhs * ch4_ps + gallons * ch4_ref) / grams_per_metric_ton
+                n2o_upstream_metrictons = (kwhs * n2o_ps + gallons * n2o_ref) / grams_per_metric_ton
 
                 # sum tailpipe and upstream into totals
                 voc_total_ustons = voc_tailpipe_ustons + voc_upstream_ustons
@@ -267,16 +306,33 @@ def calc_physical_effects(calendar_years):
                 ch4_total_metrictons = ch4_tailpipe_metrictons + ch4_upstream_metrictons
                 n2o_total_metrictons = n2o_tailpipe_metrictons + n2o_upstream_metrictons
 
+                # calc energy security related attributes and comparisons to year_for_compares
+                oil_bbl = fuel_consumption_gallons * e0_share * e0_energy_density_ratio / gal_per_bbl
+                imported_oil_bbl = oil_bbl * get_energysecurity_cf(calendar_year)
+                imported_oil_bbl_per_day = imported_oil_bbl / 365
+                share_of_us_annual_gasoline = fuel_consumption_gallons / gallons_of_gasoline_us_annual
+                share_of_us_annual_oil = oil_bbl / bbl_oil_us_annual
+
+                # calc kwh and comparisons to year_for_compares
+                share_of_us_annual_kwh = fuel_consumption_kWh / kwh_us_annual
+
                 if vmt_liquid_fuel > 0 or vmt_electricity > 0:
                     flag = 1
 
-                vehicle_effects_dict.update({'manufacturer_id': mfr_id,
+                vehicle_effects_dict.update({'session_name': omega_globals.options.session_name,
+                                             'vehicle_id': int(vad.vehicle_id),
+                                             'manufacturer_id': mfr_id,
+                                             'name': name,
+                                             'calendar_year': int(calendar_year),
                                              'model_year': calendar_year - vad.age,
+                                             'age': int(vad.age),
                                              'base_year_reg_class_id': base_year_reg_class_id,
                                              'reg_class_id': reg_class_id,
                                              'in_use_fuel_id': in_use_fuel_id,
+                                             'fueling_class': fueling_class,
                                              'registered_count': vad.registered_count,
                                              'annual_vmt': vad.annual_vmt,
+                                             'odometer': vad.odometer,
                                              'vmt': vad.vmt,
                                              'vmt_liquid_fuel': vmt_liquid_fuel,
                                              'vmt_electricity': vmt_electricity,
@@ -285,6 +341,13 @@ def calc_physical_effects(calendar_years):
                                              'onroad_gallons_per_mile': onroad_gallons_per_mile,
                                              'fuel_consumption_gallons': fuel_consumption_gallons,
                                              'fuel_consumption_kWh': fuel_consumption_kWh,
+
+                                             f'share_of_{year_for_compares}_US_gasoline': share_of_us_annual_gasoline,
+                                             f'share_of_{year_for_compares}_US_kWh': share_of_us_annual_kwh,
+                                             'barrels_of_oil': oil_bbl,
+                                             f'share_of_{year_for_compares}_US_oil': share_of_us_annual_oil,
+                                             'barrels_of_imported_oil': imported_oil_bbl,
+                                             'barrels_of_imported_oil_per_day': imported_oil_bbl_per_day,
 
                                              'voc_tailpipe_ustons': voc_tailpipe_ustons,
                                              'co_tailpipe_ustons': co_tailpipe_ustons,
@@ -336,3 +399,41 @@ def calc_physical_effects(calendar_years):
                 calendar_year_effects_dict[key] = vehicle_effects_dict
         physical_effects_dict.update(calendar_year_effects_dict)
     return physical_effects_dict
+
+
+def calc_annual_physical_effects(input_df):
+    """
+
+    Args:
+        input_df: DataFrame of physical effects by vehicle.
+
+    Returns:
+        A DataFrame of physical effects by calendar year.
+
+    """
+    attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
+    additional_attributes = ['count', 'consumption', 'barrels', 'tons']
+    for additional_attribute in additional_attributes:
+        for col in input_df:
+            if col.__contains__(additional_attribute):
+                attributes.append(col)
+
+    groupby_cols = ['session_name', 'calendar_year', 'reg_class_id', 'fueling_class']
+    return_df = input_df[[*groupby_cols, *attributes]]
+    return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+
+    # calc additional attributes
+    input_attributes_list = ['gallons_of_gasoline_us_annual', 'bbl_oil_us_annual', 'kwh_us_annual', 'year_for_compares']
+
+    gallons_of_gasoline_us_annual, bbl_oil_us_annual, kwh_us_annual, year_for_compares = get_inputs_for_effects(*input_attributes_list)
+    year_for_compares = int(year_for_compares)
+
+    share_of_us_annual_gasoline = return_df['fuel_consumption_gallons'] / gallons_of_gasoline_us_annual
+    share_of_us_annual_oil = return_df['barrels_of_oil'] / bbl_oil_us_annual
+    share_of_us_annual_kwh = return_df['fuel_consumption_kWh'] / kwh_us_annual
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
+    return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
+
+    return return_df

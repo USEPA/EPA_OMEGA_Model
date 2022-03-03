@@ -133,6 +133,7 @@ try:
             self.cost_accrual = 'end-of-year'  # end-of-year means costs accrue at year's end; beginning-of-year means cost accrue at year's beginning
             # self.calc_criteria_emission_costs = False # no longer functional in omega.py
             # effects modeling files
+            self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
             self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
             self.scc_cost_factors_file = path + 'test_inputs/cost_factors-scc.csv'
@@ -142,6 +143,7 @@ try:
             self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors-vehicles.csv'
             self.emission_factors_powersector_file = path + 'test_inputs/emission_factors-powersector.csv'
             self.emission_factors_refinery_file = path + 'test_inputs/emission_factors-refinery.csv'
+            self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost_inputs.csv'
 
             self.start_time = 0
             self.end_time = 0

@@ -12,6 +12,8 @@ Context Name,String,AEO2021,
 Context Case,String,Reference case,
 Context Fuel Prices File,String,context_fuel_prices.csv,
 Context New Vehicle Market File,String,context_new_vehicle_market.csv,
+Maintenance Costs File,String,maintenance_cost_inputs.csv,
+Repair Costs File,String,repair_cost_inputs.csv,
 Manufacturers File,String,manufacturers.csv,
 Market Classes File,String,market_classes.csv,
 New Vehicle Price Elasticity of Demand,#,-0.5,
@@ -45,6 +47,7 @@ Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
 Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
 ,,,
 Session Postproc Settings,,,
+General Inputs for Effects File,String,general_inputs_for_effects.csv,general_inputs_for_effects.csv
 Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
 Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
 Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
@@ -64,11 +67,11 @@ Slice Tech Combo Tables,TRUE / FALSE,TRUE,TRUE
 Verbose Output,TRUE / FALSE,FALSE,FALSE
 Iterate Producer-Consumer,"TRUE / FALSE, …",TRUE,TRUE
 Producer-Consumer Max Iterations,"#, …",2,2
-Producer-Consumer Convergence Tolerance,"#, …",1.00E-003,1.00E-003
-Producer Compliance Search Min Share Range,"#, …",1.00E-004,1.00E-004
+Producer-Consumer Convergence Tolerance,"#, …",1.00E-03,1.00E-03
+Producer Compliance Search Min Share Range,"#, …",1.00E-04,1.00E-04
 Producer Compliance Search Convergence Factor,"#, …",0.33,0.33
-Producer Compliance Search Tolerance,"#, …",1.00E-006,1.00E-006
-Producer Cross Subsidy Price Tolerance,"#, …",1.00E-004,1.00E-004
+Producer Compliance Search Tolerance,"#, …",1.00E-06,1.00E-06
+Producer Cross Subsidy Price Tolerance,"#, …",1.00E-04,1.00E-04
 Run Profiler,TRUE / FALSE,FALSE,FALSE
 Flat Context,TRUE / FALSE,FALSE,FALSE
 Flat Context Year,"#, …",2020,2020

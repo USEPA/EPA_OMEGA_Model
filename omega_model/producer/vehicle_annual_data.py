@@ -27,6 +27,7 @@ class VehicleAnnualData(SQABase, OMEGABase):
     age = Column(Numeric)  #: vehicle age, new vehicles have age ``0``
     registered_count = Column(Float)  #: count of vehicles remaining in service (registered)
     annual_vmt = Column(Float)  #: vehicle miles travelled in the given year
+    odometer = Column(Float) #: the cumulative annual_vmt or odometer reading
     vmt = Column(Float)  #: annual vehicle miles travelled times registered count
 
 
@@ -110,6 +111,17 @@ class VehicleAnnualData(SQABase, OMEGABase):
                     .all()
 
         return result
+
+    @staticmethod
+    def get_odometer(vehicle_id, calendar_year):
+        vad = omega_globals.session.query(VehicleAnnualData). \
+            filter(VehicleAnnualData.vehicle_id == vehicle_id). \
+            filter(VehicleAnnualData.calendar_year == calendar_year).one_or_none()
+
+        if vad:
+            return vad.odometer
+
+        return 0
 
 
 if __name__ == '__main__':
