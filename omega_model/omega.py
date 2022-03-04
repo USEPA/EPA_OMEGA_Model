@@ -432,9 +432,10 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
+    # the 0.01 factors in the below equation protect against divide by zero when/if standards are zero
     producer_decision_and_response['strategic_compliance_ratio'] = \
-        (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
-        producer_decision_and_response['total_target_co2e_megagrams']
+        (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg + 0.01) / \
+        (producer_decision_and_response['total_target_co2e_megagrams'] + 0.01)
 
     compliant = producer_decision_and_response['strategic_compliance_ratio'] <= 1.0 or \
                 abs(1 - producer_decision_and_response['strategic_compliance_ratio']) <= \
