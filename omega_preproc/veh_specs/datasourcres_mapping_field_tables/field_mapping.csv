@@ -73,7 +73,7 @@ CO2 Target,EPA_TARGET_GHG_RND_GPM_1,g/mi,,,,,,,,,,,,,,,,,,,,,,EPA_TARGET_GHG_RND
 Combined Adjusted Fuel Economy,Combined Adjusted Fuel Economy,mpg,Est. MPG Comb,mpg,2,,,,Comb Unrd Adj FE - Conventional Fuel,mpg,1,,,,,,,,,,,,,,,,,,,,,,,,,,,
 Combined Force Average Velocity,COMB_FORCEAVG_SPEED_MPH,mph,,,,,,,,,,,,,,,,,,,,,,COMB_FORCEAVG_SPEED_MPH,mph,1,,,,,,,,,,,,
 Combined Fuel Energy Intensity,Combined Fuel Energy Intensity (MJ/km),MJ/km,,,,,,,,,,,,,,,,,,,,,,Combined Fuel Energy Intensity (MJ/km),MJ/km,1,,,,,,,,,,,,
-Combined Load Factor,Combined Load Factor (%),,,,,,,,,,,,,,,,,,,,,,,Combined Load Factor (%),,1,,,,,,,,,,,,
+Combined Load Factor,Combined Load Factor (%),,,,,,,,,,,,,,,,,,,,,,,Load Factor (%),,1,,,,,,,,,,,,
 City Powertrain Efficiency,City PTEFF_FROM_RLCOEFFS,,,,,,,,,,,,,,,,,,,,,,,City PTEFF_FROM_RLCOEFFS,,1,,,,,,,,,,,,
 City Tractive Energy Intensity,City Tractive Road Energy Intensity (Wh/mi),Wh/mi,,,,,,,,,,,,,,,,,,,,,,City Tractive Road Energy Intensity (Wh/mi),Wh/mi,1,,,,,,,,,,,,
 Hwy Powertrain Efficiency,Hwy PTEFF_FROM_RLCOEFFS,,,,,,,,,,,,,,,,,,,,,,,Hwy PTEFF_FROM_RLCOEFFS,,1,,,,,,,,,,,,
