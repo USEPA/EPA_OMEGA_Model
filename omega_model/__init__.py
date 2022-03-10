@@ -83,7 +83,7 @@ try:
             self.output_folder = 'out' + os.sep
             self.database_dump_folder = self.output_folder + '__dump' + os.sep
             self.omega_model_path = path
-            self.consolidate_manufacturers = False
+            self.consolidate_manufacturers = True
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
@@ -106,7 +106,7 @@ try:
             self.logfile_prefix = 'o2log_'
             self.logfilename = ''
             self.consumer_calc_generalized_cost = None
-            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint.csv'
+            self.policy_targets_file = path + 'test_inputs/ghg_standards-footprint_NTR-FRM-CFR-form.csv'
             self.policy_reg_classes_file = path + 'test_inputs/regulatory_classes.csv'
             self.production_multipliers_file = path + 'test_inputs/production_multipliers.csv'
             self.policy_fuels_file = path + 'test_inputs/policy_fuels.csv'
@@ -120,10 +120,10 @@ try:
             self.offcycle_credits_file = path + 'test_inputs/offcycle_credits.csv'
 
             self.consumer_pricing_num_options = 4
-            self.consumer_pricing_multiplier_min = 0.95
-            self.consumer_pricing_multiplier_max = 1.05
+            self.consumer_pricing_multiplier_min = 0.9
+            self.consumer_pricing_multiplier_max = 1.1
 
-            self.new_vehicle_price_elasticity_of_demand = -0.5
+            self.new_vehicle_price_elasticity_of_demand = -0.4
             self.timestamp_str = time.strftime('%Y%m%d_%H%M%S')
 
             # self.calc_effects = True
@@ -144,6 +144,8 @@ try:
             self.emission_factors_powersector_file = path + 'test_inputs/emission_factors-powersector.csv'
             self.emission_factors_refinery_file = path + 'test_inputs/emission_factors-refinery.csv'
             self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost_inputs.csv'
+            self.repair_cost_inputs_file = path + 'test_inputs/repair_cost_inputs.csv'
+            self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost_inputs.csv'
 
             self.start_time = 0
             self.end_time = 0
