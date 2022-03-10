@@ -38,7 +38,7 @@ def adjust_dollars(df, deflators, dollar_basis_year, *args):
         adj_factor = adj_factor_numerator / deflators.get_price_deflator(basis_year)
         for arg in args:
             df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
-    df_return['dollar_basis'] = dollar_basis_year
+            df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = dollar_basis_year
     return df_return
 
 

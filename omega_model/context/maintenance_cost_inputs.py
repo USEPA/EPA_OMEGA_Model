@@ -75,6 +75,15 @@ class MaintenanceCostInputs(OMEGABase):
 
     @staticmethod
     def get_maintenance_cost_curve_coefficients(veh_type):
+        """
+
+        Args:
+            veh_type (string): The type of powertrain in the vehicle, e.g., 'ICE', 'BEV', 'HEV', 'PHEV'
+
+        Returns:
+            The maintenance cost curve coefficients for the given veh_type.
+
+        """
 
         return MaintenanceCostInputs._data[veh_type]
 

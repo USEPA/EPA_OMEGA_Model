@@ -1143,6 +1143,7 @@ def init_omega(session_runtime_options):
     from effects.ip_deflators import ImplictPriceDeflators
     from context.maintenance_cost_inputs import MaintenanceCostInputs
     from context.repair_cost_inputs import RepairCostInputs
+    from context.refueling_cost_inputs import RefuelingCostInputs
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
@@ -1255,6 +1256,9 @@ def init_omega(session_runtime_options):
 
             init_fail += RepairCostInputs.init_from_file(omega_globals.options.repair_cost_inputs_file,
                                                          verbose=verbose_init)
+
+            init_fail += RefuelingCostInputs.init_from_file(omega_globals.options.refueling_cost_inputs_file,
+                                                            verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
