@@ -76,8 +76,8 @@ try:
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
-            self.session_name = 'OMEGA Demo'
-            self.session_unique_name = 'OMEGA Demo'
+            self.session_name = 'OMEGA Quick Test'
+            self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True
             self.auto_close_figures = False
             self.output_folder = 'out' + os.sep
