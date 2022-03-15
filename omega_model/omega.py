@@ -958,11 +958,13 @@ def detect_convergence(producer_decision_and_response, producer_market_classes):
 
 def get_module(module_name):
     """
+    Get a Python module by module name
 
     Args:
-        module_name:
+        module_name (str): e.g. 'consumer.market_classes'
 
     Returns:
+        The module specified by the module name
 
     """
     import importlib
