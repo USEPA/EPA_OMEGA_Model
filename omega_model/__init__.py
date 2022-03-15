@@ -42,6 +42,7 @@ try:
     from common import file_io, omega_log
     from common.input_validation import *
     from common.omega_functions import *
+    from context.context_base_classes import *
     from policy.policy_base_classes import *
     from consumer.consumer_base_classes import *
     from producer.producer_base_classes import *
@@ -195,6 +196,7 @@ try:
             self.SalesShare = None
             self.ProducerGeneralizedCost = None
             self.MarketClass = None
+            self.CostCoud = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

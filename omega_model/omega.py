@@ -994,6 +994,10 @@ def init_user_definable_submodules():
     """
     init_fail = []
 
+    # user-definable context modules
+    module_name = get_template_name(omega_globals.options.vehicle_simulation_results_and_costs_file)
+    omega_globals.options.CostCloud = get_module(module_name).CostCloud
+
     # user-definable policy modules
     # pull in reg classes before building database tables (declaring classes) that check reg class validity
     module_name = get_template_name(omega_globals.options.policy_reg_classes_file)
@@ -1050,11 +1054,10 @@ def init_user_definable_decomposition_attributes(verbose_init):
     """
     from policy.drive_cycles import DriveCycles
     from producer.vehicles import VehicleFinal, DecompositionAttributes
-    from context.cost_clouds import CostCloud
 
     init_fail = []
 
-    init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
+    init_fail += omega_globals.options.CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                       verbose=verbose_init)
 
     init_fail += omega_globals.options.OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
@@ -1115,7 +1118,6 @@ def init_omega(session_runtime_options):
     from context.new_vehicle_market import NewVehicleMarket
     from context.price_modifications import PriceModifications # needs market classes
     from context.production_constraints import ProductionConstraints
-    from context.cost_clouds import CostCloud
 
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare

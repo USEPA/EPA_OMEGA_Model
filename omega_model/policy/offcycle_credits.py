@@ -204,9 +204,8 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        from context.cost_clouds import CostCloud
         init_fail += \
-            CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
+            omega_globals.options.CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
                                                  verbose=omega_globals.options.verbose)
 
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
@@ -218,7 +217,7 @@ if __name__ == '__main__':
                 model_year = 2020
                 reg_class_id = 'car'
                 cost_curve_class = 'ice_MPW_LRL'
-                cost_cloud = CostCloud.get_cloud(model_year, cost_curve_class)
+                cost_cloud = omega_globals.options.CostCloud.get_cloud(self)
 
             vehicle = dummyVehicle()
 

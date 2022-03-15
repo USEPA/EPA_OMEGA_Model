@@ -209,7 +209,7 @@ Data Row Name and Description
 
 :Vehicle Simulation Results and Costs File *(str)*:
     The relative or absolute path to the vehicle simulation results and costs file,
-    loaded by ``context.cost_clouds.CostCloud``
+    loaded by user-definable CostCloud class
 
 :Vehicles File *(str)*:
     The relative or absolute path to the vehicles (base year fleet) file,

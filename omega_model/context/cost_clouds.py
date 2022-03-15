@@ -25,7 +25,7 @@ values are a looser fit.  The default value provides a good compromise between n
 **INPUT FILE FORMAT**
 
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
-rows.
+rows.  The template header uses a dynamic format.
 
 The data represents vehicle technology options and costs by simulation class (cost curve class) and model year.
 
@@ -35,7 +35,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,simulated_vehicle_results_and_costs,input_template_version:,0.22,dollar_basis:,``{optional_source_data_comment}``
+       input_template_name:,``[module_name]``,input_template_version:,0.3,dollar_basis:,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -106,7 +106,7 @@ _cache = dict()
 cloud_non_numeric_columns = ['simulated_vehicle_id']
 
 
-class CostCloud(OMEGABase):
+class CostCloud(OMEGABase, CostCloudBase):
     """
     **Loads and provides access to simulated vehicle data, provides methods to calculate and plot frontiers.**
 
@@ -137,8 +137,8 @@ class CostCloud(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
-        input_template_name = 'simulated_vehicle_results_and_costs'
-        input_template_version = 0.22
+        input_template_name = __name__
+        input_template_version = 0.3
         input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
                                   'new_vehicle_mfr_cost_dollars'}
         input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
@@ -186,19 +186,18 @@ class CostCloud(OMEGABase):
         return template_errors
 
     @staticmethod
-    def get_cloud(model_year, cost_curve_class):
+    def get_cloud(vehicle):
         """
-        Retrieve cost cloud for the given model year and cost curve class.
+        Retrieve cost cloud for the given vehicle.
 
         Args:
-            model_year (numeric): model year
-            cost_curve_class (str): name of cost curve class (e.g. 'ice_MPW_LRL')
+            vehicle (Vehicle): the vehicle to get the cloud for
 
         Returns:
             Copy of the requested cost cload data.
 
         """
-        return _cache[cost_curve_class][model_year].copy()
+        return _cache[vehicle.cost_curve_class][vehicle.model_year].copy()
 
 
 if __name__ == '__main__':

@@ -112,7 +112,6 @@ if __name__ == '__main__':
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2e
         from context.new_vehicle_market import NewVehicleMarket
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
@@ -135,7 +134,7 @@ if __name__ == '__main__':
                                                 verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                          verbose=omega_globals.options.verbose)
