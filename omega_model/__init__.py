@@ -101,7 +101,9 @@ try:
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
-            self.vehicle_simulation_results_and_costs_file = path + 'test_inputs/simulated_vehicles.csv'
+            self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_ice.csv'
+            self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_bev.csv'
+            self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_phev.csv'
             self.analysis_initial_year = None
             self.analysis_final_year = 2021
             self.logfile_prefix = 'o2log_'

@@ -204,9 +204,11 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        init_fail += \
-            omega_globals.options.CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
-                                                 verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.CostCloud.\
+            init_cost_clouds_from_file(omega_globals.options.ice_vehicle_simulation_results_file,
+                                       omega_globals.options.bev_vehicle_simulation_results_file,
+                                       omega_globals.options.phev_vehicle_simulation_results_file,
+                                       verbose=omega_globals.options.verbose)
 
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                     verbose=omega_globals.options.verbose)

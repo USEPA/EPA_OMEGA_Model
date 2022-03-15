@@ -997,7 +997,7 @@ def init_user_definable_submodules():
     init_fail = []
 
     # user-definable context modules
-    module_name = get_template_name(omega_globals.options.vehicle_simulation_results_and_costs_file)
+    module_name = get_template_name(omega_globals.options.ice_vehicle_simulation_results_file)
     omega_globals.options.CostCloud = get_module(module_name).CostCloud
 
     # user-definable policy modules
@@ -1059,8 +1059,11 @@ def init_user_definable_decomposition_attributes(verbose_init):
 
     init_fail = []
 
-    init_fail += omega_globals.options.CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
-                                                      verbose=verbose_init)
+    init_fail += omega_globals.options.CostCloud. \
+        init_cost_clouds_from_file(omega_globals.options.ice_vehicle_simulation_results_file,
+                                   omega_globals.options.bev_vehicle_simulation_results_file,
+                                   omega_globals.options.phev_vehicle_simulation_results_file,
+                                   verbose=verbose_init)
 
     init_fail += omega_globals.options.OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                 verbose=verbose_init)

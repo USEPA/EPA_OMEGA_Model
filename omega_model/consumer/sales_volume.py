@@ -134,7 +134,11 @@ if __name__ == '__main__':
                                                 verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
-        init_fail += omega_globals.options.CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.CostCloud.\
+            init_cost_clouds_from_file(omega_globals.options.ice_vehicle_simulation_results_file,
+                                       omega_globals.options.bev_vehicle_simulation_results_file,
+                                       omega_globals.options.phev_vehicle_simulation_results_file,
+                                       verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                          verbose=omega_globals.options.verbose)
