@@ -269,6 +269,9 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud = pd.DataFrame()
 
+        # TODO: decide sweep ranges based on vehicle characteristics, for example, unibody v. body-on-frame or other
+        # properties?
+
         RLHP20 = [0.001, 0.00175, 0.0025]
         RLHP60 = [0.003, 0.004, 0.006]
 
@@ -278,6 +281,10 @@ class CostCloud(OMEGABase, CostCloudBase):
             ETW_HP = [vehicle.etw_lbs / vehicle.eng_rated_hp]
         else:
             ETW_HP = [16]
+
+        # TODO: if vehicle up for redesign, query all classes, otherwise use same cost_curve class as prior year...?
+        # TODO: need to assign cost curve class to vehicles from chosen tech package...?  Not sure how that will work
+        # when interpolating along the frontier.......
 
         cost_curve_classes = _cache[vehicle.fueling_class]
 
