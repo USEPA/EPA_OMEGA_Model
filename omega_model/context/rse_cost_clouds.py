@@ -82,6 +82,7 @@ Data Column Name and Description
 **CODE**
 
 """
+import pandas as pd
 
 print('importing %s' % __file__)
 
@@ -105,12 +106,18 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_data_columns = []
 
     @staticmethod
-    def eval_rse(powertrain_type, cost_curve_class, rse_name, RLHP20, RLHP60, ETW_HP, ETW):
-        HP_ETW = 1/ETW_HP
+    def eval_rse(powertrain_type, cost_curve_class, rse_name, RLHP20s, RLHP60s, ETW_HPs, ETWs):
 
-        val = eval(_cache[powertrain_type][cost_curve_class]['rse'][rse_name], {}, locals())
+        results = []
 
-        return val
+        for RLHP20 in RLHP20s:
+            for RLHP60 in RLHP60s:
+                for ETW in ETWs:
+                    for ETW_HP in ETW_HPs:
+                        HP_ETW = 1 / ETW_HP
+                        results.append(eval(_cache[powertrain_type][cost_curve_class]['rse'][rse_name], {}, locals()))
+
+        return results
 
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):
@@ -118,7 +125,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename, echo_console=True)
         input_template_name = __name__
         input_template_version = 0.1
-        input_template_columns = {'cost_curve_class','engine_displacement_L_RSE', 'engine_cylinders_RSE',
+        input_template_columns = {'cost_curve_class','engine_displacement_L', 'engine_cylinders',
                                   'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
                                   'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
                                   'diesel_fuel'}
@@ -146,7 +153,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             if not template_errors:
                 # RSE columns are the drive cycle columns + the displacement and cylinder columns
                 rse_columns = drive_cycle_columns
-                rse_columns.update(['engine_displacement_L_RSE', 'engine_cylinders_RSE'])
+                rse_columns.update(['engine_displacement_L', 'engine_cylinders'])
 
                 non_data_columns = list(rse_columns) + ['cost_curve_class']
                 CostCloud.cost_cloud_data_columns = df.columns.drop(non_data_columns)
@@ -259,7 +266,33 @@ class CostCloud(OMEGABase, CostCloudBase):
             Copy of the requested cost cload data.
 
         """
-        return _cache[vehicle.cost_curve_class][vehicle.model_year].copy()
+
+        cost_cloud = pd.DataFrame()
+
+        RLHP20 = [0.001, 0.00175, 0.0025]
+        RLHP60 = [0.003, 0.004, 0.006]
+
+        ETW    = [vehicle.etw_lbs]
+
+        if vehicle.eng_rated_hp:
+            ETW_HP = [vehicle.etw_lbs / vehicle.eng_rated_hp]
+        else:
+            ETW_HP = [16]
+
+        cost_curve_classes = _cache[vehicle.fueling_class]
+
+        for cc in cost_curve_classes:
+            # TODO: code here to decide if cost curve is applicable to vehicle (e.g. diesel for diesel, etc...)
+            # print(cc)
+            cc_cloud = pd.DataFrame()
+            for r in cost_curve_classes[cc]['rse']:
+                # print(r)
+                cc_cloud[r] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, RLHP20, RLHP60, ETW_HP, ETW)
+            cc_cloud['cost_curve_class'] = cc
+            cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
+            cost_cloud = cost_cloud.append(cc_cloud)
+
+        return cost_cloud
 
 
 if __name__ == '__main__':
@@ -290,10 +323,10 @@ if __name__ == '__main__':
             cost_curve_class = list(_cache['ICE'])[0]
 
             print(CostCloud.eval_rse('ICE', cost_curve_class, 'engine_cylinders_RSE',
-                                     RLHP20=0.001, RLHP60=0.003, ETW_HP=5, ETW=2500))
+                                     RLHP20=[0.001], RLHP60=[0.003], ETW_HP=[5], ETW=[2500]))
 
             print(CostCloud.eval_rse('ICE', cost_curve_class, DriveCycles.drive_cycle_names[0],
-                                     RLHP20=0.001, RLHP60=0.003, ETW_HP=5, ETW=2500))
+                                     RLHP20=[0.001], RLHP60=[0.003], ETW_HP=[5], ETW=[2500]))
 
         else:
             print(init_fail)
