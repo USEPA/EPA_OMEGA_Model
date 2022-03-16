@@ -106,14 +106,30 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_data_columns = []
 
     @staticmethod
-    def eval_rse(powertrain_type, cost_curve_class, rse_name, RLHP20s, RLHP60s, ETW_HPs, ETWs):
+    def eval_rse(powertrain_type, cost_curve_class, rse_name, rlhp20s, rlhp60s, etw_hps, etws):
+        """
+        Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
+        package) for the full factorial combination of the iterable terms.
 
+        Args:
+            powertrain_type (str): e.g. 'ICE', 'BEV' ...
+            cost_curve_class (str): name of the tech package, e.g. 'GDI_TRX12_SS0'
+            rse_name (str): e.g. name of the drive cycle phase to calculate for
+            rlhp20s (iterable): roadload horsepower at 20 MPH values
+            rlhp60s (iterable): roadload horsepower at 60 MPH values
+            etw_hps (iterable): weight to horsepower ratios
+            etws (iterable): test weights, e.g. 3500 lbs
+
+        Returns:
+            list of values evaluated by combining the terms
+
+        """
         results = []
 
-        for RLHP20 in RLHP20s:
-            for RLHP60 in RLHP60s:
-                for ETW in ETWs:
-                    for ETW_HP in ETW_HPs:
+        for RLHP20 in rlhp20s:
+            for RLHP60 in rlhp60s:
+                for ETW in etws:
+                    for ETW_HP in etw_hps:
                         HP_ETW = 1 / ETW_HP
                         results.append(eval(_cache[powertrain_type][cost_curve_class]['rse'][rse_name], {}, locals()))
 
@@ -272,15 +288,15 @@ class CostCloud(OMEGABase, CostCloudBase):
         # TODO: decide sweep ranges based on vehicle characteristics, for example, unibody v. body-on-frame or other
         # properties?
 
-        RLHP20 = [0.001, 0.00175, 0.0025]
-        RLHP60 = [0.003, 0.004, 0.006]
+        rlhp20s = [0.001, 0.00175, 0.0025]
+        rlhp60s = [0.003, 0.004, 0.006]
 
-        ETW    = [vehicle.etw_lbs]
+        etws    = [vehicle.etw_lbs]
 
         if vehicle.eng_rated_hp:
-            ETW_HP = [vehicle.etw_lbs / vehicle.eng_rated_hp]
+            etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]
         else:
-            ETW_HP = [16]
+            etw_hps = [16]
 
         # TODO: if vehicle up for redesign, query all classes, otherwise use same cost_curve class as prior year...?
         # TODO: need to assign cost curve class to vehicles from chosen tech package...?  Not sure how that will work
@@ -294,7 +310,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             cc_cloud = pd.DataFrame()
             for r in cost_curve_classes[cc]['rse']:
                 # print(r)
-                cc_cloud[r] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, RLHP20, RLHP60, ETW_HP, ETW)
+                cc_cloud[r] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s, etw_hps, etws)
             cc_cloud['cost_curve_class'] = cc
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
