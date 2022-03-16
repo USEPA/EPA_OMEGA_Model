@@ -3,8 +3,6 @@
 **Routines to load simulated vehicle data (vehicle energy/CO2e consumption, off-cycle tech application, and cost data)
 and calculate frontiers from "clouds" of points**
 
-Also contains a function to plot frontiers for troubleshooting purposes
-
 Cost cloud frontiers are at the heart of OMEGA's optimization and compliance processes.  For every set of points
 represented in $/CO2e_g/mi (or Y versus X in general) there is a set of points that represent the lowest cost for each
 CO2e level, this is referred to as the frontier of the cloud.  Each point in the cloud (and on the frontier) can store
@@ -117,7 +115,7 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_data_columns = []
 
     @staticmethod
-    def init_cost_clouds_from_file(ice_filename, bev_filename, phev_filename, verbose=False):
+    def init_cost_clouds_from_files(ice_filename, bev_filename, phev_filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -217,10 +215,10 @@ if __name__ == '__main__':
         init_fail = []
 
         init_fail += omega_globals.options.CostCloud.\
-            init_cost_clouds_from_file(omega_globals.options.ice_vehicle_simulation_results_file,
-                                       omega_globals.options.bev_vehicle_simulation_results_file,
-                                       omega_globals.options.phev_vehicle_simulation_results_file,
-                                       verbose=true)
+            init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
+                                        omega_globals.options.bev_vehicle_simulation_results_file,
+                                        omega_globals.options.phev_vehicle_simulation_results_file,
+                                        verbose=true)
 
         if not init_fail:
             pass

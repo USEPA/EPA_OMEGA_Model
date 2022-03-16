@@ -13,7 +13,7 @@ class CostCloudBase():
     """
 
     @staticmethod
-    def init_cost_clouds_from_file(ice_filename, bev_filename, phev_filename, verbose=False):
+    def init_cost_clouds_from_files(ice_filename, bev_filename, phev_filename, verbose=False):
         """
 
         Initialize class data from input file.

@@ -1,9 +1,7 @@
 """
 
 **Routines to create simulated vehicle data (vehicle energy/CO2e consumption, off-cycle tech application, and cost data)
-and calculate frontiers from "clouds" of points**
-
-Also contains a function to plot frontiers for troubleshooting purposes
+and calculate frontiers from response surface equations fitted to vehicle simulation results**
 
 Cost cloud frontiers are at the heart of OMEGA's optimization and compliance processes.  For every set of points
 represented in $/CO2e_g/mi (or Y versus X in general) there is a set of points that represent the lowest cost for each
@@ -41,19 +39,13 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        simulated_vehicle_id,model_year,cost_curve_class,ac_efficiency,ac_leakage,high_eff_alternator,start_stop,cd_ftp_1:cert_direct_oncycle_kwh_per_mile,cd_ftp_2:cert_direct_oncycle_kwh_per_mile,cd_ftp_3:cert_direct_oncycle_kwh_per_mile,cd_ftp_4:cert_direct_oncycle_kwh_per_mile,cd_hwfet:cert_direct_oncycle_kwh_per_mile,new_vehicle_mfr_cost_dollars,cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile
-        bev_1,2020,bev_LPW_LRL,1,1,1,1,0.12992078,0.10534883,0.1247339,0.10534883,0.13151191,29559.4800439885,0,0,0,0,0
-        ice_9086,2021,ice_MPW_HRL,1,1,1,0,0,0,0,0,0,31012.5039133722,285.798112,269.100823,246.852389,269.100823,191.235952
+        TODO: add sample
 
 Data Column Name and Description
-    :simulated_vehicle_id:
-        Unique row identifier, unused otherwise
+    :package:
+        Unique row identifier, specifies the powertrain package
 
-    :model_year:
-        The model year of the data (particularly for ``new_vehicle_mfr_cost_dollars``)
-
-    :cost_curve_class:
-        The name of the cost curve class, e.g. 'bev_LPW_LRL', 'ice_MPW_HRL', etc
+    TODO: add the rest of the columns
 
     CHARGE-DEPLETING SIMULATION RESULTS
         Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
@@ -77,11 +69,7 @@ Data Column Name and Description
         :cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
         :cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
 
-    :ac_efficiency:
-        = 1 if vehicle qualifies for the AC efficiency off-cycle credit, = 0 otherwise
-
-    :ac_leakage:
-        = 1 if vehicle qualifies for the AC leakage off-cycle credit, = 0 otherwise
+    TODO: add the rest of the flags...
 
     :high_eff_alternator:
         = 1 if vehicle qualifies for the high efficiency alternator off-cycle credit, = 0 otherwise
@@ -103,7 +91,7 @@ _cache = dict()
 
 # define list of non-numeric columns to ignore during frontier creation since they goof up pandas auto-typing of
 # columns when switching between Series and DataFrame representations
-cloud_non_numeric_columns = ['simulated_vehicle_id']
+cloud_non_numeric_columns = ['package']
 
 
 class CostCloud(OMEGABase, CostCloudBase):
@@ -117,7 +105,150 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_data_columns = []
 
     @staticmethod
-    def init_cost_clouds_from_file(ice_filename, bev_filename, phev_filename, verbose=False):
+    def init_from_ice_file(filename, verbose=False):
+        if verbose:
+            omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
+        input_template_name = __name__
+        input_template_version = 0.1
+        input_template_columns = {'package','engine_displacement_L_RSE', 'engine_cylinders_RSE',
+                                  'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
+                                  'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
+                                  'diesel_fuel'}
+
+        # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
+        if not template_errors:
+            # read in the data portion of the input file
+            cost_clouds_template_info = pd.read_csv(filename, nrows=0)
+            temp = [item for item in cost_clouds_template_info]
+
+            df = pd.read_csv(filename, skiprows=1)
+
+            template_errors = validate_template_columns(filename, input_template_columns, df.columns,
+                                                        verbose=verbose)
+
+            # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
+
+            if not template_errors:
+
+                # convert cost clouds into curves and set up cost_curves table...
+                cost_curve_classes = df['cost_curve_class'].unique()
+                # for each cost curve class
+                for cost_curve_class in cost_curve_classes:
+                    class_cloud = df[df['cost_curve_class'] == cost_curve_class]
+                    cloud_model_years = class_cloud['model_year'].unique()
+                    # for each model year
+                    _cache[cost_curve_class] = dict()
+                    for model_year in cloud_model_years:
+                        _cache[cost_curve_class][model_year] = class_cloud[
+                            class_cloud['model_year'] == model_year].copy()
+                        CostCloud._max_year = max(CostCloud._max_year, model_year)
+
+                CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
+                                                                     'cost_curve_class'])
+        return template_errors
+
+    def init_from_bev_file(filename, verbose=False):
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
+        input_template_name = __name__
+        input_template_version = 0.3
+        input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
+                                  'new_vehicle_mfr_cost_dollars'}
+        input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
+        if not template_errors:
+            # read in the data portion of the input file
+            cost_clouds_template_info = pd.read_csv(filename, nrows=0)
+            temp = [item for item in cost_clouds_template_info]
+            dollar_basis_template = int(temp[temp.index('dollar_basis:') + 1])
+
+            df = pd.read_csv(filename, skiprows=1)
+
+            template_errors = validate_template_columns(filename, input_template_columns, df.columns,
+                                                        verbose=verbose)
+
+            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
+
+            adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
+                                / deflators[dollar_basis_template]['price_deflator']
+
+            df['new_vehicle_mfr_cost_dollars'] = df['new_vehicle_mfr_cost_dollars'] * adjustment_factor
+
+            # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
+
+            if not template_errors:
+
+                # convert cost clouds into curves and set up cost_curves table...
+                cost_curve_classes = df['cost_curve_class'].unique()
+                # for each cost curve class
+                for cost_curve_class in cost_curve_classes:
+                    class_cloud = df[df['cost_curve_class'] == cost_curve_class]
+                    cloud_model_years = class_cloud['model_year'].unique()
+                    # for each model year
+                    _cache[cost_curve_class] = dict()
+                    for model_year in cloud_model_years:
+                        _cache[cost_curve_class][model_year] = class_cloud[
+                            class_cloud['model_year'] == model_year].copy()
+                        CostCloud._max_year = max(CostCloud._max_year, model_year)
+
+                CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
+                                                                     'cost_curve_class'])
+        return template_errors
+
+    def init_from_phev_file(filename, verbose=False):
+        if verbose:
+            omega_log.logwrite('\nInitializing database from %s...' % filename)
+        input_template_name = __name__
+        input_template_version = 0.3
+        input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
+                                  'new_vehicle_mfr_cost_dollars'}
+        input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
+        if not template_errors:
+            # read in the data portion of the input file
+            cost_clouds_template_info = pd.read_csv(filename, nrows=0)
+            temp = [item for item in cost_clouds_template_info]
+            dollar_basis_template = int(temp[temp.index('dollar_basis:') + 1])
+
+            df = pd.read_csv(filename, skiprows=1)
+
+            template_errors = validate_template_columns(filename, input_template_columns, df.columns,
+                                                        verbose=verbose)
+
+            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
+
+            adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
+                                / deflators[dollar_basis_template]['price_deflator']
+
+            df['new_vehicle_mfr_cost_dollars'] = df['new_vehicle_mfr_cost_dollars'] * adjustment_factor
+
+            # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
+
+            if not template_errors:
+
+                # convert cost clouds into curves and set up cost_curves table...
+                cost_curve_classes = df['cost_curve_class'].unique()
+                # for each cost curve class
+                for cost_curve_class in cost_curve_classes:
+                    class_cloud = df[df['cost_curve_class'] == cost_curve_class]
+                    cloud_model_years = class_cloud['model_year'].unique()
+                    # for each model year
+                    _cache[cost_curve_class] = dict()
+                    for model_year in cloud_model_years:
+                        _cache[cost_curve_class][model_year] = class_cloud[
+                            class_cloud['model_year'] == model_year].copy()
+                        CostCloud._max_year = max(CostCloud._max_year, model_year)
+
+                CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
+                                                                     'cost_curve_class'])
+        return template_errors
+
+    @staticmethod
+    def init_cost_clouds_from_files(ice_filename, bev_filename, phev_filename, verbose=False):
         """
 
         Initialize class data from input file.
@@ -132,62 +263,13 @@ class CostCloud(OMEGABase, CostCloudBase):
             List of template/input errors, else empty list on success
 
         """
-        from policy.offcycle_credits import OffCycleCredits  # offcycle_credits must be initalized first
-
         _cache.clear()
 
-        filename_dict = {'ICE': ice_filename, 'BEV': bev_filename, 'PHEV': phev_filename}
+        template_errors = []
 
-        for powertrain_type, filename in filename_dict.items():
-            if filename:
-                if verbose:
-                    omega_log.logwrite('\nInitializing database from %s...' % filename)
-
-                input_template_name = __name__
-                input_template_version = 0.3
-                input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
-                                          'new_vehicle_mfr_cost_dollars'}
-                input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
-
-                template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
-                                                                 verbose=verbose)
-
-                if not template_errors:
-                    # read in the data portion of the input file
-                    cost_clouds_template_info = pd.read_csv(filename, nrows=0)
-                    temp = [item for item in cost_clouds_template_info]
-                    dollar_basis_template = int(temp[temp.index('dollar_basis:') + 1])
-
-                    df = pd.read_csv(filename, skiprows=1)
-
-                    template_errors = validate_template_columns(filename, input_template_columns, df.columns,
-                                                                verbose=verbose)
-
-                    deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
-
-                    adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
-                                        / deflators[dollar_basis_template]['price_deflator']
-
-                    df['new_vehicle_mfr_cost_dollars'] = df['new_vehicle_mfr_cost_dollars'] * adjustment_factor
-
-                    # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
-
-                    if not template_errors:
-
-                        # convert cost clouds into curves and set up cost_curves table...
-                        cost_curve_classes = df['cost_curve_class'].unique()
-                        # for each cost curve class
-                        for cost_curve_class in cost_curve_classes:
-                            class_cloud = df[df['cost_curve_class'] == cost_curve_class]
-                            cloud_model_years = class_cloud['model_year'].unique()
-                            # for each model year
-                            _cache[cost_curve_class] = dict()
-                            for model_year in cloud_model_years:
-                                _cache[cost_curve_class][model_year] = class_cloud[class_cloud['model_year'] == model_year].copy()
-                                CostCloud._max_year = max(CostCloud._max_year, model_year)
-
-                        CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
-                                                                             'cost_curve_class'])
+        template_errors.append(CostCloud.init_from_ice_file(ice_filename, verbose))
+        # template_errors.append(CostCloud.init_from_bev_file(bev_filename, verbose))
+        # template_errors.append(CostCloud.init_from_phev_file(phev_filename, verbose))
 
         return template_errors
 
@@ -218,10 +300,10 @@ if __name__ == '__main__':
         init_fail = []
 
         init_fail += omega_globals.options.CostCloud.\
-            init_cost_clouds_from_file(omega_globals.options.ice_vehicle_simulation_results_file,
-                                       omega_globals.options.bev_vehicle_simulation_results_file,
-                                       omega_globals.options.phev_vehicle_simulation_results_file,
-                                       verbose=true)
+            init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
+                                        omega_globals.options.bev_vehicle_simulation_results_file,
+                                        omega_globals.options.phev_vehicle_simulation_results_file,
+                                        verbose=true)
 
         if not init_fail:
             pass

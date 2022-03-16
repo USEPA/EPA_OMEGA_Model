@@ -1060,10 +1060,10 @@ def init_user_definable_decomposition_attributes(verbose_init):
     init_fail = []
 
     init_fail += omega_globals.options.CostCloud. \
-        init_cost_clouds_from_file(omega_globals.options.ice_vehicle_simulation_results_file,
-                                   omega_globals.options.bev_vehicle_simulation_results_file,
-                                   omega_globals.options.phev_vehicle_simulation_results_file,
-                                   verbose=verbose_init)
+        init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
+                                    omega_globals.options.bev_vehicle_simulation_results_file,
+                                    omega_globals.options.phev_vehicle_simulation_results_file,
+                                    verbose=verbose_init)
 
     init_fail += omega_globals.options.OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                 verbose=verbose_init)
