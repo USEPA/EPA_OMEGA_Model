@@ -125,6 +125,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         """
         results = []
+        etw_lbs = []
 
         for RLHP20 in rlhp20s:
             for RLHP60 in rlhp60s:
@@ -132,8 +133,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                     for ETW_HP in etw_hps:
                         HP_ETW = 1 / ETW_HP
                         results.append(eval(_cache[powertrain_type][cost_curve_class]['rse'][rse_name], {}, locals()))
+                        etw_lbs.append(ETW)
 
-        return results
+        return results, etw_lbs
 
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):
@@ -291,7 +293,7 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = [0.001, 0.00175, 0.0025]
         rlhp60s = [0.003, 0.004, 0.006]
 
-        etws    = [vehicle.etw_lbs]
+        etws    = [vehicle.etw_lbs * 0.95, vehicle.etw_lbs, vehicle.etw_lbs * 1.05]
 
         if vehicle.eng_rated_hp:
             etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]
@@ -310,10 +312,12 @@ class CostCloud(OMEGABase, CostCloudBase):
             cc_cloud = pd.DataFrame()
             for r in cost_curve_classes[cc]['rse']:
                 # print(r)
-                cc_cloud[r] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s, etw_hps, etws)
+                cc_cloud[r], cc_cloud['etw_lbs'] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s, etw_hps, etws)
             cc_cloud['cost_curve_class'] = cc
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
+
+        # TODO: add costs!!
 
         return cost_cloud
 
