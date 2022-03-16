@@ -1059,6 +1059,10 @@ def init_user_definable_decomposition_attributes(verbose_init):
 
     init_fail = []
 
+    # init drive cycles PRIOR to CostCloud since CostCloud needs the drive cycle names for validation
+    init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                            verbose=verbose_init)
+
     init_fail += omega_globals.options.CostCloud. \
         init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
                                     omega_globals.options.bev_vehicle_simulation_results_file,
@@ -1067,9 +1071,6 @@ def init_user_definable_decomposition_attributes(verbose_init):
 
     init_fail += omega_globals.options.OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                 verbose=verbose_init)
-
-    init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
-                                            verbose=verbose_init)
 
     vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
     VehicleFinal.dynamic_columns = list(set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))

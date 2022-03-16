@@ -105,12 +105,20 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_data_columns = []
 
     @staticmethod
+    def eval_rse(cost_curve_class, rse_name, RLHP20, RLHP60, ETW_HP, ETW):
+        HP_ETW = 1/ETW_HP
+
+        val = eval(_cache[cost_curve_class]['rse'][rse_name], {}, locals())
+
+        return val
+
+    @staticmethod
     def init_from_ice_file(filename, verbose=False):
         if verbose:
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
         input_template_version = 0.1
-        input_template_columns = {'package','engine_displacement_L_RSE', 'engine_cylinders_RSE',
+        input_template_columns = {'cost_curve_class','engine_displacement_L_RSE', 'engine_cylinders_RSE',
                                   'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
                                   'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
                                   'diesel_fuel'}
@@ -128,74 +136,81 @@ class CostCloud(OMEGABase, CostCloudBase):
             template_errors = validate_template_columns(filename, input_template_columns, df.columns,
                                                         verbose=verbose)
 
-            # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
+            # validate drive cycle columns
+            from policy.drive_cycles import DriveCycles
+            drive_cycle_columns = set.difference(set(df.columns), input_template_columns)
+
+            if not all([dc in DriveCycles.drive_cycle_names for dc in drive_cycle_columns]):
+                template_errors.append('Invalid drive cycle column in %s' % filename)
 
             if not template_errors:
+                # RSE columns are the drive cycle columns + the displacement and cylinder columns
+                rse_columns = drive_cycle_columns
+                rse_columns.update(['engine_displacement_L_RSE', 'engine_cylinders_RSE'])
+
+                non_data_columns = list(rse_columns) + ['cost_curve_class']
+                CostCloud.cost_cloud_data_columns = df.columns.drop(non_data_columns)
 
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
-                    class_cloud = df[df['cost_curve_class'] == cost_curve_class]
-                    cloud_model_years = class_cloud['model_year'].unique()
-                    # for each model year
-                    _cache[cost_curve_class] = dict()
-                    for model_year in cloud_model_years:
-                        _cache[cost_curve_class][model_year] = class_cloud[
-                            class_cloud['model_year'] == model_year].copy()
-                        CostCloud._max_year = max(CostCloud._max_year, model_year)
+                    class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
+                    _cache[cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
 
-                CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
-                                                                     'cost_curve_class'])
+                    for c in rse_columns:
+                        _cache[cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
+
+                    _cache[cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
+
         return template_errors
 
     def init_from_bev_file(filename, verbose=False):
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
-        input_template_version = 0.3
-        input_template_columns = {'simulated_vehicle_id', 'model_year', 'cost_curve_class',
-                                  'new_vehicle_mfr_cost_dollars'}
-        input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
+        input_template_version = 0.1
+        input_template_columns = {'cost_curve_class'}
+
+        # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
         if not template_errors:
             # read in the data portion of the input file
             cost_clouds_template_info = pd.read_csv(filename, nrows=0)
             temp = [item for item in cost_clouds_template_info]
-            dollar_basis_template = int(temp[temp.index('dollar_basis:') + 1])
 
             df = pd.read_csv(filename, skiprows=1)
 
             template_errors = validate_template_columns(filename, input_template_columns, df.columns,
                                                         verbose=verbose)
 
-            deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
+            # validate drive cycle columns
+            from policy.drive_cycles import DriveCycles
+            drive_cycle_columns = set.difference(set(df.columns), input_template_columns)
 
-            adjustment_factor = deflators[omega_globals.options.analysis_dollar_basis]['price_deflator'] \
-                                / deflators[dollar_basis_template]['price_deflator']
-
-            df['new_vehicle_mfr_cost_dollars'] = df['new_vehicle_mfr_cost_dollars'] * adjustment_factor
-
-            # TODO: validate manufacturer, reg classes, fuel ids, etc, etc....
+            if not all([dc in DriveCycles.drive_cycle_names for dc in drive_cycle_columns]):
+                template_errors.append('Invalid drive cycle column in %s' % filename)
 
             if not template_errors:
+                # RSE columns are the drive cycle columns + the displacement and cylinder columns
+                rse_columns = drive_cycle_columns
+
+                non_data_columns = list(rse_columns) + ['cost_curve_class']
+                CostCloud.cost_cloud_data_columns = df.columns.drop(non_data_columns)
 
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
-                    class_cloud = df[df['cost_curve_class'] == cost_curve_class]
-                    cloud_model_years = class_cloud['model_year'].unique()
-                    # for each model year
-                    _cache[cost_curve_class] = dict()
-                    for model_year in cloud_model_years:
-                        _cache[cost_curve_class][model_year] = class_cloud[
-                            class_cloud['model_year'] == model_year].copy()
-                        CostCloud._max_year = max(CostCloud._max_year, model_year)
+                    class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
+                    _cache[cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
 
-                CostCloud.cost_cloud_data_columns = df.columns.drop(['simulated_vehicle_id', 'model_year',
-                                                                     'cost_curve_class'])
+                    for c in rse_columns:
+                        _cache[cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
+
+                    _cache[cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
+
         return template_errors
 
     def init_from_phev_file(filename, verbose=False):
@@ -267,9 +282,9 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         template_errors = []
 
-        template_errors.append(CostCloud.init_from_ice_file(ice_filename, verbose))
-        # template_errors.append(CostCloud.init_from_bev_file(bev_filename, verbose))
-        # template_errors.append(CostCloud.init_from_phev_file(phev_filename, verbose))
+        template_errors += CostCloud.init_from_ice_file(ice_filename, verbose)
+        template_errors += CostCloud.init_from_bev_file(bev_filename, verbose)
+        # template_errors += CostCloud.init_from_phev_file(phev_filename, verbose)
 
         return template_errors
 
@@ -289,9 +304,13 @@ class CostCloud(OMEGABase, CostCloudBase):
 
 
 if __name__ == '__main__':
+    __name__ = '%s.%s' % (file_io.get_parent_foldername(__file__), file_io.get_filename(__file__))
+
     try:
         if '__file__' in locals():
             print(file_io.get_filenameext(__file__))
+
+        from policy.drive_cycles import DriveCycles
 
         # set up global variables:
         omega_globals.options = OMEGASessionSettings()
@@ -299,14 +318,24 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        init_fail += omega_globals.options.CostCloud.\
+        init_fail += DriveCycles.init_from_file(omega_globals.options.drive_cycles_file,
+                                                verbose=omega_globals.options.verbose)
+
+        init_fail += CostCloud.\
             init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
                                         omega_globals.options.bev_vehicle_simulation_results_file,
                                         omega_globals.options.phev_vehicle_simulation_results_file,
-                                        verbose=true)
+                                        verbose=True)
 
         if not init_fail:
-            pass
+            cost_curve_class = list(_cache.keys())[0]
+
+            print(CostCloud.eval_rse(cost_curve_class, 'engine_cylinders_RSE',
+                                     RLHP20=0.001, RLHP60=0.003, ETW_HP=5, ETW=2500))
+
+            print(CostCloud.eval_rse(cost_curve_class, DriveCycles.drive_cycle_names[0],
+                                     RLHP20=0.001, RLHP60=0.003, ETW_HP=5, ETW=2500))
+
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
