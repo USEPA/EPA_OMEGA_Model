@@ -9,6 +9,7 @@ Some general functions for use in the effects calculations.
 """
 import pandas as pd
 from math import log10, floor
+from omega_model import *
 
 
 def adjust_dollars(df, deflators, dollar_basis_year, *args):
@@ -40,6 +41,34 @@ def adjust_dollars(df, deflators, dollar_basis_year, *args):
             df_return.loc[df_return['dollar_basis'] == basis_year, arg] = df_return[arg] * adj_factor
             df_return.loc[df_return['dollar_basis'] == basis_year, 'dollar_basis'] = dollar_basis_year
     return df_return
+
+
+def dollar_adjustment_factor(deflators, dollar_basis_input):
+    """
+
+    Args:
+        deflators (str): 'cpi_price_deflators' or 'ip_deflators' for consumer price index or implicit price deflators
+        dollar_basis_input (int): the dollar basis of the input value.
+
+    Returns:
+        The multiplicative factor that can be applied to a cost in dollar_basis_input to express that value in analysis_dollar_basis.
+
+    """
+    if deflators == 'cpi_price_deflators':
+        from effects.cpi_price_deflators import CPIPriceDeflators
+        deflators = CPIPriceDeflators
+    else:
+        from effects.ip_deflators import ImplictPriceDeflators
+        deflators = ImplictPriceDeflators
+
+    analysis_basis = omega_globals.options.analysis_dollar_basis
+
+    adj_factor_numerator = deflators.get_price_deflator(analysis_basis)
+    adj_factor_denominator = deflators.get_price_deflator(dollar_basis_input)
+
+    adj_factor = adj_factor_numerator / adj_factor_denominator
+
+    return adj_factor
 
 
 def round_sig(df, divisor=1, sig=0, *args):

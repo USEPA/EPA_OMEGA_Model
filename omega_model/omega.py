@@ -1152,6 +1152,7 @@ def init_omega(session_runtime_options):
     from context.maintenance_cost_inputs import MaintenanceCostInputs
     from context.repair_cost_inputs import RepairCostInputs
     from context.refueling_cost_inputs import RefuelingCostInputs
+    from context.powertrain_cost import PowertrainCost
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
@@ -1228,14 +1229,17 @@ def init_omega(session_runtime_options):
                                                           omega_globals.options.onroad_vehicle_calculations_file,
                                                           verbose=verbose_init)
 
+        init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
+                                                      verbose=verbose_init)
+
+        init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
+                                                          verbose=verbose_init)
+
+        init_fail += PowertrainCost.init_from_file(omega_globals.options.powertrain_cost_input_file,
+                                                   verbose=verbose_init)
+
         if omega_globals.options.calc_effects == 'Physical and Costs':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
-                                                          verbose=verbose_init)
-
-            init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
-                                                          verbose=verbose_init)
-
-            init_fail += ImplictPriceDeflators.init_from_file(omega_globals.options.ip_deflators_file,
                                                           verbose=verbose_init)
 
             init_fail += EmissionFactorsPowersector.init_from_file(omega_globals.options.emission_factors_powersector_file,
