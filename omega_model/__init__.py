@@ -110,7 +110,7 @@ try:
             self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
             self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
 
-            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost_inputs.csv'
+            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
 
             self.analysis_initial_year = None
             self.analysis_final_year = 2021
