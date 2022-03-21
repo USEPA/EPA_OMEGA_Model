@@ -22,23 +22,26 @@ def read_table(path, table_name, skiprows=4):
         A DataFrame of the table_name.
         
     """
+    # Note that "error_bad_lines" is deprecated in newer pandas versions; change to "on_bad_lines='skip'" with newer pandas
     return pd.read_csv(path / table_name, skiprows=skiprows, error_bad_lines=False).dropna()
 
 
-def return_df(table, col_id, string_id):
+def return_df(table, col_id, case_id, version_id):
     """
     
     Args:
         table: A DataFrame of the table_name passed thru the read_table function.
-        col_id: The column identifier where string_id data can be found.
-        string_id: The string identifier (e.g., the string_id such as Reference case, High Oil Price, etc.).
+        col_id (string): The column identifier where case_id data can be found.
+        case_id (string): The string identifier (e.g., the string_id such as Reference case, High Oil Price, etc.).
+        version_id (string): The AEO version info that might need to be scrubbed from col_id data (e.g., 'AEO2022').
     
     Returns:
         A DataFrame consisting of only the data for the given AEO case; the name of the AEO case is also removed from the 'full name' column entries.
         
     """
-    df_return = pd.DataFrame(table.loc[table[col_id].str.endswith(f'{string_id}'), :]).reset_index(drop=True)
-    df_return.replace({col_id: f': {string_id}'}, {col_id: ''}, regex=True, inplace=True)
+    table[col_id].replace(f'{version_id} {case_id}', case_id, regex=True, inplace=True)
+    df_return = pd.DataFrame(table.loc[table[col_id].str.endswith(f'{case_id}'), :]).reset_index(drop=True)
+    df_return.replace({col_id: f': {case_id}'}, {col_id: ''}, regex=True, inplace=True)
     return df_return
 
 
@@ -290,6 +293,7 @@ def main():
 
     for path_aeo_version in settings.path_aeo_tables.iterdir():
 
+        aeo_version = path_aeo_version.stem
         # read files as DataFrames
         aeo_class_attributes_table = read_table(path_aeo_version, settings.aeo_class_attributes_table_file)
         aeo_sales_table = read_table(path_aeo_version, settings.aeo_sales_table_file)
@@ -300,7 +304,7 @@ def main():
         # work on fuel prices
         for aeo_case in settings.aeo_cases:
             print(f'Working on context gasoline prices for the AEO {aeo_case}')
-            case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case)
+            case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(case_df)
 
             usd_basis = aeo_table_obj.aeo_dollars()
@@ -330,7 +334,7 @@ def main():
             gasoline_prices = gasoline_retail_prices.join(gasoline_pretax_prices[['pretax_dollars_per_unit']])
 
             # electricity prices
-            case_df = return_df(aeo_electricity_fuel_prices_table, 'full name', aeo_case)
+            case_df = return_df(aeo_electricity_fuel_prices_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(case_df)
             electricity_prices_residential = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: Residential', settings.create_results_thru)
             electricity_prices_allsecavg = aeo_table_obj.select_table_rows('full name', 'Electricity: End-Use Prices: All Sectors Average', settings.create_results_thru)
@@ -360,7 +364,7 @@ def main():
 
             print(f'Working on market context vehicle attributes for the AEO {aeo_case}')
             attribute = dict()
-            attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case)
+            attributes_df = return_df(aeo_class_attributes_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(attributes_df)
 
             attribute['HP'] = aeo_table_obj.select_table_rows('full name', 'Horsepower', settings.create_results_thru, replace='New Vehicle Attributes: Horsepower: Conventional ')
@@ -401,7 +405,7 @@ def main():
             aeo_veh_context.insert(0, 'context_id', aeo_table_obj.aeo_year())
 
             # work on sales
-            sales_df = return_df(aeo_sales_table, 'full name', aeo_case)
+            sales_df = return_df(aeo_sales_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(sales_df)
             print(f'Working on market context vehicle sales for the AEO {aeo_case}')
             sales_fleet = aeo_table_obj.select_table_rows('full name', 'Light-Duty Vehicle Sales: Total Vehicles Sales', settings.create_results_thru)
@@ -442,7 +446,7 @@ def main():
                 case_df = pd.concat([case_df, case_dict[year, 'car'], case_dict[year, 'truck']], axis=0, ignore_index=True)
 
             # work on vehicle prices
-            prices_df = return_df(aeo_vehicle_prices_table, 'full name', aeo_case)
+            prices_df = return_df(aeo_vehicle_prices_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(prices_df)
             print(f'Working on market context vehicle prices for the AEO {aeo_case}')
             vehicle_prices = dict()
@@ -488,7 +492,7 @@ def main():
 
     # work on deflators
     print('Working on GDP price deflators.')
-    deflators = return_df(deflators_table, 'Unnamed: 1', 'Gross domestic product')
+    deflators = return_df(deflators_table, 'Unnamed: 1', 'Gross domestic product', aeo_version)
     deflators = melt_df(deflators, 'Unnamed: 1', 'price_deflator', 'Unnamed: 1')
     deflators['price_deflator'] = deflators['price_deflator'].astype(float)
     # basis_factor_df = pd.DataFrame(deflators.loc[deflators['calendar_year'] == usd_basis, 'price_deflator']).reset_index(drop=True)

@@ -498,70 +498,70 @@ for model_year in model_years:
                 new_column[pd.isnull(new_column)] = pd.Series(np.zeros(len(query_output))).replace(0,np.nan)
         query_output = pd.concat([query_output, new_column],axis=1)
 
-    _trims = ['V6', 'V8', 'V12', 'WITH RANGE EXTENDER', '(COUPE)', 'COUPE', 'XDRIVE', 'SDRIVE', '(CONVERTIBLE)', 'CONVERTIBLE', 'SRT', 'AWD', 'RWD', 'FWD', '4X2', '4X4', 'CLASSIC', 'UNLIMITED', '4-DOOR', '5-DOOR', \
-              'REAR', 'WHEEL', 'DRIVE', '(RWD)', 'HYBRID', '2DR', '4DR', '5DR', '4MATIC', 'ALL4', 'F SPORT', 'SPORT', 'HEV', 'PHEV', 'ES', 'ECO', 'LE', 'XLE', 'HATCHBACK', 'XSE', 'FFV', 'CAB', 'PICKUP', 'CHASSIS', \
-              'BADGE', 'BLACK', 'GRAN', 'TURISMO', 'COMPETITION', 'SPORTS', 'WAGON', 'EWB', 'LWB', 'BASE', 'PAYLOAD', 'LT', 'TIRE', 'USPS', 'A-SPEC', 'XL', 'ULTIMATE', 'BLUE', 'PLUG-IN HYBRID', 'SPORTBRAKE', \
-              'SV', 'SVA', 'SVR', 'MHEV', 'SI4', 'TOURING', 'NISMO', 'SR/PLATINUM', 'RED', 'PRO-4X', 'PLATINUM', 'CARGO', 'VAN', 'SV/SL', 'LE/XLE/SE/LTD', 'LE/SE', 'XLE/XSE', 'SPORTWAGEN', '4MOTION', 'ALLTRACK', \
-              'EXECUTIVE', 'ST', 'E-HYBRID', '2WD', '4WD', 'INCOMPLETE', 'SQ4', 'S', 'GTS', 'GEN2', 'SI4', 'MANUAL', 'P250', 'P300', 'GVWR>7599', 'LBS', '5.0L']
-
-    df_query_output_grp = query_output.groupby(['CAFE_MFR_CD', 'CARLINE_NAME_all_Master Index', 'BodyID']).mean() # ELECTRIC POWER STEERING Edmunds all
-    carline_name_empty = []
-    for i in range(len(df_query_output_grp)):
-        _cafe_mfr_cd = df_query_output_grp.index[i][0]
-        _carline_name_all = df_query_output_grp.index[i][1]
-        _bodyid = df_query_output_grp.index[i][2]
-
-        if 'F150' in _carline_name_all: _carline_name_base = 'F150'
-        elif 'FUSION' in _carline_name_all: _carline_name_base = 'FUSION'
-        elif 'MUSTANG' in _carline_name_all: _carline_name_base = 'MUSTANG'
-        elif 'TRANSIT CONNECT' in _carline_name_all: _carline_name_base = 'TRANSIT CONNECT'
-        elif 'CAMRY' in _carline_name_all: _carline_name_base = 'CAMRY'
-        elif 'COROLLA' in _carline_name_all: _carline_name_base = 'COROLLA'
-        elif 'TACOMA' in _carline_name_all: _carline_name_base = 'TACOMA'
-        elif 'BOXSTER' in _carline_name_all: _carline_name_base = 'BOXSTER'
-        elif 'CAYMAN' in _carline_name_all: _carline_name_base = 'CAYMAN'
-        elif 'C10' in _carline_name_all: _carline_name_base = 'C10'
-        elif 'K10' in _carline_name_all: _carline_name_base = 'K10'
-        elif 'C15' in _carline_name_all: _carline_name_base = 'C15'
-        elif 'K15' in _carline_name_all: _carline_name_base = 'K15'
-        elif 'C1500' in _carline_name_all: _carline_name_base = 'C1500'
-        elif 'K1500' in _carline_name_all: _carline_name_base = 'K1500'
-        elif 'K1500' in _carline_name_all: _carline_name_base = 'K1500'
-        else:
-            _carline_name = str(_carline_name_all).strip().split(' ')
-            if len(_carline_name) > 1:
-                tmp = []
-                for i in range(len(_carline_name)):
-                    if ('(' in _carline_name[i]) and (')' not in _carline_name[i]):
-                        pass
-                    elif (')' in _carline_name[i]) and ('(' not in _carline_name[i]):
-                        pass
-                    elif (_carline_name[i] not in _trims):
-                        tmp.append(_carline_name[i].strip())
-                _carline_name_base = ' '.join(tmp)
-
-        try:
-            carline_name_checks = (query_output['CAFE_MFR_CD'] == _cafe_mfr_cd) & (query_output['CARLINE_NAME_all_Master Index'].str.contains(_carline_name_base))
-        except KeyError:
-            try:
-                print(_carline_name_base)
-                _carline_name_base = _carline_name_base.strip().split(' ')[0]
-                carline_name_checks = (query_output['CAFE_MFR_CD'] == _cafe_mfr_cd) & (query_output['CARLINE_NAME_all_Master Index'].str.contains(_carline_name_base))
-            except KeyError:
-                continue
-        try:
-            df_query_output = query_output.loc[carline_name_checks, :]
-        except KeyError:
-            print(_carline_name_base, _carline_name_all)
-            continue
-        if pd.isnull(df_query_output['Electric Power Steering_all']).sum() == 0: continue
-        if (~pd.isnull(df_query_output['Electric Power Steering_all']) == True).sum() == 0: continue
-        df_query_output_index = list(df_query_output.index)
-        df_query_output.reset_index(drop=True, inplace=True)
-        _eps_yes_index = df_query_output.loc[df_query_output['Electric Power Steering_all'] == 'yes', 'Electric Power Steering_all'].index
-        _eps_no_index = df_query_output.loc[df_query_output['Electric Power Steering_all'] != 'yes', 'Electric Power Steering_all'].index
-        for j in range(len(_eps_no_index)):
-            query_output['Electric Power Steering_all'][df_query_output_index[_eps_no_index[j]]] = 'yes' # query_output.loc did not work
+    # _trims = ['V6', 'V8', 'V12', 'WITH RANGE EXTENDER', '(COUPE)', 'COUPE', 'XDRIVE', 'SDRIVE', '(CONVERTIBLE)', 'CONVERTIBLE', 'SRT', 'AWD', 'RWD', 'FWD', '4X2', '4X4', 'CLASSIC', 'UNLIMITED', '4-DOOR', '5-DOOR', \
+    #           'REAR', 'WHEEL', 'DRIVE', '(RWD)', 'HYBRID', '2DR', '4DR', '5DR', '4MATIC', 'ALL4', 'F SPORT', 'SPORT', 'HEV', 'PHEV', 'ES', 'ECO', 'LE', 'XLE', 'HATCHBACK', 'XSE', 'FFV', 'CAB', 'PICKUP', 'CHASSIS', \
+    #           'BADGE', 'BLACK', 'GRAN', 'TURISMO', 'COMPETITION', 'SPORTS', 'WAGON', 'EWB', 'LWB', 'BASE', 'PAYLOAD', 'LT', 'TIRE', 'USPS', 'A-SPEC', 'XL', 'ULTIMATE', 'BLUE', 'PLUG-IN HYBRID', 'SPORTBRAKE', \
+    #           'SV', 'SVA', 'SVR', 'MHEV', 'SI4', 'TOURING', 'NISMO', 'SR/PLATINUM', 'RED', 'PRO-4X', 'PLATINUM', 'CARGO', 'VAN', 'SV/SL', 'LE/XLE/SE/LTD', 'LE/SE', 'XLE/XSE', 'SPORTWAGEN', '4MOTION', 'ALLTRACK', \
+    #           'EXECUTIVE', 'ST', 'E-HYBRID', '2WD', '4WD', 'INCOMPLETE', 'SQ4', 'S', 'GTS', 'GEN2', 'SI4', 'MANUAL', 'P250', 'P300', 'GVWR>7599', 'LBS', '5.0L']
+    #
+    # df_query_output_grp = query_output.groupby(['CAFE_MFR_CD', 'CARLINE_NAME_all_Master Index', 'BodyID']).mean() # ELECTRIC POWER STEERING Edmunds all
+    # carline_name_empty = []
+    # for i in range(len(df_query_output_grp)):
+    #     _cafe_mfr_cd = df_query_output_grp.index[i][0]
+    #     _carline_name_all = df_query_output_grp.index[i][1]
+    #     _bodyid = df_query_output_grp.index[i][2]
+    #
+    #     if 'F150' in _carline_name_all: _carline_name_base = 'F150'
+    #     elif 'FUSION' in _carline_name_all: _carline_name_base = 'FUSION'
+    #     elif 'MUSTANG' in _carline_name_all: _carline_name_base = 'MUSTANG'
+    #     elif 'TRANSIT CONNECT' in _carline_name_all: _carline_name_base = 'TRANSIT CONNECT'
+    #     elif 'CAMRY' in _carline_name_all: _carline_name_base = 'CAMRY'
+    #     elif 'COROLLA' in _carline_name_all: _carline_name_base = 'COROLLA'
+    #     elif 'TACOMA' in _carline_name_all: _carline_name_base = 'TACOMA'
+    #     elif 'BOXSTER' in _carline_name_all: _carline_name_base = 'BOXSTER'
+    #     elif 'CAYMAN' in _carline_name_all: _carline_name_base = 'CAYMAN'
+    #     elif 'C10' in _carline_name_all: _carline_name_base = 'C10'
+    #     elif 'K10' in _carline_name_all: _carline_name_base = 'K10'
+    #     elif 'C15' in _carline_name_all: _carline_name_base = 'C15'
+    #     elif 'K15' in _carline_name_all: _carline_name_base = 'K15'
+    #     elif 'C1500' in _carline_name_all: _carline_name_base = 'C1500'
+    #     elif 'K1500' in _carline_name_all: _carline_name_base = 'K1500'
+    #     elif 'K1500' in _carline_name_all: _carline_name_base = 'K1500'
+    #     else:
+    #         _carline_name = str(_carline_name_all).strip().split(' ')
+    #         if len(_carline_name) > 1:
+    #             tmp = []
+    #             for i in range(len(_carline_name)):
+    #                 if ('(' in _carline_name[i]) and (')' not in _carline_name[i]):
+    #                     pass
+    #                 elif (')' in _carline_name[i]) and ('(' not in _carline_name[i]):
+    #                     pass
+    #                 elif (_carline_name[i] not in _trims):
+    #                     tmp.append(_carline_name[i].strip())
+    #             _carline_name_base = ' '.join(tmp)
+    #
+    #     try:
+    #         carline_name_checks = (query_output['CAFE_MFR_CD'] == _cafe_mfr_cd) & (query_output['CARLINE_NAME_all_Master Index'].str.contains(_carline_name_base))
+    #     except KeyError:
+    #         try:
+    #             print(_carline_name_base)
+    #             _carline_name_base = _carline_name_base.strip().split(' ')[0]
+    #             carline_name_checks = (query_output['CAFE_MFR_CD'] == _cafe_mfr_cd) & (query_output['CARLINE_NAME_all_Master Index'].str.contains(_carline_name_base))
+    #         except KeyError:
+    #             continue
+    #     try:
+    #         df_query_output = query_output.loc[carline_name_checks, :]
+    #     except KeyError:
+    #         print(_carline_name_base, _carline_name_all)
+    #         continue
+    #     if pd.isnull(df_query_output['Electric Power Steering_all']).sum() == 0: continue
+    #     if (~pd.isnull(df_query_output['Electric Power Steering_all']) == True).sum() == 0: continue
+    #     df_query_output_index = list(df_query_output.index)
+    #     df_query_output.reset_index(drop=True, inplace=True)
+    #     _eps_yes_index = df_query_output.loc[df_query_output['Electric Power Steering_all'] == 'yes', 'Electric Power Steering_all'].index
+    #     _eps_no_index = df_query_output.loc[df_query_output['Electric Power Steering_all'] != 'yes', 'Electric Power Steering_all'].index
+    #     for j in range(len(_eps_no_index)):
+    #         query_output['Electric Power Steering_all'][df_query_output_index[_eps_no_index[j]]] = 'yes' # query_output.loc did not work
 
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     query_output = query_output.replace([np.nan, str(np.nan)], '')

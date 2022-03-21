@@ -432,9 +432,10 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     calc_market_data(candidate_mfr_composite_vehicles, producer_decision_and_response)
 
+    # the 0.01 factors in the below equation protect against divide by zero when/if standards are zero
     producer_decision_and_response['strategic_compliance_ratio'] = \
-        (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg) / \
-        producer_decision_and_response['total_target_co2e_megagrams']
+        (producer_decision_and_response['total_cert_co2e_megagrams'] - strategic_target_offset_Mg + 0.01) / \
+        (producer_decision_and_response['total_target_co2e_megagrams'] + 0.01)
 
     compliant = producer_decision_and_response['strategic_compliance_ratio'] <= 1.0 or \
                 abs(1 - producer_decision_and_response['strategic_compliance_ratio']) <= \
@@ -1142,6 +1143,7 @@ def init_omega(session_runtime_options):
     from effects.ip_deflators import ImplictPriceDeflators
     from context.maintenance_cost_inputs import MaintenanceCostInputs
     from context.repair_cost_inputs import RepairCostInputs
+    from context.refueling_cost_inputs import RefuelingCostInputs
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
@@ -1254,6 +1256,9 @@ def init_omega(session_runtime_options):
 
             init_fail += RepairCostInputs.init_from_file(omega_globals.options.repair_cost_inputs_file,
                                                          verbose=verbose_init)
+
+            init_fail += RefuelingCostInputs.init_from_file(omega_globals.options.refueling_cost_inputs_file,
+                                                            verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
