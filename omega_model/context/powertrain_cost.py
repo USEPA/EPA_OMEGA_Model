@@ -17,49 +17,16 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.3,dollar_basis:,``{optional_source_data_comment}``
+       input_template_name:,``[module_name]``,input_template_version:,0.1,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        TODO: add sample
-
-Data Column Name and Description
-    :package:
-        Unique row identifier, specifies the powertrain package
-
-    TODO: add the rest of the columns
-
-    CHARGE-DEPLETING SIMULATION RESULTS
-        Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
-
-        :cd_ftp_1:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
-        :cd_ftp_2:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
-        :cd_ftp_3:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
-        :cd_ftp_4:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
-        :cd_hwfet:cert_direct_oncycle_kwh_per_mile: simulation result, kWh/mile
-
-    :new_vehicle_mfr_cost_dollars:
-        The manufacturer cost associated with the simulation results, based on vehicle technology content and model year.Note that the
-         costs are converted in-code to 'analysis_dollar_basis' using the implicit_price_deflators input file.
-
-    CHARGE-SUSTAINING SIMULATION RESULTS
-        Column names must be consistent with the input data loaded by ``class drive_cycles.DriveCycles``
-
-        :cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
-        :cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
-        :cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
-        :cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
-        :cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile: simulation result, CO2e grams/mile
-
-    TODO: add the rest of the flags...
-
-    :high_eff_alternator:
-        = 1 if vehicle qualifies for the high efficiency alternator off-cycle credit, = 0 otherwise
-
-    :start_stop:
-        = 1 if vehicle qualifies for the engine start-stop off-cycle credit, = 0 otherwise
+        powertrain_type,item,value,quantity,dollar_basis,notes
+        ICE,dollars_per_cylinder,((-28.814) * CYL + 726.27) * CYL * MARKUP_ICE,,2019,
+        ICE,dollars_per_liter,((400) * LITERS) * MARKUP_ICE,,2019,
+        ICE,gdi,((43.237) * CYL + 97.35) * MARKUP_ICE,,2019,
 
 ----
 
@@ -82,25 +49,26 @@ class PowertrainCost(OMEGABase):
 
     """
 
-    _max_year = 0  # maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
-
     @staticmethod
-    def calc_cost(pkg_df, powertrain_type, market_class_id, model_year):
+    def calc_cost(veh, pkg_df):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
 
         Args:
+            veh (object): an object of the vehicles.Vehicle class.
             pkg_df (DataFrame): the necessary information for developing cost estimates.
-            powertrain_type (str): e.g. 'ICE', 'BEV' ...
-            market_class_id (str): e.g., 'hauling.ICE', 'non_hauling.BEV'
-            model_year (int): the model_year of the passed packages for which costs are needed
 
         Returns:
             A list of cost values indexed the same as pkg_df.
 
         """
         results = []
+
+        elec_class, market_class_id, model_year = veh.electrification_class, veh.market_class_id, veh.model_year
+        # elec_class, market_class_id, model_year = veh
+        ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV'}
+        powertrain_type = ec_dict[elec_class]
 
         # markups and learning
         MARKUP_ICE = eval(_cache['ICE', 'markup']['value'], {}, locals())
@@ -122,7 +90,7 @@ class PowertrainCost(OMEGABase):
 
         weight_bins = [0, 3200, 3800, 4400, 5000, 5600, 6200, 14000]
         tractive_motor = 'dual'
-        if market_class_id.__contains__('non_hauling'): # TODO how do we specify this?
+        if market_class_id.__contains__('non_hauling'):
             tractive_motor = 'single'
 
         for idx, row in pkg_df.iterrows():
@@ -285,7 +253,6 @@ class PowertrainCost(OMEGABase):
                                * adj_factor * learn
 
                 # electrified powertrain cost
-                # TODO Mike shows dual motor PEVs scaling some items with KW/2 rather than KW
                 KW = row['motor_kw'] # what will this be called in the passed df?
 
                 adj_factor = _cache[powertrain_type, f'motor_{tractive_motor}']['dollar_adjustment']
@@ -421,6 +388,9 @@ class PowertrainCost(OMEGABase):
 
     @staticmethod
     def init_from_file(filename, verbose=False):
+
+        _cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing PowertrainCost from %s...' % filename, echo_console=True)
         input_template_name = __name__
