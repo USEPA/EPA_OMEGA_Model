@@ -9,8 +9,6 @@
 The file format consists of a one-row template header followed by a one-row data header and subsequent data
 rows.  The template header uses a dynamic format.
 
-The data represents vehicle technology options and costs by simulation class (cost curve class) and model year.
-
 File Type
     comma-separated values (CSV)
 
@@ -408,27 +406,28 @@ class PowertrainCost(OMEGABase):
 
             if not template_errors:
 
-                powertrain_type_item_pairs = zip(df['powertrain_type'], df['item'])
+                cost_keys = zip(df['powertrain_type'], df['item'])
 
-                for powertrain_type_item_pair in powertrain_type_item_pairs:
-                        _cache[powertrain_type_item_pair] = dict()
-                        powertrain_type, item = powertrain_type_item_pair
+                for cost_key in cost_keys:
 
-                        cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
+                    _cache[cost_key] = dict()
+                    powertrain_type, item = cost_key
 
-                        if cost_info['quantity'] >= 1:
-                            quantity = cost_info['quantity']
-                        else:
-                            quantity = 0
+                    cost_info = df[(df['powertrain_type'] == powertrain_type) & (df['item'] == item)].iloc[0]
 
-                        _cache[powertrain_type_item_pair] = {'value': dict(),
-                                                             'quantity': quantity,
-                                                             'dollar_adjustment': 1}
+                    if cost_info['quantity'] >= 1:
+                        quantity = cost_info['quantity']
+                    else:
+                        quantity = 0
 
-                        if cost_info['dollar_basis'] > 0:
-                            adj_factor = dollar_adjustment_factor('ip_deflators', int(cost_info['dollar_basis']))
-                            _cache[powertrain_type_item_pair]['dollar_adjustment'] = adj_factor
+                    _cache[cost_key] = {'value': dict(),
+                                        'quantity': quantity,
+                                        'dollar_adjustment': 1}
 
-                        _cache[powertrain_type_item_pair]['value'] = compile(cost_info['value'], '<string>', 'eval')
+                    if cost_info['dollar_basis'] > 0:
+                        adj_factor = dollar_adjustment_factor('ip_deflators', int(cost_info['dollar_basis']))
+                        _cache[cost_key]['dollar_adjustment'] = adj_factor
+
+                    _cache[cost_key]['value'] = compile(cost_info['value'], '<string>', 'eval')
 
         return template_errors
