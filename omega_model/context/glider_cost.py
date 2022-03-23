@@ -63,12 +63,19 @@ class GliderCost(OMEGABase):
         """
         results = []
 
-        base_footprint, model_year, base_msrp, context_size_class = veh.footprint_ft2, veh.model_year, veh.msrp_dollars, veh.context_size_class
-        base_glider_structure_weight, material, base_powertrain_cost = veh.glider_structure_weight, veh.material, veh.powertrain_cost
-        base_height, base_ground_clearance = veh.height_in, veh.ground_clearance_in
+        base_footprint, model_year, base_msrp, context_size_class \
+            = veh.footprint_ft2, veh.model_year, veh.msrp_dollars, veh.context_size_class
+        unibody_structure, base_glider_structure_weight, material, base_powertrain_cost \
+            = veh.unibody_structure, veh.glider_structure_weight, veh.material, veh.powertrain_cost
+        base_height, base_ground_clearance \
+            = veh.height_in, veh.ground_clearance_in
+        # for testing
+        # base_footprint, model_year, base_msrp, context_size_class, unibody_structure, base_glider_structure_weight, \
+        # material, base_powertrain_cost, base_height, base_ground_clearance \
+        #     = veh
 
         structure = 'unibody_structure'
-        if veh.unibody_structure == 0:
+        if unibody_structure == 0:
             structure = 'ladder_structure'
 
         body_style_dict = {'Compact': 'sedan',
@@ -90,7 +97,7 @@ class GliderCost(OMEGABase):
         body_style = body_style_dict[context_size_class]
 
         # markups and learning
-        MARKUP = eval(_cache['ALL', 'markup', 'n/a']['value'], {}, locals())
+        MARKUP = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
 
         learning_rate = eval(_cache['ALL', 'learning_rate', 'not applicable']['value'], {}, locals())
         learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals())
@@ -111,7 +118,7 @@ class GliderCost(OMEGABase):
         for idx, row in pkg_df.iterrows():
 
             # glider structure cost
-            GLIDER_WEIGHT = row['glider_weight']
+            GLIDER_WEIGHT = row['glider_structure_weight']
             material = row['material']
             adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
             pkg_glider_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
