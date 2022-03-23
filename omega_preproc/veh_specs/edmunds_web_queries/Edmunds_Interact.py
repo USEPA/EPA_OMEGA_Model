@@ -468,9 +468,9 @@ def est_max_towing_capacity(df):
 
 def Edmunds_Interact(url):
     max_attempts = 10
-    max_time = 60
+    max_time = 30
     sleep_3sec = 3
-    sleep_sec = 0.5
+    sleep_sec = 1
     wait_sec = 30
     _max_trim_groups_count = 20 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
     _max_trim_buttons =  60     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor

@@ -75,10 +75,20 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
 
     Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['GROSS WEIGHT'] = Edmunds_data_cleaned['GROSS WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].str.replace('no', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['GROSS WEIGHT'] = Edmunds_data_cleaned['GROSS WEIGHT'].str.replace('no', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
+    Edmunds_data_cleaned['MAXIMUM PAYLOAD'] = Edmunds_data_cleaned['MAXIMUM PAYLOAD'].str.replace('no', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Most Popular)')
     Edmunds_data_cleaned['MSRP'] = Edmunds_data_cleaned['MSRP'].str.rstrip(' (Discontinued)')
     Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'] = Edmunds_data_cleaned['MAXIMUM TOWING CAPACITY'].str.rstrip(' (Estimated)')
+
+    Edmunds_data_cleaned['Drivetrain Layout Category'] = Edmunds_data_cleaned['DRIVE TYPE'].copy()
+    matching_drvtype = Edmunds_data_cleaned['DRIVE TYPE']
+    matching_drvtype[matching_drvtype.str.contains('Front')] = 'F'
+    matching_drvtype[matching_drvtype.str.contains('Four')] = '4'
+    matching_drvtype[matching_drvtype.str.contains('All')] = 'A'
+    matching_drvtype[matching_drvtype.str.contains('Rear')] = 'R'
 
     Edmunds_data_cleaned['CYLINDERS'] = Edmunds_data_cleaned['CYLINDERS'].str.replace('Inline ','I').str.replace('Flat ', 'H').replace([np.nan, str(np.nan), 'FALSE', 'false', 'False', 'No', 'no'], 'ELE')
     matching_cyl_layout = pd.Series(Edmunds_data_cleaned['CYLINDERS'].astype(str).str[0], name = 'Cylinder Layout Category').replace('E','ELE').astype(str)
@@ -87,7 +97,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     matching_eng_disp = pd.Series(Edmunds_data_cleaned['BASE ENGINE SIZE'].str.replace(' L', '').str.replace(' l', '').str.strip(), name='Engine Displacement Category')\
         .replace(['',' ', np.nan,str(np.nan), 'FALSE', 'False', 'no', 'No'], 0).astype(float).round(1)
     # matching_eng_disp = pd.to_numeric(matching_eng_disp, errors='coerce').round(1)
-    matching_drvtrn_layout = pd.Series(Edmunds_data_cleaned['DRIVE TYPE'], name = 'Drivetrain Layout Category')
+    matching_drvtrn_layout = Edmunds_data_cleaned['Drivetrain Layout Category']
     matching_drvtrn_layout[matching_drvtrn_layout.str.contains('Front')] = '2WD'
     matching_drvtrn_layout[matching_drvtrn_layout.str.contains('Four')] = '4WD'
     matching_drvtrn_layout[matching_drvtrn_layout.str.contains('All')] = '4WD'

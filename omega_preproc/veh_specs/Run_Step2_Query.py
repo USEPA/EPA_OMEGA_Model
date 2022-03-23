@@ -4,6 +4,12 @@ import datetime
 import os
 
 pd.options.mode.chained_assignment = None  # default='warn'
+cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+                "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
+                "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
+                "DRIVER ONLY WITH HEAD PROTECTION CHAMBER SIDE-MOUNTED AIRBAGS",
+                "FRONT, REAR AND THIRD ROW HEAD AIRBAGS", "FRONT AND REAR HEAD AIRBAGS", "FRONT HEAD AIRBAGS",
+                "STABILITY CONTROL", "TRACTION CONTROL", "TIRE PRESSURE MONITORING"]
 
 def weighted_average(grp):
     if grp[weighting_field]._get_numeric_data().sum() == 0: # if all the weighting factors are zero, take a simple average. Otherwise, it will calculate as 0/0.
@@ -224,8 +230,8 @@ for model_year in model_years:
             vehghg_matching_categories = matching_categories
         if unique_sourcename != master_index_source: #If the current source is not the master index, readin the source file
             try:
-                source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename,\
-                    converters={'LineageID': int, 'BodyID': int}).astype(str)
+                source_file = pd.read_csv(unique_filepath+ '\\' + unique_filename, converters={'LineageID': int, 'BodyID': int}).astype(str)
+
             except ValueError:
                 try:
                     source_file = pd.read_csv(unique_filepath + '\\' + unique_filename).astype(str)
@@ -235,6 +241,7 @@ for model_year in model_years:
                 source_file = pd.read_csv(unique_filepath + '\\' + unique_filename, encoding = "ISO-8859-1", \
                     converters={'LineageID': int, 'BodyID': int}).astype(str)
             except FileNotFoundError:
+                print(unique_filename, 'not found!!!')
                 continue
 
             if SetBodyIDtoLineageID == 1:
@@ -364,6 +371,8 @@ for model_year in model_years:
             bounding_field = all_subarray['BoundingField'][all_subarray_count]
             information_toget_source_column_name = all_subarray['Column Name'][all_subarray_count]
             information_toget = all_subarray['Desired Field'][all_subarray_count]
+            # if information_toget_source_column_name == 'STABILITY CONTROL':
+            #     print(information_toget_source_column_name)
             if (aggregating_fields==information_toget).sum() == 0 and len(master_index_file_with_desired_fields_all_merges[\
                     ~pd.isnull(master_index_file_with_desired_fields_all_merges[information_toget_source_column_name])]) > 0:
                 print(str(1 + all_subarray_count) + ': ' + information_toget_source_column_name + ' ' + unique_sourcename + ' ' + query_type)
@@ -379,16 +388,17 @@ for model_year in model_years:
                         #     master_index_file_with_desired_field_all_merges[information_toget_source_column_name].astype(float)
                         master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
                             pd.to_numeric(master_index_file_with_desired_field_all_merges[information_toget_source_column_name], errors='coerce')
+                        # if (unique_sourcename == 'Edmunds') and ('CURB WEIGHT' in master_index_file_with_desired_field_all_merges.columns):
+                        #     print(master_index_file_with_desired_field_all_merges['CURB WEIGHT'])  # = pd.Series(source_file['CURB WEIGHT']).str.extract("(\d*\.?\d+)", expand=True).astype(float)
                     except ValueError:
                         testing_column = master_index_file_with_desired_field_all_merges[ \
-                            information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
+                            information_toget_source_column_name].str.extract("(\d*\.?\d+)", expand=True).astype(float)
+                        # information_toget_source_column_name].str.extract('(\d+\.\d+)').astype(float)
                         if pd.isnull(testing_column).sum() >= 0:
                             master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = \
-                                master_index_file_with_desired_field_all_merges[
-                                    information_toget_source_column_name].str.extract('(\d+)').astype(float)
+                                master_index_file_with_desired_field_all_merges[information_toget_source_column_name].str.extract('(\d+)').astype(float)
                         else:
-                            master_index_file_with_desired_field_all_merges[
-                                information_toget_source_column_name] = testing_column
+                            master_index_file_with_desired_field_all_merges[information_toget_source_column_name] = testing_column
                 if query_type == 'max':
                     if bounding_field == str(np.nan) or pd.isnull(bounding_field):
                         query_output_source = master_index_file_with_desired_field_all_merges[ \
@@ -572,6 +582,18 @@ for model_year in model_years:
     query_output.loc[(query_output['TARGET_COEF_BEST_MTH_min'] == 0) & (query_output['TARGET_COEF_BEST_MTH_max'] == 1), 'TARGET_COEF_BEST_MTH'] = 0 #.replace('', 0, inplace=True, regex=True)
     if '_plus_MTH_34' in master_index_filename: Query_filename = 'Query_plus_MTH_34'
     else: Query_filename = 'Query_MTH_012'
+
+    query_output.loc[query_output['Drive System Code_all'] == 'F|A', 'Drive System Code_all'] = 'A|F'
+    query_output.loc[query_output['Drive System Code_all'] == 'R|A', 'Drive System Code_all'] = 'A|R'
+    query_output=query_output.rename({'Drive System Code_all': 'Drive Sys tstcar_all', 'DRIVE TYPE_all': 'Drive Sys Edmunds_all'}, axis=1)
+
+    # _airbags = query_output.columns[query_output.columns.str.contains('AIRBAG')].tolist() + ['STABILITY CONTROL_all', 'TRACTION CONTROL_all', 'TIRE PRESSURE MONITORING_all']
+    # for i in range(len(_airbags)):
+    #     _airbag = _airbags[i]
+    #     query_output.loc[query_output[_airbag] == 'null-|yes', _airbag] = 'yes|null'
+    #     query_output.loc[query_output[_airbag] == 'yes|null-', _airbag] = 'yes|null'
+    #     query_output.loc[query_output[_airbag] == 'null-', _airbag] = 'null'
+
     query_output.to_csv(output_path + '\\' + str(model_year) + '_' + Query_filename + '_' + date_and_time + '.csv',index=False)
     query_output = query_output.drop(query_output.filter(regex='Master Index').columns, axis=1)
     query_output = query_output.drop(query_output.filter(regex='Edmunds').columns, axis=1)

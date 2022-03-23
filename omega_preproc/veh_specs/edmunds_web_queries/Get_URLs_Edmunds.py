@@ -132,6 +132,7 @@ def Get_URLs_Edmunds(model_year):
     xpath_model = "//select[@name = 'select-model']"
     xpath_year = "//select[@name = 'select-year']"
     xpath_go_button = "//button[@class = 'w-100 btn btn-success']"
+    xpath_go_button = "//button[@class = 'mb-0_5 w-100 px-0 px-md-1_5 btn btn-success']"
     time.sleep(sleep_short)
     element = WebDriverWait(driver, wait_sec).until(EC.element_to_be_clickable((By.XPATH, xpath_make)))
     # time.sleep(sleep_short); element.click()
