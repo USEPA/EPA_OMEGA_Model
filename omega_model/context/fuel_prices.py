@@ -146,7 +146,7 @@ class FuelPrice(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             df = df.loc[(df['context_id'] == omega_globals.options.context_id) & (df['case_id'] == omega_globals.options.context_case_id), :]
             aeo_dollar_basis = df['dollar_basis'].mean()

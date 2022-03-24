@@ -124,7 +124,7 @@ class CostFactorsSCC(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
 

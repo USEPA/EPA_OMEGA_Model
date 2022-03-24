@@ -215,8 +215,8 @@ class CreditBank(OMEGABase):
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
-                                                        verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, input_template_columns,
+                                                             verbose=verbose)
 
         return template_errors
 
@@ -241,8 +241,8 @@ class CreditBank(OMEGABase):
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
-                                                        verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, input_template_columns,
+                                                             verbose=verbose)
 
         return template_errors
 

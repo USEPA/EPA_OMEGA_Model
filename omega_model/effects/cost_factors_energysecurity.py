@@ -114,7 +114,7 @@ class CostFactorsEnergySecurity(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis,

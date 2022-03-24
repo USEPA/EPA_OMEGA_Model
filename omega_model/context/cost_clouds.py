@@ -158,8 +158,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                     df = pd.read_csv(filename, skiprows=1)
 
-                    template_errors = validate_template_columns(filename, input_template_columns, df.columns,
-                                                                verbose=verbose)
+                    template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                                     verbose=verbose)
 
                     deflators = pd.read_csv(omega_globals.options.ip_deflators_file, skiprows=1, index_col=0).to_dict('index')
 

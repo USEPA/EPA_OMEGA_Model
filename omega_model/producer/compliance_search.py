@@ -412,7 +412,7 @@ def create_composite_vehicles(calendar_year, compliance_id):
         # proportions
 
         context_based_total_sales = 0  # sales total by compliance id size class share
-        for csc in NewVehicleMarket.context_size_classes: # for each context size class
+        for csc in NewVehicleMarket.base_year_context_size_class_sales: # for each context size class
             context_based_total_sales += \
                 NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) \
                 * VehicleFinal.mfr_base_year_size_class_share[compliance_id][csc]

@@ -107,7 +107,7 @@ def validate_template_version_info(filename, input_template_name, input_template
     return error_list
 
 
-def validate_template_columns(filename, input_template_columns, columns, verbose=False):
+def validate_template_column_names(filename, input_template_columns, columns, verbose=False):
     """
     Validate input columns against target template columns.
 
@@ -139,5 +139,60 @@ def validate_template_columns(filename, input_template_columns, columns, verbose
         omega_log.logwrite(error_list)
     elif verbose:
         omega_log.logwrite('')
+
+    return error_list
+
+
+def _validate_dataframe_column(df, column_name, allowed_values, header_lines=2):
+    """
+    Validate a dataframe column against allowed values
+
+    Args:
+        df (DataFrame): pandas dataframe containing data to validate
+        column_name (str): name of the dataframe column
+        allowed_values (iterable): a list / set of allowed values
+        header_lines (int): number of header lines in the input file, offset used to calculate the row number of the error
+
+    Returns:
+        Empty list on success or list of errors on failure
+
+    """
+    import numpy as np
+
+    error_list = []
+
+    valid = np.array([v in allowed_values for v in df[column_name].values])
+
+    # if any values are bad, report back which ones/which rows
+    if not all(valid):
+        bad_indices = np.where(~valid)[0]
+        for i in bad_indices:
+            error_list += ['unexpected value "%s" found in column "%s" at row %d, expected value in %s' %
+                           (df[column_name].iloc[i], column_name, i + header_lines + 1, allowed_values)]
+
+    return error_list
+
+
+def validate_dataframe_columns(df, validation_dict, error_source=None, header_lines=2):
+    """
+    Validate dataframe column(s) against allowed values
+
+    Args:
+        df (DataFrame): pandas dataframe containing data to validate
+        validation_dict (dict): dict of one or more column name / allowed value pairs
+        error_source (str): typically the name of the file containing the error
+        header_lines (int): header_lines (int): number of header lines in the input file, offset used to calculate the row number of the error
+
+    Returns:
+        Empty list on success or list of errors on failure
+
+    """
+    error_list = []
+
+    for column_name, allowed_values in validation_dict.items():
+        error_list += _validate_dataframe_column(df, column_name, allowed_values, header_lines)
+
+    if error_list and error_source:
+        error_list.insert(0, '\n*** Detected errors in %s ***' % error_source)
 
     return error_list

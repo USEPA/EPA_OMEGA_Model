@@ -127,7 +127,7 @@ class RequiredSalesShare(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
 
