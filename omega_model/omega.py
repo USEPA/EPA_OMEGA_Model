@@ -1281,12 +1281,13 @@ def init_omega(session_runtime_options):
             init_fail += EmissionFactorsVehicles.init_from_file(omega_globals.options.emission_factors_vehicles_file,
                                                                 verbose=verbose_init)
 
-        # initial year = initial fleet model year (latest year of data)
-        omega_globals.options.analysis_initial_year = \
-            int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
+        if not init_fail:
+            # initial year = initial fleet model year (latest year of data)
+            omega_globals.options.analysis_initial_year = \
+                int(omega_globals.session.query(func.max(VehicleFinal.model_year)).scalar()) + 1
 
-        # update vehicle annual data for base year fleet
-        stock.update_stock(omega_globals.options.analysis_initial_year - 1)
+            # update vehicle annual data for base year fleet
+            stock.update_stock(omega_globals.options.analysis_initial_year - 1)
 
     except:
         init_fail += ["\n#INIT FAIL\n%s\n" % traceback.format_exc()]
