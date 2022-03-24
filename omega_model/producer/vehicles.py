@@ -774,7 +774,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
+                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'non_structure_mass_lbs',
                        'context_size_class', 'base_year_market_share', 'electrification_class'}
 
     # transfer base properties
@@ -868,6 +868,7 @@ class Vehicle(OMEGABase):
         self.market_class_id = None
         self.initial_registered_count = 0
         self.cost_curve = None
+        self.non_structure_mass_lbs = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1120,6 +1121,7 @@ class VehicleFinal(SQABase, Vehicle):
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
     cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
     market_class_id = Column('market_class_id', String)  #: market class ID, as determined by the consumer subpackage
+    non_structure_mass_lbs = Column('non_structure_mass_lbs', Float)  #: base year non-structure mass lbs (i.e. "content")
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 
@@ -1127,6 +1129,7 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
     mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
+    # TODO: I think these need updating, maybe
     base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales'}  #: mandatory input file columns, the rest can be optional numeric columns
@@ -1311,6 +1314,7 @@ class VehicleFinal(SQABase, Vehicle):
 
             if not template_errors:
                 from producer.manufacturers import Manufacturer
+                from context.mass_scaling import MassScaling
 
                 validation_dict = {'manufacturer_id': Manufacturer.manufacturers,
                                    'reg_class_id': list(legacy_reg_classes),
@@ -1359,6 +1363,14 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # TODO: veh.cert_direct_oncycle_kwh_per_mile?
                         veh.onroad_direct_co2e_grams_per_mile = 0
                         veh.onroad_direct_kwh_per_mile = 0
+
+                        # TODO: these need to be in the vehicles.csv!!
+                        veh.body_style = 'cuv_suv'
+                        veh.structure_material = 'steel'
+                        veh.powertrain_type = veh.fueling_class
+                        structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
+
+                        veh.non_structure_mass_lbs = veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
 
                         vehicle_shares_dict['total'] += veh.initial_registered_count
 
@@ -1523,8 +1535,10 @@ if __name__ == '__main__':
 
         # setup up dynamic attributes before metadata.create_all()
         vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
+
         VehicleFinal.dynamic_columns = list(
             set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
+
         for vdc in VehicleFinal.dynamic_columns:
             VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(vdc))
 

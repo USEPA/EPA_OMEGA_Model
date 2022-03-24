@@ -1124,6 +1124,7 @@ def init_omega(session_runtime_options):
     from context.new_vehicle_market import NewVehicleMarket
     from context.price_modifications import PriceModifications # needs market classes
     from context.production_constraints import ProductionConstraints
+    from context.mass_scaling import MassScaling
 
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare
@@ -1198,6 +1199,9 @@ def init_omega(session_runtime_options):
 
         init_fail += ProductionConstraints.init_from_file(omega_globals.options.production_constraints_file,
                                                           verbose=verbose_init)
+
+        init_fail += MassScaling.init_from_file(omega_globals.options.mass_scaling_file,
+                                                verbose=omega_globals.options.verbose)
 
         init_fail += UpstreamMethods.init_from_file(omega_globals.options.fuel_upstream_methods_file,
                                                     verbose=verbose_init)
