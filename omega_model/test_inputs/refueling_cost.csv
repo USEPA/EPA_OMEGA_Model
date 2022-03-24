@@ -1,4 +1,4 @@
-input_template_name:,refueling_cost_inputs,input_template_version:,0.1,,,,
+input_template_name:,refueling_cost,input_template_version:,0.1,,,,
 item,x_squared_factor,x_factor,constant,dollar_basis,,,
 miles_to_mid_trip_charge_car,0.18,-64.4,7840,,,79.53886733,0.006628239
 miles_to_mid_trip_charge_suv,0.125,-45.5,5900,,,79.53886733,

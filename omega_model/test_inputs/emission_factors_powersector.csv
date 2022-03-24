@@ -1,4 +1,4 @@
-input_template_name:,context_emission_factors-powersector,input_template_version:,0.1,,,,,,,,,,
+input_template_name:,emission_factors_powersector,input_template_version:,0.1,,,,,,,,,,
 calendar_year,voc_grams_per_kwh,co_grams_per_kwh,nox_grams_per_kwh,pm25_grams_per_kwh,sox_grams_per_kwh,benzene_grams_per_kwh,butadiene13_grams_per_kwh,formaldehyde_grams_per_kwh,acetaldehyde_grams_per_kwh,acrolein_grams_per_kwh,co2_grams_per_kwh,n2o_grams_per_kwh,ch4_grams_per_kwh
 2020,0.055181393,0.338895846,0.240906423,0.070888642,0.236594079,0.001536237,0,3.79E-05,6.40E-05,5.95E-05,479.8,0.007436538,3.322482776
 2021,0.055181393,0.338895846,0.240906423,0.070888642,0.236594079,0.001536237,0,3.79E-05,6.40E-05,5.95E-05,460.5,0.007436538,3.322482776
