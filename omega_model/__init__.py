@@ -114,6 +114,7 @@ try:
             self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
             self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
             self.body_styles_file = path + 'test_inputs/body_styles.csv'
+            self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
 
             self.analysis_initial_year = None
             self.analysis_final_year = 2021
