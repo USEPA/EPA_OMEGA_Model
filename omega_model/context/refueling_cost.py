@@ -17,7 +17,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,refueling_inputs,input_template_version:,0.1
+       input_template_name:,refueling_cost,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -54,7 +54,7 @@ from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
 
-class RefuelingCostInputs(OMEGABase):
+class RefuelingCost(OMEGABase):
     """
     **Loads and provides access to refueling cost input values for refueling cost calculations.**
 
@@ -73,21 +73,21 @@ class RefuelingCostInputs(OMEGABase):
             The refueling cost per mile for the given veh_type.
 
         """
-        miles_to_charge_x2_factor = RefuelingCostInputs._data[f'miles_to_mid_trip_charge_{veh_type}']['x_squared_factor']
-        miles_to_charge_x_factor = RefuelingCostInputs._data[f'miles_to_mid_trip_charge_{veh_type}']['x_factor']
-        miles_to_charge_constant = RefuelingCostInputs._data[f'miles_to_mid_trip_charge_{veh_type}']['constant']
+        miles_to_charge_x2_factor = RefuelingCost._data[f'miles_to_mid_trip_charge_{veh_type}']['x_squared_factor']
+        miles_to_charge_x_factor = RefuelingCost._data[f'miles_to_mid_trip_charge_{veh_type}']['x_factor']
+        miles_to_charge_constant = RefuelingCost._data[f'miles_to_mid_trip_charge_{veh_type}']['constant']
 
-        share_of_miles_x2_factor = RefuelingCostInputs._data[f'share_of_miles_charged_mid_trip_{veh_type}']['x_squared_factor']
-        share_of_miles_x_factor = RefuelingCostInputs._data[f'share_of_miles_charged_mid_trip_{veh_type}']['x_factor']
-        share_of_miles_constant = RefuelingCostInputs._data[f'share_of_miles_charged_mid_trip_{veh_type}']['constant']
+        share_of_miles_x2_factor = RefuelingCost._data[f'share_of_miles_charged_mid_trip_{veh_type}']['x_squared_factor']
+        share_of_miles_x_factor = RefuelingCost._data[f'share_of_miles_charged_mid_trip_{veh_type}']['x_factor']
+        share_of_miles_constant = RefuelingCost._data[f'share_of_miles_charged_mid_trip_{veh_type}']['constant']
 
         if range <= 200:
-            charge_rate = RefuelingCostInputs._data[f'miles_per_hour_charge_rate_under_201']['constant']
+            charge_rate = RefuelingCost._data[f'miles_per_hour_charge_rate_under_201']['constant']
         else:
-            charge_rate = RefuelingCostInputs._data[f'miles_per_hour_charge_rate_over_201']['constant']
+            charge_rate = RefuelingCost._data[f'miles_per_hour_charge_rate_over_201']['constant']
 
-        travel_value = RefuelingCostInputs._data[f'dollars_per_hour_travel_time_{veh_type}']['constant']
-        fixed_time = RefuelingCostInputs._data[f'fixed_refueling_minutes_{veh_type}']['constant']
+        travel_value = RefuelingCost._data[f'dollars_per_hour_travel_time_{veh_type}']['constant']
+        fixed_time = RefuelingCost._data[f'fixed_refueling_minutes_{veh_type}']['constant']
 
         charge_frequency = miles_to_charge_x2_factor * range ** 2 + miles_to_charge_x_factor * range + miles_to_charge_constant
         share_charged = share_of_miles_x2_factor * range ** 2 + share_of_miles_x_factor * range + share_of_miles_constant
@@ -108,13 +108,13 @@ class RefuelingCostInputs(OMEGABase):
 
 
         """
-        refuel_rate = RefuelingCostInputs._data['gallons_per_minute_refuel_rate']['constant']
-        refuel_share = RefuelingCostInputs._data[f'tank_gallons_share_refueled_{veh_type}']['constant']
-        tank_gallons = RefuelingCostInputs._data[f'tank_gallons_{veh_type}']['constant']
+        refuel_rate = RefuelingCost._data['gallons_per_minute_refuel_rate']['constant']
+        refuel_share = RefuelingCost._data[f'tank_gallons_share_refueled_{veh_type}']['constant']
+        tank_gallons = RefuelingCost._data[f'tank_gallons_{veh_type}']['constant']
 
-        travel_value = RefuelingCostInputs._data[f'dollars_per_hour_travel_time_{veh_type}']['constant']
-        fixed_time = RefuelingCostInputs._data[f'fixed_refueling_minutes_{veh_type}']['constant']
-        scaler = RefuelingCostInputs._data['liquid_refueling_share_included']['constant']
+        travel_value = RefuelingCost._data[f'dollars_per_hour_travel_time_{veh_type}']['constant']
+        fixed_time = RefuelingCost._data[f'fixed_refueling_minutes_{veh_type}']['constant']
+        scaler = RefuelingCost._data['liquid_refueling_share_included']['constant']
 
         refueling_cost_per_gallon = (1 / (tank_gallons * refuel_share)) \
                                     * ((fixed_time + (tank_gallons * refuel_share) / refuel_rate) / 60) \
@@ -137,12 +137,12 @@ class RefuelingCostInputs(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        RefuelingCostInputs._data.clear()
+        RefuelingCost._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'refueling_cost_inputs'
+        input_template_name = 'refueling_cost'
         input_template_version = 0.1
         input_template_columns = {'item',
                                   'x_squared_factor',
@@ -165,6 +165,6 @@ class RefuelingCostInputs(OMEGABase):
             df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
             if not template_errors:
-                RefuelingCostInputs._data = df.set_index('item').to_dict(orient='index')
+                RefuelingCost._data = df.set_index('item').to_dict(orient='index')
 
         return template_errors

@@ -1149,9 +1149,9 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
-    from context.maintenance_cost_inputs import MaintenanceCostInputs
-    from context.repair_cost_inputs import RepairCostInputs
-    from context.refueling_cost_inputs import RefuelingCostInputs
+    from context.maintenance_cost import MaintenanceCost
+    from context.repair_cost import RepairCost
+    from context.refueling_cost import RefuelingCost
     from context.powertrain_cost import PowertrainCost
     from context.glider_cost import GliderCost
 
@@ -1267,14 +1267,14 @@ def init_omega(session_runtime_options):
             init_fail += CostFactorsCongestionNoise.init_from_file(omega_globals.options.congestion_noise_cost_factors_file,
                                                                    verbose=verbose_init)
 
-            init_fail += MaintenanceCostInputs.init_from_file(omega_globals.options.maintenance_cost_inputs_file,
-                                                              verbose=verbose_init)
+            init_fail += MaintenanceCost.init_from_file(omega_globals.options.maintenance_cost_inputs_file,
+                                                        verbose=verbose_init)
 
-            init_fail += RepairCostInputs.init_from_file(omega_globals.options.repair_cost_inputs_file,
-                                                         verbose=verbose_init)
+            init_fail += RepairCost.init_from_file(omega_globals.options.repair_cost_inputs_file,
+                                                   verbose=verbose_init)
 
-            init_fail += RefuelingCostInputs.init_from_file(omega_globals.options.refueling_cost_inputs_file,
-                                                            verbose=verbose_init)
+            init_fail += RefuelingCost.init_from_file(omega_globals.options.refueling_cost_inputs_file,
+                                                      verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,

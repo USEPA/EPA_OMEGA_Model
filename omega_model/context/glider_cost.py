@@ -15,7 +15,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.1,``{optional_source_data_comment}``
+       input_template_name:,glider_cost,input_template_version:,0.1,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -63,14 +63,14 @@ class GliderCost(OMEGABase):
         """
         results = []
 
-        base_footprint, model_year, base_msrp, context_size_class \
-            = veh.footprint_ft2, veh.model_year, veh.msrp_dollars, veh.context_size_class
+        base_footprint, model_year, base_msrp, body_style \
+            = veh.footprint_ft2, veh.model_year, veh.msrp_dollars, veh.body_style
         unibody_structure, base_glider_structure_weight, material, base_powertrain_cost \
             = veh.unibody_structure, veh.glider_structure_weight, veh.material, veh.powertrain_cost
         base_height, base_ground_clearance \
             = veh.height_in, veh.ground_clearance_in
         # for testing
-        # base_footprint, model_year, base_msrp, context_size_class, unibody_structure, base_glider_structure_weight, \
+        # base_footprint, model_year, base_msrp, body_style, unibody_structure, base_glider_structure_weight, \
         # material, base_powertrain_cost, base_height, base_ground_clearance \
         #     = veh
 
@@ -78,23 +78,23 @@ class GliderCost(OMEGABase):
         if unibody_structure == 0:
             structure = 'ladder_structure'
 
-        body_style_dict = {'Compact': 'sedan',
-                           'Large Utility': 'pickup',
-                           'Large': 'sedan',
-                           'Large Crossover': 'cuv_suv',
-                           'Large Pickup': 'pickup',
-                           'Large Van': 'cuv_suv',
-                           'Midsize': 'sedan',
-                           'Minicompact': 'sedan',
-                           'Small Crossover': 'cuv_suv',
-                           'Small Pickup': 'pickup',
-                           'Small Utility': 'cuv_suv',
-                           'Small Van': 'cuv_suv',
-                           'Subcompact': 'sedan',
-                           'Two Seater': 'sedan',
-                           }
-
-        body_style = body_style_dict[context_size_class]
+        # body_style_dict = {'Compact': 'sedan',
+        #                    'Large Utility': 'pickup',
+        #                    'Large': 'sedan',
+        #                    'Large Crossover': 'cuv_suv',
+        #                    'Large Pickup': 'pickup',
+        #                    'Large Van': 'cuv_suv',
+        #                    'Midsize': 'sedan',
+        #                    'Minicompact': 'sedan',
+        #                    'Small Crossover': 'cuv_suv',
+        #                    'Small Pickup': 'pickup',
+        #                    'Small Utility': 'cuv_suv',
+        #                    'Small Van': 'cuv_suv',
+        #                    'Subcompact': 'sedan',
+        #                    'Two Seater': 'sedan',
+        #                    }
+        #
+        # body_style = body_style_dict[context_size_class]
 
         # markups and learning
         MARKUP = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
@@ -157,7 +157,7 @@ class GliderCost(OMEGABase):
 
         if verbose:
             omega_log.logwrite('\nInitializing GliderCost from %s...' % filename, echo_console=True)
-        input_template_name = __name__
+        input_template_name = 'glider_cost'
         input_template_version = 0.1
         input_template_columns = {'body_style', 'item', 'material', 'value', 'dollar_basis', 'notes'}
 

@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_emission_factors-vehicles,input_template_version:,0.1
+       input_template_name:,emission_factors_vehicles,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -110,7 +110,7 @@ class EmissionFactorsVehicles(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_emission_factors-vehicles'
+        input_template_name = 'emission_factors_vehicles'
         input_template_version = 0.1
         input_template_columns = {'model_year', 'age', 'reg_class_id', 'in_use_fuel_id',
                                   'voc_grams_per_mile', 'co_grams_per_mile', 'nox_grams_per_mile', 'pm25_grams_per_mile', 'sox_grams_per_gallon',
