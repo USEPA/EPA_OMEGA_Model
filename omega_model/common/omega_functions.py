@@ -675,6 +675,39 @@ def HighwayFUF(miles):
     )), 3)
 
 
+def calc_roadload_hp(A_LBSF, B_LBSF, C_LBSF, MPH):
+    """
+    Calculate roadload horsepower from ABC coefficients and vehicle speed (MPH)
+
+    Args:
+        A_LBSF (float): "A" coefficient, lbs
+        B_LBSF (float): "B" coefficient, lbs/mph
+        C_LBSF (float): "C" coefficient, lbs/mph^2
+        MPH (float(s)): scalar float, numpy array or Series of vehicle speed(s), mph
+
+    Returns:
+        Roadload horsepower at the given vehicle speed
+
+    """
+    KW2HP = 1.341
+    N2LBF = 0.224808943
+    KMH2MPH = .621371
+    MPH2MPS = 1 / KMH2MPH * 1000.0 / 3600.0
+    MPS2MPH = 1 / MPH2MPS
+
+    A_N = A_LBSF / N2LBF
+    B_N = B_LBSF / (N2LBF / MPS2MPH)
+    C_N = C_LBSF / (N2LBF / MPS2MPH / MPS2MPH)
+    MPS = MPH / MPS2MPH
+
+    roadload_force_N = A_N + B_N * MPS + C_N * MPS**2
+    roadload_power_kW = roadload_force_N * MPS / 1000
+
+    # roadload_force_lbs = roadload_force_N * N2LBF
+    roadload_power_hp = roadload_power_kW * KW2HP
+
+    return roadload_power_hp
+
 if __name__ == '__main__':
     try:
         import pandas as pd

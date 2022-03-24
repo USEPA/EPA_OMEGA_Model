@@ -290,9 +290,15 @@ class CostCloud(OMEGABase, CostCloudBase):
         # TODO: decide sweep ranges based on vehicle characteristics, for example, unibody v. body-on-frame or other
         # properties?
 
-        rlhp20s = [0.001, 0.00175, 0.0025]
-        rlhp60s = [0.003, 0.004, 0.006]
+        vehicle_rlhp20 = calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 20)
+        vehicle_rlhp60 = calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 60)
 
+        # rlhp20s = [0.001, 0.00175, 0.0025]
+        # rlhp60s = [0.003, 0.004, 0.006]
+
+        # sweep vehicle params (for now, final ranges TBD)
+        rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
+        rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
         etws    = [vehicle.etw_lbs * 0.95, vehicle.etw_lbs, vehicle.etw_lbs * 1.05]
 
         if vehicle.eng_rated_hp:
@@ -317,7 +323,9 @@ class CostCloud(OMEGABase, CostCloudBase):
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
 
-        # TODO: add costs!!
+        # TODO: calc vehicle mass(es) so they can be used to calc costs
+
+        # TODO: calc costs!!
 
         return cost_cloud
 
