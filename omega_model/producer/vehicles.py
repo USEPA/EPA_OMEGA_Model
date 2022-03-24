@@ -27,9 +27,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,target_coef_a,target_coef_b,target_coef_c
-        Minicompact_2wd_ICE,OEM_B,2019,PV,Minicompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},19184,,,41.20107902,262.8298582,12.21811801,3400.483476,161.2357307,,54.06027083,4.90376442,99.96072282,86.43657752,40302.84404,4.142068694,873.423386,,,2,3817.337516,,2880.32936,36.62889576,0.122070038,0.020051358
-        Large Utility_4wd_EV,OEM_B,2019,LT,Large Utility,EV,,{'US electricity':1.0},{'electricity':1.0},11307,,,54.8,200,13.57780136,5927.920757,198.3,,66,6.085714286,116.7,120,96568.57143,5,,,,4,,,5419.857143,45.56533865,0.155127191,0.020301076
+        vehicle_name,manufacturer_id,model_year,reg_class_id,epa_size_class,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure
+        ICE Compact car,OEM_B,2019,car,Compact Cars,Compact,N,ice_LPW_LRL,{'pump gasoline':1.0},{'gasoline':1.0},839879,257.8936409,0,44.28736034,175.8843009,10.89410333,3401.137407,179.9070854,70.60266938,57.67845524,5.539186933,105.9507198,117.7314786,30396.74418,4.906687002,941.7256279,2175.140322,1
+        BEV Large Utility truck,OEM_B,2019,truck,Standard SUV 4WD,Large Utility,EV,bev_MPW_HRL,{'US electricity':1.0},{'electricity':1.0},10416,0,0.36,51.8,,13.4,6000,193,76.3,65.5,6.9,115.1,,78300,5,,4000,1
 
 Data Column Name and Description
 
@@ -49,12 +49,15 @@ Data Column Name and Description
         across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
         or 'legacy' reg class.
 
-    :electrification_class:
-        The electrification class of the vehicle, such as 'EV', 'HEV', (or 'N' for none - final format TBD)
+    :epa_size_class:
+        The EPA size class of the vehicle
 
     :context_size_class:
         The context size class of the vehicle, for future sales mix projections.  Must be consistent with the context
         input file loaded by ``class context_new_vehicle_market.ContextNewVehicleMarket``
+
+    :electrification_class:
+        The electrification class of the vehicle, such as 'EV', 'HEV', (or 'N' for none - final format TBD)
 
     :cost_curve_class:
         The name of the cost curve class of the vehicle, used to determine which technology options and associated costs
@@ -82,14 +85,14 @@ Data Column Name and Description
     :cert_direct_kwh_per_mile:
         Vehicle certification electricity consumption kWh/mile
 
-    :footprint_ft2:
-        Vehicle footprint based on vehicle wheelbase and track (square feet)
-
     :eng_rated_hp:
         Vehicle engine rated power (horsepower)
 
     :tot_road_load_hp:
         Vehicle roadload power (horsepower) at a vehicle speed of 50 miles per hour
+
+    :footprint_ft2:
+        Vehicle footprint based on vehicle wheelbase and track (square feet)
 
     :etw_lbs:
         Vehicle equivalent test weight (ETW) (pounds)
@@ -126,24 +129,6 @@ Data Column Name and Description
 
     :unibody_structure:
         Vehicle body structure; 1 = unibody, 0 = body-on-frame
-
-    :drive_system:
-       Drive system type; 2 = 2WD, 4 = 4WD
-
-    :gvwr_lbs:
-       Gross Vehicle Weight Rating (pounds)
-
-    :gcwr_lbs:
-       Gross Combined Weight Rating (pounds)
-
-    :target_coef_a:
-       Coast down target A coeffient (lbf)
-
-    :target_coef_b:
-       Coast down target B coeffient (lbf/mph)
-
-    :target_coef_c:
-       Coast down target C coeffient (lbf/mph**2)
 
 ----
 
@@ -775,7 +760,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
+                       'cert_fuel_id', 'market_class_id', 'epa_size_class', 'lifetime_VMT',
                        'context_size_class', 'base_year_market_share', 'electrification_class'}
 
     # transfer base properties
@@ -855,6 +840,7 @@ class Vehicle(OMEGABase):
         self.cost_curve_class = None
         self.base_year_reg_class_id = None
         self.reg_class_id = None
+        self.epa_size_class = None
         self.context_size_class = None
         self.base_year_market_share = 0
         self.electrification_class = None
@@ -1110,6 +1096,7 @@ class VehicleFinal(SQABase, Vehicle):
     cost_curve_class = Column(String)  #: ALPHA modeling result class
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
+    epa_size_class = Column(String)  #: EPA size class
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
@@ -1127,7 +1114,7 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
     mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
-    base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
+    base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id', 'epa_size_class',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales'}  #: mandatory input file columns, the rest can be optional numeric columns
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
@@ -1261,7 +1248,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id', 'base_year_reg_class_id',
-                              'reg_class_id', 'context_size_class',
+                              'reg_class_id', 'epa_size_class', 'context_size_class',
                               'base_year_market_share'] + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
@@ -1298,7 +1285,7 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.44
+        input_template_version = 0.43
         input_template_columns = VehicleFinal.base_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
@@ -1317,6 +1304,7 @@ class VehicleFinal(SQABase, Vehicle):
                         manufacturer_id=df.loc[i, 'manufacturer_id'],
                         model_year=df.loc[i, 'model_year'],
                         base_year_reg_class_id=df.loc[i, 'reg_class_id'],
+                        epa_size_class=df.loc[i, 'epa_size_class'],
                         context_size_class=df.loc[i, 'context_size_class'],
                         electrification_class=df.loc[i, 'electrification_class'],
                         cost_curve_class=df.loc[i, 'cost_curve_class'],
