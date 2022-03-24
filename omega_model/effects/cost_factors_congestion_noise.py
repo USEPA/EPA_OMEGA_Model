@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_cost_factors-congestion-noise,input_template_version:,0.1
+       input_template_name:,cost_factors_congestion_noise,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -100,7 +100,7 @@ class CostFactorsCongestionNoise(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_cost_factors-congestion-noise'
+        input_template_name = 'cost_factors_congestion_noise'
         input_template_version = 0.1
         input_template_columns = {'reg_class_id',
                                   'dollar_basis',

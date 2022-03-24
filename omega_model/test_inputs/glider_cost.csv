@@ -1,4 +1,4 @@
-input_template_name:,context.glider_cost,input_template_version:,0.1,proof-of-concept;pre-fev,
+input_template_name:,glider_cost,input_template_version:,0.1,proof-of-concept;pre-fev,
 body_style,item,material,value,dollar_basis,notes
 sedan,unibody_structure,aluminum,(2.55) * GLIDER_WEIGHT * MARKUP,2020,
 sedan,unibody_structure,steel,(1.8) * GLIDER_WEIGHT * MARKUP,2020,

@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_emission_factors-refinery,input_template_version:,0.2
+       input_template_name:,emission_factors_refinery,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -97,7 +97,7 @@ class EmissionFactorsRefinery(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_emission_factors-refinery'
+        input_template_name = 'emission_factors_refinery'
         input_template_version = 0.2
         input_template_columns = {'calendar_year', 'in_use_fuel_id',
                                   'voc_grams_per_gallon', 'co_grams_per_gallon', 'nox_grams_per_gallon',

@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,cost_factors-scc,input_template_version:,0.2
+       input_template_name:,cost_factors_scc,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -98,7 +98,7 @@ class CostFactorsSCC(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_cost_factors-scc'
+        input_template_name = 'cost_factors_scc'
         input_template_version = 0.2
         input_template_columns = {'calendar_year', 
                                   'dollar_basis',

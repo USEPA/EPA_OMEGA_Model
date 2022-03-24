@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,cost_factors-criteria,input_template_version:,0.3
+       input_template_name:,cost_factors_criteria,input_template_version:,0.3
 
 Sample Data Columns
     .. csv-table::
@@ -99,7 +99,7 @@ class CostFactorsCriteria(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename} ...')
 
-        input_template_name = 'context_cost_factors-criteria'
+        input_template_name = 'cost_factors_criteria'
         input_template_version = 0.3
         cost_factors_input_template_columns = {'calendar_year', 'dollar_basis',
                                                'pm25_tailpipe_3.0_USD_per_uston',

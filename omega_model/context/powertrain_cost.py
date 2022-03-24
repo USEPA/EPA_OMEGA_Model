@@ -15,7 +15,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,``[module_name]``,input_template_version:,0.1,``{optional_source_data_comment}``
+       input_template_name:,powertrain_cost,input_template_version:,0.1,``{optional_source_data_comment}``
 
 Sample Data Columns
     .. csv-table::
@@ -401,7 +401,7 @@ class PowertrainCost(OMEGABase):
 
         if verbose:
             omega_log.logwrite('\nInitializing PowertrainCost from %s...' % filename, echo_console=True)
-        input_template_name = __name__
+        input_template_name = 'powertrain_cost'
         input_template_version = 0.1
         input_template_columns = {'powertrain_type', 'item', 'value', 'quantity', 'dollar_basis', 'notes'}
 

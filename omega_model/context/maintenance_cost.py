@@ -17,7 +17,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,maintenance_cost_inputs,input_template_version:,0.2
+       input_template_name:,maintenance_cost,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -66,7 +66,7 @@ from omega_model import *
 import omega_model.effects.general_functions as gen_fxns
 
 
-class MaintenanceCostInputs(OMEGABase):
+class MaintenanceCost(OMEGABase):
     """
     **Loads and provides access to maintenance cost input values for effects calculations.**
 
@@ -85,7 +85,7 @@ class MaintenanceCostInputs(OMEGABase):
 
         """
 
-        return MaintenanceCostInputs._data[veh_type]
+        return MaintenanceCost._data[veh_type]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -101,12 +101,12 @@ class MaintenanceCostInputs(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        MaintenanceCostInputs._data.clear()
+        MaintenanceCost._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'maintenance_cost_inputs'
+        input_template_name = 'maintenance_cost'
         input_template_version = 0.2
         input_template_columns = {'item',
                                   'miles_per_event_ICE',
@@ -131,10 +131,10 @@ class MaintenanceCostInputs(OMEGABase):
 
             df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
 
-            maintenance_cost_curve_dict = MaintenanceCostInputs.calc_maintenance_cost_per_mile_curve(df)
+            maintenance_cost_curve_dict = MaintenanceCost.calc_maintenance_cost_per_mile_curve(df)
 
             if not template_errors:
-                MaintenanceCostInputs._data = maintenance_cost_curve_dict.copy()
+                MaintenanceCost._data = maintenance_cost_curve_dict.copy()
 
         return template_errors
 
@@ -270,14 +270,14 @@ if __name__ == '__main__':
 
         init_fail = []
 
-        init_fail += MaintenanceCostInputs.init_from_file(omega_globals.options.maintenance_cost_inputs_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += MaintenanceCost.init_from_file(omega_globals.options.maintenance_cost_inputs_file,
+                                                    verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('ICE'))
-            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('HEV'))
-            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('PHEV'))
-            print(MaintenanceCostInputs.get_maintenance_cost_curve_coefficients('BEV'))
+            print(MaintenanceCost.get_maintenance_cost_curve_coefficients('ICE'))
+            print(MaintenanceCost.get_maintenance_cost_curve_coefficients('HEV'))
+            print(MaintenanceCost.get_maintenance_cost_curve_coefficients('PHEV'))
+            print(MaintenanceCost.get_maintenance_cost_curve_coefficients('BEV'))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

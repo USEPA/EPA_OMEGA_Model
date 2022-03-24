@@ -17,7 +17,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,repair_cost_inputs,input_template_version:,0.1
+       input_template_name:,repair_cost,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -51,7 +51,7 @@ from math import e
 from omega_model import *
 
 
-class RepairCostInputs(OMEGABase):
+class RepairCost(OMEGABase):
     """
     **Loads and provides access to repair cost input values for repair cost calculations.**
 
@@ -72,14 +72,14 @@ class RepairCostInputs(OMEGABase):
             A single repair cost per mile for the given vehicle at the given age.
 
         """
-        veh_type_multiplier = RepairCostInputs._data[f'{repair_type}_multiplier']['value']
-        pt_multiplier = RepairCostInputs._data[f'{pt_type}_multiplier']['value']
+        veh_type_multiplier = RepairCost._data[f'{repair_type}_multiplier']['value']
+        pt_multiplier = RepairCost._data[f'{pt_type}_multiplier']['value']
         if age <= 4:
-            a_value = RepairCostInputs._data[f'a_value_{age}']['value']
+            a_value = RepairCost._data[f'a_value_{age}']['value']
         else:
-            a_value = RepairCostInputs._data['a_value_4']['value'] \
-                      + RepairCostInputs._data['a_value_add']['value'] * (age - 4)
-        b = RepairCostInputs._data['b']['value']
+            a_value = RepairCost._data['a_value_4']['value'] \
+                      + RepairCost._data['a_value_add']['value'] * (age - 4)
+        b = RepairCost._data['b']['value']
 
         repair_cost_per_mile = veh_type_multiplier * pt_multiplier * a_value * e ** (veh_cost * b)
 
@@ -99,12 +99,12 @@ class RepairCostInputs(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        RepairCostInputs._data.clear()
+        RepairCost._data.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
-        input_template_name = 'repair_cost_inputs'
+        input_template_name = 'repair_cost'
         input_template_version = 0.1
         input_template_columns = {'item',
                                   'value',
@@ -120,6 +120,6 @@ class RepairCostInputs(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                RepairCostInputs._data = df.set_index('item').to_dict(orient='index')
+                RepairCost._data = df.set_index('item').to_dict(orient='index')
 
         return template_errors
