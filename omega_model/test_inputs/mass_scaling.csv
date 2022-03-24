@@ -1,17 +1,26 @@
-input_template_name:,context.mass_scaling,input_template_version:,0.1,,,
-powertrain_type,item,body_style,unibody_structure,structure_material,drive_system,value
-all,null_structure_mass,sedan,1,all,all,18.5 * footprint_ft2 + 180
-all,null_structure_mass,cuv_suv,0,all,all,18.8 * footprint_ft2 + 200
-all,null_structure_mass,cuv_suv,1,all,all,18.5 * footprint_ft2 + 180
-all,structure_mass,pickup,1,all,all,18.1 * footprint_ft2 + 500
-BEV,battery_mass,all,all,all,all,(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155)
-HEV,battery_mass,all,all,all,all,(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155)
-PHEV,battery_mass,all,all,all,all,(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155)
-ICE,powertrain_mass,all,all,all,2,0.6 * eng_rated_hp + 200
-ICE,powertrain_mass,all,all,all,4,0.6 * eng_rated_hp + 275
-HEV,powertrain_mass,all,all,all,2,0.61 * eng_rated_hp + 230
-HEV,powertrain_mass,all,all,all,4,0.61 * eng_rated_hp + 330
-BEV,powertrain_mass,all,all,all,2,0.25 * eng_rated_hp + 150
-BEV,powertrain_mass,all,all,all,4,0.25 * eng_rated_hp + 175
-all,structure_mass,all,all,steel,all,1 * null_structure_mass
-all,structure_mass,all,all,aluminum,all,0.7 * null_structure_mass
+input_template_name:,context.mass_scaling,input_template_version:,0.2
+mass_term,condition,equation,
+null_structure_mass_lbs,vehicle.body_style == 'sedan' and vehicle.unibody==1,18.5 * footprint_ft2 + 180,
+null_structure_mass_lbs,vehicle.body_style == 'cuv_suv' and vehicle.unibody==0,18.8 * footprint_ft2 + 200,
+null_structure_mass_lbs,vehicle.body_style == 'cuv_suv' and vehicle.unibody==1,18.5 * footprint_ft2 + 180,
+null_structure_mass_lbs,vehicle.body_style == 'pickup' and vehicle.unibody==0,18.1 * footprint_ft2 + 500,
+,,,
+structure_mass_lbs,vehicle.structure_material == 'steel',1 * null_structure_mass,
+structure_mass_lbs,vehicle.structure_material == 'aluminum',0.7 * null_structure_mass,
+,,,
+battery_mass_lbs,vehicle.powertrain_type == 'BEV',(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155),
+battery_mass_lbs,vehicle.powertrain_type == 'HEV',(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155),
+battery_mass_lbs,vehicle.powertrain_type == 'PHEV',(2.2 * battery_kwh) / (0.0000000847 * battery_kwh ** 3 + 0.0000249011 * battery_kwh ** 2 + 0.0023686408 * battery_kwh + 0.1245668155),
+,,,
+powertrain_mass_lbs,vehicle.powertrain_type == 'ICE' and vehicle.drive_system==2,0.6 * eng_rated_hp + 200,
+powertrain_mass_lbs,vehicle.powertrain_type == 'ICE' and vehicle.drive_system==4,0.6 * eng_rated_hp + 275,
+powertrain_mass_lbs,vehicle.powertrain_type == 'HEV' and vehicle.drive_system==2,0.61 * eng_rated_hp + 230,
+powertrain_mass_lbs,vehicle.powertrain_type == 'HEV' and vehicle.drive_system==4,0.61 * eng_rated_hp + 330,
+powertrain_mass_lbs,vehicle.powertrain_type == 'PHEV' and vehicle.drive_system==2,0.25 * eng_rated_hp + 150,
+powertrain_mass_lbs,vehicle.powertrain_type == 'PHEV' and vehicle.drive_system==4,0.25 * eng_rated_hp + 175,
+powertrain_mass_lbs,vehicle.powertrain_type == 'BEV' and vehicle.drive_system==2,0.61 * mot_rated_hp + 230,
+powertrain_mass_lbs,vehicle.powertrain_type == 'BEV' and vehicle.drive_system==4,0.61 * mot_rated_hp + 330,
+,,,
+non_structure_glider_mass_lbs,vehicle.model_year == analysis_intial_year,vehicle.curbweight_lbs – powertrain_mass_lbs – structure_mass_lbs – battery_mass_lbs,
+,,,
+curb_weight_lbs,vehicle.model_year >= analysis_intial_year,powertrain_mass_lbs + structure_mass_lbs + structure_mass_lbs + non_structure_glider_mass_lbs,
