@@ -22,3 +22,5 @@ powertrain_mass_lbs,vehicle.powertrain_type == 'BEV' and vehicle.drive_system==2
 powertrain_mass_lbs,vehicle.powertrain_type == 'BEV' and vehicle.drive_system==4,0.61 * mot_rated_hp + 330,
 ,,,
 non_structure_glider_mass_lbs,vehicle.model_year == analysis_intial_year,vehicle.curbweight_lbs – powertrain_mass_lbs – structure_mass_lbs – battery_mass_lbs,
+,,,
+curb_weight_lbs,vehicle.model_year >= analysis_intial_year,powertrain_mass_lbs + structure_mass_lbs + structure_mass_lbs + non_structure_glider_mass_lbs,
