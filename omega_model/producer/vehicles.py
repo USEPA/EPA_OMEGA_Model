@@ -1411,14 +1411,14 @@ class VehicleFinal(SQABase, Vehicle):
                         if v.fueling_class == 'ICE':
                             alt_veh.fueling_class = 'BEV'
                             alt_veh.name = 'BEV of ' + v.name
-                            alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
+                            # alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
                             alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                             alt_veh.cert_fuel_id = "{'electricity':1.0}"
                             alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
                         else:
                             alt_veh.fueling_class = 'ICE'
                             alt_veh.name = 'ICE of ' + v.name
-                            alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
+                            # alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
                             alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                             alt_veh.cert_fuel_id = "{'gasoline':1.0}"
                             alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
