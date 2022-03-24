@@ -183,13 +183,14 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, electrification_class \
                 = physical['manufacturer_id'], \
                   physical['name'], \
                   physical['base_year_reg_class_id'], \
                   physical['reg_class_id'], \
                   physical['in_use_fuel_id'], \
-                  physical['fueling_class']
+                  physical['fueling_class'], \
+                  physical['electrification_class']
 
             vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
@@ -234,14 +235,16 @@ def calc_cost_effects(physical_effects_dict):
                     fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
-            if fueling_class == 'BEV':
-                powertrain_veh_type = 'BEV'
-            elif name.__contains__('PHEV'):
-                powertrain_veh_type = 'PHEV'
-            elif name.__contains__('HEV'):
-                powertrain_veh_type = 'HEV'
-            else:
-                powertrain_veh_type = 'ICE'
+            ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV'}
+            powertrain_veh_type = ec_dict[electrification_class]
+            # if fueling_class == 'BEV':
+            #     powertrain_veh_type = 'BEV'
+            # elif name.__contains__('PHEV'):
+            #     powertrain_veh_type = 'PHEV'
+            # elif name.__contains__('HEV'):
+            #     powertrain_veh_type = 'HEV'
+            # else:
+            #     powertrain_veh_type = 'ICE'
 
             slope, intercept = get_maintenance_cost(powertrain_veh_type)
             maintenance_cost_per_mile = slope * odometer + intercept
@@ -371,6 +374,7 @@ def calc_cost_effects(physical_effects_dict):
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
                                      'fueling_class': fueling_class,
+                                     'electrification_class': electrification_class,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
                                      'odometer': odometer,
