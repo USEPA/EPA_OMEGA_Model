@@ -27,9 +27,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,target_coef_a,target_coef_b,target_coef_c
-        Minicompact_2wd_ICE,OEM_B,2019,PV,Minicompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},19184,,,41.20107902,262.8298582,12.21811801,3400.483476,161.2357307,,54.06027083,4.90376442,99.96072282,86.43657752,40302.84404,4.142068694,873.423386,,,2,3817.337516,,2880.32936,36.62889576,0.122070038,0.020051358
-        Large Utility_4wd_EV,OEM_B,2019,LT,Large Utility,EV,,{'US electricity':1.0},{'electricity':1.0},11307,,,54.8,200,13.57780136,5927.920757,198.3,,66,6.085714286,116.7,120,96568.57143,5,,,,4,,,5419.857143,45.56533865,0.155127191,0.020301076
+        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,target_coef_a,target_coef_b,target_coef_c
+        Minicompact_N_{'gasoline':1.0}_car_2,consolidated_OEM,2019,car,Minicompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},19184,,,41.20107902,262.8298582,12.21811801,3400.483476,161.2357307,,54.06027083,4.90376442,99.96072282,86.43657752,40302.84404,4.142068694,873.423386,,0,sedan,steel,2,3817.337516,,2880.32936,36.62889576,0.122070038,0.020051358
+        Large Utility_N_{'gasoline':1.0}_truck_4,consolidated_OEM,2019,truck,Large Utility,N,,{'pump gasoline':1.0},{'gasoline':1.0},1483742,,,53.09122165,321.7602595,17.59397906,5311.848055,197.0303042,,70.74355064,8.484684743,115.9391286,155.5495979,50082.78416,6.477660441,,,0,cuv_suv,steel,4,6383.483571,,4820.894717,44.26678577,0.315401336,0.02893031
 
 Data Column Name and Description
 
@@ -127,8 +127,14 @@ Data Column Name and Description
     :unibody_structure:
         Vehicle body structure; 1 = unibody, 0 = body-on-frame
 
-    :drive_system:
-       Drive system type; 2 = 2WD, 4 = 4WD
+    :body_style:
+        Vehicle body style; sedan, cuv_suv, pickup
+
+    :body_style:
+        Vehicle body style; sedan, cuv_suv, pickup
+
+    :structure_material:
+        Primary material of the body structure; steel, aluminum
 
     :gvwr_lbs:
        Gross Vehicle Weight Rating (pounds)
@@ -1326,7 +1332,7 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.44
+        input_template_version = 0.45
         input_template_columns = VehicleFinal.base_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
@@ -1346,6 +1352,8 @@ class VehicleFinal(SQABase, Vehicle):
                                    'context_size_class': NewVehicleMarket.context_size_classes,
                                    'electrification_class': ['N', 'HEV', 'EV', 'FCV'],
                                    'unibody_structure': [0, 1],
+                                   'body_style': ['sedan', 'cuv_suv', 'pickup'],
+                                   'structure_material': ['steel','aluminum'],
                                    }
 
                 template_errors += validate_dataframe_columns(df, validation_dict, filename)
