@@ -303,14 +303,14 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
         rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
 
-        etws = []
+        vehicle_masses = []
         for structure_material in ['steel', 'aluminum']:
             vehicle.structure_material = structure_material
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(vehicle)
 
-            etws.append(vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs)
+            vehicle_masses.append(vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs)
 
-        etws = np.array(etws) + 300
+        etws = np.array(vehicle_masses) + 300
 
         etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]
 
@@ -326,7 +326,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             cc_cloud = pd.DataFrame()
             for r in cost_curve_classes[cc]['rse']:
                 # print(r)
-                cc_cloud[r], cc_cloud['etw_lbs'] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s, etw_hps, etws)
+                cc_cloud[r], cc_cloud['etw_lbs'] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s, etw_hps, vehicle_masses)
             cc_cloud['cost_curve_class'] = cc
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
