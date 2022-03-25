@@ -82,6 +82,7 @@ Data Column Name and Description
 **CODE**
 
 """
+import numpy as np
 import pandas as pd
 
 print('importing %s' % __file__)
@@ -284,6 +285,8 @@ class CostCloud(OMEGABase, CostCloudBase):
             Copy of the requested cost cload data.
 
         """
+        import numpy as np
+        from context.mass_scaling import MassScaling
 
         cost_cloud = pd.DataFrame()
 
@@ -299,7 +302,15 @@ class CostCloud(OMEGABase, CostCloudBase):
         # sweep vehicle params (for now, final ranges TBD)
         rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
         rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
-        etws    = [vehicle.etw_lbs * 0.95, vehicle.etw_lbs, vehicle.etw_lbs * 1.05]
+
+        etws = []
+        for structure_material in ['steel', 'aluminum']:
+            vehicle.structure_material = structure_material
+            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(vehicle)
+
+            etws.append(vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs)
+
+        etws = np.array(etws) + 300
 
         if vehicle.eng_rated_hp:
             etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]

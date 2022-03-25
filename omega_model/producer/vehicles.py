@@ -782,7 +782,9 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'glider_non_structure_mass_lbs',
                        'context_size_class', 'base_year_market_share', 'electrification_class',
-                       'unibody_structure', 'drive_system', 'curbweight_lbs'}
+                       'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
+                       'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
+                       'structure_material', 'powertrain_type'}
 
     # transfer base properties
     for attr in base_properties:
@@ -886,6 +888,7 @@ class Vehicle(OMEGABase):
         self.target_coef_c = 0
         self.body_style = ''
         self.structure_material = ''
+        self.powertrain_type = ''
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1149,6 +1152,7 @@ class VehicleFinal(SQABase, Vehicle):
     target_coef_c = Column('target_coef_c', Float)  #: roadload C coefficient, lbs/mph^2
     body_style = Column('body_style', String)  #: vehicle body style, e.g. 'sedan'
     structure_material = Column('structure_material', String)  #: vehicle body structure material, e.g. 'steel'
+    powertrain_type = Column('powertrain_type', String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
 
     # TODO: add these to vehicles.csv
     # battery_kwh = Column('battery_kwh', Float)  #: propulsion battery kWh capacity
