@@ -138,6 +138,11 @@ class PolicyFuel(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
         if not template_errors:
+            validation_dict = {'unit': ['gallon', 'kWh']}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
             PolicyFuel._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
             PolicyFuel._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='series'))
             PolicyFuel.fuel_ids = df['fuel_id'].unique()

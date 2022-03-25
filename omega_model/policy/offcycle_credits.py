@@ -163,22 +163,31 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                OffCycleCredits._offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
+        if not template_errors:
+            validation_dict = {'credit_name': ['start_stop', 'high_eff_alternator', 'ac_leakage', 'ac_efficiency'],
+                               'credit_group': ['menu', 'ac'],
+                               'credit_destination': ['cert_direct_offcycle_co2e_grams_per_mile',
+                                                      'cert_indirect_offcycle_co2e_grams_per_mile'],
+                               }
 
-                for cc in OffCycleCredits._offcycle_credit_value_columns:
-                    reg_class_id = cc.split(':')[1]
-                    if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
-                        template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                if not template_errors:
-                    OffCycleCredits.offcycle_credit_names = list(df['credit_name'].unique())
-                    OffCycleCredits._offcycle_credit_groups = list(df['credit_group'].unique())
-                    # convert dataframe to dict keyed by credit name and start year
-                    OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
-                    # add 'start_year' key which returns start years by credit name
-                    OffCycleCredits._data.update(
-                        df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series'))
+        if not template_errors:
+            OffCycleCredits._offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
+
+            for cc in OffCycleCredits._offcycle_credit_value_columns:
+                reg_class_id = cc.split(':')[1]
+                if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
+                    template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
+
+        if not template_errors:
+            OffCycleCredits.offcycle_credit_names = list(df['credit_name'].unique())
+            OffCycleCredits._offcycle_credit_groups = list(df['credit_group'].unique())
+            # convert dataframe to dict keyed by credit name and start year
+            OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
+            # add 'start_year' key which returns start years by credit name
+            OffCycleCredits._data.update(
+                df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series'))
 
         return template_errors
 
