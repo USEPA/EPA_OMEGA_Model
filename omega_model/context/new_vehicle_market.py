@@ -380,16 +380,18 @@ class NewVehicleMarket(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not all([rc in legacy_reg_classes for rc in df['reg_class_id'].values]):
-                template_errors += ['invalid legacy reg_class_id in %s' % filename]
+        if not template_errors:
+            validation_dict = {'reg_class_id': list(legacy_reg_classes)}
 
-            if not template_errors:
-                NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
-                NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
-                NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
-                NewVehicleMarket.context_size_classes = df['context_size_class'].unique().tolist()
-                NewVehicleMarket.context_ids = df['context_id'].unique().tolist()
-                NewVehicleMarket.context_case_ids = df['case_id'].unique().tolist()
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
+            NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
+            NewVehicleMarket.context_size_classes = df['context_size_class'].unique().tolist()
+            NewVehicleMarket.context_ids = df['context_id'].unique().tolist()
+            NewVehicleMarket.context_case_ids = df['case_id'].unique().tolist()
 
         return template_errors
 

@@ -147,31 +147,38 @@ class DriveCycleWeights(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                from common.omega_trees import WeightedTree
-                weight_errors = []
-                cycle_name_errors = []
-                for fc in fueling_classes:
-                    for calendar_year in df['start_year']:
-                        data = df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)]
-                        if not data.empty:
-                            tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
-                            weight_errors += tree.validate_weights()
-                            if weight_errors:
-                                template_errors = ['weight error %s: %s' %
-                                                   (calendar_year, error) for error in weight_errors]
-                            else:
-                                if not DriveCycleWeights._data:
-                                    # validate drive cycle names on first tree
-                                    cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
-                                    if cycle_name_errors:
-                                        template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
-                                if not cycle_name_errors:
-                                    if fc not in DriveCycleWeights._data:
-                                        DriveCycleWeights._data[fc] = dict()
-                                    DriveCycleWeights._data[fc][calendar_year] = tree
+        if not template_errors:
+            validation_dict = {'share_id': ['cert'],
+                               'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+                               }
 
-                    DriveCycleWeights._data[fc]['start_year'] = np.array(list(DriveCycleWeights._data[fc].keys()))
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            from common.omega_trees import WeightedTree
+            weight_errors = []
+            cycle_name_errors = []
+            for fc in fueling_classes:
+                for calendar_year in df['start_year']:
+                    data = df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)]
+                    if not data.empty:
+                        tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
+                        weight_errors += tree.validate_weights()
+                        if weight_errors:
+                            template_errors = ['weight error %s: %s' %
+                                               (calendar_year, error) for error in weight_errors]
+                        else:
+                            if not DriveCycleWeights._data:
+                                # validate drive cycle names on first tree
+                                cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
+                                if cycle_name_errors:
+                                    template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
+                            if not cycle_name_errors:
+                                if fc not in DriveCycleWeights._data:
+                                    DriveCycleWeights._data[fc] = dict()
+                                DriveCycleWeights._data[fc][calendar_year] = tree
+
+                DriveCycleWeights._data[fc]['start_year'] = np.array(list(DriveCycleWeights._data[fc].keys()))
 
         return template_errors
 

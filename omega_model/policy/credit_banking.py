@@ -241,8 +241,17 @@ class CreditBank(OMEGABase):
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_column_names(filename, input_template_columns, input_template_columns,
+            df = pd.read_csv(filename, skiprows=1)
+
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
                                                              verbose=verbose)
+
+        if not template_errors:
+            from producer.manufacturers import Manufacturer
+
+            validation_dict = {'compliance_id': Manufacturer.manufacturers}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         return template_errors
 

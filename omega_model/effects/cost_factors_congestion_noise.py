@@ -118,6 +118,12 @@ class CostFactorsCongestionNoise(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
+        if not template_errors:
+            validation_dict = {'reg_class_id': list(legacy_reg_classes)}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
             cols_to_convert = [col for col in df.columns if 'dollars_per_mile' in col]
 
             df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)

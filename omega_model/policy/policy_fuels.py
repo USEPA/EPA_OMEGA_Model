@@ -70,6 +70,8 @@ class PolicyFuel(OMEGABase):
 
     _data = dict()  # private dict, policy fuel properties
 
+    fuel_ids = []  # list of known fuel ids
+
     @staticmethod
     def get_fuel_attribute(calendar_year, fuel_id, attribute):
         """
@@ -99,23 +101,6 @@ class PolicyFuel(OMEGABase):
             return PolicyFuel._data[fuel_id, year][attribute]
         else:
             raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
-
-    @staticmethod
-    def validate_fuel_id(fuel_id):
-        """
-        Validate fuel ID
-
-        Args:
-            fuel_id (str): e.g. 'pump gasoline')
-
-        Returns:
-            Error message in a list if fuel_id is not valid
-
-        """
-        if fuel_id not in PolicyFuel._data['start_year'].keys():
-            return ['Unexpected fuel_id "%s"' % fuel_id]
-        else:
-            return []
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -155,6 +140,7 @@ class PolicyFuel(OMEGABase):
         if not template_errors:
             PolicyFuel._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
             PolicyFuel._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='series'))
+            PolicyFuel.fuel_ids = df['fuel_id'].unique()
 
         return template_errors
 
@@ -175,7 +161,6 @@ if __name__ == '__main__':
         init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(PolicyFuel.validate_fuel_id('gasoline'))
             print(PolicyFuel.get_fuel_attribute(2020, 'gasoline', 'direct_co2e_grams_per_unit'))
             print(PolicyFuel.get_fuel_attribute(2020, 'electricity', 'transmission_efficiency'))
         else:

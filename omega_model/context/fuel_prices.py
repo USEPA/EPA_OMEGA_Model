@@ -148,6 +148,19 @@ class FuelPrice(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
+        if not template_errors:
+            from context.new_vehicle_market import NewVehicleMarket
+            from context.onroad_fuels import OnroadFuel
+
+            # validate columns
+            validation_dict = {'context_id': NewVehicleMarket.context_ids,
+                               'case_id': NewVehicleMarket.context_case_ids,
+                               'fuel_id': OnroadFuel.fuel_ids,
+                               }
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
             df = df.loc[(df['context_id'] == omega_globals.options.context_id) & (df['case_id'] == omega_globals.options.context_case_id), :]
             aeo_dollar_basis = df['dollar_basis'].mean()
             cols_to_convert = [col for col in df.columns if 'dollars_per_unit' in col]
@@ -161,13 +174,6 @@ class FuelPrice(OMEGABase):
                 df[col] = df[col] * adjustment_factor
 
             df['dollar_basis'] = omega_globals.options.analysis_dollar_basis
-
-            if not template_errors:
-                from context.onroad_fuels import OnroadFuel
-
-                # validate data
-                for i in df.index:
-                    template_errors += OnroadFuel.validate_fuel_id(df.loc[i, 'fuel_id'])
 
             if not template_errors:
                 FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).sort_index()\

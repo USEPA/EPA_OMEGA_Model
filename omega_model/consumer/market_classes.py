@@ -157,16 +157,23 @@ class MarketClass(OMEGABase, MarketClassBase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                MarketClass._data = df.set_index('market_class_id').to_dict(orient='index')
+        if not template_errors:
+            validation_dict = {'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+                               'ownership_class': ['private'],  # for now...
+                               }
 
-                MarketClassBase.market_classes = df['market_class_id'].to_list()
-                for mc in MarketClass.market_classes:
-                    MarketClassBase._market_class_dict[mc] = []
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                MarketClassBase._market_class_tree_dict = MarketClass.parse_market_classes(df['market_class_id'])
-                MarketClassBase._market_class_tree_dict_rc = MarketClass.parse_market_classes(df['market_class_id'],
-                                                                                              by_reg_class=True)
+        if not template_errors:
+            MarketClass._data = df.set_index('market_class_id').to_dict(orient='index')
+
+            MarketClassBase.market_classes = df['market_class_id'].to_list()
+            for mc in MarketClass.market_classes:
+                MarketClassBase._market_class_dict[mc] = []
+
+            MarketClassBase._market_class_tree_dict = MarketClass.parse_market_classes(df['market_class_id'])
+            MarketClassBase._market_class_tree_dict_rc = MarketClass.parse_market_classes(df['market_class_id'],
+                                                                                          by_reg_class=True)
 
         return template_errors
 

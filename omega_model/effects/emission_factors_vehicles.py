@@ -127,12 +127,21 @@ class EmissionFactorsVehicles(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                EmissionFactorsVehicles._data = \
-                    df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
-                        .to_dict(orient='index')
-                EmissionFactorsVehicles._data.update(
-                    df[['model_year', 'age', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
+        if not template_errors:
+            from context.onroad_fuels import OnroadFuel
+
+            # validate columns
+            validation_dict = {'in_use_fuel_id': OnroadFuel.fuel_ids,
+                               'reg_class_id': list(legacy_reg_classes)}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            EmissionFactorsVehicles._data = \
+                df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
+                    .to_dict(orient='index')
+            EmissionFactorsVehicles._data.update(
+                df[['model_year', 'age', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
 
         return template_errors
 

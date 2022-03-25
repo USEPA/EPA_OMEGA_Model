@@ -255,19 +255,19 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.RegulatoryClasses.validate_reg_class_id(df.loc[i, 'reg_class_id'])
+        if not template_errors:
+            # validate columns
+            validation_dict = {'reg_class_id': omega_globals.options.RegulatoryClasses.reg_classes}
 
-            if not template_errors:
-                VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).sort_index().to_dict(
-                    orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                for rc in df['reg_class_id'].unique():
-                    VehicleTargets._data[rc] = {
-                        'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
+        if not template_errors:
+            VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).sort_index().to_dict(
+                orient='index')
+
+            for rc in df['reg_class_id'].unique():
+                VehicleTargets._data[rc] = {
+                    'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
 
         return template_errors
 

@@ -1183,11 +1183,12 @@ def init_omega(session_runtime_options):
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
                                                verbose=verbose_init)
 
-        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
-                                              verbose=verbose_init)
-
         init_fail += NewVehicleMarket.init_from_file(omega_globals.options.context_new_vehicle_market_file,
                                                      verbose=verbose_init)
+
+        # must come after NewVehicleMarket and OnroadFuel init for input validation
+        init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
+                                              verbose=verbose_init)
 
         init_fail += BodyStyles.init_from_file(omega_globals.options.body_styles_file,
                                                 verbose=omega_globals.options.verbose)
@@ -1228,11 +1229,12 @@ def init_omega(session_runtime_options):
         init_fail += CreditBank.validate_ghg_credit_params_template(omega_globals.options.ghg_credit_params_file,
                                                               verbose=verbose_init)
 
-        init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
-                                                              verbose=verbose_init)
-
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                                         verbose=verbose_init)
+
+        # must be after Manufacturer init for input validation
+        init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
+                                                              verbose=verbose_init)
 
         init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
                                                           omega_globals.options.onroad_vehicle_calculations_file,

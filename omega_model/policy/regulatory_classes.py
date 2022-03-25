@@ -78,23 +78,6 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
         return reg_class_id
 
     @staticmethod
-    def validate_reg_class_id(reg_class_id):
-        """
-        Validate market class ID
-
-        Args:
-            reg_class_id (str): regulatory class ID, e.g. 'car'
-
-        Returns:
-            Error message in a list if reg_class_id is not valid
-
-        """
-        if reg_class_id not in RegulatoryClasses.reg_classes:
-            return ['Unexpected reg_class_id "%s"' % reg_class_id]
-        else:
-            return []
-
-    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
