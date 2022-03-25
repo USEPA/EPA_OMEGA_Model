@@ -1,23 +1,23 @@
-input_template_name:,drive_cycles,input_template_version:,0.3,
-drive_cycle_id,drive_cycle_distance_miles,description,ballast_lbs:car,ballast_lbs:truck
-cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2e g/mi,300,300
-cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Sustaining EPA UDDS cycle phase 2 CO2e g/mi,300,300
-cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 3 CO2e g/mi,300,300
-cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Sustaining EPA UDDS cycle phase 4 CO2e g/mi,300,300
-cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2e g/mi,300,300
-cs_us06_1:cert_direct_oncycle_co2e_grams_per_mile,1.772,Charge Sustaining EPA US06 cycle phase 1 CO2e g/mi,300,300
-cs_us06_2:cert_direct_oncycle_co2e_grams_per_mile,6.235,Charge Sustaining EPA US06 cycle phase 2 CO2e g/mi,300,300
-cd_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 1 CO2e g/mi,300,300
-cd_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Depleting EPA UDDS cycle phase 2 CO2e g/mi,300,300
-cd_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 3 CO2e g/mi,300,300
-cd_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Depleting EPA UDDS cycle phase 4 CO2e g/mi,300,300
-cd_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Depleting EPA HWFET cycle CO2e g/mi,300,300
-cd_us06_1:cert_direct_oncycle_co2e_grams_per_mile,1.772,Charge Depleting EPA US06 cycle phase 1 CO2e g/mi,300,300
-cd_us06_2:cert_direct_oncycle_co2e_grams_per_mile,6.235,Charge Depleting EPA US06 cycle phase 2 CO2e g/mi,300,300
-cd_ftp_1:cert_direct_oncycle_kwh_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 1 kWh/mi,300,300
-cd_ftp_2:cert_direct_oncycle_kwh_per_mile,3.859,Charge Depleting EPA UDDS cycle phase 2 kWh/mi,300,300
-cd_ftp_3:cert_direct_oncycle_kwh_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 3 kWh/mi,300,300
-cd_ftp_4:cert_direct_oncycle_kwh_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 4 kWh/mi,300,300
-cd_hwfet:cert_direct_oncycle_kwh_per_mile,10.26,Charge Depleting EPA HWFET cycle kWh/mi,300,300
-cd_us06_1:cert_direct_oncycle_kwh_per_mile,1.772,Charge Depleting EPA US06 cycle phase 1 kWh/mi,300,300
-cd_us06_2:cert_direct_oncycle_kwh_per_mile,6.235,Charge Depleting EPA US06 cycle phase 2 kWh/mi,300,300
+input_template_name:,drive_cycles,input_template_version:,0.3,,,
+drive_cycle_id,drive_cycle_distance_miles,description,ballast_lbs:car:1974,ballast_lbs:truck:1974,ballast_lbs:car:2027,ballast_lbs:truck:2027
+cs_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 1 CO2e g/mi,300,300,600,600
+cs_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Sustaining EPA UDDS cycle phase 2 CO2e g/mi,300,300,600,600
+cs_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Sustaining EPA UDDS cycle phase 3 CO2e g/mi,300,300,600,600
+cs_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Sustaining EPA UDDS cycle phase 4 CO2e g/mi,300,300,600,600
+cs_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Sustaining EPA HWFET cycle CO2e g/mi,300,300,600,600
+cs_us06_1:cert_direct_oncycle_co2e_grams_per_mile,1.772,Charge Sustaining EPA US06 cycle phase 1 CO2e g/mi,300,300,600,600
+cs_us06_2:cert_direct_oncycle_co2e_grams_per_mile,6.235,Charge Sustaining EPA US06 cycle phase 2 CO2e g/mi,300,300,600,600
+cd_ftp_1:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 1 CO2e g/mi,300,300,600,600
+cd_ftp_2:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Depleting EPA UDDS cycle phase 2 CO2e g/mi,300,300,600,600
+cd_ftp_3:cert_direct_oncycle_co2e_grams_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 3 CO2e g/mi,300,300,600,600
+cd_ftp_4:cert_direct_oncycle_co2e_grams_per_mile,3.859,Charge Depleting EPA UDDS cycle phase 4 CO2e g/mi,300,300,600,600
+cd_hwfet:cert_direct_oncycle_co2e_grams_per_mile,10.26,Charge Depleting EPA HWFET cycle CO2e g/mi,300,300,600,600
+cd_us06_1:cert_direct_oncycle_co2e_grams_per_mile,1.772,Charge Depleting EPA US06 cycle phase 1 CO2e g/mi,300,300,600,600
+cd_us06_2:cert_direct_oncycle_co2e_grams_per_mile,6.235,Charge Depleting EPA US06 cycle phase 2 CO2e g/mi,300,300,600,600
+cd_ftp_1:cert_direct_oncycle_kwh_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 1 kWh/mi,300,300,600,600
+cd_ftp_2:cert_direct_oncycle_kwh_per_mile,3.859,Charge Depleting EPA UDDS cycle phase 2 kWh/mi,300,300,600,600
+cd_ftp_3:cert_direct_oncycle_kwh_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 3 kWh/mi,300,300,600,600
+cd_ftp_4:cert_direct_oncycle_kwh_per_mile,3.591,Charge Depleting EPA UDDS cycle phase 4 kWh/mi,300,300,600,600
+cd_hwfet:cert_direct_oncycle_kwh_per_mile,10.26,Charge Depleting EPA HWFET cycle kWh/mi,300,300,600,600
+cd_us06_1:cert_direct_oncycle_kwh_per_mile,1.772,Charge Depleting EPA US06 cycle phase 1 kWh/mi,300,300,600,600
+cd_us06_2:cert_direct_oncycle_kwh_per_mile,6.235,Charge Depleting EPA US06 cycle phase 2 kWh/mi,300,300,600,600
