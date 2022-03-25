@@ -312,10 +312,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         etws = np.array(etws) + 300
 
-        if vehicle.eng_rated_hp:
-            etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]
-        else:
-            etw_hps = [16]
+        etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]
 
         # TODO: if vehicle up for redesign, query all classes, otherwise use same cost_curve class as prior year...?
         # TODO: need to assign cost curve class to vehicles from chosen tech package...?  Not sure how that will work
