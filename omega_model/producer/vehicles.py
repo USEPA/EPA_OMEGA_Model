@@ -1307,7 +1307,7 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.44
+        input_template_version = 0.45
         input_template_columns = VehicleFinal.base_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
