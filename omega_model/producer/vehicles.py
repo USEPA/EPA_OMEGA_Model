@@ -1399,7 +1399,8 @@ class VehicleFinal(SQABase, Vehicle):
 
                         VehicleFinal.compliance_ids.add(veh.compliance_id)
 
-                        if veh.electrification_class == 'EV':
+                        # TODO: what are we doing about fuel cell vehicles...?
+                        if veh.electrification_class in ['EV', 'FCV']:
                             veh.fueling_class = 'BEV'
                         else:
                             veh.fueling_class = 'ICE'
