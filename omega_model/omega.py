@@ -1126,6 +1126,11 @@ def init_omega(session_runtime_options):
     from context.production_constraints import ProductionConstraints
     from context.mass_scaling import MassScaling
     from context.body_styles import BodyStyles
+    from context.maintenance_cost import MaintenanceCost
+    from context.repair_cost import RepairCost
+    from context.refueling_cost import RefuelingCost
+    from context.powertrain_cost import PowertrainCost
+    from context.glider_cost import GliderCost
 
     from policy.upstream_methods import UpstreamMethods
     from policy.required_sales_share import RequiredSalesShare
@@ -1151,11 +1156,6 @@ def init_omega(session_runtime_options):
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
-    from context.maintenance_cost import MaintenanceCost
-    from context.repair_cost import RepairCost
-    from context.refueling_cost import RefuelingCost
-    from context.powertrain_cost import PowertrainCost
-    from context.glider_cost import GliderCost
 
     file_io.validate_folder(omega_globals.options.output_folder)
 
