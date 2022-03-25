@@ -129,16 +129,15 @@ class RequiredSalesShare(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
+        if not template_errors:
+            share_columns = [c for c in df.columns if (min_share_units_str in c)]
 
-                share_columns = [c for c in df.columns if (min_share_units_str in c)]
+            for sc in share_columns:
+                # validate data
+                template_errors += omega_globals.options.MarketClass.validate_market_class_id(sc.split(':')[0])
 
-                for sc in share_columns:
-                    # validate data
-                    template_errors += omega_globals.options.MarketClass.validate_market_class_id(sc.split(':')[0])
-
-            if not template_errors:
-                RequiredSalesShare._data = df
+        if not template_errors:
+            RequiredSalesShare._data = df
 
         return template_errors
 

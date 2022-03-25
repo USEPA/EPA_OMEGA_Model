@@ -162,16 +162,16 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+        if not template_errors:
+            validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
 
-            if not template_errors:
-                ProducerGeneralizedCost._data = df.set_index('market_class_id').to_dict(orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            ProducerGeneralizedCost._data = df.set_index('market_class_id').to_dict(orient='index')
 
         return template_errors
 

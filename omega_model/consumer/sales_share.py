@@ -286,17 +286,16 @@ class SalesShare(OMEGABase, SalesShareBase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+        if not template_errors:
+            validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
 
-            if not template_errors:
-                SalesShare._data = df.set_index(['market_class_id', 'start_year']).sort_index().to_dict(orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                for mc in df['market_class_id'].unique():
-                    SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
+        if not template_errors:
+            SalesShare._data = df.set_index(['market_class_id', 'start_year']).sort_index().to_dict(orient='index')
+
+            for mc in df['market_class_id'].unique():
+                SalesShare._data[mc] = {'start_year': np.array(df['start_year'].loc[df['market_class_id'] == mc])}
 
         return template_errors
 

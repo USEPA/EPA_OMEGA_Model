@@ -123,22 +123,21 @@ class Reregistration(OMEGABase, ReregistrationBase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+        if not template_errors:
+            validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
 
-            if not template_errors:
-                # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                # convert dataframe to dict keyed by market class ID, age, and start year
-                Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
-                    sort_index().to_dict(orient='index')
-                # add 'start_year' key which returns start years by market class ID
-                Reregistration._data.update(
-                    df[['market_class_id', 'age', 'start_model_year']].set_index('market_class_id').
-                        to_dict(orient='series'))
+        if not template_errors:
+            # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
+
+            # convert dataframe to dict keyed by market class ID, age, and start year
+            Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
+                sort_index().to_dict(orient='index')
+            # add 'start_year' key which returns start years by market class ID
+            Reregistration._data.update(
+                df[['market_class_id', 'age', 'start_model_year']].set_index('market_class_id').
+                    to_dict(orient='series'))
 
         return template_errors
 
