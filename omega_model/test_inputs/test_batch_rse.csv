@@ -32,6 +32,10 @@ ICE Vehicle Simulation Results File,String,simulated_vehicles_rse_ice.csv,
 BEV Vehicle Simulation Results File,String,simulated_vehicles_rse_bev.csv,
 PHEV Vehicle Simulation Results File,String,simulated_vehicles_rse_phev.csv,
 Vehicles File,String,vehicles.csv,
+Powertrain Cost File,String,powertrain_cost.csv,
+Glider Cost File,String,glider_cost.csv,
+Body Styles File,String,body_styles.csv,
+Mass Scaling File,String,mass_scaling.csv,
 ,,,
 Session Settings,,,
 Enable Session,TRUE / FALSE,TRUE,TRUE
@@ -52,12 +56,12 @@ Required Sales Share File,String,required_sales_share.csv,required_sales_share.c
 ,,,
 Session Postproc Settings,,,
 General Inputs for Effects File,String,general_inputs_for_effects.csv,general_inputs_for_effects.csv
-Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
-Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
-Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
-Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
-Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
-Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
-Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
+Context Criteria Cost Factors File,String,cost_factors_criteria.csv,cost_factors_criteria.csv
+Context SCC Cost Factors File,String,cost_factors_scc.csv,cost_factors_scc.csv
+Context Energy Security Cost Factors File,String,cost_factors_energysecurity.csv,cost_factors_energysecurity.csv
+Context Congestion-Noise Cost Factors File,String,cost_factors_congestion_noise.csv,cost_factors_congestion_noise.csv
+Context Powersector Emission Factors File,String,emission_factors_powersector.csv,emission_factors_powersector.csv
+Context Refinery Emission Factors File,String,emission_factors_refinery.csv,emission_factors_refinery.csv
+Context Vehicle Emission Factors File,String,emission_factors_vehicles.csv,emission_factors_vehicles.csv
 Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
 Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
