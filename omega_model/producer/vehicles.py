@@ -884,6 +884,8 @@ class Vehicle(OMEGABase):
         self.target_coef_a = 0
         self.target_coef_b = 0
         self.target_coef_c = 0
+        self.body_style = ''
+        self.structure_material = ''
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1145,10 +1147,10 @@ class VehicleFinal(SQABase, Vehicle):
     target_coef_a = Column('target_coef_a', Float)  #: roadload A coefficient, lbs
     target_coef_b = Column('target_coef_b', Float)  #: roadload B coefficient, lbs/mph
     target_coef_c = Column('target_coef_c', Float)  #: roadload C coefficient, lbs/mph^2
+    body_style = Column('body_style', String)  #: vehicle body style, e.g. 'sedan'
+    structure_material = Column('structure_material', String)  #: vehicle body structure material, e.g. 'steel'
 
     # TODO: add these to vehicles.csv
-    # body_style = Column('body_style', String)  #: vehicle body style, e.g. 'sedan'
-    # structure_material = Column('structure_material', String)  #: vehicle body structure material, e.g. 'steel'
     # battery_kwh = Column('battery_kwh', Float)  #: propulsion battery kWh capacity
 
     _initial_registered_count = Column('_initial_registered_count', Float)
@@ -1161,8 +1163,9 @@ class VehicleFinal(SQABase, Vehicle):
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
-                                   'target_coef_a', 'target_coef_b', 'target_coef_c'}  #: mandatory input file columns, the rest can be optional numeric columns
-                                    # TODO: 'body_style', 'structure_material', 'battery_kwh'
+                                   'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
+                                   'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
+                                    # TODO: , 'battery_kwh'
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
@@ -1346,14 +1349,16 @@ class VehicleFinal(SQABase, Vehicle):
             if not template_errors:
                 from producer.manufacturers import Manufacturer
                 from context.mass_scaling import MassScaling
+                from context.body_styles import BodyStyles
 
                 validation_dict = {'manufacturer_id': Manufacturer.manufacturers,
                                    'reg_class_id': list(legacy_reg_classes),
                                    'context_size_class': NewVehicleMarket.context_size_classes,
-                                   'electrification_class': ['N', 'HEV', 'EV', 'FCV'],
+                                   'electrification_class': ['N', 'EV', 'HEV', 'PHEV', 'FCV'],
                                    'unibody_structure': [0, 1],
-                                   'body_style': ['sedan', 'cuv_suv', 'pickup'],
+                                   'body_style': BodyStyles.body_styles,
                                    'structure_material': ['steel','aluminum'],
+                                   'drive_system': [2, 4],  # for now, anyway... 1,2,3??
                                    }
 
                 template_errors += validate_dataframe_columns(df, validation_dict, filename)
@@ -1380,6 +1385,8 @@ class VehicleFinal(SQABase, Vehicle):
                             target_coef_a=df.loc[i, 'target_coef_a'],
                             target_coef_b=df.loc[i, 'target_coef_b'],
                             target_coef_c=df.loc[i, 'target_coef_c'],
+                            body_style=df.loc[i, 'body_style'],
+                            structure_material=df.loc[i, 'structure_material'],
                         )
 
                         for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
@@ -1406,8 +1413,6 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.onroad_direct_kwh_per_mile = 0
 
                         # TODO: these need to be in the vehicles.csv!!
-                        veh.body_style = 'cuv_suv'
-                        veh.structure_material = 'steel'
                         veh.powertrain_type = veh.fueling_class
                         veh.battery_kwh = 60
                         structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
