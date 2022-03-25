@@ -297,9 +297,6 @@ class CostCloud(OMEGABase, CostCloudBase):
         vehicle_rlhp20 = calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 20)
         vehicle_rlhp60 = calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 60)
 
-        # rlhp20s = [0.001, 0.00175, 0.0025]
-        # rlhp60s = [0.003, 0.004, 0.006]
-
         # sweep vehicle params (for now, final ranges TBD)
         rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
         rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
@@ -309,9 +306,10 @@ class CostCloud(OMEGABase, CostCloudBase):
             vehicle.structure_material = structure_material
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(vehicle)
 
-            vehicle_curbweights_lbs.append(vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs)
+            vehicle_curbweights_lbs.append(vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs +
+                                           structure_mass_lbs + battery_mass_lbs)
 
-        etws = np.array(vehicle_curbweights_lbs) + DriveCycleBallast.get_ballast_lbs(vehicle)  # TODO: get ballast from policy
+        etws = np.array(vehicle_curbweights_lbs) + DriveCycleBallast.get_ballast_lbs(vehicle)
 
         etw_hps = [vehicle.etw_lbs / vehicle.eng_rated_hp]
 
@@ -327,7 +325,8 @@ class CostCloud(OMEGABase, CostCloudBase):
             cc_cloud = pd.DataFrame()
             for r in cost_curve_classes[cc]['rse']:
                 # print(r)
-                cc_cloud[r], cc_cloud['etw_lbs'] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s, etw_hps, etws)
+                cc_cloud[r], cc_cloud['etw_lbs'] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s,
+                                                                      etw_hps, etws)
             cc_cloud['cost_curve_class'] = cc
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
