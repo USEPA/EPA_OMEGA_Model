@@ -775,7 +775,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'non_structure_mass_lbs',
-                       'context_size_class', 'base_year_market_share', 'electrification_class'}
+                       'context_size_class', 'base_year_market_share', 'electrification_class',
+                       'unibody_structure', 'drive_system', 'curbweight_lbs'}
 
     # transfer base properties
     for attr in base_properties:
@@ -868,7 +869,15 @@ class Vehicle(OMEGABase):
         self.market_class_id = None
         self.initial_registered_count = 0
         self.cost_curve = None
+        self.unibody_structure = 1
+        self.drive_system = 1
+        self.curbweight_lbs = 0
         self.non_structure_mass_lbs = 0
+        self.footprint_ft2 = 0
+        self.eng_rated_hp = 0
+        self.target_coef_a = 0
+        self.target_coef_b = 0
+        self.target_coef_c = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1121,7 +1130,20 @@ class VehicleFinal(SQABase, Vehicle):
     in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
     cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
     market_class_id = Column('market_class_id', String)  #: market class ID, as determined by the consumer subpackage
+    unibody_structure = Column('unibody_structure', Float)  #: unibody structure flag, e.g. 0,1
+    drive_system = Column('drive_system', Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
+    curbweight_lbs = Column('curbweight_lbs', Float)  #: vehicle curbweight, pounds
     non_structure_mass_lbs = Column('non_structure_mass_lbs', Float)  #: base year non-structure mass lbs (i.e. "content")
+    footprint_ft2 = Column('footprint_ft2', Float)  #: vehicle footprint, square feet
+    eng_rated_hp = Column('eng_rated_hp', Float)  #: engine rated horsepower
+    target_coef_a = Column('target_coef_a', Float)  #: roadload A coefficient, lbs
+    target_coef_b = Column('target_coef_b', Float)  #: roadload B coefficient, lbs/mph
+    target_coef_c = Column('target_coef_c', Float)  #: roadload C coefficient, lbs/mph^2
+
+    # TODO: add these to vehicles.csv
+    # body_style = Column('body_style', String)  #: vehicle body style, e.g. 'sedan'
+    # structure_material = Column('structure_material', String)  #: vehicle body structure material, e.g. 'steel'
+    # battery_kwh = Column('battery_kwh', Float)  #: propulsion battery kWh capacity
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 
@@ -1129,10 +1151,13 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
     mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
-    # TODO: I think these need updating, maybe
     base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
-                                   'cert_fuel_id', 'sales'}  #: mandatory input file columns, the rest can be optional numeric columns
+                                   'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
+                                   'unibody_structure', 'drive_system', 'curbweight_lbs',
+                                   'target_coef_a', 'target_coef_b', 'target_coef_c'}  #: mandatory input file columns, the rest can be optional numeric columns
+                                    # TODO: 'body_style', 'structure_material', 'battery_kwh'
+
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
 
@@ -1339,6 +1364,14 @@ class VehicleFinal(SQABase, Vehicle):
                             in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                             cert_fuel_id=df.loc[i, 'cert_fuel_id'],
                             initial_registered_count=df.loc[i, 'sales'],
+                            unibody_structure=df.loc[i, 'unibody_structure'],
+                            drive_system=df.loc[i, 'drive_system'],
+                            curbweight_lbs=df.loc[i, 'curbweight_lbs'],
+                            footprint_ft2=df.loc[i, 'footprint_ft2'],
+                            eng_rated_hp=df.loc[i, 'eng_rated_hp'],
+                            target_coef_a=df.loc[i, 'target_coef_a'],
+                            target_coef_b=df.loc[i, 'target_coef_b'],
+                            target_coef_c=df.loc[i, 'target_coef_c'],
                         )
 
                         for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
@@ -1368,6 +1401,7 @@ class VehicleFinal(SQABase, Vehicle):
                         veh.body_style = 'cuv_suv'
                         veh.structure_material = 'steel'
                         veh.powertrain_type = veh.fueling_class
+                        veh.battery_kwh = 60
                         structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
 
                         veh.non_structure_mass_lbs = veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
