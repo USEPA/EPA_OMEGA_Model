@@ -1136,6 +1136,7 @@ def init_omega(session_runtime_options):
     from policy.required_sales_share import RequiredSalesShare
     from policy.drive_cycles import DriveCycles
     from policy.drive_cycle_weights import DriveCycleWeights
+    from policy.drive_cycle_ballast import DriveCycleBallast
     from policy.incentives import Incentives
     from policy.policy_fuels import PolicyFuel
     from policy.credit_banking import CreditBank
@@ -1216,6 +1217,9 @@ def init_omega(session_runtime_options):
 
         init_fail += DriveCycleWeights.init_from_file(omega_globals.options.drive_cycle_weights_file,
                                                       verbose=verbose_init)
+
+        init_fail += DriveCycleBallast.init_from_file(omega_globals.options.drive_cycle_ballast_file,
+                                                      verbose=omega_globals.options.verbose)
 
         init_fail += Incentives.init_from_file(omega_globals.options.production_multipliers_file,
                                                verbose=verbose_init)
