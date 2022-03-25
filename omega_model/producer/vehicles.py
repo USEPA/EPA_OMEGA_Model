@@ -780,7 +780,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     """
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'base_year_reg_class_id', 'reg_class_id', 'in_use_fuel_id',
-                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'non_structure_mass_lbs',
+                       'cert_fuel_id', 'market_class_id', 'lifetime_VMT', 'glider_non_structure_mass_lbs',
                        'context_size_class', 'base_year_market_share', 'electrification_class',
                        'unibody_structure', 'drive_system', 'curbweight_lbs'}
 
@@ -878,7 +878,7 @@ class Vehicle(OMEGABase):
         self.unibody_structure = 1
         self.drive_system = 1
         self.curbweight_lbs = 0
-        self.non_structure_mass_lbs = 0
+        self.glider_non_structure_mass_lbs = 0
         self.footprint_ft2 = 0
         self.eng_rated_hp = 0
         self.target_coef_a = 0
@@ -1141,7 +1141,7 @@ class VehicleFinal(SQABase, Vehicle):
     unibody_structure = Column('unibody_structure', Float)  #: unibody structure flag, e.g. 0,1
     drive_system = Column('drive_system', Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
     curbweight_lbs = Column('curbweight_lbs', Float)  #: vehicle curbweight, pounds
-    non_structure_mass_lbs = Column('non_structure_mass_lbs', Float)  #: base year non-structure mass lbs (i.e. "content")
+    glider_non_structure_mass_lbs = Column('non_structure_mass_lbs', Float)  #: base year non-structure mass lbs (i.e. "content")
     footprint_ft2 = Column('footprint_ft2', Float)  #: vehicle footprint, square feet
     eng_rated_hp = Column('eng_rated_hp', Float)  #: engine rated horsepower
     target_coef_a = Column('target_coef_a', Float)  #: roadload A coefficient, lbs
@@ -1346,175 +1346,175 @@ class VehicleFinal(SQABase, Vehicle):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                from producer.manufacturers import Manufacturer
-                from context.mass_scaling import MassScaling
-                from context.body_styles import BodyStyles
+        if not template_errors:
+            from producer.manufacturers import Manufacturer
+            from context.mass_scaling import MassScaling
+            from context.body_styles import BodyStyles
 
-                validation_dict = {'manufacturer_id': Manufacturer.manufacturers,
-                                   'reg_class_id': list(legacy_reg_classes),
-                                   'context_size_class': NewVehicleMarket.context_size_classes,
-                                   'electrification_class': ['N', 'EV', 'HEV', 'PHEV', 'FCV'],
-                                   'unibody_structure': [0, 1],
-                                   'body_style': BodyStyles.body_styles,
-                                   'structure_material': ['steel','aluminum'],
-                                   'drive_system': [2, 4],  # for now, anyway... 1,2,3??
-                                   }
+            validation_dict = {'manufacturer_id': Manufacturer.manufacturers,
+                               'reg_class_id': list(legacy_reg_classes),
+                               'context_size_class': NewVehicleMarket.context_size_classes,
+                               'electrification_class': ['N', 'EV', 'HEV', 'PHEV', 'FCV'],
+                               'unibody_structure': [0, 1],
+                               'body_style': BodyStyles.body_styles,
+                               'structure_material': ['steel','aluminum'],
+                               'drive_system': [2, 4],  # for now, anyway... 1,2,3??
+                               }
 
-                template_errors += validate_dataframe_columns(df, validation_dict, filename)
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                if not template_errors:
-                    # load data into database
-                    for i in df.index:
-                        veh = VehicleFinal(
-                            name=df.loc[i, 'vehicle_name'],
-                            manufacturer_id=df.loc[i, 'manufacturer_id'],
-                            model_year=df.loc[i, 'model_year'],
-                            base_year_reg_class_id=df.loc[i, 'reg_class_id'],
-                            context_size_class=df.loc[i, 'context_size_class'],
-                            electrification_class=df.loc[i, 'electrification_class'],
-                            cost_curve_class=df.loc[i, 'cost_curve_class'],
-                            in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
-                            cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                            initial_registered_count=df.loc[i, 'sales'],
-                            unibody_structure=df.loc[i, 'unibody_structure'],
-                            drive_system=df.loc[i, 'drive_system'],
-                            curbweight_lbs=df.loc[i, 'curbweight_lbs'],
-                            footprint_ft2=df.loc[i, 'footprint_ft2'],
-                            eng_rated_hp=df.loc[i, 'eng_rated_hp'],
-                            target_coef_a=df.loc[i, 'target_coef_a'],
-                            target_coef_b=df.loc[i, 'target_coef_b'],
-                            target_coef_c=df.loc[i, 'target_coef_c'],
-                            body_style=df.loc[i, 'body_style'],
-                            structure_material=df.loc[i, 'structure_material'],
-                        )
+        if not template_errors:
+            # load data into database
+            for i in df.index:
+                veh = VehicleFinal(
+                    name=df.loc[i, 'vehicle_name'],
+                    manufacturer_id=df.loc[i, 'manufacturer_id'],
+                    model_year=df.loc[i, 'model_year'],
+                    base_year_reg_class_id=df.loc[i, 'reg_class_id'],
+                    context_size_class=df.loc[i, 'context_size_class'],
+                    electrification_class=df.loc[i, 'electrification_class'],
+                    cost_curve_class=df.loc[i, 'cost_curve_class'],
+                    in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
+                    cert_fuel_id=df.loc[i, 'cert_fuel_id'],
+                    initial_registered_count=df.loc[i, 'sales'],
+                    unibody_structure=df.loc[i, 'unibody_structure'],
+                    drive_system=df.loc[i, 'drive_system'],
+                    curbweight_lbs=df.loc[i, 'curbweight_lbs'],
+                    footprint_ft2=df.loc[i, 'footprint_ft2'],
+                    eng_rated_hp=df.loc[i, 'eng_rated_hp'],
+                    target_coef_a=df.loc[i, 'target_coef_a'],
+                    target_coef_b=df.loc[i, 'target_coef_b'],
+                    target_coef_c=df.loc[i, 'target_coef_c'],
+                    body_style=df.loc[i, 'body_style'],
+                    structure_material=df.loc[i, 'structure_material'],
+                )
 
-                        for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
-                            veh.__setattr__(attr, df.loc[i, dc])
+                for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
+                    veh.__setattr__(attr, df.loc[i, dc])
 
-                        if omega_globals.options.consolidate_manufacturers:
-                            veh.compliance_id = 'consolidated_OEM'
-                        else:
-                            veh.compliance_id = veh.manufacturer_id
+                if omega_globals.options.consolidate_manufacturers:
+                    veh.compliance_id = 'consolidated_OEM'
+                else:
+                    veh.compliance_id = veh.manufacturer_id
 
-                        VehicleFinal.compliance_ids.add(veh.compliance_id)
+                VehicleFinal.compliance_ids.add(veh.compliance_id)
 
-                        # TODO: what are we doing about fuel cell vehicles...?
-                        if veh.electrification_class in ['EV', 'FCV']:
-                            veh.fueling_class = 'BEV'
-                        else:
-                            veh.fueling_class = 'ICE'
+                # TODO: what are we doing about fuel cell vehicles...?
+                if veh.electrification_class in ['EV', 'FCV']:
+                    veh.fueling_class = 'BEV'
+                else:
+                    veh.fueling_class = 'ICE'
 
-                        veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
-                        veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
+                veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
+                veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
 
-                        veh.cert_co2e_grams_per_mile = None
-                        veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # TODO: veh.cert_direct_oncycle_kwh_per_mile?
-                        veh.onroad_direct_co2e_grams_per_mile = 0
-                        veh.onroad_direct_kwh_per_mile = 0
+                veh.cert_co2e_grams_per_mile = None
+                veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # TODO: veh.cert_direct_oncycle_kwh_per_mile?
+                veh.onroad_direct_co2e_grams_per_mile = 0
+                veh.onroad_direct_kwh_per_mile = 0
 
-                        # TODO: these need to be in the vehicles.csv!!
-                        veh.powertrain_type = veh.fueling_class
-                        veh.battery_kwh = 60
-                        structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
+                # TODO: these need to be in the vehicles.csv!!
+                veh.powertrain_type = veh.fueling_class
+                veh.battery_kwh = 60
+                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
 
-                        veh.non_structure_mass_lbs = veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
+                veh.glider_non_structure_mass_lbs = veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
 
-                        vehicle_shares_dict['total'] += veh.initial_registered_count
+                vehicle_shares_dict['total'] += veh.initial_registered_count
 
-                        if veh.context_size_class not in vehicle_shares_dict:
-                            vehicle_shares_dict[veh.context_size_class] = 0
+                if veh.context_size_class not in vehicle_shares_dict:
+                    vehicle_shares_dict[veh.context_size_class] = 0
 
-                        vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
+                vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
 
-                        vehicles_list.append(veh)
+                vehicles_list.append(veh)
 
-                        # assign user-definable market class
-                        veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+                # assign user-definable market class
+                veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
 
-                        non_responsive_market_category = \
-                            omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
+                non_responsive_market_category = \
+                    omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
 
-                        if non_responsive_market_category not in NewVehicleMarket.context_size_class_info_by_nrmc:
-                            NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category] = dict()
+                if non_responsive_market_category not in NewVehicleMarket.context_size_class_info_by_nrmc:
+                    NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category] = dict()
 
-                        if veh.context_size_class not in \
-                                NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category]:
-                            NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class] = \
-                                {'total': veh.initial_registered_count, 'share': 0}
-                        else:
-                            NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
-                                veh.initial_registered_count
+                if veh.context_size_class not in \
+                        NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category]:
+                    NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class] = \
+                        {'total': veh.initial_registered_count, 'share': 0}
+                else:
+                    NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
+                        veh.initial_registered_count
 
-                        if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
-                            NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = veh.initial_registered_count
-                        else:
-                            NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += veh.initial_registered_count
+                if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
+                    NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = veh.initial_registered_count
+                else:
+                    NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += veh.initial_registered_count
 
-                        size_key = veh.compliance_id + '_' + veh.context_size_class
-                        if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                            NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = veh.initial_registered_count
-                        else:
-                            NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] += veh.initial_registered_count
+                size_key = veh.compliance_id + '_' + veh.context_size_class
+                if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
+                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = veh.initial_registered_count
+                else:
+                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] += veh.initial_registered_count
 
-                        if verbose:
-                            print(veh)
+                if verbose:
+                    print(veh)
 
-                    # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
-                    # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles
-                    # from becoming midsize car BEVs, for example, just because that's the dominant BEV in the base year
-                    # fleet
-                    for v in vehicles_list:
-                        v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
+            # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
+            # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles
+            # from becoming midsize car BEVs, for example, just because that's the dominant BEV in the base year
+            # fleet
+            for v in vehicles_list:
+                v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
 
-                        alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
-                        if v.fueling_class == 'ICE':
-                            alt_veh.fueling_class = 'BEV'
-                            alt_veh.name = 'BEV of ' + v.name
-                            # alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
-                            alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
-                            alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                            alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
-                        else:
-                            alt_veh.fueling_class = 'ICE'
-                            alt_veh.name = 'ICE of ' + v.name
-                            # alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
-                            alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                            alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                            alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
-                        alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
-                        alt_veh.cert_direct_co2e_grams_per_mile = 0
-                        alt_veh.cert_direct_kwh_per_mile = 0
+                alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
+                if v.fueling_class == 'ICE':
+                    alt_veh.fueling_class = 'BEV'
+                    alt_veh.name = 'BEV of ' + v.name
+                    # alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
+                    alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
+                    alt_veh.cert_fuel_id = "{'electricity':1.0}"
+                    alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
+                else:
+                    alt_veh.fueling_class = 'ICE'
+                    alt_veh.name = 'ICE of ' + v.name
+                    # alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
+                    alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
+                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
+                    alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
+                alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
+                alt_veh.cert_direct_co2e_grams_per_mile = 0
+                alt_veh.cert_direct_kwh_per_mile = 0
 
-                    for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
-                        for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
-                            NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share'] = \
-                                NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['total'] / vehicle_shares_dict[csc]
+            for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+                for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+                    NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share'] = \
+                        NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['total'] / vehicle_shares_dict[csc]
 
-                    # calculate manufacturer base year context size class shares
-                    VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
+            # calculate manufacturer base year context size class shares
+            VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
 
-                    VehicleFinal.mfr_base_year_size_class_share = dict()
-                    for compliance_id in VehicleFinal.compliance_ids:
-                        for size_class in NewVehicleMarket.base_year_context_size_class_sales:
-                            if compliance_id not in VehicleFinal.mfr_base_year_size_class_share:
-                                VehicleFinal.mfr_base_year_size_class_share[compliance_id] = dict()
+            VehicleFinal.mfr_base_year_size_class_share = dict()
+            for compliance_id in VehicleFinal.compliance_ids:
+                for size_class in NewVehicleMarket.base_year_context_size_class_sales:
+                    if compliance_id not in VehicleFinal.mfr_base_year_size_class_share:
+                        VehicleFinal.mfr_base_year_size_class_share[compliance_id] = dict()
 
-                            size_key = compliance_id + '_' + size_class
+                    size_key = compliance_id + '_' + size_class
 
-                            if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                                NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = 0
+                    if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
+                        NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = 0
 
-                            if verbose:
-                                print('%s: %s / %s: %.2f' % (size_key,
-                                                             NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key],
-                                                             NewVehicleMarket.base_year_context_size_class_sales[size_class],
-                                                             NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] /
-                                                             NewVehicleMarket.base_year_context_size_class_sales[size_class]))
+                    if verbose:
+                        print('%s: %s / %s: %.2f' % (size_key,
+                                                     NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key],
+                                                     NewVehicleMarket.base_year_context_size_class_sales[size_class],
+                                                     NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] /
+                                                     NewVehicleMarket.base_year_context_size_class_sales[size_class]))
 
-                            VehicleFinal.mfr_base_year_size_class_share[compliance_id][size_class] = \
-                                NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] / \
-                                NewVehicleMarket.base_year_context_size_class_sales[size_class]
+                    VehicleFinal.mfr_base_year_size_class_share[compliance_id][size_class] = \
+                        NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] / \
+                        NewVehicleMarket.base_year_context_size_class_sales[size_class]
 
         return template_errors
 
