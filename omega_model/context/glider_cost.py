@@ -22,9 +22,9 @@ Sample Data Columns
         :widths: auto
 
         body_style,item,material,value,dollar_basis,notes
-        sedan,unibody_structure,aluminum,(2.55) * GLIDER_WEIGHT * MARKUP,2020,
-        sedan,unibody_structure,steel,(1.8) * GLIDER_WEIGHT * MARKUP,2020,
-        cuv_suv,unibody_structure,aluminum,(2.65) * GLIDER_WEIGHT * MARKUP,2020,
+        sedan,unibody_structure,aluminum,(2.55) * structure_mass_lbs * MARKUP,2020,
+        sedan,unibody_structure,steel,(1.8) * structure_mass_lbs * MARKUP,2020,
+        cuv_suv,unibody_structure,aluminum,(2.65) * structure_mass_lbs * MARKUP,2020,
 
 ----
 
@@ -48,13 +48,13 @@ class GliderCost(OMEGABase):
     """
 
     @staticmethod
-    def calc_cost(veh, pkg_df):
+    def calc_cost(vehicle, pkg_df):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
 
         Args:
-            veh (object): an object of the vehicles.Vehicle class.
+            vehicle (Vehicle): the vehicle to calc costs for
             pkg_df (DataFrame): the necessary information for developing cost estimates.
 
         Returns:
@@ -63,12 +63,18 @@ class GliderCost(OMEGABase):
         """
         results = []
 
+        # TODO: vehicle.structure_material from pkg_df
+        # TODO: structure_mass_lbs from pkg_df
+
         base_footprint, model_year, base_msrp, body_style \
-            = veh.footprint_ft2, veh.model_year, veh.msrp_dollars, veh.body_style
+            = vehicle.base_year_footprint_ft2, vehicle.model_year, vehicle.msrp_dollars, vehicle.body_style
+
         unibody_structure, base_glider_structure_weight, material, base_powertrain_cost \
-            = veh.unibody_structure, veh.glider_structure_weight, veh.material, veh.powertrain_cost
+            = vehicle.unibody_structure, vehicle.glider_structure_weight, vehicle.structure_material, vehicle.powertrain_cost
+
         base_height, base_ground_clearance \
-            = veh.height_in, veh.ground_clearance_in
+            = vehicle.height_in, vehicle.ground_clearance_in
+
         # for testing
         # base_footprint, model_year, base_msrp, body_style, unibody_structure, base_glider_structure_weight, \
         # material, base_powertrain_cost, base_height, base_ground_clearance \
@@ -107,7 +113,7 @@ class GliderCost(OMEGABase):
         learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
 
         # first calc base glider structure and non-structure weights
-        GLIDER_WEIGHT = base_glider_structure_weight
+        structure_mass_lbs = base_glider_structure_weight
         adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
         base_glider_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
                                      * adj_factor * learning_factor
@@ -118,7 +124,7 @@ class GliderCost(OMEGABase):
         for idx, row in pkg_df.iterrows():
 
             # glider structure cost
-            GLIDER_WEIGHT = row['glider_structure_weight']
+            structure_mass_lbs = row['structure_mass_lbs']
             material = row['material']
             adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
             pkg_glider_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \

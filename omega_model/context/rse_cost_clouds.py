@@ -306,7 +306,8 @@ class CostCloud(OMEGABase, CostCloudBase):
         vehicle_curbweights_lbs = []
         eng_rated_hps = []
         for structure_material in MassScaling.structure_materials:
-            print(structure_material)
+            # print(structure_material)
+
             # battery_usable_portion = 0.9
             # range_ballast_lbs  = 300
             # cd_range_miles = 300
@@ -337,8 +338,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                 converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
                             abs(1 - eng_rated_hp / prior_eng_rated_hp) <= convergence_tolerance
 
-                print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
-                print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs )
+                # print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
+                # print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
 
                 prior_powertrain_mass_lbs = powertrain_mass_lbs
                 prior_eng_rated_hp = eng_rated_hp

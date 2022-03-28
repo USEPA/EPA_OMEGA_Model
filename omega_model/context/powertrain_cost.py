@@ -48,13 +48,13 @@ class PowertrainCost(OMEGABase):
     """
 
     @staticmethod
-    def calc_cost(veh, pkg_df):
+    def calc_cost(vehicle, pkg_df):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
 
         Args:
-            veh (object): an object of the vehicles.Vehicle class.
+            vehicle (Vehicle): the vehicle to calc costs for
             pkg_df (DataFrame): the necessary information for developing cost estimates.
 
         Returns:
@@ -64,7 +64,7 @@ class PowertrainCost(OMEGABase):
         results = []
 
         # elec_class, market_class_id, model_year = veh.electrification_class, veh.market_class_id, veh.model_year
-        elec_class, market_class_id, model_year = veh
+        elec_class, market_class_id, model_year = vehicle
         ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV'}
         powertrain_type = ec_dict[elec_class]
 
