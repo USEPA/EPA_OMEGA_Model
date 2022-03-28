@@ -68,7 +68,7 @@ class MassScaling(OMEGABase):
     # drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
 
     @staticmethod
-    def calc_mass_terms(vehicle, structure_material, footprint_ft2):
+    def calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2):
         """
             Calculate struture mass, battery mass and powertrain mass for the given vehicle
         Args:
