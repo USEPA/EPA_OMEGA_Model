@@ -68,7 +68,7 @@ class MassScaling(OMEGABase):
     # drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
 
     @staticmethod
-    def calc_mass_terms(vehicle):
+    def calc_mass_terms(vehicle, structure_material, footprint_ft2):
         """
             Calculate struture mass, battery mass and powertrain mass for the given vehicle
         Args:
@@ -83,25 +83,29 @@ class MassScaling(OMEGABase):
         battery_mass_lbs = 0
         powertrain_mass_lbs = 0
 
+        locals_dict = {'vehicle': vehicle, 'structure_material': structure_material,
+                                           'footprint_ft2': footprint_ft2}
+
         for condition, equation in zip(MassScaling._data['null_structure_mass_lbs']['condition'],
                                        MassScaling._data['null_structure_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, {'vehicle': vehicle}):
-                null_structure_mass_lbs = eval(equation, {}, {'vehicle': vehicle})
+            if Eval.eval(condition, {}, locals_dict):
+                null_structure_mass_lbs = Eval.eval(equation, {}, locals_dict)
 
         for condition, equation in zip(MassScaling._data['structure_mass_lbs']['condition'],
                                        MassScaling._data['structure_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, {'vehicle': vehicle}):
-                structure_mass_lbs = eval(equation, {}, {'null_structure_mass_lbs': null_structure_mass_lbs})
+            locals_dict.update({'null_structure_mass_lbs': null_structure_mass_lbs})
+            if Eval.eval(condition, {}, locals_dict):
+                structure_mass_lbs = Eval.eval(equation, {}, locals_dict)
 
         for condition, equation in zip(MassScaling._data['battery_mass_lbs']['condition'],
                                        MassScaling._data['battery_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, {'vehicle': vehicle}):
-                battery_mass_lbs = eval(equation, {}, {'vehicle': vehicle})
+            if Eval.eval(condition, {}, locals_dict):
+                battery_mass_lbs = Eval.eval(equation, {}, locals_dict)
 
         for condition, equation in zip(MassScaling._data['powertrain_mass_lbs']['condition'],
                                        MassScaling._data['powertrain_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, {'vehicle': vehicle}):
-                powertrain_mass_lbs = eval(equation, {}, {'vehicle': vehicle})
+            if Eval.eval(condition, {}, locals_dict):
+                powertrain_mass_lbs = Eval.eval(equation, {}, locals_dict)
 
         return structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs
 

@@ -301,10 +301,12 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
         rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
 
+        footprint_ft2 = vehicle.footprint_ft2  # for now
+
         vehicle_curbweights_lbs = []
         for structure_material in ['steel', 'aluminum']:
-            vehicle.structure_material = structure_material
-            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(vehicle)
+            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
+                MassScaling.calc_mass_terms(vehicle, structure_material, footprint_ft2)
 
             vehicle_curbweights_lbs.append(vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs +
                                            structure_mass_lbs + battery_mass_lbs)
