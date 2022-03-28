@@ -1419,7 +1419,11 @@ class VehicleFinal(SQABase, Vehicle):
 
                 # TODO: these need to be in the vehicles.csv!!
                 veh.powertrain_type = veh.fueling_class
-                veh.battery_kwh = 60
+                if vehicle.fueling_class == 'BEV':
+                    veh.battery_kwh = 60
+                else:
+                    veh.battery_kwh = 0
+
                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
                     MassScaling.calc_mass_terms(veh, veh.structure_material, veh.footprint_ft2)
 
