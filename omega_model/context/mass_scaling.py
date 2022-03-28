@@ -64,7 +64,9 @@ class MassScaling(OMEGABase):
     """
 
     _data = dict()  # private dict, drive cycle descriptions
-    #
+
+    structure_materials = []
+
     # drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
 
     @staticmethod
@@ -138,7 +140,7 @@ class MassScaling(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'mass_term': ['null_structure_mass_lbs', 'structure_mass_lbs', 'battery_mass_lbs',
+            validation_dict = {'mass_term': ['structure_materials', 'null_structure_mass_lbs', 'structure_mass_lbs', 'battery_mass_lbs',
                                              'powertrain_mass_lbs'],
                                }
 
@@ -150,6 +152,8 @@ class MassScaling(OMEGABase):
             for term in ['null_structure_mass_lbs', 'structure_mass_lbs',
                          'battery_mass_lbs', 'powertrain_mass_lbs']:
                 MassScaling._data[term] = df[df['mass_term'] == term].set_index('mass_term').to_dict(orient='series')
+
+            MassScaling.structure_materials = Eval.eval(df[df['mass_term'] == 'structure_materials']['equation'][0])
 
         return template_errors
 

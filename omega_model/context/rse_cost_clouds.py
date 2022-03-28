@@ -305,7 +305,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         vehicle_curbweights_lbs = []
         eng_rated_hps = []
-        for structure_material in ['steel', 'aluminum']:
+        for structure_material in MassScaling.structure_materials:
             print(structure_material)
             # battery_usable_portion = 0.9
             # range_ballast_lbs  = 300

@@ -1370,7 +1370,7 @@ class VehicleFinal(SQABase, Vehicle):
                                'electrification_class': ['N', 'EV', 'HEV', 'PHEV', 'FCV'],
                                'unibody_structure': [0, 1],
                                'body_style': BodyStyles.body_styles,
-                               'structure_material': ['steel','aluminum'],
+                               'structure_material': MassScaling.structure_materials,
                                'drive_system': [2, 4],  # for now, anyway... 1,2,3??
                                }
 
