@@ -42,6 +42,7 @@ try:
     from common import file_io, omega_log
     from common.input_validation import *
     from common.omega_functions import *
+    from common.omega_eval import *
     from context.context_base_classes import *
     from policy.policy_base_classes import *
     from consumer.consumer_base_classes import *

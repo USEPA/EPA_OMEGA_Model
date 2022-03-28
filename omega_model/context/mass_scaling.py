@@ -85,22 +85,22 @@ class MassScaling(OMEGABase):
 
         for condition, equation in zip(MassScaling._data['null_structure_mass_lbs']['condition'],
                                        MassScaling._data['null_structure_mass_lbs']['equation']):
-            if eval(condition, {}, {'vehicle': vehicle}):
+            if Eval.eval(condition, {}, {'vehicle': vehicle}):
                 null_structure_mass_lbs = eval(equation, {}, {'vehicle': vehicle})
 
         for condition, equation in zip(MassScaling._data['structure_mass_lbs']['condition'],
                                        MassScaling._data['structure_mass_lbs']['equation']):
-            if eval(condition, {}, {'vehicle': vehicle}):
+            if Eval.eval(condition, {}, {'vehicle': vehicle}):
                 structure_mass_lbs = eval(equation, {}, {'null_structure_mass_lbs': null_structure_mass_lbs})
 
         for condition, equation in zip(MassScaling._data['battery_mass_lbs']['condition'],
                                        MassScaling._data['battery_mass_lbs']['equation']):
-            if eval(condition, {}, {'vehicle': vehicle}):
+            if Eval.eval(condition, {}, {'vehicle': vehicle}):
                 battery_mass_lbs = eval(equation, {}, {'vehicle': vehicle})
 
         for condition, equation in zip(MassScaling._data['powertrain_mass_lbs']['condition'],
                                        MassScaling._data['powertrain_mass_lbs']['equation']):
-            if eval(condition, {}, {'vehicle': vehicle}):
+            if Eval.eval(condition, {}, {'vehicle': vehicle}):
                 powertrain_mass_lbs = eval(equation, {}, {'vehicle': vehicle})
 
         return structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs
