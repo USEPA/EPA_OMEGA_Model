@@ -308,11 +308,10 @@ class CostCloud(OMEGABase, CostCloudBase):
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
                 MassScaling.calc_mass_terms(vehicle, structure_material, footprint_ft2)
 
-            vehicle_curbweight_lbs = vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs + \
+            vehicle_curbweight_lbs = vehicle.base_year_glider_non_structure_mass_lbs + powertrain_mass_lbs + \
                                      structure_mass_lbs + battery_mass_lbs
 
             vehicle_curbweights_lbs.append(vehicle_curbweight_lbs)
-
 
         etws = np.array(vehicle_curbweights_lbs) + DriveCycleBallast.get_ballast_lbs(vehicle)
 
