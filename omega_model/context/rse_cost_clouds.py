@@ -305,6 +305,31 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         vehicle_curbweights_lbs = []
         for structure_material in ['steel', 'aluminum']:
+
+           # mass, powertrain, battery iteration psuedocode
+           # battery_usable_portion = 0.9
+           # range_ballast_lbs  = 300
+           # cd_range_miles = 300
+           # eng_rated_hp = 0
+           # battery_kwh = 0
+           # convergence = 0
+           # while convergence == 0
+           #    structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2)
+           #    vehicle_curbweight_lbs = vehicle.glider_non_structure_mass_lbs + powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs
+           #    eng_rated_hp = powertrain_sizing_function(vehicle_curbweight_lbs, base_year_hp, base_year_curbweight)
+           #    battery_kwh = battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion)
+           #    if and(abs(1 - structure_mass_lbs/prior_structure_mass_lbs) < tol, abs(1 - battery_kwh/prior_battery_kwh) < tol, abs(1 - powertrain_mass_lbs/prior_powertrain_mass_lbs) < tol), abs(1 - eng_rated_hp/prior_eng_rated_hp) < tol))
+           #        convergence = 1
+           #
+           # def battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion):
+           #    # use RSE's for kwh/mi, and target range value to get the required kwh
+           #
+           # def powertrain_sizing_function(vehicle_curbweight_lbs, base_year_hp, base_year_curbweight):
+           #    eng_rated_hp = vehicle_curbweight_lbs / (base_year_curbweight / base_year_hp)
+           #
+           # end pseudocode
+
+
             structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
                 MassScaling.calc_mass_terms(vehicle, structure_material, footprint_ft2)
 
