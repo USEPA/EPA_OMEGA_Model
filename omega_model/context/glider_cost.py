@@ -69,14 +69,14 @@ class GliderCost(OMEGABase):
         base_footprint, model_year, base_msrp, body_style \
             = vehicle.base_year_footprint_ft2, vehicle.model_year, vehicle.msrp_dollars, vehicle.body_style
 
-        unibody_structure, base_glider_structure_weight, material, base_powertrain_cost \
-            = vehicle.unibody_structure, vehicle.glider_structure_weight, vehicle.structure_material, vehicle.powertrain_cost
+        unibody_structure, base_year_structure_mass_lbs, material, base_powertrain_cost \
+            = vehicle.unibody_structure, vehicle.base_year_structure_mass_lbs, vehicle.structure_material, vehicle.powertrain_cost
 
         base_height, base_ground_clearance \
             = vehicle.height_in, vehicle.ground_clearance_in
 
         # for testing
-        # base_footprint, model_year, base_msrp, body_style, unibody_structure, base_glider_structure_weight, \
+        # base_footprint, model_year, base_msrp, body_style, unibody_structure, base_year_structure_mass_lbs, \
         # material, base_powertrain_cost, base_height, base_ground_clearance \
         #     = veh
 
@@ -113,7 +113,7 @@ class GliderCost(OMEGABase):
         learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
 
         # first calc base glider structure and non-structure weights
-        structure_mass_lbs = base_glider_structure_weight
+        structure_mass_lbs = base_year_structure_mass_lbs
         adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
         base_glider_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
                                      * adj_factor * learning_factor
