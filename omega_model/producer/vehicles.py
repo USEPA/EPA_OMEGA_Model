@@ -1124,7 +1124,7 @@ class VehicleFinal(SQABase, Vehicle):
     # --- database table properties ---
     __tablename__ = 'vehicles'
     vehicle_id = Column(Integer, primary_key=True)  #: unique vehicle ID, database table primary key
-    name = Column('name', String)  #: vehicle name
+    name = Column(String)  #: vehicle name
     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
     compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
     manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
@@ -1136,24 +1136,24 @@ class VehicleFinal(SQABase, Vehicle):
     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
-    target_co2e_grams_per_mile = Column('target_co2e_grams_per_mile', Float)  #: cert target CO2e g/mi, as determined by the active policy
+    target_co2e_grams_per_mile = Column(Float)  #: cert target CO2e g/mi, as determined by the active policy
     lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
     target_co2e_Mg = Column('target_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
-    in_use_fuel_id = Column('in_use_fuel_id', String)  #: in-use / onroad fuel ID
-    cert_fuel_id = Column('cert_fuel_id', String)  #: cert fuel ID
-    market_class_id = Column('market_class_id', String)  #: market class ID, as determined by the consumer subpackage
-    unibody_structure = Column('unibody_structure', Float)  #: unibody structure flag, e.g. 0,1
-    drive_system = Column('drive_system', Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
-    curbweight_lbs = Column('curbweight_lbs', Float)  #: vehicle curbweight, pounds
-    footprint_ft2 = Column('footprint_ft2', Float)  #: vehicle footprint, square feet
-    eng_rated_hp = Column('eng_rated_hp', Float)  #: engine rated horsepower
-    target_coef_a = Column('target_coef_a', Float)  #: roadload A coefficient, lbs
-    target_coef_b = Column('target_coef_b', Float)  #: roadload B coefficient, lbs/mph
-    target_coef_c = Column('target_coef_c', Float)  #: roadload C coefficient, lbs/mph^2
-    body_style = Column('body_style', String)  #: vehicle body style, e.g. 'sedan'
-    structure_material = Column('structure_material', String)  #: vehicle body structure material, e.g. 'steel'
-    powertrain_type = Column('powertrain_type', String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
+    in_use_fuel_id = Column(String)  #: in-use / onroad fuel ID
+    cert_fuel_id = Column(String)  #: cert fuel ID
+    market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
+    unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
+    drive_system = Column(Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
+    curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
+    footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
+    eng_rated_hp = Column(Float)  #: engine rated horsepower
+    target_coef_a = Column(Float)  #: roadload A coefficient, lbs
+    target_coef_b = Column(Float)  #: roadload B coefficient, lbs/mph
+    target_coef_c = Column(Float)  #: roadload C coefficient, lbs/mph^2
+    body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
+    structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
+    powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
