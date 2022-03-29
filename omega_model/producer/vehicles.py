@@ -1373,13 +1373,12 @@ class VehicleFinal(SQABase, Vehicle):
 
 
     @staticmethod
-    def init_database_from_file(df, vehicle_onroad_calculations_file, verbose=False):
+    def init_from_file(vehicle_onroad_calculations_file, verbose=False):
         """
         Init vehicle database from the base year vehicles file and set up the onroad / vehicle attribute calculations.
         Also initializes decomposition attributes.
 
         Args:
-            df (DataFrame): dataframe of aggregated vehicle data
             vehicle_onroad_calculations_file (str): the name of the vehicle onroad calculations (vehicle attribute calculations) file
             verbose (bool): enable additional console and logfile output if True
 
@@ -1425,6 +1424,7 @@ if __name__ == '__main__':
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
         from context.fuel_prices import FuelPrice  # needed for retail fuel price
         from context.new_vehicle_market import NewVehicleMarket  # needed for context size class hauling info
+        from producer.vehicle_aggregation import VehicleAggregation
         from producer.vehicle_annual_data import VehicleAnnualData
 
         module_name = get_template_name(omega_globals.options.policy_targets_file)
@@ -1477,9 +1477,11 @@ if __name__ == '__main__':
         init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
                                                verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=verbose_init)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=omega_globals.options.verbose)
 
         if not init_fail:
 

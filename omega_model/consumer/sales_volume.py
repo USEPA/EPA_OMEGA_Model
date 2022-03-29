@@ -108,6 +108,7 @@ if __name__ == '__main__':
         # override reg_classes from __init__.py:
         importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
+        from producer.vehicle_aggregation import VehicleAggregation
         from producer.vehicles import VehicleFinal, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
@@ -143,9 +144,11 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=verbose_init)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=omega_globals.options.verbose)
 
         init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)

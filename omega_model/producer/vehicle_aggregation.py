@@ -215,6 +215,9 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
+# for now, eventually need to be inputs somewhere:
+aggregation_columns = ['context_size_class', 'electrification_class', 'cert_fuel_id', 'reg_class_id', 'drive_system']
+
 
 class VehicleAggregation(OMEGABase):
     """
@@ -238,24 +241,22 @@ class VehicleAggregation(OMEGABase):
         Returns:
             List of template/input errors, else empty list on success
 
-        See Also:
-            ``DecompositionAttributes``
+        # See Also:
+        #     ``DecompositionAttributes``
 
         """
         template_errors = []
 
-        DecompositionAttributes.init()   # offcycle_credits must be initalized first
+        # DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
         from producer.vehicles import VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
-
-        aggregated_vehicles_df = pd.DataFrame()
 
         if verbose:
             omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.45
+        input_template_version = 0.46
         input_template_columns = VehicleFinal.mandatory_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -280,16 +281,33 @@ class VehicleAggregation(OMEGABase):
                                'unibody_structure': [0, 1],
                                'body_style': BodyStyles.body_styles,
                                'structure_material': MassScaling.structure_materials,
+                               'in_use_fuel_id': ["{'pump gasoline':1.0}", "{'pump diesel':1.0}", "{'hydrogen':1.0}",
+                                                  "{'US electricity':1.0}"],
+                               'cert_fuel_id': ["{'gasoline':1.0}", "{'diesel':1.0}", "{'hydrogen':1.0}",
+                                                "{'electricity':1.0}"],
                                'drive_system': [2, 4],  # for now, anyway... 1,2,3??
+                               'high_eff_alternator': [0, 1],
+                               'start_stop': [0, 1],
+                               'hev': [0, 1],
+                               'phev': [0, 1],
+                               'bev': [0, 1],
+                               'deac_pd': [0, 1],
+                               'deac_fc': [0, 1],
+                               'cegr': [0, 1],
+                               'atk2': [0, 1],
+                               'gdi': [0, 1],
+                               'turb12': [0, 1],
+                               'turb11': [0, 1],
+                               'gas_fuel': [0, 1],
+                               'diesel_fuel': [0, 1],
                                }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            # TODO: aggregate rows from df -> aggregated_vehicles_df
-            pass
+            omega_globals.options.vehicles_df = df.groupby(aggregation_columns).mean(numeric_only=True)
 
-        return template_errors, aggregated_vehicles_df
+        return template_errors
 
 
 if __name__ == '__main__':

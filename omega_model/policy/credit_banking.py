@@ -574,6 +574,7 @@ if __name__ == '__main__':
 
         from producer.manufacturers import Manufacturer
         from producer.manufacturer_annual_data import ManufacturerAnnualData
+        from producer.vehicle_aggregation import VehicleAggregation
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
 
@@ -590,9 +591,11 @@ if __name__ == '__main__':
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=verbose_init)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=omega_globals.options.verbose)
 
         # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'consolidated_OEM')
         # credit_bank.update_credit_age(2020)

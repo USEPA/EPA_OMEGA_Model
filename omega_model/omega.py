@@ -1143,6 +1143,7 @@ def init_omega(session_runtime_options):
 
     from producer.manufacturers import Manufacturer
     from producer.manufacturer_annual_data import ManufacturerAnnualData
+    from producer.vehicle_aggregation import VehicleAggregation
     from producer.vehicles import VehicleFinal, DecompositionAttributes
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer import compliance_search
@@ -1240,9 +1241,11 @@ def init_omega(session_runtime_options):
         init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
                                                               verbose=verbose_init)
 
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=verbose_init)
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=verbose_init)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=verbose_init)
 
         init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
                                                       verbose=verbose_init)
