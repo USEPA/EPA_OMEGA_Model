@@ -115,10 +115,10 @@ class GliderCost(OMEGABase):
         # first calc base glider structure and non-structure weights
         structure_mass_lbs = base_year_structure_mass_lbs
         adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
-        base_glider_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
+        base_year_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
                                      * adj_factor * learning_factor
 
-        base_glider_non_structure_cost = (base_msrp / MARKUP) - base_glider_structure_cost - base_powertrain_cost
+        base_year_glider_non_structure_cost = (base_msrp / MARKUP) - base_year_structure_cost - base_powertrain_cost
 
         # now calc package costs
         for idx, row in pkg_df.iterrows():
@@ -137,7 +137,7 @@ class GliderCost(OMEGABase):
             adj_factor = _cache[body_style, 'non_structure', 'various']['dollar_adjustment']
             delta_glider_non_structure_cost = eval(_cache[body_style, 'non_structure', 'various']['value'], {}, locals()) \
                                               * adj_factor * learning_factor
-            pkg_glider_non_structure_cost = base_glider_non_structure_cost + delta_glider_non_structure_cost
+            pkg_glider_non_structure_cost = base_year_glider_non_structure_cost + delta_glider_non_structure_cost
 
             pkg_glider_cost = pkg_glider_structure_cost + pkg_glider_non_structure_cost
 

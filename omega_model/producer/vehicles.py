@@ -1440,7 +1440,8 @@ class VehicleFinal(SQABase, Vehicle):
                     MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
 
                 veh.base_year_structure_mass_lbs = structure_mass_lbs
-                veh.base_year_glider_non_structure_mass_lbs = veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
+                veh.base_year_glider_non_structure_mass_lbs = \
+                    veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
                 veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / veh.eng_rated_hp
 
                 vehicle_shares_dict['total'] += veh.initial_registered_count
