@@ -305,7 +305,9 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            omega_globals.options.vehicles_df = df.groupby(aggregation_columns).mean(numeric_only=True)
+            omega_globals.options.vehicles_df = df.groupby(aggregation_columns, as_index=False).mean(numeric_only=True)
+
+        omega_globals.options.vehicles_df['manufacturer_id'] = 'consolidated_OEM'
 
         return template_errors
 
