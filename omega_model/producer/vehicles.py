@@ -27,9 +27,9 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,target_coef_a,target_coef_b,target_coef_c
-        Minicompact_N_{'gasoline':1.0}_car_2,consolidated_OEM,2019,car,Minicompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},19184,,,41.20107902,262.8298582,12.21811801,3400.483476,161.2357307,,54.06027083,4.90376442,99.96072282,86.43657752,40302.84404,4.142068694,873.423386,,0,sedan,steel,2,3817.337516,,2880.32936,36.62889576,0.122070038,0.020051358
-        Large Utility_N_{'gasoline':1.0}_truck_4,consolidated_OEM,2019,truck,Large Utility,N,,{'pump gasoline':1.0},{'gasoline':1.0},1483742,,,53.09122165,321.7602595,17.59397906,5311.848055,197.0303042,,70.74355064,8.484684743,115.9391286,155.5495979,50082.78416,6.477660441,,,0,cuv_suv,steel,4,6383.483571,,4820.894717,44.26678577,0.315401336,0.02893031
+        vehicle_name,manufacturer_id,model_year,reg_class_id,context_size_class,electrification_class,cost_curve_class,in_use_fuel_id,cert_fuel_id,sales,cert_direct_oncycle_co2e_grams_per_mile,cert_direct_oncycle_kwh_per_mile,footprint_ft2,eng_rated_hp,tot_road_load_hp,etw_lbs,length_in,width_in,height_in,ground_clearance_in,wheelbase_in,interior_volume_cuft,msrp_dollars,passenger_capacity,payload_capacity_lbs,towing_capacity_lbs,unibody_structure,body_style,structure_material,drive_system,gvwr_lbs,gcwr_lbs,curbweight_lbs,eng_cyls_num,eng_disp_liters,high_eff_alternator,start_stop,hev,phev,bev,deac_pd,deac_fc,cegr,atk2,gdi,turb12,turb11,gas_fuel,diesel_fuel,target_coef_a,target_coef_b,target_coef_c
+        COOPER HARDTOP 2 DOOR,BMX,2019,car,Subcompact,N,,{'pump gasoline':1.0},{'gasoline':1.0},4459,,,40,134,10.7,3000,153.5,,55.8,5.1,99.2,,23900,4.3,775,,0,sedan,steel,2,3680,,2743,3,1.5,0,0,0,0,0,0,0,0,0,1,1,0,1,0,27.6,0.156,0.01806
+        Panamera 4 e-Hybrid,VGA,2019,car,Large,PHEV,,{'pump gasoline':1.0},{'gasoline':1.0},458,,,52.7,330,15.8,5500,200.8,,56.1,,118.1,,107783,4.3,,,0,sedan,steel,4,5860,,4547,6,2.9,0,1,0,1,0,0,0,0,0,1,1,0,1,0,51.706,0.39797,0.01863
 
 Data Column Name and Description
 
@@ -49,12 +49,12 @@ Data Column Name and Description
         across years within the simulation based on policy changes. ``reg_class_id`` can be considered a 'historical'
         or 'legacy' reg class.
 
-    :electrification_class:
-        The electrification class of the vehicle, such as 'EV', 'HEV', (or 'N' for none - final format TBD)
-
     :context_size_class:
         The context size class of the vehicle, for future sales mix projections.  Must be consistent with the context
         input file loaded by ``class context_new_vehicle_market.ContextNewVehicleMarket``
+
+    :electrification_class:
+        The electrification class of the vehicle, such as 'EV', 'HEV', (or 'N' for none - final format TBD)
 
     :cost_curve_class:
         The name of the cost curve class of the vehicle, used to determine which technology options and associated costs
@@ -72,15 +72,11 @@ Data Column Name and Description
     :sales:
         Number of vehicles sold in the ``model_year``
 
-    **OPTIONAL COLUMNS**
-        These columns become object attributes that may be used to determine vehicle regulatory class
-        (e.g. 'car','truck') based on the simulated policy, or they may be used for other purposes.
+    :cert_direct_oncycle_co2e_grams_per_mile:
+        Vehicle direct oncycle emissions CO2e grams/mile
 
-    :cert_co2e_grams_per_mile:
-        Vehicle certification emissions CO2e grams/mile
-
-    :cert_direct_kwh_per_mile:
-        Vehicle certification electricity consumption kWh/mile
+    :cert_direct_oncycle_kwh_per_mile:
+        Vehicle direct oncycle electricity consumption kWh/mile
 
     :footprint_ft2:
         Vehicle footprint based on vehicle wheelbase and track (square feet)
@@ -93,6 +89,88 @@ Data Column Name and Description
 
     :etw_lbs:
         Vehicle equivalent test weight (ETW) (pounds)
+
+    :msrp_dollars:
+        Vehicle manufacturer suggested retail price (MSRP)
+
+    :unibody_structure:
+        Vehicle body structure; 1 = unibody, 0 = body-on-frame
+
+    :body_style:
+        Vehicle body style; sedan, cuv_suv, pickup
+
+    :structure_material:
+        Primary material of the body structure; steel, aluminum
+
+    :curbweight_lbs:
+        Vehicle curb weight (pounds)
+
+    :eng_cyls_num:
+        Number of engine cylinders
+
+    :eng_disp_liters:
+        Engine displacement (liters)
+
+    :high_eff_alternator:
+        Technology flag for high efficiency alternator (1 = Equipped, 0 = Not equipped)
+
+    :start_stop:
+        Technology flag for engine start-stop system (1 = Equipped, 0 = Not equipped)
+
+    :hev:
+        Technology flag for non plug-in hybrid system (1 = Equipped, 0 = Not equipped)
+
+    :phev:
+        Technology flag for plug-in hybrid system (1 = Equipped, 0 = Not equipped)
+
+    :bev:
+        Technology flag for battery electric vehicle (1 = Equipped, 0 = Not equipped)
+
+    :deac_pd:
+        Technology flag for cylinder deactivation, discrete operation of partial number of cylinders (1 = Equipped, 0 = Not equipped)
+
+    :deac_fc:
+        Technology flag for cylinder deactivation, continuosly variable operation of full number of cylinders (1 = Equipped, 0 = Not equipped)
+
+    :deac_fc:
+        Technology flag for cooled exhaust gas recirculation (1 = Equipped, 0 = Not equipped)
+
+    :atk2:
+        Technology flag for high geometric compression ratio Atkinson cycle engine (1 = Equipped, 0 = Not equipped)
+
+    :gdi:
+        Technology flag for gasoline direct injection system (1 = Equipped, 0 = Not equipped)
+
+    :turb12:
+        Technology turbocharged engine, 18-21bar 2nd generation (1 = Equipped, 0 = Not equipped)
+
+    :turb11:
+        Technology turbocharged engine, 18-21bar 1st generation (1 = Equipped, 0 = Not equipped)
+
+    :gas_fuel
+        Technology gasoline-fueled engines (1 = Equipped, 0 = Not equipped)
+
+    :diesel_fuel
+        Technology diesel-fueled engines (1 = Equipped, 0 = Not equipped)
+
+    :target_coef_a:
+       Coast down target A coeffient (lbf)
+
+    :target_coef_b:
+       Coast down target B coeffient (lbf/mph)
+
+    :target_coef_c:
+       Coast down target C coeffient (lbf/mph**2)
+
+    **OPTIONAL COLUMNS**
+        These columns become object attributes that may be used to determine vehicle regulatory class
+        (e.g. 'car','truck') based on the simulated policy, or they may be used for other purposes.
+
+    :cert_co2e_grams_per_mile:
+        Vehicle certification emissions CO2e grams/mile
+
+    :cert_direct_kwh_per_mile:
+        Vehicle certification electricity consumption kWh/mile
 
     :length_in:
         Vehicle overall length (inches)
@@ -112,9 +190,6 @@ Data Column Name and Description
     :interior_volume_cuft:
         Vehicle interior volume (cubic feet)
 
-    :msrp_dollars:
-        Vehicle manufacturer suggested retail price (MSRP)
-
     :passenger_capacity:
         Vehicle passenger capacity (number of occupants)
 
@@ -124,32 +199,11 @@ Data Column Name and Description
     :towing_capacity_lbs:
         Vehicle towing capacity (pounds)
 
-    :unibody_structure:
-        Vehicle body structure; 1 = unibody, 0 = body-on-frame
-
-    :body_style:
-        Vehicle body style; sedan, cuv_suv, pickup
-
-    :body_style:
-        Vehicle body style; sedan, cuv_suv, pickup
-
-    :structure_material:
-        Primary material of the body structure; steel, aluminum
-
     :gvwr_lbs:
        Gross Vehicle Weight Rating (pounds)
 
     :gcwr_lbs:
        Gross Combined Weight Rating (pounds)
-
-    :target_coef_a:
-       Coast down target A coeffient (lbf)
-
-    :target_coef_b:
-       Coast down target B coeffient (lbf/mph)
-
-    :target_coef_c:
-       Coast down target C coeffient (lbf/mph**2)
 
 ----
 
@@ -1172,12 +1226,7 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
     mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
-    base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
-                                   'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
-                                   'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
-                                   'unibody_structure', 'drive_system', 'curbweight_lbs',
-                                   'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
-                                   'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
+    base_input_template_columns = {'vehicle_name',' manufacturer_id',' model_year',' reg_class_id',' context_size_class',' electrification_class',' cost_curve_class',' in_use_fuel_id',' cert_fuel_id',' sales',' cert_direct_oncycle_co2e_grams_per_mile',' cert_direct_oncycle_kwh_per_mile',' footprint_ft2',' eng_rated_hp',' tot_road_load_hp',' etw_lbs',' ',' ',' ',' ',' ',' ',' msrp_dollars',' ',' ',' ',' unibody_structure',' body_style',' structure_material',' drive_system',' ',' ',' curbweight_lbs',' high_eff_alternator',' start_stop',' hev',' phev',' bev',' deac_pd',' deac_fc',' cegr',' atk2',' gdi',' turb12',' turb11',' gas_fuel',' diesel_fuel',' target_coef_a',' target_coef_b',' target_coef_c'}  #: mandatory input file columns, the rest can be optional numeric columns
                                     # TODO: , 'battery_kwh'
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
@@ -1350,7 +1399,7 @@ class VehicleFinal(SQABase, Vehicle):
             omega_log.logwrite('\nInitializing database from %s...' % filename)
 
         input_template_name = 'vehicles'
-        input_template_version = 0.45
+        input_template_version = 0.46
         input_template_columns = VehicleFinal.base_input_template_columns
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
