@@ -227,40 +227,46 @@ class VehicleAggregation(OMEGABase):
         pass
 
     @staticmethod
-    def init_vehicles_from_file(filename, verbose=False):
+    def init_from_file(filename, verbose=False):
         """
-
-        Load data from the base year vehicle file
+        Validate and read detailed vehicles.csv file
 
         Args:
-            filename (str): name of input file
+            filename (str): the name of the base year vehicles file
             verbose (bool): enable additional console and logfile output if True
 
         Returns:
             List of template/input errors, else empty list on success
 
+        See Also:
+            ``DecompositionAttributes``
+
         """
+        template_errors = []
+
+        DecompositionAttributes.init()   # offcycle_credits must be initalized first
+
+        from producer.vehicles import VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
 
-        vehicle_shares_dict = {'total': 0}
-
-        VehicleFinal.compliance_ids = set()
-        vehicles_list = []
+        aggregated_vehicles_df = pd.DataFrame()
 
         if verbose:
-            omega_log.logwrite('\nInitializing database from %s...' % filename)
+            omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
         input_template_version = 0.45
-        input_template_columns = VehicleFinal.base_input_template_columns
+        input_template_columns = VehicleFinal.mandatory_input_template_columns
 
-        template_errors = validate_template_version_info(filename, input_template_name, input_template_version, verbose=verbose)
+        template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
+                                                         verbose=verbose)
 
         if not template_errors:
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
         if not template_errors:
             from producer.manufacturers import Manufacturer
@@ -280,193 +286,10 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            # load data into database
-            for i in df.index:
-                veh = VehicleFinal(
-                    name=df.loc[i, 'vehicle_name'],
-                    manufacturer_id=df.loc[i, 'manufacturer_id'],
-                    model_year=df.loc[i, 'model_year'],
-                    context_size_class=df.loc[i, 'context_size_class'],
-                    electrification_class=df.loc[i, 'electrification_class'],
-                    cost_curve_class=df.loc[i, 'cost_curve_class'],
-                    in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
-                    cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                    initial_registered_count=df.loc[i, 'sales'],
-                    unibody_structure=df.loc[i, 'unibody_structure'],
-                    drive_system=df.loc[i, 'drive_system'],
-                    curbweight_lbs=df.loc[i, 'curbweight_lbs'],
-                    footprint_ft2=df.loc[i, 'footprint_ft2'],
-                    eng_rated_hp=df.loc[i, 'eng_rated_hp'],
-                    target_coef_a=df.loc[i, 'target_coef_a'],
-                    target_coef_b=df.loc[i, 'target_coef_b'],
-                    target_coef_c=df.loc[i, 'target_coef_c'],
-                    body_style=df.loc[i, 'body_style'],
-                    structure_material=df.loc[i, 'structure_material'],
-                    base_year_reg_class_id=df.loc[i, 'reg_class_id'],
-                    base_year_footprint_ft2=df.loc[i, 'footprint_ft2'],
-                )
+            # TODO: aggregate rows from df -> aggregated_vehicles_df
+            pass
 
-                for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
-                    veh.__setattr__(attr, df.loc[i, dc])
-
-                if omega_globals.options.consolidate_manufacturers:
-                    veh.compliance_id = 'consolidated_OEM'
-                else:
-                    veh.compliance_id = veh.manufacturer_id
-
-                VehicleFinal.compliance_ids.add(veh.compliance_id)
-
-                # TODO: what are we doing about fuel cell vehicles...?
-                if veh.electrification_class in ['EV', 'FCV']:
-                    veh.fueling_class = 'BEV'
-                else:
-                    veh.fueling_class = 'ICE'
-
-                veh.cert_direct_oncycle_co2e_grams_per_mile = df.loc[i, 'cert_direct_oncycle_co2e_grams_per_mile']
-                veh.cert_direct_co2e_grams_per_mile = veh.cert_direct_oncycle_co2e_grams_per_mile  # TODO: minus any credits??
-
-                veh.cert_co2e_grams_per_mile = None
-                veh.cert_direct_kwh_per_mile = df.loc[i, 'cert_direct_oncycle_kwh_per_mile']  # TODO: veh.cert_direct_oncycle_kwh_per_mile?
-                veh.onroad_direct_co2e_grams_per_mile = 0
-                veh.onroad_direct_kwh_per_mile = 0
-
-                # TODO: these need to be in the vehicles.csv!!
-                veh.powertrain_type = veh.fueling_class
-                if veh.fueling_class == 'BEV':
-                    veh.battery_kwh = 60
-                else:
-                    veh.battery_kwh = 0
-
-                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
-                    MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
-
-                veh.base_year_structure_mass_lbs = structure_mass_lbs
-                veh.base_year_glider_non_structure_mass_lbs = \
-                    veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
-                veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / veh.eng_rated_hp
-
-                vehicle_shares_dict['total'] += veh.initial_registered_count
-
-                if veh.context_size_class not in vehicle_shares_dict:
-                    vehicle_shares_dict[veh.context_size_class] = 0
-
-                vehicle_shares_dict[veh.context_size_class] += veh.initial_registered_count
-
-                vehicles_list.append(veh)
-
-                # assign user-definable market class
-                veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
-
-                non_responsive_market_category = \
-                    omega_globals.options.MarketClass.get_non_responsive_market_category(veh.market_class_id)
-
-                if non_responsive_market_category not in NewVehicleMarket.context_size_class_info_by_nrmc:
-                    NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category] = dict()
-
-                if veh.context_size_class not in \
-                        NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category]:
-                    NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class] = \
-                        {'total': veh.initial_registered_count, 'share': 0}
-                else:
-                    NewVehicleMarket.context_size_class_info_by_nrmc[non_responsive_market_category][veh.context_size_class]['total'] += \
-                        veh.initial_registered_count
-
-                if veh.context_size_class not in NewVehicleMarket.base_year_context_size_class_sales:
-                    NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] = veh.initial_registered_count
-                else:
-                    NewVehicleMarket.base_year_context_size_class_sales[veh.context_size_class] += veh.initial_registered_count
-
-                size_key = veh.compliance_id + '_' + veh.context_size_class
-                if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = veh.initial_registered_count
-                else:
-                    NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] += veh.initial_registered_count
-
-                if verbose:
-                    print(veh)
-
-            # Update market share and create alternative vehicles (a BEV equivalent for every ICE vehicle, etc).
-            # Alternative vehicles maintain fleet utility mix across model years and prevent all future vehicles
-            # from becoming midsize car BEVs, for example, just because that's the dominant BEV in the base year
-            # fleet
-            for v in vehicles_list:
-                v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
-
-                alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
-                if v.fueling_class == 'ICE':
-                    alt_veh.fueling_class = 'BEV'
-                    alt_veh.name = 'BEV of ' + v.name
-                    # alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
-                    alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
-                    alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                    alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
-                else:
-                    alt_veh.fueling_class = 'ICE'
-                    alt_veh.name = 'ICE of ' + v.name
-                    # alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
-                    alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
-                    alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                    alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
-                alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
-                alt_veh.cert_direct_co2e_grams_per_mile = 0
-                alt_veh.cert_direct_kwh_per_mile = 0
-
-            for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
-                for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
-                    NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share'] = \
-                        NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['total'] / vehicle_shares_dict[csc]
-
-            # calculate manufacturer base year context size class shares
-            VehicleFinal.compliance_ids = sorted(list(VehicleFinal.compliance_ids))
-
-            VehicleFinal.mfr_base_year_size_class_share = dict()
-            for compliance_id in VehicleFinal.compliance_ids:
-                for size_class in NewVehicleMarket.base_year_context_size_class_sales:
-                    if compliance_id not in VehicleFinal.mfr_base_year_size_class_share:
-                        VehicleFinal.mfr_base_year_size_class_share[compliance_id] = dict()
-
-                    size_key = compliance_id + '_' + size_class
-
-                    if size_key not in NewVehicleMarket.manufacturer_base_year_context_size_class_sales:
-                        NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] = 0
-
-                    if verbose:
-                        print('%s: %s / %s: %.2f' % (size_key,
-                                                     NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key],
-                                                     NewVehicleMarket.base_year_context_size_class_sales[size_class],
-                                                     NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] /
-                                                     NewVehicleMarket.base_year_context_size_class_sales[size_class]))
-
-                    VehicleFinal.mfr_base_year_size_class_share[compliance_id][size_class] = \
-                        NewVehicleMarket.manufacturer_base_year_context_size_class_sales[size_key] / \
-                        NewVehicleMarket.base_year_context_size_class_sales[size_class]
-
-        return template_errors
-
-    @staticmethod
-    def init_from_file(vehicles_file, verbose=False):
-        """
-        Validate and read detailed vehicles.csv file
-
-        Args:
-            vehicles_file (str): the name of the base year vehicles file
-            verbose (bool): enable additional console and logfile output if True
-
-        Returns:
-            List of template/input errors, else empty list on success
-
-        See Also:
-            ``DecompositionAttributes``
-
-        """
-        _init_fail = []
-
-        DecompositionAttributes.init()   # offcycle_credits must be initalized first
-
-        _init_fail += VehicleFinal.init_vehicles_from_file(vehicles_file, verbose=verbose)
-
-        return _init_fail
-
+        return template_errors, aggregated_vehicles_df
 
 
 if __name__ == '__main__':
