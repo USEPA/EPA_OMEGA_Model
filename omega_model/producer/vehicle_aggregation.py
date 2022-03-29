@@ -307,6 +307,9 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
+            # TDOO: calculate mass costs THEN groupby
+            # TODO: calculate weighted numeric values within the groups
+
             groupby = df.groupby(aggregation_columns, as_index=False)
             omega_globals.options.vehicles_df = groupby.mean(numeric_only=True)
 
