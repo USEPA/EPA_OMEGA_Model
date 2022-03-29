@@ -1029,7 +1029,7 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
     mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
-    base_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
+    mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
@@ -1439,7 +1439,7 @@ if __name__ == '__main__':
         vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
 
         VehicleFinal.dynamic_columns = list(
-            set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
+            set.difference(set(vehicle_columns), VehicleFinal.mandatory_input_template_columns))
 
         for vdc in VehicleFinal.dynamic_columns:
             VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(vdc))

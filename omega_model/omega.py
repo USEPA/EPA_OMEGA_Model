@@ -1073,7 +1073,7 @@ def init_user_definable_decomposition_attributes(verbose_init):
                                                 verbose=verbose_init)
 
     vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
-    VehicleFinal.dynamic_columns = list(set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
+    VehicleFinal.dynamic_columns = list(set.difference(set(vehicle_columns), VehicleFinal.mandatory_input_template_columns))
     for dc in VehicleFinal.dynamic_columns:
         VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(dc))
 
