@@ -216,7 +216,9 @@ print('importing %s' % __file__)
 from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
-aggregation_columns = ['context_size_class', 'electrification_class', 'cert_fuel_id', 'reg_class_id', 'drive_system']
+aggregation_columns = ['context_size_class', 'body_style', 'electrification_class', 'structure_material',
+                       'cert_fuel_id', 'in_use_fuel_id',
+                       'reg_class_id', 'drive_system']
 
 
 class VehicleAggregation(OMEGABase):
@@ -305,7 +307,8 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            omega_globals.options.vehicles_df = df.groupby(aggregation_columns, as_index=False).mean(numeric_only=True)
+            groupby = df.groupby(aggregation_columns, as_index=False)
+            omega_globals.options.vehicles_df = groupby.mean(numeric_only=True)
 
         omega_globals.options.vehicles_df['manufacturer_id'] = 'consolidated_OEM'
 
