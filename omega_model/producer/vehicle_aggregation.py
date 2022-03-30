@@ -342,9 +342,14 @@ class VehicleAggregation(OMEGABase):
 
             powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
 
+            # new columns calculated here for every vehicle in vehicles.csv:
             df['structure_mass_lbs'] = 0
             df['battery_mass_lbs'] = 0
             df['powertrain_mass_lbs'] = 0
+            df['glider_cost_dollars'] = 0
+            df['structure_cost_dollars'] = 0
+            df['glider_non_structure_cost_dollars'] = 0
+            df['powertrain_cost_dollars'] = 0
 
             for idx, row in df.iterrows():
                 veh = Vehicle()
@@ -360,6 +365,8 @@ class VehicleAggregation(OMEGABase):
                 df.loc[idx, 'structure_mass_lbs'] = structure_mass_lbs
                 df.loc[idx, 'battery_mass_lbs'] = battery_mass_lbs
                 df.loc[idx, 'powertrain_mass_lbs'] = powertrain_mass_lbs
+
+                row['structure_mass_lbs'] = structure_mass_lbs
 
                 if pd.isna(row['ground_clearance_in']):
                     row['ground_clearance_in'] = 6.6  # dummy value, sales-weighted
@@ -386,7 +393,9 @@ class VehicleAggregation(OMEGABase):
                 veh.base_year_msrp_dollars = row['msrp_dollars']
                 veh.base_year_structure_mass_lbs = structure_mass_lbs
 
-                df.loc[idx, 'glider_cost_dollars'] = GliderCost.calc_cost(veh, pd.DataFrame([row]))
+                df.loc[idx, 'glider_cost_dollars'], df.loc[idx, 'structure_cost_dollars'], \
+                    df.loc[idx, 'glider_non_structure_cost_dollars'] = GliderCost.calc_cost(veh, pd.DataFrame([row]))[0]
+
                 df.loc[idx, 'powertrain_cost_dollars'] = veh.powertrain_cost
 
             df['glider_non_structure_mass_lbs'] = \

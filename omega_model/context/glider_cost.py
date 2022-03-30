@@ -122,7 +122,7 @@ class GliderCost(OMEGABase):
 
             pkg_glider_cost = pkg_structure_cost + pkg_glider_non_structure_cost
 
-            results.append(pkg_glider_cost)
+            results.append((pkg_glider_cost, pkg_structure_cost, pkg_glider_non_structure_cost))
 
         return results
 
