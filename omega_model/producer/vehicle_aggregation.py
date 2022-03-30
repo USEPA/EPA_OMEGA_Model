@@ -359,6 +359,26 @@ class VehicleAggregation(OMEGABase):
                 df.loc[idx, 'battery_mass_lbs'] = battery_mass_lbs
                 df.loc[idx, 'powertrain_mass_lbs'] = powertrain_mass_lbs
 
+                if pd.isna(row['ground_clearance_in']):
+                    row['ground_clearance_in'] = 6.6  # dummy value, sales-weighted
+
+                if pd.isna(row['height_in']):
+                    row['height_in'] = 62.4  # dummy value, sales-weighted
+
+                veh.powertrain_cost = 0 # NEED THIS FOR GLIDER COST!
+                # TODO: calc powertrain cost here
+
+                veh.model_year = row.model_year
+                veh.structure_material = row.structure_material
+                veh.base_year_footprint_ft2 = row['footprint_ft2']
+                veh.height_in = row['height_in']
+                veh.ground_clearance_in = row['ground_clearance_in']
+                veh.base_year_msrp_dollars = row['msrp_dollars']
+                veh.base_year_structure_mass_lbs = structure_mass_lbs
+
+                row['structure_mass_lbs'] = structure_mass_lbs
+                glider_cost_dollars = GliderCost.calc_cost(veh, pd.DataFrame([row]))
+
             df['glider_non_structure_mass_lbs'] = \
                 df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
 

@@ -63,6 +63,7 @@ class GliderCost(OMEGABase):
         """
         results = []
 
+        # TODO: need vehicle powertrain_cost
         # TODO: structure_material from pkg_df
         # TODO: structure_mass_lbs from pkg_df
         # TODO: footprint_ft2 from pkg_df
@@ -144,7 +145,7 @@ class GliderCost(OMEGABase):
         if verbose:
             omega_log.logwrite('\nInitializing GliderCost from %s...' % filename, echo_console=True)
         input_template_name = 'glider_cost'
-        input_template_version = 0.1
+        input_template_version = 0.11
         input_template_columns = {'body_style', 'item', 'structure_material', 'value', 'dollar_basis', 'notes'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -163,11 +164,11 @@ class GliderCost(OMEGABase):
                 for cost_key in cost_keys:
 
                     _cache[cost_key] = dict()
-                    body_style, item, material = cost_key
+                    body_style, item, structure_material = cost_key
 
                     cost_info = df[(df['body_style'] == body_style)
                                    & (df['item'] == item)
-                                   & (df['structure_material'] == material)].iloc[0]
+                                   & (df['structure_material'] == structure_material)].iloc[0]
 
                     _cache[cost_key] = {'value': dict(),
                                         'dollar_adjustment': 1}

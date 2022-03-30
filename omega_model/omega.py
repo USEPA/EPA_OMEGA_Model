@@ -1241,12 +1241,6 @@ def init_omega(session_runtime_options):
         init_fail += CreditBank.validate_ghg_credits_template(omega_globals.options.ghg_credits_file,
                                                               verbose=verbose_init)
 
-        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
-                                                       verbose=verbose_init)
-
-        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
-                                                 verbose=verbose_init)
-
         init_fail += CPIPriceDeflators.init_from_file(omega_globals.options.cpi_deflators_file,
                                                       verbose=verbose_init)
 
@@ -1258,6 +1252,13 @@ def init_omega(session_runtime_options):
 
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=verbose_init)
+
+        if not init_fail:
+            init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                           verbose=verbose_init)
+
+            init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                     verbose=verbose_init)
 
         if omega_globals.options.calc_effects == 'Physical and Costs':
             init_fail += GeneralInputsForEffects.init_from_file(omega_globals.options.general_inputs_for_effects_file,
