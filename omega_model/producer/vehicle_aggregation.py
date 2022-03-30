@@ -221,16 +221,19 @@ aggregation_columns = ['context_size_class', 'body_style', 'electrification_clas
 
 
 def weighted_average(df):
+    import numpy as np
+
     numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
     non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
 
     avg_df = pd.DataFrame()
+    avg_df = pd.Series()
 
     for c in numeric_columns:
         if c != 'sales':
-            avg_df[c] = [np.nansum(df[c] * df['sales']) / np.sum(df['sales'] * ~np.isnan(df[c]))]
+            avg_df[c] = np.nansum(df[c] * df['sales']) / np.sum(df['sales'] * ~np.isnan(df[c]))
         else:
-            avg_df[c] = [df[c].sum()]
+            avg_df[c] = df[c].sum()
 
     for c in non_numeric_columns:
         avg_df[c] = ':'.join(df[c].unique())
@@ -268,7 +271,7 @@ class VehicleAggregation(OMEGABase):
 
         # DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
-        from producer.vehicles import VehicleFinal
+        from producer.vehicles import Vehicle, VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
 
         if verbose:
@@ -325,6 +328,43 @@ class VehicleAggregation(OMEGABase):
 
         if not template_errors:
             # TDOO: calculate mass costs THEN groupby
+            # veh.powertrain_type = veh.fueling_class
+            # if veh.fueling_class == 'BEV':
+            #     veh.battery_kwh = 60
+            # else:
+            #     veh.battery_kwh = 0
+            #
+            # structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
+            #     MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
+
+            powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
+
+            structure_mass_lbs_list = []
+            battery_mass_lbs_list = []
+            powertrain_mass_lbs_list = []
+            for idx, row in df.iterrows():
+                veh = Vehicle()
+                veh.body_style = row.body_style
+                veh.unibody_structure = row.unibody_structure
+                veh.structure_material = row.structure_material
+                veh.battery_kwh = 60
+                veh.footprint_ft2 = row.footprint_ft2
+                veh.eng_rated_hp = row.eng_rated_hp
+                veh.drive_system = row.drive_system
+                veh.powertrain_type = powertrain_type_dict[row.electrification_class]
+
+                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
+                    MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
+
+                structure_mass_lbs_list.append(structure_mass_lbs)
+                battery_mass_lbs_list.append(battery_mass_lbs)
+                powertrain_mass_lbs_list.append(powertrain_mass_lbs)
+
+            df['structure_mass_lbs'] = structure_mass_lbs_list
+            df['battery_mass_lbs'] = battery_mass_lbs_list
+            df['powertrain_mass_lbs'] = powertrain_mass_lbs_list
+            df['glider_non_structure_mass_lbs'] = \
+                df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
 
             # calculate weighted numeric values within the groups, and combined string values
             groupby = df.groupby(aggregation_columns, as_index=False)
