@@ -329,16 +329,6 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            # TDOO: calculate mass costs THEN groupby
-            # veh.powertrain_type = veh.fueling_class
-            # if veh.fueling_class == 'BEV':
-            #     veh.battery_kwh = 60
-            # else:
-            #     veh.battery_kwh = 0
-            #
-            # structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
-            #     MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
-
             powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
 
             # new columns calculated here for every vehicle in vehicles.csv:
