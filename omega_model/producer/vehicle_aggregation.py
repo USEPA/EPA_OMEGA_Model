@@ -407,7 +407,7 @@ class VehicleAggregation(OMEGABase):
             agg_df = groupby.apply(weighted_average)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
             agg_df['manufacturer_id'] = 'consolidated_OEM'
-            agg_df.to_csv('agg_df.csv')
+            agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
         omega_globals.options.vehicles_df = agg_df
 
