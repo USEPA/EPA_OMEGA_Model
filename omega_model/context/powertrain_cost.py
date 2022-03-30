@@ -63,9 +63,8 @@ class PowertrainCost(OMEGABase):
         """
         results = []
 
-        # elec_class, market_class_id, model_year = veh.electrification_class, veh.market_class_id, veh.model_year
-        elec_class, market_class_id, model_year = vehicle
-        ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV'}
+        elec_class, market_class_id, model_year = vehicle.electrification_class, vehicle.market_class_id, vehicle.model_year
+        ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
         powertrain_type = ec_dict[elec_class]
 
         # markups and learning
@@ -244,7 +243,7 @@ class PowertrainCost(OMEGABase):
                     learn = learning_factor_pev
 
                 # battery cost
-                KWH = row['battery_kwh_gross'] # what will this be called in the passed df?
+                KWH = row['battery_kwh']
                 adj_factor = _cache[powertrain_type, 'battery']['dollar_adjustment']
                 battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {}, locals()) \
                                * adj_factor * learn

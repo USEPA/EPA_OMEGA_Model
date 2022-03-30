@@ -210,6 +210,7 @@ Data Column Name and Description
 **CODE**
 
 """
+import pandas as pd
 
 print('importing %s' % __file__)
 
@@ -274,6 +275,7 @@ class VehicleAggregation(OMEGABase):
         from producer.vehicles import Vehicle, VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
         from context.glider_cost import GliderCost
+        from context.powertrain_cost import PowertrainCost
 
         if verbose:
             omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
@@ -348,9 +350,9 @@ class VehicleAggregation(OMEGABase):
                 veh = Vehicle()
                 veh.body_style = row.body_style
                 veh.unibody_structure = row.unibody_structure
-                battery_kwh = 60
                 veh.drive_system = row.drive_system
                 veh.powertrain_type = powertrain_type_dict[row.electrification_class]
+                battery_kwh = {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
 
                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
                     MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, battery_kwh, row.footprint_ft2)
@@ -365,10 +367,18 @@ class VehicleAggregation(OMEGABase):
                 if pd.isna(row['height_in']):
                     row['height_in'] = 62.4  # dummy value, sales-weighted
 
-                veh.powertrain_cost = 0 # NEED THIS FOR GLIDER COST!
-                # TODO: calc powertrain cost here
-
+                # calc powertrain cost
                 veh.model_year = row.model_year
+                veh.electrification_class = row.electrification_class
+                veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
+                row['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
+                row['engine_cylinders'] = row['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+                row['engine_displacement_L'] = row['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+                row['battery_kwh'] = battery_kwh
+                row['motor_kw'] = 150  # FOR NOW, NEED SOMETHING HERE
+                veh.powertrain_cost = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0]  # vehicle.base_year_powertrain_cost ... ???
+
+                # calc glider cost
                 veh.structure_material = row.structure_material
                 veh.base_year_footprint_ft2 = row['footprint_ft2']
                 veh.height_in = row['height_in']
@@ -376,8 +386,8 @@ class VehicleAggregation(OMEGABase):
                 veh.base_year_msrp_dollars = row['msrp_dollars']
                 veh.base_year_structure_mass_lbs = structure_mass_lbs
 
-                row['structure_mass_lbs'] = structure_mass_lbs
-                glider_cost_dollars = GliderCost.calc_cost(veh, pd.DataFrame([row]))
+                df.loc[idx, 'glider_cost_dollars'] = GliderCost.calc_cost(veh, pd.DataFrame([row]))
+                df.loc[idx, 'powertrain_cost_dollars'] = veh.powertrain_cost
 
             df['glider_non_structure_mass_lbs'] = \
                 df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
