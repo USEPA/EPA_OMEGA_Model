@@ -227,13 +227,12 @@ def weighted_average(df):
     numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
     non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
 
-    avg_df = pd.DataFrame()
     avg_df = pd.Series()
 
     for c in numeric_columns:
-        if c != 'sales':
+        if c != 'sales' and c != 'model_year':
             avg_df[c] = np.nansum(df[c] * df['sales']) / np.sum(df['sales'] * ~np.isnan(df[c]))
-        else:
+        elif c == 'sales':
             avg_df[c] = df[c].sum()
 
     for c in non_numeric_columns:
@@ -343,6 +342,7 @@ class VehicleAggregation(OMEGABase):
             powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
 
             # new columns calculated here for every vehicle in vehicles.csv:
+            df['base_year_msrp_dollars'] = df['msrp_dollars']
             df['structure_mass_lbs'] = 0
             df['battery_mass_lbs'] = 0
             df['powertrain_mass_lbs'] = 0
@@ -407,6 +407,7 @@ class VehicleAggregation(OMEGABase):
             agg_df = groupby.apply(weighted_average)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
             agg_df['manufacturer_id'] = 'consolidated_OEM'
+            agg_df['model_year'] = df['model_year'].iloc[0]
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
         omega_globals.options.vehicles_df = agg_df

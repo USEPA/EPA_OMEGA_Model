@@ -1397,7 +1397,7 @@ class VehicleFinal(SQABase, Vehicle):
 
         DecompositionAttributes.init()   # offcycle_credits must be initalized first
 
-        VehicleFinal.init_vehicles_from_dataframe(df, verbose=verbose)
+        VehicleFinal.init_vehicles_from_dataframe(omega_globals.options.vehicles_df, verbose=verbose)
 
         _init_fail += VehicleAttributeCalculations.init_vehicle_attribute_calculations_from_file(
             vehicle_onroad_calculations_file, clear_cache=True, verbose=verbose)
