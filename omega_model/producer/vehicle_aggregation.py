@@ -346,15 +346,12 @@ class VehicleAggregation(OMEGABase):
                 veh = Vehicle()
                 veh.body_style = row.body_style
                 veh.unibody_structure = row.unibody_structure
-                veh.structure_material = row.structure_material
-                veh.battery_kwh = 60
-                veh.footprint_ft2 = row.footprint_ft2
-                veh.eng_rated_hp = row.eng_rated_hp
+                battery_kwh = 60
                 veh.drive_system = row.drive_system
                 veh.powertrain_type = powertrain_type_dict[row.electrification_class]
 
                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
-                    MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
+                    MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, battery_kwh, row.footprint_ft2)
 
                 structure_mass_lbs_list.append(structure_mass_lbs)
                 battery_mass_lbs_list.append(battery_mass_lbs)
