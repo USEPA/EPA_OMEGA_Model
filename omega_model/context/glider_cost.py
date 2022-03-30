@@ -63,11 +63,14 @@ class GliderCost(OMEGABase):
         """
         results = []
 
-        # TODO: vehicle.structure_material from pkg_df
+        # TODO: structure_material from pkg_df
         # TODO: structure_mass_lbs from pkg_df
+        # TODO: footprint_ft2 from pkg_df
+        # TODO: height_in from pkg_df
+        # TODO: ground_clearance_in from pkg_df
 
-        base_footprint, model_year, base_msrp, body_style \
-            = vehicle.base_year_footprint_ft2, vehicle.model_year, vehicle.msrp_dollars, vehicle.body_style
+        base_footprint, model_year, base_year_msrp_dollars, body_style \
+            = vehicle.base_year_footprint_ft2, vehicle.model_year, vehicle.base_year_msrp_dollars, vehicle.body_style
 
         unibody_structure, base_year_structure_mass_lbs, material, base_powertrain_cost \
             = vehicle.unibody_structure, vehicle.base_year_structure_mass_lbs, vehicle.structure_material, vehicle.powertrain_cost
@@ -75,32 +78,9 @@ class GliderCost(OMEGABase):
         base_height, base_ground_clearance \
             = vehicle.height_in, vehicle.ground_clearance_in
 
-        # for testing
-        # base_footprint, model_year, base_msrp, body_style, unibody_structure, base_year_structure_mass_lbs, \
-        # material, base_powertrain_cost, base_height, base_ground_clearance \
-        #     = veh
-
-        structure = 'unibody_structure'
+        body_structure = 'unibody_structure'
         if unibody_structure == 0:
-            structure = 'ladder_structure'
-
-        # body_style_dict = {'Compact': 'sedan',
-        #                    'Large Utility': 'pickup',
-        #                    'Large': 'sedan',
-        #                    'Large Crossover': 'cuv_suv',
-        #                    'Large Pickup': 'pickup',
-        #                    'Large Van': 'cuv_suv',
-        #                    'Midsize': 'sedan',
-        #                    'Minicompact': 'sedan',
-        #                    'Small Crossover': 'cuv_suv',
-        #                    'Small Pickup': 'pickup',
-        #                    'Small Utility': 'cuv_suv',
-        #                    'Small Van': 'cuv_suv',
-        #                    'Subcompact': 'sedan',
-        #                    'Two Seater': 'sedan',
-        #                    }
-        #
-        # body_style = body_style_dict[context_size_class]
+            body_structure = 'ladder_structure'
 
         # markups and learning
         MARKUP = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
@@ -114,20 +94,20 @@ class GliderCost(OMEGABase):
 
         # first calc base glider structure and non-structure weights
         structure_mass_lbs = base_year_structure_mass_lbs
-        adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
-        base_year_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
-                                     * adj_factor * learning_factor
+        adj_factor = _cache[body_style, body_structure, material]['dollar_adjustment']
+        structure_cost = eval(_cache[body_style, body_structure, material]['value'], {}, locals()) \
+                         * adj_factor * learning_factor
 
-        base_year_glider_non_structure_cost = (base_msrp / MARKUP) - base_year_structure_cost - base_powertrain_cost
+        base_year_glider_non_structure_cost = (base_year_msrp_dollars / MARKUP) - structure_cost - base_powertrain_cost
 
         # now calc package costs
         for idx, row in pkg_df.iterrows():
 
             # glider structure cost
             structure_mass_lbs = row['structure_mass_lbs']
-            material = row['material']
-            adj_factor = _cache[body_style, structure, material]['dollar_adjustment']
-            pkg_glider_structure_cost = eval(_cache[body_style, structure, material]['value'], {}, locals()) \
+            material = row['structure_material']
+            adj_factor = _cache[body_style, body_structure, material]['dollar_adjustment']
+            pkg_structure_cost = eval(_cache[body_style, body_structure, material]['value'], {}, locals()) \
                                         * adj_factor * learning_factor
 
             # glider non-structure cost
@@ -139,7 +119,7 @@ class GliderCost(OMEGABase):
                                               * adj_factor * learning_factor
             pkg_glider_non_structure_cost = base_year_glider_non_structure_cost + delta_glider_non_structure_cost
 
-            pkg_glider_cost = pkg_glider_structure_cost + pkg_glider_non_structure_cost
+            pkg_glider_cost = pkg_structure_cost + pkg_glider_non_structure_cost
 
             results.append(pkg_glider_cost)
 

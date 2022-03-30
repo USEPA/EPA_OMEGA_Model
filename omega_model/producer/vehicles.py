@@ -643,7 +643,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
                        'base_year_structure_mass_lbs', 'base_year_glider_non_structure_mass_lbs',
-                       'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp'}
+                       'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'}
 
     # transfer base properties
     for attr in base_properties:
@@ -751,6 +751,7 @@ class Vehicle(OMEGABase):
         self.base_year_glider_non_structure_mass_lbs = 0
         self.base_year_footprint_ft2 = 0
         self.base_year_curbweight_lbs_to_hp = 0
+        self.base_year_msrp_dollars = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1019,6 +1020,7 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
     base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
+    base_year_msrp_dollars = Column(Float)  #: base year Manufacturer Suggested Retail Price (dollars)
 
     # TODO: add these to vehicles.csv
     # battery_kwh = Column('battery_kwh', Float)  #: propulsion battery kWh capacity
@@ -1033,7 +1035,7 @@ class VehicleFinal(SQABase, Vehicle):
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
-                                   'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
+                                   'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style', 'msrp_dollars',
                                    'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
                                     # TODO: , 'battery_kwh'
 
@@ -1171,7 +1173,8 @@ class VehicleFinal(SQABase, Vehicle):
                               'reg_class_id', 'context_size_class',
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_structure_mass_lbs',
                               'base_year_glider_non_structure_mass_lbs', 'base_year_footprint_ft2',
-                              'base_year_curbweight_lbs_to_hp'] + VehicleFinal.dynamic_attributes
+                              'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'] \
+                              + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
         veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
@@ -1234,6 +1237,7 @@ class VehicleFinal(SQABase, Vehicle):
                 structure_material=df.loc[i, 'structure_material'],
                 base_year_reg_class_id=df.loc[i, 'reg_class_id'],
                 base_year_footprint_ft2=df.loc[i, 'footprint_ft2'],
+                base_year_msrp_dollars=df.loc[i, 'base_year_msrp_dollars']
             )
 
             for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
