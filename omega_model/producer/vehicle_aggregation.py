@@ -273,6 +273,7 @@ class VehicleAggregation(OMEGABase):
 
         from producer.vehicles import Vehicle, VehicleFinal
         from context.new_vehicle_market import NewVehicleMarket
+        from context.glider_cost import GliderCost
 
         if verbose:
             omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
@@ -339,9 +340,10 @@ class VehicleAggregation(OMEGABase):
 
             powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
 
-            structure_mass_lbs_list = []
-            battery_mass_lbs_list = []
-            powertrain_mass_lbs_list = []
+            df['structure_mass_lbs'] = 0
+            df['battery_mass_lbs'] = 0
+            df['powertrain_mass_lbs'] = 0
+
             for idx, row in df.iterrows():
                 veh = Vehicle()
                 veh.body_style = row.body_style
@@ -353,13 +355,10 @@ class VehicleAggregation(OMEGABase):
                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
                     MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, battery_kwh, row.footprint_ft2)
 
-                structure_mass_lbs_list.append(structure_mass_lbs)
-                battery_mass_lbs_list.append(battery_mass_lbs)
-                powertrain_mass_lbs_list.append(powertrain_mass_lbs)
+                df.loc[idx, 'structure_mass_lbs'] = structure_mass_lbs
+                df.loc[idx, 'battery_mass_lbs'] = battery_mass_lbs
+                df.loc[idx, 'powertrain_mass_lbs'] = powertrain_mass_lbs
 
-            df['structure_mass_lbs'] = structure_mass_lbs_list
-            df['battery_mass_lbs'] = battery_mass_lbs_list
-            df['powertrain_mass_lbs'] = powertrain_mass_lbs_list
             df['glider_non_structure_mass_lbs'] = \
                 df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
 

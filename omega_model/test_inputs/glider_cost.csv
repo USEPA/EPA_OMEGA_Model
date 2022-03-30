@@ -1,5 +1,5 @@
-input_template_name:,glider_cost,input_template_version:,0.1,proof-of-concept;pre-fev,
-body_style,item,material,value,dollar_basis,notes
+input_template_name:,glider_cost,input_template_version:,0.11,proof-of-concept;pre-fev,
+body_style,item,structure_material,value,dollar_basis,notes
 sedan,unibody_structure,aluminum,(2.55) * structure_mass_lbs * MARKUP,2020,
 sedan,unibody_structure,steel,(1.8) * structure_mass_lbs * MARKUP,2020,
 cuv_suv,unibody_structure,aluminum,(2.65) * structure_mass_lbs * MARKUP,2020,

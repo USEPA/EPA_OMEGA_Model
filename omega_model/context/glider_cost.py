@@ -145,7 +145,7 @@ class GliderCost(OMEGABase):
             omega_log.logwrite('\nInitializing GliderCost from %s...' % filename, echo_console=True)
         input_template_name = 'glider_cost'
         input_template_version = 0.1
-        input_template_columns = {'body_style', 'item', 'material', 'value', 'dollar_basis', 'notes'}
+        input_template_columns = {'body_style', 'item', 'structure_material', 'value', 'dollar_basis', 'notes'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -158,7 +158,7 @@ class GliderCost(OMEGABase):
 
             if not template_errors:
 
-                cost_keys = zip(df['body_style'], df['item'], df['material'])
+                cost_keys = zip(df['body_style'], df['item'], df['structure_material'])
 
                 for cost_key in cost_keys:
 
@@ -167,7 +167,7 @@ class GliderCost(OMEGABase):
 
                     cost_info = df[(df['body_style'] == body_style)
                                    & (df['item'] == item)
-                                   & (df['material'] == material)].iloc[0]
+                                   & (df['structure_material'] == material)].iloc[0]
 
                     _cache[cost_key] = {'value': dict(),
                                         'dollar_adjustment': 1}
