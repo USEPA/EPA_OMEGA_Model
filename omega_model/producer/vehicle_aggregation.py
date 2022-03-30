@@ -216,9 +216,26 @@ print('importing %s' % __file__)
 from omega_model import *
 
 # for now, eventually need to be inputs somewhere:
-aggregation_columns = ['context_size_class', 'body_style', 'electrification_class', 'structure_material',
-                       'cert_fuel_id', 'in_use_fuel_id',
-                       'reg_class_id', 'drive_system']
+aggregation_columns = ['context_size_class', 'body_style', 'electrification_class', 'unibody_structure',
+                       'cert_fuel_id', 'reg_class_id', 'drive_system']
+
+
+def weighted_average(df):
+    numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
+    non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
+
+    avg_df = pd.DataFrame()
+
+    for c in numeric_columns:
+        if c != 'sales':
+            avg_df[c] = [np.nansum(df[c] * df['sales']) / np.sum(df['sales'] * ~np.isnan(df[c]))]
+        else:
+            avg_df[c] = [df[c].sum()]
+
+    for c in non_numeric_columns:
+        avg_df[c] = ':'.join(df[c].unique())
+
+    return avg_df
 
 
 class VehicleAggregation(OMEGABase):
@@ -308,12 +325,16 @@ class VehicleAggregation(OMEGABase):
 
         if not template_errors:
             # TDOO: calculate mass costs THEN groupby
-            # TODO: calculate weighted numeric values within the groups
 
+            # calculate weighted numeric values within the groups, and combined string values
             groupby = df.groupby(aggregation_columns, as_index=False)
-            omega_globals.options.vehicles_df = groupby.mean(numeric_only=True)
 
-        omega_globals.options.vehicles_df['manufacturer_id'] = 'consolidated_OEM'
+            agg_df = groupby.apply(weighted_average)
+            agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
+            agg_df['manufacturer_id'] = 'consolidated_OEM'
+            agg_df.to_csv('agg_df.csv')
+
+        omega_globals.options.vehicles_df = agg_df
 
         return template_errors
 

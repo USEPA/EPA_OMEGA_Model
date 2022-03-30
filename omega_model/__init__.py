@@ -35,6 +35,7 @@ import traceback
 try:
     import pandas as pd
     pd.set_option('chained_assignment', 'raise')
+    from pandas.api.types import is_numeric_dtype
 
     from common.omega_globals import *
     from common.omega_types import *
