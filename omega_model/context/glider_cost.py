@@ -76,9 +76,6 @@ class GliderCost(OMEGABase):
         unibody_structure, base_year_structure_mass_lbs, material, base_powertrain_cost \
             = vehicle.unibody_structure, vehicle.base_year_structure_mass_lbs, vehicle.structure_material, vehicle.powertrain_cost
 
-        base_height, base_ground_clearance \
-            = vehicle.height_in, vehicle.ground_clearance_in
-
         body_structure = 'unibody_structure'
         if unibody_structure == 0:
             body_structure = 'ladder_structure'
@@ -113,8 +110,6 @@ class GliderCost(OMEGABase):
 
             # glider non-structure cost
             DELTA_FOOTPRINT = base_footprint - row['footprint_ft2']
-            DELTA_HEIGHT = base_height - row['height_in']
-            DELTA_CLEARANCE = base_ground_clearance - row['ground_clearance_in']
             adj_factor = _cache[body_style, 'non_structure', 'various']['dollar_adjustment']
             delta_glider_non_structure_cost = eval(_cache[body_style, 'non_structure', 'various']['value'], {}, locals()) \
                                               * adj_factor * learning_factor
