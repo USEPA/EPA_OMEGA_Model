@@ -332,13 +332,8 @@ class VehicleAggregation(OMEGABase):
             powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
 
             # new columns calculated here for every vehicle in vehicles.csv:
-            df['structure_mass_lbs'] = 0
-            df['battery_mass_lbs'] = 0
-            df['powertrain_mass_lbs'] = 0
-            df['glider_cost_dollars'] = 0
-            df['structure_cost_dollars'] = 0
             df['glider_non_structure_cost_dollars'] = 0
-            df['powertrain_cost_dollars'] = 0
+            df['glider_non_structure_mass_lbs'] = 0
 
             # fill in missing values
             for idx, row in df.iterrows():
@@ -366,10 +361,6 @@ class VehicleAggregation(OMEGABase):
                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
                     MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, row.battery_kwh, row.footprint_ft2)
 
-                df.loc[idx, 'structure_mass_lbs'] = structure_mass_lbs
-                df.loc[idx, 'battery_mass_lbs'] = battery_mass_lbs
-                df.loc[idx, 'powertrain_mass_lbs'] = powertrain_mass_lbs
-
                 # calc powertrain cost
                 veh.model_year = row.model_year
                 veh.electrification_class = row.electrification_class
@@ -390,16 +381,15 @@ class VehicleAggregation(OMEGABase):
                 veh.height_in = row['height_in']
                 veh.ground_clearance_in = row['ground_clearance_in']
                 veh.base_year_msrp_dollars = row['msrp_dollars']
-                veh.base_year_structure_mass_lbs = structure_mass_lbs
 
                 veh.base_year_glider_non_structure_cost_dollars = \
-                    GliderCost.get_base_year_glider_non_structure_cost(veh, powertrain_cost)
+                    GliderCost.get_base_year_glider_non_structure_cost(veh, structure_mass_lbs, powertrain_cost)
 
-                df.loc[idx, 'glider_cost_dollars'], df.loc[idx, 'structure_cost_dollars'], \
-                    df.loc[idx, 'glider_non_structure_cost_dollars'] = GliderCost.calc_cost(veh, pd.DataFrame([row]))[0]
+                df.loc[idx, 'glider_non_structure_cost_dollars'] = \
+                    GliderCost.calc_cost(veh, pd.DataFrame([row]))[0][2]
 
-            df['glider_non_structure_mass_lbs'] = \
-                df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
+                df.loc[idx, 'glider_non_structure_mass_lbs'] = \
+                    row['curbweight_lbs'] - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
 
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(weighted_average)

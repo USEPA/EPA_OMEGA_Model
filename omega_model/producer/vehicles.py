@@ -642,7 +642,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
-                       'base_year_structure_mass_lbs', 'base_year_glider_non_structure_mass_lbs',
+                       'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'}
 
@@ -748,7 +748,6 @@ class Vehicle(OMEGABase):
         self.powertrain_type = ''
         self.base_year_reg_class_id = None
         self.base_year_market_share = 0
-        self.base_year_structure_mass_lbs = 0
         self.base_year_glider_non_structure_mass_lbs = 0
         self.base_year_glider_non_structure_cost_dollars = 0
         self.base_year_footprint_ft2 = 0
@@ -1020,7 +1019,6 @@ class VehicleFinal(SQABase, Vehicle):
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
-    base_year_structure_mass_lbs = Column(Float)  #: base year vehicle structure mass lbs
     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
     base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year non-structure cost dollars
     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
@@ -1176,7 +1174,7 @@ class VehicleFinal(SQABase, Vehicle):
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
                               'reg_class_id', 'context_size_class',
-                              'base_year_reg_class_id', 'base_year_market_share', 'base_year_structure_mass_lbs',
+                              'base_year_reg_class_id', 'base_year_market_share',
                               'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars' 
                               'base_year_footprint_ft2',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'] \

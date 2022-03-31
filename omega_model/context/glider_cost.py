@@ -74,7 +74,7 @@ class GliderCost(OMEGABase):
         return body_structure, learning_factor, markup
 
     @staticmethod
-    def get_base_year_glider_non_structure_cost(vehicle, powertrain_cost):
+    def get_base_year_glider_non_structure_cost(vehicle, structure_mass_lbs, powertrain_cost):
         """
 
         Args:
@@ -86,7 +86,6 @@ class GliderCost(OMEGABase):
         body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
 
         # first calc base glider structure and non-structure weights
-        structure_mass_lbs = vehicle.base_year_structure_mass_lbs
         adj_factor = _cache[vehicle.body_style, body_structure, vehicle.structure_material]['dollar_adjustment']
         structure_cost = eval(_cache[vehicle.body_style, body_structure, vehicle.structure_material]['value'], {},
                               locals()) * adj_factor * learning_factor
