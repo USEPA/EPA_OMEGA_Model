@@ -84,6 +84,7 @@ class MassScaling(OMEGABase):
         structure_mass_lbs = 0
         battery_mass_lbs = 0
         powertrain_mass_lbs = 0
+        delta_glider_non_structure_mass_lbs = 0
 
         for condition, equation in zip(MassScaling._data['null_structure_mass_lbs']['condition'],
                                        MassScaling._data['null_structure_mass_lbs']['equation']):
@@ -105,7 +106,13 @@ class MassScaling(OMEGABase):
             if Eval.eval(condition, {}, locals()):
                 powertrain_mass_lbs = Eval.eval(equation, {}, locals())
 
-        return structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs
+        for condition, equation in zip(MassScaling._data['delta_glider_non_structure_mass_lbs']['condition'],
+                                       MassScaling._data['delta_glider_non_structure_mass_lbs']['equation']):
+            if Eval.eval(condition, {}, locals()):
+                delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
+                delta_glider_non_structure_mass_lbs = Eval.eval(equation, {}, locals())
+
+        return structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -140,8 +147,9 @@ class MassScaling(OMEGABase):
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
         if not template_errors:
-            validation_dict = {'mass_term': ['structure_materials', 'null_structure_mass_lbs', 'structure_mass_lbs', 'battery_mass_lbs',
-                                             'powertrain_mass_lbs'],
+            validation_dict = {'mass_term': ['structure_materials', 'null_structure_mass_lbs', 'structure_mass_lbs',
+                                             'battery_mass_lbs', 'powertrain_mass_lbs',
+                                             'delta_glider_non_structure_mass_lbs'],
                                }
 
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
@@ -150,7 +158,7 @@ class MassScaling(OMEGABase):
             df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
             for term in ['null_structure_mass_lbs', 'structure_mass_lbs',
-                         'battery_mass_lbs', 'powertrain_mass_lbs']:
+                         'battery_mass_lbs', 'powertrain_mass_lbs', 'delta_glider_non_structure_mass_lbs']:
                 MassScaling._data[term] = df[df['mass_term'] == term].set_index('mass_term').to_dict(orient='series')
 
             MassScaling.structure_materials = Eval.eval(df[df['mass_term'] == 'structure_materials']['equation'][0])
@@ -177,7 +185,10 @@ if __name__ == '__main__':
         if not init_fail:
             class Vehicle(OMEGABase):
                 body_style = 'sedan'
-                footprint_ft2 = 20
+                base_year_footprint_ft2 = 20
+                footprint_ft2 = 22
+                height_in = 65
+                ground_clearance_in = 6
                 structure_material = 'aluminum'
                 eng_rated_hp = 200
                 drive_system = 2
@@ -187,11 +198,15 @@ if __name__ == '__main__':
 
             veh = Vehicle()
 
-            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
-            print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs)
+            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs = \
+                MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
+                                            veh.battery_kwh, veh.footprint_ft2)
+            print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs)
             veh.powertrain_type = 'BEV'
-            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = MassScaling.calc_mass_terms(veh)
-            print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs)
+            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs = \
+                MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp,
+                                            veh.battery_kwh, veh.footprint_ft2)
+            print(structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs)
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

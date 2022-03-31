@@ -327,11 +327,12 @@ class CostCloud(OMEGABase, CostCloudBase):
             convergence_tolerance = 0.01
             converged = False
             while not converged:
-                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
+                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs = \
                     MassScaling.calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2)
 
-                vehicle_curbweight_lbs = vehicle.base_year_glider_non_structure_mass_lbs + powertrain_mass_lbs + \
-                                         structure_mass_lbs + battery_mass_lbs
+                vehicle_curbweight_lbs = \
+                    vehicle.base_year_glider_non_structure_mass_lbs + delta_glider_non_structure_mass_lbs + \
+                        powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs
 
                 eng_rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 

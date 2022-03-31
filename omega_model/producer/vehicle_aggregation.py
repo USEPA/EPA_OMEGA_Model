@@ -344,7 +344,7 @@ class VehicleAggregation(OMEGABase):
                     df.loc[idx, 'height_in'] = 62.4  # dummy value, sales-weighted
 
                 veh = Vehicle()
-                veh.powertrain_type = powertrain_type_dict[row.electrification_class]
+                veh.powertrain_type = powertrain_type_dict[row['electrification_class']]
                 df.loc[idx, 'battery_kwh'] = \
                     {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
 
@@ -352,18 +352,21 @@ class VehicleAggregation(OMEGABase):
                     {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (row['drive_system'] == 4)), 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
 
             for idx, row in df.iterrows():
+                print(row['vehicle_name'])
                 veh = Vehicle()
-                veh.body_style = row.body_style
-                veh.unibody_structure = row.unibody_structure
-                veh.drive_system = row.drive_system
-                veh.powertrain_type = powertrain_type_dict[row.electrification_class]
+                veh.body_style = row['body_style']
+                veh.unibody_structure = row['unibody_structure']
+                veh.drive_system = row['drive_system']
+                veh.powertrain_type = powertrain_type_dict[row['electrification_class']]
+                veh.base_year_footprint_ft2 = row['footprint_ft2']
 
-                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
-                    MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, row.battery_kwh, row.footprint_ft2)
+                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, _ = \
+                    MassScaling.calc_mass_terms(veh, row['structure_material'], row['eng_rated_hp'],
+                                                row['battery_kwh'], row['footprint_ft2'])
 
                 # calc powertrain cost
-                veh.model_year = row.model_year
-                veh.electrification_class = row.electrification_class
+                veh.model_year = row['model_year']
+                veh.electrification_class = row['electrification_class']
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 row['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
                 row['engine_cylinders'] = row['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
@@ -376,8 +379,7 @@ class VehicleAggregation(OMEGABase):
 
                 # calc glider cost
                 row['structure_mass_lbs'] = structure_mass_lbs
-                veh.structure_material = row.structure_material
-                veh.base_year_footprint_ft2 = row['footprint_ft2']
+                veh.structure_material = row['structure_material']
                 veh.height_in = row['height_in']
                 veh.ground_clearance_in = row['ground_clearance_in']
                 veh.base_year_msrp_dollars = row['msrp_dollars']
