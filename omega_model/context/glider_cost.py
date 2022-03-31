@@ -81,8 +81,7 @@ class GliderCost(OMEGABase):
             body_structure = 'ladder_structure'
 
         # markups and learning
-        MARKUP = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
-
+        markup = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
         learning_rate = eval(_cache['ALL', 'learning_rate', 'not applicable']['value'], {}, locals())
         learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals())
         legacy_sales_scaler = eval(_cache['ALL', 'legacy_sales_learning_scaler', 'not applicable']['value'], {}, locals())
@@ -96,7 +95,7 @@ class GliderCost(OMEGABase):
         structure_cost = eval(_cache[body_style, body_structure, material]['value'], {}, locals()) \
                          * adj_factor * learning_factor
 
-        base_year_glider_non_structure_cost = (base_year_msrp_dollars / MARKUP) - structure_cost - base_powertrain_cost
+        base_year_glider_non_structure_cost = (base_year_msrp_dollars / markup) - structure_cost - base_powertrain_cost
 
         # now calc package costs
         for idx, row in pkg_df.iterrows():
@@ -109,7 +108,7 @@ class GliderCost(OMEGABase):
                                         * adj_factor * learning_factor
 
             # glider non-structure cost
-            DELTA_FOOTPRINT = base_footprint - row['footprint_ft2']
+            delta_footprint = base_footprint - row['footprint_ft2']
             adj_factor = _cache[body_style, 'non_structure', 'various']['dollar_adjustment']
             delta_glider_non_structure_cost = eval(_cache[body_style, 'non_structure', 'various']['value'], {}, locals()) \
                                               * adj_factor * learning_factor
