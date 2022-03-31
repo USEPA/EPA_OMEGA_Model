@@ -121,9 +121,9 @@ def get_maintenance_cost(veh_type):
         Curve coefficient values to calculate maintenance costs per mile at any odometer value.
 
     """
-    from context.maintenance_cost_inputs import MaintenanceCostInputs
+    from context.maintenance_cost import MaintenanceCost
 
-    d = MaintenanceCostInputs.get_maintenance_cost_curve_coefficients(veh_type)
+    d = MaintenanceCost.get_maintenance_cost_curve_coefficients(veh_type)
 
     return d['slope'], d['intercept']
 
@@ -143,8 +143,8 @@ def calc_cost_effects(physical_effects_dict):
     """
     from context.fuel_prices import FuelPrice
     from producer.vehicles import VehicleFinal
-    from context.repair_cost_inputs import RepairCostInputs
-    from context.refueling_cost_inputs import RefuelingCostInputs
+    from context.repair_cost import RepairCost
+    from context.refueling_cost import RefuelingCost
 
     # UPDATE cost effects data
     costs_dict = dict()
@@ -235,7 +235,7 @@ def calc_cost_effects(physical_effects_dict):
                     fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
-            ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV'}
+            ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
             powertrain_veh_type = ec_dict[electrification_class]
             # if fueling_class == 'BEV':
             #     powertrain_veh_type = 'BEV'
@@ -258,7 +258,7 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 operating_veh_type = 'suv'
 
-            repair_cost_per_mile = RepairCostInputs.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, operating_veh_type, age)
+            repair_cost_per_mile = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs
@@ -267,14 +267,14 @@ def calc_cost_effects(physical_effects_dict):
                 if (operating_veh_type, range) in refueling_bev_dict.keys():
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, range)]
                 else:
-                    refueling_cost_per_mile = RefuelingCostInputs.calc_bev_refueling_cost_per_mile(operating_veh_type, range)
+                    refueling_cost_per_mile = RefuelingCost.calc_bev_refueling_cost_per_mile(operating_veh_type, range)
                     refueling_bev_dict.update({(operating_veh_type, range): refueling_cost_per_mile})
                 refueling_cost_dollars = refueling_cost_per_mile * vmt
             else:
                 if operating_veh_type in refueling_liquid_dict.keys():
                     refueling_cost_per_gallon = refueling_liquid_dict[operating_veh_type]
                 else:
-                    refueling_cost_per_gallon = RefuelingCostInputs.calc_liquid_refueling_cost_per_gallon(operating_veh_type)
+                    refueling_cost_per_gallon = RefuelingCost.calc_liquid_refueling_cost_per_gallon(operating_veh_type)
                     refueling_liquid_dict.update({operating_veh_type: refueling_cost_per_gallon})
                 refueling_cost_dollars = refueling_cost_per_gallon * gallons
 

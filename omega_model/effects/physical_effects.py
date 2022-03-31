@@ -182,7 +182,7 @@ def calc_physical_effects(calendar_years):
         for vad in vads:
 
             attribute_list = ['manufacturer_id', 'name', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
-                              'in_use_fuel_id', 'fueling_class',
+                              'in_use_fuel_id', 'fueling_class', 'electrification_class',
                               'target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile',
                               'onroad_direct_kwh_per_mile']
 
@@ -190,7 +190,7 @@ def calc_physical_effects(calendar_years):
             if vad.vehicle_id not in vehicle_info_dict:
                 vehicle_info_dict[vad.vehicle_id] = VehicleFinal.get_vehicle_attributes(vad.vehicle_id, attribute_list)
 
-            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
+            mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, electrification_class,\
             target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vad.vehicle_id]
 
@@ -330,6 +330,7 @@ def calc_physical_effects(calendar_years):
                                              'reg_class_id': reg_class_id,
                                              'in_use_fuel_id': in_use_fuel_id,
                                              'fueling_class': fueling_class,
+                                             'electrification_class': electrification_class,
                                              'registered_count': vad.registered_count,
                                              'annual_vmt': vad.annual_vmt,
                                              'odometer': vad.odometer,
