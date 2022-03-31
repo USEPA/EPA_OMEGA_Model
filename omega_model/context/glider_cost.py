@@ -63,21 +63,11 @@ class GliderCost(OMEGABase):
         """
         results = []
 
-        # TODO: need vehicle powertrain_cost
-        # TODO: structure_material from pkg_df
-        # TODO: structure_mass_lbs from pkg_df
-        # TODO: footprint_ft2 from pkg_df
-        # TODO: height_in from pkg_df
-        # TODO: ground_clearance_in from pkg_df
-
-        base_footprint, model_year, base_year_msrp_dollars, body_style \
-            = vehicle.base_year_footprint_ft2, vehicle.model_year, vehicle.base_year_msrp_dollars, vehicle.body_style
-
-        unibody_structure, base_year_structure_mass_lbs, material, base_powertrain_cost \
-            = vehicle.unibody_structure, vehicle.base_year_structure_mass_lbs, vehicle.structure_material, vehicle.powertrain_cost
+        base_powertrain_cost \
+            = vehicle.powertrain_cost
 
         body_structure = 'unibody_structure'
-        if unibody_structure == 0:
+        if vehicle.unibody_structure == 0:
             body_structure = 'ladder_structure'
 
         # markups and learning
@@ -86,31 +76,30 @@ class GliderCost(OMEGABase):
         learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals())
         legacy_sales_scaler = eval(_cache['ALL', 'legacy_sales_learning_scaler', 'not applicable']['value'], {}, locals())
         sales_scaler = eval(_cache['ALL', 'sales_scaler', 'not applicable']['value'], {}, locals())
-        cumulative_sales = sales_scaler * (model_year - learning_start)
+        cumulative_sales = sales_scaler * (vehicle.model_year - learning_start)
         learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
 
         # first calc base glider structure and non-structure weights
-        structure_mass_lbs = base_year_structure_mass_lbs
-        adj_factor = _cache[body_style, body_structure, material]['dollar_adjustment']
-        structure_cost = eval(_cache[body_style, body_structure, material]['value'], {}, locals()) \
+        structure_mass_lbs = vehicle.base_year_structure_mass_lbs
+        adj_factor = _cache[vehicle.body_style, body_structure, vehicle.structure_material]['dollar_adjustment']
+        structure_cost = eval(_cache[vehicle.body_style, body_structure, vehicle.structure_material]['value'], {}, locals()) \
                          * adj_factor * learning_factor
 
-        base_year_glider_non_structure_cost = (base_year_msrp_dollars / markup) - structure_cost - base_powertrain_cost
+        base_year_glider_non_structure_cost = (vehicle.base_year_msrp_dollars / markup) - structure_cost - base_powertrain_cost
 
         # now calc package costs
         for idx, row in pkg_df.iterrows():
-
             # glider structure cost
             structure_mass_lbs = row['structure_mass_lbs']
             material = row['structure_material']
-            adj_factor = _cache[body_style, body_structure, material]['dollar_adjustment']
-            pkg_structure_cost = eval(_cache[body_style, body_structure, material]['value'], {}, locals()) \
+            adj_factor = _cache[vehicle.body_style, body_structure, material]['dollar_adjustment']
+            pkg_structure_cost = eval(_cache[vehicle.body_style, body_structure, material]['value'], {}, locals()) \
                                         * adj_factor * learning_factor
 
             # glider non-structure cost
-            delta_footprint = base_footprint - row['footprint_ft2']
-            adj_factor = _cache[body_style, 'non_structure', 'various']['dollar_adjustment']
-            delta_glider_non_structure_cost = eval(_cache[body_style, 'non_structure', 'various']['value'], {}, locals()) \
+            delta_footprint = vehicle.base_year_footprint_ft2 - row['footprint_ft2']
+            adj_factor = _cache[vehicle.body_style, 'non_structure', 'various']['dollar_adjustment']
+            delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'], {}, locals()) \
                                               * adj_factor * learning_factor
             pkg_glider_non_structure_cost = base_year_glider_non_structure_cost + delta_glider_non_structure_cost
 
