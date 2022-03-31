@@ -643,6 +643,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
                        'base_year_structure_mass_lbs', 'base_year_glider_non_structure_mass_lbs',
+                       'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'}
 
     # transfer base properties
@@ -749,6 +750,7 @@ class Vehicle(OMEGABase):
         self.base_year_market_share = 0
         self.base_year_structure_mass_lbs = 0
         self.base_year_glider_non_structure_mass_lbs = 0
+        self.base_year_glider_non_structure_cost_dollars = 0
         self.base_year_footprint_ft2 = 0
         self.base_year_curbweight_lbs_to_hp = 0
         self.base_year_msrp_dollars = 0
@@ -1013,11 +1015,14 @@ class VehicleFinal(SQABase, Vehicle):
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
     structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
     powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
+    battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
+    motor_kw = Column(Float)  #: vehicle propulsion motor(s) total power, kW
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     base_year_structure_mass_lbs = Column(Float)  #: base year vehicle structure mass lbs
     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
+    base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year non-structure cost dollars
     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
     base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
     base_year_msrp_dollars = Column(Float)  #: base year Manufacturer Suggested Retail Price (dollars)
@@ -1172,7 +1177,8 @@ class VehicleFinal(SQABase, Vehicle):
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
                               'reg_class_id', 'context_size_class',
                               'base_year_reg_class_id', 'base_year_market_share', 'base_year_structure_mass_lbs',
-                              'base_year_glider_non_structure_mass_lbs', 'base_year_footprint_ft2',
+                              'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars' 
+                              'base_year_footprint_ft2',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'] \
                               + VehicleFinal.dynamic_attributes
 
@@ -1237,7 +1243,12 @@ class VehicleFinal(SQABase, Vehicle):
                 structure_material=df.loc[i, 'structure_material'],
                 base_year_reg_class_id=df.loc[i, 'reg_class_id'],
                 base_year_footprint_ft2=df.loc[i, 'footprint_ft2'],
-                base_year_msrp_dollars=df.loc[i, 'base_year_msrp_dollars']
+                base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
+                base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
+                base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
+                structure_mass_lbs=df.loc[i,'structure_mass_lbs'],
+                battery_kwh=df.loc[i, 'battery_kwh'],
+                motor_kw=df.loc[i, 'motor_kw'],
             )
 
             for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
@@ -1264,19 +1275,8 @@ class VehicleFinal(SQABase, Vehicle):
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0
 
-            # TODO: these need to be in the vehicles.csv!!
             veh.powertrain_type = veh.fueling_class
-            if veh.fueling_class == 'BEV':
-                veh.battery_kwh = 60
-            else:
-                veh.battery_kwh = 0
 
-            structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
-                MassScaling.calc_mass_terms(veh, veh.structure_material, veh.eng_rated_hp, veh.battery_kwh, veh.footprint_ft2)
-
-            veh.base_year_structure_mass_lbs = structure_mass_lbs
-            veh.base_year_glider_non_structure_mass_lbs = \
-                veh.curbweight_lbs - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
             veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / veh.eng_rated_hp
 
             vehicle_shares_dict['total'] += veh.initial_registered_count

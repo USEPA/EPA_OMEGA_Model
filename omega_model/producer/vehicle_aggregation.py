@@ -332,7 +332,6 @@ class VehicleAggregation(OMEGABase):
             powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
 
             # new columns calculated here for every vehicle in vehicles.csv:
-            df['base_year_msrp_dollars'] = df['msrp_dollars']
             df['structure_mass_lbs'] = 0
             df['battery_mass_lbs'] = 0
             df['powertrain_mass_lbs'] = 0
@@ -349,17 +348,23 @@ class VehicleAggregation(OMEGABase):
                 if pd.isna(row['height_in']):
                     df.loc[idx, 'height_in'] = 62.4  # dummy value, sales-weighted
 
+                veh = Vehicle()
+                veh.powertrain_type = powertrain_type_dict[row.electrification_class]
+                df.loc[idx, 'battery_kwh'] = \
+                    {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
+
+                df.loc[idx, 'motor_kw'] = \
+                    {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (row['drive_system'] == 4)), 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
+
             for idx, row in df.iterrows():
                 veh = Vehicle()
                 veh.body_style = row.body_style
                 veh.unibody_structure = row.unibody_structure
                 veh.drive_system = row.drive_system
                 veh.powertrain_type = powertrain_type_dict[row.electrification_class]
-                battery_kwh = {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
-                motor_kw = {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (row['drive_system'] == 4)), 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
 
                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs = \
-                    MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, battery_kwh, row.footprint_ft2)
+                    MassScaling.calc_mass_terms(veh, row.structure_material, row.eng_rated_hp, row.battery_kwh, row.footprint_ft2)
 
                 df.loc[idx, 'structure_mass_lbs'] = structure_mass_lbs
                 df.loc[idx, 'battery_mass_lbs'] = battery_mass_lbs
@@ -372,9 +377,11 @@ class VehicleAggregation(OMEGABase):
                 row['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
                 row['engine_cylinders'] = row['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
                 row['engine_displacement_L'] = row['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-                row['battery_kwh'] = battery_kwh  # FOR NOW, NEED SOMETHING HERE
-                row['motor_kw'] = motor_kw  # FOR NOW, NEED SOMETHING HERE
-                veh.powertrain_cost = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0]  # vehicle.base_year_powertrain_cost ... ???
+                powertrain_cost = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0]
+
+                # don't think we need this, unless we want it for information purposes, veh.powertrain cost was only
+                # calculated to get the glider_non_structure_cost
+                # df.loc[idx, 'powertrain_cost_dollars'] = powertrain_cost
 
                 # calc glider cost
                 row['structure_mass_lbs'] = structure_mass_lbs
@@ -385,10 +392,11 @@ class VehicleAggregation(OMEGABase):
                 veh.base_year_msrp_dollars = row['msrp_dollars']
                 veh.base_year_structure_mass_lbs = structure_mass_lbs
 
+                veh.base_year_glider_non_structure_cost_dollars = \
+                    GliderCost.get_base_year_glider_non_structure_cost(veh, powertrain_cost)
+
                 df.loc[idx, 'glider_cost_dollars'], df.loc[idx, 'structure_cost_dollars'], \
                     df.loc[idx, 'glider_non_structure_cost_dollars'] = GliderCost.calc_cost(veh, pd.DataFrame([row]))[0]
-
-                df.loc[idx, 'powertrain_cost_dollars'] = veh.powertrain_cost
 
             df['glider_non_structure_mass_lbs'] = \
                 df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
