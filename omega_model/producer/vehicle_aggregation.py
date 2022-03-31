@@ -341,6 +341,14 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_cost_dollars'] = 0
             df['powertrain_cost_dollars'] = 0
 
+            # fill in missing values
+            for idx, row in df.iterrows():
+                if pd.isna(row['ground_clearance_in']):
+                    df.loc[idx, 'ground_clearance_in'] = 6.6  # dummy value, sales-weighted
+
+                if pd.isna(row['height_in']):
+                    df.loc[idx, 'height_in'] = 62.4  # dummy value, sales-weighted
+
             for idx, row in df.iterrows():
                 veh = Vehicle()
                 veh.body_style = row.body_style
@@ -357,14 +365,6 @@ class VehicleAggregation(OMEGABase):
                 df.loc[idx, 'battery_mass_lbs'] = battery_mass_lbs
                 df.loc[idx, 'powertrain_mass_lbs'] = powertrain_mass_lbs
 
-                row['structure_mass_lbs'] = structure_mass_lbs
-
-                if pd.isna(row['ground_clearance_in']):
-                    row['ground_clearance_in'] = 6.6  # dummy value, sales-weighted
-
-                if pd.isna(row['height_in']):
-                    row['height_in'] = 62.4  # dummy value, sales-weighted
-
                 # calc powertrain cost
                 veh.model_year = row.model_year
                 veh.electrification_class = row.electrification_class
@@ -377,6 +377,7 @@ class VehicleAggregation(OMEGABase):
                 veh.powertrain_cost = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0]  # vehicle.base_year_powertrain_cost ... ???
 
                 # calc glider cost
+                row['structure_mass_lbs'] = structure_mass_lbs
                 veh.structure_material = row.structure_material
                 veh.base_year_footprint_ft2 = row['footprint_ft2']
                 veh.height_in = row['height_in']
@@ -393,9 +394,7 @@ class VehicleAggregation(OMEGABase):
                 df['curbweight_lbs'] - df['powertrain_mass_lbs'] - df['structure_mass_lbs'] - df['battery_mass_lbs']
 
             # calculate weighted numeric values within the groups, and combined string values
-            groupby = df.groupby(aggregation_columns, as_index=False)
-
-            agg_df = groupby.apply(weighted_average)
+            agg_df = df.groupby(aggregation_columns, as_index=False).apply(weighted_average)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
             agg_df['manufacturer_id'] = 'consolidated_OEM'
             agg_df['model_year'] = df['model_year'].iloc[0]
