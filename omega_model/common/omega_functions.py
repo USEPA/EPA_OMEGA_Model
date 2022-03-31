@@ -81,7 +81,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
     import numpy as np
     import pandas as pd
     import common.omega_globals as omega_globals
-    from context.cost_clouds import cloud_non_numeric_columns
+    cloud_non_numeric_columns = omega_globals.options.CostCloud.cloud_non_numeric_columns
 
     if len(cloud) > 1:
         frontier_pts = []
