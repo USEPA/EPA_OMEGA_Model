@@ -107,7 +107,8 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_data_columns = []
 
     @staticmethod
-    def eval_rse(powertrain_type, cost_curve_class, rse_name, rlhp20s, rlhp60s, etw_hps, etws):
+    def eval_rse(powertrain_type, cost_curve_class, rse_name, rlhp20s, rlhp60s,
+                 eng_rated_hps, etw_lbs, battery_kwhs, structure_masses_lbs, structure_materials, fooprint_ft2s):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
         package) for the full factorial combination of the iterable terms.
@@ -118,25 +119,41 @@ class CostCloud(OMEGABase, CostCloudBase):
             rse_name (str): e.g. name of the drive cycle phase to calculate for
             rlhp20s (iterable): roadload horsepower at 20 MPH values
             rlhp60s (iterable): roadload horsepower at 60 MPH values
-            etw_hps (iterable): weight to horsepower ratios
-            etws (iterable): test weights, e.g. 3500 lbs
+            eng_rated_hps (iterable): engine horsepowers
+            etw_lbs (iterable): test weights, e.g. 3500 lbs
+            battery_kwhs(iterable): battery capacities, kWh
 
         Returns:
             list of values evaluated by combining the terms
 
         """
         results = []
-        etw_lbs = []
+        eng_rated_hps_list = []
+        etw_lbs_list = []
+        battery_kwhs_list = []
+        structure_masses_lbs_list = []
+        structure_materials_list = []
+        fooprint_ft2s_list = []
 
-        for RLHP20 in rlhp20s:
-            for RLHP60 in rlhp60s:
-                for ETW in etws:
-                    for ETW_HP in etw_hps:
-                        HP_ETW = 1 / ETW_HP
+        for rlhp20 in rlhp20s:
+            for rlhp60 in rlhp60s:
+                for eng_rated_hp in eng_rated_hps:
+                    for ETW, battery_kwh, structure_mass_lbs, structure_material, footprint_ft2\
+                            in zip(etw_lbs, battery_kwhs, structure_masses_lbs, structure_materials, fooprint_ft2s):
+                        RLHP20 = rlhp20 / ETW
+                        RLHP60 = rlhp60 / ETW
+                        HP_ETW = eng_rated_hp / ETW
                         results.append(eval(_cache[powertrain_type][cost_curve_class]['rse'][rse_name], {}, locals()))
-                        etw_lbs.append(ETW)
 
-        return results, etw_lbs
+                        eng_rated_hps_list.append(eng_rated_hp)
+                        etw_lbs_list.append(ETW)
+                        battery_kwhs_list.append(battery_kwh)
+                        structure_masses_lbs_list.append(structure_mass_lbs)
+                        structure_materials_list.append(structure_material)
+                        fooprint_ft2s_list.append(footprint_ft2)
+
+        return results, eng_rated_hps_list, etw_lbs_list, battery_kwhs_list, \
+               structure_masses_lbs_list, structure_materials_list, fooprint_ft2s_list
 
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):
@@ -288,11 +305,72 @@ class CostCloud(OMEGABase, CostCloudBase):
         import numpy as np
         from context.mass_scaling import MassScaling
         from policy.drive_cycle_ballast import DriveCycleBallast
+        from context.powertrain_cost import PowertrainCost
+        from context.glider_cost import GliderCost
 
         cost_cloud = pd.DataFrame()
 
-        # TODO: decide sweep ranges based on vehicle characteristics, for example, unibody v. body-on-frame or other
-        # properties?
+        vehicle_curbweights_lbs = []
+        eng_rated_hps = []
+        battery_kwhs = []
+        structure_masses_lbs = []
+        structure_materials = []
+        fooprint_ft2s = []
+        for structure_material in MassScaling.structure_materials:
+            for footprint_ft2 in [vehicle.footprint_ft2 * 0.95, vehicle.footprint_ft2, vehicle.footprint_ft2 * 1.05]:
+                battery_kwh = vehicle.battery_kwh  # for now...
+
+                # battery_usable_portion = 0.9
+                # range_ballast_lbs  = 300
+                # cd_range_miles = 300
+                # convergence = 0
+                # while convergence == 0
+                #    battery_kwh = battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion)
+                #    if and(abs(1 - structure_mass_lbs/prior_structure_mass_lbs) < tol, abs(1 - battery_kwh/prior_battery_kwh) < tol, abs(1 - powertrain_mass_lbs/prior_powertrain_mass_lbs) < tol), abs(1 - eng_rated_hp/prior_eng_rated_hp) < tol))
+                #        convergence = 1
+                #
+                # def battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion):
+                #    # use RSE's for kwh/mi, and target range value to get the required kwh
+
+                eng_rated_hp = 0
+                prior_powertrain_mass_lbs = 1
+                prior_eng_rated_hp = 1
+                convergence_tolerance = 0.01
+                converged = False
+                while not converged:
+                    structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs = \
+                        MassScaling.calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2)
+
+                    vehicle_curbweight_lbs = \
+                        vehicle.base_year_glider_non_structure_mass_lbs + \
+                        delta_glider_non_structure_mass_lbs + \
+                        powertrain_mass_lbs + \
+                        structure_mass_lbs + \
+                        battery_mass_lbs
+
+                    eng_rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
+
+                    converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
+                                abs(1 - eng_rated_hp / prior_eng_rated_hp) <= convergence_tolerance
+
+                    print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
+                    print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
+
+                    prior_powertrain_mass_lbs = powertrain_mass_lbs
+                    prior_eng_rated_hp = eng_rated_hp
+
+                structure_masses_lbs.append(structure_mass_lbs)
+                vehicle_curbweights_lbs.append(vehicle_curbweight_lbs)
+                eng_rated_hps.append(eng_rated_hp)
+                battery_kwhs.append(battery_kwh)
+                structure_materials.append(structure_material)
+                fooprint_ft2s.append(footprint_ft2)
+
+        # TODO: if vehicle up for redesign, query all classes, otherwise use same cost_curve class as prior year...?
+        # TODO: need to assign cost curve class to vehicles from chosen tech package...?  Not sure how that will work
+        # when interpolating along the frontier.......
+
+        etw_lbs = np.array(vehicle_curbweights_lbs) + DriveCycleBallast.get_ballast_lbs(vehicle)
 
         vehicle_rlhp20 = calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 20)
         vehicle_rlhp60 = calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 60)
@@ -301,61 +379,6 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
         rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
 
-        footprint_ft2 = vehicle.footprint_ft2  # for now
-
-        vehicle_curbweights_lbs = []
-        eng_rated_hps = []
-        for structure_material in MassScaling.structure_materials:
-            # print(structure_material)
-
-            # battery_usable_portion = 0.9
-            # range_ballast_lbs  = 300
-            # cd_range_miles = 300
-            # convergence = 0
-            # while convergence == 0
-            #    battery_kwh = battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion)
-            #    if and(abs(1 - structure_mass_lbs/prior_structure_mass_lbs) < tol, abs(1 - battery_kwh/prior_battery_kwh) < tol, abs(1 - powertrain_mass_lbs/prior_powertrain_mass_lbs) < tol), abs(1 - eng_rated_hp/prior_eng_rated_hp) < tol))
-            #        convergence = 1
-            #
-            # def battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion):
-            #    # use RSE's for kwh/mi, and target range value to get the required kwh
-
-            battery_kwh = 0
-            eng_rated_hp = 0
-            prior_powertrain_mass_lbs = 1
-            prior_eng_rated_hp = 1
-            convergence_tolerance = 0.01
-            converged = False
-            while not converged:
-                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs = \
-                    MassScaling.calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2)
-
-                vehicle_curbweight_lbs = \
-                    vehicle.base_year_glider_non_structure_mass_lbs + delta_glider_non_structure_mass_lbs + \
-                        powertrain_mass_lbs + structure_mass_lbs + battery_mass_lbs
-
-                eng_rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
-
-                converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
-                            abs(1 - eng_rated_hp / prior_eng_rated_hp) <= convergence_tolerance
-
-                # print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
-                # print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
-
-                prior_powertrain_mass_lbs = powertrain_mass_lbs
-                prior_eng_rated_hp = eng_rated_hp
-
-            vehicle_curbweights_lbs.append(vehicle_curbweight_lbs)
-            eng_rated_hps.append(eng_rated_hp)
-
-        etws = np.array(vehicle_curbweights_lbs) + DriveCycleBallast.get_ballast_lbs(vehicle)
-
-        etw_hps = etws / np.array(eng_rated_hps)
-
-        # TODO: if vehicle up for redesign, query all classes, otherwise use same cost_curve class as prior year...?
-        # TODO: need to assign cost curve class to vehicles from chosen tech package...?  Not sure how that will work
-        # when interpolating along the frontier.......
-
         cost_curve_classes = _cache[vehicle.fueling_class]
 
         for cc in cost_curve_classes:
@@ -363,16 +386,36 @@ class CostCloud(OMEGABase, CostCloudBase):
             # print(cc)
             cc_cloud = pd.DataFrame()
             for r in cost_curve_classes[cc]['rse']:
-                # print(r)
-                cc_cloud[r], cc_cloud['etw_lbs'] = CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s,
-                                                                      etw_hps, etws)
+                cc_cloud[r], cc_cloud['eng_rated_hp'], cc_cloud['etw_lbs'], cc_cloud['battery_kwh'], \
+                cc_cloud['structure_mass_lbs'], cc_cloud['structure_material'], cc_cloud['footprint_ft2'] = \
+                    CostCloud.eval_rse(vehicle.fueling_class, cc, r, rlhp20s, rlhp60s,
+                                       eng_rated_hps, etw_lbs, battery_kwhs, structure_masses_lbs, structure_materials,
+                                       fooprint_ft2s)
+
             cc_cloud['cost_curve_class'] = cc
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
 
-        # TODO: calc vehicle mass(es) so they can be used to calc costs
+        cost_cloud['motor_kw'] = vehicle.motor_kw
+        cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
 
-        # TODO: calc costs!!
+        glider_costs = GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
+        cost_cloud['glider_cost_dollars'] = [gc[0] for gc in glider_costs]
+
+        # TODO: fill in the blanks...
+        # cost_cloud['delta_glider_non_structure_cost_dollars'] = 0
+        # cost_cloud['structure_cost_dollars'] = 0
+        # cost_cloud['battery_cost_dollars'] = 0
+
+        cost_cloud['new_vehicle_mfr_cost_dollars'] = \
+            vehicle.base_year_glider_non_structure_cost_dollars + \
+            cost_cloud['powertrain_cost_dollars'] + \
+            cost_cloud['glider_cost_dollars']
+            # cost_cloud['delta_glider_non_structure_cost_dollars'] + \
+            # cost_cloud['structure_cost_dollars']  # + \
+            # cost_cloud['battery_cost_dollars']
+
+        # cost_cloud.to_csv(omega_globals.options.output_folder + 'cost_cloud.csv')
 
         return cost_cloud
 

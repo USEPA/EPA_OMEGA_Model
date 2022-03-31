@@ -644,7 +644,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
                        'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
-                       'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'}
+                       'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
+                       'battery_kwh', 'motor_kw'}
 
     # transfer base properties
     for attr in base_properties:
@@ -753,6 +754,8 @@ class Vehicle(OMEGABase):
         self.base_year_footprint_ft2 = 0
         self.base_year_curbweight_lbs_to_hp = 0
         self.base_year_msrp_dollars = 0
+        self.battery_kwh = 0
+        self.motor_kw = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1025,9 +1028,6 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
     base_year_msrp_dollars = Column(Float)  #: base year Manufacturer Suggested Retail Price (dollars)
 
-    # TODO: add these to vehicles.csv
-    # battery_kwh = Column('battery_kwh', Float)  #: propulsion battery kWh capacity
-
     _initial_registered_count = Column('_initial_registered_count', Float)
 
     # --- static properties ---
@@ -1040,7 +1040,7 @@ class VehicleFinal(SQABase, Vehicle):
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
                                    'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style', 'msrp_dollars',
                                    'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
-                                    # TODO: , 'battery_kwh'
+                                    # TODO: 'battery_kwh', 'motor_kw'
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
@@ -1175,7 +1175,7 @@ class VehicleFinal(SQABase, Vehicle):
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
                               'reg_class_id', 'context_size_class',
                               'base_year_reg_class_id', 'base_year_market_share',
-                              'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars' 
+                              'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars',
                               'base_year_footprint_ft2',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'] \
                               + VehicleFinal.dynamic_attributes
@@ -1244,7 +1244,6 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
                 base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
-                structure_mass_lbs=df.loc[i,'structure_mass_lbs'],
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
             )
