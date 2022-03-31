@@ -148,15 +148,15 @@ Data Row Name and Description
 
 :Maintenance Costs File *(str)*:
     The relative or absolute path to the maintenance cost inputs file,
-    loaded by ``context.maintenance_cost_inputs.MaintenanceCostInputs``
+    loaded by ``context.maintenance_cost_inputs.MaintenanceCost``
 
 :Repair Costs File *(str)*:
     The relative or absolute path to the repair cost inputs file,
-    loaded by ``context.repair_cost_inputs.RepairCostInputs``
+    loaded by ``context.repair_cost.RepairCost``
 
 :Refueling Costs File *(str)*:
     The relative or absolute path to the refueling cost inputs file,
-    loaded by ``context.refueling_cost_inputs.RefuelingCostInputs``
+    loaded by ``context.refueling_cost_inputs.RefuelingCost``
 
 :Manufacturers File *(str)*:
     The relative or absolute path to the manufacturers file,
