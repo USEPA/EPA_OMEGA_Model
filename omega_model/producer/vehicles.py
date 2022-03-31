@@ -931,7 +931,9 @@ class Vehicle(OMEGABase):
         cost_curve = calc_frontier(cost_cloud, 'cert_co2e_grams_per_mile',
                                    'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
-        # common.omega_functions.plot_frontier(cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, o2.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
+        # import common
+        # self.cost_curve_class = 'RSE'
+        # common.omega_functions.plot_frontier(cost_cloud, self.cost_curve_class + '\nallow_upslope=%s, frontier_affinity_factor=%s' % (allow_upslope, omega_globals.options.cost_curve_frontier_affinity_factor), cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
         # rename generic columns to vehicle-specific columns
         cost_curve = DecompositionAttributes.rename_decomposition_columns(self, cost_curve)
@@ -1173,11 +1175,12 @@ class VehicleFinal(SQABase, Vehicle):
 
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
-                              'reg_class_id', 'context_size_class',
+                              'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
                               'base_year_reg_class_id', 'base_year_market_share',
                               'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars',
-                              'base_year_footprint_ft2',
-                              'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars'] \
+                              'footprint_ft2', 'base_year_footprint_ft2', 'drive_system',
+                              'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
+                              'target_coef_a', 'target_coef_b', 'target_coef_c'] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
@@ -1260,6 +1263,9 @@ class VehicleFinal(SQABase, Vehicle):
 
             # TODO: what are we doing about fuel cell vehicles...?
             if veh.electrification_class in ['EV', 'FCV']:
+                if veh.electrification_class == 'FCV':
+                    veh.in_use_fuel_id = "{'US electricity':1.0}"
+                    veh.cert_fuel_id = "{'electricity':1.0}"
                 veh.fueling_class = 'BEV'
             else:
                 veh.fueling_class = 'ICE'
@@ -1324,20 +1330,32 @@ class VehicleFinal(SQABase, Vehicle):
             v.base_year_market_share = v.initial_registered_count / vehicle_shares_dict['total']
 
             alt_veh = v.clone_vehicle(v)  # create alternative powertrain clone of vehicle
+
             if v.fueling_class == 'ICE':
                 alt_veh.fueling_class = 'BEV'
+                alt_veh.electrification_class = 'EV'
                 alt_veh.name = 'BEV of ' + v.name
-                # alt_veh.cost_curve_class = v.cost_curve_class.replace('ice_', 'bev_')
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                alt_veh.market_class_id = v.market_class_id.replace('ICE', 'BEV')
+                alt_veh.battery_kwh = 60
+                alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)
+                alt_veh.eng_rated_hp = 0
+                alt_veh.eng_cyls_num = 0
+                alt_veh.eng_disp_liters = 0
             else:
                 alt_veh.fueling_class = 'ICE'
+                alt_veh.electrification_class = 'N'
                 alt_veh.name = 'ICE of ' + v.name
-                # alt_veh.cost_curve_class = v.cost_curve_class.replace('bev_', 'ice_')
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                alt_veh.market_class_id = v.market_class_id.replace('BEV', 'ICE')
+                alt_veh.eng_rated_hp = v.motor_kw * 1.34102
+                alt_veh.motor_kw = 0
+                alt_veh.battery_kwh = 0
+                alt_veh.eng_cyls_num = None
+                alt_veh.eng_disp_liters = None
+
+            alt_veh.powertrain_type = v.fueling_class
+            alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
             alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
             alt_veh.cert_direct_co2e_grams_per_mile = 0
             alt_veh.cert_direct_kwh_per_mile = 0
