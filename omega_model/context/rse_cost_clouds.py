@@ -93,7 +93,6 @@ _cache = dict()
 
 # define list of non-numeric columns to ignore during frontier creation since they goof up pandas auto-typing of
 # columns when switching between Series and DataFrame representations
-cloud_non_numeric_columns = ['package']
 
 
 class CostCloud(OMEGABase, CostCloudBase):
@@ -105,6 +104,8 @@ class CostCloud(OMEGABase, CostCloudBase):
     _max_year = 0  # maximum year of cost cloud data (e.g. 2050), set by ``init_cost_clouds_from_file()``
 
     cost_cloud_data_columns = []
+
+    cloud_non_numeric_columns = ['structure_material']
 
     @staticmethod
     def eval_rse(powertrain_type, cost_curve_class, rse_name, rlhp20s, rlhp60s,
@@ -215,7 +216,11 @@ class CostCloud(OMEGABase, CostCloudBase):
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename, echo_console=True)
         input_template_name = __name__
         input_template_version = 0.1
-        input_template_columns = {'cost_curve_class'}
+        input_template_columns = {'cost_curve_class',
+                                  'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
+                                  'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
+                                  'diesel_fuel'}
+
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -350,11 +355,14 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                     eng_rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 
-                    converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
+                    try:
+                        converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
                                 abs(1 - eng_rated_hp / prior_eng_rated_hp) <= convergence_tolerance
+                    except:
+                        print('wtf??')
 
-                    print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
-                    print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
+                    # print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
+                    # print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
 
                     prior_powertrain_mass_lbs = powertrain_mass_lbs
                     prior_eng_rated_hp = eng_rated_hp
@@ -415,7 +423,14 @@ class CostCloud(OMEGABase, CostCloudBase):
             # cost_cloud['structure_cost_dollars']  # + \
             # cost_cloud['battery_cost_dollars']
 
-        # cost_cloud.to_csv(omega_globals.options.output_folder + 'cost_cloud.csv')
+        cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
+        # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
+        cost_cloud['ac_leakage'] = 1
+        cost_cloud['ac_efficiency'] = 1
+
+        cost_cloud = cost_cloud.reset_index(drop=True)
+
+        # cost_cloud.to_csv(omega_globals.options.output_folder + 'cost_cloud.csv', index=False)
 
         return cost_cloud
 
@@ -460,3 +475,4 @@ if __name__ == '__main__':
     except:
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
+
