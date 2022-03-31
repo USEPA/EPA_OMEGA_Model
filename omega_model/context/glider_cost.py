@@ -48,6 +48,55 @@ class GliderCost(OMEGABase):
     """
 
     @staticmethod
+    def get_markups_and_learning(vehicle):
+        """
+
+        Args:
+            vehicle:
+
+        Returns:
+
+        """
+        body_structure = 'unibody_structure'
+        if vehicle.unibody_structure == 0:
+            body_structure = 'ladder_structure'
+
+        # markups and learning
+        markup = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
+        learning_rate = eval(_cache['ALL', 'learning_rate', 'not applicable']['value'], {}, locals())
+        learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals())
+        legacy_sales_scaler = eval(_cache['ALL', 'legacy_sales_learning_scaler', 'not applicable']['value'], {},
+                                   locals())
+        sales_scaler = eval(_cache['ALL', 'sales_scaler', 'not applicable']['value'], {}, locals())
+        cumulative_sales = sales_scaler * (vehicle.model_year - learning_start)
+        learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
+
+        return body_structure, learning_factor, markup
+
+    @staticmethod
+    def get_base_year_glider_non_structure_cost(vehicle, powertrain_cost):
+        """
+
+        Args:
+            vehicle:
+
+        Returns:
+
+        """
+        body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
+
+        # first calc base glider structure and non-structure weights
+        structure_mass_lbs = vehicle.base_year_structure_mass_lbs
+        adj_factor = _cache[vehicle.body_style, body_structure, vehicle.structure_material]['dollar_adjustment']
+        structure_cost = eval(_cache[vehicle.body_style, body_structure, vehicle.structure_material]['value'], {},
+                              locals()) * adj_factor * learning_factor
+
+        base_year_glider_non_structure_cost = \
+            (vehicle.base_year_msrp_dollars / markup) - structure_cost - powertrain_cost
+
+        return base_year_glider_non_structure_cost
+
+    @staticmethod
     def calc_cost(vehicle, pkg_df):
         """
         Calculate the value of the response surface equation for the given powertrain type, cost curve class (tech
@@ -63,37 +112,14 @@ class GliderCost(OMEGABase):
         """
         results = []
 
-        base_powertrain_cost \
-            = vehicle.powertrain_cost
-
-        body_structure = 'unibody_structure'
-        if vehicle.unibody_structure == 0:
-            body_structure = 'ladder_structure'
-
-        # markups and learning
-        markup = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
-        learning_rate = eval(_cache['ALL', 'learning_rate', 'not applicable']['value'], {}, locals())
-        learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals())
-        legacy_sales_scaler = eval(_cache['ALL', 'legacy_sales_learning_scaler', 'not applicable']['value'], {}, locals())
-        sales_scaler = eval(_cache['ALL', 'sales_scaler', 'not applicable']['value'], {}, locals())
-        cumulative_sales = sales_scaler * (vehicle.model_year - learning_start)
-        learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
-
-        # first calc base glider structure and non-structure weights
-        structure_mass_lbs = vehicle.base_year_structure_mass_lbs
-        adj_factor = _cache[vehicle.body_style, body_structure, vehicle.structure_material]['dollar_adjustment']
-        structure_cost = eval(_cache[vehicle.body_style, body_structure, vehicle.structure_material]['value'], {}, locals()) \
-                         * adj_factor * learning_factor
-
-        base_year_glider_non_structure_cost = (vehicle.base_year_msrp_dollars / markup) - structure_cost - base_powertrain_cost
+        body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
 
         # now calc package costs
         for idx, row in pkg_df.iterrows():
             # glider structure cost
             structure_mass_lbs = row['structure_mass_lbs']
-            material = row['structure_material']
-            adj_factor = _cache[vehicle.body_style, body_structure, material]['dollar_adjustment']
-            pkg_structure_cost = eval(_cache[vehicle.body_style, body_structure, material]['value'], {}, locals()) \
+            adj_factor = _cache[vehicle.body_style, body_structure, row['structure_material']]['dollar_adjustment']
+            pkg_structure_cost = eval(_cache[vehicle.body_style, body_structure, row['structure_material']]['value'], {}, locals()) \
                                         * adj_factor * learning_factor
 
             # glider non-structure cost
@@ -101,7 +127,9 @@ class GliderCost(OMEGABase):
             adj_factor = _cache[vehicle.body_style, 'non_structure', 'various']['dollar_adjustment']
             delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'], {}, locals()) \
                                               * adj_factor * learning_factor
-            pkg_glider_non_structure_cost = base_year_glider_non_structure_cost + delta_glider_non_structure_cost
+
+            pkg_glider_non_structure_cost = \
+                vehicle.base_year_glider_non_structure_cost_dollars + delta_glider_non_structure_cost
 
             pkg_glider_cost = pkg_structure_cost + pkg_glider_non_structure_cost
 
