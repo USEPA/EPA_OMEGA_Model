@@ -894,8 +894,6 @@ class OMEGASessionObject(OMEGABase):
             name (str): the name of the session
             
         """
-        from omega import OMEGASessionSettings
-
         self.batch = []
         self.name = name
         self.num = 0
@@ -940,8 +938,6 @@ class OMEGASessionObject(OMEGABase):
             Nothing, updates session attributes
 
         """
-        from omega import OMEGASessionSettings
-
         self.num = session_num
         self.enabled = session_num == 0 or \
                        validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
