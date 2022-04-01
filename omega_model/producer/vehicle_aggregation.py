@@ -276,8 +276,7 @@ class VehicleAggregation(OMEGABase):
         from context.glider_cost import GliderCost
         from context.powertrain_cost import PowertrainCost
 
-        if verbose:
-            omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
+        omega_log.logwrite('\nAggregating vehicles from %s...' % filename, echo_console=True)
 
         input_template_name = 'vehicles'
         input_template_version = 0.46
@@ -352,7 +351,7 @@ class VehicleAggregation(OMEGABase):
                     {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (row['drive_system'] == 4)), 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
 
             for idx, row in df.iterrows():
-                print(row['vehicle_name'])
+                # print(row['vehicle_name'])
                 veh = Vehicle()
                 veh.body_style = row['body_style']
                 veh.unibody_structure = row['unibody_structure']
@@ -422,78 +421,7 @@ if __name__ == '__main__':
         init_omega_db(omega_globals.options.verbose)
         omega_log.init_logfile()
 
-        # from common.omega_functions import weighted_value
-        #
-        # from producer.manufacturers import Manufacturer  # needed for manufacturers table
-        # from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        # from context.fuel_prices import FuelPrice  # needed for retail fuel price
-        # from context.new_vehicle_market import NewVehicleMarket  # needed for context size class hauling info
-        # from producer.vehicle_annual_data import VehicleAnnualData
-        #
-        # module_name = get_template_name(omega_globals.options.policy_targets_file)
-        # omega_globals.options.VehicleTargets = importlib.import_module(module_name).VehicleTargets
-        #
-        # module_name = get_template_name(omega_globals.options.market_classes_file)
-        # omega_globals.options.MarketClass = importlib.import_module(module_name).MarketClass
-        #
-        # from policy.policy_fuels import PolicyFuel
-        #
-        # # setup up dynamic attributes before metadata.create_all()
-        # vehicle_columns = get_template_columns(omega_globals.options.vehicles_file)
-        #
-        # VehicleFinal.dynamic_columns = list(
-        #     set.difference(set(vehicle_columns), VehicleFinal.base_input_template_columns))
-        #
-        # for vdc in VehicleFinal.dynamic_columns:
-        #     VehicleFinal.dynamic_attributes.append(make_valid_python_identifier(vdc))
-        #
-        # for attribute in VehicleFinal.dynamic_attributes:
-        #     if attribute not in VehicleFinal.__dict__:
-        #         if int(sqlalchemy.__version__.split('.')[1]) > 3:
-        #             sqlalchemy.ext.declarative.DeclarativeMeta.__setattr__(VehicleFinal, attribute, Column(attribute, Float))
-        #         else:
-        #             sqlalchemy.ext.declarative.api.DeclarativeMeta.__setattr__(VehicleFinal, attribute, Column(attribute, Float))
-        #
-        # SQABase.metadata.create_all(omega_globals.engine)
-        #
-        # init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
-        #                                                   verbose=omega_globals.options.verbose)
-        #
-        # init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
-        #                                         verbose=omega_globals.options.verbose)
-        #
-        # init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file,
-        #                                        verbose=omega_globals.options.verbose)
-        #
-        # init_fail += FuelPrice.init_from_file(omega_globals.options.context_fuel_prices_file,
-        #                                       verbose=omega_globals.options.verbose)
-        #
-        # init_fail += omega_globals.options.CostCloud.\
-        #     init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
-        #                                 omega_globals.options.bev_vehicle_simulation_results_file,
-        #                                 omega_globals.options.phev_vehicle_simulation_results_file,
-        #                                 verbose=omega_globals.options.verbose)
-        #
-        # init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
-        #                                                                  verbose=omega_globals.options.verbose)
-        #
-        # init_fail += PolicyFuel.init_from_file(omega_globals.options.policy_fuels_file,
-        #                                        verbose=omega_globals.options.verbose)
-        #
-        # init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-        #                                                   omega_globals.options.onroad_vehicle_calculations_file,
-        #                                                   verbose=omega_globals.options.verbose)
-        #
         if not init_fail:
-            #     vehicle_list = VehicleFinal.get_compliance_vehicles(2019, 'OEM_A')
-            #
-            #     # update vehicle annual data, registered count must be update first:
-            #     VehicleAnnualData.update_registered_count(vehicle_list[0], 2020, 54321)
-            #
-            #     # dump database with updated vehicle annual data
-            #     dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
-            #
-            #     weighted_footprint = weighted_value(vehicle_list, 'initial_registered_count', 'footprint_ft2')
             pass
         else:
             print(init_fail)
