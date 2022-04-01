@@ -29,6 +29,8 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
             plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
     """
+    import common.omega_globals as omega_globals
+
     import matplotlib.pyplot as plt
     plt.figure()
     plt.plot(cost_cloud[x_key], cost_cloud[y_key],
@@ -39,7 +41,7 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
     plt.plot(frontier_df[x_key], frontier_df[y_key],
              'r-')
     plt.grid()
-    plt.savefig(globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
+    plt.savefig(omega_globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
 
 
 def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
