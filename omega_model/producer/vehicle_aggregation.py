@@ -399,7 +399,7 @@ class VehicleAggregation(OMEGABase):
             agg_df['model_year'] = df['model_year'].iloc[0]
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
-        omega_globals.options.vehicles_df = agg_df
+            omega_globals.options.vehicles_df = agg_df
 
         return template_errors
 
