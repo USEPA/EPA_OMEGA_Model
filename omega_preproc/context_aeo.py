@@ -303,35 +303,65 @@ def main():
 
         # work on fuel prices
         for aeo_case in settings.aeo_cases:
-            print(f'Working on context gasoline prices for the AEO {aeo_case}')
+            # print(f'Working on context gasoline prices for the AEO {aeo_case}')
             case_df = return_df(aeo_petroleum_fuel_prices_table, 'full name', aeo_case, aeo_version)
             aeo_table_obj = GetContext(case_df)
 
             usd_basis = aeo_table_obj.aeo_dollars()
 
-            gasoline_retail_prices = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price', settings.create_results_thru)
-            # the above selects all rows but all we want is the true end user price row, so now get that alone
-            gasoline_retail_prices = gasoline_retail_prices.loc[gasoline_retail_prices['full name'] == 'Price Components: Motor Gasoline: End-User Price', :]
+            aeo_to_omega_dict = {'Motor Gasoline': 'pump gasoline',
+                                 'Diesel': 'pump diesel'}
+            case_prices = pd.DataFrame()
+            for liquid_fuel in ['Motor Gasoline', 'Diesel']:
+                print(f'Working on {liquid_fuel} prices for the AEO {aeo_case}')
 
-            gasoline_distribution = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Distribution Costs', settings.create_results_thru)
+                omega_fuel_id = aeo_to_omega_dict[liquid_fuel]
+                retail_prices = aeo_table_obj.select_table_rows('full name', f'Price Components: {liquid_fuel}: End-User Price', settings.create_results_thru)
+                retail_prices = retail_prices.loc[retail_prices['full name'] == f'Price Components: {liquid_fuel}: End-User Price', :]
 
-            gasoline_wholesale = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Wholesale Price', settings.create_results_thru)
+                distribution = aeo_table_obj.select_table_rows('full name', f'Price Components: {liquid_fuel}: End-User Price: Distribution Costs', settings.create_results_thru)
+                wholesale = aeo_table_obj.select_table_rows('full name', f'Price Components: {liquid_fuel}: End-User Price: Wholesale Price', settings.create_results_thru)
 
-            gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
-            gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline')
-            gasoline_retail_prices.insert(0, 'case_id', f'{aeo_case}')
-            gasoline_retail_prices.insert(0, 'dollar_basis', f'{usd_basis}')
-            gasoline_retail_prices.insert(0, 'context_id', aeo_table_obj.aeo_year())
+                retail_prices = melt_df(retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
+                retail_prices.insert(0, 'fuel_id', omega_fuel_id)
+                retail_prices.insert(0, 'case_id', f'{aeo_case}')
+                retail_prices.insert(0, 'dollar_basis', f'{usd_basis}')
+                retail_prices.insert(0, 'context_id', aeo_table_obj.aeo_year())
 
-            gasoline_distribution = melt_df(gasoline_distribution, 'full name', 'gasoline_distribution', 'full name')
-            gasoline_wholesale = melt_df(gasoline_wholesale, 'full name', 'gasoline_wholesale', 'full name')
+                distribution = melt_df(distribution, 'full name', 'distribution', 'full name')
+                wholesale = melt_df(wholesale, 'full name', 'wholesale', 'full name')
 
-            gasoline_pretax_prices = gasoline_retail_prices.copy()
-            gasoline_pretax_prices['pretax_dollars_per_unit'] = gasoline_distribution['gasoline_distribution'] \
-                                                                + gasoline_wholesale['gasoline_wholesale']
-            gasoline_pretax_prices['fuel_id'] = 'pump gasoline'
+                pretax_prices = retail_prices.copy()
+                pretax_prices['pretax_dollars_per_unit'] = distribution['distribution'] + wholesale['wholesale']
+                pretax_prices['fuel_id'] = omega_fuel_id
 
-            gasoline_prices = gasoline_retail_prices.join(gasoline_pretax_prices[['pretax_dollars_per_unit']])
+                prices = retail_prices.join(pretax_prices[['pretax_dollars_per_unit']])
+
+                case_prices = pd.concat([case_prices, prices], axis=0, ignore_index=True)
+
+            # gasoline_retail_prices = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price', settings.create_results_thru)
+            # # the above selects all rows but all we want is the true end user price row, so now get that alone
+            # gasoline_retail_prices = gasoline_retail_prices.loc[gasoline_retail_prices['full name'] == 'Price Components: Motor Gasoline: End-User Price', :]
+            #
+            # gasoline_distribution = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Distribution Costs', settings.create_results_thru)
+            #
+            # gasoline_wholesale = aeo_table_obj.select_table_rows('full name', 'Price Components: Motor Gasoline: End-User Price: Wholesale Price', settings.create_results_thru)
+            #
+            # gasoline_retail_prices = melt_df(gasoline_retail_prices, 'full name', 'retail_dollars_per_unit', 'full name')
+            # gasoline_retail_prices.insert(0, 'fuel_id', 'pump gasoline')
+            # gasoline_retail_prices.insert(0, 'case_id', f'{aeo_case}')
+            # gasoline_retail_prices.insert(0, 'dollar_basis', f'{usd_basis}')
+            # gasoline_retail_prices.insert(0, 'context_id', aeo_table_obj.aeo_year())
+            #
+            # gasoline_distribution = melt_df(gasoline_distribution, 'full name', 'gasoline_distribution', 'full name')
+            # gasoline_wholesale = melt_df(gasoline_wholesale, 'full name', 'gasoline_wholesale', 'full name')
+            #
+            # gasoline_pretax_prices = gasoline_retail_prices.copy()
+            # gasoline_pretax_prices['pretax_dollars_per_unit'] = gasoline_distribution['gasoline_distribution'] \
+            #                                                     + gasoline_wholesale['gasoline_wholesale']
+            # gasoline_pretax_prices['fuel_id'] = 'pump gasoline'
+            #
+            # gasoline_prices = gasoline_retail_prices.join(gasoline_pretax_prices[['pretax_dollars_per_unit']])
 
             # electricity prices
             case_df = return_df(aeo_electricity_fuel_prices_table, 'full name', aeo_case, aeo_version)
@@ -358,7 +388,8 @@ def main():
 
             electricity_prices = electricity_prices_residential.join(electricity_prices_allsecavg[['pretax_dollars_per_unit']])
 
-            case_prices = pd.concat([gasoline_prices, electricity_prices], axis=0, ignore_index=True)
+            case_prices = pd.concat([case_prices, electricity_prices], axis=0, ignore_index=True)
+            # case_prices = pd.concat([gasoline_prices, electricity_prices], axis=0, ignore_index=True)
             # concatenate the fuel prices into one DF
             fuel_context_df = pd.concat([fuel_context_df, case_prices], ignore_index=True, axis=0)
 
