@@ -1280,7 +1280,15 @@ class VehicleFinal(SQABase, Vehicle):
 
             veh.powertrain_type = veh.fueling_class
 
-            veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / veh.eng_rated_hp
+            # TODO: we need to figure out how we want to do this for real
+            if veh.electrification_class == 'EV':
+                rated_hp = veh.motor_kw * 1.34102
+            elif veh.electrification_class in ['HEV', 'PHEV']:
+                rated_hp = veh.eng_rated_hp + veh.motor_kw * 1.34102
+            else:
+                rated_hp = veh.eng_rated_hp
+
+            veh.base_year_curbweight_lbs_to_hp = veh.curbweight_lbs / rated_hp
 
             vehicle_shares_dict['total'] += veh.initial_registered_count
 
