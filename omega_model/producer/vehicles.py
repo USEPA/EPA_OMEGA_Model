@@ -928,8 +928,18 @@ class Vehicle(OMEGABase):
 
         # calculate frontier from updated cloud
         allow_upslope = True
-        cost_curve = calc_frontier(cost_cloud, 'cert_co2e_grams_per_mile',
-                                   'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
+
+        # special handling for the case where all cert_co2e_grams_per_mile are the same value, e.g. 0
+        if cost_cloud['cert_co2e_grams_per_mile'].min() == cost_cloud['cert_co2e_grams_per_mile'].max():
+            # try to take lowest generalized cost point
+            cost_curve = cost_cloud[cost_cloud['new_vehicle_mfr_generalized_cost_dollars'] == cost_cloud[
+                'new_vehicle_mfr_generalized_cost_dollars'].min()]
+            # if somehow more than one point, just take the first one...
+            if len(cost_curve) > 1:
+                cost_curve = cost_curve.iloc[[0]]
+        else:
+            cost_curve = calc_frontier(cost_cloud, 'cert_co2e_grams_per_mile',
+                                       'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
         # import common
         # self.cost_curve_class = 'RSE'
