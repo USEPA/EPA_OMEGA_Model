@@ -949,7 +949,7 @@ class Vehicle(OMEGABase):
         cost_curve = DecompositionAttributes.rename_decomposition_columns(self, cost_curve)
 
         # drop frontier factor
-        cost_curve = cost_curve.drop(columns=['frontier_factor'])
+        cost_curve = cost_curve.drop(columns=['frontier_factor'], errors='ignore')
 
         if ((omega_globals.options.log_producer_compliance_search_years == 'all') or
             (self.model_year in omega_globals.options.log_producer_compliance_search_years)) and \
