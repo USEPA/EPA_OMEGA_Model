@@ -881,8 +881,11 @@ class Vehicle(OMEGABase):
         cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
             DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class, cost_cloud)
 
-        cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
-            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cost_cloud)
+        if self.fueling_class != 'ICE':
+            cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cost_cloud)
+        else:
+            cost_cloud['cert_direct_oncycle_kwh_per_mile'] = 0
 
         # initialize onroad values
         cost_cloud['onroad_direct_co2e_grams_per_mile'] = 0
@@ -890,8 +893,6 @@ class Vehicle(OMEGABase):
 
         # drop extraneous columns
         cost_cloud = cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
-
-        # TODO: update dynamic costs, if any
 
         # calculate off cycle credits before calculating upstream and onroad
         cost_cloud = OffCycleCredits.calc_off_cycle_credits(self, cost_cloud)
