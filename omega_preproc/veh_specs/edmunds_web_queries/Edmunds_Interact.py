@@ -706,6 +706,22 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                             tmp_raw_table[name_category][j] = 'EPA Time To Charge Battery (At 240V)'
                         elif ('EPA KWh/100 Mi'.lower() in tmp_raw_table[name_category][j].lower()):
                             tmp_raw_table[name_category][j] = 'EPA KWh/100 Mi'
+                if (name_category == 'Tires & Wheels'):
+                    for j in range(len(tmp_raw_table)):
+                        if ('In. Wheels'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_val = tmp_raw_table[name_category][j]
+                            tmp_raw_table[name_category][j] = 'Wheels'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif ('All Season Tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('PERFORMANCE TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or ('ALL-SEASON RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('All terrain tires'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_val = tmp_raw_table[name_category][j]
+                            tmp_raw_table[name_category][j] = 'Tire Types'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_val = tmp_raw_table[name_category][j]
+                            tmp_raw_table[name_category][j] = 'Tires'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
                 if tmp_raw_table.columns[0] != 'Category':
                     tmp_raw_table.insert(0, 'Category', name_category)
                 # tmp_raw_table['Category'] = name_category

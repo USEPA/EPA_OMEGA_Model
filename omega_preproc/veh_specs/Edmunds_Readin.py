@@ -114,6 +114,8 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     # matching_trns_numgears = pd.to_numeric(matching_trns_numgears, errors='coerce').astype(int)
 
     # matching_trns_numgears = pd.Series(Edmunds_data_cleaned['TRANSMISSION'].str[0], name='Number of Transmission Gears Category').replace('C',1).replace('E',1).astype(int)
+    Edmunds_data_cleaned['TRANSMISSION'].fillna('N/A', inplace=True)
+    print(Edmunds_data_cleaned.loc[Edmunds_data_cleaned['TRANSMISSION'] == 'N/A', 'TRANSMISSION'])
     matching_trns_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Transmission Type Category').replace(0,'A')
     matching_trns_category[matching_trns_numgears == 1] = '1ST'
     matching_trns_category[Edmunds_data_cleaned['TRANSMISSION'].str.contains('automated manual')] = 'AM'
@@ -121,6 +123,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     matching_trns_category[Edmunds_data_cleaned['TRANSMISSION'].str.contains('speed manual')] = 'M'
     matching_trns_category[Edmunds_data_cleaned['TRANSMISSION'].str.contains('continuous')] = '1ST'
 
+    matching_boost_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Boost Type Category').replace(0,'N')
     matching_boost_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Boost Type Category').replace(0,'N')
     matching_boost_category[Edmunds_data_cleaned['Trims'].str.contains('Turbo')] = 'TC'
     matching_boost_category[Edmunds_data_cleaned['Trims'].str.contains('Turbodiesel')] = 'TC'
@@ -162,13 +165,15 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     # tire_categories = pd.Series(initial_columns[(initial_columns.str.contains('TIRES')) \
     #     & (initial_columns.str.contains('/')) & (~initial_columns.str.contains('W/'))].str.strip().unique())
     # tire_categories_raw = pd.Series(initial_columns[(initial_columns.str.contains('TIRES'))].str.strip().unique())
-    tire_sizes = Edmunds_data_cleaned['TIRES']
-    tire_types = Edmunds_data_cleaned['TIRE TYPES']
-    i = 0
-    for tire_type, tire_size in zip(tire_types, tire_sizes):
-        if tire_size == '': tire_size = 'NA'
-        tire_codes[i] = str(tire_type) + '|' + str(tire_size)
-        i += 1
+
+    # tire_sizes = Edmunds_data_cleaned['TIRES']
+    # tire_types = Edmunds_data_cleaned['TIRE TYPES']
+    # i = 0
+    # for tire_type, tire_size in zip(tire_types, tire_sizes):
+    #     if tire_size == '': tire_size = 'NA'
+    #     tire_codes[i] = str(tire_type) + '|' + str(tire_size)
+    #     i += 1
+
         # if tire_category.find(' ') == -2: #!= -1
         #     for tire_trim in tire_trims:
         #         tire_codes[(Edmunds_data_cleaned['Trims'] == tire_trim) & (tire_codes != '')] = \
@@ -185,6 +190,10 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
                                            matching_trns_numgears, matching_boost_category, matching_mfr_category, \
                                            matching_fuel_category, electrification_category, tire_codes],axis=1)
     Edmunds_Final_Output.rename(columns={'WHEEL BASE':'WHEEL_BASE_INCHES'})
+    if ('OVERALL WIDTH WITHOUT MIRRORS' in Edmunds_Final_Output.columns) and ('WIDTH' not in Edmunds_Final_Output.columns):
+        # Edmunds_Final_Output.rename(columns={'OVERALL WIDTH WITHOUT MIRRORS': 'WIDTH'})
+        Edmunds_Final_Output['WIDTH'] = Edmunds_Final_Output['OVERALL WIDTH WITHOUT MIRRORS'].copy()
+
     date_and_time = str(datetime.datetime.now())[:19].replace(':', '').replace('-', '')
     print('output_path: ', output_path)
     Edmunds_Final_Output.to_csv(output_path+'\\'+'Edmunds Readin'+'_ '+'MY'+str(year)+' '+date_and_time+'.csv', index=False)
