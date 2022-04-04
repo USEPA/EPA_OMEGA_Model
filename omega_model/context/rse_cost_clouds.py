@@ -355,11 +355,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                     eng_rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 
-                    try:
-                        converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
-                                abs(1 - eng_rated_hp / prior_eng_rated_hp) <= convergence_tolerance
-                    except:
-                        print('wtf??')
+                    converged = abs(1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
+                            abs(1 - eng_rated_hp / prior_eng_rated_hp) <= convergence_tolerance
 
                     # print(eng_rated_hp, prior_eng_rated_hp, eng_rated_hp / prior_eng_rated_hp)
                     # print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
