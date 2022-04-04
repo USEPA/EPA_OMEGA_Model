@@ -63,10 +63,12 @@ class WeightedNode(OMEGABase):
             Node weight times node value if weight is not ``None``, else returns 0.
 
         """
-        if self.weight is not None:
-            return self.weight * self.value
-        else:
-            return 0 * self.value
+        value = 0
+
+        if self.weight:
+            value = self.weight * self.value
+
+        return value
 
     @property
     def identifier(self):
