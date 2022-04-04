@@ -359,7 +359,7 @@ class VehicleAggregation(OMEGABase):
                 veh.powertrain_type = powertrain_type_dict[row['electrification_class']]
                 veh.base_year_footprint_ft2 = row['footprint_ft2']
 
-                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, _ = \
+                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, _, _ = \
                     MassScaling.calc_mass_terms(veh, row['structure_material'], row['eng_rated_hp'],
                                                 row['battery_kwh'], row['footprint_ft2'])
 

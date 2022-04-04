@@ -343,7 +343,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                 convergence_tolerance = 0.01
                 converged = False
                 while not converged:
-                    structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs = \
+                    structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs,\
+                        usable_battery_capacity_norm = \
                         MassScaling.calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2)
 
                     vehicle_curbweight_lbs = \
@@ -400,6 +401,12 @@ class CostCloud(OMEGABase, CostCloudBase):
             cc_cloud['cost_curve_class'] = cc
             cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
             cost_cloud = cost_cloud.append(cc_cloud)
+
+        # just a test
+        if vehicle.fueling_class=='BEV':
+            from policy.drive_cycle_weights import DriveCycleWeights
+            cost_cloud['bev_range_mi'] = vehicle.battery_kwh / DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(vehicle.model_year, vehicle.fueling_class,
+                                                                          cost_cloud)
 
         cost_cloud['motor_kw'] = vehicle.motor_kw
         cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
