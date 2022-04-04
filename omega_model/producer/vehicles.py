@@ -878,8 +878,11 @@ class Vehicle(OMEGABase):
         from policy.drive_cycle_weights import DriveCycleWeights
         from policy.offcycle_credits import OffCycleCredits
 
-        cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
-            DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class, cost_cloud)
+        if self.fueling_class != 'BEV':
+            cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class, cost_cloud)
+        else:
+            cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = 0
 
         if self.fueling_class != 'ICE':
             cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
