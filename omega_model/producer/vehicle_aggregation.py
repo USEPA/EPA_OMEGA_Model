@@ -390,7 +390,7 @@ class VehicleAggregation(OMEGABase):
                     GliderCost.get_base_year_glider_non_structure_cost(veh, structure_mass_lbs, powertrain_cost)
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
-                    GliderCost.calc_cost(veh, pd.DataFrame([row]))[0][1]
+                    float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
 
                 # glider_costs = GliderCost.calc_cost(veh, pd.DataFrame([row]))  # includes structure_cost and glider_non_structure_cost
                 # glider_cost_terms = ['glider_structure_cost', 'glider_non_structure_cost']
@@ -400,7 +400,7 @@ class VehicleAggregation(OMEGABase):
                 df.loc[idx, 'glider_non_structure_mass_lbs'] = \
                     row['curbweight_lbs'] - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
 
-            df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
+            # df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(weighted_average)

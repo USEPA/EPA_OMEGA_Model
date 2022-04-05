@@ -426,7 +426,7 @@ class CostCloud(OMEGABase, CostCloudBase):
         glider_costs = GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
         glider_cost_terms = ['glider_structure_cost', 'glider_non_structure_cost']
         for idx, ct in enumerate(glider_cost_terms):
-            cost_cloud[ct] = [gc[idx] for gc in glider_costs]
+            cost_cloud[ct] = glider_costs[idx]
 
         cost_terms = powertrain_cost_terms + glider_cost_terms
 

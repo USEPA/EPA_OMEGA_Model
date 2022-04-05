@@ -32,6 +32,7 @@ Sample Data Columns
 
 """
 import pandas as pd
+import numpy as np
 
 print('importing %s' % __file__)
 
@@ -109,30 +110,33 @@ class GliderCost(OMEGABase):
             A list of cost values indexed the same as pkg_df.
 
         """
-        results = []
+
+        from context.mass_scaling import MassScaling
 
         body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
 
-        # now calc package costs
-        for idx, row in pkg_df.iterrows():
-            # glider structure cost
-            structure_mass_lbs = row['structure_mass_lbs']
-            adj_factor = _cache[vehicle.body_style, body_structure, row['structure_material']]['dollar_adjustment']
-            glider_structure_cost = eval(_cache[vehicle.body_style, body_structure, row['structure_material']]['value'], {}, locals()) \
-                                        * adj_factor * learning_factor
+        structure_mass_lbs = pkg_df['structure_mass_lbs']
+        delta_footprint = vehicle.base_year_footprint_ft2 - pkg_df['footprint_ft2']
 
-            # glider non-structure cost
-            delta_footprint = vehicle.base_year_footprint_ft2 - row['footprint_ft2']
-            adj_factor = _cache[vehicle.body_style, 'non_structure', 'various']['dollar_adjustment']
-            delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'], {}, locals()) \
-                                              * adj_factor * learning_factor
+        locals_dict = locals()  # cache local equation terms
 
-            glider_non_structure_cost = \
-                vehicle.base_year_glider_non_structure_cost_dollars + delta_glider_non_structure_cost
+        # glider structure cost
+        adj_factor = np.array([_cache[vehicle.body_style, body_structure, sm]['dollar_adjustment'] for sm in pkg_df['structure_material']])
 
-            results.append((glider_structure_cost, glider_non_structure_cost))
+        values = np.zeros_like(structure_mass_lbs)
+        for structure_material in MassScaling.structure_materials:
+            values += eval(_cache[vehicle.body_style, body_structure, structure_material]['value']) * (pkg_df['structure_material'] == structure_material)
+        glider_structure_cost = values * adj_factor * learning_factor
 
-        return results
+        # glider non-structure cost
+        adj_factor = _cache[vehicle.body_style, 'non_structure', 'various']['dollar_adjustment']
+        delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'], {}, locals_dict) \
+                                          * adj_factor * learning_factor
+
+        glider_non_structure_cost = \
+            vehicle.base_year_glider_non_structure_cost_dollars + delta_glider_non_structure_cost
+
+        return glider_structure_cost, glider_non_structure_cost
 
     @staticmethod
     def init_from_file(filename, verbose=False):
