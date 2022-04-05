@@ -195,13 +195,13 @@ class PowertrainCost(OMEGABase):
             adj_factor = _cache['ALL', 'turb12']['dollar_adjustment']
             turb12_cost = eval(_cache['ALL', 'turb12']['value'], {}, locals_dict) \
                           * adj_factor * learning_factor_ice * pkg_df['turb12']
-            turb_scaler = turb_input_scaler
 
             # turb11 cost
             adj_factor = _cache['ALL', 'turb11']['dollar_adjustment']
             turb11_cost = eval(_cache['ALL', 'turb11']['value'], {}, locals_dict) \
                           * adj_factor * learning_factor_ice * pkg_df['turb11']
-            turb_scaler = turb_input_scaler
+
+            turb_scaler += (turb_input_scaler - turb_scaler) * (pkg_df['turb11'] | pkg_df['turb12'])
 
             # 3-way catalyst cost
             adj_factor_sub = _cache['ALL', 'twc_substrate']['dollar_adjustment']
