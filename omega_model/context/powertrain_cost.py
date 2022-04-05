@@ -32,6 +32,7 @@ Sample Data Columns
 
 """
 import pandas as pd
+import numpy as np
 
 print('importing %s' % __file__)
 
@@ -92,308 +93,288 @@ class PowertrainCost(OMEGABase):
         if (market_class_id.__contains__('non_hauling') and vehicle.drive_system < 4) or powertrain_type == 'HEV':
             tractive_motor = 'single'
 
-        for idx, row in pkg_df.iterrows():
-            trans_cost = cyl_cost = liter_cost = 0
-            high_eff_alt_cost = start_stop_cost = deac_pd_cost = deac_fc_cost = cegr_cost = atk2_cost = gdi_cost = 0
-            turb12_cost = turb11_cost = 0
-            twc_cost = gpf_cost = 0
-            ac_leakage_cost = ac_efficiency_cost = 0
-            induction_inverter_cost = 0
-            turb_scaler = 1  # default value adjusted below for turb packages
+        trans_cost = cyl_cost = liter_cost = 0
+        high_eff_alt_cost = start_stop_cost = deac_pd_cost = deac_fc_cost = cegr_cost = atk2_cost = gdi_cost = 0
+        turb12_cost = turb11_cost = 0
+        twc_cost = gpf_cost = 0
+        ac_leakage_cost = ac_efficiency_cost = 0
+        induction_inverter_cost = 0
+        turb_scaler = 1  # default value adjusted below for turb packages
 
-            battery_cost = electrified_driveline_cost = motor_cost = induction_motor_cost = inverter_cost = 0
-            obc_and_dcdc_converter_cost = hv_orange_cables_cost = lv_battery_cost = 0
-            hvac_cost = single_speed_gearbox_cost = powertrain_cooling_loop_cost = 0
-            charging_cord_kit_cost = dc_fast_charge_circuitry_cost = 0
-            power_management_and_distribution_cost = brake_sensors_actuators_cost = 0
-            additional_pair_of_half_shafts_cost = 0
-            emachine_cost = 0
+        battery_cost = electrified_driveline_cost = motor_cost = induction_motor_cost = inverter_cost = 0
+        obc_and_dcdc_converter_cost = hv_orange_cables_cost = lv_battery_cost = 0
+        hvac_cost = single_speed_gearbox_cost = powertrain_cooling_loop_cost = 0
+        charging_cord_kit_cost = dc_fast_charge_circuitry_cost = 0
+        power_management_and_distribution_cost = brake_sensors_actuators_cost = 0
+        additional_pair_of_half_shafts_cost = 0
+        emachine_cost = 0
 
-            CURBWT = row['curbweight_lbs']
+        CURBWT = pkg_df['curbweight_lbs']
 
-            # powertrain costs for anything with a liquid fueled engine
-            if powertrain_type in ['ICE', 'HEV', 'PHEV']:
+        # powertrain costs for anything with a liquid fueled engine
+        if powertrain_type in ['ICE', 'HEV', 'PHEV']:
 
-                trx_idx = row['cost_curve_class'].find('TRX')
-                trans = row['cost_curve_class'][trx_idx:trx_idx+5]
-                gasoline_flag = row['gas_fuel']
-                diesel_flat = row['diesel_fuel']
+            pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(lambda x: x.find('TRX'))
+            pkg_df['trx_idx_end'] = pkg_df['trx_idx'] + 5
 
-                CYL = row['engine_cylinders']
-                LITERS = row['engine_displacement_L']
+            trans = pkg_df.apply(lambda x: x['cost_curve_class'][x['trx_idx']:x['trx_idx_end']], axis=1)
 
-                locals_dict = locals()
+            gasoline_flag = pkg_df['gas_fuel']
+            diesel_flat = pkg_df['diesel_fuel']
 
-                # PGM costs and loadings
-                PT_USD_PER_OZ = eval(_cache['ALL', 'pt_dollars_per_oz']['value'], {}, locals_dict)
-                PD_USD_PER_OZ = eval(_cache['ALL', 'pd_dollars_per_oz']['value'], {}, locals_dict)
-                RH_USD_PER_OZ = eval(_cache['ALL', 'rh_dollars_per_oz']['value'], {}, locals_dict)
-                PT_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pt_grams_per_liter']['value'], {}, locals_dict)
-                PD_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pd_grams_per_liter']['value'], {}, locals_dict)
-                RH_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_rh_grams_per_liter']['value'], {}, locals_dict)
-                PT_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_pt_grams_per_liter']['value'], {}, locals_dict)
-                PD_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_pd_grams_per_liter']['value'], {}, locals_dict)
-                RH_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_rh_grams_per_liter']['value'], {}, locals_dict)
-                OZ_PER_GRAM = eval(_cache['ALL', 'troy_oz_per_gram']['value'], {}, locals_dict)  # note that these are Troy ounces
+            CYL = pkg_df['engine_cylinders']
+            LITERS = pkg_df['engine_displacement_L']
 
-                turb_input_scaler = eval(_cache['ALL', 'turb_scaler']['value'], {}, locals_dict)
+            locals_dict = locals()
 
-                # determine trans and calc cost
-                adj_factor = _cache['ALL', trans]['dollar_adjustment']
-                trans_cost = eval(_cache['ALL', trans]['value'], {}, locals_dict) \
-                             * adj_factor * learning_factor_ice
+            # PGM costs and loadings
+            PT_USD_PER_OZ = eval(_cache['ALL', 'pt_dollars_per_oz']['value'], {}, locals_dict)
+            PD_USD_PER_OZ = eval(_cache['ALL', 'pd_dollars_per_oz']['value'], {}, locals_dict)
+            RH_USD_PER_OZ = eval(_cache['ALL', 'rh_dollars_per_oz']['value'], {}, locals_dict)
+            PT_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pt_grams_per_liter']['value'], {}, locals_dict)
+            PD_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_pd_grams_per_liter']['value'], {}, locals_dict)
+            RH_GRAMS_PER_LITER_TWC = eval(_cache['ALL', 'twc_rh_grams_per_liter']['value'], {}, locals_dict)
+            PT_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_pt_grams_per_liter']['value'], {}, locals_dict)
+            PD_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_pd_grams_per_liter']['value'], {}, locals_dict)
+            RH_GRAMS_PER_LITER_GPF = eval(_cache['ALL', 'gpf_rh_grams_per_liter']['value'], {}, locals_dict)
+            OZ_PER_GRAM = eval(_cache['ALL', 'troy_oz_per_gram']['value'], {}, locals_dict)  # note that these are Troy ounces
 
-                # cylinder cost
-                adj_factor = _cache['ALL', 'dollars_per_cylinder']['dollar_adjustment']
-                cyl_cost = eval(_cache['ALL', 'dollars_per_cylinder']['value'], {}, locals_dict) \
-                           * adj_factor * learning_factor_ice
+            turb_input_scaler = eval(_cache['ALL', 'turb_scaler']['value'], {}, locals_dict)
 
-                # displacement cost
-                adj_factor = _cache['ALL', 'dollars_per_liter']['dollar_adjustment']
-                liter_cost = eval(_cache['ALL', 'dollars_per_liter']['value'], {}, locals_dict) \
-                             * adj_factor * learning_factor_ice
+            # determine trans and calc cost
+            adj_factor = np.array([_cache['ALL', t]['dollar_adjustment'] for t in trans])
+            trans_cost = np.array([eval(_cache['ALL', t]['value'], {}, locals_dict) for t in trans]) \
+                         * adj_factor * learning_factor_ice
 
-                # high efficiency alternator cost
-                if row['high_eff_alternator']:
-                    adj_factor = _cache['ALL', 'high_eff_alternator']['dollar_adjustment']
-                    high_eff_alt_cost = eval(_cache['ALL', 'high_eff_alternator']['value'], {}, locals_dict) \
-                                        * adj_factor * learning_factor_ice
+            # cylinder cost
+            adj_factor = _cache['ALL', 'dollars_per_cylinder']['dollar_adjustment']
+            cyl_cost = eval(_cache['ALL', 'dollars_per_cylinder']['value'], {}, locals_dict) \
+                       * adj_factor * learning_factor_ice
 
-                # start_stop cost
-                if row['start_stop']:
-                    adj_factor = _cache['ALL', 'start_stop']['dollar_adjustment']
-                    start_stop_cost = eval(_cache['ALL', 'start_stop']['value'], {}, locals_dict) \
-                                      * adj_factor * learning_factor_ice
+            # displacement cost
+            adj_factor = _cache['ALL', 'dollars_per_liter']['dollar_adjustment']
+            liter_cost = eval(_cache['ALL', 'dollars_per_liter']['value'], {}, locals_dict) \
+                         * adj_factor * learning_factor_ice
 
-                # deac_pd cost
-                if row['deac_pd']:
-                    adj_factor = _cache['ALL', 'deac_pd']['dollar_adjustment']
-                    deac_pd_cost = eval(_cache['ALL', 'deac_pd']['value'], {}, locals_dict) \
-                                   * adj_factor * learning_factor_ice
+            # high efficiency alternator cost
+            adj_factor = _cache['ALL', 'high_eff_alternator']['dollar_adjustment']
+            high_eff_alt_cost = eval(_cache['ALL', 'high_eff_alternator']['value'], {}, locals_dict) \
+                                * adj_factor * learning_factor_ice * pkg_df['high_eff_alternator']
 
-                # deac_fc cost
-                if row['deac_fc']:
-                    adj_factor = _cache['ALL', 'deac_fc']['dollar_adjustment']
-                    deac_fc_cost = eval(_cache['ALL', 'deac_fc']['value'], {}, locals_dict) \
-                                   * adj_factor * learning_factor_ice
+            # start_stop cost
+            adj_factor = _cache['ALL', 'start_stop']['dollar_adjustment']
+            start_stop_cost = eval(_cache['ALL', 'start_stop']['value'], {}, locals_dict) \
+                              * adj_factor * learning_factor_ice * pkg_df['start_stop']
 
-                # cegr cost
-                if row['cegr']:
-                    adj_factor = _cache['ALL', 'cegr']['dollar_adjustment']
-                    cegr_cost = eval(_cache['ALL', 'cegr']['value'], {}, locals_dict) \
-                                   * adj_factor * learning_factor_ice
+            # deac_pd cost
+            adj_factor = _cache['ALL', 'deac_pd']['dollar_adjustment']
+            deac_pd_cost = eval(_cache['ALL', 'deac_pd']['value'], {}, locals_dict) \
+                           * adj_factor * learning_factor_ice * pkg_df['deac_pd']
 
-                # atk2 cost
-                if row['atk2']:
-                    adj_factor = _cache['ALL', 'atk2']['dollar_adjustment']
-                    atk2_cost = eval(_cache['ALL', 'atk2']['value'], {}, locals_dict) \
-                                * adj_factor * learning_factor_ice
+            # deac_fc cost
+            adj_factor = _cache['ALL', 'deac_fc']['dollar_adjustment']
+            deac_fc_cost = eval(_cache['ALL', 'deac_fc']['value'], {}, locals_dict) \
+                           * adj_factor * learning_factor_ice * pkg_df['deac_fc']
 
-                # gdi cost
-                if row['gdi']:
-                    adj_factor = _cache['ALL', 'gdi']['dollar_adjustment']
-                    gdi_cost = eval(_cache['ALL', 'gdi']['value'], {}, locals_dict) \
-                                * adj_factor * learning_factor_ice
+            # cegr cost
+            adj_factor = _cache['ALL', 'cegr']['dollar_adjustment']
+            cegr_cost = eval(_cache['ALL', 'cegr']['value'], {}, locals_dict) \
+                           * adj_factor * learning_factor_ice * pkg_df['cegr']
 
-                # turb12 cost
-                if row['turb12']:
-                    adj_factor = _cache['ALL', 'turb12']['dollar_adjustment']
-                    turb12_cost = eval(_cache['ALL', 'turb12']['value'], {}, locals_dict) \
-                                  * adj_factor * learning_factor_ice
-                    turb_scaler = turb_input_scaler
+            # atk2 cost
+            adj_factor = _cache['ALL', 'atk2']['dollar_adjustment']
+            atk2_cost = eval(_cache['ALL', 'atk2']['value'], {}, locals_dict) \
+                        * adj_factor * learning_factor_ice * pkg_df['atk2']
 
-                # turb11 cost
-                if row['turb11']:
-                    adj_factor = _cache['ALL', 'turb11']['dollar_adjustment']
-                    turb11_cost = eval(_cache['ALL', 'turb11']['value'], {}, locals_dict) \
-                                  * adj_factor * learning_factor_ice
-                    turb_scaler = turb_input_scaler
+            # gdi cost
+            adj_factor = _cache['ALL', 'gdi']['dollar_adjustment']
+            gdi_cost = eval(_cache['ALL', 'gdi']['value'], {}, locals_dict) \
+                        * adj_factor * learning_factor_ice * pkg_df['gdi']
 
-                # 3-way catalyst cost
-                if gasoline_flag == 1:
-                    adj_factor_sub = _cache['ALL', 'twc_substrate']['dollar_adjustment']
-                    adj_factor_wash = _cache['ALL', 'twc_washcoat']['dollar_adjustment']
-                    adj_factor_can = _cache['ALL', 'twc_canning']['dollar_adjustment']
-                    TWC_SWEPT_VOLUME = eval(_cache['ALL', 'twc_swept_volume']['value'], {}, locals_dict)
-                    locals_dict = locals()
-                    substrate = eval(_cache['ALL', 'twc_substrate']['value'], {}, locals_dict) \
-                                * adj_factor_sub * learning_factor_ice
-                    washcoat = eval(_cache['ALL', 'twc_washcoat']['value'], {}, locals_dict) \
-                               * adj_factor_wash * learning_factor_ice
-                    canning = eval(_cache['ALL', 'twc_canning']['value'], {}, locals_dict) \
-                              * adj_factor_can * learning_factor_ice
-                    pgm = eval(_cache['ALL', 'twc_pgm']['value'], {}, locals_dict)
-                    twc_cost = substrate + washcoat + canning + pgm
+            # turb12 cost
+            adj_factor = _cache['ALL', 'turb12']['dollar_adjustment']
+            turb12_cost = eval(_cache['ALL', 'turb12']['value'], {}, locals_dict) \
+                          * adj_factor * learning_factor_ice * pkg_df['turb12']
+            turb_scaler = turb_input_scaler
 
-                # gpf cost
-                flag = 1
-                if flag == 1 and gasoline_flag == 1:
-                    adj_factor_sub = _cache['ALL', 'gpf_substrate']['dollar_adjustment']
-                    adj_factor_wash = _cache['ALL', 'gpf_washcoat']['dollar_adjustment']
-                    adj_factor_can = _cache['ALL', 'gpf_canning']['dollar_adjustment']
-                    GPF_SWEPT_VOLUME = eval(_cache['ALL', 'gpf_swept_volume']['value'], {}, locals_dict)
-                    locals_dict = locals()
-                    substrate = eval(_cache['ALL', 'gpf_substrate']['value'], {}, locals_dict) \
-                                * adj_factor_sub * learning_factor_ice
-                    washcoat = eval(_cache['ALL', 'gpf_washcoat']['value'], {}, locals_dict) \
-                               * adj_factor_wash * learning_factor_ice
-                    canning = eval(_cache['ALL', 'gpf_canning']['value'], {}, locals_dict) \
-                              * adj_factor_can * learning_factor_ice
-                    pgm = eval(_cache['ALL', 'gpf_pgm']['value'], {}, locals_dict)
-                    gpf_cost = substrate + washcoat + canning + pgm
+            # turb11 cost
+            adj_factor = _cache['ALL', 'turb11']['dollar_adjustment']
+            turb11_cost = eval(_cache['ALL', 'turb11']['value'], {}, locals_dict) \
+                          * adj_factor * learning_factor_ice * pkg_df['turb11']
+            turb_scaler = turb_input_scaler
 
-            if powertrain_type in ['HEV', 'PHEV', 'BEV']:
+            # 3-way catalyst cost
+            adj_factor_sub = _cache['ALL', 'twc_substrate']['dollar_adjustment']
+            adj_factor_wash = _cache['ALL', 'twc_washcoat']['dollar_adjustment']
+            adj_factor_can = _cache['ALL', 'twc_canning']['dollar_adjustment']
+            TWC_SWEPT_VOLUME = eval(_cache['ALL', 'twc_swept_volume']['value'], {}, locals_dict)
+            locals_dict = locals()
+            substrate = eval(_cache['ALL', 'twc_substrate']['value'], {}, locals_dict) \
+                        * adj_factor_sub * learning_factor_ice
+            washcoat = eval(_cache['ALL', 'twc_washcoat']['value'], {}, locals_dict) \
+                       * adj_factor_wash * learning_factor_ice
+            canning = eval(_cache['ALL', 'twc_canning']['value'], {}, locals_dict) \
+                      * adj_factor_can * learning_factor_ice
+            pgm = eval(_cache['ALL', 'twc_pgm']['value'], {}, locals_dict)
+            twc_cost = (substrate + washcoat + canning + pgm) * gasoline_flag
 
-                if powertrain_type == 'HEV':
-                    learn = learning_factor_ice
-                else:
-                    learn = learning_factor_pev
+            # gpf cost
+            adj_factor_sub = _cache['ALL', 'gpf_substrate']['dollar_adjustment']
+            adj_factor_wash = _cache['ALL', 'gpf_washcoat']['dollar_adjustment']
+            adj_factor_can = _cache['ALL', 'gpf_canning']['dollar_adjustment']
+            GPF_SWEPT_VOLUME = eval(_cache['ALL', 'gpf_swept_volume']['value'], {}, locals_dict)
+            locals_dict = locals()
+            substrate = eval(_cache['ALL', 'gpf_substrate']['value'], {}, locals_dict) \
+                        * adj_factor_sub * learning_factor_ice
+            washcoat = eval(_cache['ALL', 'gpf_washcoat']['value'], {}, locals_dict) \
+                       * adj_factor_wash * learning_factor_ice
+            canning = eval(_cache['ALL', 'gpf_canning']['value'], {}, locals_dict) \
+                      * adj_factor_can * learning_factor_ice
+            pgm = eval(_cache['ALL', 'gpf_pgm']['value'], {}, locals_dict)
+            gpf_cost = (substrate + washcoat + canning + pgm) * gasoline_flag
 
-                KWH = row['battery_kwh']
-                KW = row['motor_kw']
+        if powertrain_type in ['HEV', 'PHEV', 'BEV']:
 
-                if powertrain_type == 'HEV':
-                    obc_kw = 0
-                elif powertrain_type == 'PHEV':
-                    if KWH < 7:
-                        obc_kw = 0.7
-                    elif KWH < 10:
-                        obc_kw = 1.1
-                    else:
-                        obc_kw = 1.9
-                else:
-                    if KWH < 70:
-                        obc_kw = 7
-                    elif KWH < 100:
-                        obc_kw = 11
-                    else:
-                        obc_kw = 19
+            if powertrain_type == 'HEV':
+                learn = learning_factor_ice
+            else:
+                learn = learning_factor_pev
 
-                dcdc_converter_kw = eval(_cache[powertrain_type, 'DCDC_converter_kW']['value'], {}, locals_dict)
+            KWH = pkg_df['battery_kwh']
+            KW = pkg_df['motor_kw']
 
-                OBC_AND_DCDC_CONVERTER_KW = dcdc_converter_kw + obc_kw
-                VEHICLE_SIZE_CLASS = weight_bins.index(min([v for v in weight_bins if CURBWT < v])) # TODO where is this coming from, if we keep this?
+            if powertrain_type == 'HEV':
+                obc_kw = 0
+            elif powertrain_type == 'PHEV':
+                obc_kw = 1.9 * np.ones_like(KWH)
+                obc_kw[KWH < 7] = 0.7
+                obc_kw[KWH < 10] = 1.1
+            else:
+                obc_kw = 19 * np.ones_like(KWH)
+                obc_kw[KWH < 7] = 7
+                obc_kw[KWH < 10] = 11
 
-                locals_dict = locals()
+            dcdc_converter_kw = eval(_cache[powertrain_type, 'DCDC_converter_kW']['value'], {}, locals_dict)
 
-                # battery cost
-                adj_factor = _cache[powertrain_type, 'battery']['dollar_adjustment']
-                battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {}, locals_dict) \
-                               * adj_factor * learn
+            OBC_AND_DCDC_CONVERTER_KW = dcdc_converter_kw + obc_kw
+            # VEHICLE_SIZE_CLASS = weight_bins.index(min([v for v in weight_bins if CURBWT < v])) # TODO where is this coming from, if we keep this?
 
-                # electrified powertrain cost
+            VEHICLE_SIZE_CLASS = np.array([weight_bins.index(min([v for v in weight_bins if cw < v])) for cw in CURBWT])
 
-                adj_factor = _cache[powertrain_type, f'motor_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'motor_{tractive_motor}']['quantity']
-                motor_cost = eval(_cache[powertrain_type, f'motor_{tractive_motor}']['value'], {}, locals_dict) \
-                             * adj_factor * learn * quantity
+            locals_dict = locals()
 
-                adj_factor = _cache[powertrain_type, f'inverter_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'inverter_{tractive_motor}']['quantity']
-                inverter_cost = eval(_cache[powertrain_type, f'inverter_{tractive_motor}']['value'], {}, locals_dict) \
-                                * adj_factor * learn * quantity
+            # battery cost
+            adj_factor = _cache[powertrain_type, 'battery']['dollar_adjustment']
+            battery_cost = eval(_cache[powertrain_type, 'battery']['value'], {}, locals_dict) \
+                           * adj_factor * learn
 
-                adj_factor = _cache[powertrain_type, f'induction_motor_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'induction_motor_{tractive_motor}']['quantity']
-                induction_motor_cost = eval(_cache[powertrain_type, f'induction_motor_{tractive_motor}']['value'], {}, locals_dict) \
-                                       * adj_factor * learn * quantity
+            # electrified powertrain cost
 
-                adj_factor = _cache[powertrain_type, f'induction_inverter_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'induction_inverter_{tractive_motor}']['quantity']
-                induction_inverter_cost = eval(_cache[powertrain_type, f'induction_inverter_{tractive_motor}']['value'], {}, locals_dict) \
-                                          * adj_factor * learn * quantity
+            adj_factor = _cache[powertrain_type, f'motor_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'motor_{tractive_motor}']['quantity']
+            motor_cost = eval(_cache[powertrain_type, f'motor_{tractive_motor}']['value'], {}, locals_dict) \
+                         * adj_factor * learn * quantity
 
-                adj_factor = _cache[powertrain_type, 'OBC_and_DCDC_converter']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'OBC_and_DCDC_converter']['quantity']
-                obc_and_dcdc_converter_cost = eval(_cache[powertrain_type, 'OBC_and_DCDC_converter']['value'], {}, locals_dict) \
-                                              * adj_factor * learn * quantity
-
-                adj_factor = _cache[powertrain_type, 'HV_orange_cables']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'HV_orange_cables']['quantity']
-                hv_orange_cables_cost = eval(_cache[powertrain_type, 'HV_orange_cables']['value'], {}, locals_dict) \
-                                        * adj_factor * learn * quantity
-
-                adj_factor = _cache[powertrain_type, 'LV_battery']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'LV_battery']['quantity']
-                lv_battery_cost = eval(_cache[powertrain_type, 'LV_battery']['value'], {}, locals_dict) \
-                                  * adj_factor * learn * quantity
-
-                adj_factor = _cache[powertrain_type, 'HVAC']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'HVAC']['quantity']
-                hvac_cost = eval(_cache[powertrain_type, 'HVAC']['value'], {}, locals_dict) \
+            adj_factor = _cache[powertrain_type, f'inverter_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'inverter_{tractive_motor}']['quantity']
+            inverter_cost = eval(_cache[powertrain_type, f'inverter_{tractive_motor}']['value'], {}, locals_dict) \
                             * adj_factor * learn * quantity
 
-                adj_factor = _cache[powertrain_type, f'single_speed_gearbox_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'single_speed_gearbox_{tractive_motor}']['quantity']
-                single_speed_gearbox_cost = eval(_cache[powertrain_type, f'single_speed_gearbox_{tractive_motor}']['value'], {}, locals_dict) \
+            adj_factor = _cache[powertrain_type, f'induction_motor_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'induction_motor_{tractive_motor}']['quantity']
+            induction_motor_cost = eval(_cache[powertrain_type, f'induction_motor_{tractive_motor}']['value'], {}, locals_dict) \
+                                   * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, f'induction_inverter_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'induction_inverter_{tractive_motor}']['quantity']
+            induction_inverter_cost = eval(_cache[powertrain_type, f'induction_inverter_{tractive_motor}']['value'], {}, locals_dict) \
+                                      * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, 'OBC_and_DCDC_converter']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'OBC_and_DCDC_converter']['quantity']
+            obc_and_dcdc_converter_cost = eval(_cache[powertrain_type, 'OBC_and_DCDC_converter']['value'], {}, locals_dict) \
+                                          * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, 'HV_orange_cables']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'HV_orange_cables']['quantity']
+            hv_orange_cables_cost = eval(_cache[powertrain_type, 'HV_orange_cables']['value'], {}, locals_dict) \
+                                    * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, 'LV_battery']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'LV_battery']['quantity']
+            lv_battery_cost = eval(_cache[powertrain_type, 'LV_battery']['value'], {}, locals_dict) \
+                              * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, 'HVAC']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'HVAC']['quantity']
+            hvac_cost = eval(_cache[powertrain_type, 'HVAC']['value'], {}, locals_dict) \
+                        * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, f'single_speed_gearbox_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'single_speed_gearbox_{tractive_motor}']['quantity']
+            single_speed_gearbox_cost = eval(_cache[powertrain_type, f'single_speed_gearbox_{tractive_motor}']['value'], {}, locals_dict) \
+                                        * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, f'powertrain_cooling_loop_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'powertrain_cooling_loop_{tractive_motor}']['quantity']
+            powertrain_cooling_loop_cost = eval(_cache[powertrain_type, f'powertrain_cooling_loop_{tractive_motor}']['value'], {}, locals_dict) \
+                                           * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, 'charging_cord_kit']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'charging_cord_kit']['quantity']
+            charging_cord_kit_cost = eval(_cache[powertrain_type, 'charging_cord_kit']['value'], {}, locals_dict) \
+                                     * adj_factor * learn * quantity
+
+            adj_factor = _cache[powertrain_type, 'DC_fast_charge_circuitry']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'DC_fast_charge_circuitry']['quantity']
+            dc_fast_charge_circuitry_cost = eval(_cache[powertrain_type, 'DC_fast_charge_circuitry']['value'], {}, locals_dict) \
                                             * adj_factor * learn * quantity
 
-                adj_factor = _cache[powertrain_type, f'powertrain_cooling_loop_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'powertrain_cooling_loop_{tractive_motor}']['quantity']
-                powertrain_cooling_loop_cost = eval(_cache[powertrain_type, f'powertrain_cooling_loop_{tractive_motor}']['value'], {}, locals_dict) \
-                                               * adj_factor * learn * quantity
+            adj_factor = _cache[powertrain_type, 'power_management_and_distribution']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'power_management_and_distribution']['quantity']
+            power_management_and_distribution_cost = eval(_cache[powertrain_type, 'power_management_and_distribution']['value'], {}, locals_dict) \
+                                                     * adj_factor * learn * quantity
 
-                adj_factor = _cache[powertrain_type, 'charging_cord_kit']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'charging_cord_kit']['quantity']
-                charging_cord_kit_cost = eval(_cache[powertrain_type, 'charging_cord_kit']['value'], {}, locals_dict) \
-                                         * adj_factor * learn * quantity
+            adj_factor = _cache[powertrain_type, 'brake_sensors_actuators']['dollar_adjustment']
+            quantity = _cache[powertrain_type, 'brake_sensors_actuators']['quantity']
+            brake_sensors_actuators_cost = eval(_cache[powertrain_type, 'brake_sensors_actuators']['value'], {}, locals_dict) \
+                                           * adj_factor * learn * quantity
 
-                adj_factor = _cache[powertrain_type, 'DC_fast_charge_circuitry']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'DC_fast_charge_circuitry']['quantity']
-                dc_fast_charge_circuitry_cost = eval(_cache[powertrain_type, 'DC_fast_charge_circuitry']['value'], {}, locals_dict) \
-                                                * adj_factor * learn * quantity
+            adj_factor = _cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['dollar_adjustment']
+            quantity = _cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['quantity']
+            additional_pair_of_half_shafts_cost = eval(_cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['value'], {}, locals_dict) \
+                                                  * adj_factor * learn * quantity
 
-                adj_factor = _cache[powertrain_type, 'power_management_and_distribution']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'power_management_and_distribution']['quantity']
-                power_management_and_distribution_cost = eval(_cache[powertrain_type, 'power_management_and_distribution']['value'], {}, locals_dict) \
-                                                         * adj_factor * learn * quantity
+            emachine_cost = motor_cost + induction_motor_cost
 
-                adj_factor = _cache[powertrain_type, 'brake_sensors_actuators']['dollar_adjustment']
-                quantity = _cache[powertrain_type, 'brake_sensors_actuators']['quantity']
-                brake_sensors_actuators_cost = eval(_cache[powertrain_type, 'brake_sensors_actuators']['value'], {}, locals_dict) \
-                                               * adj_factor * learn * quantity
+            electrified_driveline_cost = inverter_cost + induction_inverter_cost \
+                                          + obc_and_dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost \
+                                          + hvac_cost + single_speed_gearbox_cost + powertrain_cooling_loop_cost \
+                                          + charging_cord_kit_cost + dc_fast_charge_circuitry_cost \
+                                          + power_management_and_distribution_cost + brake_sensors_actuators_cost \
+                                          + additional_pair_of_half_shafts_cost
 
-                adj_factor = _cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['dollar_adjustment']
-                quantity = _cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['quantity']
-                additional_pair_of_half_shafts_cost = eval(_cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['value'], {}, locals_dict) \
-                                                      * adj_factor * learn * quantity
+        # ac leakage cost
+        adj_factor = _cache['ALL', 'ac_leakage']['dollar_adjustment']
+        ac_leakage_cost = eval(_cache['ALL', 'ac_leakage']['value'], {}, locals_dict) \
+                          * adj_factor * learning_factor_ice
 
-                emachine_cost = motor_cost + induction_motor_cost
+        # ac efficiency cost
+        adj_factor = _cache['ALL', 'ac_efficiency']['dollar_adjustment']
+        ac_efficiency_cost = eval(_cache['ALL', 'ac_efficiency']['value'], {}, locals_dict) \
+                             * adj_factor * learning_factor_ice
 
-                electrified_driveline_cost = inverter_cost + induction_inverter_cost \
-                                              + obc_and_dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost \
-                                              + hvac_cost + single_speed_gearbox_cost + powertrain_cooling_loop_cost \
-                                              + charging_cord_kit_cost + dc_fast_charge_circuitry_cost \
-                                              + power_management_and_distribution_cost + brake_sensors_actuators_cost \
-                                              + additional_pair_of_half_shafts_cost
+        engine_cost = (cyl_cost + liter_cost) * turb_scaler \
+                          + deac_pd_cost + deac_fc_cost \
+                          + cegr_cost + atk2_cost + gdi_cost \
+                          + turb12_cost + turb11_cost \
+                          + twc_cost + gpf_cost
 
-            # ac leakage cost
-            flag = 1
-            if flag == 1:
-                adj_factor = _cache['ALL', 'ac_leakage']['dollar_adjustment']
-                ac_leakage_cost = eval(_cache['ALL', 'ac_leakage']['value'], {}, locals_dict) \
-                                  * adj_factor * learning_factor_ice
+        driveline_cost = trans_cost \
+                          + high_eff_alt_cost + start_stop_cost \
+                          + ac_leakage_cost + ac_efficiency_cost
 
-            # ac efficiency cost
-            flag = 1
-            if flag == 1:
-                adj_factor = _cache['ALL', 'ac_efficiency']['dollar_adjustment']
-                ac_efficiency_cost = eval(_cache['ALL', 'ac_efficiency']['value'], {}, locals_dict) \
-                                     * adj_factor * learning_factor_ice
-
-            engine_cost = (cyl_cost + liter_cost) * turb_scaler \
-                              + deac_pd_cost + deac_fc_cost \
-                              + cegr_cost + atk2_cost + gdi_cost \
-                              + turb12_cost + turb11_cost \
-                              + twc_cost + gpf_cost
-
-            driveline_cost = trans_cost \
-                              + high_eff_alt_cost + start_stop_cost \
-                              + ac_leakage_cost + ac_efficiency_cost
-
-            results.append((engine_cost, driveline_cost, emachine_cost, battery_cost, electrified_driveline_cost))
-
-        return results
+        return engine_cost, driveline_cost, emachine_cost, battery_cost, electrified_driveline_cost
 
     @staticmethod
     def init_from_file(filename, verbose=False):

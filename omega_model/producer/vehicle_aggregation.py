@@ -370,7 +370,8 @@ class VehicleAggregation(OMEGABase):
                 row['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
                 row['engine_cylinders'] = row['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
                 row['engine_displacement_L'] = row['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0])
+
+                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row]))).iloc[0]
 
                 # don't think we need this, unless we want it for information purposes, veh.powertrain cost was only
                 # calculated to get the glider_non_structure_cost
@@ -391,6 +392,8 @@ class VehicleAggregation(OMEGABase):
 
                 df.loc[idx, 'glider_non_structure_mass_lbs'] = \
                     row['curbweight_lbs'] - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
+
+            df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(weighted_average)
