@@ -114,8 +114,8 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     # matching_trns_numgears = pd.to_numeric(matching_trns_numgears, errors='coerce').astype(int)
 
     # matching_trns_numgears = pd.Series(Edmunds_data_cleaned['TRANSMISSION'].str[0], name='Number of Transmission Gears Category').replace('C',1).replace('E',1).astype(int)
-    Edmunds_data_cleaned['TRANSMISSION'].fillna('N/A', inplace=True)
-    print(Edmunds_data_cleaned.loc[Edmunds_data_cleaned['TRANSMISSION'] == 'N/A', 'TRANSMISSION'])
+    Edmunds_data_cleaned['TRANSMISSION'].fillna(' ', inplace=True)
+    # print(Edmunds_data_cleaned.loc[Edmunds_data_cleaned['TRANSMISSION'] == 'N/A', 'TRANSMISSION'])
     matching_trns_category = pd.Series(np.zeros(len(Edmunds_data_cleaned)), name = 'Transmission Type Category').replace(0,'A')
     matching_trns_category[matching_trns_numgears == 1] = '1ST'
     matching_trns_category[Edmunds_data_cleaned['TRANSMISSION'].str.contains('automated manual')] = 'AM'
@@ -166,13 +166,13 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     #     & (initial_columns.str.contains('/')) & (~initial_columns.str.contains('W/'))].str.strip().unique())
     # tire_categories_raw = pd.Series(initial_columns[(initial_columns.str.contains('TIRES'))].str.strip().unique())
 
-    # tire_sizes = Edmunds_data_cleaned['TIRES']
-    # tire_types = Edmunds_data_cleaned['TIRE TYPES']
-    # i = 0
-    # for tire_type, tire_size in zip(tire_types, tire_sizes):
-    #     if tire_size == '': tire_size = 'NA'
-    #     tire_codes[i] = str(tire_type) + '|' + str(tire_size)
-    #     i += 1
+    tire_sizes = Edmunds_data_cleaned['TIRES']
+    tire_types = Edmunds_data_cleaned['TIRE TYPES']
+    i = 0
+    for tire_type, tire_size in zip(tire_types, tire_sizes):
+        if tire_size == '': tire_size = 'NA'
+        tire_codes[i] = str(tire_type) + '|' + str(tire_size)
+        i += 1
 
         # if tire_category.find(' ') == -2: #!= -1
         #     for tire_trim in tire_trims:
