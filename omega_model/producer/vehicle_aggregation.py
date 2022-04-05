@@ -370,7 +370,7 @@ class VehicleAggregation(OMEGABase):
                 row['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
                 row['engine_cylinders'] = row['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
                 row['engine_displacement_L'] = row['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-                powertrain_cost = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0]
+                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row]))[0])
 
                 # don't think we need this, unless we want it for information purposes, veh.powertrain cost was only
                 # calculated to get the glider_non_structure_cost
@@ -387,7 +387,7 @@ class VehicleAggregation(OMEGABase):
                     GliderCost.get_base_year_glider_non_structure_cost(veh, structure_mass_lbs, powertrain_cost)
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
-                    GliderCost.calc_cost(veh, pd.DataFrame([row]))[0][2]
+                    GliderCost.calc_cost(veh, pd.DataFrame([row]))[0][1]
 
                 df.loc[idx, 'glider_non_structure_mass_lbs'] = \
                     row['curbweight_lbs'] - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs

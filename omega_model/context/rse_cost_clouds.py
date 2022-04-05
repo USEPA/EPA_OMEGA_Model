@@ -105,6 +105,10 @@ class CostCloud(OMEGABase, CostCloudBase):
 
     cost_cloud_data_columns = []
 
+    # for reporting powertrain cost breakdowns
+    cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
+                               'electrified_driveline_cost', 'glider_structure_cost', 'glider_non_structure_cost']
+
     cloud_non_numeric_columns = ['structure_material']
 
     @staticmethod
@@ -221,7 +225,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                   'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
                                   'diesel_fuel'}
 
-
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -292,6 +295,8 @@ class CostCloud(OMEGABase, CostCloudBase):
         template_errors += CostCloud.init_from_ice_file(ice_filename, verbose=verbose)
         template_errors += CostCloud.init_from_bev_file(bev_filename, verbose=verbose)
         template_errors += CostCloud.init_from_phev_file(phev_filename, verbose=verbose)
+
+        CostCloud.cost_cloud_data_columns = list(CostCloud.cost_cloud_data_columns) + CostCloud.cost_cloud_cost_columns
 
         return template_errors
 
@@ -408,24 +413,26 @@ class CostCloud(OMEGABase, CostCloudBase):
             cost_cloud['bev_range_mi'] = vehicle.battery_kwh / DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(vehicle.model_year, vehicle.fueling_class,
                                                                           cost_cloud)
 
+        cost_cloud['curbweight_lbs'] = cost_cloud['etw_lbs'] - DriveCycleBallast.get_ballast_lbs(vehicle)
+
         cost_cloud['motor_kw'] = vehicle.motor_kw
-        cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
+        # cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
+        powertrain_costs = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
+        powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
+                                 'electrified_driveline_cost']
+        for idx, ct in enumerate(powertrain_cost_terms):
+            cost_cloud[ct] = [pc[idx] for pc in powertrain_costs]
 
         glider_costs = GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
-        cost_cloud['glider_cost_dollars'] = [gc[0] for gc in glider_costs]
+        glider_cost_terms = ['glider_structure_cost', 'glider_non_structure_cost']
+        for idx, ct in enumerate(glider_cost_terms):
+            cost_cloud[ct] = [gc[idx] for gc in glider_costs]
 
-        # TODO: fill in the blanks...
-        # cost_cloud['delta_glider_non_structure_cost_dollars'] = 0
-        # cost_cloud['structure_cost_dollars'] = 0
-        # cost_cloud['battery_cost_dollars'] = 0
+        cost_terms = powertrain_cost_terms + glider_cost_terms
 
         cost_cloud['new_vehicle_mfr_cost_dollars'] = \
             vehicle.base_year_glider_non_structure_cost_dollars + \
-            cost_cloud['powertrain_cost_dollars'] + \
-            cost_cloud['glider_cost_dollars']
-            # cost_cloud['delta_glider_non_structure_cost_dollars'] + \
-            # cost_cloud['structure_cost_dollars']  # + \
-            # cost_cloud['battery_cost_dollars']
+            cost_cloud[cost_terms].sum(axis=1)
 
         cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
         # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...

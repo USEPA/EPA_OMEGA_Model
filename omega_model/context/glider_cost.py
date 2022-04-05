@@ -118,7 +118,7 @@ class GliderCost(OMEGABase):
             # glider structure cost
             structure_mass_lbs = row['structure_mass_lbs']
             adj_factor = _cache[vehicle.body_style, body_structure, row['structure_material']]['dollar_adjustment']
-            pkg_structure_cost = eval(_cache[vehicle.body_style, body_structure, row['structure_material']]['value'], {}, locals()) \
+            glider_structure_cost = eval(_cache[vehicle.body_style, body_structure, row['structure_material']]['value'], {}, locals()) \
                                         * adj_factor * learning_factor
 
             # glider non-structure cost
@@ -127,12 +127,10 @@ class GliderCost(OMEGABase):
             delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'], {}, locals()) \
                                               * adj_factor * learning_factor
 
-            pkg_glider_non_structure_cost = \
+            glider_non_structure_cost = \
                 vehicle.base_year_glider_non_structure_cost_dollars + delta_glider_non_structure_cost
 
-            pkg_glider_cost = pkg_structure_cost + pkg_glider_non_structure_cost
-
-            results.append((pkg_glider_cost, pkg_structure_cost, pkg_glider_non_structure_cost))
+            results.append((glider_structure_cost, glider_non_structure_cost))
 
         return results
 

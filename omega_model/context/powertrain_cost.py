@@ -91,17 +91,26 @@ class PowertrainCost(OMEGABase):
             tractive_motor = 'single'
 
         for idx, row in pkg_df.iterrows():
-
             trans_cost = cyl_cost = liter_cost = 0
             high_eff_alt_cost = start_stop_cost = deac_pd_cost = deac_fc_cost = cegr_cost = atk2_cost = gdi_cost = 0
             turb12_cost = turb11_cost = 0
             twc_cost = gpf_cost = 0
             ac_leakage_cost = ac_efficiency_cost = 0
-            battery_cost = electrified_powertrain_cost = 0
-            turb_scaler = 1 # default value adjusted below for turb packages
+            induction_inverter_cost = 0
+            turb_scaler = 1  # default value adjusted below for turb packages
+
+            battery_cost = electrified_driveline_cost = motor_cost = induction_motor_cost = inverter_cost = 0
+            obc_and_dcdc_converter_cost = hv_orange_cables_cost = lv_battery_cost = 0
+            hvac_cost = single_speed_gearbox_cost = powertrain_cooling_loop_cost = 0
+            charging_cord_kit_cost = dc_fast_charge_circuitry_cost = 0
+            power_management_and_distribution_cost = brake_sensors_actuators_cost = 0
+            additional_pair_of_half_shafts_cost = 0
+            emachine_cost = 0
+
+            CURBWT = row['curbweight_lbs']
 
             # powertrain costs for anything with a liquid fueled engine
-            if powertrain_type == 'ICE' or powertrain_type == 'HEV' or powertrain_type == 'PHEV':
+            if powertrain_type in ['ICE', 'HEV', 'PHEV']:
 
                 # PGM costs and loadings
                 PT_USD_PER_OZ = eval(_cache['ALL', 'pt_dollars_per_oz']['value'], {}, locals())
@@ -148,7 +157,6 @@ class PowertrainCost(OMEGABase):
                 # start_stop cost
                 flag = row['start_stop']
                 if flag == 1:
-                    CURBWT = row['etw_lbs'] - 300
                     adj_factor = _cache['ALL', 'start_stop']['dollar_adjustment']
                     start_stop_cost = eval(_cache['ALL', 'start_stop']['value'], {}, locals()) \
                                       * adj_factor * learning_factor_ice
@@ -235,7 +243,7 @@ class PowertrainCost(OMEGABase):
                     pgm = eval(_cache['ALL', 'gpf_pgm']['value'], {}, locals())
                     gpf_cost = substrate + washcoat + canning + pgm
 
-            if powertrain_type == 'HEV' or powertrain_type == 'PHEV' or powertrain_type == 'BEV':
+            if powertrain_type in ['HEV', 'PHEV', 'BEV']:
 
                 if powertrain_type == 'HEV':
                     learn = learning_factor_ice
@@ -294,7 +302,6 @@ class PowertrainCost(OMEGABase):
                 obc_and_dcdc_converter_cost = eval(_cache[powertrain_type, 'OBC_and_DCDC_converter']['value'], {}, locals()) \
                                               * adj_factor * learn * quantity
 
-                CURBWT = row['etw_lbs'] - 300
                 VEHICLE_SIZE_CLASS = weight_bins.index(min([v for v in weight_bins if CURBWT < v])) # TODO where is this coming from, if we keep this?
                 adj_factor = _cache[powertrain_type, 'HV_orange_cables']['dollar_adjustment']
                 quantity = _cache[powertrain_type, 'HV_orange_cables']['quantity']
@@ -346,8 +353,9 @@ class PowertrainCost(OMEGABase):
                 additional_pair_of_half_shafts_cost = eval(_cache[powertrain_type, f'additional_pair_of_half_shafts_{tractive_motor}']['value'], {}, locals()) \
                                                       * adj_factor * learn * quantity
 
-                electrified_powertrain_cost = battery_cost + motor_cost + inverter_cost \
-                                              + induction_motor_cost + induction_inverter_cost \
+                emachine_cost = motor_cost + induction_motor_cost
+
+                electrified_driveline_cost = inverter_cost + induction_inverter_cost \
                                               + obc_and_dcdc_converter_cost + hv_orange_cables_cost + lv_battery_cost \
                                               + hvac_cost + single_speed_gearbox_cost + powertrain_cooling_loop_cost \
                                               + charging_cord_kit_cost + dc_fast_charge_circuitry_cost \
@@ -368,17 +376,17 @@ class PowertrainCost(OMEGABase):
                 ac_efficiency_cost = eval(_cache['ALL', 'ac_efficiency']['value'], {}, locals()) \
                                      * adj_factor * learning_factor_ice
 
-            powertrain_cost = trans_cost \
-                              + (cyl_cost + liter_cost) * turb_scaler \
-                              + high_eff_alt_cost + start_stop_cost \
+            engine_cost = (cyl_cost + liter_cost) * turb_scaler \
                               + deac_pd_cost + deac_fc_cost \
                               + cegr_cost + atk2_cost + gdi_cost \
                               + turb12_cost + turb11_cost \
-                              + twc_cost + gpf_cost \
-                              + ac_leakage_cost + ac_efficiency_cost\
-                              + electrified_powertrain_cost
+                              + twc_cost + gpf_cost
 
-            results.append(powertrain_cost)
+            driveline_cost = trans_cost \
+                              + high_eff_alt_cost + start_stop_cost \
+                              + ac_leakage_cost + ac_efficiency_cost
+
+            results.append((engine_cost, driveline_cost, emachine_cost, battery_cost, electrified_driveline_cost))
 
         return results
 
