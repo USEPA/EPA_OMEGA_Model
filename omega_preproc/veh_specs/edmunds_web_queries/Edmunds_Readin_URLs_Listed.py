@@ -31,7 +31,7 @@ start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
 run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019.csv')
 start_count = 0 #Set to 0 when time permits
-final_table_to_csv_inc = 50 # print final_table csv file at the final_table_to_csv_inc increments
+final_table_to_csv_inc = 30 # print final_table csv file at the final_table_to_csv_inc increments
 # cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
 #                 "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
 #                 "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
@@ -62,7 +62,7 @@ for run_count in range (0,len(run_controller)):
         for error_model in readin_error_models:
             print ('Removing ' + str(error_model))
             final_table = final_table[final_table['Model'] != error_model].reset_index(drop=True)
-        final_table.to_csv(working_directory + output_name, index=False)
+        # final_table.to_csv(working_directory + output_name + '_bkp', index=False)
     for url_count in range(start_count,len(url_list)):
         url = url_list[url_count]
         print(str(url_count) + ',' + str(url))
