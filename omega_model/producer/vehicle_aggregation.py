@@ -335,20 +335,16 @@ class VehicleAggregation(OMEGABase):
             df['glider_non_structure_mass_lbs'] = 0
 
             # fill in missing values
-            for idx, row in df.iterrows():
-                if pd.isna(row['ground_clearance_in']):
-                    df.loc[idx, 'ground_clearance_in'] = 6.6  # dummy value, sales-weighted
+            df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6) # dummy value, sales-weighted
+            df['height_in'] = df['height_in'].fillna(62.4)  # dummy value, sales-weighted
 
-                if pd.isna(row['height_in']):
-                    df.loc[idx, 'height_in'] = 62.4  # dummy value, sales-weighted
+            df['powertrain_type'] = [powertrain_type_dict[ec] for ec in df['electrification_class']]
+            df['battery_kwh'] = df[['powertrain_type']].\
+                replace({'powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}})
 
-                veh = Vehicle()
-                veh.powertrain_type = powertrain_type_dict[row['electrification_class']]
-                df.loc[idx, 'battery_kwh'] = \
-                    {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
-
-                df.loc[idx, 'motor_kw'] = \
-                    {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (row['drive_system'] == 4)), 'ICE': 0}[veh.powertrain_type]  # FOR NOW, NEED REAL NUMBERS
+            df['motor_kw'] = df[['powertrain_type']].\
+                replace({'powertrain_type': {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (df['drive_system'] == 4)),
+                                             'ICE': 0}})
 
             for idx, row in df.iterrows():
                 # print(row['vehicle_name'])
