@@ -247,12 +247,12 @@ class PowertrainCost(OMEGABase):
                 obc_kw = 0
             elif powertrain_type == 'PHEV':
                 obc_kw = 1.9 * np.ones_like(KWH)
-                obc_kw[KWH < 7] = 0.7
                 obc_kw[KWH < 10] = 1.1
+                obc_kw[KWH < 7] = 0.7
             else:
                 obc_kw = 19 * np.ones_like(KWH)
-                obc_kw[KWH < 7] = 7
-                obc_kw[KWH < 10] = 11
+                obc_kw[KWH < 100] = 11
+                obc_kw[KWH < 70] = 7
 
             dcdc_converter_kw = eval(_cache[powertrain_type, 'DCDC_converter_kW']['value'], {}, locals_dict)
 
