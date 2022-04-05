@@ -373,9 +373,11 @@ class VehicleAggregation(OMEGABase):
 
                 powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row]))).iloc[0]
 
-                # don't think we need this, unless we want it for information purposes, veh.powertrain cost was only
-                # calculated to get the glider_non_structure_cost
-                # df.loc[idx, 'powertrain_cost_dollars'] = powertrain_cost
+                powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost
+                powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
+                                         'electrified_driveline_cost']
+                for i, ct in enumerate(powertrain_cost_terms):
+                    df.loc[idx, ct] = float(powertrain_costs[i])
 
                 # calc glider cost
                 row['structure_mass_lbs'] = structure_mass_lbs
@@ -389,6 +391,11 @@ class VehicleAggregation(OMEGABase):
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     GliderCost.calc_cost(veh, pd.DataFrame([row]))[0][1]
+
+                glider_costs = GliderCost.calc_cost(veh, pd.DataFrame([row]))  # includes structure_cost and glider_non_structure_cost
+                glider_cost_terms = ['glider_structure_cost', 'glider_non_structure_cost']
+                for i, ct in enumerate(glider_cost_terms):
+                    df.loc[idx, ct] = [gc[i] for gc in glider_costs]
 
                 df.loc[idx, 'glider_non_structure_mass_lbs'] = \
                     row['curbweight_lbs'] - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
