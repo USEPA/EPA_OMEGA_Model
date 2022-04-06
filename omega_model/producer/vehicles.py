@@ -1355,6 +1355,7 @@ class VehicleFinal(SQABase, Vehicle):
 
             if v.fueling_class == 'ICE':
                 alt_veh.fueling_class = 'BEV'
+                alt_veh.powertrain_type = 'BEV'
                 alt_veh.electrification_class = 'EV'
                 alt_veh.name = 'BEV of ' + v.name
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
@@ -1366,6 +1367,7 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.eng_disp_liters = 0
             else:
                 alt_veh.fueling_class = 'ICE'
+                alt_veh.powertrain_type = 'ICE'
                 alt_veh.electrification_class = 'N'
                 alt_veh.name = 'ICE of ' + v.name
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
