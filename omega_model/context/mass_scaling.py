@@ -86,38 +86,34 @@ class MassScaling(OMEGABase):
         battery_mass_lbs = 0
         powertrain_mass_lbs = 0
         delta_glider_non_structure_mass_lbs = 0
-        usable_battery_capacity_norm = 1.0
+        usable_battery_capacity_norm = 0
 
         for condition, equation in zip(MassScaling._data['null_structure_mass_lbs']['condition'],
                                        MassScaling._data['null_structure_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, locals()):
-                null_structure_mass_lbs = Eval.eval(equation, {}, locals())
+            null_structure_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
 
         for condition, equation in zip(MassScaling._data['structure_mass_lbs']['condition'],
                                        MassScaling._data['structure_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, locals()):
-                structure_mass_lbs = Eval.eval(equation, {}, locals())
+            structure_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
 
         for condition, equation in zip(MassScaling._data['battery_mass_lbs']['condition'],
                                        MassScaling._data['battery_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, locals()):
-                battery_mass_lbs = Eval.eval(equation, {}, locals())
+            battery_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
 
         for condition, equation in zip(MassScaling._data['powertrain_mass_lbs']['condition'],
                                        MassScaling._data['powertrain_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, locals()):
-                powertrain_mass_lbs = Eval.eval(equation, {}, locals())
+            powertrain_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
 
         for condition, equation in zip(MassScaling._data['delta_glider_non_structure_mass_lbs']['condition'],
                                        MassScaling._data['delta_glider_non_structure_mass_lbs']['equation']):
-            if Eval.eval(condition, {}, locals()):
-                delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
-                delta_glider_non_structure_mass_lbs = Eval.eval(equation, {}, locals())
+            delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
+            delta_glider_non_structure_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
 
         for condition, equation in zip(MassScaling._data['usable_battery_capacity_norm']['condition'],
                                        MassScaling._data['usable_battery_capacity_norm']['equation']):
-            if Eval.eval(condition, {}, locals()):
-                usable_battery_capacity_norm = Eval.eval(equation, {}, locals())
+            usable_battery_capacity_norm += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+
+        usable_battery_capacity_norm += (usable_battery_capacity_norm == 0)  # zeros -> 1.0s by default
 
         return structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs, \
                usable_battery_capacity_norm
