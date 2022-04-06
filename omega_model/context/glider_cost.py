@@ -58,17 +58,23 @@ class GliderCost(OMEGABase):
         Returns:
 
         """
+        # for future vectorizing if "vehicle" is not a Vehicle() ... could do this earlier in the init, too
+        # body_structure = vehicle.unibody_structure.replace({0: 'ladder_structure', 1: 'unibody_structure'})
+
         body_structure = 'unibody_structure'
         if vehicle.unibody_structure == 0:
             body_structure = 'ladder_structure'
 
+        locals_dict = locals()
+
         # markups and learning
-        markup = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals())
-        learning_rate = eval(_cache['ALL', 'learning_rate', 'not applicable']['value'], {}, locals())
-        learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals())
+        markup = eval(_cache['ALL', 'markup', 'not applicable']['value'], {}, locals_dict)
+        learning_rate = eval(_cache['ALL', 'learning_rate', 'not applicable']['value'], {}, locals_dict)
+        learning_start = eval(_cache['ALL', 'learning_start', 'not applicable']['value'], {}, locals_dict)
         legacy_sales_scaler = eval(_cache['ALL', 'legacy_sales_learning_scaler', 'not applicable']['value'], {},
-                                   locals())
-        sales_scaler = eval(_cache['ALL', 'sales_scaler', 'not applicable']['value'], {}, locals())
+                                   locals_dict)
+        sales_scaler = eval(_cache['ALL', 'sales_scaler', 'not applicable']['value'], {}, locals_dict)
+
         cumulative_sales = sales_scaler * (vehicle.model_year - learning_start)
         learning_factor = ((cumulative_sales + legacy_sales_scaler) / legacy_sales_scaler) ** learning_rate
 
@@ -87,6 +93,9 @@ class GliderCost(OMEGABase):
         body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
 
         # first calc base glider structure and non-structure weights
+
+        # convert adj_factor and structure_cost to np.array(list comprehensions) for vectorizing...
+
         adj_factor = _cache[vehicle.body_style, body_structure, vehicle.structure_material]['dollar_adjustment']
         structure_cost = eval(_cache[vehicle.body_style, body_structure, vehicle.structure_material]['value'], {},
                               locals()) * adj_factor * learning_factor

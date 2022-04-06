@@ -65,6 +65,29 @@ class MarketClass(OMEGABase, MarketClassBase):
     non_responsive_market_categories = ['hauling', 'non_hauling']  #: market categories that do not have consumer response
 
     @staticmethod
+    def get_vehicle_market_class_x(vehicle):
+        """
+        Get vehicle market class ID based on vehicle characteristics
+
+        Args:
+            vehicle (object): the vehicles to determine the market class of
+
+        Returns:
+            The vehicle's market class ID based on vehicle characteristics.
+
+        """
+        if vehicle.unibody_structure == 0 and vehicle.electrification_class == 'EV':
+            market_class_id = 'hauling.BEV'
+        elif vehicle.unibody_structure == 0 and vehicle.electrification_class != 'EV':
+            market_class_id = 'hauling.ICE'
+        elif vehicle.electrification_class == 'EV':
+            market_class_id = 'non_hauling.BEV'
+        else:
+            market_class_id = 'non_hauling.ICE'
+
+        return market_class_id
+
+    @staticmethod
     def get_vehicle_market_class(vehicle):
         """
         Get vehicle market class ID based on vehicle characteristics
