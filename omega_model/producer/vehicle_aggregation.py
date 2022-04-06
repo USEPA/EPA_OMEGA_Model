@@ -346,26 +346,59 @@ class VehicleAggregation(OMEGABase):
                 replace({'powertrain_type': {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (df['drive_system'] == 4)),
                                              'ICE': 0}})
 
+            # need to determine vehicle trans / techs
+            df['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
+            df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+            df['engine_displacement_L']= df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+
+            import time
+            start_time = time.time()
+            print('starting iterrows')
+
+            # these are the desired outputs of the loop:
+            # row['structure_mass_lbs']
+            # df['glider_non_structure_cost_dollars'] f(structure_mass_lbs, powertrain_cost)
+            # df['glider_non_structure_mass_lbs'] f(curbweight_lbs, powertrain_mass_lbs, strucure_mass_lbs, battery_mass_lbs)
+
+            class DummyVehicle():
+                # for mass calcs:
+                body_style = None
+                unibody_structure = None
+                drive_system = None
+                powertrain_type = None
+                base_year_footprint_ft2 = None
+                height_in = None
+                ground_clearance_in = None
+
+                # for powertrain cost calcs:
+                model_year = None
+                electrification_class = None
+
+            veh = DummyVehicle()
+
+            veh.body_style = df['body_style']
+            veh.unibody_structure = df['unibody_structure']
+            veh.drive_system = df['drive_system']
+            veh.powertrain_type = df['powertrain_type']
+            veh.base_year_footprint_ft2 = df['footprint_ft2']
+            veh.height_in = df['height_in']
+            veh.ground_clearance_in = df['ground_clearance_in']
+
+            df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'], \
+            df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
+                MassScaling.calc_mass_terms(veh, df['structure_material'], df['eng_rated_hp'],
+                                            df['battery_kwh'], df['footprint_ft2'])
+
+            # veh.model_year = df['model_year']
+            # veh.electrification_class = df['electrification_class']
+
             for idx, row in df.iterrows():
-                # print(row['vehicle_name'])
-                veh = Vehicle()
-                veh.body_style = row['body_style']
-                veh.unibody_structure = row['unibody_structure']
-                veh.drive_system = row['drive_system']
-                veh.powertrain_type = powertrain_type_dict[row['electrification_class']]
-                veh.base_year_footprint_ft2 = row['footprint_ft2']
-
-                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, _, _ = \
-                    MassScaling.calc_mass_terms(veh, row['structure_material'], row['eng_rated_hp'],
-                                                row['battery_kwh'], row['footprint_ft2'])
-
                 # calc powertrain cost
+                veh = Vehicle()
                 veh.model_year = row['model_year']
                 veh.electrification_class = row['electrification_class']
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
-                row['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
-                row['engine_cylinders'] = row['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-                row['engine_displacement_L'] = row['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+                veh.drive_system = row['drive_system']
 
                 powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row]))).iloc[0]
 
@@ -376,14 +409,17 @@ class VehicleAggregation(OMEGABase):
                 #     df.loc[idx, ct] = float(powertrain_costs[i])
 
                 # calc glider cost
-                row['structure_mass_lbs'] = structure_mass_lbs
                 veh.structure_material = row['structure_material']
                 veh.height_in = row['height_in']
                 veh.ground_clearance_in = row['ground_clearance_in']
                 veh.base_year_msrp_dollars = row['msrp_dollars']
+                veh.unibody_structure = row['unibody_structure']
+                veh.body_style = row['body_style']
 
                 veh.base_year_glider_non_structure_cost_dollars = \
-                    GliderCost.get_base_year_glider_non_structure_cost(veh, structure_mass_lbs, powertrain_cost)
+                    GliderCost.get_base_year_glider_non_structure_cost(veh, row['structure_mass_lbs'], powertrain_cost)
+
+                veh.base_year_footprint_ft2 = row['footprint_ft2']
 
                 df.loc[idx, 'glider_non_structure_cost_dollars'] = \
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
@@ -393,16 +429,19 @@ class VehicleAggregation(OMEGABase):
                 # for i, ct in enumerate(glider_cost_terms):
                 #     df.loc[idx, ct] = [gc[i] for gc in glider_costs]
 
-                df.loc[idx, 'glider_non_structure_mass_lbs'] = \
-                    row['curbweight_lbs'] - powertrain_mass_lbs - structure_mass_lbs - battery_mass_lbs
+            df['glider_non_structure_mass_lbs'] = df['curbweight_lbs'] - df['powertrain_mass_lbs'] \
+                                                  - df['structure_mass_lbs'] - df['battery_mass_lbs']
 
-            # df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
+            print('done %.2f' % (time.time() - start_time))
+
+            df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 
             # calculate weighted numeric values within the groups, and combined string values
             agg_df = df.groupby(aggregation_columns, as_index=False).apply(weighted_average)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
             agg_df['manufacturer_id'] = 'consolidated_OEM'
             agg_df['model_year'] = df['model_year'].iloc[0]
+
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
             omega_globals.options.vehicles_df = agg_df
