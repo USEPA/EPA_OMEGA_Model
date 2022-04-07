@@ -1190,7 +1190,7 @@ class VehicleFinal(SQABase, Vehicle):
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
                               'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
-                              'base_year_reg_class_id', 'base_year_market_share',
+                              'base_year_reg_class_id', 'base_year_market_share', 'curbweight_lbs',
                               'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars',
                               'footprint_ft2', 'base_year_footprint_ft2', 'drive_system',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
@@ -1378,7 +1378,6 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.eng_cyls_num = None
                 alt_veh.eng_disp_liters = None
 
-            alt_veh.powertrain_type = v.fueling_class
             alt_veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(alt_veh)
             alt_veh.cert_direct_oncycle_co2e_grams_per_mile = 0
             alt_veh.cert_direct_co2e_grams_per_mile = 0

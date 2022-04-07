@@ -317,8 +317,12 @@ class CostCloud(OMEGABase, CostCloudBase):
         from policy.drive_cycle_ballast import DriveCycleBallast
         from context.powertrain_cost import PowertrainCost
         from context.glider_cost import GliderCost
+        from producer.vehicles import VehicleAttributeCalculations
 
-        cost_cloud = pd.DataFrame()
+        import time
+        start_time = time.time()
+
+        print('Generating Cost Cloud for %s' % vehicle.name)
 
         vehicle_rlhp20 = \
             calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 20)
@@ -330,120 +334,177 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
         rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
 
-        for structure_material in MassScaling.structure_materials:
-            for footprint_ft2 in [vehicle.footprint_ft2 * 0.95, vehicle.footprint_ft2, vehicle.footprint_ft2 * 1.05]:
+        vehicle_footprints = [vehicle.footprint_ft2 * 0.95, vehicle.footprint_ft2, vehicle.footprint_ft2 * 1.05]
 
-                # TODO: if vehicle up for redesign, query all classes, otherwise use same cost_curve class as prior year...?
-                # TODO: need to assign cost curve class to vehicles from chosen tech package...?  Not sure how that will work
-                # when interpolating along the frontier.......
+        cost_cloud = pd.DataFrame()
 
-                cost_curve_classes = _cache[vehicle.fueling_class]
+        cloud_points = []  # build a list of Series that will be dumped into the cloud at the end
+                           # (faster than sequentially appending)
 
-                for cc in cost_curve_classes:
-                    # TODO: code here to decide if cost curve is applicable to vehicle (e.g. diesel for diesel, etc...)
-                    # print(cc)
-                    cc_cloud = pd.DataFrame()
-                    for rse_name in cost_curve_classes[cc]['rse']:
-                        results = []
-                        curbweight_lbs = []
-                        battery_kwhs = []
-                        structure_mass_lbss = []
-                        footprint_ft2s = []
-                        structure_materialss = []
+        cost_curve_classes = _cache[vehicle.fueling_class]
 
-                        for rlhp20 in rlhp20s:
-                            for rlhp60 in rlhp60s:
+        for cc in cost_curve_classes:
+            # print('cost_curve_classes', cc)
+            for structure_material in MassScaling.structure_materials:
+                # print('structure_material', structure_material)
+                for footprint_ft2 in vehicle_footprints:
+                    # print('footprint_ft2', footprint_ft2)
+                    for rlhp20 in rlhp20s:
+                        # print('rlhp20', rlhp20)
+                        for rlhp60 in rlhp60s:
+                            # print('rlhp60', rlhp60)
+                            # cloud_point = pd.Series()
 
-                                # ------------------------------------------------------------------------------------#
-                                # !!insert engine sizing and battery sizing loop here!!
-                                rated_hp = 0
-                                prior_powertrain_mass_lbs = 1
-                                prior_rated_hp = 1
-                                prior_battery_kwh = 1
-                                convergence_tolerance = 0.01
+                            cloud_point = cost_curve_classes[cc]['tech_flags'].to_dict()
 
-                                battery_kwh = vehicle.battery_kwh  # for now...
+                            # cloud_point = cloud_point.append(cost_curve_classes[cc]['tech_flags'])
+                            # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
+                            cloud_point['ac_leakage'] = 1
+                            cloud_point['ac_efficiency'] = 1
 
-                                converged = False
-                                while not converged:
-                                    # rated hp sizing --------------------------------------------------------------- #
-                                    structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, \
-                                    delta_glider_non_structure_mass_lbs, usable_battery_capacity_norm = \
-                                        MassScaling.calc_mass_terms(vehicle, structure_material, rated_hp,
-                                                                    battery_kwh, footprint_ft2)
+                            # ------------------------------------------------------------------------------------#
+                            # size components ...
+                            if vehicle.powertrain_type == 'ICE':
+                                rated_hp = vehicle.eng_rated_hp
+                            elif vehicle.powertrain_type == 'BEV':
+                                rated_hp = vehicle.motor_kw * 1.34102
+                            else:  # HEVs / PHEVs... what to do about sizing...?
+                                rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
 
-                                    vehicle_curbweight_lbs = \
-                                        vehicle.base_year_glider_non_structure_mass_lbs + \
-                                        delta_glider_non_structure_mass_lbs + \
-                                        powertrain_mass_lbs + \
-                                        structure_mass_lbs + \
-                                        battery_mass_lbs
+                            prior_powertrain_mass_lbs = 1
+                            prior_rated_hp = 1
+                            prior_battery_kwh = 1
+                            convergence_tolerance = 0.01
 
-                                    rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
+                            battery_kwh = vehicle.battery_kwh  # for now...
+                            motor_kw = vehicle.motor_kw  # for now...
+                            vehicle_curbweight_lbs = vehicle.curbweight_lbs  # need to start somewhere
 
-                                    # battery sizing ---------------------------------------------------------------- #
-
-                                    # battery_usable_portion = 0.9
-                                    # range_ballast_lbs  = 300
-                                    # cd_range_miles = 300
-                                    # convergence = 0
-                                    # while convergence == 0
-                                    #    battery_kwh = battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion)
-                                    #    if and(abs(1 - structure_mass_lbs/prior_structure_mass_lbs) < tol, abs(1 - battery_kwh/prior_battery_kwh) < tol, abs(1 - powertrain_mass_lbs/prior_powertrain_mass_lbs) < tol), abs(1 - rated_hp/prior_rated_hp) < tol))
-                                    #        convergence = 1
-                                    #
-                                    # def battery_sizing_function(vehicle_curbweight_lbs, cd_range_miles, range_ballast_lbs, battery_usable_portion):
-                                    #    # use RSE's for kwh/mi, and target range value to get the required kwh
-
-                                    # determine convergence
-                                    converged = abs(
-                                        1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
-                                                abs(1 - rated_hp / prior_rated_hp) <= convergence_tolerance
-
-                                    # print(rated_hp, prior_rated_hp, rated_hp / prior_rated_hp)
-                                    # print(powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
-
-                                    prior_powertrain_mass_lbs = powertrain_mass_lbs
-                                    prior_rated_hp = rated_hp
-                                    prior_battery_kwh = battery_kwh
-
-                                # ------------------------------------------------------------------------------------#
+                            converged = False
+                            while not converged:
+                                # print('.')
 
                                 ETW = vehicle_curbweight_lbs + DriveCycleBallast.get_ballast_lbs(vehicle)
+
                                 RLHP20 = rlhp20 / ETW
                                 RLHP60 = rlhp60 / ETW
                                 HP_ETW = rated_hp / ETW
 
-                                curbweight_lbs.append(vehicle_curbweight_lbs)
-                                battery_kwhs.append(battery_kwh)
-                                structure_mass_lbss.append(structure_mass_lbs)
-                                footprint_ft2s.append(footprint_ft2)
-                                structure_materialss.append(structure_material)
+                                # rated hp sizing --------------------------------------------------------------- #
+                                structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, \
+                                delta_glider_non_structure_mass_lbs, usable_battery_capacity_norm = \
+                                    MassScaling.calc_mass_terms(vehicle, structure_material, rated_hp,
+                                                                battery_kwh, footprint_ft2)
 
-                                results.append( eval(_cache[vehicle.fueling_class][cc]['rse'][rse_name],
-                                                 {}, locals()))
+                                vehicle_curbweight_lbs = \
+                                    vehicle.base_year_glider_non_structure_mass_lbs + \
+                                    delta_glider_non_structure_mass_lbs + \
+                                    powertrain_mass_lbs + \
+                                    structure_mass_lbs + \
+                                    battery_mass_lbs
 
-                        cc_cloud[rse_name] = results
-                        cc_cloud['curbweight_lbs'] = curbweight_lbs
-                        cc_cloud['battery_kwh'] = battery_kwhs
-                        cc_cloud['structure_mass_lbs'] = structure_mass_lbss
-                        cc_cloud['footprint_ft2'] = footprint_ft2s
-                        cc_cloud['structure_material'] = structure_materialss
+                                rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 
-                        # cc_cloud['eng_rated_hp']
-                        # cc_cloud['etw_lbs']
+                                for rse_name in cost_curve_classes[cc]['rse']:
+                                    cloud_point[rse_name] = \
+                                        eval(_cache[vehicle.fueling_class][cc]['rse'][rse_name], {}, locals())
 
-                    cc_cloud['cost_curve_class'] = cc
-                    cc_cloud[cost_curve_classes[cc]['tech_flags'].keys()] = cost_curve_classes[cc]['tech_flags']
-                    cost_cloud = cost_cloud.append(cc_cloud)
+                                if vehicle.powertrain_type != 'ICE':
+                                    from policy.upstream_methods import UpstreamMethods
+                                    from policy.drive_cycle_weights import DriveCycleWeights
+                                    from policy.offcycle_credits import OffCycleCredits
 
-        # # just a test
-        # if vehicle.fueling_class=='BEV':
-        #     from policy.drive_cycle_weights import DriveCycleWeights
-        #     cost_cloud['bev_range_mi'] = vehicle.battery_kwh / DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(vehicle.model_year, vehicle.fueling_class,
-        #                                                                   cost_cloud)
+                                    if vehicle.fueling_class != 'BEV':
+                                        cloud_point['cert_direct_oncycle_co2e_grams_per_mile'] = \
+                                            DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(vehicle.model_year,
+                                                                                                           vehicle.fueling_class,
+                                                                                                           cloud_point)
+                                    else:
+                                        cloud_point['cert_direct_oncycle_co2e_grams_per_mile'] = 0
 
-        cost_cloud['motor_kw'] = vehicle.motor_kw
+                                    if vehicle.fueling_class != 'ICE':
+                                        cloud_point['cert_direct_oncycle_kwh_per_mile'] = \
+                                            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(vehicle.model_year,
+                                                                                                    vehicle.fueling_class,
+                                                                                                    cloud_point)
+                                        # initialize onroad values
+                                        cloud_point['onroad_direct_co2e_grams_per_mile'] = 0
+                                        cloud_point['onroad_direct_kwh_per_mile'] = 0
+
+                                        # drop extraneous columns
+                                        # cost_cloud = cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
+
+                                        # calculate off cycle credits before calculating upstream and onroad
+                                        cloud_point = OffCycleCredits.calc_off_cycle_credits(vehicle, cloud_point)
+
+                                        cloud_point['cert_direct_co2e_grams_per_mile'] = \
+                                            cloud_point['cert_direct_oncycle_co2e_grams_per_mile'] - \
+                                            cloud_point['cert_direct_offcycle_co2e_grams_per_mile']
+
+                                        cloud_point['cert_direct_kwh_per_mile'] = \
+                                            cloud_point['cert_direct_oncycle_kwh_per_mile'] - \
+                                            cloud_point['cert_direct_offcycle_kwh_per_mile']
+
+                                        # calc onroad gap, etc...
+                                        VehicleAttributeCalculations.perform_attribute_calculations(vehicle,
+                                                                                                    cloud_point)
+
+                                    else:
+                                        cloud_point['cert_direct_oncycle_kwh_per_mile'] = 0
+
+                                    # battery sizing ---------------------------------------------------------------- #
+
+                                    if cloud_point['cert_direct_oncycle_kwh_per_mile']:
+                                        # battery_kwh = 300 * cloud_point['cert_direct_oncycle_kwh_per_mile'] / usable_battery_capacity_norm
+                                        battery_kwh = 300 * cloud_point['onroad_direct_kwh_per_mile'] / usable_battery_capacity_norm
+
+                                # determine convergence
+                                converged = abs(
+                                    1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
+                                            abs(1 - rated_hp / prior_rated_hp) <= convergence_tolerance
+
+                                if vehicle.powertrain_type != 'ICE':
+                                    converged = converged and \
+                                            abs(1 - battery_kwh / prior_battery_kwh) < convergence_tolerance
+
+                                # print(rated_hp, prior_rated_hp, rated_hp / prior_rated_hp)
+                                # print(vehicle_curbweight_lbs, powertrain_mass_lbs, prior_powertrain_mass_lbs, powertrain_mass_lbs / prior_powertrain_mass_lbs)
+
+                                prior_powertrain_mass_lbs = powertrain_mass_lbs
+                                prior_rated_hp = rated_hp
+                                prior_battery_kwh = battery_kwh
+
+                                # ------------------------------------------------------------------------------------#
+
+                            # required cloud data for powertrain costing, etc:
+                            cloud_point['cost_curve_class'] = cc
+                            cloud_point['curbweight_lbs'] = vehicle_curbweight_lbs
+                            cloud_point['battery_kwh'] = battery_kwh
+                            cloud_point['structure_mass_lbs'] = structure_mass_lbs
+                            cloud_point['footprint_ft2'] = footprint_ft2
+                            cloud_point['structure_material'] = structure_material
+                            cloud_point['motor_kw'] = motor_kw
+
+                            # informative data for troubleshooting:
+                            cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
+                            cloud_point['battery_mass_lbs']= battery_mass_lbs
+                            cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
+                            cloud_point['etw_lbs'] = ETW
+                            cloud_point['rated_hp'] = rated_hp
+                            cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp
+                            cloud_point['vehicle_mot_rated_kw'] = vehicle.motor_kw
+                            cloud_point['rlhp20'] = rlhp20
+                            cloud_point['rlhp60'] = rlhp60
+
+                            cloud_points.append(pd.Series(cloud_point))
+
+            # if vehicle.powertrain_type == 'ICE':
+            #     for rse_name in cost_curve_classes[cc]['rse']:
+            #         cloud_points[-1][rse_name] = \
+            #             eval(_cache[vehicle.fueling_class][cc]['rse'][rse_name], {}, locals())
+
+        cost_cloud = pd.concat(cloud_points, axis=1).transpose()
+
         # cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
         powertrain_costs = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
         powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
@@ -463,13 +524,17 @@ class CostCloud(OMEGABase, CostCloudBase):
             cost_cloud[cost_terms].sum(axis=1)
 
         cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
-        # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
-        cost_cloud['ac_leakage'] = 1
-        cost_cloud['ac_efficiency'] = 1
 
-        cost_cloud = cost_cloud.reset_index(drop=True)
+        # these DO NOT WORK
+        # cost_cloud = cost_cloud.astype('float', errors='ignore') # cost_cloud.convert_dtypes()  # convert to numeric data, otherwise some columns are 'object'
 
-        # cost_cloud.to_csv(omega_globals.options.output_folder + 'cost_cloud.csv', index=False)
+        # this DOES
+        cost_cloud = cost_cloud.apply(lambda x: pd.to_numeric(x, errors='ignore'), axis=1)
+
+        # if vehicle.model_year == 2020:
+        #     cost_cloud.to_csv(omega_globals.options.output_folder + '%s_%s_cost_cloud.csv' % (vehicle.model_year, vehicle.name.replace(':','-')))
+
+        print('done %.2f' % (time.time() - start_time))
 
         return cost_cloud
 
