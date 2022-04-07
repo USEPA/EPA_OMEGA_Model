@@ -496,14 +496,14 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['rlhp20'] = rlhp20
                             cloud_point['rlhp60'] = rlhp60
 
-                            cloud_points.append(pd.Series(cloud_point))
+                            cloud_points.append(cloud_point)
 
             # if vehicle.powertrain_type == 'ICE':
             #     for rse_name in cost_curve_classes[cc]['rse']:
             #         cloud_points[-1][rse_name] = \
             #             eval(_cache[vehicle.fueling_class][cc]['rse'][rse_name], {}, locals())
 
-        cost_cloud = pd.concat(cloud_points, axis=1).transpose()
+        cost_cloud = pd.DataFrame(cloud_points)
 
         # cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
         powertrain_costs = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
@@ -524,15 +524,6 @@ class CostCloud(OMEGABase, CostCloudBase):
             cost_cloud[cost_terms].sum(axis=1)
 
         cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
-
-        # these DO NOT WORK
-        # cost_cloud = cost_cloud.astype('float', errors='ignore') # cost_cloud.convert_dtypes()  # convert to numeric data, otherwise some columns are 'object'
-
-        # this DOES
-        cost_cloud = cost_cloud.apply(lambda x: pd.to_numeric(x, errors='ignore'), axis=1)
-
-        # if vehicle.model_year == 2020:
-        #     cost_cloud.to_csv(omega_globals.options.output_folder + '%s_%s_cost_cloud.csv' % (vehicle.model_year, vehicle.name.replace(':','-')))
 
         print('done %.2f' % (time.time() - start_time))
 
