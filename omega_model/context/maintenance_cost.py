@@ -172,7 +172,7 @@ class MaintenanceCost(OMEGABase):
         for veh_type in veh_types:
             df = pd.DataFrame()
             df.insert(0, 'miles', pd.Series(range(0, max_value + 1, 100)))
-            intervals = pd.Series(input_df[f'miles_per_event_{veh_type}'].dropna().unique())
+            intervals = input_df[f'miles_per_event_{veh_type}'].dropna().unique()
             for interval in intervals:
                 cost_at_interval = input_df.loc[input_df[f'miles_per_event_{veh_type}'] == interval, 'dollars_per_event'].sum()
                 df.insert(1, f'cost_for_{int(interval)}', 0)
@@ -187,8 +187,8 @@ class MaintenanceCost(OMEGABase):
             df.insert(0, f'rollup', df[cols].sum(axis=1))
             df.insert(0, f'rollup_cumulative', df['rollup'].cumsum(axis=0))
 
-            cumulative_cost = df['rollup_cumulative'].max()
-            max_miles = df['miles'].max()
+            cumulative_cost = df['rollup_cumulative'].values.max()
+            max_miles = df['miles'].values.max()
 
             # calc cost/mile at max miles to that gives a triangular area equal to cumulative costs
             cost_per_mile_at_max_miles = cumulative_cost / (0.5 * max_miles)

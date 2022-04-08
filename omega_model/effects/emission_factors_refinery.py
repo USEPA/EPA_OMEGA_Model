@@ -67,6 +67,7 @@ class EmissionFactorsRefinery(OMEGABase):
         import pandas as pd
 
         calendar_years = pd.Series(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
+        # calendar_years = np.array(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
         year = max([yr for yr in calendar_years if yr <= calendar_year])
 
         factors = []

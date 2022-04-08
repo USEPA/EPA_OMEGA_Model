@@ -128,7 +128,7 @@ class Incentives(OMEGABase):
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 Incentives._data = df.to_dict(orient='index')
-                Incentives._data['start_year'] = np.array(list(Incentives._data.keys()))
+                Incentives._data['start_year'] = np.array([*Incentives._data]) # np.array(list(Incentives._data.keys()))
 
         return template_errors
 

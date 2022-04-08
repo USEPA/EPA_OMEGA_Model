@@ -66,6 +66,8 @@ class ImplictPriceDeflators(OMEGABase):
 
         """
         calendar_years = pd.Series(ImplictPriceDeflators._data.keys())
+        # calendar_years = np.array(list(ImplictPriceDeflators._data.keys()))
+        # calendar_years = np.array([*ImplictPriceDeflators._data])
         if len(calendar_years[calendar_years <= calendar_year]) > 0:
             year = max(calendar_years[calendar_years <= calendar_year])
 

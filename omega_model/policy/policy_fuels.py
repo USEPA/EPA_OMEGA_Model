@@ -95,6 +95,8 @@ class PolicyFuel(OMEGABase):
         import pandas as pd
 
         start_years = pd.Series(PolicyFuel._data['start_year'][fuel_id])
+        # start_years = np.atleast_1d(np.array(PolicyFuel._data['start_year'][fuel_id]))
+        # start_years = np.atleast_1d(PolicyFuel._data['start_year'][fuel_id])
         if len(start_years[start_years <= calendar_year]) > 0:
             year = max([yr for yr in start_years if yr <= calendar_year])
 

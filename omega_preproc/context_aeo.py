@@ -460,7 +460,7 @@ def main():
             # calc some new metrics
             case_dict = dict()
             case_df = pd.DataFrame()
-            for year in range(aeo_veh_context['calendar_year'].min(), aeo_veh_context['calendar_year'].max() + 1):
+            for year in range(aeo_veh_context['calendar_year'].values.min(), aeo_veh_context['calendar_year'].values.max() + 1):
                 sales_df = pd.DataFrame(sales.loc[sales['calendar_year'] == year, :])
                 sales_df.reset_index(drop=True, inplace=True)
                 car_sales = sales_df.at[0, 'sales_car']
@@ -510,7 +510,7 @@ def main():
             case_df.rename(columns={'full name': 'context_size_class'}, inplace=True)
 
             # lastly, round all the sales shares and force sum to 100
-            for yr in range(case_df['calendar_year'].min(), case_df['calendar_year'].max() + 1):
+            for yr in range(case_df['calendar_year'].values.min(), case_df['calendar_year'].values.max() + 1):
                 shares = pd.Series(case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total']).tolist()
                 new_shares = round_floats_to_100(shares, 2)
                 case_df.loc[case_df['calendar_year'] == yr, 'sales_share_of_total'] = new_shares

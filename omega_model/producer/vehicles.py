@@ -149,10 +149,10 @@ class DecompositionAttributes(OMEGABase):
             prefix = ''
 
         if len(cost_curve) > 1:
-            interp1d = scipy.interpolate.interp1d(cost_curve[index_column],
-                                                  cost_curve['%s%s' % (prefix, attribute_name)],
-                                                  fill_value=(cost_curve['%s%s' % (prefix, attribute_name)].min(),
-                                                          cost_curve['%s%s' % (prefix, attribute_name)].max()),
+            interp1d = scipy.interpolate.interp1d(cost_curve[index_column].values,
+                                                  cost_curve['%s%s' % (prefix, attribute_name)].values,
+                                                  fill_value=(cost_curve['%s%s' % (prefix, attribute_name)].values.min(),
+                                                          cost_curve['%s%s' % (prefix, attribute_name)].values.max()),
                                                   bounds_error=False)
             return interp1d(index_value)
         else:
@@ -232,8 +232,11 @@ class VehicleAttributeCalculations(OMEGABase):
 
                 VehicleAttributeCalculations._cache = df.to_dict(orient='index')
 
+                # VehicleAttributeCalculations._cache['start_year'] = \
+                #     np.array(list(VehicleAttributeCalculations._cache.keys()))
+
                 VehicleAttributeCalculations._cache['start_year'] = \
-                    np.array(list(VehicleAttributeCalculations._cache.keys()))
+                    np.array([*VehicleAttributeCalculations._cache])
 
         return template_errors
 
@@ -558,8 +561,8 @@ class CompositeVehicle(OMEGABase):
         if len(self.cost_curve) > 1:
             cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2e_grams_per_mile'],
                                                       self.cost_curve['new_vehicle_mfr_cost_dollars'],
-                                                      fill_value=(self.cost_curve['new_vehicle_mfr_cost_dollars'].min(),
-                                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'].max()),
+                                                      fill_value=(self.cost_curve['new_vehicle_mfr_cost_dollars'].values.min(),
+                                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'].values.max()),
                                                       bounds_error=False)
             return cost_dollars(query_co2e_gpmi)
         else:
@@ -602,7 +605,7 @@ class CompositeVehicle(OMEGABase):
             A float, max cert CO2e g/mi from the cost curve
 
         """
-        return self.cost_curve['cert_co2e_grams_per_mile'].max()
+        return self.cost_curve['cert_co2e_grams_per_mile'].values.max()
 
     def get_min_cert_co2e_gpmi(self):
         """
@@ -612,7 +615,7 @@ class CompositeVehicle(OMEGABase):
             A float, min cert CO2e g/mi from the cost curve
 
         """
-        return self.cost_curve['cert_co2e_grams_per_mile'].min()
+        return self.cost_curve['cert_co2e_grams_per_mile'].values.min()
 
     def get_weighted_attribute(self, attribute_name):
         from common.omega_functions import weighted_value
@@ -934,10 +937,10 @@ class Vehicle(OMEGABase):
         allow_upslope = True
 
         # special handling for the case where all cert_co2e_grams_per_mile are the same value, e.g. 0
-        if cost_cloud['cert_co2e_grams_per_mile'].min() == cost_cloud['cert_co2e_grams_per_mile'].max():
+        if cost_cloud['cert_co2e_grams_per_mile'].values.min() == cost_cloud['cert_co2e_grams_per_mile'].values.max():
             # try to take lowest generalized cost point
             cost_curve = cost_cloud[cost_cloud['new_vehicle_mfr_generalized_cost_dollars'] == cost_cloud[
-                'new_vehicle_mfr_generalized_cost_dollars'].min()]
+                'new_vehicle_mfr_generalized_cost_dollars'].values.min()]
             # if somehow more than one point, just take the first one...
             if len(cost_curve) > 1:
                 cost_curve = cost_curve.iloc[[0]]

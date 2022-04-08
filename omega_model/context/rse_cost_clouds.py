@@ -338,10 +338,12 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud = pd.DataFrame()
 
-        cloud_points = []  # build a list of Series that will be dumped into the cloud at the end
+        cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
                            # (faster than sequentially appending)
 
         cost_curve_classes = _cache[vehicle.fueling_class]
+
+        search_iterations = 0
 
         for cc in cost_curve_classes:
             # print('cost_curve_classes', cc)
@@ -382,6 +384,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             converged = False
                             while not converged:
+                                search_iterations += 1
                                 # print('.')
 
                                 ETW = vehicle_curbweight_lbs + DriveCycleBallast.get_ballast_lbs(vehicle)
@@ -498,11 +501,6 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             cloud_points.append(cloud_point)
 
-            # if vehicle.powertrain_type == 'ICE':
-            #     for rse_name in cost_curve_classes[cc]['rse']:
-            #         cloud_points[-1][rse_name] = \
-            #             eval(_cache[vehicle.fueling_class][cc]['rse'][rse_name], {}, locals())
-
         cost_cloud = pd.DataFrame(cloud_points)
 
         # cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
@@ -525,6 +523,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
 
+        # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
         print('done %.2f' % (time.time() - start_time))
 
         return cost_cloud

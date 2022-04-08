@@ -33,6 +33,7 @@ def adjust_dollars(df, deflators, dollar_basis_year, *args):
         deflators = ImplictPriceDeflators
 
     basis_years = pd.Series(df.loc[df['dollar_basis'] > 0, 'dollar_basis']).unique()
+    # basis_years = np.unique(np.array(df.loc[df['dollar_basis'] > 0, 'dollar_basis']))
     adj_factor_numerator = deflators.get_price_deflator(dollar_basis_year)
     df_return = df.copy()
     for basis_year in basis_years:

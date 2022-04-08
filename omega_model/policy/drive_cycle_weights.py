@@ -178,7 +178,7 @@ class DriveCycleWeights(OMEGABase):
                                     DriveCycleWeights._data[fc] = dict()
                                 DriveCycleWeights._data[fc][calendar_year] = tree
 
-                DriveCycleWeights._data[fc]['start_year'] = np.array(list(DriveCycleWeights._data[fc].keys()))
+                DriveCycleWeights._data[fc]['start_year'] = np.array([*DriveCycleWeights._data[fc]]) # np.array(list(DriveCycleWeights._data[fc].keys()))
 
         return template_errors
 

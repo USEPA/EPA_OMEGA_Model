@@ -360,33 +360,11 @@ class VehicleAggregation(OMEGABase):
             # df['glider_non_structure_cost_dollars'] f(structure_mass_lbs, powertrain_cost)
             # df['glider_non_structure_mass_lbs'] f(curbweight_lbs, powertrain_mass_lbs, strucure_mass_lbs, battery_mass_lbs)
 
-            class DummyVehicle():
-                # for mass calcs:
-                body_style = None
-                unibody_structure = None
-                drive_system = None
-                powertrain_type = None
-                base_year_footprint_ft2 = None
-                height_in = None
-                ground_clearance_in = None
-
-                # for powertrain cost calcs:
-                model_year = None
-                electrification_class = None
-
-            veh = DummyVehicle()
-
-            veh.body_style = df['body_style']
-            veh.unibody_structure = df['unibody_structure']
-            veh.drive_system = df['drive_system']
-            veh.powertrain_type = df['powertrain_type']
-            veh.base_year_footprint_ft2 = df['footprint_ft2']
-            veh.height_in = df['height_in']
-            veh.ground_clearance_in = df['ground_clearance_in']
+            df['base_year_footprint_ft2'] = df['footprint_ft2']
 
             df['structure_mass_lbs'], df['battery_mass_lbs'], df['powertrain_mass_lbs'], \
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
-                MassScaling.calc_mass_terms(veh, df['structure_material'], df['eng_rated_hp'],
+                MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
                                             df['battery_kwh'], df['footprint_ft2'])
 
             # veh.model_year = df['model_year']

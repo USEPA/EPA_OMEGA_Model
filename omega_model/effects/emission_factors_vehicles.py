@@ -77,7 +77,8 @@ class EmissionFactorsVehicles(OMEGABase):
         import pandas as pd
 
         calendar_years = pd.Series(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
-        ages = pd.Series(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
+        # calendar_years = np.array(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
+        ages = np.array(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
 
         year = max([yr for yr in calendar_years if yr <= model_year])
         age_use = max([a for a in ages if a <= age])

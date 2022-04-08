@@ -117,7 +117,7 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             attribute, value = credit_column.split(':')
             if vehicle.__getattribute__(attribute) == value:
                 for offcycle_credit in OffCycleCredits.offcycle_credit_names:
-                    start_years = pd.Series(OffCycleCredits._data['start_year'][offcycle_credit])
+                    start_years = np.array(OffCycleCredits._data['start_year'][offcycle_credit])
                     if len(start_years[start_years <= vehicle.model_year]) > 0:
                         year = max(start_years[start_years <= vehicle.model_year])
 

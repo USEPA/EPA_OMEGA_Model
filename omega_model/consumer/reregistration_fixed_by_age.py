@@ -80,8 +80,9 @@ class Reregistration(OMEGABase, ReregistrationBase):
 
         """
         start_years = pd.Series(Reregistration._data['start_model_year'][market_class_id])
+        # start_years = np.array(Reregistration._data['start_model_year'][market_class_id])
 
-        max_age = max(pd.Series(Reregistration._data['age'][market_class_id]))
+        max_age = int(max(np.array(Reregistration._data['age'][market_class_id])))
 
         if age > max_age:
             return 0

@@ -163,7 +163,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                             ((1 + discount_rate) ** price_amortization_period) - 1)
 
                     total_capital_costs = market_class_data[
-                        'average_modified_cross_subsidized_price_%s' % market_class_id]
+                        'average_modified_cross_subsidized_price_%s' % market_class_id].values
                     average_co2e_gpmi = producer_decision['average_onroad_direct_co2e_gpmi_%s' % market_class_id]
                     average_kwh_pmi = producer_decision['average_onroad_direct_kwh_pmi_%s' % market_class_id]
 
@@ -200,7 +200,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                 else:
                     demanded_share = sales_share_numerator[market_class_id] / sales_share_denominator
                     demanded_absolute_share = \
-                        demanded_share * market_class_data['consumer_abs_share_frac_%s' % parent_market_class]
+                        demanded_share * market_class_data['consumer_abs_share_frac_%s' % parent_market_class].values
 
                     market_class_data['consumer_share_frac_%s' % market_class_id] = demanded_share
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share

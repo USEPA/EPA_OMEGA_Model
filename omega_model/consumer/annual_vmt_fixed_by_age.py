@@ -80,6 +80,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
 
         """
         start_years = pd.Series(OnroadVMT._data['start_year'][market_class_id])
+        # start_years = np.array(OnroadVMT._data['start_year'][market_class_id])
 
         if len(start_years[start_years <= calendar_year]) > 0:
             year = max(start_years[start_years <= calendar_year])

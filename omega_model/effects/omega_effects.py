@@ -55,6 +55,7 @@ def run_effects_calcs():
     physical_effects_df = cost_effects_df = present_and_annualized_cost_df = pd.DataFrame()
 
     calendar_years = pd.Series(VehicleAnnualData.get_calendar_years()).unique()
+    # calendar_years = np.unique(np.array(VehicleAnnualData.get_calendar_years()))
     calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
     omega_log.logwrite('\nCalculating tech volumes and shares', echo_console=True)

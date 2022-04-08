@@ -88,30 +88,43 @@ class MassScaling(OMEGABase):
         delta_glider_non_structure_mass_lbs = 0
         usable_battery_capacity_norm = 0
 
+        locals_dict = locals()
         for condition, equation in zip(MassScaling._data['null_structure_mass_lbs']['condition'],
                                        MassScaling._data['null_structure_mass_lbs']['equation']):
-            null_structure_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+            # if any(Eval.eval(condition, {}, locals_dict)):
+            null_structure_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
+        locals_dict = locals()
         for condition, equation in zip(MassScaling._data['structure_mass_lbs']['condition'],
                                        MassScaling._data['structure_mass_lbs']['equation']):
-            structure_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+            # if any(Eval.eval(condition, {}, locals_dict)):
+            structure_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
+        locals_dict = locals()
         for condition, equation in zip(MassScaling._data['battery_mass_lbs']['condition'],
                                        MassScaling._data['battery_mass_lbs']['equation']):
-            battery_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+            # if any(Eval.eval(condition, {}, locals_dict)):
+            battery_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
+        locals_dict = locals()
         for condition, equation in zip(MassScaling._data['powertrain_mass_lbs']['condition'],
                                        MassScaling._data['powertrain_mass_lbs']['equation']):
-            powertrain_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+            # if any(Eval.eval(condition, {}, locals_dict)):
+            powertrain_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
+        delta_footprint = 0
+        locals_dict = locals()
         for condition, equation in zip(MassScaling._data['delta_glider_non_structure_mass_lbs']['condition'],
                                        MassScaling._data['delta_glider_non_structure_mass_lbs']['equation']):
+            # if any(Eval.eval(condition, {}, locals_dict)):
             delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
-            delta_glider_non_structure_mass_lbs += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+            delta_glider_non_structure_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
+        locals_dict = locals()
         for condition, equation in zip(MassScaling._data['usable_battery_capacity_norm']['condition'],
                                        MassScaling._data['usable_battery_capacity_norm']['equation']):
-            usable_battery_capacity_norm += Eval.eval(condition, {}, locals()) * Eval.eval(equation, {}, locals())
+            # if any(Eval.eval(condition, {}, locals_dict)):
+            usable_battery_capacity_norm += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
         usable_battery_capacity_norm += (usable_battery_capacity_norm == 0)  # zeros -> 1.0s by default
 
@@ -164,7 +177,7 @@ class MassScaling(OMEGABase):
             for term in ['null_structure_mass_lbs', 'structure_mass_lbs',
                          'battery_mass_lbs', 'powertrain_mass_lbs', 'delta_glider_non_structure_mass_lbs',
                          'usable_battery_capacity_norm']:
-                MassScaling._data[term] = df[df['mass_term'] == term].set_index('mass_term').to_dict(orient='series')
+                MassScaling._data[term] = df[df['mass_term'] == term].set_index('mass_term').to_dict(orient='list')
 
             MassScaling.structure_materials = Eval.eval(df[df['mass_term'] == 'structure_materials']['equation'][0])
 

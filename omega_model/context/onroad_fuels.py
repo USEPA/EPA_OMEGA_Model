@@ -97,6 +97,8 @@ class OnroadFuel(OMEGABase):
         import pandas as pd
 
         start_years = pd.Series(OnroadFuel._data['start_year'][in_use_fuel_id])
+        # start_years = np.atleast_1d(np.array(OnroadFuel._data['start_year'][in_use_fuel_id]))
+        # start_years = np.atleast_1d(OnroadFuel._data['start_year'][in_use_fuel_id])
         if len(start_years[start_years <= calendar_year]) > 0:
             year = max([yr for yr in start_years if yr <= calendar_year])
 
