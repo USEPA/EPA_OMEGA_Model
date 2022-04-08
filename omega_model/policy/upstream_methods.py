@@ -152,6 +152,8 @@ class UpstreamMethods(OMEGABase):
 
     _data = pd.DataFrame()  # private Dataframe, upstream methods by start year
 
+    _cache = dict()
+
     @staticmethod
     def get_upstream_method(calendar_year):
         """
@@ -164,16 +166,23 @@ class UpstreamMethods(OMEGABase):
             A callable python function used to calculate upstream cert emissions for the given calendar year
 
         """
-        start_years = UpstreamMethods._data['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
 
-            method = UpstreamMethods._data['upstream_calculation_method'].loc[
-                UpstreamMethods._data['start_year'] == calendar_year].item()
+        cache_key = calendar_year
 
-            return upstream_method_dict[method]
-        else:
-            raise Exception('Missing upstream calculation method for %d or prior' % calendar_year)
+        if cache_key not in UpstreamMethods._cache:
+
+            start_years = np.atleast_1d(UpstreamMethods._data['start_year'])
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
+
+                method = UpstreamMethods._data['upstream_calculation_method'].loc[
+                    UpstreamMethods._data['start_year'] == calendar_year].item()
+
+                UpstreamMethods._cache[cache_key] = upstream_method_dict[method]
+            else:
+                raise Exception('Missing upstream calculation method for %d or prior' % calendar_year)
+
+        return UpstreamMethods._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -192,6 +201,8 @@ class UpstreamMethods(OMEGABase):
         import pandas as pd
 
         UpstreamMethods._data = pd.DataFrame()
+
+        UpstreamMethods._cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)

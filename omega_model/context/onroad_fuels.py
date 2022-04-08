@@ -94,15 +94,19 @@ class OnroadFuel(OMEGABase):
                     OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
-        import pandas as pd
 
-        start_years = pd.Series(OnroadFuel._data['start_year'][in_use_fuel_id])
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max([yr for yr in start_years if yr <= calendar_year])
+        cache_key = (calendar_year, in_use_fuel_id, attribute)
 
-            return OnroadFuel._data[in_use_fuel_id, year][attribute]
-        else:
-            raise Exception('Missing onroad fuel values for %s, %d or prior' % (fuel_id, calendar_year))
+        if cache_key not in OnroadFuel._data:
+            start_years = np.atleast_1d(OnroadFuel._data['start_year'][in_use_fuel_id])
+            if len(start_years[start_years <= calendar_year]) > 0:
+                year = max([yr for yr in start_years if yr <= calendar_year])
+
+                OnroadFuel._data[cache_key] = OnroadFuel._data[in_use_fuel_id, year][attribute]
+            else:
+                raise Exception('Missing policy fuel values for %s, %d or prior' %(in_use_fuel_id, calendar_year))
+
+        return OnroadFuel._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

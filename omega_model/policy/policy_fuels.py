@@ -92,15 +92,18 @@ class PolicyFuel(OMEGABase):
                     PolicyFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
-        import pandas as pd
+        cache_key = (calendar_year, fuel_id, attribute)
 
-        start_years = pd.Series(PolicyFuel._data['start_year'][fuel_id])
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max([yr for yr in start_years if yr <= calendar_year])
+        if cache_key not in PolicyFuel._data:
+            start_years = np.atleast_1d(PolicyFuel._data['start_year'][fuel_id])
+            if len(start_years[start_years <= calendar_year]) > 0:
+                year = max([yr for yr in start_years if yr <= calendar_year])
 
-            return PolicyFuel._data[fuel_id, year][attribute]
-        else:
-            raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
+                PolicyFuel._data[cache_key] = PolicyFuel._data[fuel_id, year][attribute]
+            else:
+                raise Exception('Missing policy fuel values for %s, %d or prior' %(fuel_id, calendar_year))
+
+        return PolicyFuel._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
