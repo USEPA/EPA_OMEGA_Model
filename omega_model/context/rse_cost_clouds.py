@@ -109,7 +109,7 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                'electrified_driveline_cost', 'glider_structure_cost', 'glider_non_structure_cost']
 
-    cloud_non_numeric_columns = ['structure_material']
+    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material']
 
     @staticmethod
     def eval_rse(powertrain_type, cost_curve_class, rse_name, rlhp20s, rlhp60s,
@@ -317,7 +317,8 @@ class CostCloud(OMEGABase, CostCloudBase):
         from policy.drive_cycle_ballast import DriveCycleBallast
         from context.powertrain_cost import PowertrainCost
         from context.glider_cost import GliderCost
-        from producer.vehicles import VehicleAttributeCalculations
+        from producer.vehicles import VehicleAttributeCalculations, Vehicle
+        import copy
 
         import time
         start_time = time.time()
@@ -406,7 +407,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':
-                                    cloud_point = vehicle.calc_cert_direct_values(cloud_point)
+                                    cloud_point = vehicle.calc_cert_values(cloud_point)
 
                                     # TODO: get rid of hard-coded 300:
                                     if cloud_point['cert_direct_oncycle_kwh_per_mile']:
@@ -429,6 +430,17 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 prior_battery_kwh = battery_kwh
 
                                 # ------------------------------------------------------------------------------------#
+
+                            if vehicle.powertrain_type == 'ICE':
+                                cloud_point = vehicle.calc_cert_values(cloud_point)
+
+                            v = copy.copy(vehicle)
+                            v.footprint_ft2 = footprint_ft2
+                            v.set_target_co2e_grams_per_mile()
+                            cloud_point['target_co2e_grams_per_mile'] = v.target_co2e_grams_per_mile
+
+                            cloud_point['credits_co2e_grams_per_mile'] = \
+                                cloud_point['cert_co2e_grams_per_mile'] - cloud_point['target_co2e_grams_per_mile']
 
                             # required cloud data for powertrain costing, etc:
                             cloud_point['cost_curve_class'] = ccc
@@ -471,7 +483,12 @@ class CostCloud(OMEGABase, CostCloudBase):
             vehicle.base_year_glider_non_structure_cost_dollars + \
             cost_cloud[cost_terms].sum(axis=1)
 
-        cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
+        # calculate producer generalized cost
+        cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
+            calc_generalized_cost(vehicle, cost_cloud, 'onroad_direct_co2e_grams_per_mile',
+                                  'onroad_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars')
+
+        # cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
 
         # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
         # print('done %.2f' % (time.time() - start_time))
