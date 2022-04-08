@@ -284,18 +284,18 @@ class NewVehicleMarket(OMEGABase):
                     context_size_class, context_reg_class, calendar_year) in NewVehicleMarket._data_by_csc_rc:
                 return NewVehicleMarket._data_by_csc_rc[omega_globals.options.context_id,
                                                         omega_globals.options.context_case_id,
-                                                        context_size_class, context_reg_class, calendar_year]['sales']
+                                                        context_size_class, context_reg_class, calendar_year]['sales'].values
             else:
                 return 0
 
         elif context_size_class:
-            return NewVehicleMarket._data_by_csc['sales'][omega_globals.options.context_id,
+            return sum(NewVehicleMarket._data_by_csc['sales'][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
-                                                    context_size_class, calendar_year].sum()
+                                                    context_size_class, calendar_year].values)
         else:
-            return NewVehicleMarket._data_by_total['sales'][omega_globals.options.context_id,
+            return sum(NewVehicleMarket._data_by_total['sales'][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
-                                                    calendar_year].sum()
+                                                    calendar_year].values)
 
     @staticmethod
     def validate_context_size_class(context_size_class):

@@ -114,14 +114,25 @@ class VehicleAnnualData(SQABase, OMEGABase):
 
     @staticmethod
     def get_odometer(vehicle_id, calendar_year):
+        # vad = omega_globals.session.query(VehicleAnnualData). \
+        #     filter(VehicleAnnualData.vehicle_id == vehicle_id). \
+        #     filter(VehicleAnnualData.calendar_year == calendar_year).one_or_none()
+        #
+        # if vad:
+        #     return vad.odometer
+        #
+        # return 0
+
         vad = omega_globals.session.query(VehicleAnnualData). \
             filter(VehicleAnnualData.vehicle_id == vehicle_id). \
-            filter(VehicleAnnualData.calendar_year == calendar_year).one_or_none()
+            filter(VehicleAnnualData.calendar_year == calendar_year)
 
-        if vad:
-            return vad.odometer
+        val = vad.first()
 
-        return 0
+        if val:
+            return val.odometer
+        else:
+            return 0
 
 
 if __name__ == '__main__':

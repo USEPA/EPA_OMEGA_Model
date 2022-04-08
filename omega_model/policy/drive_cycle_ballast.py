@@ -96,14 +96,21 @@ class DriveCycleBallast(OMEGABase):
             Drive cycle ballast in pounds
 
         """
-        start_years = DriveCycleBallast._data[vehicle.reg_class_id]['start_year']
-        if len(start_years[start_years <= vehicle.model_year]) > 0:
-            calendar_year = max(start_years[start_years <= vehicle.model_year])
 
-            return DriveCycleBallast._data[vehicle.reg_class_id, calendar_year]['ballast_lbs']
-        else:
-            raise Exception('Missing drive cycle ballast parameters for %s, %d or prior' %
-                            (vehicle.reg_class_id, vehicle.model_year))
+        cache_key = (vehicle.reg_class_id, vehicle.model_year)
+
+        if cache_key not in DriveCycleBallast._data:
+
+            start_years = DriveCycleBallast._data[vehicle.reg_class_id]['start_year']
+            if len(start_years[start_years <= vehicle.model_year]) > 0:
+                calendar_year = max(start_years[start_years <= vehicle.model_year])
+
+                DriveCycleBallast._data[cache_key] = DriveCycleBallast._data[vehicle.reg_class_id, calendar_year]['ballast_lbs']
+            else:
+                raise Exception('Missing drive cycle ballast parameters for %s, %d or prior' %
+                                (vehicle.reg_class_id, vehicle.model_year))
+
+        return DriveCycleBallast._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

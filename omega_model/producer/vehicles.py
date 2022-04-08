@@ -65,6 +65,7 @@ For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh
 **CODE**
 
 """
+import numpy as np
 
 print('importing %s' % __file__)
 
@@ -149,12 +150,14 @@ class DecompositionAttributes(OMEGABase):
             prefix = ''
 
         if len(cost_curve) > 1:
-            interp1d = scipy.interpolate.interp1d(cost_curve[index_column].values,
-                                                  cost_curve['%s%s' % (prefix, attribute_name)].values,
-                                                  fill_value=(cost_curve['%s%s' % (prefix, attribute_name)].values.min(),
-                                                          cost_curve['%s%s' % (prefix, attribute_name)].values.max()),
-                                                  bounds_error=False)
-            return interp1d(index_value)
+            # interp1d = scipy.interpolate.interp1d(cost_curve[index_column].values,
+            #                                       cost_curve['%s%s' % (prefix, attribute_name)].values,
+            #                                       fill_value=(cost_curve['%s%s' % (prefix, attribute_name)].values.min(),
+            #                                               cost_curve['%s%s' % (prefix, attribute_name)].values.max()),
+            #                                       bounds_error=False)
+            # return interp1d(index_value)
+            return np.interp(index_value, cost_curve[index_column].values,
+                      cost_curve['%s%s' % (prefix, attribute_name)].values)
         else:
             return cost_curve['%s%s' % (prefix, attribute_name)].item()
 

@@ -403,11 +403,12 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 for rse_name in cost_curve_classes[ccc]['rse']:
                                     cloud_point[rse_name] = \
-                                        eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {}, locals())
+                                        eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {},
+                                             {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':
-                                    cloud_point = vehicle.calc_cert_values(cloud_point)
+                                    cloud_point = vehicle.calc_cert_values(cloud_point)  # TODO: should NOT pass in tech flags here... even though they get ignored...?
 
                                     # TODO: get rid of hard-coded 300:
                                     if cloud_point['cert_direct_oncycle_kwh_per_mile']:
