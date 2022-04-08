@@ -404,56 +404,15 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     cloud_point[rse_name] = \
                                         eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {}, locals())
 
+                                # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':
-                                    from policy.upstream_methods import UpstreamMethods
-                                    from policy.drive_cycle_weights import DriveCycleWeights
-                                    from policy.offcycle_credits import OffCycleCredits
+                                    cloud_point = vehicle.calc_cert_direct_values(cloud_point)
 
-                                    if vehicle.fueling_class != 'BEV':
-                                        cloud_point['cert_direct_oncycle_co2e_grams_per_mile'] = \
-                                            DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(vehicle.model_year,
-                                                                                                           vehicle.fueling_class,
-                                                                                                           cloud_point)
-                                    else:
-                                        cloud_point['cert_direct_oncycle_co2e_grams_per_mile'] = 0
-
-                                    if vehicle.fueling_class != 'ICE':
-                                        cloud_point['cert_direct_oncycle_kwh_per_mile'] = \
-                                            DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(vehicle.model_year,
-                                                                                                    vehicle.fueling_class,
-                                                                                                    cloud_point)
-                                        # initialize onroad values
-                                        cloud_point['onroad_direct_co2e_grams_per_mile'] = 0
-                                        cloud_point['onroad_direct_kwh_per_mile'] = 0
-
-                                        # drop extraneous columns
-                                        # cost_cloud = cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
-
-                                        # calculate off cycle credits before calculating upstream and onroad
-                                        cloud_point = OffCycleCredits.calc_off_cycle_credits(vehicle, cloud_point)
-
-                                        cloud_point['cert_direct_co2e_grams_per_mile'] = \
-                                            cloud_point['cert_direct_oncycle_co2e_grams_per_mile'] - \
-                                            cloud_point['cert_direct_offcycle_co2e_grams_per_mile']
-
-                                        cloud_point['cert_direct_kwh_per_mile'] = \
-                                            cloud_point['cert_direct_oncycle_kwh_per_mile'] - \
-                                            cloud_point['cert_direct_offcycle_kwh_per_mile']
-
-                                        # calc onroad gap, etc...
-                                        VehicleAttributeCalculations.perform_attribute_calculations(vehicle,
-                                                                                                    cloud_point)
-
-                                    else:
-                                        cloud_point['cert_direct_oncycle_kwh_per_mile'] = 0
-
-                                    # battery sizing ---------------------------------------------------------------- #
-
+                                    # TODO: get rid of hard-coded 300:
                                     if cloud_point['cert_direct_oncycle_kwh_per_mile']:
-                                        # battery_kwh = 300 * cloud_point['cert_direct_oncycle_kwh_per_mile'] / usable_battery_capacity_norm
                                         battery_kwh = 300 * cloud_point['onroad_direct_kwh_per_mile'] / usable_battery_capacity_norm
 
-                                # determine convergence
+                                # determine convergence ------------------------------------------------------------- #
                                 converged = abs(
                                     1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
                                             abs(1 - rated_hp / prior_rated_hp) <= convergence_tolerance

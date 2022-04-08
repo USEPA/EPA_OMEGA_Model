@@ -856,6 +856,51 @@ class Vehicle(OMEGABase):
         """
         self.cert_co2e_Mg = omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self)
 
+    def calc_cert_direct_values(self, cloud):
+        """
+
+        Args:
+            cloud:
+
+        Returns:
+
+        """
+        from policy.drive_cycle_weights import DriveCycleWeights
+        from policy.offcycle_credits import OffCycleCredits
+
+        if self.fueling_class != 'BEV':
+            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class,
+                                                                               cloud)
+        else:
+            cloud['cert_direct_oncycle_co2e_grams_per_mile'] = 0
+
+        if self.fueling_class != 'ICE':
+            cloud['cert_direct_oncycle_kwh_per_mile'] = \
+                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cloud)
+        else:
+            cloud['cert_direct_oncycle_kwh_per_mile'] = 0
+
+        # initialize onroad values
+        cloud['onroad_direct_co2e_grams_per_mile'] = 0
+        cloud['onroad_direct_kwh_per_mile'] = 0
+
+        # calculate off cycle credits before calculating upstream and onroad
+        cloud = OffCycleCredits.calc_off_cycle_credits(self, cloud)
+
+        cloud['cert_direct_co2e_grams_per_mile'] = \
+            cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
+            cloud['cert_direct_offcycle_co2e_grams_per_mile']
+
+        cloud['cert_direct_kwh_per_mile'] = \
+            cloud['cert_direct_oncycle_kwh_per_mile'] - \
+            cloud['cert_direct_offcycle_kwh_per_mile']
+
+        # calc onroad gap, etc...
+        VehicleAttributeCalculations.perform_attribute_calculations(self, cloud)
+
+        return cloud
+
     def create_frontier_df(self, cost_cloud):
         """
         Create a frontier ("cost curve") from a vehicle's cloud of simulated vehicle points ("cost cloud") based
@@ -878,41 +923,12 @@ class Vehicle(OMEGABase):
         """
         from common.omega_functions import calc_frontier
         from policy.upstream_methods import UpstreamMethods
-        from policy.drive_cycle_weights import DriveCycleWeights
-        from policy.offcycle_credits import OffCycleCredits
 
-        if self.fueling_class != 'BEV':
-            cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
-                DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class, cost_cloud)
-        else:
-            cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] = 0
-
-        if self.fueling_class != 'ICE':
-            cost_cloud['cert_direct_oncycle_kwh_per_mile'] = \
-                DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(self.model_year, self.fueling_class, cost_cloud)
-        else:
-            cost_cloud['cert_direct_oncycle_kwh_per_mile'] = 0
-
-        # initialize onroad values
-        cost_cloud['onroad_direct_co2e_grams_per_mile'] = 0
-        cost_cloud['onroad_direct_kwh_per_mile'] = 0
+        if 'cert_direct_co2e_grams_per_mile' not in cost_cloud:
+            cost_cloud = self.calc_cert_direct_values(cost_cloud)
 
         # drop extraneous columns
         cost_cloud = cost_cloud.drop(columns=['cost_curve_class', 'model_year'])
-
-        # calculate off cycle credits before calculating upstream and onroad
-        cost_cloud = OffCycleCredits.calc_off_cycle_credits(self, cost_cloud)
-
-        cost_cloud['cert_direct_co2e_grams_per_mile'] = \
-            cost_cloud['cert_direct_oncycle_co2e_grams_per_mile'] - \
-            cost_cloud['cert_direct_offcycle_co2e_grams_per_mile']
-
-        cost_cloud['cert_direct_kwh_per_mile'] = \
-            cost_cloud['cert_direct_oncycle_kwh_per_mile'] -\
-            cost_cloud['cert_direct_offcycle_kwh_per_mile']
-
-        # calc onroad gap, etc...
-        VehicleAttributeCalculations.perform_attribute_calculations(self, cost_cloud)
 
         # add upstream calcs
         upstream_method = UpstreamMethods.get_upstream_method(self.model_year)
