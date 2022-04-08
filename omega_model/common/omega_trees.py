@@ -8,7 +8,7 @@
 
 """
 
-from omega import *
+from omega_model import *
 
 
 class _OMEGATree(OMEGABase):
@@ -119,7 +119,7 @@ class WeightedTree(OMEGABase):
                     self.tree.create_node(identifier=parent_name, data=WeightedNode(1.0))
                 node_weight = tree_df[c].item()
                 if type(node_weight) is str:
-                    node_weight = eval(node_weight, {'__builtins__': None}, {})
+                    node_weight = Eval.eval(node_weight, {'__builtins__': None}, {})
                 self.tree.create_node(identifier=child_name, parent=parent_name, data=WeightedNode(node_weight))
 
         if verbose:

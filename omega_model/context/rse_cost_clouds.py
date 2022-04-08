@@ -339,27 +339,19 @@ class CostCloud(OMEGABase, CostCloudBase):
         cost_cloud = pd.DataFrame()
 
         cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
-                           # (faster than sequentially appending)
+                           # (faster than sequentially appending Series objects)
 
         cost_curve_classes = _cache[vehicle.fueling_class]
 
         search_iterations = 0
 
-        for cc in cost_curve_classes:
-            # print('cost_curve_classes', cc)
+        for ccc in cost_curve_classes:
             for structure_material in MassScaling.structure_materials:
-                # print('structure_material', structure_material)
                 for footprint_ft2 in vehicle_footprints:
-                    # print('footprint_ft2', footprint_ft2)
                     for rlhp20 in rlhp20s:
-                        # print('rlhp20', rlhp20)
                         for rlhp60 in rlhp60s:
-                            # print('rlhp60', rlhp60)
-                            # cloud_point = pd.Series()
+                            cloud_point = cost_curve_classes[ccc]['tech_flags'].to_dict()
 
-                            cloud_point = cost_curve_classes[cc]['tech_flags'].to_dict()
-
-                            # cloud_point = cloud_point.append(cost_curve_classes[cc]['tech_flags'])
                             # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
                             cloud_point['ac_leakage'] = 1
                             cloud_point['ac_efficiency'] = 1
@@ -380,7 +372,6 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             battery_kwh = vehicle.battery_kwh  # for now...
                             motor_kw = vehicle.motor_kw  # for now...
-                            vehicle_curbweight_lbs = vehicle.curbweight_lbs  # need to start somewhere
 
                             converged = False
                             while not converged:
@@ -409,9 +400,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 RLHP60 = rlhp60 / ETW
                                 HP_ETW = rated_hp / ETW
 
-                                for rse_name in cost_curve_classes[cc]['rse']:
+                                for rse_name in cost_curve_classes[ccc]['rse']:
                                     cloud_point[rse_name] = \
-                                        eval(_cache[vehicle.fueling_class][cc]['rse'][rse_name], {}, locals())
+                                        eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {}, locals())
 
                                 if vehicle.powertrain_type != 'ICE':
                                     from policy.upstream_methods import UpstreamMethods
@@ -481,7 +472,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 # ------------------------------------------------------------------------------------#
 
                             # required cloud data for powertrain costing, etc:
-                            cloud_point['cost_curve_class'] = cc
+                            cloud_point['cost_curve_class'] = ccc
                             cloud_point['curbweight_lbs'] = vehicle_curbweight_lbs
                             cloud_point['battery_kwh'] = battery_kwh
                             cloud_point['structure_mass_lbs'] = structure_mass_lbs
@@ -490,21 +481,20 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['motor_kw'] = motor_kw
 
                             # informative data for troubleshooting:
-                            cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
-                            cloud_point['battery_mass_lbs']= battery_mass_lbs
-                            cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
-                            cloud_point['etw_lbs'] = ETW
-                            cloud_point['rated_hp'] = rated_hp
-                            cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp
-                            cloud_point['vehicle_mot_rated_kw'] = vehicle.motor_kw
-                            cloud_point['rlhp20'] = rlhp20
-                            cloud_point['rlhp60'] = rlhp60
+                            # cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
+                            # cloud_point['battery_mass_lbs']= battery_mass_lbs
+                            # cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
+                            # cloud_point['etw_lbs'] = ETW
+                            # cloud_point['rated_hp'] = rated_hp
+                            # cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp
+                            # cloud_point['vehicle_mot_rated_kw'] = vehicle.motor_kw
+                            # cloud_point['rlhp20'] = rlhp20
+                            # cloud_point['rlhp60'] = rlhp60
 
                             cloud_points.append(cloud_point)
 
         cost_cloud = pd.DataFrame(cloud_points)
 
-        # cost_cloud['powertrain_cost_dollars'] = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
         powertrain_costs = PowertrainCost.calc_cost(vehicle, cost_cloud)  # includes battery cost
         powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                  'electrified_driveline_cost']

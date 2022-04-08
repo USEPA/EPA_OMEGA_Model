@@ -145,6 +145,7 @@ def calc_cost_effects(physical_effects_dict):
     from producer.vehicles import VehicleFinal
     from context.repair_cost import RepairCost
     from context.refueling_cost import RefuelingCost
+    from common.omega_eval import Eval
 
     # UPDATE cost effects data
     costs_dict = dict()
@@ -223,7 +224,7 @@ def calc_cost_effects(physical_effects_dict):
                 tech_cost_dollars = vehicle_count * new_vehicle_cost
 
             # fuel costs
-            fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
+            fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
                 retail_price = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel)
                 pretax_price = FuelPrice.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel)

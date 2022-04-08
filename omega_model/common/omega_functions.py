@@ -101,7 +101,6 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         # find frontier starting point, lowest x-value, and add to frontier
         idxmin = cloud[x_key].idxmin()
         frontier_pts.append(cloud.loc[idxmin])
-        # frontier_pts.append(cloud.loc[idxmin].to_dict())
         min_frontier_factor = 0
 
         if cloud[x_key].values.min() != cloud[x_key].values.max():
@@ -128,11 +127,8 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
                     if pd.notna(idxmin) and (allow_upslope or min_frontier_factor <= 0):
                         frontier_pts.append(cloud.loc[idxmin])
-                        # frontier_pts.append(cloud.loc[idxmin].to_dict())
-                        # frontier_pts.append(cloud.loc[[idxmin]])
 
         frontier_df = pd.concat(frontier_pts, axis=1).transpose()
-        # frontier_df = pd.DataFrame(frontier_pts)
     else:
         frontier_df = cloud
 
@@ -173,8 +169,7 @@ def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_ke
 
 
 def cull_cloud(cloud, prior_x, x_key):
-    # cloud = cloud.loc[cloud[x_key] > prior_x]  # .copy()
-    cloud = cloud[cloud[x_key].values > prior_x]  # .copy()
+    cloud = cloud.loc[cloud[x_key] > prior_x]  # .copy()
     return cloud
 
 

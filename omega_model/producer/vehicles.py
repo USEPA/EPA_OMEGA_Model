@@ -800,7 +800,7 @@ class Vehicle(OMEGABase):
             calendar_year = self.model_year
 
         price = 0
-        fuel_dict = eval(self.in_use_fuel_id, {'__builtins__': None}, {})
+        fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
 
@@ -818,7 +818,7 @@ class Vehicle(OMEGABase):
         from context.onroad_fuels import OnroadFuel
 
         co2_emissions_grams_per_unit = 0
-        fuel_dict = eval(self.in_use_fuel_id, {'__builtins__': None}, {})
+        fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
         for fuel, fuel_share in fuel_dict.items():
             co2_emissions_grams_per_unit += \
                 (OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'direct_co2e_grams_per_unit') /

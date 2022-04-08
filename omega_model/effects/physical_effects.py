@@ -162,6 +162,7 @@ def calc_physical_effects(calendar_years):
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer.vehicles import VehicleFinal
     from context.onroad_fuels import OnroadFuel
+    from common.omega_eval import Eval
 
     input_attributes_list = ['grams_per_us_ton', 'grams_per_metric_ton', 'gal_per_bbl',
                              'e0_in_retail_gasoline', 'e0_energy_density_ratio',
@@ -227,7 +228,7 @@ def calc_physical_effects(calendar_years):
                 voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
                     = 26 * [0]
 
-                fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
+                fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
                 for fuel, fuel_share in fuel_dict.items():
                     refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                     transmission_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
