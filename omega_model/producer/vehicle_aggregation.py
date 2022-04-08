@@ -378,7 +378,7 @@ class VehicleAggregation(OMEGABase):
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 veh.drive_system = row['drive_system']
 
-                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row]))).iloc[0]
+                powertrain_cost = sum(PowertrainCost.calc_cost(veh, pd.DataFrame([row])))
 
                 # powertrain_costs = PowertrainCost.calc_cost(veh, pd.DataFrame([row]))  # includes battery cost
                 # powertrain_cost_terms = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',

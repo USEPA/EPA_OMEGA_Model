@@ -169,7 +169,7 @@ def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_ke
 
 
 def cull_cloud(cloud, prior_x, x_key):
-    cloud = cloud.loc[cloud[x_key] > prior_x]  # .copy()
+    cloud = cloud.loc[cloud[x_key].values > prior_x]  # .copy()
     return cloud
 
 

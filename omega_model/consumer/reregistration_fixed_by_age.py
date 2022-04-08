@@ -79,19 +79,24 @@ class Reregistration(OMEGABase, ReregistrationBase):
             Re-registered proportion [0..1]
 
         """
-        start_years = pd.Series(Reregistration._data['start_model_year'][market_class_id])
-        # start_years = np.array(Reregistration._data['start_model_year'][market_class_id])
 
-        max_age = int(max(np.array(Reregistration._data['age'][market_class_id])))
+        cache_key = (model_year, market_class_id, age)
 
-        if age > max_age:
-            return 0
-        elif len(start_years[start_years <= model_year]) > 0:
-            year = max(start_years[start_years <= model_year])
-            return Reregistration._data[market_class_id, age, year]['reregistered_proportion']
-        else:
-            raise Exception('Missing registration fixed by age parameters for %s, %d or prior' %
-                            (market_class_id, calendar_year))
+        if cache_key not in Reregistration._data:
+            start_years = np.array(Reregistration._data['start_model_year'][market_class_id])
+
+            max_age = int(max(np.array(Reregistration._data['age'][market_class_id])))
+
+            if age > max_age:
+                Reregistration._data[cache_key] = 0
+            elif len(start_years[start_years <= model_year]) > 0:
+                year = max(start_years[start_years <= model_year])
+                Reregistration._data[cache_key] =  Reregistration._data[market_class_id, age, year]['reregistered_proportion']
+            else:
+                raise Exception('Missing registration fixed by age parameters for %s, %d or prior' %
+                                (market_class_id, calendar_year))
+
+        return Reregistration._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

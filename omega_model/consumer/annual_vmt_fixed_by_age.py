@@ -79,15 +79,19 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
             (float) Annual vehicle miles travelled.
 
         """
-        start_years = pd.Series(OnroadVMT._data['start_year'][market_class_id])
-        # start_years = np.array(OnroadVMT._data['start_year'][market_class_id])
+        cache_key = (calendar_year, market_class_id, age)
 
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max(start_years[start_years <= calendar_year])
-            return OnroadVMT._data[market_class_id, age, year]['annual_vmt']
-        else:
-            raise Exception('Missing onroad VMT fixed by age parameters for %s, %d or prior' %
-                            (market_class_id, calendar_year))
+        if cache_key not in OnroadVMT._data:
+            start_years = np.array(OnroadVMT._data['start_year'][market_class_id])
+
+            if len(start_years[start_years <= calendar_year]) > 0:
+                year = max(start_years[start_years <= calendar_year])
+                OnroadVMT._data[cache_key] = OnroadVMT._data[market_class_id, age, year]['annual_vmt']
+            else:
+                raise Exception('Missing onroad VMT fixed by age parameters for %s, %d or prior' %
+                                (market_class_id, calendar_year))
+
+        return OnroadVMT._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

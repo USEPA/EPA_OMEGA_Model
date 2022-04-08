@@ -488,8 +488,6 @@ class CostCloud(OMEGABase, CostCloudBase):
             calc_generalized_cost(vehicle, cost_cloud, 'onroad_direct_co2e_grams_per_mile',
                                   'onroad_direct_kwh_per_mile', 'new_vehicle_mfr_cost_dollars')
 
-        # cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
-
         # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
         # print('done %.2f' % (time.time() - start_time))
 

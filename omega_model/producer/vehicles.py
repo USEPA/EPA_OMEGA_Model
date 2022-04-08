@@ -268,10 +268,12 @@ class VehicleAttributeCalculations(OMEGABase):
                         # print('vehicle.%s = vehicle.%s %s %s' % (attribute_target, attribute_source, operator, value))
                         if cost_cloud is not None:
                             cost_cloud[attribute_target] = \
-                                eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value))
+                                Eval.eval("cost_cloud['%s'] %s %s" % (attribute_source, operator, value),
+                                                                      {}, {'cost_cloud': cost_cloud})
                         else:
                             vehicle.__setattr__(attribute_target,
-                                                eval('vehicle.%s %s %s' % (attribute_source, operator, value)))
+                                                Eval.eval('vehicle.%s %s %s' % (attribute_source, operator, value),
+                                                          {}, {'vehicle': vehicle}))
         else:
             raise Exception('Missing vehicle attribute (vehicle onroad) calculations for %d, or prior'
                             % vehicle.model_year)
@@ -498,13 +500,13 @@ class CompositeVehicle(OMEGABase):
 
             composite_frontier_df = cartesian_prod(composite_frontier_df, vehicle_frontier)
 
-            prior_market_share_frac = composite_frontier_df['market_share_frac']
-            veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_id]
+            prior_market_share_frac = composite_frontier_df['market_share_frac'].values
+            veh_market_share_frac = composite_frontier_df['veh_%s_market_share' % v.vehicle_id].values
 
             for wv in self.weighted_values:
                 composite_frontier_df[wv] = \
-                    (composite_frontier_df[wv] * prior_market_share_frac +
-                     composite_frontier_df['veh_%s_%s' % (v.vehicle_id, wv)] * veh_market_share_frac) / \
+                    (composite_frontier_df[wv].values * prior_market_share_frac +
+                     composite_frontier_df['veh_%s_%s' % (v.vehicle_id, wv)].values * veh_market_share_frac) / \
                     (prior_market_share_frac + veh_market_share_frac)
 
             # update running total market share

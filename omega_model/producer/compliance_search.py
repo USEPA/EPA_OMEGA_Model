@@ -752,9 +752,9 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
         # grab best non-compliant option
         non_compliant_tech_share_options['weighted_slope'] = \
-            non_compliant_tech_share_options['strategic_compliance_ratio'] * \
-            ((non_compliant_tech_share_options[cost_name] - lowest_cost_compliant_tech_share_option[cost_name].item()) /
-            (non_compliant_tech_share_options['strategic_compliance_ratio'] -
+            non_compliant_tech_share_options['strategic_compliance_ratio'].values * \
+            ((non_compliant_tech_share_options[cost_name].values - lowest_cost_compliant_tech_share_option[cost_name].item()) /
+            (non_compliant_tech_share_options['strategic_compliance_ratio'].values -
              lowest_cost_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
         best_non_compliant_tech_share_option = \
@@ -764,9 +764,9 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
                 lowest_cost_compliant_tech_share_option[cost_name].item():
             # cost cloud up-slopes from left to right, calculate slope relative to best non-compliant option
             compliant_tech_share_options['weighted_slope'] = \
-                compliant_tech_share_options['strategic_compliance_ratio'] * \
-                ((compliant_tech_share_options[cost_name] - best_non_compliant_tech_share_option[cost_name].item()) /
-                (compliant_tech_share_options['strategic_compliance_ratio'] -
+                compliant_tech_share_options['strategic_compliance_ratio'].values * \
+                ((compliant_tech_share_options[cost_name].values - best_non_compliant_tech_share_option[cost_name].item()) /
+                (compliant_tech_share_options['strategic_compliance_ratio'].values -
                  best_non_compliant_tech_share_option['strategic_compliance_ratio'].item()))
 
             best_compliant_tech_share_option = \
@@ -800,7 +800,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             # log (some or all) production options cloud and tag selected points
             production_options.loc[candidate_production_decisions.index, 'candidate_production_option'] = True
             if omega_globals.options.slice_tech_combo_cloud_tables:
-                production_options = production_options[production_options['strategic_compliance_ratio'] <= 1.2]
+                production_options = production_options[production_options['strategic_compliance_ratio'].values <= 1.2]
             producer_iteration_log.write(production_options)
         else:
             # log candidate production decisions only
