@@ -124,8 +124,8 @@ class GliderCost(OMEGABase):
 
         body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
 
-        structure_mass_lbs = pkg_df['structure_mass_lbs']
-        delta_footprint = vehicle.base_year_footprint_ft2 - pkg_df['footprint_ft2']
+        structure_mass_lbs = pkg_df['structure_mass_lbs'].values
+        delta_footprint = vehicle.base_year_footprint_ft2 - pkg_df['footprint_ft2'].values
 
         locals_dict = locals()  # cache local equation terms
 
@@ -134,7 +134,7 @@ class GliderCost(OMEGABase):
 
         values = np.zeros_like(structure_mass_lbs)
         for structure_material in MassScaling.structure_materials:
-            values += eval(_cache[vehicle.body_style, body_structure, structure_material]['value']) * (pkg_df['structure_material'] == structure_material)
+            values += eval(_cache[vehicle.body_style, body_structure, structure_material]['value']) * (pkg_df['structure_material'].values == structure_material)
         glider_structure_cost = values * adj_factor * learning_factor
 
         # glider non-structure cost
