@@ -112,12 +112,11 @@ class MassScaling(OMEGABase):
             # if any(Eval.eval(condition, {}, locals_dict)):
             powertrain_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
-        delta_footprint = 0
+        delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
         locals_dict = locals()
         for condition, equation in zip(MassScaling._data['delta_glider_non_structure_mass_lbs']['condition'],
                                        MassScaling._data['delta_glider_non_structure_mass_lbs']['equation']):
             # if any(Eval.eval(condition, {}, locals_dict)):
-            delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
             delta_glider_non_structure_mass_lbs += Eval.eval(condition, {}, locals_dict) * Eval.eval(equation, {}, locals_dict)
 
         locals_dict = locals()
