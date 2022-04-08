@@ -322,7 +322,7 @@ class CostCloud(OMEGABase, CostCloudBase):
         import time
         start_time = time.time()
 
-        print('Generating Cost Cloud for %s' % vehicle.name)
+        # print('Generating Cost Cloud for %s' % vehicle.name)
 
         vehicle_rlhp20 = \
             calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 20)
@@ -387,12 +387,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 search_iterations += 1
                                 # print('.')
 
-                                ETW = vehicle_curbweight_lbs + DriveCycleBallast.get_ballast_lbs(vehicle)
-
-                                RLHP20 = rlhp20 / ETW
-                                RLHP60 = rlhp60 / ETW
-                                HP_ETW = rated_hp / ETW
-
                                 # rated hp sizing --------------------------------------------------------------- #
                                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, \
                                 delta_glider_non_structure_mass_lbs, usable_battery_capacity_norm = \
@@ -407,6 +401,13 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     battery_mass_lbs
 
                                 rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
+
+                                # set up RSE terms and run RSEs
+                                ETW = vehicle_curbweight_lbs + DriveCycleBallast.get_ballast_lbs(vehicle)
+
+                                RLHP20 = rlhp20 / ETW
+                                RLHP60 = rlhp60 / ETW
+                                HP_ETW = rated_hp / ETW
 
                                 for rse_name in cost_curve_classes[cc]['rse']:
                                     cloud_point[rse_name] = \
@@ -524,10 +525,10 @@ class CostCloud(OMEGABase, CostCloudBase):
         cost_cloud['model_year'] = vehicle.model_year  # this column actually gets dropped later...
 
         # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
-        print('done %.2f' % (time.time() - start_time))
+        # print('done %.2f' % (time.time() - start_time))
 
-        if vehicle.model_year == 2020:
-            cost_cloud.to_csv(omega_globals.options.output_folder + '%s_%s_cost_cloud.csv' % (vehicle.model_year, vehicle.name.replace(':','-')))
+        # if vehicle.model_year == 2020:
+        #     cost_cloud.to_csv(omega_globals.options.output_folder + '%s_%s_cost_cloud.csv' % (vehicle.model_year, vehicle.name.replace(':','-')))
 
         return cost_cloud
 
