@@ -526,6 +526,9 @@ class CostCloud(OMEGABase, CostCloudBase):
         # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
         print('done %.2f' % (time.time() - start_time))
 
+        if vehicle.model_year == 2020:
+            cost_cloud.to_csv(omega_globals.options.output_folder + '%s_%s_cost_cloud.csv' % (vehicle.model_year, vehicle.name.replace(':','-')))
+
         return cost_cloud
 
 
