@@ -730,17 +730,17 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
 
     mini_df = pd.DataFrame()
     mini_df['total_credits_with_offset_co2e_megagrams'] = \
-        production_options['total_credits_co2e_megagrams'] + strategic_target_offset_Mg
+        production_options['total_credits_co2e_megagrams'].values + strategic_target_offset_Mg
     mini_df['total_cost_dollars'] = production_options['total_cost_dollars']
     mini_df['total_generalized_cost_dollars'] = production_options['total_generalized_cost_dollars']
     mini_df['strategic_compliance_ratio'] = production_options['strategic_compliance_ratio']
 
     production_options['producer_search_iteration'] = search_iteration
     production_options['selected_production_option'] = False
-    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'])
+    production_options['strategic_compliance_error'] = abs(1 - production_options['strategic_compliance_ratio'].values)
 
-    compliant_tech_share_options = mini_df[(mini_df['total_credits_with_offset_co2e_megagrams']) >= 0].copy()
-    non_compliant_tech_share_options = mini_df[(mini_df['total_credits_with_offset_co2e_megagrams']) < 0].copy()
+    compliant_tech_share_options = mini_df[mini_df['total_credits_with_offset_co2e_megagrams'].values >= 0].copy()
+    non_compliant_tech_share_options = mini_df[mini_df['total_credits_with_offset_co2e_megagrams'].values < 0].copy()
 
     if not compliant_tech_share_options.empty and not non_compliant_tech_share_options.empty:
         # tech share options straddle compliance target

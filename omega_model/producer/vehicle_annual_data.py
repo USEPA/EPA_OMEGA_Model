@@ -123,14 +123,23 @@ class VehicleAnnualData(SQABase, OMEGABase):
         #
         # return 0
 
-        vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_id == vehicle_id). \
-            filter(VehicleAnnualData.calendar_year == calendar_year)
+        # vad = omega_globals.session.query(VehicleAnnualData). \
+        #     filter(VehicleAnnualData.vehicle_id == vehicle_id). \
+        #     filter(VehicleAnnualData.calendar_year == calendar_year)
+        #
+        # val = vad.first()
+        #
+        # if val:
+        #     return val.odometer
+        # else:
+        #     return 0
 
-        val = vad.first()
+        val = omega_globals.session.query(VehicleAnnualData.odometer).\
+            filter(VehicleAnnualData.vehicle_id == vehicle_id).\
+            filter(VehicleAnnualData.calendar_year == calendar_year).scalar()
 
         if val:
-            return val.odometer
+            return val
         else:
             return 0
 
