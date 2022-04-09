@@ -50,8 +50,6 @@ try:
     from consumer.consumer_base_classes import *
     from producer.producer_base_classes import *
 
-    import scipy.interpolate
-
     # --- OMEGA2 global constants ---
 
     # enumerated values
