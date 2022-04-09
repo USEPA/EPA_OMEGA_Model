@@ -150,12 +150,6 @@ class DecompositionAttributes(OMEGABase):
             prefix = ''
 
         if len(cost_curve) > 1:
-            # interp1d = scipy.interpolate.interp1d(cost_curve[index_column].values,
-            #                                       cost_curve['%s%s' % (prefix, attribute_name)].values,
-            #                                       fill_value=(cost_curve['%s%s' % (prefix, attribute_name)].values.min(),
-            #                                               cost_curve['%s%s' % (prefix, attribute_name)].values.max()),
-            #                                       bounds_error=False)
-            # return interp1d(index_value)
             return np.interp(index_value, cost_curve[index_column].values,
                       cost_curve['%s%s' % (prefix, attribute_name)].values)
         else:
@@ -564,12 +558,8 @@ class CompositeVehicle(OMEGABase):
 
         """
         if len(self.cost_curve) > 1:
-            cost_dollars = scipy.interpolate.interp1d(self.cost_curve['cert_co2e_grams_per_mile'],
-                                                      self.cost_curve['new_vehicle_mfr_cost_dollars'],
-                                                      fill_value=(self.cost_curve['new_vehicle_mfr_cost_dollars'].values.min(),
-                                                                  self.cost_curve['new_vehicle_mfr_cost_dollars'].values.max()),
-                                                      bounds_error=False)
-            return cost_dollars(query_co2e_gpmi)
+            return np.interp(query_co2e_gpmi, self.cost_curve['cert_co2e_grams_per_mile'],
+                                                      self.cost_curve['new_vehicle_mfr_cost_dollars'])
         else:
             return self.cost_curve['new_vehicle_mfr_cost_dollars'].item()
 
