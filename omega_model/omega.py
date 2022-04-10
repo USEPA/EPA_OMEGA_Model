@@ -340,34 +340,39 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
         Nothing, updates ``cross_subsidy_options_and_response``
 
     """
-    cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
-    cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] = 0
-    cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] = 0
+    _cross_subsidy_options_and_response = dict()
+
+    _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] = 0
+    _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] = 0
+    _cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] = 0
 
     if mcat == '':
-        cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat] = 1.0
+        _cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat] = 1.0
 
     for mc in cross_subsidy_pair:
-        cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
+        _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat] += \
             producer_decision['average_new_vehicle_mfr_cost_%s' % mc] * \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc].values / \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat].values
 
-        cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] += \
+        _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] += \
             cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mc].values * \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc].values / \
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mcat].values
 
-        cross_subsidy_options_and_response['abs_share_delta_%s' % mc] = abs(
+        _cross_subsidy_options_and_response['abs_share_delta_%s' % mc] = abs(
             producer_decision['producer_abs_share_frac_%s' % mc] -
             cross_subsidy_options_and_response['consumer_abs_share_frac_%s' % mc].values)
 
-        cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] += \
-            0.5 * cross_subsidy_options_and_response['abs_share_delta_%s' % mc].values
+        _cross_subsidy_options_and_response['abs_share_delta_%s' % mcat] += \
+            0.5 * _cross_subsidy_options_and_response['abs_share_delta_%s' % mc]
 
-    cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] = \
-        abs(1 - cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat].values /
-            cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat].values)
+    _cross_subsidy_options_and_response['pricing_price_ratio_delta_%s' % mcat] = \
+        abs(1 - _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] /
+            _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
+
+    cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
+        _cross_subsidy_options_and_response.values()
 
 
 def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_decision_and_response,
