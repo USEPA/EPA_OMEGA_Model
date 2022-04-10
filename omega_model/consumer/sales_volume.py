@@ -12,6 +12,9 @@ sales-weighted generalized cost.**
 from omega_model import *
 
 
+_cache = dict()
+
+
 def context_new_vehicle_sales(calendar_year):
     """
     Get new vehicle sales from the context.
@@ -26,23 +29,26 @@ def context_new_vehicle_sales(calendar_year):
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
     from context.new_vehicle_market import NewVehicleMarket
 
-    sales_dict = dict()
+    if calendar_year not in _cache:
+        sales_dict = dict()
 
-    if omega_globals.options.flat_context:
-        calendar_year = omega_globals.options.flat_context_year
+        if omega_globals.options.flat_context:
+            calendar_year = omega_globals.options.flat_context_year
 
-    # calculate sales by non-responsive market category as a function of context size class sales and
-    # base year share of those vehicles in the non-responsive market category
-    for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
-        sales_dict[nrmc] = 0
-        for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
-            sales_dict[nrmc] += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) * \
-                                     NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
+        # calculate sales by non-responsive market category as a function of context size class sales and
+        # base year share of those vehicles in the non-responsive market category
+        for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+            sales_dict[nrmc] = 0
+            for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+                sales_dict[nrmc] += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) * \
+                                         NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
 
-    # get total sales from context
-    sales_dict['total'] = NewVehicleMarket.new_vehicle_sales(calendar_year)
+        # get total sales from context
+        sales_dict['total'] = NewVehicleMarket.new_vehicle_sales(calendar_year)
 
-    return sales_dict
+        _cache[calendar_year] = sales_dict
+
+    return _cache[calendar_year]
 
 
 def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_new_vehicle_generalized_cost=False):
@@ -84,6 +90,10 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_n
     Q = Q0 + M * (P-P0)  # point-slope equation of a line
 
     return Q/Q0
+
+
+def init_sales_volume():
+    _cache.clear()
 
 
 if __name__ == '__main__':

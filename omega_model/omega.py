@@ -1172,6 +1172,8 @@ def init_omega(session_runtime_options):
     from effects.cpi_price_deflators import CPIPriceDeflators
     from effects.ip_deflators import ImplictPriceDeflators
 
+    from consumer.sales_volume import init_sales_volume
+
     file_io.validate_folder(omega_globals.options.output_folder)
 
     verbose_init = omega_globals.options.verbose
@@ -1183,6 +1185,9 @@ def init_omega(session_runtime_options):
         SQABase.metadata.create_all(omega_globals.engine)
 
         # load remaining input data
+
+        init_sales_volume()
+
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                                       verbose=verbose_init)
 
