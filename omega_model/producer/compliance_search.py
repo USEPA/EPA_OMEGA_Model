@@ -82,7 +82,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_tree, candidate_pro
         else:
             # process leaf, loop over composite vehicles
             for cv in market_class_tree[k]:
-                df = pd.DataFrame()
+                df = dict()  # pd.DataFrame()
 
                 incremented = False
 
@@ -136,7 +136,7 @@ def create_tech_and_share_sweeps(calendar_year, market_class_tree, candidate_pro
                 df['veh_%s_cost_dollars' % cv.vehicle_id] = tech_cost_options
                 df['veh_%s_generalized_cost_dollars' % cv.vehicle_id] = tech_generalized_cost_options
 
-                child_df_list.append(df)
+                child_df_list.append(pd.DataFrame(df))
 
     # Generate market share options
     if consumer_response is None:
@@ -176,10 +176,11 @@ def create_tech_and_share_sweeps(calendar_year, market_class_tree, candidate_pro
                                                        min_constraints=min_constraints,
                                                        max_constraints=max_constraints)
         else:
-            sales_share_df = pd.DataFrame()
+            sales_share_df = dict()  # pd.DataFrame()
             for c, cn in zip(children, share_column_names):
                 sales_share_df[cn] = [consumer.sales_volume.context_new_vehicle_sales(calendar_year)[c] /
                                       consumer.sales_volume.context_new_vehicle_sales(calendar_year)['total']]
+            sales_share_df = pd.DataFrame(sales_share_df)
     else:
         # inherit absolute market shares from consumer response
         if node_name:
@@ -187,12 +188,13 @@ def create_tech_and_share_sweeps(calendar_year, market_class_tree, candidate_pro
         else:
             abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
 
-        sales_share_df = pd.DataFrame()
+        sales_share_df = dict()  # pd.DataFrame()
         share_total = 0
         for cn in abs_share_column_names:
             if cn.replace('producer', 'consumer') in consumer_response:
                 sales_share_df[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
-                share_total += sales_share_df[cn]
+                share_total += np.array(sales_share_df[cn])
+        sales_share_df = pd.DataFrame(sales_share_df)
 
     # Combine tech and market share options
     if verbose:

@@ -81,13 +81,12 @@ def update_stock(calendar_year, compliance_id=None):
         else:
             pass
 
-    prior_year_vehicle_ids = \
-        sql_unpack_result(VehicleAnnualData.get_vehicle_annual_data(calendar_year-1, compliance_id, 'vehicle_id'))
+    prior_year_vehicle_ids = odometer_data['vehicle_id'].values
 
     vad_list = []
 
     # CREATE vehicle annual data for last year's stock, now one year older:
-    if prior_year_vehicle_ids:
+    if len(prior_year_vehicle_ids):
         for vehicle_id in prior_year_vehicle_ids:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
             age = calendar_year - model_year
@@ -103,7 +102,7 @@ def update_stock(calendar_year, compliance_id=None):
 
                 registered_count = initial_registered_count * reregistration_factor
 
-                vad_list.append(VehicleAnnualData(vehicle_id=vehicle_id,
+                vad_list.append(VehicleAnnualData(vehicle_id=int(vehicle_id),
                                                   calendar_year=calendar_year,
                                                   registered_count=registered_count,
                                                   age=calendar_year-model_year,
