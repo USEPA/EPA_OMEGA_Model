@@ -211,6 +211,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
 
+                    # _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
+                    #     (rse_columns, df[rse_columns].apply(tuple, axis=1))
+
                     _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
 
         return template_errors
@@ -240,7 +243,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
             # validate drive cycle columns
             from policy.drive_cycles import DriveCycles
-            drive_cycle_columns = set.difference(set(df.columns), input_template_columns)
+            drive_cycle_columns = sorted(set.difference(set(df.columns), input_template_columns))
 
             if not all([dc in DriveCycles.drive_cycle_names for dc in drive_cycle_columns]):
                 template_errors.append('Invalid drive cycle column in %s' % filename)
@@ -263,6 +266,9 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                     for c in rse_columns:
                         _cache['BEV'][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
+
+                    # _cache['BEV'][cost_curve_class]['rse_tuple'] = \
+                    #     (rse_columns, df[rse_columns].apply(tuple, axis=1).values)
 
                     _cache['BEV'][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
 
@@ -400,6 +406,9 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 RLHP20 = rlhp20 / ETW
                                 RLHP60 = rlhp60 / ETW
                                 HP_ETW = rated_hp / ETW
+
+                                # Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'][1][0][0],
+                                #           {}, {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
 
                                 for rse_name in cost_curve_classes[ccc]['rse']:
                                     cloud_point[rse_name] = \
