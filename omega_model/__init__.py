@@ -33,6 +33,7 @@ import traceback
 
 
 try:
+    import time
     import pandas as pd
     pd.set_option('chained_assignment', 'raise')
     from pandas.api.types import is_numeric_dtype
@@ -78,6 +79,7 @@ try:
             import time
 
             path = os.path.dirname(os.path.abspath(__file__)) + os.sep
+            self.multiprocessing = True and not getattr(sys, 'frozen', False)
             self.session_name = 'OMEGA Quick Test'
             self.session_unique_name = 'OMEGA Quick Test'
             self.session_is_reference = True

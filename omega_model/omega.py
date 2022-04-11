@@ -1344,6 +1344,30 @@ def init_omega(session_runtime_options):
     return init_fail
 
 
+def poolwait():
+    return None
+    # from context.cost_clouds import CostCloud
+    # print('* %s *' % CostCloud.cost_curve_classes)
+    # CostCloud.get_cloud(2020, 'ice_MPW_LRL')
+    #
+    # print('pooltest')
+    # print('module name:', __name__)
+    # print('parent process:', os.getppid())
+    # print('process id:', os.getpid())
+    # print('engine id: ', id(omega_globals.engine))
+    # print('engine tables:', omega_globals.engine.table_names())
+    # return 42
+
+
+# def callback(arg):
+#     print('callback')
+
+
+def error_callback(e):
+    print('error_callback')
+    print(e)
+
+
 def run_omega(session_runtime_options, standalone_run=False):
     """
     Run a single OMEGA simulation session and run session postproc.
@@ -1366,6 +1390,30 @@ def run_omega(session_runtime_options, standalone_run=False):
         init_fail = init_omega(session_runtime_options)
 
         if not init_fail:
+
+            if session_runtime_options.multiprocessing:
+                from omega_model import omega
+
+                from multiprocessing import Pool, freeze_support
+
+                freeze_support()
+
+                num_processes = 4  # os.cpu_count() - 1
+
+                start_time = time.time()
+                omega_globals.pool = Pool(processes=num_processes,
+                                          initializer=omega.init_omega, initargs=[session_runtime_options])
+
+                results = []
+                for i in range(num_processes):
+                    results.append(omega_globals.pool.apply_async(func=omega.poolwait,
+                                                     callback=None,
+                                                     error_callback=omega.error_callback))
+
+                [r.get() for r in results]
+
+                print('Elapsed init time = %f' % (time.time() - start_time))
+
             omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name, echo_console=True)
 
             if omega_globals.options.run_profiler:
@@ -1410,6 +1458,10 @@ def run_omega(session_runtime_options, standalone_run=False):
             omega_globals.engine = None
             omega_globals.session = None
             omega_globals.options = None
+
+            if session_runtime_options.multiprocessing:
+                omega_globals.pool.close()
+                omega_globals.pool.join()
 
         else:
             omega_log.logwrite(init_fail, echo_console=True)

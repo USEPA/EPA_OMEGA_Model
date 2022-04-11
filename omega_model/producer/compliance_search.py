@@ -18,6 +18,254 @@ import consumer
 _cache = dict()
 
 
+def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range, verbose=False):
+    """
+    Create tech sweeps is responsible for creating tech (CO2e g/mi levels) options to
+    develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
+    active policy.
+
+    Called from ``search_production_options()``.
+
+    The combination of shares (to determine vehicle sales) and g/mi levels determines the CO2e Mg compliance outcome of
+    each option outside of this function.
+
+    On the first pass through this function, there are no ``candidate_production_decisions``
+    so the result of the first pass is effectively unconstrained
+    (in the absence of required minimum production levels or production constraints).
+
+    On the second pass, the producer has chosen one or more candidate production options from the prior cloud of
+    choices, the share range is compressed based on the ``producer_compliance_search_convergence_factor`` setting.
+    Subsequent tech options will be generated around the ``candidate_production_decisions``.
+
+    Calls from ``search_production_options()`` continue with subsequently tighter share ranges until the compliance
+    target has been met within a tolerance. Ultimately a single candidate production decision is selected and passed
+    to the consumer which reacts to the generalized cost of each option with a desired market share.
+
+    Args:
+        composite_vehicles ([CompositeVehicle]): the list of producer composite vehicles
+        candidate_production_decisions (None, DataFrame): zero or 1 or 2 candidate production decisions chosen from the
+            results of the previous search iteration
+        share_range (float): determines the numerical range of share and tech options that are considered
+        verbose (bool): enables additional console output if ``True``
+
+    Returns:
+        A dataframe containing a range of composite vehicle CO2e g/mi options factorially combined
+
+    """
+    import time
+    from common.omega_functions import cartesian_prod
+
+    child_df_list = []
+
+    start_time = time.time()
+    # Generate tech options (CO2e g/mi levels)
+    for cv in composite_vehicles:
+        start_time = time.time()
+        incremented = False
+
+        if share_range == 1.0:
+            cv.tech_option_iteration_num = 0  # reset vehicle tech option progression
+
+        if cv.fueling_class == 'ICE':
+            num_tech_options = omega_globals.options.producer_num_tech_options_per_ice_vehicle
+        else:
+            num_tech_options = omega_globals.options.producer_num_tech_options_per_bev_vehicle
+
+        veh_min_co2e_gpmi = cv.get_min_cert_co2e_gpmi()
+        veh_max_co2e_gpmi = cv.get_max_cert_co2e_gpmi()
+
+        if candidate_production_decisions is not None:
+            co2_gpmi_options = np.array([])
+            for idx, combo in candidate_production_decisions.iterrows():
+
+                if ((combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
+                        not incremented:
+                    cv.tech_option_iteration_num += 1
+                    incremented = True
+
+                tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
+                                   cv.tech_option_iteration_num
+                veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % cv.vehicle_id]
+                min_co2e_gpmi = max(veh_min_co2e_gpmi, veh_co2e_gpmi * (1 - tech_share_range))
+                max_co2e_gpmi = min(veh_max_co2e_gpmi, veh_co2e_gpmi * (1 + tech_share_range))
+                co2_gpmi_options = \
+                    np.append(np.append(co2_gpmi_options,
+                                        np.linspace(min_co2e_gpmi, max_co2e_gpmi, num=num_tech_options)), veh_co2e_gpmi)
+
+            if num_tech_options == 1:
+                co2_gpmi_options = [veh_max_co2e_gpmi]
+            else:
+                co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
+        else:  # first producer pass, generate full range of options
+            if num_tech_options == 1:
+                co2_gpmi_options = [veh_max_co2e_gpmi]
+            else:
+                co2_gpmi_options = np.linspace(veh_min_co2e_gpmi, veh_max_co2e_gpmi, num=num_tech_options)
+
+        tech_cost_options = cv.get_new_vehicle_mfr_cost_from_cost_curve(co2_gpmi_options)
+        tech_generalized_cost_options = cv.get_new_vehicle_mfr_generalized_cost_from_cost_curve(co2_gpmi_options)
+        tech_kwh_options = cv.get_cert_direct_kwh_pmi_from_cost_curve(co2_gpmi_options)
+
+        d = {'veh_%s_co2e_gpmi' % cv.vehicle_id: co2_gpmi_options,
+             'veh_%s_kwh_pmi' % cv.vehicle_id: tech_kwh_options,
+             'veh_%s_cost_dollars' % cv.vehicle_id: tech_cost_options,
+             'veh_%s_generalized_cost_dollars' % cv.vehicle_id: tech_generalized_cost_options}
+        df = pd.DataFrame.from_dict(d)
+
+        child_df_list.append(df)
+
+        # print('for cv in composite_vehicles = %f' % (time.time() - start_time))
+
+    start_time = time.time()
+
+    tech_combos_df = pd.DataFrame()
+    for df in child_df_list:
+        tech_combos_df = cartesian_prod(tech_combos_df, df)
+
+    # print('cartesian_prod tech options time = %f' % (time.time() - start_time))
+
+    return tech_combos_df
+
+
+def create_share_sweeps(calendar_year, market_class_dict, candidate_production_decisions, share_range,
+                        consumer_response, node_name='', verbose=False):
+    """
+    Create share sweeps is responsible for creating market share options to
+    develop a set of candidate compliance outcomes for the manufacturer in the given year as a function of the
+    active policy.  The function recursively navigates the ``market_class_dict`` as a tree of market categories.
+
+    Called from ``search_production_options()``.
+
+    The combination of shares (to determine vehicle sales) and g/mi levels determines the CO2e Mg compliance outcome of
+    each option outside of this function.
+
+    On the first pass through this function, there are no ``candidate_production_decisions`` and there is not yet a
+    ``consumer_response`` to those production decisions so the result of the first pass is effectively unconstrained
+    (in the absence of required minimum production levels or production constraints).
+
+    On the second pass, the producer has chosen one or more candidate production options from the prior cloud of
+    choices, the share range is compressed based on the ``producer_compliance_search_convergence_factor`` setting.
+    Subsequent market shares will be generated around the ``candidate_production_decisions``.
+
+    Calls from ``search_production_options()`` continue with subsequently tighter share ranges until the compliance
+    target has been met within a tolerance. Ultimately a single candidate production decision is selected and passed
+    to the consumer which reacts to the generalized cost of each option with a desired market share.
+
+    If none of the outcomes are within the market share convergence tolerance then subsequent calls to this function
+    include the ``consumer_response`` and are used as to generate nearby market share options, again as a function of
+    the ``share_range`` as the producer continues to search compliance options.
+
+    Args:
+        calendar_year (int): the year in which the compliance calculations take place
+        market_class_dict (dict): a dict of CompositeVehicle object lists hiearchically grouped by market categories
+            into market classes
+        candidate_production_decisions (None, DataFrame): zero or 1 or 2 candidate production decisions chosen from the
+            results of the previous search iteration
+        share_range (float): determines the numerical range of share and tech options that are considered
+        consumer_response (Series): a pandas Series containing the final producer decision from prior iterations and
+            containing the consumer desired market shares based on that decision and the producer's cross-subsidy, if
+            any
+        node_name (str): name of the node in the ``market_class_dict``, used to traverse the market class tree
+        verbose (bool): enables additional console output if ``True``
+
+    Returns:
+        A dataframe containing a range of market share options factorially combined
+
+    """
+    import time
+    # import numpy as np
+    from common.omega_functions import partition, cartesian_prod
+    from consumer.sales_volume import context_new_vehicle_sales
+
+    child_df_list = []
+
+    children = list(market_class_dict)
+
+    start_time = time.time()
+    for k in market_class_dict:
+        if verbose:
+            print('processing ' + k)
+        if type(market_class_dict[k]) is dict:
+            # process subtree
+            child_df_list.append(
+                create_share_sweeps(calendar_year, market_class_dict[k],
+                                    candidate_production_decisions, share_range,
+                                    consumer_response,
+                                    node_name=k))
+
+    # Generate market share options
+    if consumer_response is None:
+        # generate producer desired market shares for responsive market sectors
+        producer_prefix = 'producer_share_frac_'
+        if node_name:
+            share_column_names = [producer_prefix + node_name + '.' + c for c in children]
+        else:
+            share_column_names = [producer_prefix + c for c in children]
+
+        if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
+            from context.production_constraints import ProductionConstraints
+            from policy.required_sales_share import RequiredSalesShare
+
+            min_constraints = dict()
+            max_constraints = dict()
+            for c in share_column_names:
+                production_min = ProductionConstraints.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+                production_max = ProductionConstraints.get_maximum_share(calendar_year, c.replace(producer_prefix, ''))
+                required_zev_share = RequiredSalesShare.get_minimum_share(calendar_year, c.replace(producer_prefix, ''))
+
+                max_constraints[c] = production_max
+                min_constraints[c] = min(production_max, max(required_zev_share, production_min))
+
+            if share_range == 1.0:
+                # span the whole space of shares
+                sales_share_df = partition(share_column_names,
+                                           num_levels=omega_globals.options.producer_num_market_share_options,
+                                           min_constraints=min_constraints, max_constraints=max_constraints)
+            else:
+                # narrow search span to a range of shares around the winners
+                from common.omega_functions import generate_constrained_nearby_shares
+                sales_share_df = \
+                    generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
+                                                       share_range,
+                                                       omega_globals.options.producer_num_market_share_options,
+                                                       min_constraints=min_constraints,
+                                                       max_constraints=max_constraints)
+        else:
+            sales_share_dict = pd.DataFrame()
+            for c, cn in zip(children, share_column_names):
+                sales_share_dict[cn] = [context_new_vehicle_sales(calendar_year)[c] /
+                                        context_new_vehicle_sales(calendar_year)['total']]
+            sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
+    else:
+        # inherit absolute market shares from consumer response
+        if node_name:
+            abs_share_column_names = ['producer_abs_share_frac_' + node_name + '.' + c for c in children]
+        else:
+            abs_share_column_names = ['producer_abs_share_frac_' + c for c in children]
+
+        sales_share_dict = dict()
+        for cn in abs_share_column_names:
+            if cn.replace('producer', 'consumer') in consumer_response:
+                sales_share_dict[cn] = [consumer_response[cn.replace('producer', 'consumer')]]
+
+        sales_share_df = pd.DataFrame.from_dict(sales_share_dict)
+
+    # print('generate market share options time = %f' % (time.time() - start_time))
+
+    child_df_list.append(sales_share_df)
+
+    # Combine tech and market share options
+    if verbose:
+        print('combining ' + str(children))
+    share_combos_df = pd.DataFrame()
+    for df in child_df_list:
+        share_combos_df = cartesian_prod(share_combos_df, df)
+
+    # print('generate share options time = %f' % (time.time() - start_time))
+
+    return share_combos_df
+
+
 def create_tech_and_share_sweeps(calendar_year, market_class_tree, candidate_production_decisions, share_range,
                                  consumer_response, node_name='', verbose=False):
     """
@@ -300,9 +548,48 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
-        tech_and_share_sweeps = create_tech_and_share_sweeps(calendar_year, market_class_tree,
-                                                             candidate_production_decisions, share_range,
-                                                             producer_decision_and_response)
+        # tech_and_share_sweeps = create_tech_and_share_sweeps(calendar_year, market_class_tree,
+        #                                                      candidate_production_decisions, share_range,
+        #                                                      producer_decision_and_response)
+
+        start_time = time.time()
+
+        if False and omega_globals.options.multiprocessing:
+            results = []
+            results.append(omega_globals.pool.apply_async(func=create_tech_sweeps,
+                                                          args=[composite_vehicles, candidate_production_decisions,
+                                                                share_range],
+                                                          callback=None,
+                                                          error_callback=None))
+
+            results.append(omega_globals.pool.apply_async(func=create_share_sweeps,
+                                                          args=[calendar_year, market_class_tree,
+                                                                candidate_production_decisions, share_range,
+                                                                producer_decision_and_response],
+                                                          callback=None,
+                                                          error_callback=None))
+
+            while not all([r.ready() for r in results]):
+                time.sleep(0.1)
+
+            tech_and_share_sweeps = cartesian_prod(results[0].get(), results[1].get())
+
+        else:
+            start_time = time.time()
+            tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
+            # print('tech_sweeps time %f' % (time.time() - start_time))
+
+            start_time = time.time()
+            share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
+                                               candidate_production_decisions, share_range,
+                                               producer_decision_and_response)
+            # print('share_sweeps time %f' % (time.time() - start_time))
+
+            start_time = time.time()
+            tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
+            # print('cartesian_prod time %f' % (time.time() - start_time))
+
+        # print('tech_and_share_sweeps Time %f' % (time.time() - start_time))
 
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)
@@ -372,6 +659,25 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
     return composite_vehicles, selected_production_decision, market_class_tree, \
            producer_compliance_possible
+
+
+def update_vehicles(calendar_year, prior_veh, vehicle_id=None):
+    from producer.vehicles import Vehicle, transfer_vehicle_data
+
+    new_veh = Vehicle(vehicle_id=vehicle_id)
+    transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
+    new_veh.initial_registered_count = new_veh.base_year_market_share
+
+    return new_veh
+
+
+def calc_composite_vehicles(mc, rc, mctrc):
+    from producer.vehicles import CompositeVehicle
+
+    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
+    cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
+
+    return cv
 
 
 def create_composite_vehicles(calendar_year, compliance_id):
@@ -460,14 +766,40 @@ def create_composite_vehicles(calendar_year, compliance_id):
             mctrc[new_veh.market_class_id][new_veh.reg_class_id].append(new_veh)
             mctrc[new_veh.market_class_id]['sales'] += new_veh.initial_registered_count
 
-        composite_vehicles = []
-        for mc in mctrc:
+        mcrc_priority_list = []
+        for mc in omega_globals.options.MarketClass.market_classes:
             for rc in omega_globals.options.RegulatoryClasses.reg_classes:
                 if mctrc[mc][rc]:
-                    cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
-                    cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
-                    composite_vehicles.append(cv)
+                    mcrc_priority_list.append((mc, rc, len(mctrc[mc][rc])))
+        # sort composite vehicles by number of source vehicles
+        mcrc_priority_list = sorted(mcrc_priority_list, key=lambda x: x[-1], reverse=True)
 
+        start_time = time.time()
+
+        composite_vehicles = []
+
+        # for mc in mctrc:
+        #     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
+        #         if mctrc[mc][rc]:
+        #             cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
+        #             cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
+        #             composite_vehicles.append(cv)
+
+        if omega_globals.options.multiprocessing:
+            results = []
+            # start longest jobs first!
+            for mc, rc, _ in mcrc_priority_list:
+                results.append(omega_globals.pool.apply_async(func=calc_composite_vehicles,
+                                                              args=[mc, rc, mctrc],
+                                                              callback=None,
+                                                              error_callback=error_callback))
+
+            composite_vehicles = [r.get() for r in results]
+        else:
+            for mc, rc, _ in mcrc_priority_list:
+                composite_vehicles.append(calc_composite_vehicles(mc, rc, mctrc))
+
+        print('Composite Vehicles Elapsed Time %f' % (time.time() - start_time))
         # get empty market class tree
         market_class_tree = omega_globals.options.MarketClass.get_market_class_tree()
 
