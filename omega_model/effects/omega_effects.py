@@ -90,12 +90,13 @@ def run_effects_calcs():
         else:
             physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
 
-        print('Saving Annual Physical Effects...')
-        annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
-                                           f'{omega_globals.options.session_unique_name}_annual_physical_effects.csv'
+        if not omega_globals.options.multiprocessing:
+            print('Saving Annual Physical Effects...')
+            annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
+                                               f'{omega_globals.options.session_unique_name}_annual_physical_effects.csv'
 
-        annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
-        annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
+            annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
+            annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
 
         if 'Costs' in omega_globals.options.calc_effects:
             cost_effects_dict = dict()
@@ -147,6 +148,14 @@ def run_effects_calcs():
                 pass
 
             tech_tracking_df = tech_tracking_result.get()
+
+        if 'Physical' in omega_globals.options.calc_effects:
+            print('Saving Annual Physical Effects...')
+            annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
+                                               f'{omega_globals.options.session_unique_name}_annual_physical_effects.csv'
+
+            annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
+            annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
 
     print('OMEGA Effects Complete')
 

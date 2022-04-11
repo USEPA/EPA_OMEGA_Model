@@ -548,26 +548,27 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         composite_vehicles, market_class_tree, context_based_total_sales = \
             create_composite_vehicles(calendar_year, compliance_id)
 
+        # start_time = time.time()
+        #
         # tech_and_share_sweeps = create_tech_and_share_sweeps(calendar_year, market_class_tree,
         #                                                      candidate_production_decisions, share_range,
         #                                                      producer_decision_and_response)
+        # print('tech_and_share_sweeps time %f' % (time.time() - start_time))
 
-        start_time = time.time()
+        # start_time = time.time()
 
         tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
         # print('tech_sweeps time %f' % (time.time() - start_time))
 
-        start_time = time.time()
+        # start_time = time.time()
         share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
                                            candidate_production_decisions, share_range,
                                            producer_decision_and_response)
         # print('share_sweeps time %f' % (time.time() - start_time))
-
-        start_time = time.time()
+        #
+        # start_time = time.time()
         tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
         # print('cartesian_prod time %f' % (time.time() - start_time))
-
-        # print('tech_and_share_sweeps Time %f' % (time.time() - start_time))
 
         production_options = create_production_options_from_shares(composite_vehicles, tech_and_share_sweeps,
                                                                    context_based_total_sales)

@@ -67,6 +67,8 @@ class RequiredSalesShare(OMEGABase):
     """
     _data = pd.DataFrame()
 
+    _cache = dict()
+
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
         """
@@ -82,18 +84,24 @@ class RequiredSalesShare(OMEGABase):
             ``producer.compliance_strategy.create_tech_and_share_sweeps()``
 
         """
-        minimum_share = 0
+        cache_key = (calendar_year, market_class_id)
 
-        start_years = RequiredSalesShare._data['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
+        if cache_key not in RequiredSalesShare._cache:
 
-            min_key = '%s:%s' % (market_class_id, min_share_units_str)
-            if min_key in RequiredSalesShare._data:
-                minimum_share = RequiredSalesShare._data['%s:%s' % (market_class_id, min_share_units_str)].loc[
-                    RequiredSalesShare._data['start_year'] == calendar_year].item()
+            minimum_share = 0
 
-        return minimum_share
+            start_years = RequiredSalesShare._data['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
+
+                min_key = '%s:%s' % (market_class_id, min_share_units_str)
+                if min_key in RequiredSalesShare._data:
+                    minimum_share = RequiredSalesShare._data['%s:%s' % (market_class_id, min_share_units_str)].loc[
+                        RequiredSalesShare._data['start_year'] == calendar_year].item()
+
+            RequiredSalesShare._cache[cache_key] = minimum_share
+
+        return RequiredSalesShare._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -112,6 +120,8 @@ class RequiredSalesShare(OMEGABase):
         import numpy as np
 
         RequiredSalesShare._data = pd.DataFrame()
+
+        RequiredSalesShare._cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)

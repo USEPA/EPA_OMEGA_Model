@@ -512,14 +512,17 @@ class CompositeVehicle(OMEGABase):
             drop_columns = [c for c in composite_frontier_df.columns if c.endswith('_y') or c.endswith('_x') or
                             c.endswith('_market_share')] + ['_']
 
-            composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
+            # composite_frontier_df = composite_frontier_df.drop(drop_columns, axis=1, errors='ignore')
+            # composite_frontier_df = composite_frontier_df.columns.drop(drop_columns, errors='ignore')
 
             # calculate new sales-weighted frontier
             composite_frontier_df = calc_frontier(composite_frontier_df, 'cert_co2e_grams_per_mile',
                                                   'new_vehicle_mfr_generalized_cost_dollars',
                                                   allow_upslope=True)
 
-            composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
+            # composite_frontier_df = composite_frontier_df.drop(['frontier_factor'], axis=1, errors='ignore')
+            composite_frontier_df = composite_frontier_df.drop(drop_columns + ['frontier_factor'], axis=1, errors='ignore')
+            # composite_frontier_df = composite_frontier_df[composite_frontier_df.columns.drop(drop_columns + ['frontier_factor'], errors='ignore')]
 
             if plot:
                 if v.name in omega_globals.options.plot_and_log_vehicles:

@@ -1398,7 +1398,9 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                 freeze_support()
 
-                num_processes = 4  # os.cpu_count() - 1
+                # num_processes = os.cpu_count() - 1
+
+                num_processes = min(len(omega_globals.options.MarketClass.market_classes), os.cpu_count() - 1)
 
                 start_time = time.time()
                 omega_globals.pool = Pool(processes=num_processes,
