@@ -178,7 +178,12 @@ class WeightedTree(OMEGABase):
         """
         if not tree.children(node_id):
             try:
-                return tree.get_node(node_id).data.weighted_value
+                if tree.get_node(node_id).data.weight:
+                    wv = tree.get_node(node_id).data.weighted_value
+                    eq_str = "%.20f * results['%s']" % (tree.get_node(node_id).data.weight, node_id)
+                    return wv, eq_str
+                else:
+                    return 0, ''
             except:
                 raise Exception(
                     '*** Missing drive cycle "%s" in input to WeightedTree.calc_node_weighted_value() ***' %
@@ -186,9 +191,16 @@ class WeightedTree(OMEGABase):
         else:
             n = tree.get_node(node_id)
             n.data.value = 0
+            if n.data.weight != 1:
+                eq_str = '%.20f * (' % n.data.weight
+            else:
+                eq_str = '('
             for child in tree.children(node_id):
-                n.data.value += WeightedTree.calc_node_weighted_value(tree, child.identifier)
-            return n.data.weighted_value
+                wv, child_eq_str = WeightedTree.calc_node_weighted_value(tree, child.identifier)
+                n.data.value += wv
+                eq_str += '%s + ' % child_eq_str
+            eq_str = '%s)' % eq_str[0:eq_str.rfind(']',)+1]
+            return n.data.weighted_value, eq_str
 
     def calc_value(self, values_dict, node_id=None, weighted=False):
         """
@@ -217,12 +229,13 @@ class WeightedTree(OMEGABase):
         if node_id is None:
             node_id = self.tree.root
 
-        WeightedTree.calc_node_weighted_value(self.tree, node_id)
+        value, eq_str = WeightedTree.calc_node_weighted_value(self.tree, node_id)
 
         if weighted:
-            return self.tree.get_node(node_id).data.weighted_value
+            eq_str = '%f * %s' % (self.tree.get_node(node_id).data.weight, node_id)
+            return self.tree.get_node(node_id).data.weighted_value, eq_str
         else:
-            return self.tree.get_node(node_id).data.value
+            return self.tree.get_node(node_id).data.value, eq_str
 
     def show(self):
         """

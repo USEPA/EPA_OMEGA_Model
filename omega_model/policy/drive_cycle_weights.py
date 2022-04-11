@@ -200,13 +200,21 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        start_years = DriveCycleWeights._data[fueling_class]['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
-            return DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
-                                                                  weighted=weighted)
-        else:
-            raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
+
+        cache_key = calendar_year, fueling_class
+
+        if cache_key not in DriveCycleWeights._data:
+
+            start_years = DriveCycleWeights._data[fueling_class]['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
+                eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+                                                                      weighted=weighted)[1]
+                DriveCycleWeights._data[cache_key] = eq_str
+            else:
+                raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
+
+        return Eval.eval(DriveCycleWeights._data[cache_key], {}, {'results': cycle_values})
 
     @staticmethod
     def calc_cert_direct_oncycle_co2e_grams_per_mile(calendar_year, fueling_class, cycle_values):
@@ -276,8 +284,13 @@ if __name__ == '__main__':
                             'cd_ftp_4:cert_direct_oncycle_kwh_per_mile': 0.2332757,
                             'cd_hwfet:cert_direct_oncycle_kwh_per_mile': 0.22907605,
             }
+
             print(DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(2020, 'ICE', sample_cycle_results))
+            # eq_str = DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(2020, 'ICE', sample_cycle_results)[1]
+            # print(eval(eq_str, {}, {'results': sample_cycle_results}))
             print(DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, 'BEV', sample_cycle_results))
+            # eq_str = DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, 'BEV', sample_cycle_results)[1]
+            # print(eval(eq_str, {}, {'results': sample_cycle_results}))
 
         else:
             print(init_fail)
