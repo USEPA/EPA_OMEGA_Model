@@ -138,7 +138,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                     orient='index')
                 # add 'start_year' key which returns start years by market class ID
                 OnroadVMT._data.update(
-                    df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='series'))
+                    df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='dict'))
 
 
         return template_errors

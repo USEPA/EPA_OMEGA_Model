@@ -28,7 +28,7 @@ def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
     """
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
 
-    emission_factors = ['voc_grams_per_mile',
+    emission_factors = ('voc_grams_per_mile',
                         'co_grams_per_mile',
                         'nox_grams_per_mile',
                         'pm25_grams_per_mile',
@@ -40,7 +40,7 @@ def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
                         'acrolein_grams_per_mile',
                         'ch4_grams_per_mile',
                         'n2o_grams_per_mile',
-                        ]
+                        )
 
     age = calendar_year - model_year
 
@@ -59,7 +59,7 @@ def get_powersector_ef(calendar_year):
     """
     from effects.emission_factors_powersector import EmissionFactorsPowersector
 
-    emission_factors = ['voc_grams_per_kwh',
+    emission_factors = ('voc_grams_per_kwh',
                         'co_grams_per_kwh',
                         'nox_grams_per_kwh',
                         'pm25_grams_per_kwh',
@@ -72,7 +72,7 @@ def get_powersector_ef(calendar_year):
                         'co2_grams_per_kwh',
                         'ch4_grams_per_kwh',
                         'n2o_grams_per_kwh',
-                        ]
+                        )
 
     return EmissionFactorsPowersector.get_emission_factors(calendar_year, emission_factors)
 
@@ -90,7 +90,7 @@ def get_refinery_ef(calendar_year, fuel):
     """
     from effects.emission_factors_refinery import EmissionFactorsRefinery
 
-    emission_factors = ['voc_grams_per_gallon',
+    emission_factors = ('voc_grams_per_gallon',
                         'co_grams_per_gallon',
                         'nox_grams_per_gallon',
                         'pm25_grams_per_gallon',
@@ -103,7 +103,7 @@ def get_refinery_ef(calendar_year, fuel):
                         'co2_grams_per_gallon',
                         'ch4_grams_per_gallon',
                         'n2o_grams_per_gallon',
-                        ]
+                        )
 
     return EmissionFactorsRefinery.get_emission_factors(calendar_year, fuel, emission_factors)
 

@@ -67,8 +67,8 @@ class EmissionFactorsVehicles(OMEGABase):
         Args:
             model_year (int): vehicle model year for which to get emission factors
             age (int): the vehicle age
-            reg_class_id (string): the regulatory class, e.g., 'car' or 'truck'
-            in_use_fuel_id (string): the liquid fuel ID, e.g., 'pump gasoline'
+            reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
+            in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             emission_factors: name of emission factor or list of emission factor attributes to get
 
         Returns: emission factor or list of emission factors
@@ -76,21 +76,26 @@ class EmissionFactorsVehicles(OMEGABase):
         """
         import pandas as pd
 
-        calendar_years = pd.Series(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
-        # calendar_years = np.array(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
-        ages = np.array(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
+        cache_key = (model_year, age, reg_class_id, in_use_fuel_id, emission_factors)
 
-        year = max([yr for yr in calendar_years if yr <= model_year])
-        age_use = max([a for a in ages if a <= age])
+        if cache_key not in EmissionFactorsVehicles._data:
 
-        factors = []
-        for ef in emission_factors:
-            factors.append(EmissionFactorsVehicles._data[year, age_use, reg_class_id, in_use_fuel_id][ef])
+            calendar_years = np.atleast_1d(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
+            ages = np.array(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
 
-        if len(emission_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            year = max([yr for yr in calendar_years if yr <= model_year])
+            age_use = max([a for a in ages if a <= age])
+
+            factors = []
+            for ef in emission_factors:
+                factors.append(EmissionFactorsVehicles._data[year, age_use, reg_class_id, in_use_fuel_id][ef])
+
+            if len(emission_factors) == 1:
+                EmissionFactorsVehicles._data[cache_key] = factors[0]
+            else:
+                EmissionFactorsVehicles._data[cache_key] = factors
+
+        return EmissionFactorsVehicles._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

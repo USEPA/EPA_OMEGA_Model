@@ -58,6 +58,7 @@ class EmissionFactorsRefinery(OMEGABase):
 
         Args:
             calendar_year (int): calendar year to get emission factors for
+            in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             emission_factors (str, [strs]): name of emission factor or list of emission factor attributes to get
 
         Returns:
@@ -66,18 +67,23 @@ class EmissionFactorsRefinery(OMEGABase):
         """
         import pandas as pd
 
-        calendar_years = pd.Series(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
-        # calendar_years = np.array(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
-        year = max([yr for yr in calendar_years if yr <= calendar_year])
+        cache_key = (calendar_year, in_use_fuel_id, emission_factors)
 
-        factors = []
-        for ef in emission_factors:
-            factors.append(EmissionFactorsRefinery._data[year, in_use_fuel_id][ef])
+        if cache_key not in EmissionFactorsRefinery._data:
 
-        if len(emission_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            calendar_years = np.atleast_1d(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
+            year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+            factors = []
+            for ef in emission_factors:
+                factors.append(EmissionFactorsRefinery._data[year, in_use_fuel_id][ef])
+
+            if len(emission_factors) == 1:
+                EmissionFactorsRefinery._data[cache_key] = factors[0]
+            else:
+                EmissionFactorsRefinery._data[cache_key] = factors
+
+        return EmissionFactorsRefinery._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

@@ -117,15 +117,21 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             attribute, value = credit_column.split(':')
             if vehicle.__getattribute__(attribute) == value:
                 for offcycle_credit in OffCycleCredits.offcycle_credit_names:
-                    start_years = np.array(OffCycleCredits._data['start_year'][offcycle_credit])
-                    if len(start_years[start_years <= vehicle.model_year]) > 0:
-                        year = max(start_years[start_years <= vehicle.model_year])
+                    cache_key = (credit_column, attribute, vehicle.model_year, offcycle_credit)
+                    if cache_key not in OffCycleCredits._data:
+                        start_years = np.array(OffCycleCredits._data['start_year'][offcycle_credit])
+                        if len(start_years[start_years <= vehicle.model_year]) > 0:
+                            year = max(start_years[start_years <= vehicle.model_year])
 
-                        credit_value = OffCycleCredits._data[offcycle_credit, year][credit_column]
-                        credit_destination = \
-                            OffCycleCredits._data[offcycle_credit, year]['credit_destination']
+                            credit_value = OffCycleCredits._data[offcycle_credit, year][credit_column]
+                            credit_destination = \
+                                OffCycleCredits._data[offcycle_credit, year]['credit_destination']
 
-                        cost_cloud[credit_destination] += credit_value * cost_cloud[offcycle_credit]
+                            OffCycleCredits._data[cache_key] = (credit_destination, credit_value)
+
+                    (credit_destination, credit_value) = OffCycleCredits._data[cache_key]
+
+                    cost_cloud[credit_destination] += credit_value * cost_cloud[offcycle_credit]
 
         return cost_cloud
 
@@ -187,7 +193,7 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
             # add 'start_year' key which returns start years by credit name
             OffCycleCredits._data.update(
-                df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series'))
+                df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='dict'))
 
         return template_errors
 
