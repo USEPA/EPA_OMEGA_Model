@@ -1611,29 +1611,33 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                    + '_summary_results.csv'
                         session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
-                        annual_physical_effects_filename = options.batch_path + '_' \
-                                                           + batch.sessions[s_index].settings.output_folder \
-                                                           + batch.sessions[s_index].settings.session_unique_name \
-                                                           + '_annual_physical_effects.csv'
-                        annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
+                        if 'Physical' in options.calc_effects:
+                            annual_physical_effects_filename = options.batch_path + '_' \
+                                                               + batch.sessions[s_index].settings.output_folder \
+                                                               + batch.sessions[s_index].settings.session_unique_name \
+                                                               + '_annual_physical_effects.csv'
+                            annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
-                        apa_cost_effects_filename = options.batch_path + '_' \
-                                                    + batch.sessions[s_index].settings.output_folder \
-                                                    + batch.sessions[s_index].settings.session_unique_name \
-                                                    + '_annual_present_and_annualized_cost_effects.csv'
-                        apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
+                        if 'Costs' in options.calc_effects:
+                            apa_cost_effects_filename = options.batch_path + '_' \
+                                                        + batch.sessions[s_index].settings.output_folder \
+                                                        + batch.sessions[s_index].settings.session_unique_name \
+                                                        + '_annual_present_and_annualized_cost_effects.csv'
+                            apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
 
                 batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
                 batch_summary_filename = batch.name + '_summary_results.csv'
                 batch_summary_df.to_csv(batch_summary_filename, index=False)
 
-                batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
-                batch_annual_physical_effects_filename = batch.name + '_annual_physical_effects.csv'
-                batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
+                if 'Physical' in options.calc_effects:
+                    batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
+                    batch_annual_physical_effects_filename = batch.name + '_annual_physical_effects.csv'
+                    batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
 
-                batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
-                batch_apa_cost_effects_filename = batch.name + '_annual_present_and_annualized_cost_effects.csv'
-                batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
+                if 'Costs' in options.calc_effects:
+                    batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
+                    batch_apa_cost_effects_filename = batch.name + '_annual_present_and_annualized_cost_effects.csv'
+                    batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
 
 
 if __name__ == '__main__':
