@@ -109,7 +109,7 @@ class CostCloud(OMEGABase, CostCloudBase):
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                'electrified_driveline_cost', 'glider_structure_cost', 'glider_non_structure_cost']
 
-    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material']
+    cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'vehicle_name']
 
     @staticmethod
     def eval_rse(powertrain_type, cost_curve_class, rse_name, rlhp20s, rlhp60s,
@@ -453,15 +453,19 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['motor_kw'] = motor_kw
 
                             # informative data for troubleshooting:
-                            # cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
-                            # cloud_point['battery_mass_lbs']= battery_mass_lbs
-                            # cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
-                            # cloud_point['etw_lbs'] = ETW
-                            # cloud_point['rated_hp'] = rated_hp
-                            # cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp
-                            # cloud_point['vehicle_mot_rated_kw'] = vehicle.motor_kw
-                            # cloud_point['rlhp20'] = rlhp20
-                            # cloud_point['rlhp60'] = rlhp60
+                            if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
+                                    omega_globals.options.log_vehicle_cloud_years == 'all':
+                                cloud_point['vehicle_name'] = vehicle.name
+                                cloud_point['model_year'] = vehicle.model_year
+                                cloud_point['delta_glider_non_structure_mass_lbs'] = delta_glider_non_structure_mass_lbs
+                                cloud_point['battery_mass_lbs']= battery_mass_lbs
+                                cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
+                                cloud_point['etw_lbs'] = ETW
+                                cloud_point['rated_hp'] = rated_hp
+                                cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp
+                                cloud_point['vehicle_mot_rated_kw'] = vehicle.motor_kw
+                                cloud_point['rlhp20'] = rlhp20
+                                cloud_point['rlhp60'] = rlhp60
 
                             cloud_points.append(cloud_point)
 
@@ -492,8 +496,10 @@ class CostCloud(OMEGABase, CostCloudBase):
         # print('done %.2f %d' % ((time.time() - start_time), search_iterations))
         # print('done %.2f' % (time.time() - start_time))
 
-        # if vehicle.model_year == 2020:
-        #     cost_cloud.to_csv(omega_globals.options.output_folder + '%s_%s_cost_cloud.csv' % (vehicle.model_year, vehicle.name.replace(':','-')))
+        if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
+                omega_globals.options.log_vehicle_cloud_years == 'all':
+            with open(omega_globals.options.output_folder + 'cost_clouds_%s.csv' % vehicle.powertrain_type, 'a') as f:
+                cost_cloud.to_csv(f, mode='a', header=not f.tell(), columns=sorted(cost_cloud.columns), index=False)
 
         return cost_cloud
 

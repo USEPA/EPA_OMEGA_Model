@@ -1044,6 +1044,10 @@ class OMEGASessionObject(OMEGABase):
             self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
             true_false_dict)
 
+        self.settings.log_vehicle_cloud_years = \
+            self.read_parameter('Log Vehicle Cloud Years',
+                                self.settings.log_vehicle_cloud_years)
+
         self.settings.log_consumer_iteration_years = \
             self.read_parameter('Log Consumer Iteration Years',
                                 self.settings.log_consumer_iteration_years)
