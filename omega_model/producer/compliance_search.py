@@ -554,40 +554,18 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
         start_time = time.time()
 
-        if False and omega_globals.options.multiprocessing:
-            results = []
-            results.append(omega_globals.pool.apply_async(func=create_tech_sweeps,
-                                                          args=[composite_vehicles, candidate_production_decisions,
-                                                                share_range],
-                                                          callback=None,
-                                                          error_callback=None))
+        tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
+        # print('tech_sweeps time %f' % (time.time() - start_time))
 
-            results.append(omega_globals.pool.apply_async(func=create_share_sweeps,
-                                                          args=[calendar_year, market_class_tree,
-                                                                candidate_production_decisions, share_range,
-                                                                producer_decision_and_response],
-                                                          callback=None,
-                                                          error_callback=None))
+        start_time = time.time()
+        share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
+                                           candidate_production_decisions, share_range,
+                                           producer_decision_and_response)
+        # print('share_sweeps time %f' % (time.time() - start_time))
 
-            while not all([r.ready() for r in results]):
-                time.sleep(0.1)
-
-            tech_and_share_sweeps = cartesian_prod(results[0].get(), results[1].get())
-
-        else:
-            start_time = time.time()
-            tech_sweeps = create_tech_sweeps(composite_vehicles, candidate_production_decisions, share_range)
-            # print('tech_sweeps time %f' % (time.time() - start_time))
-
-            start_time = time.time()
-            share_sweeps = create_share_sweeps(calendar_year, market_class_tree,
-                                               candidate_production_decisions, share_range,
-                                               producer_decision_and_response)
-            # print('share_sweeps time %f' % (time.time() - start_time))
-
-            start_time = time.time()
-            tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
-            # print('cartesian_prod time %f' % (time.time() - start_time))
+        start_time = time.time()
+        tech_and_share_sweeps = cartesian_prod(tech_sweeps, share_sweeps)
+        # print('cartesian_prod time %f' % (time.time() - start_time))
 
         # print('tech_and_share_sweeps Time %f' % (time.time() - start_time))
 
