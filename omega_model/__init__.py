@@ -184,7 +184,7 @@ try:
             self.producer_compliance_search_convergence_factor = 0.5
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
-            self.run_profiler = True
+            self.run_profiler = False
             self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.flat_context = False
             self.flat_context_year = 2021

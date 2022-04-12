@@ -211,12 +211,12 @@ class CostCloud(OMEGABase, CostCloudBase):
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
 
-                    rse_tuple = (sorted(rse_columns), df[sorted(rse_columns)].apply(tuple, axis=1))
+                    rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 
                     _cache[powertrain_type][cost_curve_class]['rse_names'] = rse_tuple[0]
 
                     _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
-                        str(rse_tuple[1][0]).replace("'", '')
+                        str(rse_tuple[1]).replace("'", '')
 
                     _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
 
@@ -273,12 +273,12 @@ class CostCloud(OMEGABase, CostCloudBase):
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
 
-                    rse_tuple = (sorted(rse_columns), df[sorted(rse_columns)].apply(tuple, axis=1))
+                    rse_tuple = (sorted(rse_columns), tuple(class_cloud[sorted(rse_columns)]))
 
                     _cache[powertrain_type][cost_curve_class]['rse_names'] = rse_tuple[0]
 
                     _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
-                        str(rse_tuple[1][0]).replace("'", '')
+                        str(rse_tuple[1]).replace("'", '')
 
                     _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
 
@@ -374,6 +374,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                         for rlhp60 in rlhp60s:
                             cloud_point = copy.copy(tech_flags) # cost_curve_classes[ccc]['tech_flags'].to_dict()
 
+                            _cloud_point = dict()
+
                             # ------------------------------------------------------------------------------------#
                             # size components ...
                             if vehicle.powertrain_type == 'ICE':
@@ -420,16 +422,27 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'],
                                 #           {}, {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
-                                #
-                                for rse_name in cost_curve_classes[ccc]['rse']:
-                                    cloud_point[rse_name] = \
-                                        eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {},
-                                             {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
 
-                                # cloud_point.update(zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
+                                # for rse_name in sorted(cost_curve_classes[ccc]['rse']):
+                                #     _cloud_point[rse_name] = \
+                                #         eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {},
+                                #              {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
+                                #     # print(rse_name, _cloud_point[rse_name])
+
+                                cloud_point.update(zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
+                                                       Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'], {},
+                                                                 {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60,
+                                                                  'HP_ETW': HP_ETW})))
+
+                                # for rse_name in sorted(cost_curve_classes[ccc]['rse']):
+                                #     # print(rse_name, cloud_point[rse_name])
+                                #     if cloud_point[rse_name] != _cloud_point[rse_name]:
+                                #         print('wtf??')
+
+                                # foo = zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
                                 #                        Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'], {},
                                 #                                  {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60,
-                                #                                   'HP_ETW': HP_ETW})))
+                                #                                   'HP_ETW': HP_ETW}))
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':
