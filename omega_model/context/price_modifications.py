@@ -64,6 +64,8 @@ class PriceModifications(OMEGABase):
     """
     _data = pd.DataFrame()  #: holds the price modification data
 
+    _cache = dict()
+
     @staticmethod
     def get_price_modification(calendar_year, market_class_id):
         """
@@ -77,18 +79,23 @@ class PriceModifications(OMEGABase):
             The requested price modification, or 0 if there is none.
 
         """
-        price_modification = 0
+        cache_key = (calendar_year, market_class_id)
 
-        start_years = PriceModifications._data['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
+        if cache_key not in PriceModifications._cache:
+            price_modification = 0
 
-            mod_key = '%s:%s' % (market_class_id, price_modification_str)
-            if mod_key in PriceModifications._data:
-                price_modification = PriceModifications._data['%s:%s' % (market_class_id, price_modification_str)].loc[
-                    PriceModifications._data['start_year'] == calendar_year].item()
+            start_years = PriceModifications._data['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
 
-        return price_modification
+                mod_key = '%s:%s' % (market_class_id, price_modification_str)
+                if mod_key in PriceModifications._data:
+                    price_modification = PriceModifications._data['%s:%s' % (market_class_id, price_modification_str)].loc[
+                        PriceModifications._data['start_year'] == calendar_year].item()
+
+            PriceModifications._cache[cache_key] = price_modification
+
+        return PriceModifications._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -107,6 +114,8 @@ class PriceModifications(OMEGABase):
         import numpy as np
 
         PriceModifications._data = pd.DataFrame()
+
+        PriceModifications._cache.clear()
 
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)

@@ -72,14 +72,20 @@ class CostFactorsCongestionNoise(OMEGABase):
             Cost factor or list of cost factors
 
         """
-        factors = []
-        for cf in cost_factors:
-            factors.append(CostFactorsCongestionNoise._data[reg_class_id][cf])
+        cache_key = (reg_class_id, cost_factors)
 
-        if len(cost_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+        if cache_key not in CostFactorsCongestionNoise._data:
+
+            factors = []
+            for cf in cost_factors:
+                factors.append(CostFactorsCongestionNoise._data[reg_class_id][cf])
+
+            if len(cost_factors) == 1:
+                CostFactorsCongestionNoise._data[cache_key] = factors[0]
+            else:
+                CostFactorsCongestionNoise._data[cache_key] = factors
+
+        return CostFactorsCongestionNoise._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

@@ -73,7 +73,12 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             The requested generalized cost attributes.
 
         """
-        return [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
+        cache_key = (market_class_id, attribute_types)
+
+        if cache_key not in ProducerGeneralizedCost._data:
+            ProducerGeneralizedCost._data[cache_key] = [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
+
+        return ProducerGeneralizedCost._data[cache_key]
 
     @staticmethod
     def calc_generalized_cost(vehicle, cost_cloud, co2_name, kwh_name, cost_name):
@@ -97,7 +102,7 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
 
         producer_generalized_cost_fuel_years, producer_generalized_cost_annual_vmt = \
             ProducerGeneralizedCost. \
-                get_producer_generalized_cost_attributes(vehicle.market_class_id, ['fuel_years', 'annual_vmt'])
+                get_producer_generalized_cost_attributes(vehicle.market_class_id, ('fuel_years', 'annual_vmt'))
 
         # cost_cloud = vehicle.cost_cloud
         vehicle_cost = cost_cloud[cost_name]

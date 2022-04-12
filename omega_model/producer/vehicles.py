@@ -71,6 +71,10 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
+from policy.drive_cycle_weights import DriveCycleWeights
+from policy.offcycle_credits import OffCycleCredits
+from policy.upstream_methods import UpstreamMethods
+
 
 class DecompositionAttributes(OMEGABase):
     """
@@ -863,10 +867,6 @@ class Vehicle(OMEGABase):
         Returns:
 
         """
-        from policy.drive_cycle_weights import DriveCycleWeights
-        from policy.offcycle_credits import OffCycleCredits
-        from policy.upstream_methods import UpstreamMethods
-
         if self.fueling_class != 'BEV':
             cloud['cert_direct_oncycle_co2e_grams_per_mile'] = \
                 DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(self.model_year, self.fueling_class,

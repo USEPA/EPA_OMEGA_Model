@@ -86,7 +86,7 @@ class PowertrainCost(OMEGABase):
         learning_factor_ice = ((cumulative_sales_ice + legacy_sales_scaler_ice) / legacy_sales_scaler_ice) ** learning_rate
         learning_factor_pev = ((cumulative_sales_pev + legacy_sales_scaler_pev) / legacy_sales_scaler_pev) ** learning_rate
 
-        weight_bins = [0, 3200, 3800, 4400, 5000, 5600, 6200, 14000]
+        weight_bins = (0, 3200, 3800, 4400, 5000, 5600, 6200, 14000)
         tractive_motor = 'dual'
         if (market_class_id.__contains__('non_hauling') and vehicle.drive_system < 4) or powertrain_type == 'HEV':
             tractive_motor = 'single'

@@ -96,23 +96,28 @@ class FuelPrice(OMEGABase):
 
         """
 
-        if omega_globals.options.flat_context:
-            calendar_year = omega_globals.options.flat_context_year
+        cache_key = (calendar_year, price_types, fuel_id)
 
-        if type(price_types) is not list:
-            price_types = [price_types]
+        if cache_key not in FuelPrice._data:
+            if omega_globals.options.flat_context:
+                calendar_year = omega_globals.options.flat_context_year
 
-        prices = []
-        for pt in price_types:
-            prices.append(FuelPrice._data[omega_globals.options.context_id,
-                                          omega_globals.options.context_case_id,
-                                          fuel_id,
-                                          calendar_year][pt])
+            if type(price_types) is not list:
+                price_types = [price_types]
 
-        if len(prices) == 1:
-            return prices[0]
-        else:
-            return prices
+            prices = []
+            for pt in price_types:
+                prices.append(FuelPrice._data[omega_globals.options.context_id,
+                                              omega_globals.options.context_case_id,
+                                              fuel_id,
+                                              calendar_year][pt])
+
+            if len(prices) == 1:
+                FuelPrice._data[cache_key] = prices[0]
+            else:
+                FuelPrice._data[cache_key] = prices
+
+        return FuelPrice._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):

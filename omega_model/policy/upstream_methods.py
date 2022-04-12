@@ -44,6 +44,7 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
+from policy.policy_fuels import PolicyFuel
 
 
 def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
@@ -79,9 +80,6 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
         Upstream cert emissions based on kWh/mi relative to an ICE vehicle with the same target emissions
 
     """
-    from policy.policy_fuels import PolicyFuel
-    import numpy as np
-
     if vehicle.fueling_class == 'BEV':
         upstream_gco2_per_kwh = \
             PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2e_grams_per_unit')
@@ -119,8 +117,6 @@ def upstream_actual(vehicle, co2_grams_per_mile, kwh_per_mile):
         Upstream cert emissions based on cert direct kWh/mi and CO2e g/mi
 
     """
-    from policy.policy_fuels import PolicyFuel
-
     upstream_gco2_per_kwh = \
         PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2e_grams_per_unit')
 

@@ -121,8 +121,8 @@ def get_energysecurity_cf(calendar_year):
     """
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
-    cost_factors = ['oil_import_reduction_as_percent_of_total_oil_demand_reduction',
-                    ]
+    cost_factors = ('oil_import_reduction_as_percent_of_total_oil_demand_reduction',
+                    )
 
     return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
 

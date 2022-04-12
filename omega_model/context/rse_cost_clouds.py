@@ -211,8 +211,12 @@ class CostCloud(OMEGABase, CostCloudBase):
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
 
-                    # _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
-                    #     (rse_columns, df[rse_columns].apply(tuple, axis=1))
+                    rse_tuple = (sorted(rse_columns), df[sorted(rse_columns)].apply(tuple, axis=1))
+
+                    _cache[powertrain_type][cost_curve_class]['rse_names'] = rse_tuple[0]
+
+                    _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
+                        str(rse_tuple[1][0]).replace("'", '')
 
                     _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
 
@@ -227,6 +231,8 @@ class CostCloud(OMEGABase, CostCloudBase):
                                   'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
                                   'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
                                   'diesel_fuel'}
+
+        powertrain_type = 'BEV'
 
         # input_template_columns = input_template_columns.union(OffCycleCredits.offcycle_credit_names)
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
@@ -255,22 +261,26 @@ class CostCloud(OMEGABase, CostCloudBase):
                 non_data_columns = list(rse_columns) + ['cost_curve_class']
                 CostCloud.cost_cloud_data_columns = df.columns.drop(non_data_columns)
 
-                _cache['BEV'] = dict()
+                _cache[powertrain_type] = dict()
 
                 # convert cost clouds into curves and set up cost_curves table...
                 cost_curve_classes = df['cost_curve_class'].unique()
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache['BEV'][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
+                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
 
                     for c in rse_columns:
-                        _cache['BEV'][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
+                        _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
 
-                    # _cache['BEV'][cost_curve_class]['rse_tuple'] = \
-                    #     (rse_columns, df[rse_columns].apply(tuple, axis=1).values)
+                    rse_tuple = (sorted(rse_columns), df[sorted(rse_columns)].apply(tuple, axis=1))
 
-                    _cache['BEV'][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
+                    _cache[powertrain_type][cost_curve_class]['rse_names'] = rse_tuple[0]
+
+                    _cache[powertrain_type][cost_curve_class]['rse_tuple'] = \
+                        str(rse_tuple[1][0]).replace("'", '')
+
+                    _cache[powertrain_type][cost_curve_class]['tech_flags'] = class_cloud[CostCloud.cost_cloud_data_columns]
 
         return template_errors
 
@@ -338,10 +348,10 @@ class CostCloud(OMEGABase, CostCloudBase):
             calc_roadload_hp(vehicle.target_coef_a, vehicle.target_coef_b, vehicle.target_coef_c, 60)
 
         # sweep vehicle params (for now, final ranges TBD)
-        rlhp20s = [vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05]
-        rlhp60s = [vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05]
+        rlhp20s = (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
+        rlhp60s = (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
 
-        vehicle_footprints = [vehicle.footprint_ft2 * 0.95, vehicle.footprint_ft2, vehicle.footprint_ft2 * 1.05]
+        vehicle_footprints = (vehicle.footprint_ft2 * 0.95, vehicle.footprint_ft2, vehicle.footprint_ft2 * 1.05)
 
         cost_cloud = pd.DataFrame()
 
@@ -353,15 +363,16 @@ class CostCloud(OMEGABase, CostCloudBase):
         search_iterations = 0
 
         for ccc in cost_curve_classes:
+            tech_flags = cost_curve_classes[ccc]['tech_flags'].to_dict()
+            # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
+            tech_flags['ac_leakage'] = 1
+            tech_flags['ac_efficiency'] = 1
+
             for structure_material in MassScaling.structure_materials:
                 for footprint_ft2 in vehicle_footprints:
                     for rlhp20 in rlhp20s:
                         for rlhp60 in rlhp60s:
-                            cloud_point = cost_curve_classes[ccc]['tech_flags'].to_dict()
-
-                            # TODO: we need to deal with these properly, right now they are automatic in the powertrain cost...
-                            cloud_point['ac_leakage'] = 1
-                            cloud_point['ac_efficiency'] = 1
+                            cloud_point = copy.copy(tech_flags) # cost_curve_classes[ccc]['tech_flags'].to_dict()
 
                             # ------------------------------------------------------------------------------------#
                             # size components ...
@@ -407,13 +418,18 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 RLHP60 = rlhp60 / ETW
                                 HP_ETW = rated_hp / ETW
 
-                                # Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'][1][0][0],
+                                # Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'],
                                 #           {}, {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
-
+                                #
                                 for rse_name in cost_curve_classes[ccc]['rse']:
                                     cloud_point[rse_name] = \
                                         eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {},
                                              {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
+
+                                # cloud_point.update(zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
+                                #                        Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'], {},
+                                #                                  {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60,
+                                #                                   'HP_ETW': HP_ETW})))
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':

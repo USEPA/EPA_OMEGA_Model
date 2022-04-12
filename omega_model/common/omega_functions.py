@@ -143,11 +143,14 @@ def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
     if not np.isinf(min_frontier_factor):
         if len(cloud[cloud['frontier_factor'].values == min_frontier_factor]) > 1:
             # if multiple points with the same slope, take the one with the highest x-value
-            idxmin = cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].idxmax()
+            # idxmin = cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].idxmax()
+            idxmin = cloud.index[np.argmax(cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].values)]
         else:
-            idxmin = cloud['frontier_factor'].idxmin()
+            # idxmin = cloud['frontier_factor'].idxmin()
+            idxmin = cloud.index[np.argmin(cloud['frontier_factor'])]
     else:
-        idxmin = cloud['frontier_factor'].idxmax()
+        # idxmin = cloud['frontier_factor'].idxmax()
+        idxmin = cloud.index[np.argmax(cloud['frontier_factor'].values)]
 
     return idxmin
 

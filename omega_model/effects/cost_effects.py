@@ -24,7 +24,7 @@ def get_scc_cf(calendar_year):
     """
     from effects.cost_factors_scc import CostFactorsSCC
 
-    cost_factors = ['co2_global_5.0_USD_per_metricton',
+    cost_factors = ('co2_global_5.0_USD_per_metricton',
                     'co2_global_3.0_USD_per_metricton',
                     'co2_global_2.5_USD_per_metricton',
                     'co2_global_3.95_USD_per_metricton',
@@ -36,7 +36,7 @@ def get_scc_cf(calendar_year):
                     'n2o_global_3.0_USD_per_metricton',
                     'n2o_global_2.5_USD_per_metricton',
                     'n2o_global_3.95_USD_per_metricton',
-                    ]
+                    )
 
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
@@ -55,7 +55,7 @@ def get_criteria_cf(calendar_year):
     """
     from effects.cost_factors_criteria import CostFactorsCriteria
 
-    cost_factors = ['pm25_tailpipe_3.0_USD_per_uston',
+    cost_factors = ('pm25_tailpipe_3.0_USD_per_uston',
                     'pm25_upstream_3.0_USD_per_uston',
                     'nox_tailpipe_3.0_USD_per_uston',
                     'nox_upstream_3.0_USD_per_uston',
@@ -67,7 +67,7 @@ def get_criteria_cf(calendar_year):
                     'nox_upstream_7.0_USD_per_uston',
                     'so2_tailpipe_7.0_USD_per_uston',
                     'so2_upstream_7.0_USD_per_uston',
-                    ]
+                    )
 
     return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
 
@@ -85,8 +85,8 @@ def get_energysecurity_cf(calendar_year):
     """
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
-    cost_factors = ['dollars_per_bbl',
-                    ]
+    cost_factors = ('dollars_per_bbl',
+                    )
 
     return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
 
@@ -104,9 +104,9 @@ def get_congestion_noise_cf(reg_class_id):
     """
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
 
-    cost_factors = ['congestion_cost_dollars_per_mile',
+    cost_factors = ('congestion_cost_dollars_per_mile',
                     'noise_cost_dollars_per_mile',
-                    ]
+                    )
 
     return CostFactorsCongestionNoise.get_cost_factors(reg_class_id, cost_factors)
 

@@ -110,13 +110,19 @@ class SalesShare(OMEGABase, SalesShareBase):
             GCAM parameters for the given calendar year and market class
 
         """
-        start_years = SalesShare._data[market_class_id]['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
+        cache_key = (calendar_year, market_class_id)
 
-            return SalesShare._data[market_class_id, calendar_year]
-        else:
-            raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
+        if cache_key not in SalesShare._data:
+
+            start_years = SalesShare._data[market_class_id]['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
+
+                SalesShare._data[cache_key] = SalesShare._data[market_class_id, calendar_year]
+            else:
+                raise Exception('Missing GCAM parameters for %s, %d or prior' % (market_class_id, calendar_year))
+
+        return SalesShare._data[cache_key]
 
     @staticmethod
     def calc_shares_gcam(producer_decision, market_class_data, calendar_year,

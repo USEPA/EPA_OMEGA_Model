@@ -70,62 +70,6 @@ class MassScaling(OMEGABase):
     # drive_cycle_names = []  #: list of available drive cycles (may not all be used, depends on the simulated vehicles data)
 
     @staticmethod
-    def calc_mass_terms_old(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2):
-        """
-            Calculate struture mass, battery mass and powertrain mass for the given vehicle
-        Args:
-            vehicle (Vehicle):
-
-        Returns:
-            tuple of structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs, \
-               and usable_battery_capacity_norm for the given vehicle
-
-        """
-        null_structure_mass_lbs = 0
-        structure_mass_lbs = 0
-        battery_mass_lbs = 0
-        powertrain_mass_lbs = 0
-        delta_glider_non_structure_mass_lbs = 0
-        usable_battery_capacity_norm = 0
-
-        locals_dict = locals()
-        for condition, equation in zip(MassScaling._data['null_structure_mass_lbs']['condition'],
-                                       MassScaling._data['null_structure_mass_lbs']['equation']):
-            null_structure_mass_lbs += Eval.eval('(%s)*(%s)' % (condition, equation), {}, locals_dict)
-
-        locals_dict = locals()
-        for condition, equation in zip(MassScaling._data['structure_mass_lbs']['condition'],
-                                       MassScaling._data['structure_mass_lbs']['equation']):
-            structure_mass_lbs += Eval.eval('(%s)*(%s)' % (condition, equation), {}, locals_dict)
-
-        locals_dict = locals()
-        for condition, equation in zip(MassScaling._data['battery_mass_lbs']['condition'],
-                                       MassScaling._data['battery_mass_lbs']['equation']):
-            battery_mass_lbs += Eval.eval('(%s)*(%s)' % (condition, equation), {}, locals_dict)
-
-        locals_dict = locals()
-        for condition, equation in zip(MassScaling._data['powertrain_mass_lbs']['condition'],
-                                       MassScaling._data['powertrain_mass_lbs']['equation']):
-            powertrain_mass_lbs += Eval.eval('(%s)*(%s)' % (condition, equation), {}, locals_dict)
-
-        delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
-        locals_dict = locals()
-        for condition, equation in zip(MassScaling._data['delta_glider_non_structure_mass_lbs']['condition'],
-                                       MassScaling._data['delta_glider_non_structure_mass_lbs']['equation']):
-            delta_glider_non_structure_mass_lbs += Eval.eval('(%s)*(%s)' % (condition, equation), {}, locals_dict)
-
-        locals_dict = locals()
-        for condition, equation in zip(MassScaling._data['usable_battery_capacity_norm']['condition'],
-                                       MassScaling._data['usable_battery_capacity_norm']['equation']):
-            usable_battery_capacity_norm += Eval.eval('(%s)*(%s)' % (condition, equation), {}, locals_dict)
-
-        usable_battery_capacity_norm += (usable_battery_capacity_norm == 0)  # zeros -> 1.0s by default
-
-        return structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, delta_glider_non_structure_mass_lbs, \
-               usable_battery_capacity_norm
-
-
-    @staticmethod
     def calc_mass_terms(vehicle, structure_material, eng_rated_hp, battery_kwh, footprint_ft2):
         """
             Calculate struture mass, battery mass and powertrain mass for the given vehicle
@@ -144,57 +88,31 @@ class MassScaling(OMEGABase):
         delta_glider_non_structure_mass_lbs = 0
         usable_battery_capacity_norm = 0
 
-        if type(structure_material) == str:
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['null_structure_mass_lbs']['condition_equation']:
-                null_structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
+        delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
 
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['structure_mass_lbs']['condition_equation']:
-                structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
+        locals_dict = locals()
+        for condition_equation in MassScaling._data['null_structure_mass_lbs']['condition_equation']:
+            null_structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
 
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['battery_mass_lbs']['condition_equation']:
-                battery_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
+        locals_dict = locals()
+        for condition_equation in MassScaling._data['structure_mass_lbs']['condition_equation']:
+            structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
 
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['powertrain_mass_lbs']['condition_equation']:
-                powertrain_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
+        # locals_dict = locals()
+        for condition_equation in MassScaling._data['battery_mass_lbs']['condition_equation']:
+            battery_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
 
-            delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['delta_glider_non_structure_mass_lbs']['condition_equation']:
-                delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
+        # locals_dict = locals()
+        for condition_equation in MassScaling._data['powertrain_mass_lbs']['condition_equation']:
+            powertrain_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
 
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['usable_battery_capacity_norm']['condition_equation']:
-                usable_battery_capacity_norm += Eval.eval(condition_equation, {}, locals_dict)
+        # locals_dict = locals()
+        for condition_equation in MassScaling._data['delta_glider_non_structure_mass_lbs']['condition_equation']:
+            delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict)
 
-        else:
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['null_structure_mass_lbs']['condition_equation']:
-                null_structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict).values
-
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['structure_mass_lbs']['condition_equation']:
-                structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict).values
-
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['battery_mass_lbs']['condition_equation']:
-                battery_mass_lbs += Eval.eval(condition_equation, {}, locals_dict).values
-
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['powertrain_mass_lbs']['condition_equation']:
-                powertrain_mass_lbs += Eval.eval(condition_equation, {}, locals_dict).values
-
-            delta_footprint = footprint_ft2 - vehicle.base_year_footprint_ft2
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['delta_glider_non_structure_mass_lbs']['condition_equation']:
-                delta_glider_non_structure_mass_lbs += Eval.eval(condition_equation, {}, locals_dict).values
-
-            locals_dict = locals()
-            for condition_equation in MassScaling._data['usable_battery_capacity_norm']['condition_equation']:
-                usable_battery_capacity_norm += Eval.eval(condition_equation, {}, locals_dict).values
+        # locals_dict = locals()
+        for condition_equation in MassScaling._data['usable_battery_capacity_norm']['condition_equation']:
+            usable_battery_capacity_norm += Eval.eval(condition_equation, {}, locals_dict)
 
         usable_battery_capacity_norm += (usable_battery_capacity_norm == 0)  # zeros -> 1.0s by default
 

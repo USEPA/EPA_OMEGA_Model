@@ -54,6 +54,8 @@ class CostFactorsCriteria(OMEGABase):
     """
     _data = dict()  # private dict, cost factors criteria by calendar year
 
+    _cache = dict()
+
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
@@ -68,17 +70,23 @@ class CostFactorsCriteria(OMEGABase):
             Cost factor or list of cost factors
 
         """
-        calendar_years = CostFactorsCriteria._data.keys()
-        year = max([yr for yr in calendar_years if yr <= calendar_year])
+        cache_key = (calendar_year, cost_factors)
 
-        factors = []
-        for cf in cost_factors:
-            factors.append(CostFactorsCriteria._data[year][cf])
+        if cache_key not in CostFactorsCriteria._cache:
 
-        if len(cost_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            calendar_years = CostFactorsCriteria._data.keys()
+            year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+            factors = []
+            for cf in cost_factors:
+                factors.append(CostFactorsCriteria._data[year][cf])
+
+            if len(cost_factors) == 1:
+                CostFactorsCriteria._cache[cache_key] = factors[0]
+            else:
+                CostFactorsCriteria._cache[cache_key] = factors
+
+        return CostFactorsCriteria._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -95,6 +103,8 @@ class CostFactorsCriteria(OMEGABase):
 
         """
         CostFactorsCriteria._data.clear()
+
+        CostFactorsCriteria._cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename} ...')

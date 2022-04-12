@@ -53,6 +53,8 @@ class CostFactorsEnergySecurity(OMEGABase):
     """
     _data = dict()
 
+    _cache = dict()
+
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
@@ -67,17 +69,23 @@ class CostFactorsEnergySecurity(OMEGABase):
             Cost factor or list of cost factors
 
         """
-        calendar_years = CostFactorsEnergySecurity._data.keys()
-        year = max([yr for yr in calendar_years if yr <= calendar_year])
+        cache_key = (calendar_year, cost_factors)
 
-        factors = []
-        for cf in cost_factors:
-            factors.append(CostFactorsEnergySecurity._data[year][cf])
+        if cache_key not in CostFactorsEnergySecurity._cache:
 
-        if len(cost_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            calendar_years = CostFactorsEnergySecurity._data.keys()
+            year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+            factors = []
+            for cf in cost_factors:
+                factors.append(CostFactorsEnergySecurity._data[year][cf])
+
+            if len(cost_factors) == 1:
+                CostFactorsEnergySecurity._cache[cache_key] = factors[0]
+            else:
+                CostFactorsEnergySecurity._cache[cache_key] = factors
+
+        return CostFactorsEnergySecurity._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -94,6 +102,7 @@ class CostFactorsEnergySecurity(OMEGABase):
 
         """
         CostFactorsEnergySecurity._data.clear()
+        CostFactorsEnergySecurity._cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
