@@ -29,9 +29,9 @@ def movecol(df, cols_to_move=[], ref_cols='', place='After'):
 
 start_time = datetime.now()
 working_directory = str(Path.home()) + '/Documents/Python/Edmunds_web_vehicle_specs/'
-run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2019.csv')
+run_controller = pd.read_csv(working_directory+'Edmunds Run Controller-2021.csv')
 start_count = 0 #Set to 0 when time permits
-final_table_to_csv_inc = 30 # print final_table csv file at the final_table_to_csv_inc increments
+final_table_to_csv_inc = 20 # print final_table csv file at the final_table_to_csv_inc increments
 # cols_safety = ["DUAL FRONT SIDE-MOUNTED AIRBAGS", "DUAL FRONT WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
 #                 "DUAL FRONT AND DUAL REAR SIDE-MOUNTED AIRBAGS",
 #                 "DUAL FRONT AND DUAL REAR WITH HEAD PROTECTION CHAMBERS SIDE-MOUNTED AIRBAGS",
