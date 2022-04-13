@@ -141,8 +141,8 @@ class FuelPrice(OMEGABase):
         # don't forget to update the module docstring with changes here
         input_template_name = 'context_fuel_prices'
         input_template_version = 0.2
-        input_template_columns = {'context_id', 'dollar_basis', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
-                                  'pretax_dollars_per_unit'}
+        input_template_columns = {'context_id', 'dollar_basis', 'case_id', 'fuel_id', 'calendar_year',
+                                  'retail_dollars_per_unit', 'pretax_dollars_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
