@@ -200,7 +200,6 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-
         cache_key = calendar_year, fueling_class
 
         if cache_key not in DriveCycleWeights._data:

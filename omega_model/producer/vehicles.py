@@ -649,7 +649,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
-                       'battery_kwh', 'motor_kw'}
+                       'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'}
 
     # transfer base properties
     for attr in base_properties:
@@ -762,6 +762,7 @@ class Vehicle(OMEGABase):
         self.base_year_msrp_dollars = 0
         self.battery_kwh = 0
         self.motor_kw = 0
+        self.charge_depleting_range_mi = 0
 
         # additional attriutes are added dynamically and may vary based on user inputs (such as off-cycle credits)
         for ccv in DecompositionAttributes.values:
@@ -1055,6 +1056,7 @@ class VehicleFinal(SQABase, Vehicle):
     powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
     battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
     motor_kw = Column(Float)  #: vehicle propulsion motor(s) total power, kW
+    charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
@@ -1070,13 +1072,14 @@ class VehicleFinal(SQABase, Vehicle):
     compliance_ids = set()  #: the set of compliance IDs (manufacturer IDs or 'consolidated_OEM')
     mfr_base_year_size_class_share = dict()  #: dict of base year context size class market share by compliance ID and size class, used to project future vehicle sales based on the context
 
+    # these are used to validate vehicles.csv:
     mandatory_input_template_columns = {'vehicle_name', 'manufacturer_id', 'model_year', 'reg_class_id',
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
                                    'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style', 'msrp_dollars',
                                    'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
-                                    # TODO: 'battery_kwh', 'motor_kw'
+                                    # TODO: 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
     dynamic_attributes = []  #: list of dynamic attribute names, from dynamic_columns
@@ -1283,6 +1286,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
+                charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
             )
 
             for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
@@ -1380,8 +1384,9 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.name = 'BEV of ' + v.name
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
-                alt_veh.battery_kwh = 60
-                alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)
+                alt_veh.battery_kwh = 60  # TODO: do we need this?  it gets set in the cloud search
+                alt_veh.motor_kw = 150 + 100 * (v.drive_system == 4)  # TODO: where does power come from?
+                alt_veh.charge_depleting_range_mi = 300  # TODO: where does 300 come from?
                 alt_veh.eng_rated_hp = 0
                 alt_veh.eng_cyls_num = 0
                 alt_veh.eng_disp_liters = 0
@@ -1392,8 +1397,9 @@ class VehicleFinal(SQABase, Vehicle):
                 alt_veh.name = 'ICE of ' + v.name
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"
-                alt_veh.eng_rated_hp = v.motor_kw * 1.34102
+                alt_veh.eng_rated_hp = v.motor_kw * 1.34102  # TODO: where does power come from?
                 alt_veh.motor_kw = 0
+                alt_veh.charge_depleting_range_mi = 0
                 alt_veh.battery_kwh = 0
                 alt_veh.eng_cyls_num = None
                 alt_veh.eng_disp_liters = None

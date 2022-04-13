@@ -328,17 +328,18 @@ class VehicleAggregation(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            powertrain_type_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
-
             # new columns calculated here for every vehicle in vehicles.csv:
             df['glider_non_structure_cost_dollars'] = 0
             df['glider_non_structure_mass_lbs'] = 0
 
             # fill in missing values
             df['ground_clearance_in'] = df['ground_clearance_in'].fillna(6.6) # dummy value, sales-weighted
+
             df['height_in'] = df['height_in'].fillna(62.4)  # dummy value, sales-weighted
 
-            df['powertrain_type'] = [powertrain_type_dict[ec] for ec in df['electrification_class']]
+            df['powertrain_type'] = df['electrification_class'].\
+                replace({'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'})
+
             df['battery_kwh'] = df[['powertrain_type']].\
                 replace({'powertrain_type': {'HEV': 1, 'PHEV': 18, 'BEV': 60, 'ICE': 0}})
 
@@ -346,19 +347,18 @@ class VehicleAggregation(OMEGABase):
                 replace({'powertrain_type': {'HEV': 20, 'PHEV': 50, 'BEV': 150 + (100 * (df['drive_system'] == 4)),
                                              'ICE': 0}})
 
+            df['charge_depleting_range_mi'] = df[['powertrain_type']].\
+                replace({'powertrain_type': {'HEV': 0, 'PHEV': 50, 'BEV': 300,
+                                             'ICE': 0}})
+
             # need to determine vehicle trans / techs
             df['cost_curve_class'] = 'TRX12'  # FOR NOW, NEED TO ADD TRX FLAGS TO THE VEHICLES.CSV
             df['engine_cylinders'] = df['eng_cyls_num']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
-            df['engine_displacement_L']= df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
+            df['engine_displacement_L'] = df['eng_disp_liters']  # MIGHT NEED TO RENAME THESE, ONE PLACE OR ANOTHER
 
             import time
             start_time = time.time()
             print('starting iterrows')
-
-            # these are the desired outputs of the loop:
-            # row['structure_mass_lbs']
-            # df['glider_non_structure_cost_dollars'] f(structure_mass_lbs, powertrain_cost)
-            # df['glider_non_structure_mass_lbs'] f(curbweight_lbs, powertrain_mass_lbs, strucure_mass_lbs, battery_mass_lbs)
 
             df['base_year_footprint_ft2'] = df['footprint_ft2']
 
@@ -366,9 +366,6 @@ class VehicleAggregation(OMEGABase):
             df['delta_glider_non_structure_mass_lbs'], df['usable_battery_capacity_norm'] = \
                 MassScaling.calc_mass_terms(df, df['structure_material'], df['eng_rated_hp'],
                                             df['battery_kwh'], df['footprint_ft2'])
-
-            # veh.model_year = df['model_year']
-            # veh.electrification_class = df['electrification_class']
 
             for idx, row in df.iterrows():
                 # calc powertrain cost

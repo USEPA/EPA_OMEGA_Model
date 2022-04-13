@@ -420,11 +420,11 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':
-                                    cloud_point = vehicle.calc_cert_values(cloud_point)  # TODO: should NOT pass in tech flags here... even though they get ignored...?
+                                    cloud_point = vehicle.calc_cert_values(cloud_point)
 
-                                    # TODO: get rid of hard-coded 300:
-                                    if cloud_point['cert_direct_oncycle_kwh_per_mile']:
-                                        battery_kwh = 300 * cloud_point['onroad_direct_kwh_per_mile'] / usable_battery_capacity_norm
+                                    battery_kwh = vehicle.charge_depleting_range_mi * \
+                                              cloud_point['onroad_direct_kwh_per_mile'] / \
+                                              usable_battery_capacity_norm
 
                                 # determine convergence ------------------------------------------------------------- #
                                 converged = abs(
