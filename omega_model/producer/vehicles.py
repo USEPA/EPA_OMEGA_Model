@@ -824,7 +824,7 @@ class Vehicle(OMEGABase):
             The onroad CO2e emission in grams per unit of onroad fuel, including refuel efficiency.
 
         """
-        cache_key = (self.vehicle_id, 'onroad_co2e_emissions_grams_per_unit')
+        cache_key = (self.vehicle_id, 'onroad_co2e_emissions_grams_per_unit', self.model_year)
 
         if cache_key not in self._cache:
 
