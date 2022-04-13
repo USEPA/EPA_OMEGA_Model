@@ -75,7 +75,7 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
-
+import math
 
 class SalesShare(OMEGABase, SalesShareBase):
     """
@@ -212,6 +212,69 @@ class SalesShare(OMEGABase, SalesShareBase):
                     market_class_data['consumer_abs_share_frac_%s' % market_class_id] = demanded_absolute_share
 
         return market_class_data.copy()
+
+    @staticmethod
+    def calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, vehicle_class):
+
+        # seeds need vehicle_power, curbweight and average_mpg attributes
+        class seed_data():
+            def __init__(self, vehicle_power, curbweight, average_mpg, share):
+                self.share = share
+                self.vehicle_power = vehicle_power
+                self.curbweight = curbweight
+                self.average_mpg = average_mpg
+
+        if vehicle_class == 'LDV':
+            seed1 = seed_data(150, 3500, 27, 0.5)  # vehicle_class data, year-1
+            seed2 = seed_data(150, 3500, 27, 0.5)  # vehicle_class data, year-2
+        else:
+            seed1 = seed_data(250, 5500, 17, 0.5)  # vehicle_class data, year-1
+            seed2 = seed_data(250, 5500, 17, 0.5)  # vehicle_class data, year-2
+
+        gasFP0 = 2.75  # FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
+        gasFP1 = 2.75  # FuelPrice.get_fuel_prices(calendar_year-1, 'retail_dollars_per_unit', 'pump gasoline')
+
+        LDV_constants = {'Constant': 3.4468,
+                         'Rho': 0.8903,
+                         'FP': 0.1441,
+                         'HP': -0.4436,
+                         'CW': -0.0994,
+                         'MPG': -0.5452,
+                         'Dummy': -0.1174,
+                         }
+
+        LDT_constants = {'Constant': 7.8932,
+                         'Rho': 0.3482,
+                         'FP': -0.469,
+                         'HP': 1.3607,
+                         'CW': -1.5664,
+                         'MPG': 0.0813,
+                         'Dummy': 0.6192,
+                         }
+
+        dfs_coeffs = pd.Series({'LDV': LDV_constants, 'LDT': LDT_constants}[vehicle_class])
+
+        share = (dfs_coeffs.Constant * (1 - dfs_coeffs.Rho) + dfs_coeffs.Rho * (math.log(seed1.share)) +
+                dfs_coeffs.FP * (math.log(gasFP0 * 100) - dfs_coeffs.Rho * math.log(gasFP1 * 100)) +
+                dfs_coeffs.HP * (math.log(seed1.vehicle_power) - dfs_coeffs.Rho * math.log(seed2.vehicle_power)) +
+                dfs_coeffs.CW * (math.log(seed1.curbweight) - dfs_coeffs.Rho * math.log(seed2.curbweight)) +
+                dfs_coeffs.MPG * (math.log(seed1.average_mpg) - dfs_coeffs.Rho * math.log(seed2.average_mpg)) +
+                dfs_coeffs.Dummy * (math.log(0.31554770318021) - dfs_coeffs.Rho * math.log(0.31554770318021))
+                )
+
+        print(math.exp(share))
+
+        return math.exp(share)
+
+    @staticmethod
+    def calc_shares_NEMS(producer_decision, market_class_data, prev_market_class_data, calendar_year):
+        pc_share = calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, 'LDV')
+        lt_share = calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, 'LDT')
+
+        pc_share = pc_share / (pc_share + lt_share)
+        lt_share = 1 - pc_share
+
+        return pc_share, lt_share
 
     @staticmethod
     def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
