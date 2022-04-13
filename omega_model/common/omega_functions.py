@@ -9,6 +9,11 @@
 
 """
 
+import sys
+import pandas as pd
+import numpy as np
+import common.omega_globals as omega_globals
+
 
 def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
     """
@@ -79,10 +84,6 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         Default affinity factor, no up-slope
 
     """
-
-    import numpy as np
-    import pandas as pd
-    import common.omega_globals as omega_globals
     cloud_non_numeric_columns = omega_globals.options.CostCloud.cloud_non_numeric_columns
 
     if len(cloud) > 1:
@@ -138,8 +139,6 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
 
 def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
-    import numpy as np
-
     if not np.isinf(min_frontier_factor):
         if len(cloud[cloud['frontier_factor'].values == min_frontier_factor]) > 1:
             # if multiple points with the same slope, take the one with the highest x-value
@@ -156,16 +155,12 @@ def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
 
 
 def calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
-    import common.omega_globals as omega_globals
-
     # frontier factor is different for up-slope (swap x & y and invert "y")
     cloud['frontier_factor'] = (prior_x - cloud[x_key].values) / (cloud[y_key].values - prior_y) \
                                ** omega_globals.options.cost_curve_frontier_affinity_factor
 
 
 def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
-    import common.omega_globals as omega_globals
-
     cloud['frontier_factor'] = (cloud[y_key].values - prior_y) / (cloud[x_key].values - prior_x) \
                                ** omega_globals.options.cost_curve_frontier_affinity_factor
     # find next frontier point (lowest slope), if there is one, and add to frontier list
@@ -218,7 +213,6 @@ def linspace(min, max, num_values):
         A list of evenly spaced values between min and max
 
     """
-    import numpy as np
     ans = np.arange(min, max + (max-min) / (num_values-1), (max-min) / (num_values-1))
     return ans[0:num_values]
 
@@ -250,10 +244,6 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
 
     """
-    import sys
-    import pandas as pd
-    import numpy as np
-
     cache_key = '%s_%s_%s_%s' % (column_names, num_levels, min_constraints, max_constraints)
 
     if cache_key not in partition_dict:
@@ -355,8 +345,6 @@ def unique(vector):
         List of unique values, in order of appearance
 
     """
-    import numpy as np
-
     indexes = np.unique(vector, return_index=True)[1]
     return [vector[index] for index in sorted(indexes)]
 
@@ -455,8 +443,6 @@ def cartesian_prod(left_df, right_df):
         the right dataframe).
 
     """
-    import pandas as pd
-
     if left_df.empty:
         return right_df
     else:
@@ -479,9 +465,6 @@ def _generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_lev
         Partition dataframe, with columns as specified, values near the initial values from combo.
 
     """
-    import numpy as np
-    import pandas as pd
-
     dfs = []
 
     for i in range(0, len(columns) - 1):
@@ -568,9 +551,6 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
         e.g. 0.00100000000000000002 versus 0.00100000000000000089
 
     """
-    import numpy as np
-    import pandas as pd
-
     dfs = []
 
     for i in range(0, len(columns) - 1):
@@ -609,8 +589,6 @@ def ASTM_round(var, precision=0):
         var rounded using ASTM method with precision decimal places in result
 
     """
-    import numpy as np
-
     scaled_var = var * (10 ** precision)
 
     z = np.remainder(scaled_var, 2)
@@ -638,8 +616,6 @@ def CityFUF(miles):
         City utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    import numpy as np
-
     miles_norm = miles/399
 
     return ASTM_round(1-np.exp(-(
@@ -667,9 +643,6 @@ def HighwayFUF(miles):
         Highway utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    import math
-    import numpy as np
-
     miles_norm = miles/399
 
     return ASTM_round(1-np.exp(-(
@@ -718,8 +691,6 @@ def calc_roadload_hp(A_LBSF, B_LBSF, C_LBSF, MPH):
 
 if __name__ == '__main__':
     try:
-        import pandas as pd
-
         # partition test
         part = partition(['a', 'b'], verbose=True)
 

@@ -353,14 +353,25 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         vehicle_footprints = (vehicle.footprint_ft2 * 0.95, vehicle.footprint_ft2, vehicle.footprint_ft2 * 1.05)
 
+        # convergence terms init
+        convergence_tolerance = 0.01
+        vehicle_ballast = DriveCycleBallast.get_ballast_lbs(vehicle)
+        battery_kwh = vehicle.battery_kwh  # for now...
+        motor_kw = vehicle.motor_kw  # for now...
+
+        if vehicle.powertrain_type == 'ICE':
+            rated_hp = vehicle.eng_rated_hp
+        elif vehicle.powertrain_type == 'BEV':
+            rated_hp = vehicle.motor_kw * 1.34102
+        else:  # HEVs / PHEVs... what to do about sizing...?
+            rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
+
         cost_cloud = pd.DataFrame()
 
         cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
                            # (faster than sequentially appending Series objects)
 
         cost_curve_classes = _cache[vehicle.fueling_class]
-
-        search_iterations = 0
 
         for ccc in cost_curve_classes:
             tech_flags = cost_curve_classes[ccc]['tech_flags'].to_dict()
@@ -377,72 +388,35 @@ class CostCloud(OMEGABase, CostCloudBase):
                             _cloud_point = dict()
 
                             # ------------------------------------------------------------------------------------#
-                            # size components ...
-                            if vehicle.powertrain_type == 'ICE':
-                                rated_hp = vehicle.eng_rated_hp
-                            elif vehicle.powertrain_type == 'BEV':
-                                rated_hp = vehicle.motor_kw * 1.34102
-                            else:  # HEVs / PHEVs... what to do about sizing...?
-                                rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
-
                             prior_powertrain_mass_lbs = 1
                             prior_rated_hp = 1
                             prior_battery_kwh = 1
-                            convergence_tolerance = 0.01
-
-                            battery_kwh = vehicle.battery_kwh  # for now...
-                            motor_kw = vehicle.motor_kw  # for now...
 
                             converged = False
                             while not converged:
-                                search_iterations += 1
-                                # print('.')
-
                                 # rated hp sizing --------------------------------------------------------------- #
                                 structure_mass_lbs, battery_mass_lbs, powertrain_mass_lbs, \
                                 delta_glider_non_structure_mass_lbs, usable_battery_capacity_norm = \
                                     MassScaling.calc_mass_terms(vehicle, structure_material, rated_hp,
                                                                 battery_kwh, footprint_ft2)
 
-                                vehicle_curbweight_lbs = \
-                                    vehicle.base_year_glider_non_structure_mass_lbs + \
-                                    delta_glider_non_structure_mass_lbs + \
-                                    powertrain_mass_lbs + \
-                                    structure_mass_lbs + \
-                                    battery_mass_lbs
+                                vehicle_curbweight_lbs = sum((vehicle.base_year_glider_non_structure_mass_lbs,
+                                                             delta_glider_non_structure_mass_lbs,
+                                                             powertrain_mass_lbs, structure_mass_lbs, battery_mass_lbs))
 
                                 rated_hp = vehicle_curbweight_lbs / vehicle.base_year_curbweight_lbs_to_hp
 
                                 # set up RSE terms and run RSEs
-                                ETW = vehicle_curbweight_lbs + DriveCycleBallast.get_ballast_lbs(vehicle)
+                                ETW = vehicle_curbweight_lbs + vehicle_ballast
 
                                 RLHP20 = rlhp20 / ETW
                                 RLHP60 = rlhp60 / ETW
                                 HP_ETW = rated_hp / ETW
 
-                                # Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'],
-                                #           {}, {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
-
-                                # for rse_name in sorted(cost_curve_classes[ccc]['rse']):
-                                #     _cloud_point[rse_name] = \
-                                #         eval(_cache[vehicle.fueling_class][ccc]['rse'][rse_name], {},
-                                #              {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60, 'HP_ETW': HP_ETW})
-                                #     # print(rse_name, _cloud_point[rse_name])
-
                                 cloud_point.update(zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
                                                        Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'], {},
                                                                  {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60,
                                                                   'HP_ETW': HP_ETW})))
-
-                                # for rse_name in sorted(cost_curve_classes[ccc]['rse']):
-                                #     # print(rse_name, cloud_point[rse_name])
-                                #     if cloud_point[rse_name] != _cloud_point[rse_name]:
-                                #         print('wtf??')
-
-                                # foo = zip(_cache[vehicle.fueling_class][ccc]['rse_names'],
-                                #                        Eval.eval(_cache[vehicle.fueling_class][ccc]['rse_tuple'], {},
-                                #                                  {'ETW': ETW, 'RLHP20': RLHP20, 'RLHP60': RLHP60,
-                                #                                   'HP_ETW': HP_ETW}))
 
                                 # battery sizing -------------------------------------------------------------------- #
                                 if vehicle.powertrain_type != 'ICE':

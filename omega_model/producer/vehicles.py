@@ -75,6 +75,13 @@ from policy.drive_cycle_weights import DriveCycleWeights
 from policy.offcycle_credits import OffCycleCredits
 from policy.upstream_methods import UpstreamMethods
 
+from common.omega_functions import cartesian_prod, calc_frontier
+from common.omega_plot import figure, label_xyt
+from common.omega_functions import weighted_value
+
+from context.fuel_prices import FuelPrice
+from context.onroad_fuels import OnroadFuel
+
 
 class DecompositionAttributes(OMEGABase):
     """
@@ -316,8 +323,6 @@ class CompositeVehicle(OMEGABase):
             'base_year_market_share'
 
         """
-        from common.omega_functions import weighted_value
-
         self.vehicle_list = vehicles_list  # copy.deepcopy(vehicle_list)
         self.name = 'composite vehicle (%s.%s)' % (self.vehicle_list[0].market_class_id, self.vehicle_list[0].reg_class_id)
 
@@ -380,8 +385,6 @@ class CompositeVehicle(OMEGABase):
             Weighted Vehicle ``retail_fuel_price_dollars_per_unit``
 
         """
-        from common.omega_functions import weighted_value
-
         if calendar_year is None:
             calendar_year = self.model_year
 
@@ -481,9 +484,6 @@ class CompositeVehicle(OMEGABase):
             DataFrame containing the composite cost curve
 
         """
-        from common.omega_functions import cartesian_prod, calc_frontier
-        from common.omega_plot import figure, label_xyt
-
         if plot:
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e [g/mi]', 'Generalized Cost [$]', '%s' % self.name)
@@ -620,7 +620,6 @@ class CompositeVehicle(OMEGABase):
         return self.cost_curve['cert_co2e_grams_per_mile'].values.min()
 
     def get_weighted_attribute(self, attribute_name):
-        from common.omega_functions import weighted_value
         return weighted_value(self.vehicle_list, self.weight_by, attribute_name)
 
 
@@ -715,6 +714,8 @@ class Vehicle(OMEGABase):
     """
     next_vehicle_id = 0
 
+    _cache = dict()
+
     def __init__(self):
         """
         Create a new ``Vehicle`` object
@@ -797,16 +798,21 @@ class Vehicle(OMEGABase):
             The retail fuel price in dollars per unit for the given year.
 
         """
-        from context.fuel_prices import FuelPrice
-        if calendar_year is None:
-            calendar_year = self.model_year
+        cache_key = (self.vehicle_id, 'retail_fuel_price', calendar_year)
 
-        price = 0
-        fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
-        for fuel, fuel_share in fuel_dict.items():
-            price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+        if cache_key not in self._cache:
+            if calendar_year is None:
+                calendar_year = self.model_year
 
-        return price
+            price = 0
+            fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
+            for fuel, fuel_share in fuel_dict.items():
+                price += FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel) * fuel_share
+
+            self._cache[cache_key] = price
+
+        return self._cache[cache_key]
+
 
     def onroad_co2e_emissions_grams_per_unit(self):
         """
@@ -817,16 +823,20 @@ class Vehicle(OMEGABase):
             The onroad CO2e emission in grams per unit of onroad fuel, including refuel efficiency.
 
         """
-        from context.onroad_fuels import OnroadFuel
+        cache_key = (self.vehicle_id, 'onroad_co2e_emissions_grams_per_unit')
 
-        co2_emissions_grams_per_unit = 0
-        fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
-        for fuel, fuel_share in fuel_dict.items():
-            co2_emissions_grams_per_unit += \
-                (OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'direct_co2e_grams_per_unit') /
-                 OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'refuel_efficiency') * fuel_share)
+        if cache_key not in self._cache:
 
-        return co2_emissions_grams_per_unit
+            co2_emissions_grams_per_unit = 0
+            fuel_dict = Eval.eval(self.in_use_fuel_id, {'__builtins__': None}, {})
+            for fuel, fuel_share in fuel_dict.items():
+                co2_emissions_grams_per_unit += \
+                    (OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'direct_co2e_grams_per_unit') /
+                     OnroadFuel.get_fuel_attribute(self.model_year, fuel, 'refuel_efficiency') * fuel_share)
+
+            self._cache[cache_key] = co2_emissions_grams_per_unit
+
+        return self._cache[cache_key]
 
     def set_target_co2e_grams_per_mile(self):
         """
@@ -932,8 +942,6 @@ class Vehicle(OMEGABase):
             The vehicle frontier / cost curve as a DataFrame.
 
         """
-        from common.omega_functions import calc_frontier
-
         if 'cert_direct_co2e_grams_per_mile' not in cost_cloud:
             cost_cloud = self.calc_cert_values(cost_cloud)
 
