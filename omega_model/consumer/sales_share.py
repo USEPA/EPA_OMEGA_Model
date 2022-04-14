@@ -214,7 +214,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, vehicle_class):
+    def calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, vehicle_class, prev_share):
 
         # seeds need vehicle_power, curbweight and average_mpg attributes
         class seed_data():
@@ -225,11 +225,11 @@ class SalesShare(OMEGABase, SalesShareBase):
                 self.average_mpg = average_mpg
 
         if vehicle_class == 'LDV':
-            seed1 = seed_data(150, 3500, 27, 0.5)  # vehicle_class data, year-1
-            seed2 = seed_data(150, 3500, 27, 0.5)  # vehicle_class data, year-2
+            seed1 = seed_data(150, 3500, 27, prev_share)  # vehicle_class data, year-1
+            seed2 = seed_data(150, 3500, 27, prev_share)  # vehicle_class data, year-2
         else:
-            seed1 = seed_data(250, 5500, 17, 0.5)  # vehicle_class data, year-1
-            seed2 = seed_data(250, 5500, 17, 0.5)  # vehicle_class data, year-2
+            seed1 = seed_data(250, 5500, 17, prev_share)  # vehicle_class data, year-1
+            seed2 = seed_data(250, 5500, 17, prev_share)  # vehicle_class data, year-2
 
         gasFP0 = 2.75  # FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
         gasFP1 = 2.75  # FuelPrice.get_fuel_prices(calendar_year-1, 'retail_dollars_per_unit', 'pump gasoline')
@@ -254,15 +254,13 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         dfs_coeffs = pd.Series({'LDV': LDV_constants, 'LDT': LDT_constants}[vehicle_class])
 
-        share = (dfs_coeffs.Constant * (1 - dfs_coeffs.Rho) + dfs_coeffs.Rho * (math.log(seed1.share)) +
+        share = (dfs_coeffs.Constant * (1 - dfs_coeffs.Rho) + dfs_coeffs.Rho * math.log(seed1.share) +
                 dfs_coeffs.FP * (math.log(gasFP0 * 100) - dfs_coeffs.Rho * math.log(gasFP1 * 100)) +
                 dfs_coeffs.HP * (math.log(seed1.vehicle_power) - dfs_coeffs.Rho * math.log(seed2.vehicle_power)) +
                 dfs_coeffs.CW * (math.log(seed1.curbweight) - dfs_coeffs.Rho * math.log(seed2.curbweight)) +
                 dfs_coeffs.MPG * (math.log(seed1.average_mpg) - dfs_coeffs.Rho * math.log(seed2.average_mpg)) +
                 dfs_coeffs.Dummy * (math.log(0.31554770318021) - dfs_coeffs.Rho * math.log(0.31554770318021))
                 )
-
-        print(math.exp(share))
 
         return math.exp(share)
 
