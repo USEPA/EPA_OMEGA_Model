@@ -46,7 +46,7 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
     Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].replace(np.nan, 0).astype(int)
     Edmunds_data_cleaned['LineageID'] = Edmunds_data_cleaned['LineageID'].replace(np.nan, 0)
     in_unit_columns=[]; ft_unit_columns = []; ft3_unit_columns = []; lbs_unit_columns = []
-    degree_unit_columns=[]; gal_unit_columns = []; mpg_unit_columns = [];
+    degree_unit_columns=[]; gal_unit_columns = []; mpg_unit_columns = []; mpge_unit_columns = []; kwh_unit_columns = []; mi_unit_columns = []; hr_unit_columns = [];
     ncolumns = len(Edmunds_data_cleaned.columns)
     for i in range(ncolumns):
         cell_str = str(Edmunds_data_cleaned.iloc[:, i].to_list())
@@ -56,7 +56,14 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
         if ' lbs.' in cell_str: lbs_unit_columns.append(Edmunds_data_cleaned.columns[i])
         if ' degrees' in cell_str: degree_unit_columns.append(Edmunds_data_cleaned.columns[i])
         if ' gal.' in cell_str: gal_unit_columns.append(Edmunds_data_cleaned.columns[i])
-        if ' mpg' in cell_str: mpg_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' kwh' in cell_str: kwh_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if (' mi.' in cell_str) or (' mi' in cell_str): mi_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if (' hr.' in cell_str) or (' hr' in cell_str): hr_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        if ' mpge' in cell_str:
+            mpge_unit_columns.append(Edmunds_data_cleaned.columns[i])
+        elif ' mpg' in cell_str:
+            mpg_unit_columns.append(Edmunds_data_cleaned.columns[i])
+
 
     for i in range(len(in_unit_columns)):
         Edmunds_data_cleaned[in_unit_columns[i]] = Edmunds_data_cleaned[in_unit_columns[i]].replace(np.nan, '').str.replace(' in.', '').str.replace('no', '')
@@ -70,8 +77,42 @@ def Edmunds_Readin(rawdata_input_path, run_input_path, input_filename, output_pa
         Edmunds_data_cleaned[degree_unit_columns[i]] = Edmunds_data_cleaned[degree_unit_columns[i]].replace(np.nan, '').str.replace(' degrees', '').str.replace('no', '')
     for i in range(len(gal_unit_columns)):
         Edmunds_data_cleaned[gal_unit_columns[i]] = Edmunds_data_cleaned[gal_unit_columns[i]].replace(np.nan, '').str.replace(' gal.', '').str.replace('no', '')
+    for i in range(len(mpge_unit_columns)):
+        Edmunds_data_cleaned[mpge_unit_columns[i]] = Edmunds_data_cleaned[mpge_unit_columns[i]].replace(np.nan, '').str.replace(' mpge', '').str.replace('no', '')
     for i in range(len(mpg_unit_columns)):
         Edmunds_data_cleaned[mpg_unit_columns[i]] = Edmunds_data_cleaned[mpg_unit_columns[i]].replace(np.nan, '').str.replace(' mpg', '').str.replace('no', '')
+    for i in range(len(kwh_unit_columns)):
+        Edmunds_data_cleaned[kwh_unit_columns[i]] = Edmunds_data_cleaned[kwh_unit_columns[i]].replace(np.nan, '').str.replace(' kwh', '').str.replace('no', '')
+    for i in range(len(mi_unit_columns)):
+        Edmunds_data_cleaned[mi_unit_columns[i]] = Edmunds_data_cleaned[mi_unit_columns[i]].replace(np.nan, '').str.replace(' mi.', '').str.replace('no', '')
+    for i in range(len(hr_unit_columns)):
+        Edmunds_data_cleaned[hr_unit_columns[i]] = Edmunds_data_cleaned[hr_unit_columns[i]].replace(np.nan, '').str.replace(' hr.', '').str.replace('no', '')
+
+    # print(Edmunds_data_cleaned.loc[Edmunds_data_cleaned['TRANSMISSION'] == 'N/A', 'TRANSMISSION'])
+
+    ncolumns = len(Edmunds_data_cleaned.columns)
+    columns_duplicated = []
+    for i in range(ncolumns):
+        column_name = Edmunds_data_cleaned.columns[i]
+        if ('EPA COMBINED MPGE') in column_name and len(column_name) > len('EPA COMBINED MPGE'):
+            Edmunds_data_cleaned[column_name].fillna('', inplace=True)
+            Edmunds_data_cleaned.loc[Edmunds_data_cleaned[column_name] != '', 'EPA COMBINED MPGE'] = Edmunds_data_cleaned[column_name]
+            columns_duplicated.append(column_name)
+        if ('EPA ELECTRICITY RANGE') in column_name and len(column_name) > len('EPA ELECTRICITY RANGE'):
+            Edmunds_data_cleaned[column_name].fillna('', inplace=True)
+            Edmunds_data_cleaned.loc[Edmunds_data_cleaned[column_name] != '', 'EPA ELECTRICITY RANGE'] = Edmunds_data_cleaned[column_name]
+            columns_duplicated.append(column_name)
+        if ('EPA TIME TO CHARGE BATTERY (AT 240V)') in column_name and len(column_name) > len('EPA TIME TO CHARGE BATTERY (AT 240V)'):
+            Edmunds_data_cleaned[column_name].fillna('', inplace=True)
+            Edmunds_data_cleaned.loc[Edmunds_data_cleaned[column_name] != '', 'EPA TIME TO CHARGE BATTERY (AT 240V)'] = Edmunds_data_cleaned[column_name]
+            columns_duplicated.append(column_name)
+        if ('EPA KWH/100 MI') in column_name and len(column_name) > len('EPA KWH/100 MI'):
+            Edmunds_data_cleaned[column_name].fillna('', inplace=True)
+            Edmunds_data_cleaned.loc[Edmunds_data_cleaned[column_name] != '', 'EPA KWH/100 MI'] = Edmunds_data_cleaned[column_name]
+            columns_duplicated.append(column_name)
+
+    for i in range (len(columns_duplicated)):
+        Edmunds_data_cleaned.drop(columns_duplicated[i], inplace=True, axis=1)
 
     Edmunds_data_cleaned['CURB WEIGHT'] = Edmunds_data_cleaned['CURB WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')
     Edmunds_data_cleaned['GROSS WEIGHT'] = Edmunds_data_cleaned['GROSS WEIGHT'].str.replace(',', '') #.str.replace(' (Most Popular)', '').str.replace(' (Discontinued)', '')

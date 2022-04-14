@@ -37,7 +37,7 @@ for run_count in range(0,len(run_controller)):
         hwfet_drivecycle_filename = str(run_controller['HWFET Drive Cycle Filename'][run_count])
         lineageid_filename = str(run_controller['LineageID Filename'][run_count])
         if exception_table_filename != 'N':
-            exceptions_table = pd.read_csv(raw_data_filepath+'\\'+exception_table_filename)
+            exceptions_table = pd.read_csv(raw_data_filepath + '\\' + exception_table_filename)
         else:
             exceptions_table = 'N'
         # aero_table_filename = str(run_controller['Aero Table Filename'][run_count])

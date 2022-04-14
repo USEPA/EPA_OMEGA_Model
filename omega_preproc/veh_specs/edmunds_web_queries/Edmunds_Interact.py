@@ -696,7 +696,7 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                 for i in range(_num_menu_columns):
                     table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i_trims_page]})
                 tmp_raw_table = table_list[table_count]
-                if (name_category == 'Battery & Range'):
+                if (name_category == 'Battery & Range') or (name_category == 'Fuel & MPG'):
                     for j in range(len(tmp_raw_table)):
                         if ('EPA Combined MPGe'.lower() in tmp_raw_table[name_category][j].lower()):
                             tmp_raw_table[name_category][j] = 'EPA Combined MPGe'
