@@ -51,7 +51,7 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
-import omega_model.effects.general_functions as gen_fxns
+from effects.general_functions import dollar_adjustment_factor
 
 
 class RefuelingCost(OMEGABase):
@@ -62,59 +62,62 @@ class RefuelingCost(OMEGABase):
     _data = dict()  # private dict of general input attributes and values
 
     @staticmethod
-    def calc_bev_refueling_cost_per_mile(veh_type, range):
+    def calc_bev_refueling_cost_per_mile(type, range):
         """
 
         Args:
-            veh_type (string): The type of vehicle, e.g., 'car', 'suv', 'truck'.
+            type (string): The type of vehicle, e.g., 'car', 'suv', 'truck'.
             range (integer): The range (miles) of the BEV on a full charge.
 
         Returns:
             The refueling cost per mile for the given veh_type.
 
         """
-        miles_to_charge_x2_factor = RefuelingCost._data[f'miles_to_mid_trip_charge_{veh_type}']['x_squared_factor']
-        miles_to_charge_x_factor = RefuelingCost._data[f'miles_to_mid_trip_charge_{veh_type}']['x_factor']
-        miles_to_charge_constant = RefuelingCost._data[f'miles_to_mid_trip_charge_{veh_type}']['constant']
-
-        share_of_miles_x2_factor = RefuelingCost._data[f'share_of_miles_charged_mid_trip_{veh_type}']['x_squared_factor']
-        share_of_miles_x_factor = RefuelingCost._data[f'share_of_miles_charged_mid_trip_{veh_type}']['x_factor']
-        share_of_miles_constant = RefuelingCost._data[f'share_of_miles_charged_mid_trip_{veh_type}']['constant']
+        locals_dict = locals()
 
         if range <= 200:
-            charge_rate = RefuelingCost._data[f'miles_per_hour_charge_rate_under_201']['constant']
+            charge_rate = eval(RefuelingCost._data['under_200', 'miles_per_hour_charge_rate']['value'], {}, locals_dict)
         else:
-            charge_rate = RefuelingCost._data[f'miles_per_hour_charge_rate_over_201']['constant']
+            charge_rate = eval(RefuelingCost._data['over_201', 'miles_per_hour_charge_rate']['value'], {}, locals_dict)
 
-        travel_value = RefuelingCost._data[f'dollars_per_hour_travel_time_{veh_type}']['constant']
-        fixed_time = RefuelingCost._data[f'fixed_refueling_minutes_{veh_type}']['constant']
+        charge_frequency = eval(RefuelingCost._data[type, 'miles_to_mid_trip_charge']['value'], {}, locals_dict)
+        share_charged = eval(RefuelingCost._data[type, 'share_of_miles_charged_mid_trip']['value'], {}, locals_dict)
 
-        charge_frequency = miles_to_charge_x2_factor * range ** 2 + miles_to_charge_x_factor * range + miles_to_charge_constant
-        share_charged = share_of_miles_x2_factor * range ** 2 + share_of_miles_x_factor * range + share_of_miles_constant
+        travel_value = eval(RefuelingCost._data[type, 'dollars_per_hour_travel_time']['value'], {}, locals_dict)
+        adj_factor = RefuelingCost._data[type, 'dollars_per_hour_travel_time']['dollar_adjustment']
+        travel_value = travel_value * adj_factor
+
+        fixed_time = eval(RefuelingCost._data[type, 'fixed_refueling_minutes']['value'], {}, locals_dict)
 
         refueling_cost_per_mile = ((fixed_time / 60) / charge_frequency + (share_charged / charge_rate)) * travel_value
 
         return refueling_cost_per_mile
 
     @staticmethod
-    def calc_liquid_refueling_cost_per_gallon(veh_type):
+    def calc_liquid_refueling_cost_per_gallon(type):
         """
 
         Args:
-            veh_type (string): The type of vehicle, e.g., 'car', 'suv', 'truck'.
+            type (string): The type of vehicle, e.g., 'car', 'suv', 'truck'.
 
         Returns:
             The refueling cost per mile for the given veh_type.
 
 
         """
-        refuel_rate = RefuelingCost._data['gallons_per_minute_refuel_rate']['constant']
-        refuel_share = RefuelingCost._data[f'tank_gallons_share_refueled_{veh_type}']['constant']
-        tank_gallons = RefuelingCost._data[f'tank_gallons_{veh_type}']['constant']
+        locals_dict = locals()
 
-        travel_value = RefuelingCost._data[f'dollars_per_hour_travel_time_{veh_type}']['constant']
-        fixed_time = RefuelingCost._data[f'fixed_refueling_minutes_{veh_type}']['constant']
-        scaler = RefuelingCost._data['liquid_refueling_share_included']['constant']
+        refuel_rate = eval(RefuelingCost._data['all', 'gallons_per_minute_refuel_rate']['value'], {}, locals_dict)
+        refuel_share = eval(RefuelingCost._data[type, 'tank_gallons_share_refueled']['value'], {}, locals_dict)
+        tank_gallons = eval(RefuelingCost._data[type, 'tank_gallons']['value'], {}, locals_dict)
+
+        travel_value = eval(RefuelingCost._data[type, 'dollars_per_hour_travel_time']['value'], {}, locals_dict)
+        adj_factor = RefuelingCost._data[type, 'dollars_per_hour_travel_time']['dollar_adjustment']
+        travel_value = travel_value * adj_factor
+
+        fixed_time = eval(RefuelingCost._data[type, 'fixed_refueling_minutes']['value'], {}, locals_dict)
+
+        scaler = eval(RefuelingCost._data['all', 'liquid_refueling_share_included']['value'], {}, locals_dict)
 
         refueling_cost_per_gallon = (1 / (tank_gallons * refuel_share)) \
                                     * ((fixed_time + (tank_gallons * refuel_share) / refuel_rate) / 60) \
@@ -143,11 +146,10 @@ class RefuelingCost(OMEGABase):
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
         input_template_name = 'refueling_cost'
-        input_template_version = 0.1
-        input_template_columns = {'item',
-                                  'x_squared_factor',
-                                  'x_factor',
-                                  'constant',
+        input_template_version = 0.2
+        input_template_columns = {'type',
+                                  'item',
+                                  'value',
                                   'dollar_basis',
                                   }
 
@@ -160,11 +162,24 @@ class RefuelingCost(OMEGABase):
 
             template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            cols_to_convert = [col for col in df.columns if 'constant' in col]
-
-            df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)
-
             if not template_errors:
-                RefuelingCost._data = df.set_index('item').to_dict(orient='index')
+
+                cost_keys = zip(df['type'], df['item'])
+
+                for cost_key in cost_keys:
+
+                    RefuelingCost._data[cost_key] = dict()
+                    type, item = cost_key
+
+                    cost_info = df[(df['type'] == type) & (df['item'] == item)].iloc[0]
+
+                    RefuelingCost._data[cost_key] = {'value': dict(),
+                                                     'dollar_adjustment': 1}
+
+                    if cost_info['dollar_basis'] > 0:
+                        adj_factor = dollar_adjustment_factor('ip_deflators', int(cost_info['dollar_basis']))
+                        RefuelingCost._data[cost_key]['dollar_adjustment'] = adj_factor
+
+                    RefuelingCost._data[cost_key]['value'] = compile(cost_info['value'], '<string>', 'eval')
 
         return template_errors
