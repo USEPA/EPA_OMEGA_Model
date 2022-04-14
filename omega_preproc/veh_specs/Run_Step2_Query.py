@@ -95,6 +95,7 @@ for model_year in model_years:
 
     master_category_check_df = master_category_check_file.set_index(master_category_check_file['Readin Sources'].values)
 
+    field_mapping_df['UserFriendlyName'].fillna('', inplace=True)
     aggregating_columns = pd.Series(np.zeros(len(aggregating_fields))).replace(0, '')
     master_schema = data_sources_df['SourceSchema'][data_sources_df['SourceSchema'][(data_sources_df['SourceName']==master_index_source) & \
         (data_sources_df['MY']==model_year)].index[0]]
@@ -109,6 +110,7 @@ for model_year in model_years:
         information_priority = field_mapping_df[
             list(pd.Series(field_mapping_df.columns)[pd.Series(field_mapping_df.columns).str.contains('Priority')])] \
             [field_mapping_df['UserFriendlyName'] == information_toget].reset_index(drop=True)
+        # if information_toget == 'EPA Time To Charge Battery (At 240V)': print(information_toget)
         total_schema_count += len(information_priority.columns[~pd.isnull(information_priority).iloc[0]])
     #From list of desired quantities, get all sources, filenames and fieldnames in order
     all_schemas = pd.Series(np.zeros(total_schema_count), name = 'SourceSchema')
