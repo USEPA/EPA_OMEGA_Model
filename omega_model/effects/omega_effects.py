@@ -41,7 +41,7 @@ from omega_model.effects.cost_effects import calc_cost_effects
 from omega_model.effects.general_functions import save_dict_to_csv
 from omega_model.effects.discounting import discount_values
 from omega_model.effects.present_and_annualized_values import calc_present_and_annualized_values
-from omega_model.effects.tech_tracking import calc_tech_tracking, TechTracking
+from omega_model.effects.tech_tracking import TechTracking
 
 
 def run_effects_calcs():
@@ -59,7 +59,9 @@ def run_effects_calcs():
     calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
     omega_log.logwrite('\nCalculating tech volumes and shares', echo_console=True)
-    tech_tracking_dict = TechTracking().init_class(calendar_years)
+    tech_tracking = TechTracking()
+    tech_tracking.create_dict(calendar_years)
+    tech_tracking_dict = tech_tracking._data
     # tech_tracking_dict = calc_tech_tracking(calendar_years)
 
     tech_tracking_filename = f'{omega_globals.options.output_folder}' + \
@@ -68,9 +70,9 @@ def run_effects_calcs():
     if omega_globals.options.multiprocessing:
         print('Starting multiprocess save_dict_to_csv...')
         tech_tracking_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
-                                                          args=[tech_tracking_dict, tech_tracking_filename, False],
-                                                          callback=None,
-                                                          error_callback=None)
+                                                              args=[tech_tracking_dict, tech_tracking_filename, False],
+                                                              callback=None,
+                                                              error_callback=None)
     else:
         tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
 
@@ -84,10 +86,10 @@ def run_effects_calcs():
         if omega_globals.options.multiprocessing:
             print('Starting multiprocess save_dict_to_csv...')
             physical_effects_result = omega_globals.pool.apply_async(func=save_dict_to_csv,
-                                                                  args=[physical_effects_dict, physical_effects_filename,
-                                                                        False],
-                                                                  callback=None,
-                                                                  error_callback=None)
+                                                                     args=[physical_effects_dict, physical_effects_filename,
+                                                                           False],
+                                                                     callback=None,
+                                                                     error_callback=None)
         else:
             physical_effects_df = save_dict_to_csv(physical_effects_dict, physical_effects_filename, index=False)
 
