@@ -9,6 +9,96 @@ Functions to track vehicle technology use.
 
 """
 from omega_model import *
+from producer.vehicle_annual_data import VehicleAnnualData
+from producer.vehicles import VehicleFinal
+from producer.vehicles import DecompositionAttributes
+
+
+class TechTracking(OMEGABase):
+
+    _data = dict()
+    new_vehicle_tech_flag_dict = dict()
+    tech_tracking_dict = dict()
+    tech_flag_list = [item for item in DecompositionAttributes.other_values if 'cost' not in item] + DecompositionAttributes.offcycle_values
+    id_attribute_list = ['name', 'manufacturer_id', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
+                         'in_use_fuel_id', 'target_co2e_grams_per_mile']
+
+    @staticmethod
+    def init_class(calendar_years):
+
+        TechTracking._data.clear()
+
+        new_vehicle_info_dict = dict()
+
+        for calendar_year in calendar_years:
+            vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
+
+            for vad in vads:
+
+                vehicle_id, age, registered_count = vad.vehicle_id, vad.age, vad.registered_count
+                key = vehicle_id, int(calendar_year), int(age)
+
+                if vehicle_id not in new_vehicle_info_dict:
+                    new_vehicle_info_dict[vehicle_id] \
+                        = VehicleFinal.get_vehicle_attributes(vehicle_id, TechTracking.id_attribute_list)
+
+                name, mfr_id, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, \
+                target_co2e_grams_per_mile \
+                    = new_vehicle_info_dict[vehicle_id]
+
+                if target_co2e_grams_per_mile is not None:
+                    TechTracking._data[key] = {'session_name': omega_globals.options.session_name,
+                                               'calendar_year': int(calendar_year),
+                                               'model_year': model_year,
+                                               'age': int(age),
+                                               'name': name,
+                                               'manufacturer_id': mfr_id,
+                                               'base_year_reg_class_id': base_year_reg_class_id,
+                                               'reg_class_id': reg_class_id,
+                                               'in_use_fuel_id': in_use_fuel_id,
+                                               'registered_count': registered_count,
+                                               }
+                    TechTracking.get_tech_flags(key)
+                    TechTracking.calc_volumes_and_weight_flags(key)
+
+    @staticmethod
+    def update_dict(key, update_dict):
+        TechTracking._data[key] = update_dict
+
+    @staticmethod
+    def add_attributes_and_values(key, update_dict):
+        for k, v in update_dict.items():
+            TechTracking._data[key].update({k: v})
+
+    @staticmethod
+    def get_tech_flags(key):
+        vehicle_id, calendar_year, age = key
+        tech_flag_values = VehicleFinal.get_vehicle_attributes(vehicle_id, TechTracking.tech_flag_list)
+
+        for idx, tech_flag in enumerate(TechTracking.tech_flag_list):
+            TechTracking.add_attributes_and_values(key, {f'{tech_flag}_share': tech_flag_values[idx]})
+
+    @staticmethod
+    def get_attribute_value(key, attribute_name):
+        return TechTracking._data[key][attribute_name]
+
+    @staticmethod
+    def calc_volumes_and_weight_flags(key):
+        vehicle_id, calendar_year, age = key
+        registered_count = TechTracking.get_attribute_value(key, 'registered_count')
+        update_dict = dict()
+        for tech_flag, tech_flag_value in TechTracking.new_vehicle_tech_flag_dict[vehicle_id].items():
+            if tech_flag_value is None:
+                update_dict.update({f'{tech_flag}_volume': tech_flag_value})
+            elif tech_flag == 'curb_weight':
+                update_dict.update({tech_flag: tech_flag_value})
+                update_dict.update({'fleet_pounds': tech_flag_value * registered_count})
+            elif tech_flag == 'weight_reduction':
+                update_dict.update({tech_flag: tech_flag_value})
+            else:
+                update_dict.update({f'{tech_flag}_volume': tech_flag_value * registered_count})
+        TechTracking.add_attributes_and_values(key, update_dict)
+
 
 
 def calc_tech_tracking(calendar_years):
