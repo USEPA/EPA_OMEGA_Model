@@ -230,8 +230,8 @@ class SalesShare(OMEGABase, SalesShareBase):
         """
         # seeds need vehicle_power, curbweight and average_mpg attributes
         class seed_data():
-            def __init__(self, vehicle_power, curbweight, average_mpg, share):
-                self.share = share
+            def __init__(self, vehicle_power, curbweight, average_mpg, prev_share_norm):
+                self.share = prev_share_norm
                 self.vehicle_power = vehicle_power
                 self.curbweight = curbweight
                 self.average_mpg = average_mpg
@@ -271,7 +271,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                 dfs_coeffs.HP * (math.log(seed1.vehicle_power) - dfs_coeffs.Rho * math.log(seed2.vehicle_power)) +
                 dfs_coeffs.CW * (math.log(seed1.curbweight) - dfs_coeffs.Rho * math.log(seed2.curbweight)) +
                 dfs_coeffs.MPG * (math.log(seed1.average_mpg) - dfs_coeffs.Rho * math.log(seed2.average_mpg)) +
-                dfs_coeffs.Dummy * (math.log(0.31554770318021) - dfs_coeffs.Rho * math.log(0.31554770318021))
+                dfs_coeffs.Dummy * (math.log(0.321554770318021) - dfs_coeffs.Rho * math.log(0.321554770318021))
                 )
 
         return math.exp(share_raw)
