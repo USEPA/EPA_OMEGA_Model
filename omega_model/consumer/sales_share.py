@@ -230,11 +230,11 @@ class SalesShare(OMEGABase, SalesShareBase):
         """
         # seeds need vehicle_power, curbweight and average_mpg attributes
         class seed_data():
-            def __init__(self, vehicle_power, curbweight, average_mpg, prev_share_norm):
+            def __init__(self, vehicle_power, curbweight, average_onroad_mpg, prev_share_norm):
                 self.share = prev_share_norm
                 self.vehicle_power = vehicle_power
                 self.curbweight = curbweight
-                self.average_mpg = average_mpg
+                self.average_onroad_mpg = average_onroad_mpg
 
         if vehicle_class == 'LDV':
             seed1 = seed_data(150, 3500, 27, prev_share_norm)  # vehicle_class data, year-1
@@ -267,12 +267,12 @@ class SalesShare(OMEGABase, SalesShareBase):
         dfs_coeffs = pd.Series({'LDV': LDV_constants, 'LDT': LDT_constants}[vehicle_class])
 
         share_raw = (dfs_coeffs.Constant * (1 - dfs_coeffs.Rho) + dfs_coeffs.Rho * math.log(seed1.share) +
-                dfs_coeffs.FP * (math.log(gasFP0 * 100) - dfs_coeffs.Rho * math.log(gasFP1 * 100)) +
-                dfs_coeffs.HP * (math.log(seed1.vehicle_power) - dfs_coeffs.Rho * math.log(seed2.vehicle_power)) +
-                dfs_coeffs.CW * (math.log(seed1.curbweight) - dfs_coeffs.Rho * math.log(seed2.curbweight)) +
-                dfs_coeffs.MPG * (math.log(seed1.average_mpg) - dfs_coeffs.Rho * math.log(seed2.average_mpg)) +
-                dfs_coeffs.Dummy * (math.log(0.321554770318021) - dfs_coeffs.Rho * math.log(0.321554770318021))
-                )
+                     dfs_coeffs.FP * (math.log(gasFP0 * 100) - dfs_coeffs.Rho * math.log(gasFP1 * 100)) +
+                     dfs_coeffs.HP * (math.log(seed1.vehicle_power) - dfs_coeffs.Rho * math.log(seed2.vehicle_power)) +
+                     dfs_coeffs.CW * (math.log(seed1.curbweight) - dfs_coeffs.Rho * math.log(seed2.curbweight)) +
+                     dfs_coeffs.MPG * (math.log(seed1.average_onroad_mpg) - dfs_coeffs.Rho * math.log(seed2.average_onroad_mpg)) +
+                     dfs_coeffs.Dummy * (math.log(0.321554770318021) - dfs_coeffs.Rho * math.log(0.321554770318021))
+                     )
 
         return math.exp(share_raw)
 
