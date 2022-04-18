@@ -121,7 +121,8 @@ class NewVehicleMarket(OMEGABase):
 
     """
 
-    _data_by_csc_rc = dict()  # private dict, sales by context size class and reg class
+    _data_by_csc_rc = dict()  # private dict, sales by context size class and legacy reg class
+    _data_by_rc = dict()  # private dict, sales by legacy reg class
     _data_by_csc = dict()  # private dict, sales by context size class
     _data_by_total = dict()  # private dict, total sales
 
@@ -288,10 +289,14 @@ class NewVehicleMarket(OMEGABase):
             else:
                 return 0
 
-        elif context_size_class:
+        elif context_size_class and not context_reg_class:
             return sum(NewVehicleMarket._data_by_csc['sales'][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_size_class, calendar_year].values)
+        elif context_reg_class and not context_size_class:
+            return NewVehicleMarket._data_by_rc['sales'].loc[omega_globals.options.context_id,
+                                                    omega_globals.options.context_case_id,
+                                                    context_reg_class, calendar_year]
         else:
             return sum(NewVehicleMarket._data_by_total['sales'][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
@@ -355,6 +360,7 @@ class NewVehicleMarket(OMEGABase):
         """
 
         NewVehicleMarket._data_by_csc_rc.clear()
+        NewVehicleMarket._data_by_rc.clear()
         NewVehicleMarket._data_by_csc.clear()
         NewVehicleMarket._data_by_total.clear()
 
@@ -386,6 +392,9 @@ class NewVehicleMarket(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
+            from producer.vehicle_aggregation import weighted_average
+            NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(weighted_average)
+
             NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
             NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
             NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')

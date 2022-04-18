@@ -43,8 +43,18 @@ def context_new_vehicle_sales(calendar_year):
                 sales_dict[nrmc] += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) * \
                                          NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
 
+        for rc in legacy_reg_classes:
+            sales_dict[rc] = NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=None,
+                                                                       context_reg_class=rc)
+
         # get total sales from context
         sales_dict['total'] = NewVehicleMarket.new_vehicle_sales(calendar_year)
+
+        for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+            sales_dict['%s_share' % nrmc] = sales_dict[nrmc] / sales_dict['total']
+
+        for rc in legacy_reg_classes:
+            sales_dict['%s_share' % rc] = sales_dict[rc] / sales_dict['total']
 
         _cache[calendar_year] = sales_dict
 
