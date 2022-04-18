@@ -230,9 +230,9 @@ def weighted_average(df):
     avg_df = pd.Series()
 
     for c in numeric_columns:
-        if c != 'sales' and c != 'model_year':
+        if 'sales' not in c and c != 'model_year':
             avg_df[c] = np.nansum(df[c].values * df['sales'].values) / np.sum(df['sales'].values * ~np.isnan(df[c].values))
-        elif c == 'sales':
+        elif 'sales' in c:
             avg_df[c] = df[c].sum()
 
     for c in non_numeric_columns:
