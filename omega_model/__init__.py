@@ -47,6 +47,7 @@ try:
     from common.omega_functions import *
     from common.omega_eval import *
     from context.context_base_classes import *
+    from context.onroad_fuels import *
     from policy.policy_base_classes import *
     from consumer.consumer_base_classes import *
     from producer.producer_base_classes import *

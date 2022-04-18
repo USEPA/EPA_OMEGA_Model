@@ -105,6 +105,8 @@ class CostCloud(OMEGABase, CostCloudBase):
 
     cost_cloud_data_columns = []
 
+    cost_cloud_calculated_columns = ['curbweight_lbs', 'rated_hp']
+
     # for reporting powertrain cost breakdowns
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
                                'electrified_driveline_cost', 'glider_structure_cost', 'glider_non_structure_cost']
@@ -166,7 +168,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             omega_log.logwrite('\nInitializing CostCloud from %s...' % filename, echo_console=True)
         input_template_name = __name__
         input_template_version = 0.1
-        input_template_columns = {'cost_curve_class','engine_displacement_L', 'engine_cylinders',
+        input_template_columns = {'cost_curve_class', 'engine_displacement_L', 'engine_cylinders',
                                   'high_eff_alternator', 'start_stop', 'hev', 'hev_truck', 'deac_pd',
                                   'deac_fc', 'cegr', 'atk2', 'gdi', 'turb12', 'turb11', 'gas_fuel',
                                   'diesel_fuel'}
@@ -197,7 +199,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rse_columns.update(['engine_displacement_L', 'engine_cylinders'])
 
                 non_data_columns = list(rse_columns) + ['cost_curve_class']
-                CostCloud.cost_cloud_data_columns = df.columns.drop(non_data_columns)
+                CostCloud.cost_cloud_data_columns = list(df.columns.drop(non_data_columns))
 
                 _cache[powertrain_type] = dict()
 
@@ -259,7 +261,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 rse_columns = drive_cycle_columns
 
                 non_data_columns = list(rse_columns) + ['cost_curve_class']
-                CostCloud.cost_cloud_data_columns = df.columns.drop(non_data_columns)
+                CostCloud.cost_cloud_data_columns = list(df.columns.drop(non_data_columns))
 
                 _cache[powertrain_type] = dict()
 
@@ -312,7 +314,9 @@ class CostCloud(OMEGABase, CostCloudBase):
         template_errors += CostCloud.init_from_bev_file(bev_filename, verbose=verbose)
         template_errors += CostCloud.init_from_phev_file(phev_filename, verbose=verbose)
 
-        CostCloud.cost_cloud_data_columns = list(CostCloud.cost_cloud_data_columns) + CostCloud.cost_cloud_cost_columns
+        CostCloud.cost_cloud_data_columns = list(CostCloud.cost_cloud_data_columns) + \
+                                            CostCloud.cost_cloud_cost_columns + \
+                                            CostCloud.cost_cloud_calculated_columns
 
         return template_errors
 
@@ -457,12 +461,13 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             # required cloud data for powertrain costing, etc:
                             cloud_point['cost_curve_class'] = ccc
-                            cloud_point['curbweight_lbs'] = vehicle_curbweight_lbs
                             cloud_point['battery_kwh'] = battery_kwh
                             cloud_point['structure_mass_lbs'] = structure_mass_lbs
                             cloud_point['footprint_ft2'] = footprint_ft2
                             cloud_point['structure_material'] = structure_material
                             cloud_point['motor_kw'] = motor_kw
+                            cloud_point['curbweight_lbs'] = vehicle_curbweight_lbs
+                            cloud_point['rated_hp'] = rated_hp
 
                             # informative data for troubleshooting:
                             if vehicle.model_year in omega_globals.options.log_vehicle_cloud_years or \
@@ -473,7 +478,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                                 cloud_point['battery_mass_lbs']= battery_mass_lbs
                                 cloud_point['powertrain_mass_lbs'] = powertrain_mass_lbs
                                 cloud_point['etw_lbs'] = ETW
-                                cloud_point['rated_hp'] = rated_hp
                                 cloud_point['vehicle_eng_rated_hp'] = vehicle.eng_rated_hp
                                 cloud_point['vehicle_mot_rated_kw'] = vehicle.motor_kw
                                 cloud_point['rlhp20'] = rlhp20

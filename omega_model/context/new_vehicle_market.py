@@ -250,7 +250,7 @@ class NewVehicleMarket(OMEGABase):
         cls._session_new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)] = generalized_cost
 
     @staticmethod
-    def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
+    def new_vehicle_data(calendar_year, context_size_class=None, context_reg_class=None, value='sales'):
         """
         Get new vehicle sales by session context ID, session context case, calendar year, context size class
         and context reg class.  User can specify total sales (no optional arguments) or sales by context size class or
@@ -290,15 +290,15 @@ class NewVehicleMarket(OMEGABase):
                 return 0
 
         elif context_size_class and not context_reg_class:
-            return sum(NewVehicleMarket._data_by_csc['sales'][omega_globals.options.context_id,
+            return sum(NewVehicleMarket._data_by_csc[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_size_class, calendar_year].values)
         elif context_reg_class and not context_size_class:
-            return NewVehicleMarket._data_by_rc['sales'].loc[omega_globals.options.context_id,
+            return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     context_reg_class, calendar_year]
         else:
-            return sum(NewVehicleMarket._data_by_total['sales'][omega_globals.options.context_id,
+            return sum(NewVehicleMarket._data_by_total[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
                                                     calendar_year].values)
 
@@ -392,8 +392,8 @@ class NewVehicleMarket(OMEGABase):
             template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         if not template_errors:
-            from producer.vehicle_aggregation import weighted_average
-            NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(weighted_average)
+            from producer.vehicle_aggregation import sales_weight_average_dataframe
+            NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(sales_weight_average_dataframe)
 
             NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
             NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
@@ -420,7 +420,7 @@ if __name__ == '__main__':
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(NewVehicleMarket.new_vehicle_sales(2021))
+            print(NewVehicleMarket.new_vehicle_data(2021))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

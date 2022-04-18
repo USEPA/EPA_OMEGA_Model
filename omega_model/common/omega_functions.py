@@ -11,8 +11,41 @@
 
 import sys
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 import numpy as np
 import common.omega_globals as omega_globals
+
+
+def sales_weight_average_dataframe(df):
+    """
+        Numeric columns are sales-weighted-averaged except for 'model_year' and columns containing
+        'sales', which is the weighting factor.  Non-numeric columns have unique values joined by ':'
+
+    Args:
+        df (DataFrame): the dataframe to sales-weight
+
+    Returns:
+        DataFrame with sales-weighted-average for numeric columns
+
+    """
+    import numpy as np
+
+    numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
+    non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
+
+    avg_df = pd.Series()
+
+    for c in numeric_columns:
+        if 'sales' not in c and c != 'model_year':
+            avg_df[c] = np.nansum(df[c].values * df['sales'].values) / np.sum(
+                df['sales'].values * ~np.isnan(df[c].values))
+        elif 'sales' in c:
+            avg_df[c] = df[c].sum()
+
+    for c in non_numeric_columns:
+        avg_df[c] = ':'.join(df[c].unique())
+
+    return avg_df
 
 
 def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):

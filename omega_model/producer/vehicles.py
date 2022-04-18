@@ -334,6 +334,8 @@ class CompositeVehicle(OMEGABase):
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_id = self.vehicle_list[0].market_class_id
 
+        # weighted values are populated from interpolating the composite cost curve after production decisions
+        # are applied to composite vehicles
         self.weighted_values = ['cert_co2e_grams_per_mile',
                                 'cert_direct_co2e_grams_per_mile',
                                 'cert_direct_kwh_per_mile',
@@ -341,6 +343,8 @@ class CompositeVehicle(OMEGABase):
                                 'onroad_direct_kwh_per_mile',
                                 'new_vehicle_mfr_cost_dollars',
                                 'new_vehicle_mfr_generalized_cost_dollars',
+                                'curbweight_lbs',
+                                'rated_hp',
                                 ]
 
         # calc weighted values
@@ -553,7 +557,7 @@ class CompositeVehicle(OMEGABase):
 
         return composite_frontier_df
 
-    def get_new_vehicle_mfr_cost_from_cost_curve(self, query_co2e_gpmi):
+    def get_from_cost_curve(self, attribute_name, query_co2e_gpmi):
         """
         Get new vehicle manufacturer cost from the composite cost curve for the provided cert CO2e g/mi value(s).
 
@@ -564,40 +568,59 @@ class CompositeVehicle(OMEGABase):
             A float or numeric Array of new vehicle manufacturer costs
 
         """
-        if len(self.cost_curve) > 1:
-            return np.interp(query_co2e_gpmi, self.cost_curve['cert_co2e_grams_per_mile'],
-                                                      self.cost_curve['new_vehicle_mfr_cost_dollars'])
-        else:
-            return self.cost_curve['new_vehicle_mfr_cost_dollars'].item()
 
-    def get_cert_direct_kwh_pmi_from_cost_curve(self, query_co2e_gpmi):
-        """
-        Get kWh/mi from the composite cost curve for the provided cert CO2e g/mi value(s).
-
-        Args:
-            query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi value(s) at which to query the cost curve
-
-        Returns:
-            A float or numeric Array of kWh/mi values
-
-        """
         return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
-                                                'cert_direct_kwh_per_mile')
+                                         attribute_name)
 
-    def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
-        """
-        Get new vehicle manufacturer generalized cost from the composite cost curve for the provided cert CO2e g/mi
-        value(s).
-
-        Args:
-            query_co2e_gpmi (numeric list or Array): the cert CO2e value(s) at which to query the cost curve
-
-        Returns:
-            A float or numeric Array of new vehicle manufacturer generalized costs
-
-        """
-        return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
-                                                'new_vehicle_mfr_generalized_cost_dollars')
+    # def get_new_vehicle_mfr_cost_from_cost_curve(self, query_co2e_gpmi):
+    #     """
+    #     Get new vehicle manufacturer cost from the composite cost curve for the provided cert CO2e g/mi value(s).
+    #
+    #     Args:
+    #         query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi values at which to query the cost curve
+    #
+    #     Returns:
+    #         A float or numeric Array of new vehicle manufacturer costs
+    #
+    #     """
+    #
+    #     return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
+    #                                      'new_vehicle_mfr_cost_dollars')
+    #
+    #     # if len(self.cost_curve) > 1:
+    #     #     return np.interp(query_co2e_gpmi, self.cost_curve['cert_co2e_grams_per_mile'],
+    #     #                                               self.cost_curve['new_vehicle_mfr_cost_dollars'])
+    #     # else:
+    #     #     return self.cost_curve['new_vehicle_mfr_cost_dollars'].item()
+    #
+    # def get_cert_direct_kwh_pmi_from_cost_curve(self, query_co2e_gpmi):
+    #     """
+    #     Get kWh/mi from the composite cost curve for the provided cert CO2e g/mi value(s).
+    #
+    #     Args:
+    #         query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi value(s) at which to query the cost curve
+    #
+    #     Returns:
+    #         A float or numeric Array of kWh/mi values
+    #
+    #     """
+    #     return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
+    #                                             'cert_direct_kwh_per_mile')
+    #
+    # def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
+    #     """
+    #     Get new vehicle manufacturer generalized cost from the composite cost curve for the provided cert CO2e g/mi
+    #     value(s).
+    #
+    #     Args:
+    #         query_co2e_gpmi (numeric list or Array): the cert CO2e value(s) at which to query the cost curve
+    #
+    #     Returns:
+    #         A float or numeric Array of new vehicle manufacturer generalized costs
+    #
+    #     """
+    #     return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
+    #                                             'new_vehicle_mfr_generalized_cost_dollars')
 
     def get_max_cert_co2e_gpmi(self):
         """
@@ -1287,7 +1310,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
                 base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
-                base_year_vehicle_id=i + 3,  # i.e. vehicles.csv row number...
+                base_year_vehicle_id=i,  # i.e. aggregated_vehicles.csv index number...
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],

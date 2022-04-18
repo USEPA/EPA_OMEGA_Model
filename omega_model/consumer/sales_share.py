@@ -77,6 +77,7 @@ print('importing %s' % __file__)
 from omega_model import *
 import math
 
+
 class SalesShare(OMEGABase, SalesShareBase):
     """
     Loads and provides access to GCAM consumer response parameters.
@@ -132,10 +133,12 @@ class SalesShare(OMEGABase, SalesShareBase):
         Relative shares are calculated within the parent market class and then converted to absolute shares.
 
         Args:
-            producer_decision (Series): selected producer compliance option
-            market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
-                'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
-                columns, where MC = market class ID
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
             calendar_year (int): calendar year to calculate market shares in
             parent_market_class (str): e.g. 'non_hauling'
             child_market_classes ([strs]): e.g. ['non_hauling.BEV', 'non_hauling.ICE']
@@ -214,7 +217,7 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, vehicle_class, prev_share_norm):
+    def calc_new_fleet_share(calendar_year, producer_decision, prev_producer_decision, vehicle_class, prev_share_norm):
         """
 
         Args:
@@ -277,9 +280,15 @@ class SalesShare(OMEGABase, SalesShareBase):
         return math.exp(share_raw)
 
     @staticmethod
-    def calc_shares_NEMS(producer_decision, market_class_data, prev_market_class_data, calendar_year):
-        pc_share = calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, 'LDV')
-        lt_share = calc_new_fleet_share(calendar_year, market_class_data, prev_market_class_data, 'LDT')
+    def calc_shares_NEMS(producer_decision, prev_producer_decision, calendar_year):
+        # if something_something:
+        #     prev_producer_decision = producer_decision
+
+        # TODO: just bootstrapping here, eventually need to store previous decision somewhere when finalizing
+        prev_producer_decision = producer_decision
+
+        pc_share = calc_new_fleet_share(calendar_year, producer_decision, prev_producer_decision, 'LDV')
+        lt_share = calc_new_fleet_share(calendar_year, producer_decision, prev_producer_decision, 'LDT')
 
         pc_share = pc_share / (pc_share + lt_share)
         lt_share = 1 - pc_share
@@ -293,10 +302,12 @@ class SalesShare(OMEGABase, SalesShareBase):
 
         Args:
             calendar_year (int): calendar year to calculate market shares in
-            producer_decision (Series): selected producer compliance option
-            market_class_data (DataFrame): DataFrame with 'average_fuel_price_MC',
-                'average_modified_cross_subsidized_price_MC', 'average_co2e_gpmi_MC', 'average_kwh_pmi_MC'
-                columns, where MC = market class ID
+            producer_decision (Series): selected producer compliance option with
+                'average_retail_fuel_price_dollars_per_unit_MC',
+                'average_onroad_direct_co2e_gpmi_MC', 'average_onroad_direct_kwh_pmi_MC' attributes,
+                where MC = market class ID
+            market_class_data (DataFrame): DataFrame with 'average_modified_cross_subsidized_price_MC' columns,
+                where MC = market class ID
             mc_parent (str): e.g. '' for the total market, 'hauling' or 'non_hauling', etc
             mc_pair ([strs]): e.g. '['hauling', 'non_hauling'] or ['hauling.ICE', 'hauling.BEV'], etc
 
@@ -327,6 +338,19 @@ class SalesShare(OMEGABase, SalesShareBase):
                                                         mc_parent, mc_pair)
 
         return market_class_data
+
+    @staticmethod
+    def calc_base_year_data(base_year_vehicles_df):
+        base_year = max(base_year_vehicles_df['model_year'].values)
+        base_year_vehicles_df = base_year_vehicles_df[base_year_vehicles_df['model_year'] == base_year]
+
+        base_year_reg_class_data = \
+            base_year_vehicles_df.groupby(['reg_class_id']).apply(sales_weight_average_dataframe)
+
+        for rc in legacy_reg_classes:
+            for c in ['curbweight_lbs', 'rated_hp']:  # TODO: add 'onroad_mpg' ...
+                SalesShare._data['share_seed_data', base_year, rc, c] = base_year_reg_class_data[c][rc]
+
 
     @staticmethod
     def init_from_file(filename, verbose=False):

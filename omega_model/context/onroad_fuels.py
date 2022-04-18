@@ -74,6 +74,10 @@ class OnroadFuel(OMEGABase):
 
     fuel_ids = []  # list of known fuel ids
 
+    # TODO: I don't know where this should be defined, or if it should be a user input
+    kilowatt_hours_per_gallon = 33.7  # for MPGe calcs from kWh/mi ...
+    grams_co2e_per_gallon = 8887  # for MPG calcs from gCO2e/mi
+
     @staticmethod
     def get_fuel_attribute(calendar_year, in_use_fuel_id, attribute):
         """

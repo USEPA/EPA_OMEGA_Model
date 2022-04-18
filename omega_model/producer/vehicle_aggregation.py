@@ -221,26 +221,6 @@ aggregation_columns = ['context_size_class', 'body_style', 'electrification_clas
                        'cert_fuel_id', 'reg_class_id', 'drive_system']
 
 
-def weighted_average(df):
-    import numpy as np
-
-    numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
-    non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
-
-    avg_df = pd.Series()
-
-    for c in numeric_columns:
-        if 'sales' not in c and c != 'model_year':
-            avg_df[c] = np.nansum(df[c].values * df['sales'].values) / np.sum(df['sales'].values * ~np.isnan(df[c].values))
-        elif 'sales' in c:
-            avg_df[c] = df[c].sum()
-
-    for c in non_numeric_columns:
-        avg_df[c] = ':'.join(df[c].unique())
-
-    return avg_df
-
-
 class VehicleAggregation(OMEGABase):
     """
     **Implements aggregation of detailed vehicle data into compliance vehicles.**
@@ -412,14 +392,18 @@ class VehicleAggregation(OMEGABase):
             df.to_csv(omega_globals.options.output_folder + 'costed_vehicles.csv')
 
             # calculate weighted numeric values within the groups, and combined string values
-            agg_df = df.groupby(aggregation_columns, as_index=False).apply(weighted_average)
+            agg_df = df.groupby(aggregation_columns, as_index=False).apply(sales_weight_average_dataframe)
             agg_df['vehicle_name'] = agg_df[aggregation_columns].apply(lambda x: ':'.join(x.values.astype(str)), axis=1)
             agg_df['manufacturer_id'] = 'consolidated_OEM'
             agg_df['model_year'] = df['model_year'].iloc[0]
 
             agg_df.to_csv(omega_globals.options.output_folder + 'aggregated_vehicles.csv')
 
+            agg_df['rated_hp'] = agg_df['eng_rated_hp']  # TODO: we need to figure out this 'engine' rated hp biz
+
             omega_globals.options.vehicles_df = agg_df
+
+            omega_globals.options.SalesShare.calc_base_year_data(omega_globals.options.vehicles_df)
 
         return template_errors
 
