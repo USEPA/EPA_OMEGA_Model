@@ -646,7 +646,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
-                       'base_year_glider_non_structure_mass_lbs',
+                       'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
                        'base_year_footprint_ft2', 'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                        'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'}
@@ -754,6 +754,7 @@ class Vehicle(OMEGABase):
         self.structure_material = ''
         self.powertrain_type = ''
         self.base_year_reg_class_id = None
+        self.base_year_vehicle_id = 0
         self.base_year_market_share = 0
         self.base_year_glider_non_structure_mass_lbs = 0
         self.base_year_glider_non_structure_cost_dollars = 0
@@ -1059,6 +1060,7 @@ class VehicleFinal(SQABase, Vehicle):
     charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
+    base_year_vehicle_id = Column(Float)  #: base year vehicle id from vehicles.csv
     base_year_market_share = Column(Float)  #: base year market share, used to maintain market share relationships within context size classes
     base_year_glider_non_structure_mass_lbs = Column(Float)  #: base year non-structure mass lbs (i.e. "content")
     base_year_glider_non_structure_cost_dollars = Column(Float)  #: base year non-structure cost dollars
@@ -1213,8 +1215,9 @@ class VehicleFinal(SQABase, Vehicle):
         """
         inherit_properties = ['name', 'manufacturer_id', 'compliance_id',
                               'reg_class_id', 'context_size_class', 'unibody_structure', 'body_style',
-                              'base_year_reg_class_id', 'base_year_market_share', 'curbweight_lbs',
-                              'base_year_glider_non_structure_mass_lbs', 'base_year_glider_non_structure_cost_dollars',
+                              'base_year_reg_class_id', 'base_year_market_share', 'base_year_vehicle_id',
+                              'curbweight_lbs', 'base_year_glider_non_structure_mass_lbs',
+                              'base_year_glider_non_structure_cost_dollars',
                               'footprint_ft2', 'base_year_footprint_ft2', 'drive_system',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
                               'target_coef_a', 'target_coef_b', 'target_coef_c'] \
@@ -1284,6 +1287,7 @@ class VehicleFinal(SQABase, Vehicle):
                 base_year_msrp_dollars=df.loc[i, 'msrp_dollars'],
                 base_year_glider_non_structure_mass_lbs=df.loc[i, 'glider_non_structure_mass_lbs'],
                 base_year_glider_non_structure_cost_dollars=df.loc[i, 'glider_non_structure_cost_dollars'],
+                base_year_vehicle_id=i + 3,  # i.e. vehicles.csv row number...
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
