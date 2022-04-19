@@ -352,6 +352,7 @@ class VehicleAggregation(OMEGABase):
                 veh = Vehicle()
                 veh.model_year = row['model_year']
                 veh.electrification_class = row['electrification_class']
+                veh.base_year_reg_class_id = row['reg_class_id']
                 veh.market_class_id = omega_globals.options.MarketClass.get_vehicle_market_class(veh)
                 veh.drive_system = row['drive_system']
 

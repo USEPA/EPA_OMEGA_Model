@@ -410,11 +410,17 @@ class SalesShare(OMEGABase, SalesShareBase):
         analysis_non_hauling_share *= SalesShare._data['non_hauling_calibration'][calendar_year]
         analysis_hauling_share = 1 - analysis_non_hauling_share
 
-        market_class_data['consumer_abs_share_frac_hauling'] = \
-            producer_decision['producer_abs_share_frac_hauling']
+        # market_class_data['consumer_abs_share_frac_non_hauling'] = \
+        #     producer_decision['producer_abs_share_frac_non_hauling']
+        #
+        # market_class_data['consumer_abs_share_frac_hauling'] = \
+        #     producer_decision['producer_abs_share_frac_hauling']
 
         market_class_data['consumer_abs_share_frac_non_hauling'] = \
-            producer_decision['producer_abs_share_frac_non_hauling']
+            analysis_non_hauling_share
+
+        market_class_data['consumer_abs_share_frac_hauling'] = \
+            analysis_hauling_share
 
         if all([SalesShare.gcam_supports_market_class(mc) for mc in mc_pair]):
             # calculate desired ICE/BEV shares within hauling/non_hauling using methods based on the GCAM model:
