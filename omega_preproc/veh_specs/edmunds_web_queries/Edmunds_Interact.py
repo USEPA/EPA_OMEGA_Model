@@ -475,8 +475,8 @@ def Edmunds_Interact(url):
     sleep_3sec = 3
     sleep_sec = 1
     wait_sec = 30
-    _max_trim_groups_count = 20 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
-    _max_trim_buttons =  60     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
+    _max_trim_groups_count = 75 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
+    _max_trim_buttons =  100     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
     _num_menu_columns = 1 # 3 trims were displayed in 2020, and changed the trim column to 1 in 2021
     trim_options = []
     num_column_shift = 2 #
@@ -696,7 +696,7 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                 for i in range(_num_menu_columns):
                     table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i_trims_page]})
                 tmp_raw_table = table_list[table_count]
-                if (name_category == 'Battery & Range'):
+                if (name_category == 'Battery & Range') or (name_category == 'Fuel & MPG'):
                     for j in range(len(tmp_raw_table)):
                         if ('EPA Combined MPGe'.lower() in tmp_raw_table[name_category][j].lower()):
                             tmp_raw_table[name_category][j] = 'EPA Combined MPGe'
