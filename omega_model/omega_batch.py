@@ -963,7 +963,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.session_is_reference = self.num == 0
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
-        self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
+        self.settings.generate_context_calibration_files = (self.num == 0)
 
         # read context settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')

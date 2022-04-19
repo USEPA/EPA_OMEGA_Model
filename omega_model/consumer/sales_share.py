@@ -75,6 +75,9 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
+from context.fuel_prices import FuelPrice
+from common.omega_functions import sales_weight_average_dataframe
+
 import math
 
 
@@ -84,6 +87,8 @@ class SalesShare(OMEGABase, SalesShareBase):
 
     """
     _data = dict()
+
+    prev_producer_decisions_and_responses = []
 
     @staticmethod
     def gcam_supports_market_class(market_class_id):
@@ -217,37 +222,45 @@ class SalesShare(OMEGABase, SalesShareBase):
         return market_class_data.copy()
 
     @staticmethod
-    def calc_new_fleet_share(calendar_year, producer_decision, prev_producer_decision, vehicle_class, prev_share_norm):
+    def calc_new_fleet_share(calendar_year, prev_producer_decision_and_response1, prev_producer_decision_and_response2,
+                             market_class):
         """
 
         Args:
             calendar_year (int):
-            market_class_data:
-            prev_market_class_data:
-            vehicle_class (str): e.g. 'LDV' or 'LDT'
-            prev_share_norm (float): prior vehicle class share, 0..1
+            prev_producer_decision_and_response1:
+            prev_producer_decision_and_response2:
+            market_class (str): e.g. 'hauling' or 'non_hauling'
 
         Returns:
             Non-normalized fleet share for the given vehicle class
 
         """
         # seeds need vehicle_power, curbweight and average_mpg attributes
-        class seed_data():
-            def __init__(self, vehicle_power, curbweight, average_onroad_mpg, prev_share_norm):
-                self.share = prev_share_norm
+        class seed_data(OMEGABase):
+            def __init__(self, vehicle_power, curbweight, average_onroad_mpg, prev_share_norm=None):
+                if prev_share_norm:
+                    self.share = prev_share_norm
                 self.vehicle_power = vehicle_power
                 self.curbweight = curbweight
                 self.average_onroad_mpg = average_onroad_mpg
 
-        if vehicle_class == 'LDV':
-            seed1 = seed_data(150, 3500, 27, prev_share_norm)  # vehicle_class data, year-1
-            seed2 = seed_data(150, 3500, 27, prev_share_norm)  # vehicle_class data, year-2
+        if 'consumer_abs_share_frac_%s' % market_class in prev_producer_decision_and_response1:
+            prev_share_norm = prev_producer_decision_and_response1['consumer_abs_share_frac_%s' % market_class]
         else:
-            seed1 = seed_data(250, 5500, 17, prev_share_norm)  # vehicle_class data, year-1
-            seed2 = seed_data(250, 5500, 17, prev_share_norm)  # vehicle_class data, year-2
+            prev_share_norm = prev_producer_decision_and_response1['producer_abs_share_frac_%s' % market_class]
 
-        gasFP0 = 2.75  # FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
-        gasFP1 = 2.75  # FuelPrice.get_fuel_prices(calendar_year-1, 'retail_dollars_per_unit', 'pump gasoline')
+        seed1 = seed_data(prev_producer_decision_and_response1['average_rated_hp_%s' % market_class],
+                          prev_producer_decision_and_response1['average_curbweight_lbs_%s' % market_class],
+                          prev_producer_decision_and_response1['average_onroad_mpg_%s' % market_class],
+                          prev_share_norm)  # vehicle_class data, year-1
+
+        seed2 = seed_data(prev_producer_decision_and_response2['average_rated_hp_%s' % market_class],
+                          prev_producer_decision_and_response2['average_curbweight_lbs_%s' % market_class],
+                          prev_producer_decision_and_response2['average_onroad_mpg_%s' % market_class])  # vehicle data, year-2
+
+        gasFP0 = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', 'pump gasoline')
+        gasFP1 = FuelPrice.get_fuel_prices(calendar_year-1, 'retail_dollars_per_unit', 'pump gasoline')
 
         LDV_constants = {'Constant': 3.4468,
                          'Rho': 0.8903,
@@ -267,7 +280,7 @@ class SalesShare(OMEGABase, SalesShareBase):
                          'Dummy': 0.6192,
                          }
 
-        dfs_coeffs = pd.Series({'LDV': LDV_constants, 'LDT': LDT_constants}[vehicle_class])
+        dfs_coeffs = pd.Series({'non_hauling': LDV_constants, 'hauling': LDT_constants}[market_class])
 
         share_raw = (dfs_coeffs.Constant * (1 - dfs_coeffs.Rho) + dfs_coeffs.Rho * math.log(seed1.share) +
                      dfs_coeffs.FP * (math.log(gasFP0 * 100) - dfs_coeffs.Rho * math.log(gasFP1 * 100)) +
@@ -280,20 +293,68 @@ class SalesShare(OMEGABase, SalesShareBase):
         return math.exp(share_raw)
 
     @staticmethod
-    def calc_shares_NEMS(producer_decision, prev_producer_decision, calendar_year):
-        # if something_something:
-        #     prev_producer_decision = producer_decision
+    def calc_shares_NEMS(calendar_year, producer_decision):
+        if len(SalesShare.prev_producer_decisions_and_responses) == 0:
+            # no historical share data, use current decision plus base year data
+            base_year_data = omega_globals.options.vehicles_df.groupby('reg_class_id').\
+                apply(sales_weight_average_dataframe)
 
-        # TODO: just bootstrapping here, eventually need to store previous decision somewhere when finalizing
-        prev_producer_decision = producer_decision
+            prev_producer_decision_and_response1 = producer_decision.copy()
 
-        pc_share = calc_new_fleet_share(calendar_year, producer_decision, prev_producer_decision, 'LDV')
-        lt_share = calc_new_fleet_share(calendar_year, producer_decision, prev_producer_decision, 'LDT')
+            # need rated_hp, curbweight_lbs and abs_share_fracs and mpg, for prior two years, if possible
+            # year-1 = base year, use base year data except for mpg, don't have data, implicitly use current year mpg
+            prev_producer_decision_and_response1['average_rated_hp_non_hauling'] = \
+                base_year_data['rated_hp']['car']
+            prev_producer_decision_and_response1['average_rated_hp_hauling'] = \
+                base_year_data['rated_hp']['truck']
+            prev_producer_decision_and_response1['average_curbweight_lbs_non_hauling'] = \
+                base_year_data['curbweight_lbs']['car']
+            prev_producer_decision_and_response1['average_curbweight_lbs_hauling'] = \
+                base_year_data['curbweight_lbs']['truck']
+            prev_producer_decision_and_response1['consumer_abs_share_frac_non_hauling'] = \
+                base_year_data['sales']['car'] / base_year_data['sales'].sum()
+            prev_producer_decision_and_response1['consumer_abs_share_frac_hauling'] = \
+                base_year_data['sales']['truck'] / base_year_data['sales'].sum()
 
-        pc_share = pc_share / (pc_share + lt_share)
-        lt_share = 1 - pc_share
+            # year-2 has no data, use base year data except for mpg, don't have data, implicitly use current year mpg
+            prev_producer_decision_and_response2 = prev_producer_decision_and_response1.copy()
 
-        return pc_share, lt_share
+        elif len(SalesShare.prev_producer_decisions_and_responses) == 1:
+            base_year_data = omega_globals.options.vehicles_df.groupby('reg_class_id').\
+                apply(sales_weight_average_dataframe)
+
+            # year-1 = prior analysis year, use it for all fields
+            prev_producer_decision_and_response1 = SalesShare.prev_producer_decisions_and_responses[-1]
+
+            # year-2 = base year, use if for all fields except mpg, don't have data, implicitly use prior year mpg
+            prev_producer_decision_and_response2 = SalesShare.prev_producer_decisions_and_responses[-1].copy()
+            prev_producer_decision_and_response2['average_rated_hp_non_hauling'] = \
+                base_year_data['rated_hp']['car']
+            prev_producer_decision_and_response2['average_rated_hp_hauling'] = \
+                base_year_data['rated_hp']['truck']
+            prev_producer_decision_and_response2['average_curbweight_lbs_non_hauling'] = \
+                base_year_data['curbweight_lbs']['car']
+            prev_producer_decision_and_response2['average_curbweight_lbs_hauling'] = \
+                base_year_data['curbweight_lbs']['truck']
+            prev_producer_decision_and_response2['consumer_abs_share_frac_non_hauling'] = \
+                base_year_data['sales']['car'] / base_year_data['sales'].sum()
+            prev_producer_decision_and_response2['consumer_abs_share_frac_hauling'] = \
+                base_year_data['sales']['truck'] / base_year_data['sales'].sum()
+        else:
+            # two prior years of share data, use as-is
+            prev_producer_decision_and_response1 = SalesShare.prev_producer_decisions_and_responses[-1]
+            prev_producer_decision_and_response2 = SalesShare.prev_producer_decisions_and_responses[-2]
+
+        non_hauling_share = SalesShare.calc_new_fleet_share(calendar_year, prev_producer_decision_and_response1,
+                                                            prev_producer_decision_and_response2, 'non_hauling')
+
+        hauling_share = SalesShare.calc_new_fleet_share(calendar_year, prev_producer_decision_and_response1,
+                                                        prev_producer_decision_and_response2, 'hauling')
+
+        non_hauling_share = non_hauling_share / (non_hauling_share + hauling_share)
+        hauling_share = 1 - non_hauling_share
+
+        return non_hauling_share, hauling_share
 
     @staticmethod
     def calc_shares(calendar_year, producer_decision, market_class_data, mc_parent, mc_pair):
@@ -325,6 +386,8 @@ class SalesShare(OMEGABase, SalesShareBase):
         # which gets them from the context size class projections and the makeup of the base year fleet.
         # If the hauling/non_hauling shares were responsive (endogenous), methods to calculate these values would
         # be called here.
+
+        # non_hauling_share, hauling_share = SalesShare.calc_shares_NEMS(calendar_year, producer_decision)
 
         market_class_data['consumer_abs_share_frac_hauling'] = \
             producer_decision['producer_abs_share_frac_hauling']
@@ -369,6 +432,8 @@ class SalesShare(OMEGABase, SalesShareBase):
         import numpy as np
 
         SalesShare._data.clear()
+
+        SalesShare.prev_producer_decisions_and_responses = []
 
         if verbose:
             omega_log.logwrite('\nInitializing database from %s...' % filename)

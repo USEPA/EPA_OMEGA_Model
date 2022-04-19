@@ -153,7 +153,7 @@ class NewVehicleMarket(OMEGABase):
         cls._context_new_vehicle_generalized_costs.clear()
         cls._session_new_vehicle_generalized_costs.clear()
 
-        if not omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
+        if not omega_globals.options.generate_context_calibration_files:
             df = pd.read_csv(filename, index_col=0, dtype=str)
             # wanted to do: cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas

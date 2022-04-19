@@ -307,6 +307,9 @@ def run_producer_consumer():
             credit_banks[compliance_id].handle_credit(calendar_year,
                                                      producer_decision_and_response['total_credits_co2e_megagrams'])
 
+            # TODO: encapsulate this:
+            omega_globals.options.SalesShare.prev_producer_decisions_and_responses.append(producer_decision_and_response)
+
             stock.update_stock(calendar_year, compliance_id)
 
         credit_banks[compliance_id].credit_bank.to_csv(omega_globals.options.output_folder +
@@ -1479,9 +1482,10 @@ def run_omega(session_runtime_options, standalone_run=False):
             from context.new_vehicle_market import NewVehicleMarket
 
             if omega_globals.options.session_is_reference and \
-                    omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
+                    omega_globals.options.generate_context_calibration_files:
                 NewVehicleMarket.save_context_new_vehicle_generalized_costs(
                     omega_globals.options.context_new_vehicle_generalized_costs_file)
+                #TODO: save NEMS market share calibrations
 
             NewVehicleMarket.save_session_new_vehicle_generalized_costs(
                 omega_globals.options.output_folder + omega_globals.options.session_unique_name +
