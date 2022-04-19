@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.join(path, '..'))  # picks up omega_model sub-package
 
 from omega_model import *
 from omega_model.consumer import stock
+from omega_model.context.onroad_fuels import OnroadFuel
 import postproc_session
 
 
@@ -307,8 +308,7 @@ def run_producer_consumer():
             credit_banks[compliance_id].handle_credit(calendar_year,
                                                      producer_decision_and_response['total_credits_co2e_megagrams'])
 
-            # TODO: encapsulate this:
-            omega_globals.options.SalesShare.prev_producer_decisions_and_responses.append(producer_decision_and_response)
+            omega_globals.options.SalesShare.store_producer_decision_and_response(producer_decision_and_response)
 
             stock.update_stock(calendar_year, compliance_id)
 
@@ -1485,7 +1485,8 @@ def run_omega(session_runtime_options, standalone_run=False):
                     omega_globals.options.generate_context_calibration_files:
                 NewVehicleMarket.save_context_new_vehicle_generalized_costs(
                     omega_globals.options.context_new_vehicle_generalized_costs_file)
-                #TODO: save NEMS market share calibrations
+                omega_globals.options.SalesShare.save_calibration(
+                    omega_globals.options.sales_share_calibration_file)
 
             NewVehicleMarket.save_session_new_vehicle_generalized_costs(
                 omega_globals.options.output_folder + omega_globals.options.session_unique_name +

@@ -122,7 +122,7 @@ class NewVehicleMarket(OMEGABase):
     """
 
     _data_by_csc_rc = dict()  # private dict, sales by context size class and legacy reg class
-    _data_by_rc = dict()  # private dict, sales by legacy reg class
+    _data_by_rc = pd.DataFrame()  # private dict, sales by legacy reg class
     _data_by_csc = dict()  # private dict, sales by context size class
     _data_by_total = dict()  # private dict, total sales
 
@@ -360,7 +360,7 @@ class NewVehicleMarket(OMEGABase):
         """
 
         NewVehicleMarket._data_by_csc_rc.clear()
-        NewVehicleMarket._data_by_rc.clear()
+        NewVehicleMarket._data_by_rc = pd.DataFrame()
         NewVehicleMarket._data_by_csc.clear()
         NewVehicleMarket._data_by_total.clear()
 

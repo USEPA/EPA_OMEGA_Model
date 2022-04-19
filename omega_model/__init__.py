@@ -98,6 +98,7 @@ try:
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
             self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
+            self.sales_share_calibration_file = 'context_sales_share_calibration.csv'
             self.generate_context_calibration_files = True
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
