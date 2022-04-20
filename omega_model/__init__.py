@@ -187,7 +187,7 @@ try:
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
             self.run_profiler = False
-            self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
+            self.multiprocessing = False and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.flat_context = False
             self.flat_context_year = 2021
 
@@ -202,7 +202,7 @@ try:
                                             'cross_subsidy_convergence_']
 
             self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
-            self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
+            self.log_producer_compliance_search_years = [2020]  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
 

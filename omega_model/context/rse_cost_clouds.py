@@ -410,6 +410,16 @@ class CostCloud(OMEGABase, CostCloudBase):
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2
                             v.set_target_co2e_grams_per_mile()
+                            cloud_point['target_co2e_Mg_per_vehicle'] = \
+                                omega_globals.options.VehicleTargets.calc_target_co2e_Mg(v, sales_variants=1)
+
+                            cloud_point['cert_co2e_Mg_per_vehicle'] = \
+                                omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(v, co2_gpmi_variants=
+                                cloud_point['cert_co2e_grams_per_mile'], sales_variants=1)
+
+                            cloud_point['credits_co2e_Mg_per_vehicle'] = \
+                                cloud_point['target_co2e_Mg_per_vehicle'] - cloud_point['cert_co2e_Mg_per_vehicle']
+
                             cloud_point['target_co2e_grams_per_mile'] = v.target_co2e_grams_per_mile
 
                             cloud_point['credits_co2e_grams_per_mile'] = \
