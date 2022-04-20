@@ -334,8 +334,11 @@ class CompositeVehicle(OMEGABase):
         self.fueling_class = self.vehicle_list[0].fueling_class
         self.market_class_id = self.vehicle_list[0].market_class_id
 
-        # weighted values are populated from interpolating the composite cost curve after production decisions
-        # are applied to composite vehicles
+        # weighted values are applied to the source vehicles by interpolating the composite cost curve after production
+        # decisions are applied to composite vehicles, then those values are re-calculated for the composite vehicle based
+        # on the relative share weights of the source vehicles.  See ``decompose()``
+        # Composite vehicle weighted values are used to calculate market class/category sales-weighted average values
+        # used by the ``omega_globals.options.SalesShare`` module to determine market shares
         self.weighted_values = ['cert_co2e_grams_per_mile',
                                 'cert_direct_co2e_grams_per_mile',
                                 'cert_direct_kwh_per_mile',
@@ -343,6 +346,7 @@ class CompositeVehicle(OMEGABase):
                                 'onroad_direct_kwh_per_mile',
                                 'new_vehicle_mfr_cost_dollars',
                                 'new_vehicle_mfr_generalized_cost_dollars',
+                                # these are needed for NEMS market share calcs (in addition to g/mi and kWh/hi):
                                 'curbweight_lbs',
                                 'rated_hp',
                                 ]
@@ -572,56 +576,6 @@ class CompositeVehicle(OMEGABase):
         return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
                                          attribute_name)
 
-    # def get_new_vehicle_mfr_cost_from_cost_curve(self, query_co2e_gpmi):
-    #     """
-    #     Get new vehicle manufacturer cost from the composite cost curve for the provided cert CO2e g/mi value(s).
-    #
-    #     Args:
-    #         query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi values at which to query the cost curve
-    #
-    #     Returns:
-    #         A float or numeric Array of new vehicle manufacturer costs
-    #
-    #     """
-    #
-    #     return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
-    #                                      'new_vehicle_mfr_cost_dollars')
-    #
-    #     # if len(self.cost_curve) > 1:
-    #     #     return np.interp(query_co2e_gpmi, self.cost_curve['cert_co2e_grams_per_mile'],
-    #     #                                               self.cost_curve['new_vehicle_mfr_cost_dollars'])
-    #     # else:
-    #     #     return self.cost_curve['new_vehicle_mfr_cost_dollars'].item()
-    #
-    # def get_cert_direct_kwh_pmi_from_cost_curve(self, query_co2e_gpmi):
-    #     """
-    #     Get kWh/mi from the composite cost curve for the provided cert CO2e g/mi value(s).
-    #
-    #     Args:
-    #         query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi value(s) at which to query the cost curve
-    #
-    #     Returns:
-    #         A float or numeric Array of kWh/mi values
-    #
-    #     """
-    #     return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
-    #                                             'cert_direct_kwh_per_mile')
-    #
-    # def get_new_vehicle_mfr_generalized_cost_from_cost_curve(self, query_co2e_gpmi):
-    #     """
-    #     Get new vehicle manufacturer generalized cost from the composite cost curve for the provided cert CO2e g/mi
-    #     value(s).
-    #
-    #     Args:
-    #         query_co2e_gpmi (numeric list or Array): the cert CO2e value(s) at which to query the cost curve
-    #
-    #     Returns:
-    #         A float or numeric Array of new vehicle manufacturer generalized costs
-    #
-    #     """
-    #     return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
-    #                                             'new_vehicle_mfr_generalized_cost_dollars')
-
     def get_max_cert_co2e_gpmi(self):
         """
         Get maximum cert CO2e g/mi from the cost curve.
@@ -667,7 +621,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
                        'context_size_class', 'electrification_class',
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
-                       'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style',
+                       'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
                        'base_year_vehicle_id', 'base_year_glider_non_structure_mass_lbs',
                        'base_year_glider_non_structure_cost_dollars',
@@ -770,9 +724,9 @@ class Vehicle(OMEGABase):
         self.curbweight_lbs = 0
         self.footprint_ft2 = 0
         self.eng_rated_hp = 0
-        self.target_coef_a = 0
-        self.target_coef_b = 0
-        self.target_coef_c = 0
+        self.base_year_target_coef_a = 0
+        self.base_year_target_coef_b = 0
+        self.base_year_target_coef_c = 0
         self.body_style = ''
         self.structure_material = ''
         self.powertrain_type = ''
@@ -1056,7 +1010,6 @@ class VehicleFinal(SQABase, Vehicle):
 
     model_year = Column(Numeric)  #: vehicle model year
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
-    cost_curve_class = Column(String)  #: ALPHA modeling result class
     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
     electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
@@ -1069,18 +1022,10 @@ class VehicleFinal(SQABase, Vehicle):
     market_class_id = Column(String)  #: market class ID, as determined by the consumer subpackage
     unibody_structure = Column(Float)  #: unibody structure flag, e.g. 0,1
     drive_system = Column(Float)  #: drive system, 1=FWD, 2=RWD, 4=AWD
-    curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
-    footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
-    eng_rated_hp = Column(Float)  #: engine rated horsepower
-    target_coef_a = Column(Float)  #: roadload A coefficient, lbs
-    target_coef_b = Column(Float)  #: roadload B coefficient, lbs/mph
-    target_coef_c = Column(Float)  #: roadload C coefficient, lbs/mph^2
     body_style = Column(String)  #: vehicle body style, e.g. 'sedan'
-    structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
     powertrain_type = Column(String)  #: vehicle powertrain type, e.g. 'ICE', 'HEV', etc
-    battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
-    motor_kw = Column(Float)  #: vehicle propulsion motor(s) total power, kW
     charge_depleting_range_mi = Column(Float)  #: vehicle charge-depleting range, miles
+
     # "base year properties" - things that may change over time but we want to retain the original values
     base_year_reg_class_id = Column(Enum(*legacy_reg_classes, validate_strings=True))  #: base year regulatory class, historical data
     base_year_vehicle_id = Column(Float)  #: base year vehicle id from vehicles.csv
@@ -1090,6 +1035,20 @@ class VehicleFinal(SQABase, Vehicle):
     base_year_footprint_ft2 = Column(Float)  #: base year vehicle footprint, square feet
     base_year_curbweight_lbs_to_hp = Column(Float)  #: base year curbweight to power ratio (pounds per hp)
     base_year_msrp_dollars = Column(Float)  #: base year Manufacturer Suggested Retail Price (dollars)
+    base_year_target_coef_a = Column(Float)  #: roadload A coefficient, lbs
+    base_year_target_coef_b = Column(Float)  #: roadload B coefficient, lbs/mph
+    base_year_target_coef_c = Column(Float)  #: roadload C coefficient, lbs/mph^2
+
+    # TODO: non-numeric attributes that >could< change based on interpolating the frontier...:
+    cost_curve_class = Column(String)  #: ALPHA modeling result class
+    structure_material = Column(String)  #: vehicle body structure material, e.g. 'steel'
+    # numeric attributes that can change based on interpolating the frontier:
+    battery_kwh = Column(Float)  #: vehicle propulsion battery kWh
+    motor_kw = Column(Float)  #: vehicle propulsion motor(s) total power, kW
+    curbweight_lbs = Column(Float)  #: vehicle curbweight, pounds
+    footprint_ft2 = Column(Float)  #: vehicle footprint, square feet
+    # TODO: maybe: ?? does rated_hp -> eng_rated_hp?
+    eng_rated_hp = Column(Float)  #: engine rated horsepower
 
     _initial_registered_count = Column('_initial_registered_count', Float)
 
@@ -1102,8 +1061,8 @@ class VehicleFinal(SQABase, Vehicle):
                                    'context_size_class', 'electrification_class', 'cost_curve_class', 'in_use_fuel_id',
                                    'cert_fuel_id', 'sales', 'footprint_ft2', 'eng_rated_hp',
                                    'unibody_structure', 'drive_system', 'curbweight_lbs',
-                                   'target_coef_a', 'target_coef_b', 'target_coef_c', 'body_style', 'msrp_dollars',
-                                   'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
+                                   'target_coef_a', 'target_coef_b', 'target_coef_c',
+                                   'body_style', 'msrp_dollars', 'structure_material'}  #: mandatory input file columns, the rest can be optional numeric columns
                                     # TODO: 'battery_kwh', 'motor_kw', 'charge_depleting_range_mi'
 
     dynamic_columns = []  #: additional data columns such as footprint, passenger capacity, etc
@@ -1243,7 +1202,7 @@ class VehicleFinal(SQABase, Vehicle):
                               'base_year_glider_non_structure_cost_dollars',
                               'footprint_ft2', 'base_year_footprint_ft2', 'drive_system',
                               'base_year_curbweight_lbs_to_hp', 'base_year_msrp_dollars',
-                              'target_coef_a', 'target_coef_b', 'target_coef_c'] \
+                              'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c'] \
                               + VehicleFinal.dynamic_attributes
 
         # model year and registered count are required to make a full-blown VehicleFinal object
@@ -1287,7 +1246,7 @@ class VehicleFinal(SQABase, Vehicle):
         for i in df.index:
             veh = VehicleFinal(
                 name=df.loc[i, 'vehicle_name'],
-                manufacturer_id=df.loc[i, 'manufacturer_id'],
+                manufacturer_id=df.loc[i, 'compliance_id'],  # df.loc[i, 'manufacturer_id'],
                 model_year=df.loc[i, 'model_year'],
                 context_size_class=df.loc[i, 'context_size_class'],
                 electrification_class=df.loc[i, 'electrification_class'],
@@ -1300,9 +1259,9 @@ class VehicleFinal(SQABase, Vehicle):
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
                 footprint_ft2=df.loc[i, 'footprint_ft2'],
                 eng_rated_hp=df.loc[i, 'eng_rated_hp'],
-                target_coef_a=df.loc[i, 'target_coef_a'],
-                target_coef_b=df.loc[i, 'target_coef_b'],
-                target_coef_c=df.loc[i, 'target_coef_c'],
+                base_year_target_coef_a=df.loc[i, 'target_coef_a'],
+                base_year_target_coef_b=df.loc[i, 'target_coef_b'],
+                base_year_target_coef_c=df.loc[i, 'target_coef_c'],
                 body_style=df.loc[i, 'body_style'],
                 structure_material=df.loc[i, 'structure_material'],
                 base_year_reg_class_id=df.loc[i, 'reg_class_id'],
