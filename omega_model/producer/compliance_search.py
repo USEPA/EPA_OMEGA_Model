@@ -71,11 +71,11 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         else:
             num_tech_options = omega_globals.options.producer_num_tech_options_per_bev_vehicle
 
-        veh_min_co2e_gpmi = cv.get_min_cert_co2e_gpmi()
-        veh_max_co2e_gpmi = cv.get_max_cert_co2e_gpmi()
+        veh_min_cost_curve_index = cv.get_min_cost_curve_index()
+        veh_max_cost_curve_index = cv.get_max_cost_curve_index()
 
         if candidate_production_decisions is not None:
-            co2_gpmi_options = np.array([])
+            cost_curve_options = np.array([])
             for idx, combo in candidate_production_decisions.iterrows():
 
                 if ((combo['veh_%s_sales' % cv.vehicle_id] > 0) or (cv.tech_option_iteration_num > 0)) and \
@@ -85,35 +85,35 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
 
                 tech_share_range = omega_globals.options.producer_compliance_search_convergence_factor ** \
                                    cv.tech_option_iteration_num
-                veh_co2e_gpmi = combo['veh_%s_co2e_gpmi' % cv.vehicle_id]
-                min_co2e_gpmi = max(veh_min_co2e_gpmi, veh_co2e_gpmi * (1 - tech_share_range))
-                max_co2e_gpmi = min(veh_max_co2e_gpmi, veh_co2e_gpmi * (1 + tech_share_range))
-                co2_gpmi_options = \
-                    np.append(np.append(co2_gpmi_options,
-                                        np.linspace(min_co2e_gpmi, max_co2e_gpmi, num=num_tech_options)), veh_co2e_gpmi)
+                veh_cost_curve_index = combo['veh_%s_cost_curve_indices' % cv.vehicle_id]
+                min_co2e_gpmi = max(veh_min_cost_curve_index, veh_cost_curve_index * (1 - tech_share_range))
+                max_co2e_gpmi = min(veh_max_cost_curve_index, veh_cost_curve_index * (1 + tech_share_range))
+                cost_curve_options = \
+                    np.append(np.append(cost_curve_options,
+                                        np.linspace(min_co2e_gpmi, max_co2e_gpmi, num=num_tech_options)), veh_cost_curve_index)
 
             if num_tech_options == 1:
-                co2_gpmi_options = [veh_max_co2e_gpmi]
+                cost_curve_options = [veh_max_cost_curve_index]
             else:
-                co2_gpmi_options = np.unique(co2_gpmi_options)  # filter out redundant tech options
+                cost_curve_options = np.unique(cost_curve_options)  # filter out redundant tech options
         else:  # first producer pass, generate full range of options
             if num_tech_options == 1:
-                co2_gpmi_options = [veh_max_co2e_gpmi]
+                cost_curve_options = [veh_max_cost_curve_index]
             else:
-                co2_gpmi_options = np.linspace(veh_min_co2e_gpmi, veh_max_co2e_gpmi, num=num_tech_options)
+                cost_curve_options = np.linspace(veh_min_cost_curve_index, veh_max_cost_curve_index, num=num_tech_options)
 
-        # tech_cost_options = cv.get_new_vehicle_mfr_cost_from_cost_curve(co2_gpmi_options)
-        # tech_generalized_cost_options = cv.get_new_vehicle_mfr_generalized_cost_from_cost_curve(co2_gpmi_options)
-        # tech_kwh_options = cv.get_cert_direct_kwh_pmi_from_cost_curve(co2_gpmi_options)
+        # tech_cost_options = cv.get_new_vehicle_mfr_cost_from_cost_curve(cost_curve_options)
+        # tech_generalized_cost_options = cv.get_new_vehicle_mfr_generalized_cost_from_cost_curve(cost_curve_options)
+        # tech_kwh_options = cv.get_cert_direct_kwh_pmi_from_cost_curve(cost_curve_options)
 
         tech_cost_options = \
-            cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', co2_gpmi_options)
+            cv.get_from_cost_curve('new_vehicle_mfr_cost_dollars', cost_curve_options)
         tech_generalized_cost_options = \
-            cv.get_from_cost_curve('new_vehicle_mfr_generalized_cost_dollars', co2_gpmi_options)
+            cv.get_from_cost_curve('new_vehicle_mfr_generalized_cost_dollars', cost_curve_options)
         tech_kwh_options = \
-            cv.get_from_cost_curve('cert_direct_kwh_per_mile', co2_gpmi_options)
+            cv.get_from_cost_curve('cert_direct_kwh_per_mile', cost_curve_options)
 
-        d = {'veh_%s_co2e_gpmi' % cv.vehicle_id: co2_gpmi_options,
+        d = {'veh_%s_cost_curve_indices' % cv.vehicle_id: cost_curve_options,
              'veh_%s_kwh_pmi' % cv.vehicle_id: tech_kwh_options,
              'veh_%s_cost_dollars' % cv.vehicle_id: tech_cost_options,
              'veh_%s_generalized_cost_dollars' % cv.vehicle_id: tech_generalized_cost_options}
@@ -294,7 +294,7 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
 
     # assign co2 values and sales to vehicles...
     for cv in composite_vehicles:
-        cv.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_co2e_gpmi' % cv.vehicle_id]
+        cv.cert_co2e_grams_per_mile = selected_production_decision['veh_%s_cost_curve_indices' % cv.vehicle_id]
         cv.cert_direct_kwh_per_mile = selected_production_decision['veh_%s_kwh_pmi' % cv.vehicle_id]
         cv.initial_registered_count = selected_production_decision['veh_%s_sales' % cv.vehicle_id]
         VehicleAttributeCalculations.perform_attribute_calculations(cv)
@@ -750,8 +750,8 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
                 composite_veh_sales * production_options[
                     'veh_%s_generalized_cost_dollars' % composite_veh.vehicle_id]
 
-            composite_veh_cert_co2_gpmi = production_options[
-                'veh_%s_co2e_gpmi' % composite_veh.vehicle_id]
+            composite_veh_cost_curve_options = production_options[
+                'veh_%s_cost_curve_indices' % composite_veh.vehicle_id]
 
         else:
             composite_veh_total_cost_dollars = \
@@ -762,32 +762,37 @@ def create_production_options_from_shares(composite_vehicles, tech_and_share_com
                 composite_veh_sales * production_options[
                     'veh_%s_generalized_cost_dollars' % composite_veh.vehicle_id].values
 
-            composite_veh_cert_co2_gpmi = production_options[
-                'veh_%s_co2e_gpmi' % composite_veh.vehicle_id].values
+            composite_veh_cost_curve_options = production_options[
+                'veh_%s_cost_curve_indices' % composite_veh.vehicle_id].values
 
         production_options['veh_%s_total_cost_dollars' % composite_veh.vehicle_id] = composite_veh_total_cost_dollars
 
+        composite_veh_credits_co2e_Mg = \
+            composite_veh_sales * composite_veh_cost_curve_options
+
         # calculate cert and target Mg for the vehicle
-        composite_veh_cert_co2e_Mg = \
-            composite_veh_sales * composite_veh.normalized_cert_co2e_Mg * composite_veh_cert_co2_gpmi
-
-        composite_veh_target_co2e_Mg = \
-            composite_veh_sales * composite_veh.normalized_target_co2e_Mg
-
-        production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
-        production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
+        # composite_veh_cert_co2e_Mg = \
+        #     composite_veh_sales * composite_veh.normalized_cert_co2e_Mg * composite_veh_cost_curve_options
+        #
+        # composite_veh_target_co2e_Mg = \
+        #     composite_veh_sales * composite_veh.normalized_target_co2e_Mg
+        #
+        # production_options['veh_%s_cert_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_cert_co2e_Mg
+        # production_options['veh_%s_target_co2e_megagrams' % composite_veh.vehicle_id] = composite_veh_target_co2e_Mg
 
         # update totals
-        total_target_co2e_Mg += composite_veh_target_co2e_Mg
-        total_cert_co2e_Mg += composite_veh_cert_co2e_Mg
+        # total_target_co2e_Mg += composite_veh_target_co2e_Mg
+        # total_cert_co2e_Mg += composite_veh_cert_co2e_Mg
         total_cost_dollars += composite_veh_total_cost_dollars
         total_generalized_cost_dollars += composite_veh_total_generalized_cost_dollars
+        total_credits_co2e_Mg += composite_veh_credits_co2e_Mg
 
-    production_options['total_target_co2e_megagrams'] = total_target_co2e_Mg
-    production_options['total_cert_co2e_megagrams'] = total_cert_co2e_Mg
+    # TODO: looks like we'll need to calculate these, too?  Or use credits directly to select production decisions, not target/cert/strategic_offset...
+    # production_options['total_target_co2e_megagrams'] = total_target_co2e_Mg
+    # production_options['total_cert_co2e_megagrams'] = total_cert_co2e_Mg
     production_options['total_cost_dollars'] = total_cost_dollars
     production_options['total_generalized_cost_dollars'] = total_generalized_cost_dollars
-    production_options['total_credits_co2e_megagrams'] = total_target_co2e_Mg - total_cert_co2e_Mg
+    production_options['total_credits_co2e_megagrams'] = total_credits_co2e_Mg  # total_target_co2e_Mg - total_cert_co2e_Mg
     production_options['total_sales'] = total_sales
 
     return production_options

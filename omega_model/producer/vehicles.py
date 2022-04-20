@@ -82,6 +82,8 @@ from common.omega_functions import weighted_value
 from context.fuel_prices import FuelPrice
 from context.onroad_fuels import OnroadFuel
 
+cost_curve_interp_key = 'credits_co2e_Mg_per_vehicle'  # was 'cert_co2e_grams_per_mile'
+
 
 class DecompositionAttributes(OMEGABase):
     """
@@ -102,7 +104,9 @@ class DecompositionAttributes(OMEGABase):
         from policy.drive_cycles import DriveCycles
 
         # set base values
-        base_values = ['cert_co2e_grams_per_mile',
+        base_values = ['credits_co2e_Mg_per_vehicle',
+
+                       'cert_co2e_grams_per_mile',
                        'new_vehicle_mfr_generalized_cost_dollars',
 
                        'new_vehicle_mfr_cost_dollars',
@@ -339,7 +343,8 @@ class CompositeVehicle(OMEGABase):
         # on the relative share weights of the source vehicles.  See ``decompose()``
         # Composite vehicle weighted values are used to calculate market class/category sales-weighted average values
         # used by the ``omega_globals.options.SalesShare`` module to determine market shares
-        self.weighted_values = ['cert_co2e_grams_per_mile',
+        self.weighted_values = ['credits_co2e_Mg_per_vehicle',
+                                'cert_co2e_grams_per_mile',
                                 'cert_direct_co2e_grams_per_mile',
                                 'cert_direct_kwh_per_mile',
                                 'onroad_direct_co2e_grams_per_mile',
@@ -376,11 +381,11 @@ class CompositeVehicle(OMEGABase):
 
         self.tech_option_iteration_num = 0
 
-        self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
-                                                        'normalized_target_co2e_Mg')
-
-        self.normalized_cert_co2e_Mg = \
-            omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, co2_gpmi_variants=1, sales_variants=1)
+        # self.normalized_target_co2e_Mg = weighted_value(self.vehicle_list, self.weight_by,
+        #                                                 'normalized_target_co2e_Mg')
+        #
+        # self.normalized_cert_co2e_Mg = \
+        #     omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(self, co2_gpmi_variants=1, sales_variants=1)
 
     def retail_fuel_price_dollars_per_unit(self, calendar_year=None):
         """
@@ -425,7 +430,7 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
-                    v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, 'cert_co2e_grams_per_mile',
+                    v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
                                                                         self.cert_co2e_grams_per_mile, ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
@@ -460,7 +465,7 @@ class CompositeVehicle(OMEGABase):
             ax1.relim()
             ax1.autoscale()
 
-            ax1.plot(self.cost_curve['cert_co2e_grams_per_mile'],
+            ax1.plot(self.cost_curve[cost_curve_interp_key],
                      self.cost_curve['new_vehicle_mfr_generalized_cost_dollars'], '-', linewidth=3,
                      label='Composite Vehicle')
 
@@ -528,7 +533,7 @@ class CompositeVehicle(OMEGABase):
             # composite_frontier_df = composite_frontier_df.columns.drop(drop_columns, errors='ignore')
 
             # calculate new sales-weighted frontier
-            composite_frontier_df = calc_frontier(composite_frontier_df, 'cert_co2e_grams_per_mile',
+            composite_frontier_df = calc_frontier(composite_frontier_df, cost_curve_interp_key,
                                                   'new_vehicle_mfr_generalized_cost_dollars',
                                                   allow_upslope=True)
 
@@ -548,7 +553,7 @@ class CompositeVehicle(OMEGABase):
                              linewidth=1, label='veh %s %s' % (v.vehicle_id, v.name))
 
         if plot:
-            ax1.plot(composite_frontier_df['cert_co2e_grams_per_mile'],
+            ax1.plot(composite_frontier_df[cost_curve_interp_key],
                      composite_frontier_df['new_vehicle_mfr_generalized_cost_dollars'], '-', linewidth=3,
                      label='Composite Vehicle')
 
@@ -573,28 +578,28 @@ class CompositeVehicle(OMEGABase):
 
         """
 
-        return DecompositionAttributes.interp1d(self, self.cost_curve, 'cert_co2e_grams_per_mile', query_co2e_gpmi,
+        return DecompositionAttributes.interp1d(self, self.cost_curve, cost_curve_interp_key, query_co2e_gpmi,
                                          attribute_name)
 
-    def get_max_cert_co2e_gpmi(self):
+    def get_max_cost_curve_index(self):
         """
-        Get maximum cert CO2e g/mi from the cost curve.
+        Get maximum value from the cost curve interpolation axis, see ``vehicles.cost_curve_interp_key``.
 
         Returns:
-            A float, max cert CO2e g/mi from the cost curve
+            A float, max value from the cost curve interpolation axis
 
         """
-        return self.cost_curve['cert_co2e_grams_per_mile'].values.max()
+        return self.cost_curve[cost_curve_interp_key].values.max()
 
-    def get_min_cert_co2e_gpmi(self):
+    def get_min_cost_curve_index(self):
         """
-        Get minimum cert CO2e g/mi from the cost curve.
+        Get minimum value from the cost curve interpolation axis, see ``vehicles.cost_curve_interp_key``.
 
         Returns:
-            A float, min cert CO2e g/mi from the cost curve
+            A float, min value from the cost curve interpolation axis
 
         """
-        return self.cost_curve['cert_co2e_grams_per_mile'].values.min()
+        return self.cost_curve[cost_curve_interp_key].values.min()
 
     def get_weighted_attribute(self, attribute_name):
         return weighted_value(self.vehicle_list, self.weight_by, attribute_name)
@@ -655,8 +660,8 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
 
         to_vehicle.cost_curve = to_vehicle.create_frontier_df(cost_cloud)  # create frontier, inc. generalized cost and policy effects
 
-        to_vehicle.normalized_target_co2e_Mg = \
-            omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
+        # to_vehicle.normalized_target_co2e_Mg = \
+        #     omega_globals.options.VehicleTargets.calc_target_co2e_Mg(to_vehicle, sales_variants=1)
 
         VehicleAttributeCalculations.perform_attribute_calculations(to_vehicle)
     else:  # type(from_vehicle == Vehicle)
@@ -713,7 +718,7 @@ class Vehicle(OMEGABase):
         self.lifetime_VMT = 0
         self.cert_co2e_Mg = 0
         self.target_co2e_Mg = 0
-        self.normalized_target_co2e_Mg = 0
+        # self.normalized_target_co2e_Mg = 0
         self.in_use_fuel_id = None
         self.cert_fuel_id = None
         self.market_class_id = None
@@ -791,7 +796,6 @@ class Vehicle(OMEGABase):
             self._cache[cache_key] = price
 
         return self._cache[cache_key]
-
 
     def onroad_co2e_emissions_grams_per_unit(self):
         """
@@ -932,8 +936,8 @@ class Vehicle(OMEGABase):
         # calculate frontier from updated cloud
         allow_upslope = True
 
-        # special handling for the case where all cert_co2e_grams_per_mile are the same value, e.g. 0
-        if cost_cloud['cert_co2e_grams_per_mile'].values.min() == cost_cloud['cert_co2e_grams_per_mile'].values.max():
+        # special handling for the case where all cost_curve_interp_key values are the same value, e.g. 0
+        if cost_cloud[cost_curve_interp_key].values.min() == cost_cloud[cost_curve_interp_key].values.max():
             # try to take lowest generalized cost point
             cost_curve = cost_cloud[cost_cloud['new_vehicle_mfr_generalized_cost_dollars'] == cost_cloud[
                 'new_vehicle_mfr_generalized_cost_dollars'].values.min()]
@@ -941,13 +945,7 @@ class Vehicle(OMEGABase):
             if len(cost_curve) > 1:
                 cost_curve = cost_curve.iloc[[0]]
         else:
-            # cost_curve = calc_frontier(cost_cloud, 'cert_co2e_grams_per_mile',
-            #                            'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
-
-            # cost_curve = calc_frontier(cost_cloud, 'credits_co2e_grams_per_mile',
-            #                            'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
-
-            cost_curve = calc_frontier(cost_cloud, 'credits_co2e_Mg_per_vehicle',
+            cost_curve = calc_frontier(cost_cloud, cost_curve_interp_key,
                                        'new_vehicle_mfr_cost_dollars', allow_upslope=allow_upslope)
 
         # import common
@@ -987,11 +985,11 @@ class Vehicle(OMEGABase):
                      cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], '.',
                      label='Generalized Cost')
 
-            ax1.plot(cost_cloud['credits_co2e_Mg_per_vehicle'],
+            ax1.plot(cost_cloud[cost_curve_interp_key],
                      cost_cloud['new_vehicle_mfr_generalized_cost_dollars'], 'x',
                      label='Credits g/mi')
 
-            ax1.plot(cost_curve['credits_co2e_Mg_per_vehicle'],
+            ax1.plot(cost_curve[cost_curve_interp_key],
                      cost_curve['veh_%s_new_vehicle_mfr_generalized_cost_dollars' % self.vehicle_id], 'x-',
                      color='black',
                      label='Credit Cost Curve')
@@ -1010,11 +1008,11 @@ class Vehicle(OMEGABase):
 
             fig, ax1 = figure()
             label_xyt(ax1, 'CO2e credits [Mg]', 'CO2e [g/mi]', 'veh %s %s' % (self.vehicle_id, self.name))
-            ax1.plot(cost_cloud['credits_co2e_Mg_per_vehicle'],
+            ax1.plot(cost_cloud[cost_curve_interp_key],
                      cost_cloud['cert_co2e_grams_per_mile'], '.',
                      label='CO2e g/mi')
 
-            ax1.plot(cost_curve['credits_co2e_Mg_per_vehicle'],
+            ax1.plot(cost_curve[cost_curve_interp_key],
                      cost_curve['veh_%s_cert_co2e_grams_per_mile' % self.vehicle_id], 's-',
                      color='black',
                      label='Credit CO2e Curve')
