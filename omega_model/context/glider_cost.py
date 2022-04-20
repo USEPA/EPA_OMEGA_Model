@@ -125,7 +125,7 @@ class GliderCost(OMEGABase):
         body_structure, learning_factor, markup = GliderCost.get_markups_and_learning(vehicle)
 
         structure_mass_lbs = pkg_df['structure_mass_lbs'].values
-        delta_footprint = vehicle.base_year_footprint_ft2 - pkg_df['footprint_ft2'].values
+        delta_footprint = pkg_df['footprint_ft2'].values - vehicle.base_year_footprint_ft2
 
         locals_dict = locals()  # cache local equation terms
 
