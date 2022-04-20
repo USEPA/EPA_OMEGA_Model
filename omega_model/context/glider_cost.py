@@ -130,17 +130,19 @@ class GliderCost(OMEGABase):
         locals_dict = locals()  # cache local equation terms
 
         # glider structure cost
-        adj_factor = np.array([_cache[vehicle.body_style, body_structure, sm]['dollar_adjustment'] for sm in pkg_df['structure_material']])
+        adj_factor = np.array([_cache[vehicle.body_style, body_structure, sm]['dollar_adjustment']
+                               for sm in pkg_df['structure_material']])
 
         values = np.zeros_like(structure_mass_lbs)
         for structure_material in MassScaling.structure_materials:
-            values += eval(_cache[vehicle.body_style, body_structure, structure_material]['value']) * (pkg_df['structure_material'].values == structure_material)
+            values += eval(_cache[vehicle.body_style, body_structure, structure_material]['value']) * \
+                      (pkg_df['structure_material'].values == structure_material)
         glider_structure_cost = values * adj_factor * learning_factor
 
         # glider non-structure cost
         adj_factor = _cache[vehicle.body_style, 'non_structure', 'various']['dollar_adjustment']
-        delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'], {}, locals_dict) \
-                                          * adj_factor * learning_factor
+        delta_glider_non_structure_cost = eval(_cache[vehicle.body_style, 'non_structure', 'various']['value'],
+                                               {}, locals_dict) * adj_factor * learning_factor
 
         glider_non_structure_cost = \
             vehicle.base_year_glider_non_structure_cost_dollars + delta_glider_non_structure_cost
