@@ -130,10 +130,15 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
                                               producer_generalized_cost_annual_vmt *
                                               producer_generalized_cost_fuel_years)
 
+        # TODO: if we keep this, the 1300 should be an input somewhere
+        delta_footprint_ft2 = cost_cloud['footprint_ft2'] - vehicle.base_year_footprint_ft2
+        footprint_wltp = delta_footprint_ft2 * 1300
+
         generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
         cost_cloud[
-            cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + price_modification
+            cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + \
+                                                           price_modification - footprint_wltp
 
         return cost_cloud
 
