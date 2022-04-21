@@ -407,7 +407,7 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
         if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
             omega_log.logwrite(('%d_%d_%d' % (calendar_year, producer_consumer_iteration_num,
                                               search_iteration)).ljust(12) + 'SR:%f CR:%.10f' % (share_range,
-                                    best_candidate_production_decision['strategic_compliance_ratio']), echo_console=True)
+                                    best_candidate_production_decision['strategic_compliance_ratio']))
 
         search_iteration += 1
 
@@ -439,8 +439,8 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
     if 'producer_compliance_search' in omega_globals.options.verbose_console_modules:
         for mc in omega_globals.options.MarketClass.market_classes:
             omega_log.logwrite(('%d producer_abs_share_frac_%s' % (calendar_year, mc)).ljust(50) + '= %s' %
-                               (selected_production_decision['producer_abs_share_frac_%s' % mc]), echo_console=True)
-        omega_log.logwrite('', echo_console=True)
+                               (selected_production_decision['producer_abs_share_frac_%s' % mc]))
+        omega_log.logwrite('')
 
     composite_vehicles = apply_production_decision_to_composite_vehicles(composite_vehicles,
                                                                          selected_production_decision)

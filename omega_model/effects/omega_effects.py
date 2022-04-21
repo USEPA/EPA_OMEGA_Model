@@ -58,7 +58,7 @@ def run_effects_calcs():
     # calendar_years = np.unique(np.array(VehicleAnnualData.get_calendar_years()))
     calendar_years = [int(year) for year in calendar_years if year >= omega_globals.options.analysis_initial_year]
 
-    omega_log.logwrite('\nCalculating tech volumes and shares', echo_console=True)
+    omega_log.logwrite('\nCalculating tech volumes and shares')
     tech_tracking = TechTracking()
     tech_tracking.create_dict(calendar_years)
     tech_tracking_dict = tech_tracking._data
@@ -77,7 +77,7 @@ def run_effects_calcs():
         tech_tracking_df = save_dict_to_csv(tech_tracking_dict, tech_tracking_filename, index=False)
 
     if 'Physical' in omega_globals.options.calc_effects:
-        omega_log.logwrite('\nCalculating physical effects', echo_console=True)
+        omega_log.logwrite('\nCalculating physical effects')
         physical_effects_dict = calc_physical_effects(calendar_years)
 
         physical_effects_filename = f'{omega_globals.options.output_folder}' + \
@@ -104,10 +104,10 @@ def run_effects_calcs():
         if 'Costs' in omega_globals.options.calc_effects:
             cost_effects_dict = dict()
 
-            omega_log.logwrite('\nCalculating cost effects', echo_console=True)
+            omega_log.logwrite('\nCalculating cost effects')
             cost_effects_dict.update(calc_cost_effects(physical_effects_dict))
 
-            omega_log.logwrite('\nDiscounting costs', echo_console=True)
+            omega_log.logwrite('\nDiscounting costs')
             cost_effects_dict = discount_values(cost_effects_dict)
 
             cost_effects_filename = f'{omega_globals.options.output_folder}' + \
@@ -123,7 +123,7 @@ def run_effects_calcs():
             else:
                 cost_effects_df = save_dict_to_csv(cost_effects_dict, cost_effects_filename, index=False)
 
-            omega_log.logwrite('\nCalculating annual, present and annualized values', echo_console=True)
+            omega_log.logwrite('\nCalculating annual, present and annualized values')
             present_and_annualized_dict = calc_present_and_annualized_values(cost_effects_dict, calendar_years)
 
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \

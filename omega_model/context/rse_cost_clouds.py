@@ -118,7 +118,7 @@ class CostCloud(OMEGABase, CostCloudBase):
     @staticmethod
     def init_from_ice_file(filename, powertrain_type='ICE', verbose=False):
         if verbose:
-            omega_log.logwrite('\nInitializing CostCloud from %s...' % filename, echo_console=True)
+            omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
         input_template_version = 0.1
         input_template_columns = {'cost_curve_class', 'engine_displacement_L', 'engine_cylinders',
@@ -179,7 +179,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
     def init_from_bev_file(filename, verbose=False):
         if verbose:
-            omega_log.logwrite('\nInitializing CostCloud from %s...' % filename, echo_console=True)
+            omega_log.logwrite('\nInitializing CostCloud from %s...' % filename)
         input_template_name = __name__
         input_template_version = 0.1
         input_template_columns = {'cost_curve_class',

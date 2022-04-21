@@ -389,7 +389,7 @@ class PowertrainCost(OMEGABase):
         _cache.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing PowertrainCost from %s...' % filename, echo_console=True)
+            omega_log.logwrite('\nInitializing PowertrainCost from %s...' % filename)
         input_template_name = 'powertrain_cost'
         input_template_version = 0.1
         input_template_columns = {'powertrain_type', 'item', 'value', 'quantity', 'dollar_basis', 'notes'}

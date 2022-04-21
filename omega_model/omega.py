@@ -122,7 +122,7 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
             2020_0_0  SCORE:0.000845, CE:0.018211, CSPE:0.000121
 
     """
-    omega_log.logwrite('', echo_console=True)
+    omega_log.logwrite('')
 
     for mc in sorted(omega_globals.options.MarketClass.market_classes):
         omega_log.logwrite(('%d producer / consumer_abs_share_frac_%s' % (calendar_year, mc)).ljust(55) +
@@ -131,9 +131,9 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
                                producer_decision_and_response['consumer_abs_share_frac_%s' % mc],
                                abs(producer_decision_and_response['producer_abs_share_frac_%s' % mc] -
                                    producer_decision_and_response['consumer_abs_share_frac_%s' % mc])
-                           ), echo_console=True)
+                           ))
 
-    omega_log.logwrite('', echo_console=True)
+    omega_log.logwrite('')
 
     for mc in sorted(omega_globals.options.MarketClass.market_classes):
         omega_log.logwrite(
@@ -142,9 +142,9 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc],
                 producer_decision_and_response['average_cross_subsidized_price_%s' % mc] /
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mc]
-            ), echo_console=True)
+            ))
 
-    omega_log.logwrite('', echo_console=True)
+    omega_log.logwrite('')
 
     for mcat in sorted(omega_globals.options.MarketClass.market_categories):
         omega_log.logwrite(
@@ -153,7 +153,7 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat],
                 producer_decision_and_response['average_cross_subsidized_price_%s' % mcat] /
                 producer_decision_and_response['average_new_vehicle_mfr_cost_%s' % mcat]
-            ), echo_console=True)
+            ))
 
     omega_log.logwrite(
         'cross subsidized price / cost TOTAL'.ljust(50) + '$%d / $%d R:%f' % (
@@ -161,15 +161,15 @@ def logwrite_shares_and_costs(calendar_year, share_convergence_error, cross_subs
             producer_decision_and_response['average_new_vehicle_mfr_cost'],
             producer_decision_and_response['average_cross_subsidized_price_total'] /
             producer_decision_and_response['average_new_vehicle_mfr_cost']
-        ), echo_console=True)
+        ))
 
-    omega_log.logwrite('', echo_console=True)
+    omega_log.logwrite('')
 
     omega_log.logwrite(
         '%d_%d_%d  SCORE:%f, CE:%f, CSPE:%f\n' % (calendar_year, producer_consumer_iteration_num,
                                                   cross_subsidy_iteration_num,
                                                   producer_decision_and_response['pricing_score'],
-                                                  share_convergence_error, cross_subsidy_pricing_error), echo_console=True)
+                                                  share_convergence_error, cross_subsidy_pricing_error))
 
 
 def update_cross_subsidy_log_data(producer_decision_and_response, calendar_year, compliance_id, converged,
@@ -563,7 +563,7 @@ def search_cross_subsidies(calendar_year, compliance_id, mcat, cross_subsidy_pai
                                       cross_subsidy_options_and_response)
 
     if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
-        omega_log.logwrite('', echo_console=True)
+        omega_log.logwrite('')
 
     return cross_subsidy_options_and_response, iteration_log
 
@@ -598,10 +598,10 @@ def update_market_classes_console_log(calendar_year, mcat, cross_subsidy_pair, s
     if 'cross_subsidy_convergence' in omega_globals.options.verbose_console_modules:
         if mcat_converged:
             omega_log.logwrite('   PRODUCER-CONSUMER CONVERGED %s CE:%f, CSPE:%f' %
-                               (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error), echo_console=True)
+                               (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error))
         else:
             omega_log.logwrite('** PRODUCER-CONSUMER CONVERGENCE FAIL %s CE:%f, CSPE:%f **' %
-                               (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error), echo_console=True)
+                               (' / '.join(cross_subsidy_pair), share_convergence_error, cross_subsidy_pricing_error))
 
 
 def calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes):
@@ -744,7 +744,7 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
     if not first_pass and search_collapsed:
         continue_search = False
         if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
-            omega_log.logwrite('SEARCH COLLAPSED', echo_console=True)
+            omega_log.logwrite('SEARCH COLLAPSED')
 
     return continue_search, price_options_df
 
@@ -808,7 +808,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
     if 'cross_subsidy_search' in omega_globals.options.verbose_console_modules:
         mr_str = str(['%.8f' % m for m in multiplier_range]).replace("'", '')
         omega_log.logwrite(('%s' % multiplier_column).ljust(35) + '= %.5f MR:%s R:%f' % (
-            prev_multiplier, mr_str, max_val - min_val), echo_console=True)
+            prev_multiplier, mr_str, max_val - min_val))
 
     return multiplier_range, search_collapsed
 
@@ -1170,7 +1170,7 @@ def init_omega(session_runtime_options):
 
     omega_log.init_logfile()
 
-    omega_log.logwrite("Initializing %s:" % omega_globals.options.session_unique_name, echo_console=True)
+    omega_log.logwrite("Initializing %s:" % omega_globals.options.session_unique_name)
 
     init_fail = []
 
@@ -1458,7 +1458,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
                 print('Elapsed init time = %f' % (time.time() - start_time))
 
-            omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name, echo_console=True)
+            omega_log.logwrite("Running %s:" % omega_globals.options.session_unique_name)
 
             if omega_globals.options.run_profiler:
                 # run with profiler
@@ -1510,12 +1510,12 @@ def run_omega(session_runtime_options, standalone_run=False):
                 omega_globals.pool.join()
 
         else:
-            omega_log.logwrite(init_fail, echo_console=True)
+            omega_log.logwrite(init_fail)
             omega_log.end_logfile("\nSession Fail")
             dump_omega_db_to_csv(omega_globals.options.database_dump_folder)
 
     except:
-        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("### Check OMEGA log for error messages ###")
         omega_log.end_logfile("\nSession Fail")
         dump_omega_db_to_csv(omega_globals.options.database_dump_folder)

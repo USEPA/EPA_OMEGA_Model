@@ -256,7 +256,7 @@ class VehicleAggregation(OMEGABase):
         from context.glider_cost import GliderCost
         from context.powertrain_cost import PowertrainCost
 
-        omega_log.logwrite('\nAggregating vehicles from %s...' % filename, echo_console=True)
+        omega_log.logwrite('\nAggregating vehicles from %s...' % filename)
 
         input_template_name = 'vehicles'
         input_template_version = 0.46

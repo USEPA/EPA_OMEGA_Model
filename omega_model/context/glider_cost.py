@@ -166,7 +166,7 @@ class GliderCost(OMEGABase):
         _cache.clear()
 
         if verbose:
-            omega_log.logwrite('\nInitializing GliderCost from %s...' % filename, echo_console=True)
+            omega_log.logwrite('\nInitializing GliderCost from %s...' % filename)
         input_template_name = 'glider_cost'
         input_template_version = 0.11
         input_template_columns = {'body_style', 'item', 'structure_material', 'value', 'dollar_basis', 'notes'}

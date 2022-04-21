@@ -355,6 +355,6 @@ if __name__ == '__main__':
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:
-        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)
