@@ -379,7 +379,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                                                   'HP_ETW': HP_ETW})))
 
                                 # battery sizing -------------------------------------------------------------------- #
-                                if vehicle.powertrain_type != 'ICE':
+                                if vehicle.powertrain_type == 'BEV':  # TODO: or 'PHEV'
                                     cloud_point = vehicle.calc_cert_values(cloud_point)
 
                                     battery_kwh = vehicle.charge_depleting_range_mi * \
@@ -391,7 +391,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                                     1 - powertrain_mass_lbs / prior_powertrain_mass_lbs) <= convergence_tolerance and \
                                             abs(1 - rated_hp / prior_rated_hp) <= convergence_tolerance
 
-                                if vehicle.powertrain_type != 'ICE':
+                                if vehicle.powertrain_type == 'BEV':
                                     converged = converged and \
                                             abs(1 - battery_kwh / prior_battery_kwh) < convergence_tolerance
 
@@ -404,7 +404,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                                 # ------------------------------------------------------------------------------------#
 
-                            if vehicle.powertrain_type == 'ICE':
+                            if vehicle.powertrain_type != 'BEV':
                                 cloud_point = vehicle.calc_cert_values(cloud_point)
 
                             v = copy.copy(vehicle)

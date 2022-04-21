@@ -62,9 +62,7 @@ class PowertrainCost(OMEGABase):
             A list of cost values indexed the same as pkg_df.
 
         """
-        elec_class, market_class_id, model_year = vehicle.electrification_class, vehicle.market_class_id, vehicle.model_year
-        ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
-        powertrain_type = ec_dict[elec_class]
+        powertrain_type, market_class_id, model_year = vehicle.powertrain_type, vehicle.market_class_id, vehicle.model_year
 
         locals_dict = locals()
 

@@ -630,7 +630,7 @@ def transfer_vehicle_data(from_vehicle, to_vehicle, model_year=None):
     base_properties = {'name', 'manufacturer_id', 'compliance_id', 'model_year', 'fueling_class',
                        'cost_curve_class', 'reg_class_id', 'in_use_fuel_id',
                        'cert_fuel_id', 'market_class_id', 'lifetime_VMT',
-                       'context_size_class', 'electrification_class',
+                       'context_size_class',
                        'unibody_structure', 'drive_system', 'curbweight_lbs', 'eng_rated_hp', 'footprint_ft2',
                        'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c', 'body_style',
                        'structure_material', 'powertrain_type', 'base_year_reg_class_id', 'base_year_market_share',
@@ -719,7 +719,7 @@ class Vehicle(OMEGABase):
         self.cost_curve_class = None
         self.reg_class_id = None
         self.context_size_class = None
-        self.electrification_class = None
+        # self.electrification_class = None
         self.target_co2e_grams_per_mile = 0
         self.lifetime_VMT = 0
         self.cert_co2e_Mg = 0
@@ -1051,7 +1051,7 @@ class VehicleFinal(SQABase, Vehicle):
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
     reg_class_id = Column(String)  #: regulatory class assigned according the active policy
     context_size_class = Column(String)  #: context size class, used to project future vehicle sales based on the context
-    electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
+    # electrification_class = Column(String)  #: electrification class, used to determine ``fueling_class`` at this time
     target_co2e_grams_per_mile = Column(Float)  #: cert target CO2e g/mi, as determined by the active policy
     lifetime_VMT = Column('lifetime_vmt', Float)  #: lifetime VMT, used to calculate CO2e Mg
     cert_co2e_Mg = Column('cert_co2e_megagrams', Float)  #: cert CO2e Mg, as determined by the active policy
@@ -1288,7 +1288,6 @@ class VehicleFinal(SQABase, Vehicle):
                 manufacturer_id=df.loc[i, 'compliance_id'],  # df.loc[i, 'manufacturer_id'],
                 model_year=df.loc[i, 'model_year'],
                 context_size_class=df.loc[i, 'context_size_class'],
-                electrification_class=df.loc[i, 'electrification_class'],
                 cost_curve_class=df.loc[i, 'cost_curve_class'],
                 in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
@@ -1312,7 +1311,10 @@ class VehicleFinal(SQABase, Vehicle):
                 battery_kwh=df.loc[i, 'battery_kwh'],
                 motor_kw=df.loc[i, 'motor_kw'],
                 charge_depleting_range_mi=df.loc[i, 'charge_depleting_range_mi'],
+                powertrain_type=df.loc[i, 'powertrain_type'],
             )
+
+            electrification_class = df.loc[i, 'electrification_class']
 
             for attr, dc in zip(VehicleFinal.dynamic_attributes, VehicleFinal.dynamic_columns):
                 veh.__setattr__(attr, df.loc[i, dc])
@@ -1325,10 +1327,12 @@ class VehicleFinal(SQABase, Vehicle):
             VehicleFinal.compliance_ids.add(veh.compliance_id)
 
             # TODO: what are we doing about fuel cell vehicles...?
-            if veh.electrification_class in ['EV', 'FCV']:
-                if veh.electrification_class == 'FCV':
+            if veh.powertrain_type in ['BEV', 'FCV']:
+                if veh.powertrain_type == 'FCV':
+                    # TODO: MAP FCV to BEV for now
                     veh.in_use_fuel_id = "{'US electricity':1.0}"
                     veh.cert_fuel_id = "{'electricity':1.0}"
+                    veh.powertrain_type = 'BEV'
                 veh.fueling_class = 'BEV'
             else:
                 veh.fueling_class = 'ICE'
@@ -1341,12 +1345,10 @@ class VehicleFinal(SQABase, Vehicle):
             veh.onroad_direct_co2e_grams_per_mile = 0
             veh.onroad_direct_kwh_per_mile = 0
 
-            veh.powertrain_type = veh.fueling_class
-
             # TODO: we need to figure out how we want to do this for real
-            if veh.electrification_class == 'EV':
+            if veh.powertrain_type in ['BEV', 'FCV']:
                 rated_hp = veh.motor_kw * 1.34102
-            elif veh.electrification_class in ['HEV', 'PHEV']:
+            elif electrification_class in ['HEV', 'PHEV']:
                 rated_hp = veh.eng_rated_hp + veh.motor_kw * 1.34102
             else:
                 rated_hp = veh.eng_rated_hp
@@ -1405,7 +1407,7 @@ class VehicleFinal(SQABase, Vehicle):
             if v.fueling_class == 'ICE':
                 alt_veh.fueling_class = 'BEV'
                 alt_veh.powertrain_type = 'BEV'
-                alt_veh.electrification_class = 'EV'
+                # alt_veh.electrification_class = 'EV'
                 alt_veh.name = 'BEV of ' + v.name
                 alt_veh.in_use_fuel_id = "{'US electricity':1.0}"
                 alt_veh.cert_fuel_id = "{'electricity':1.0}"
@@ -1418,7 +1420,7 @@ class VehicleFinal(SQABase, Vehicle):
             else:
                 alt_veh.fueling_class = 'ICE'
                 alt_veh.powertrain_type = 'ICE'
-                alt_veh.electrification_class = 'N'
+                # alt_veh.electrification_class = 'N'
                 alt_veh.name = 'ICE of ' + v.name
                 alt_veh.in_use_fuel_id = "{'pump gasoline':1.0}"
                 alt_veh.cert_fuel_id = "{'gasoline':1.0}"

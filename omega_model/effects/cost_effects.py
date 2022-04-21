@@ -184,14 +184,14 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, electrification_class \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, powertrain_type \
                 = physical['manufacturer_id'], \
                   physical['name'], \
                   physical['base_year_reg_class_id'], \
                   physical['reg_class_id'], \
                   physical['in_use_fuel_id'], \
                   physical['fueling_class'], \
-                  physical['electrification_class']
+                  physical['powertrain_type']
 
             vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
@@ -236,18 +236,7 @@ def calc_cost_effects(physical_effects_dict):
                     fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
-            ec_dict = {'N': 'ICE', 'EV': 'BEV', 'HEV': 'HEV', 'PHEV': 'PHEV', 'FCV': 'BEV'}
-            powertrain_veh_type = ec_dict[electrification_class]
-            # if fueling_class == 'BEV':
-            #     powertrain_veh_type = 'BEV'
-            # elif name.__contains__('PHEV'):
-            #     powertrain_veh_type = 'PHEV'
-            # elif name.__contains__('HEV'):
-            #     powertrain_veh_type = 'HEV'
-            # else:
-            #     powertrain_veh_type = 'ICE'
-
-            slope, intercept = get_maintenance_cost(powertrain_veh_type)
+            slope, intercept = get_maintenance_cost(powertrain_type)
             maintenance_cost_per_mile = slope * odometer + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
@@ -259,11 +248,11 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 operating_veh_type = 'suv'
 
-            repair_cost_per_mile = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, operating_veh_type, age)
+            repair_cost_per_mile = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_type, operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs
-            if powertrain_veh_type == 'BEV':
+            if powertrain_type == 'BEV':
                 range = 300 # TODO do we stay with this or will range be an attribute tracked within omega
                 if (operating_veh_type, range) in refueling_bev_dict.keys():
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, range)]
@@ -375,7 +364,7 @@ def calc_cost_effects(physical_effects_dict):
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
                                      'fueling_class': fueling_class,
-                                     'electrification_class': electrification_class,
+                                     'powertrain_type': powertrain_type,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
                                      'odometer': odometer,
