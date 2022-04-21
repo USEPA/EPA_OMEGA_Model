@@ -308,10 +308,10 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
         rlhp60s = (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
 
-        vehicle_footprints = [vehicle.base_year_footprint_ft2]
-        # vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
-        #                       vehicle.base_year_footprint_ft2,
-        #                       vehicle.base_year_footprint_ft2 * 1.05)
+        # vehicle_footprints = [vehicle.base_year_footprint_ft2]
+        vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
+                              vehicle.base_year_footprint_ft2,
+                              vehicle.base_year_footprint_ft2 * 1.05)
 
         # convergence terms init
         convergence_tolerance = 0.01
