@@ -298,8 +298,6 @@ def run_producer_consumer():
 
             producer_decision_and_response['cross_subsidy_iteration_num'] = -1  # tag final result
 
-            # iteration_log = iteration_log.append(producer_decision_and_response, ignore_index=True)
-
             iteration_log.append(producer_decision_and_response)
 
             compliance_search.finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles,

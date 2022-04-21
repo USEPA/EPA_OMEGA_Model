@@ -308,10 +308,10 @@ class CostCloud(OMEGABase, CostCloudBase):
         rlhp20s = (vehicle_rlhp20 * 0.95, vehicle_rlhp20, vehicle_rlhp20 * 1.05)
         rlhp60s = (vehicle_rlhp60 * 0.95, vehicle_rlhp60, vehicle_rlhp60 * 1.05)
 
-        # vehicle_footprints = [vehicle.base_year_footprint_ft2]
-        vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
-                              vehicle.base_year_footprint_ft2,
-                              vehicle.base_year_footprint_ft2 * 1.05)
+        vehicle_footprints = [vehicle.base_year_footprint_ft2]
+        # vehicle_footprints = (vehicle.base_year_footprint_ft2 * 0.95,
+        #                       vehicle.base_year_footprint_ft2,
+        #                       vehicle.base_year_footprint_ft2 * 1.05)
 
         # convergence terms init
         convergence_tolerance = 0.01
@@ -409,22 +409,17 @@ class CostCloud(OMEGABase, CostCloudBase):
 
                             v = copy.copy(vehicle)
                             v.footprint_ft2 = footprint_ft2
-                            # v.set_target_co2e_grams_per_mile()
-                            # cloud_point['target_co2e_Mg_per_vehicle'] = \
-                            target_co2e_Mg_per_vehicle = \
+                            cloud_point['target_co2e_Mg_per_vehicle'] = \
                                 omega_globals.options.VehicleTargets.calc_target_co2e_Mg(v, sales_variants=1)
 
-                            # cloud_point['cert_co2e_Mg_per_vehicle'] = \
-                            cert_co2e_Mg_per_vehicle = \
+                            cloud_point['cert_co2e_Mg_per_vehicle'] = \
                                 omega_globals.options.VehicleTargets.calc_cert_co2e_Mg(v, co2_gpmi_variants=
                                 cloud_point['cert_co2e_grams_per_mile'], sales_variants=1)
 
                             cloud_point['credits_co2e_Mg_per_vehicle'] = \
-                                target_co2e_Mg_per_vehicle - cert_co2e_Mg_per_vehicle
+                                cloud_point['target_co2e_Mg_per_vehicle'] - cloud_point['cert_co2e_Mg_per_vehicle']
 
-                            # cloud_point['credits_co2e_Mg_per_vehicle'] = \
-                            #     cloud_point['target_co2e_Mg_per_vehicle'] - cloud_point['cert_co2e_Mg_per_vehicle']
-
+                            # v.set_target_co2e_grams_per_mile()
                             # cloud_point['target_co2e_grams_per_mile'] = v.target_co2e_grams_per_mile
                             #
                             # cloud_point['credits_co2e_grams_per_mile'] = \

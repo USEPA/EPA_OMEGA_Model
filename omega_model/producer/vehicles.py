@@ -105,6 +105,8 @@ class DecompositionAttributes(OMEGABase):
 
         # set base values
         base_values = ['credits_co2e_Mg_per_vehicle',
+                       'target_co2e_Mg_per_vehicle',
+                       'cert_co2e_Mg_per_vehicle',
 
                        'cert_co2e_grams_per_mile',
                        'new_vehicle_mfr_generalized_cost_dollars',
@@ -344,6 +346,8 @@ class CompositeVehicle(OMEGABase):
         # Composite vehicle weighted values are used to calculate market class/category sales-weighted average values
         # used by the ``omega_globals.options.SalesShare`` module to determine market shares
         self.weighted_values = ['credits_co2e_Mg_per_vehicle',
+                                'target_co2e_Mg_per_vehicle',
+                                'cert_co2e_Mg_per_vehicle',
                                 'cert_co2e_grams_per_mile',
                                 'cert_direct_co2e_grams_per_mile',
                                 'cert_direct_kwh_per_mile',
@@ -430,8 +434,10 @@ class CompositeVehicle(OMEGABase):
         for v in self.vehicle_list:
             if 'cost_curve' in self.__dict__:
                 for ccv in DecompositionAttributes.values:
+                    # v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
+                    #                                                     self.cert_co2e_grams_per_mile, ccv))
                     v.__setattr__(ccv, DecompositionAttributes.interp1d(v, self.cost_curve, cost_curve_interp_key,
-                                                                        self.cert_co2e_grams_per_mile, ccv))
+                                                                        self.__getattribute__(cost_curve_interp_key), ccv))
             v.initial_registered_count = self.initial_registered_count * v.composite_vehicle_share_frac
             v.set_target_co2e_Mg()  # varies by model year and initial_registered_count
             v.set_cert_co2e_Mg()  # varies by model year and initial_registered_count
@@ -566,20 +572,20 @@ class CompositeVehicle(OMEGABase):
 
         return composite_frontier_df
 
-    def get_from_cost_curve(self, attribute_name, query_co2e_gpmi):
+    def get_from_cost_curve(self, attribute_name, query_points):
         """
         Get new vehicle manufacturer cost from the composite cost curve for the provided cert CO2e g/mi value(s).
 
         Args:
-            query_co2e_gpmi (numeric list or Array): the cert CO2e g/mi values at which to query the cost curve
+            query_points (numeric list or Array): the values at which to query the cost curve
 
         Returns:
             A float or numeric Array of new vehicle manufacturer costs
 
         """
 
-        return DecompositionAttributes.interp1d(self, self.cost_curve, cost_curve_interp_key, query_co2e_gpmi,
-                                         attribute_name)
+        return DecompositionAttributes.interp1d(self, self.cost_curve, cost_curve_interp_key, query_points,
+                                                attribute_name)
 
     def get_max_cost_curve_index(self):
         """

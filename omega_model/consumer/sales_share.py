@@ -439,6 +439,9 @@ class SalesShare(OMEGABase, SalesShareBase):
         calibration = pd.Series(SalesShare._data['non_hauling_calibration'], name='non_hauling_calibration')
         calibration.to_csv(filename)
 
+        pdar_df = pd.DataFrame(SalesShare.prev_producer_decisions_and_responses)
+        pdar_df.to_csv(filename.replace('context_sales_share_calibration', 'context_sales_share_pdar'))
+
     @staticmethod
     def store_producer_decision_and_response(producer_decision_and_response):
         """
