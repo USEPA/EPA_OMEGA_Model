@@ -19,7 +19,7 @@ powertrain_mass_lbs,(vehicle.powertrain_type == 'HEV') & (vehicle.drive_system==
 powertrain_mass_lbs,(vehicle.powertrain_type == 'PHEV') & (vehicle.drive_system==2),0.25 * eng_rated_hp + 150,
 powertrain_mass_lbs,(vehicle.powertrain_type == 'PHEV') & (vehicle.drive_system==4),0.25 * eng_rated_hp + 175,
 powertrain_mass_lbs,((vehicle.powertrain_type == 'BEV') | (vehicle.powertrain_type == 'FCV')) & (vehicle.drive_system==2),0.61 * eng_rated_hp + 230,
-powertrain_mass_lbs,((vehicle.powertrain_type == 'BEV') | (vehicle.powertrain_type == 'FCV')) & (vehicle.drive_system==2),0.61 * eng_rated_hp + 330,
+powertrain_mass_lbs,((vehicle.powertrain_type == 'BEV') | (vehicle.powertrain_type == 'FCV')) & (vehicle.drive_system==4),0.61 * eng_rated_hp + 330,
 delta_glider_non_structure_mass_lbs,vehicle.body_style == 'sedan',(4.2 * delta_footprint + 2.3 * delta_footprint * (vehicle.height_in - vehicle.ground_clearance_in)),
 delta_glider_non_structure_mass_lbs,vehicle.body_style == 'cuv_suv',(4.9 * delta_footprint + 2.5 * delta_footprint * (vehicle.height_in - vehicle.ground_clearance_in)),
 delta_glider_non_structure_mass_lbs,vehicle.body_style == 'pickup',(3.4 * delta_footprint + 1.9 * delta_footprint * (vehicle.height_in - vehicle.ground_clearance_in)),
