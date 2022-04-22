@@ -468,9 +468,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         cost_terms = powertrain_cost_terms + glider_cost_terms
 
-        cost_cloud['new_vehicle_mfr_cost_dollars'] = \
-            vehicle.base_year_glider_non_structure_cost_dollars + \
-            cost_cloud[cost_terms].sum(axis=1)
+        cost_cloud['new_vehicle_mfr_cost_dollars'] = cost_cloud[cost_terms].sum(axis=1)
 
         # calculate producer generalized cost
         cost_cloud = omega_globals.options.ProducerGeneralizedCost.\
