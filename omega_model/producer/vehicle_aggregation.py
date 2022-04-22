@@ -389,7 +389,7 @@ class VehicleAggregation(OMEGABase):
                     float(GliderCost.calc_cost(veh, pd.DataFrame([row]))[1])
 
                 # glider_costs = GliderCost.calc_cost(veh, pd.DataFrame([row]))  # includes structure_cost and glider_non_structure_cost
-                # glider_cost_terms = ['glider_structure_cost', 'glider_non_structure_cost']
+                # glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
                 # for i, ct in enumerate(glider_cost_terms):
                 #     df.loc[idx, ct] = [gc[i] for gc in glider_costs]
 

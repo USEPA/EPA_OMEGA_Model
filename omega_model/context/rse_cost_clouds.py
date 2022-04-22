@@ -111,7 +111,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
     # for reporting powertrain cost breakdowns
     cost_cloud_cost_columns = ['engine_cost', 'driveline_cost', 'emachine_cost', 'battery_cost',
-                               'electrified_driveline_cost', 'glider_structure_cost', 'glider_non_structure_cost']
+                               'electrified_driveline_cost', 'structure_cost', 'glider_non_structure_cost']
 
     cloud_non_numeric_columns = ['cost_curve_class', 'structure_material', 'vehicle_name']
 
@@ -462,13 +462,16 @@ class CostCloud(OMEGABase, CostCloudBase):
             cost_cloud[ct] = powertrain_costs[idx]
 
         glider_costs = GliderCost.calc_cost(vehicle, cost_cloud)  # includes structure_cost and glider_non_structure_cost
-        glider_cost_terms = ['glider_structure_cost', 'glider_non_structure_cost']
+        glider_cost_terms = ['structure_cost', 'glider_non_structure_cost']
         for idx, ct in enumerate(glider_cost_terms):
             cost_cloud[ct] = glider_costs[idx]
 
         cost_terms = powertrain_cost_terms + glider_cost_terms
 
         cost_cloud['new_vehicle_mfr_cost_dollars'] = cost_cloud[cost_terms].sum(axis=1)
+
+        powertrain_cost_terms.remove('battery_cost')
+        cost_cloud['powertrain_cost'] = cost_cloud[powertrain_cost_terms].sum(axis=1)
 
         # calculate producer generalized cost
         cost_cloud = omega_globals.options.ProducerGeneralizedCost.\

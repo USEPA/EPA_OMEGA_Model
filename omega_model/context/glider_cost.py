@@ -137,7 +137,7 @@ class GliderCost(OMEGABase):
         for structure_material in MassScaling.structure_materials:
             values += eval(_cache[vehicle.body_style, body_structure, structure_material]['value']) * \
                       (pkg_df['structure_material'].values == structure_material)
-        glider_structure_cost = values * adj_factor * learning_factor
+        structure_cost = values * adj_factor * learning_factor
 
         # glider non-structure cost
         adj_factor = _cache[vehicle.body_style, 'non_structure', 'various']['dollar_adjustment']
@@ -147,7 +147,7 @@ class GliderCost(OMEGABase):
         glider_non_structure_cost = \
             vehicle.base_year_glider_non_structure_cost_dollars + delta_glider_non_structure_cost
 
-        return glider_structure_cost, glider_non_structure_cost
+        return structure_cost, glider_non_structure_cost
 
     @staticmethod
     def init_from_file(filename, verbose=False):
