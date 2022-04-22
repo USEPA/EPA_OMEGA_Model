@@ -419,12 +419,6 @@ class CostCloud(OMEGABase, CostCloudBase):
                             cloud_point['credits_co2e_Mg_per_vehicle'] = \
                                 cloud_point['target_co2e_Mg_per_vehicle'] - cloud_point['cert_co2e_Mg_per_vehicle']
 
-                            # v.set_target_co2e_grams_per_mile()
-                            # cloud_point['target_co2e_grams_per_mile'] = v.target_co2e_grams_per_mile
-                            #
-                            # cloud_point['credits_co2e_grams_per_mile'] = \
-                            #     cloud_point['target_co2e_grams_per_mile'] - cloud_point['cert_co2e_grams_per_mile']
-
                             # required cloud data for powertrain costing, etc:
                             cloud_point['cost_curve_class'] = ccc
                             cloud_point['battery_kwh'] = battery_kwh
