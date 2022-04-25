@@ -101,7 +101,7 @@ class GliderCost(OMEGABase):
                               locals()) * adj_factor * learning_factor
 
         base_year_glider_non_structure_cost = \
-            (vehicle.base_year_msrp_dollars / markup) - structure_cost - powertrain_cost
+            vehicle.base_year_msrp_dollars - structure_cost - powertrain_cost
 
         return base_year_glider_non_structure_cost
 
