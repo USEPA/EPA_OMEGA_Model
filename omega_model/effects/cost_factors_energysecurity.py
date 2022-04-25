@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_cost_factors-energysecurity,input_template_version:,0.2
+       input_template_name:,cost_factors_energysecurity,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -53,6 +53,8 @@ class CostFactorsEnergySecurity(OMEGABase):
     """
     _data = dict()
 
+    _cache = dict()
+
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
@@ -67,17 +69,23 @@ class CostFactorsEnergySecurity(OMEGABase):
             Cost factor or list of cost factors
 
         """
-        calendar_years = CostFactorsEnergySecurity._data.keys()
-        year = max([yr for yr in calendar_years if yr <= calendar_year])
+        cache_key = (calendar_year, cost_factors)
 
-        factors = []
-        for cf in cost_factors:
-            factors.append(CostFactorsEnergySecurity._data[year][cf])
+        if cache_key not in CostFactorsEnergySecurity._cache:
 
-        if len(cost_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            calendar_years = CostFactorsEnergySecurity._data.keys()
+            year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+            factors = []
+            for cf in cost_factors:
+                factors.append(CostFactorsEnergySecurity._data[year][cf])
+
+            if len(cost_factors) == 1:
+                CostFactorsEnergySecurity._cache[cache_key] = factors[0]
+            else:
+                CostFactorsEnergySecurity._cache[cache_key] = factors
+
+        return CostFactorsEnergySecurity._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -94,11 +102,12 @@ class CostFactorsEnergySecurity(OMEGABase):
 
         """
         CostFactorsEnergySecurity._data.clear()
+        CostFactorsEnergySecurity._cache.clear()
 
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_cost_factors-energysecurity'
+        input_template_name = 'cost_factors_energysecurity'
         input_template_version = 0.3
         input_template_columns = {'calendar_year',
                                   'dollar_basis',
@@ -114,7 +123,7 @@ class CostFactorsEnergySecurity(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis,

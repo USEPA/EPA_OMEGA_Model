@@ -9,6 +9,44 @@
 
 """
 
+import sys
+import pandas as pd
+from pandas.api.types import is_numeric_dtype
+import numpy as np
+import common.omega_globals as omega_globals
+
+
+def sales_weight_average_dataframe(df):
+    """
+        Numeric columns are sales-weighted-averaged except for 'model_year' and columns containing
+        'sales', which is the weighting factor.  Non-numeric columns have unique values joined by ':'
+
+    Args:
+        df (DataFrame): the dataframe to sales-weight
+
+    Returns:
+        DataFrame with sales-weighted-average for numeric columns
+
+    """
+    import numpy as np
+
+    numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
+    non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
+
+    avg_df = pd.Series()
+
+    for c in numeric_columns:
+        if 'sales' not in c and c != 'model_year':
+            avg_df[c] = np.nansum(df[c].values * df['sales'].values) / np.sum(
+                df['sales'].values * ~np.isnan(df[c].values))
+        elif 'sales' in c:
+            avg_df[c] = df[c].sum()
+
+    for c in non_numeric_columns:
+        avg_df[c] = ':'.join(df[c].unique())
+
+    return avg_df
+
 
 def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
     """
@@ -26,9 +64,11 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
         ::
 
             # from create_frontier_df() in vehicles.py
-            CostCloud.plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
+            plot_frontier(self.cost_cloud, '', cost_curve, 'cert_co2e_grams_per_mile', 'new_vehicle_mfr_cost_dollars')
 
     """
+    import common.omega_globals as omega_globals
+
     import matplotlib.pyplot as plt
     plt.figure()
     plt.plot(cost_cloud[x_key], cost_cloud[y_key],
@@ -39,7 +79,7 @@ def plot_frontier(cost_cloud, cost_curve_name, frontier_df, x_key, y_key):
     plt.plot(frontier_df[x_key], frontier_df[y_key],
              'r-')
     plt.grid()
-    plt.savefig(globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
+    plt.savefig(omega_globals.options.output_folder + '%s versus %s %s.png' % (y_key, x_key, cost_curve_name))
 
 
 def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
@@ -77,11 +117,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         Default affinity factor, no up-slope
 
     """
-
-    import numpy as np
-    import pandas as pd
-    import common.omega_globals as omega_globals
-    from context.cost_clouds import cloud_non_numeric_columns
+    cloud_non_numeric_columns = omega_globals.options.CostCloud.cloud_non_numeric_columns
 
     if len(cloud) > 1:
         frontier_pts = []
@@ -90,8 +126,8 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         cloud = cloud.drop(columns=cloud_non_numeric_columns, errors='ignore')
 
         # normalize data (helps with up-slope frontier)
-        cloud['y_norm'] = (cloud[y_key] - cloud[y_key].min()) / (cloud[y_key].max() - cloud[y_key].min())
-        cloud['x_norm'] = (cloud[x_key] - cloud[x_key].min()) / (cloud[x_key].max() - cloud[x_key].min())
+        cloud['y_norm'] = (cloud[y_key].values - cloud[y_key].values.min()) / (cloud[y_key].values.max() - cloud[y_key].values.min())
+        cloud['x_norm'] = (cloud[x_key].values - cloud[x_key].values.min()) / (cloud[x_key].values.max() - cloud[x_key].values.min())
 
         x_key = 'x_norm'
         y_key = 'y_norm'
@@ -101,7 +137,7 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
         frontier_pts.append(cloud.loc[idxmin])
         min_frontier_factor = 0
 
-        if cloud[x_key].min() != cloud[x_key].max():
+        if cloud[x_key].values.min() != cloud[x_key].values.max():
             while pd.notna(idxmin) and (min_frontier_factor <= 0 or allow_upslope) \
                     and not np.isinf(min_frontier_factor) and not cloud.empty:
 
@@ -112,12 +148,13 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
                 # to prior frontier point if frontier_social_affinity_factor = 1.0, else a "weighted" slope
                 cloud = cull_cloud(cloud, prior_x, x_key)
 
-                calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
-                min_frontier_factor = cloud['frontier_factor'].min()
+                if not cloud.empty:
+                    calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
+                    min_frontier_factor = cloud['frontier_factor'].values.min()
 
-                if min_frontier_factor > 0 and allow_upslope:
-                    calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
-                    min_frontier_factor = cloud['frontier_factor'].min()
+                    if min_frontier_factor > 0 and allow_upslope:
+                        calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key)
+                        min_frontier_factor = cloud['frontier_factor'].values.min()
 
                 if not cloud.empty:
                     idxmin = get_idxmin(cloud, idxmin, min_frontier_factor, x_key)
@@ -131,41 +168,39 @@ def calc_frontier(cloud, x_key, y_key, allow_upslope=False):
 
     frontier_df['frontier_factor'] = 0
 
-    return frontier_df.copy()
+    return frontier_df #.copy()
 
 
 def get_idxmin(cloud, idxmin, min_frontier_factor, x_key):
-    import numpy as np
-
     if not np.isinf(min_frontier_factor):
-        if len(cloud[cloud['frontier_factor'] == min_frontier_factor]) > 1:
+        if len(cloud[cloud['frontier_factor'].values == min_frontier_factor]) > 1:
             # if multiple points with the same slope, take the one with the highest x-value
-            idxmin = cloud[cloud['frontier_factor'] == min_frontier_factor][x_key].idxmax()
+            # idxmin = cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].idxmax()
+            idxmin = cloud.index[np.argmax(cloud[cloud['frontier_factor'].values == min_frontier_factor][x_key].values)]
         else:
-            idxmin = cloud['frontier_factor'].idxmin()
+            # idxmin = cloud['frontier_factor'].idxmin()
+            idxmin = cloud.index[np.argmin(cloud['frontier_factor'])]
     else:
-        idxmin = cloud['frontier_factor'].idxmax()
+        # idxmin = cloud['frontier_factor'].idxmax()
+        idxmin = cloud.index[np.argmax(cloud['frontier_factor'].values)]
+
     return idxmin
 
 
 def calc_frontier_factor_up(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
-    import common.omega_globals as omega_globals
-
     # frontier factor is different for up-slope (swap x & y and invert "y")
-    cloud['frontier_factor'] = (prior_x - cloud[x_key]) / (cloud[y_key] - prior_y) \
+    cloud['frontier_factor'] = (prior_x - cloud[x_key].values) / (cloud[y_key].values - prior_y) \
                                ** omega_globals.options.cost_curve_frontier_affinity_factor
 
 
 def calc_frontier_factor_down(cloud, min_frontier_factor, prior_x, prior_y, x_key, y_key):
-    import common.omega_globals as omega_globals
-
-    cloud['frontier_factor'] = (cloud[y_key] - prior_y) / (cloud[x_key] - prior_x) \
+    cloud['frontier_factor'] = (cloud[y_key].values - prior_y) / (cloud[x_key].values - prior_x) \
                                ** omega_globals.options.cost_curve_frontier_affinity_factor
     # find next frontier point (lowest slope), if there is one, and add to frontier list
 
 
 def cull_cloud(cloud, prior_x, x_key):
-    cloud = cloud.loc[cloud[x_key] > prior_x]  # .copy()
+    cloud = cloud.loc[cloud[x_key].values > prior_x]  # .copy()
     return cloud
 
 
@@ -211,7 +246,6 @@ def linspace(min, max, num_values):
         A list of evenly spaced values between min and max
 
     """
-    import numpy as np
     ans = np.arange(min, max + (max-min) / (num_values-1), (max-min) / (num_values-1))
     return ans[0:num_values]
 
@@ -243,10 +277,6 @@ def partition(column_names, num_levels=5, min_constraints=None, max_constraints=
 
 
     """
-    import sys
-    import pandas as pd
-    import numpy as np
-
     cache_key = '%s_%s_%s_%s' % (column_names, num_levels, min_constraints, max_constraints)
 
     if cache_key not in partition_dict:
@@ -348,8 +378,6 @@ def unique(vector):
         List of unique values, in order of appearance
 
     """
-    import numpy as np
-
     indexes = np.unique(vector, return_index=True)[1]
     return [vector[index] for index in sorted(indexes)]
 
@@ -448,8 +476,6 @@ def cartesian_prod(left_df, right_df):
         the right dataframe).
 
     """
-    import pandas as pd
-
     if left_df.empty:
         return right_df
     else:
@@ -472,9 +498,6 @@ def _generate_nearby_shares(columns, combos, half_range_frac, num_steps, min_lev
         Partition dataframe, with columns as specified, values near the initial values from combo.
 
     """
-    import numpy as np
-    import pandas as pd
-
     dfs = []
 
     for i in range(0, len(columns) - 1):
@@ -561,9 +584,6 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
         e.g. 0.00100000000000000002 versus 0.00100000000000000089
 
     """
-    import numpy as np
-    import pandas as pd
-
     dfs = []
 
     for i in range(0, len(columns) - 1):
@@ -581,8 +601,8 @@ def generate_constrained_nearby_shares(columns, combos, half_range_frac, num_ste
         dfx = cartesian_prod(dfx, df)
 
     # dfx2 prevents >>intermittent<< "A value is trying to be set on a copy of a slice from a DataFrame." errors
-    dfx2 = dfx[dfx.sum(axis=1) <= 1]
-    dfx.loc[:, columns[-1]] = 1 - dfx2.sum(axis=1)  # using ".loc" in combination with dfx2 prevents errors
+    dfx2 = dfx[dfx.sum(axis=1).values <= 1]
+    dfx.loc[:, columns[-1]] = 1 - dfx2.sum(axis=1).values  # using ".loc" in combination with dfx2 prevents errors
 
     if verbose:
         print(dfx)
@@ -602,8 +622,6 @@ def ASTM_round(var, precision=0):
         var rounded using ASTM method with precision decimal places in result
 
     """
-    import numpy as np
-
     scaled_var = var * (10 ** precision)
 
     z = np.remainder(scaled_var, 2)
@@ -631,8 +649,6 @@ def CityFUF(miles):
         City utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    import numpy as np
-
     miles_norm = miles/399
 
     return ASTM_round(1-np.exp(-(
@@ -660,9 +676,6 @@ def HighwayFUF(miles):
         Highway utility factor from SAEJ2841 SEP2010, Table 5 (55/45 city/highway split)
 
     """
-    import math
-    import numpy as np
-
     miles_norm = miles/399
 
     return ASTM_round(1-np.exp(-(
@@ -675,10 +688,42 @@ def HighwayFUF(miles):
     )), 3)
 
 
+def calc_roadload_hp(A_LBSF, B_LBSF, C_LBSF, MPH):
+    """
+    Calculate roadload horsepower from ABC coefficients and vehicle speed (MPH)
+
+    Args:
+        A_LBSF (float): "A" coefficient, lbs
+        B_LBSF (float): "B" coefficient, lbs/mph
+        C_LBSF (float): "C" coefficient, lbs/mph^2
+        MPH (float(s)): scalar float, numpy array or Series of vehicle speed(s), mph
+
+    Returns:
+        Roadload horsepower at the given vehicle speed
+
+    """
+    KW2HP = 1.341
+    N2LBF = 0.224808943
+    KMH2MPH = .621371
+    MPH2MPS = 1 / KMH2MPH * 1000.0 / 3600.0
+    MPS2MPH = 1 / MPH2MPS
+
+    A_N = A_LBSF / N2LBF
+    B_N = B_LBSF / (N2LBF / MPS2MPH)
+    C_N = C_LBSF / (N2LBF / MPS2MPH / MPS2MPH)
+    MPS = MPH / MPS2MPH
+
+    roadload_force_N = A_N + B_N * MPS + C_N * MPS**2
+    roadload_power_kW = roadload_force_N * MPS / 1000
+
+    # roadload_force_lbs = roadload_force_N * N2LBF
+    roadload_power_hp = roadload_power_kW * KW2HP
+
+    return roadload_power_hp
+
+
 if __name__ == '__main__':
     try:
-        import pandas as pd
-
         # partition test
         part = partition(['a', 'b'], verbose=True)
 

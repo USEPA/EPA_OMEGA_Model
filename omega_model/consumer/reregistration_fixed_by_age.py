@@ -79,18 +79,24 @@ class Reregistration(OMEGABase, ReregistrationBase):
             Re-registered proportion [0..1]
 
         """
-        start_years = pd.Series(Reregistration._data['start_model_year'][market_class_id])
 
-        max_age = max(pd.Series(Reregistration._data['age'][market_class_id]))
+        cache_key = (model_year, market_class_id, age)
 
-        if age > max_age:
-            return 0
-        elif len(start_years[start_years <= model_year]) > 0:
-            year = max(start_years[start_years <= model_year])
-            return Reregistration._data[market_class_id, age, year]['reregistered_proportion']
-        else:
-            raise Exception('Missing registration fixed by age parameters for %s, %d or prior' %
-                            (market_class_id, calendar_year))
+        if cache_key not in Reregistration._data:
+            start_years = np.array(Reregistration._data['start_model_year'][market_class_id])
+
+            max_age = int(max(np.array(Reregistration._data['age'][market_class_id])))
+
+            if age > max_age:
+                Reregistration._data[cache_key] = 0
+            elif len(start_years[start_years <= model_year]) > 0:
+                year = max(start_years[start_years <= model_year])
+                Reregistration._data[cache_key] =  Reregistration._data[market_class_id, age, year]['reregistered_proportion']
+            else:
+                raise Exception('Missing registration fixed by age parameters for %s, %d or prior' %
+                                (market_class_id, calendar_year))
+
+        return Reregistration._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -121,24 +127,23 @@ class Reregistration(OMEGABase, ReregistrationBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+        if not template_errors:
+            validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
 
-            if not template_errors:
-                # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                # convert dataframe to dict keyed by market class ID, age, and start year
-                Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
-                    sort_index().to_dict(orient='index')
-                # add 'start_year' key which returns start years by market class ID
-                Reregistration._data.update(
-                    df[['market_class_id', 'age', 'start_model_year']].set_index('market_class_id').
-                        to_dict(orient='series'))
+        if not template_errors:
+            # Reregistration._data = df.set_index(['market_class_id', 'age']).sort_index().to_dict(orient='index')
+
+            # convert dataframe to dict keyed by market class ID, age, and start year
+            Reregistration._data = df.set_index(['market_class_id', 'age', 'start_model_year']).\
+                sort_index().to_dict(orient='index')
+            # add 'start_year' key which returns start years by market class ID
+            Reregistration._data.update(
+                df[['market_class_id', 'age', 'start_model_year']].set_index('market_class_id').
+                    to_dict(orient='series'))
 
         return template_errors
 

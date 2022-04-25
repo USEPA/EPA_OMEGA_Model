@@ -113,15 +113,10 @@ class VehicleAnnualData(SQABase, OMEGABase):
         return result
 
     @staticmethod
-    def get_odometer(vehicle_id, calendar_year):
-        vad = omega_globals.session.query(VehicleAnnualData). \
-            filter(VehicleAnnualData.vehicle_id == vehicle_id). \
-            filter(VehicleAnnualData.calendar_year == calendar_year).one_or_none()
-
-        if vad:
-            return vad.odometer
-
-        return 0
+    def get_odometers(calendar_year):
+        data = omega_globals.session.query(VehicleAnnualData.vehicle_id, VehicleAnnualData.odometer).\
+            filter(VehicleAnnualData.calendar_year == calendar_year).all()
+        return pd.DataFrame(data, columns=['vehicle_id', 'odometer'])
 
 
 if __name__ == '__main__':

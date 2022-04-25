@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_cost_factors-congestion-noise,input_template_version:,0.1
+       input_template_name:,cost_factors_congestion_noise,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -72,14 +72,20 @@ class CostFactorsCongestionNoise(OMEGABase):
             Cost factor or list of cost factors
 
         """
-        factors = []
-        for cf in cost_factors:
-            factors.append(CostFactorsCongestionNoise._data[reg_class_id][cf])
+        cache_key = (reg_class_id, cost_factors)
 
-        if len(cost_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+        if cache_key not in CostFactorsCongestionNoise._data:
+
+            factors = []
+            for cf in cost_factors:
+                factors.append(CostFactorsCongestionNoise._data[reg_class_id][cf])
+
+            if len(cost_factors) == 1:
+                CostFactorsCongestionNoise._data[cache_key] = factors[0]
+            else:
+                CostFactorsCongestionNoise._data[cache_key] = factors
+
+        return CostFactorsCongestionNoise._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -100,7 +106,7 @@ class CostFactorsCongestionNoise(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_cost_factors-congestion-noise'
+        input_template_name = 'cost_factors_congestion_noise'
         input_template_version = 0.1
         input_template_columns = {'reg_class_id',
                                   'dollar_basis',
@@ -116,8 +122,14 @@ class CostFactorsCongestionNoise(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
+        if not template_errors:
+            validation_dict = {'reg_class_id': list(legacy_reg_classes)}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
             cols_to_convert = [col for col in df.columns if 'dollars_per_mile' in col]
 
             df = gen_fxns.adjust_dollars(df, 'ip_deflators', omega_globals.options.analysis_dollar_basis, *cols_to_convert)

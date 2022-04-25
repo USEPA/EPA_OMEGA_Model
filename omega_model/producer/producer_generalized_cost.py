@@ -73,7 +73,12 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             The requested generalized cost attributes.
 
         """
-        return [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
+        cache_key = (market_class_id, attribute_types)
+
+        if cache_key not in ProducerGeneralizedCost._data:
+            ProducerGeneralizedCost._data[cache_key] = [ProducerGeneralizedCost._data[market_class_id][attr] for attr in attribute_types]
+
+        return ProducerGeneralizedCost._data[cache_key]
 
     @staticmethod
     def calc_generalized_cost(vehicle, cost_cloud, co2_name, kwh_name, cost_name):
@@ -97,7 +102,7 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
 
         producer_generalized_cost_fuel_years, producer_generalized_cost_annual_vmt = \
             ProducerGeneralizedCost. \
-                get_producer_generalized_cost_attributes(vehicle.market_class_id, ['fuel_years', 'annual_vmt'])
+                get_producer_generalized_cost_attributes(vehicle.market_class_id, ('fuel_years', 'annual_vmt'))
 
         # cost_cloud = vehicle.cost_cloud
         vehicle_cost = cost_cloud[cost_name]
@@ -125,10 +130,15 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
                                               producer_generalized_cost_annual_vmt *
                                               producer_generalized_cost_fuel_years)
 
+        # TODO: if we keep this, the 1300 should be an input somewhere
+        delta_footprint_ft2 = cost_cloud['footprint_ft2'] - vehicle.base_year_footprint_ft2
+        footprint_wltp = delta_footprint_ft2 * 1300
+
         generalized_fuel_cost = liquid_generalized_fuel_cost + electric_generalized_fuel_cost
 
         cost_cloud[
-            cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + price_modification
+            cost_name.replace('mfr', 'mfr_generalized')] = generalized_fuel_cost + vehicle_cost + \
+                                                           price_modification - footprint_wltp
 
         return cost_cloud
 
@@ -162,16 +172,16 @@ class ProducerGeneralizedCost(OMEGABase, ProducerGeneralizedCostBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+        if not template_errors:
+            validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
 
-            if not template_errors:
-                ProducerGeneralizedCost._data = df.set_index('market_class_id').to_dict(orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            ProducerGeneralizedCost._data = df.set_index('market_class_id').to_dict(orient='index')
 
         return template_errors
 

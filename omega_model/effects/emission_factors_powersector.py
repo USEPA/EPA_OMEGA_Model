@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_emission_factors-powersector,input_template_version:,0.1
+       input_template_name:,emission_factors_powersector,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -91,7 +91,7 @@ class EmissionFactorsPowersector(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_emission_factors-powersector'
+        input_template_name = 'emission_factors_powersector'
         input_template_version = 0.1
         input_template_columns = {'calendar_year',
                                   'voc_grams_per_kwh', 'co_grams_per_kwh', 'nox_grams_per_kwh', 'pm25_grams_per_kwh', 'sox_grams_per_kwh',
@@ -106,7 +106,7 @@ class EmissionFactorsPowersector(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 EmissionFactorsPowersector._data = df.set_index('calendar_year').to_dict(orient='index')

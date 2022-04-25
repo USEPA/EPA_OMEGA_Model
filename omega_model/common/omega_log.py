@@ -146,12 +146,12 @@ def end_logfile(message):
     omega_globals.options.end_time = time.time()
     elapsed_time = (omega_globals.options.end_time - omega_globals.options.start_time)
     import datetime
-    logwrite('\nSession ended at %s %s' % (datetime.date.today(), time.strftime('%H:%M:%S')), echo_console=True)
-    logwrite('Session elapsed time %.2f seconds\n' % elapsed_time, echo_console=True)
+    logwrite('\nSession ended at %s %s' % (datetime.date.today(), time.strftime('%H:%M:%S')))
+    logwrite('Session elapsed time %.2f seconds\n' % elapsed_time)
     logwrite(message, terminator='')
 
 
-def logwrite(message, echo_console=False, terminator='\n'):
+def logwrite(message, echo_console=True, terminator='\n'):
     """
     Write message to logfile.
 

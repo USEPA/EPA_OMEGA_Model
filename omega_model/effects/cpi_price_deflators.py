@@ -65,9 +65,10 @@ class CPIPriceDeflators(OMEGABase):
             The CPI price deflator for the given calendar year.
 
         """
-        import pandas as pd
+        # import pandas as pd
 
         calendar_years = pd.Series(CPIPriceDeflators._data.keys())
+        # calendar_years = np.array([*CPIPriceDeflators._data]) # np.array(list(CPIPriceDeflators._data.keys()))
         if len(calendar_years[calendar_years <= calendar_year]) > 0:
             year = max(calendar_years[calendar_years <= calendar_year])
 
@@ -107,7 +108,7 @@ class CPIPriceDeflators(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 CPIPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')

@@ -253,21 +253,21 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.RegulatoryClasses.validate_reg_class_id(df.loc[i, 'reg_class_id'])
+        if not template_errors:
+            # validate columns
+            validation_dict = {'reg_class_id': omega_globals.options.RegulatoryClasses.reg_classes}
 
-            if not template_errors:
-                VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).sort_index().to_dict(
-                    orient='index')
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                for rc in df['reg_class_id'].unique():
-                    VehicleTargets._data[rc] = {
-                        'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
+        if not template_errors:
+            VehicleTargets._data = df.set_index(['reg_class_id', 'start_year']).sort_index().to_dict(
+                orient='index')
+
+            for rc in df['reg_class_id'].unique():
+                VehicleTargets._data[rc] = {
+                    'start_year': np.array(df['start_year'].loc[df['reg_class_id'] == rc])}
 
         return template_errors
 
@@ -337,6 +337,6 @@ if __name__ == '__main__':
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())
             os._exit(-1)
     except:
-        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc(), echo_console=True)
+        omega_log.logwrite("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())
         os._exit(-1)

@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_emission_factors-refinery,input_template_version:,0.2
+       input_template_name:,emission_factors_refinery,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -58,6 +58,7 @@ class EmissionFactorsRefinery(OMEGABase):
 
         Args:
             calendar_year (int): calendar year to get emission factors for
+            in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             emission_factors (str, [strs]): name of emission factor or list of emission factor attributes to get
 
         Returns:
@@ -66,17 +67,23 @@ class EmissionFactorsRefinery(OMEGABase):
         """
         import pandas as pd
 
-        calendar_years = pd.Series(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
-        year = max([yr for yr in calendar_years if yr <= calendar_year])
+        cache_key = (calendar_year, in_use_fuel_id, emission_factors)
 
-        factors = []
-        for ef in emission_factors:
-            factors.append(EmissionFactorsRefinery._data[year, in_use_fuel_id][ef])
+        if cache_key not in EmissionFactorsRefinery._data:
 
-        if len(emission_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            calendar_years = np.atleast_1d(EmissionFactorsRefinery._data['calendar_year'][in_use_fuel_id])
+            year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+            factors = []
+            for ef in emission_factors:
+                factors.append(EmissionFactorsRefinery._data[year, in_use_fuel_id][ef])
+
+            if len(emission_factors) == 1:
+                EmissionFactorsRefinery._data[cache_key] = factors[0]
+            else:
+                EmissionFactorsRefinery._data[cache_key] = factors
+
+        return EmissionFactorsRefinery._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -97,7 +104,7 @@ class EmissionFactorsRefinery(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_emission_factors-refinery'
+        input_template_name = 'emission_factors_refinery'
         input_template_version = 0.2
         input_template_columns = {'calendar_year', 'in_use_fuel_id',
                                   'voc_grams_per_gallon', 'co_grams_per_gallon', 'nox_grams_per_gallon',
@@ -113,13 +120,21 @@ class EmissionFactorsRefinery(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                EmissionFactorsRefinery._data = \
-                    df.set_index(['calendar_year', 'in_use_fuel_id']).sort_index().to_dict(orient='index')
-                EmissionFactorsRefinery._data.update(
-                    df[['calendar_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
+        if not template_errors:
+            from context.onroad_fuels import OnroadFuel
+
+            # validate columns
+            validation_dict = {'in_use_fuel_id': OnroadFuel.fuel_ids}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            EmissionFactorsRefinery._data = \
+                df.set_index(['calendar_year', 'in_use_fuel_id']).sort_index().to_dict(orient='index')
+            EmissionFactorsRefinery._data.update(
+                df[['calendar_year', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
 
         return template_errors
 

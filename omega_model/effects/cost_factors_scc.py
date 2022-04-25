@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,cost_factors-scc,input_template_version:,0.2
+       input_template_name:,cost_factors_scc,input_template_version:,0.2
 
 Sample Data Columns
     .. csv-table::
@@ -98,7 +98,7 @@ class CostFactorsSCC(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_cost_factors-scc'
+        input_template_name = 'cost_factors_scc'
         input_template_version = 0.2
         input_template_columns = {'calendar_year', 
                                   'dollar_basis',
@@ -124,7 +124,7 @@ class CostFactorsSCC(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             cols_to_convert = [col for col in df.columns if 'USD_per_metricton' in col]
 

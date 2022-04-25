@@ -28,7 +28,7 @@ def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
     """
     from effects.emission_factors_vehicles import EmissionFactorsVehicles
 
-    emission_factors = ['voc_grams_per_mile',
+    emission_factors = ('voc_grams_per_mile',
                         'co_grams_per_mile',
                         'nox_grams_per_mile',
                         'pm25_grams_per_mile',
@@ -40,7 +40,7 @@ def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
                         'acrolein_grams_per_mile',
                         'ch4_grams_per_mile',
                         'n2o_grams_per_mile',
-                        ]
+                        )
 
     age = calendar_year - model_year
 
@@ -59,7 +59,7 @@ def get_powersector_ef(calendar_year):
     """
     from effects.emission_factors_powersector import EmissionFactorsPowersector
 
-    emission_factors = ['voc_grams_per_kwh',
+    emission_factors = ('voc_grams_per_kwh',
                         'co_grams_per_kwh',
                         'nox_grams_per_kwh',
                         'pm25_grams_per_kwh',
@@ -72,7 +72,7 @@ def get_powersector_ef(calendar_year):
                         'co2_grams_per_kwh',
                         'ch4_grams_per_kwh',
                         'n2o_grams_per_kwh',
-                        ]
+                        )
 
     return EmissionFactorsPowersector.get_emission_factors(calendar_year, emission_factors)
 
@@ -90,7 +90,7 @@ def get_refinery_ef(calendar_year, fuel):
     """
     from effects.emission_factors_refinery import EmissionFactorsRefinery
 
-    emission_factors = ['voc_grams_per_gallon',
+    emission_factors = ('voc_grams_per_gallon',
                         'co_grams_per_gallon',
                         'nox_grams_per_gallon',
                         'pm25_grams_per_gallon',
@@ -103,7 +103,7 @@ def get_refinery_ef(calendar_year, fuel):
                         'co2_grams_per_gallon',
                         'ch4_grams_per_gallon',
                         'n2o_grams_per_gallon',
-                        ]
+                        )
 
     return EmissionFactorsRefinery.get_emission_factors(calendar_year, fuel, emission_factors)
 
@@ -121,8 +121,8 @@ def get_energysecurity_cf(calendar_year):
     """
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
-    cost_factors = ['oil_import_reduction_as_percent_of_total_oil_demand_reduction',
-                    ]
+    cost_factors = ('oil_import_reduction_as_percent_of_total_oil_demand_reduction',
+                    )
 
     return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
 
@@ -162,6 +162,7 @@ def calc_physical_effects(calendar_years):
     from producer.vehicle_annual_data import VehicleAnnualData
     from producer.vehicles import VehicleFinal
     from context.onroad_fuels import OnroadFuel
+    from common.omega_eval import Eval
 
     input_attributes_list = ['grams_per_us_ton', 'grams_per_metric_ton', 'gal_per_bbl',
                              'e0_in_retail_gasoline', 'e0_energy_density_ratio',
@@ -182,7 +183,7 @@ def calc_physical_effects(calendar_years):
         for vad in vads:
 
             attribute_list = ['manufacturer_id', 'name', 'model_year', 'base_year_reg_class_id', 'reg_class_id',
-                              'in_use_fuel_id', 'fueling_class',
+                              'in_use_fuel_id', 'fueling_class', 'powertrain_type',
                               'target_co2e_grams_per_mile', 'onroad_direct_co2e_grams_per_mile',
                               'onroad_direct_kwh_per_mile']
 
@@ -191,7 +192,7 @@ def calc_physical_effects(calendar_years):
                 vehicle_info_dict[vad.vehicle_id] = VehicleFinal.get_vehicle_attributes(vad.vehicle_id, attribute_list)
 
             mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
-            target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
+            powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
                 = vehicle_info_dict[vad.vehicle_id]
 
             # need vehicle effects for each vehicle and for each calendar year since they change year-over-year
@@ -227,7 +228,7 @@ def calc_physical_effects(calendar_years):
                 voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
                     = 26 * [0]
 
-                fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
+                fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
                 for fuel, fuel_share in fuel_dict.items():
                     refuel_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'refuel_efficiency')
                     transmission_efficiency = OnroadFuel.get_fuel_attribute(calendar_year, fuel, 'transmission_efficiency')
@@ -330,6 +331,7 @@ def calc_physical_effects(calendar_years):
                                              'reg_class_id': reg_class_id,
                                              'in_use_fuel_id': in_use_fuel_id,
                                              'fueling_class': fueling_class,
+                                             'powertrain_type': powertrain_type,
                                              'registered_count': vad.registered_count,
                                              'annual_vmt': vad.annual_vmt,
                                              'odometer': vad.odometer,

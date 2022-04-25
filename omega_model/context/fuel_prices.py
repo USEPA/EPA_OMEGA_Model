@@ -96,23 +96,30 @@ class FuelPrice(OMEGABase):
 
         """
 
-        if omega_globals.options.flat_context:
-            calendar_year = omega_globals.options.flat_context_year
+        cache_key = (calendar_year, price_types, fuel_id)
 
-        if type(price_types) is not list:
-            price_types = [price_types]
+        if cache_key not in FuelPrice._data:
+            if omega_globals.options.flat_context:
+                calendar_year = omega_globals.options.flat_context_year
+            else:
+                calendar_year = max(calendar_year, FuelPrice._data['min_calendar_year'])
 
-        prices = []
-        for pt in price_types:
-            prices.append(FuelPrice._data[omega_globals.options.context_id,
-                                          omega_globals.options.context_case_id,
-                                          fuel_id,
-                                          calendar_year][pt])
+            if type(price_types) is not list:
+                price_types = [price_types]
 
-        if len(prices) == 1:
-            return prices[0]
-        else:
-            return prices
+            prices = []
+            for pt in price_types:
+                prices.append(FuelPrice._data[omega_globals.options.context_id,
+                                              omega_globals.options.context_case_id,
+                                              fuel_id,
+                                              calendar_year][pt])
+
+            if len(prices) == 1:
+                FuelPrice._data[cache_key] = prices[0]
+            else:
+                FuelPrice._data[cache_key] = prices
+
+        return FuelPrice._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -136,8 +143,8 @@ class FuelPrice(OMEGABase):
         # don't forget to update the module docstring with changes here
         input_template_name = 'context_fuel_prices'
         input_template_version = 0.2
-        input_template_columns = {'context_id', 'dollar_basis', 'case_id', 'fuel_id', 'calendar_year', 'retail_dollars_per_unit',
-                                  'pretax_dollars_per_unit'}
+        input_template_columns = {'context_id', 'dollar_basis', 'case_id', 'fuel_id', 'calendar_year',
+                                  'retail_dollars_per_unit', 'pretax_dollars_per_unit'}
 
         template_errors = validate_template_version_info(filename, input_template_name, input_template_version,
                                                          verbose=verbose)
@@ -146,8 +153,21 @@ class FuelPrice(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
+        if not template_errors:
+            from context.new_vehicle_market import NewVehicleMarket
+            from context.onroad_fuels import OnroadFuel
+
+            # validate columns
+            validation_dict = {'context_id': NewVehicleMarket.context_ids,
+                               'case_id': NewVehicleMarket.context_case_ids,
+                               'fuel_id': OnroadFuel.fuel_ids,
+                               }
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
             df = df.loc[(df['context_id'] == omega_globals.options.context_id) & (df['case_id'] == omega_globals.options.context_case_id), :]
             aeo_dollar_basis = df['dollar_basis'].mean()
             cols_to_convert = [col for col in df.columns if 'dollars_per_unit' in col]
@@ -163,15 +183,9 @@ class FuelPrice(OMEGABase):
             df['dollar_basis'] = omega_globals.options.analysis_dollar_basis
 
             if not template_errors:
-                from context.onroad_fuels import OnroadFuel
-
-                # validate data
-                for i in df.index:
-                    template_errors += OnroadFuel.validate_fuel_id(df.loc[i, 'fuel_id'])
-
-            if not template_errors:
                 FuelPrice._data = df.set_index(['context_id', 'case_id', 'fuel_id', 'calendar_year']).sort_index()\
                     .to_dict(orient='index')
+                FuelPrice._data['min_calendar_year'] = df['calendar_year'].min()
 
         return template_errors
 

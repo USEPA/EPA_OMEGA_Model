@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,cost_factors-criteria,input_template_version:,0.3
+       input_template_name:,cost_factors_criteria,input_template_version:,0.3
 
 Sample Data Columns
     .. csv-table::
@@ -54,6 +54,8 @@ class CostFactorsCriteria(OMEGABase):
     """
     _data = dict()  # private dict, cost factors criteria by calendar year
 
+    _cache = dict()
+
     @staticmethod
     def get_cost_factors(calendar_year, cost_factors):
         """
@@ -68,17 +70,23 @@ class CostFactorsCriteria(OMEGABase):
             Cost factor or list of cost factors
 
         """
-        calendar_years = CostFactorsCriteria._data.keys()
-        year = max([yr for yr in calendar_years if yr <= calendar_year])
+        cache_key = (calendar_year, cost_factors)
 
-        factors = []
-        for cf in cost_factors:
-            factors.append(CostFactorsCriteria._data[year][cf])
+        if cache_key not in CostFactorsCriteria._cache:
 
-        if len(cost_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            calendar_years = CostFactorsCriteria._data.keys()
+            year = max([yr for yr in calendar_years if yr <= calendar_year])
+
+            factors = []
+            for cf in cost_factors:
+                factors.append(CostFactorsCriteria._data[year][cf])
+
+            if len(cost_factors) == 1:
+                CostFactorsCriteria._cache[cache_key] = factors[0]
+            else:
+                CostFactorsCriteria._cache[cache_key] = factors
+
+        return CostFactorsCriteria._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -96,10 +104,12 @@ class CostFactorsCriteria(OMEGABase):
         """
         CostFactorsCriteria._data.clear()
 
+        CostFactorsCriteria._cache.clear()
+
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename} ...')
 
-        input_template_name = 'context_cost_factors-criteria'
+        input_template_name = 'cost_factors_criteria'
         input_template_version = 0.3
         cost_factors_input_template_columns = {'calendar_year', 'dollar_basis',
                                                'pm25_tailpipe_3.0_USD_per_uston',
@@ -123,8 +133,8 @@ class CostFactorsCriteria(OMEGABase):
             df = pd.read_csv(filename, skiprows=1)
             df = df.loc[df['dollar_basis'] != 0, :]
 
-            template_errors = validate_template_columns(filename, cost_factors_input_template_columns,
-                                                        df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, cost_factors_input_template_columns,
+                                                             df.columns, verbose=verbose)
 
             cols_to_convert = [col for col in df.columns if 'USD_per_uston' in col]
 

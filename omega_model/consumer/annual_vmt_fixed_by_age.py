@@ -79,14 +79,19 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
             (float) Annual vehicle miles travelled.
 
         """
-        start_years = pd.Series(OnroadVMT._data['start_year'][market_class_id])
+        cache_key = (calendar_year, market_class_id, age)
 
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max(start_years[start_years <= calendar_year])
-            return OnroadVMT._data[market_class_id, age, year]['annual_vmt']
-        else:
-            raise Exception('Missing onroad VMT fixed by age parameters for %s, %d or prior' %
-                            (market_class_id, calendar_year))
+        if cache_key not in OnroadVMT._data:
+            start_years = np.array(OnroadVMT._data['start_year'][market_class_id])
+
+            if len(start_years[start_years <= calendar_year]) > 0:
+                year = max(start_years[start_years <= calendar_year])
+                OnroadVMT._data[cache_key] = OnroadVMT._data[market_class_id, age, year]['annual_vmt']
+            else:
+                raise Exception('Missing onroad VMT fixed by age parameters for %s, %d or prior' %
+                                (market_class_id, calendar_year))
+
+        return OnroadVMT._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -118,13 +123,12 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
-                # validate data
-                for i in df.index:
-                    template_errors += \
-                        omega_globals.options.MarketClass.validate_market_class_id(df.loc[i, 'market_class_id'])
+                validation_dict = {'market_class_id': omega_globals.options.MarketClass.market_classes}
+
+                template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
             if not template_errors:
                 # OnroadVMT._data = df.set_index(['market_class_id','age']).sort_index().to_dict(orient='index')
@@ -134,7 +138,7 @@ class OnroadVMT(OMEGABase, AnnualVMTBase):
                     orient='index')
                 # add 'start_year' key which returns start years by market class ID
                 OnroadVMT._data.update(
-                    df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='series'))
+                    df[['market_class_id', 'age', 'start_year']].set_index('market_class_id').to_dict(orient='dict'))
 
 
         return template_errors

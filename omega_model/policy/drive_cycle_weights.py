@@ -145,33 +145,40 @@ class DriveCycleWeights(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                from common.omega_trees import WeightedTree
-                weight_errors = []
-                cycle_name_errors = []
-                for fc in fueling_classes:
-                    for calendar_year in df['start_year']:
-                        data = df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)]
-                        if not data.empty:
-                            tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
-                            weight_errors += tree.validate_weights()
-                            if weight_errors:
-                                template_errors = ['weight error %s: %s' %
-                                                   (calendar_year, error) for error in weight_errors]
-                            else:
-                                if not DriveCycleWeights._data:
-                                    # validate drive cycle names on first tree
-                                    cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
-                                    if cycle_name_errors:
-                                        template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
-                                if not cycle_name_errors:
-                                    if fc not in DriveCycleWeights._data:
-                                        DriveCycleWeights._data[fc] = dict()
-                                    DriveCycleWeights._data[fc][calendar_year] = tree
+        if not template_errors:
+            validation_dict = {'share_id': ['cert'],
+                               'fueling_class': ['ICE', 'BEV', 'PHEV'],  #TODO: fueling class / powertrain type class..?
+                               }
 
-                    DriveCycleWeights._data[fc]['start_year'] = np.array(list(DriveCycleWeights._data[fc].keys()))
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            from common.omega_trees import WeightedTree
+            weight_errors = []
+            cycle_name_errors = []
+            for fc in fueling_classes:
+                for calendar_year in df['start_year']:
+                    data = df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)]
+                    if not data.empty:
+                        tree = WeightedTree(df.loc[(df['start_year'] == calendar_year) & (df['fueling_class'] == fc)], verbose)
+                        weight_errors += tree.validate_weights()
+                        if weight_errors:
+                            template_errors = ['weight error %s: %s' %
+                                               (calendar_year, error) for error in weight_errors]
+                        else:
+                            if not DriveCycleWeights._data:
+                                # validate drive cycle names on first tree
+                                cycle_name_errors = DriveCycleWeights.validate_drive_cycle_names(tree, filename)
+                                if cycle_name_errors:
+                                    template_errors = ['cyclename error %s' % error for error in cycle_name_errors]
+                            if not cycle_name_errors:
+                                if fc not in DriveCycleWeights._data:
+                                    DriveCycleWeights._data[fc] = dict()
+                                DriveCycleWeights._data[fc][calendar_year] = tree
+
+                DriveCycleWeights._data[fc]['start_year'] = np.array([*DriveCycleWeights._data[fc]]) # np.array(list(DriveCycleWeights._data[fc].keys()))
 
         return template_errors
 
@@ -193,13 +200,20 @@ class DriveCycleWeights(OMEGABase):
             A pandas ``Series`` object of the weighted results
 
         """
-        start_years = DriveCycleWeights._data[fueling_class]['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
-            return DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
-                                                                  weighted=weighted)
-        else:
-            raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
+        cache_key = calendar_year, fueling_class
+
+        if cache_key not in DriveCycleWeights._data:
+
+            start_years = DriveCycleWeights._data[fueling_class]['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
+                eq_str = DriveCycleWeights._data[fueling_class][calendar_year].calc_value(cycle_values, node_id=node_id,
+                                                                      weighted=weighted)[1]
+                DriveCycleWeights._data[cache_key] = eq_str
+            else:
+                raise Exception('Missing drive cycle weights for %s, %d or prior' % (fueling_class, calendar_year))
+
+        return Eval.eval(DriveCycleWeights._data[cache_key], {}, {'results': cycle_values})
 
     @staticmethod
     def calc_cert_direct_oncycle_co2e_grams_per_mile(calendar_year, fueling_class, cycle_values):
@@ -269,8 +283,13 @@ if __name__ == '__main__':
                             'cd_ftp_4:cert_direct_oncycle_kwh_per_mile': 0.2332757,
                             'cd_hwfet:cert_direct_oncycle_kwh_per_mile': 0.22907605,
             }
+
             print(DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(2020, 'ICE', sample_cycle_results))
+            # eq_str = DriveCycleWeights.calc_cert_direct_oncycle_co2e_grams_per_mile(2020, 'ICE', sample_cycle_results)[1]
+            # print(eval(eq_str, {}, {'results': sample_cycle_results}))
             print(DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, 'BEV', sample_cycle_results))
+            # eq_str = DriveCycleWeights.calc_cert_direct_oncycle_kwh_per_mile(2020, 'BEV', sample_cycle_results)[1]
+            # print(eval(eq_str, {}, {'results': sample_cycle_results}))
 
         else:
             print(init_fail)

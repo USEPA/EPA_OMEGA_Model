@@ -78,23 +78,6 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
         return reg_class_id
 
     @staticmethod
-    def validate_reg_class_id(reg_class_id):
-        """
-        Validate market class ID
-
-        Args:
-            reg_class_id (str): regulatory class ID, e.g. 'car'
-
-        Returns:
-            Error message in a list if reg_class_id is not valid
-
-        """
-        if reg_class_id not in RegulatoryClasses.reg_classes:
-            return ['Unexpected reg_class_id "%s"' % reg_class_id]
-        else:
-            return []
-
-    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
@@ -123,7 +106,7 @@ class RegulatoryClasses(OMEGABase, RegulatoryClassesBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 RegulatoryClasses._data = df.set_index('reg_class_id').to_dict(orient='index')

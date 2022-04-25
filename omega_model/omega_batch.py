@@ -31,67 +31,74 @@ Sample Data Columns
     .. csv-table::
         :widths: auto
 
-        Parameter,Type,Value,
-        Batch Settings,,,
-        Batch Name,String,test_batch,
-        Analysis Final Year,#,2050,
-        Consolidate Manufacturers,TRUE / FALSE,TRUE,
-        Cost Accrual,end-of-year / beginning-of-year,end-of-year,
-        Discount Values to Year,#,2021,
-        Analysis Dollar Basis,#,2020,
-        ,,,
-        Batch Analysis Context Settings,,,
-        Context Name,String,AEO2021,
-        Context Case,String,Reference case,
-        Context Fuel Prices File,String,context_fuel_prices.csv,
-        Context New Vehicle Market File,String,context_new_vehicle_market.csv,
-        Maintenance Costs File,String,maintenance_cost_inputs.csv,
-        Repair Costs File,String,repair_cost_inputs.csv,
-        Refueling Costs File,String,refueling_cost_inputs.csv,
-        Manufacturers File,String,manufacturers.csv,
-        Market Classes File,String,market_classes.csv,
-        New Vehicle Price Elasticity of Demand,#,-0.5,
-        Onroad Fuels File,String,onroad_fuels.csv,
-        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv,
-        Onroad VMT File,String,annual_vmt_fixed_by_age.csv,
-        Producer Cross Subsidy Multiplier Max,#,1.05,
-        Producer Cross Subsidy Multiplier Min,#,0.95,
-        Producer Generalized Cost File,String,producer_generalized_cost.csv,
-        Production Constraints File,String,production_constraints.csv,
-        Sales Share File,String,sales_share_params.csv,
-        Vehicle Price Modifications File,String,vehicle_price_modifications.csv,
-        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv,
-        Vehicle Simulation Results and Costs File,String,simulated_vehicles.csv,
-        Vehicles File,String,vehicles.csv,
-        ,,,
-        Session Settings,,,
-        Enable Session,TRUE / FALSE,TRUE,TRUE
-        Session Name,String,NoActionPolicy,ActionAlternative
-        ,,,
-        Session Policy Alternatives Settings,,,
-        Drive Cycle Weights File,String,drive_cycle_weights.csv,drive_cycle_weights.csv
-        Drive Cycles File,String,drive_cycles.csv,drive_cycles.csv
-        GHG Credit Params File,String,ghg_credit_params.csv,ghg_credit_params.csv
-        GHG Credits File,String,ghg_credits.csv,ghg_credits.csv
-        GHG Standards File,String,ghg_standards-footprint.csv,ghg_standards-alternative.csv
-        Off-Cycle Credits File,String,offcycle_credits.csv,offcycle_credits.csv
-        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv,policy_fuel_upstream_methods.csv
-        Policy Fuels File,String,policy_fuels.csv,policy_fuels.csv
-        Production Multipliers File,String,production_multipliers.csv,production_multipliers.csv
-        Regulatory Classes File,String,regulatory_classes.csv,regulatory_classes.csv
-        Required Sales Share File,String,required_sales_share.csv,required_sales_share.csv
-        ,,,
-        Session Postproc Settings,,,
-        General Inputs for Effects File,String,general_inputs_for_effects.csv,general_inputs_for_effects.csv
-        Context Criteria Cost Factors File,String,cost_factors-criteria.csv,cost_factors-criteria.csv
-        Context SCC Cost Factors File,String,cost_factors-scc.csv,cost_factors-scc.csv
-        Context Energy Security Cost Factors File,String,cost_factors-energysecurity.csv,cost_factors-energysecurity.csv
-        Context Congestion-Noise Cost Factors File,String,cost_factors-congestion-noise.csv,cost_factors-congestion-noise.csv
-        Context Powersector Emission Factors File,String,emission_factors-powersector.csv,emission_factors-powersector.csv
-        Context Refinery Emission Factors File,String,emission_factors-refinery.csv,emission_factors-refinery.csv
-        Context Vehicle Emission Factors File,String,emission_factors-vehicles.csv,emission_factors-vehicles.csv
-        Context Implicit Price Deflators File,String,implicit_price_deflators.csv,implicit_price_deflators.csv
-        Context Consumer Price Index File,String,cpi_price_deflators.csv,cpi_price_deflators.csv
+        Parameter,Type,Value
+        Batch Settings,,
+        Batch Name,String,test_batch
+        Analysis Final Year,#,2030
+        Consolidate Manufacturers,TRUE / FALSE,TRUE
+        Cost Accrual,end-of-year / beginning-of-year,end-of-year
+        Discount Values to Year,#,2021
+        Analysis Dollar Basis,#,2020
+        ,,
+        Batch Analysis Context Settings,,
+        Context Name,String,AEO2021
+        Context Case,String,Reference case
+        Context Fuel Prices File,String,context_fuel_prices.csv
+        Context New Vehicle Market File,String,context_new_vehicle_market.csv
+        Maintenance Costs File,String,maintenance_cost_inputs.csv
+        Repair Costs File,String,repair_cost_inputs.csv
+        Refueling Costs File,String,refueling_cost_inputs.csv
+        Manufacturers File,String,manufacturers.csv
+        Market Classes File,String,market_classes.csv
+        New Vehicle Price Elasticity of Demand,#,-0.4
+        Onroad Fuels File,String,onroad_fuels.csv
+        Onroad Vehicle Calculations File,String,onroad_vehicle_calculations.csv
+        Onroad VMT File,String,annual_vmt_fixed_by_age.csv
+        Producer Cross Subsidy Multiplier Max,#,1.1
+        Producer Cross Subsidy Multiplier Min,#,0.9
+        Producer Generalized Cost File,String,producer_generalized_cost.csv
+        Production Constraints File,String,production_constraints.csv
+        Sales Share File,String,sales_share_params.csv
+        Vehicle Price Modifications File,String,vehicle_price_modifications.csv
+        Vehicle Reregistration File,String,reregistration_fixed_by_age.csv
+        ICE Vehicle Simulation Results File,String,simulated_vehicles_ice.csv
+        BEV Vehicle Simulation Results File,String,simulated_vehicles_bev.csv
+        PHEV Vehicle Simulation Results File,String,simulated_vehicles_phev.csv
+        Vehicles File,String,vehicles.csv
+        Powertrain Cost File,String,powertrain_cost.csv
+        Glider Cost File,String,glider_cost.csv
+        Body Styles File,String,body_styles.csv
+        Mass Scaling File,String,mass_scaling.csv
+        ,,
+        Session Settings,,
+        Enable Session,TRUE / FALSE,TRUE
+        Session Name,String,NoActionPolicy
+        ,,
+        Session Policy Alternatives Settings,,
+        Drive Cycle Weights File,String,drive_cycle_weights.csv
+        Drive Cycles File,String,drive_cycles.csv
+        GHG Credit Params File,String,ghg_credit_params.csv
+        GHG Credits File,String,ghg_credits.csv
+        GHG Standards File,String,ghg_standards-footprint.csv
+        Off-Cycle Credits File,String,offcycle_credits.csv
+        Policy Fuel Upstream Methods File,String,policy_fuel_upstream_methods.csv
+        Policy Fuels File,String,policy_fuels.csv
+        Production Multipliers File,String,production_multipliers.csv
+        Regulatory Classes File,String,regulatory_classes.csv
+        Required Sales Share File,String,required_sales_share.csv
+        ,,
+        Session Postproc Settings,,
+        General Inputs for Effects File,String,general_inputs_for_effects.csv
+        Context Criteria Cost Factors File,String,cost_factors_criteria.csv
+        Context SCC Cost Factors File,String,cost_factors_scc.csv
+        Context Energy Security Cost Factors File,String,cost_factors_energysecurity.csv
+        Context Congestion-Noise Cost Factors File,String,cost_factors_congestion_noise.csv
+        Context Powersector Emission Factors File,String,emission_factors_powersector.csv
+        Context Refinery Emission Factors File,String,emission_factors_refinery.csv
+        Context Vehicle Emission Factors File,String,emission_factors_vehicles.csv
+        Context Implicit Price Deflators File,String,implicit_price_deflators.csv
+        Context Consumer Price Index File,String,cpi_price_deflators.csv
+
 
 The first column defines the parameter name, the second column is a type-hint and does not get evaluated.  Subsequent
 columns contain the data to define batch settings and session settings.
@@ -141,15 +148,15 @@ Data Row Name and Description
 
 :Maintenance Costs File *(str)*:
     The relative or absolute path to the maintenance cost inputs file,
-    loaded by ``context.maintenance_cost_inputs.MaintenanceCostInputs``
+    loaded by ``context.maintenance_cost_inputs.MaintenanceCost``
 
 :Repair Costs File *(str)*:
     The relative or absolute path to the repair cost inputs file,
-    loaded by ``context.repair_cost_inputs.RepairCostInputs``
+    loaded by ``context.repair_cost.RepairCost``
 
 :Refueling Costs File *(str)*:
     The relative or absolute path to the refueling cost inputs file,
-    loaded by ``context.refueling_cost_inputs.RefuelingCostInputs``
+    loaded by ``context.refueling_cost_inputs.RefuelingCost``
 
 :Manufacturers File *(str)*:
     The relative or absolute path to the manufacturers file,
@@ -207,13 +214,37 @@ Data Row Name and Description
     loaded dynamically by the ``Reregistration`` class defined in the module specified by the file header,
     e.g. ``consumer.reregistration_fixed_by_age``
 
-:Vehicle Simulation Results and Costs File *(str)*:
-    The relative or absolute path to the vehicle simulation results and costs file,
-    loaded by ``context.cost_clouds.CostCloud``
+:ICE Simulation Results and Costs File *(str)*:
+    The relative or absolute path to the ICE vehicle simulation results and costs file,
+    loaded by user-definable CostCloud class
+
+:BEV Simulation Results and Costs File *(str)*:
+    The relative or absolute path to the BEV vehicle simulation results and costs file,
+    loaded by user-definable CostCloud class
+
+:PHEV Simulation Results and Costs File *(str)*:
+    The relative or absolute path to the PHEV vehicle simulation results and costs file,
+    loaded by user-definable CostCloud class
 
 :Vehicles File *(str)*:
     The relative or absolute path to the vehicles (base year fleet) file,
     loaded by ``producer.vehicles.VehicleFinal``
+
+:Powertrain Cost File *(str)*:
+    The relative or absolute path to the powertrain cost file,
+    loaded by ``context.powertrain_cost``
+
+:Glider Cost File *(str)*:
+    The relative or absolute path to the vehicle glider cost file,
+    loaded by ``context.glider_cost``
+
+:Body Styles File *(str)*:
+    The relative or absolute path to the body styles file,
+    loaded by ``context.body_styles``
+
+:Mass Scaling File *(str)*:
+    The relative or absolute path to the mass scaling file,
+    loaded by ``context.mass_scaling``
 
 :General Inputs for Effects File *(str)*:
     The relative or absolute path to the general inputs used for effects calculations,
@@ -792,9 +823,14 @@ class OMEGABatchObject(OMEGABase):
         self.settings.sales_share_file = self.read_parameter('Sales Share File')
         self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
-        self.settings.vehicle_simulation_results_and_costs_file = \
-            self.read_parameter('Vehicle Simulation Results and Costs File')
+        self.settings.ice_vehicle_simulation_results_file = self.read_parameter('ICE Vehicle Simulation Results File')
+        self.settings.bev_vehicle_simulation_results_file = self.read_parameter('BEV Vehicle Simulation Results File')
+        self.settings.phev_vehicle_simulation_results_file = self.read_parameter('PHEV Vehicle Simulation Results File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
+        self.settings.powertrain_cost_input_file = self.read_parameter('Powertrain Cost File')
+        self.settings.glider_cost_input_file = self.read_parameter('Glider Cost File')
+        self.settings.body_styles_file = self.read_parameter('Body Styles File')
+        self.settings.mass_scaling_file = self.read_parameter('Mass Scaling File')
 
         # read postproc settings
         self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
@@ -858,8 +894,6 @@ class OMEGASessionObject(OMEGABase):
             name (str): the name of the session
             
         """
-        from omega import OMEGASessionSettings
-
         self.batch = []
         self.name = name
         self.num = 0
@@ -904,8 +938,6 @@ class OMEGASessionObject(OMEGABase):
             Nothing, updates session attributes
 
         """
-        from omega import OMEGASessionSettings
-
         self.num = session_num
         self.enabled = session_num == 0 or \
                        validate_predefined_input(self.read_parameter('Enable Session'), true_false_dict)
@@ -931,7 +963,7 @@ class OMEGASessionObject(OMEGABase):
         self.settings.session_is_reference = self.num == 0
         self.settings.output_folder = self.name + os.sep + self.settings.output_folder
         self.settings.database_dump_folder = self.name + os.sep + self.settings.database_dump_folder
-        self.settings.generate_context_new_vehicle_generalized_costs_file = (self.num == 0)
+        self.settings.generate_context_calibration_files = (self.num == 0)
 
         # read context settings
         self.settings.context_fuel_prices_file = self.read_parameter('Context Fuel Prices File')
@@ -949,9 +981,14 @@ class OMEGASessionObject(OMEGABase):
         self.settings.sales_share_file = self.read_parameter('Sales Share File')
         self.settings.vehicle_price_modifications_file = self.read_parameter('Vehicle Price Modifications File')
         self.settings.vehicle_reregistration_file = self.read_parameter('Vehicle Reregistration File')
-        self.settings.vehicle_simulation_results_and_costs_file = \
-            self.read_parameter('Vehicle Simulation Results and Costs File')
+        self.settings.ice_vehicle_simulation_results_file = self.read_parameter('ICE Vehicle Simulation Results File')
+        self.settings.bev_vehicle_simulation_results_file = self.read_parameter('BEV Vehicle Simulation Results File')
+        self.settings.phev_vehicle_simulation_results_file = self.read_parameter('PHEV Vehicle Simulation Results File')
         self.settings.vehicles_file = self.read_parameter('Vehicles File')
+        self.settings.powertrain_cost_input_file = self.read_parameter('Powertrain Cost File')
+        self.settings.glider_cost_input_file = self.read_parameter('Glider Cost File')
+        self.settings.body_styles_file = self.read_parameter('Body Styles File')
+        self.settings.mass_scaling_file = self.read_parameter('Mass Scaling File')
 
         # read postproc settings
         self.settings.general_inputs_for_effects_file = self.read_parameter('General Inputs for Effects File')
@@ -1006,6 +1043,10 @@ class OMEGASessionObject(OMEGABase):
         self.settings.iterate_producer_consumer = validate_predefined_input(
             self.read_parameter('Iterate Producer-Consumer', self.settings.iterate_producer_consumer),
             true_false_dict)
+
+        self.settings.log_vehicle_cloud_years = \
+            self.read_parameter('Log Vehicle Cloud Years',
+                                self.settings.log_vehicle_cloud_years)
 
         self.settings.log_consumer_iteration_years = \
             self.read_parameter('Log Consumer Iteration Years',
@@ -1611,29 +1652,33 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                                                    + '_summary_results.csv'
                         session_summary_dfs.append(pd.read_csv(session_summary_filename))
 
-                        annual_physical_effects_filename = options.batch_path + '_' \
-                                                           + batch.sessions[s_index].settings.output_folder \
-                                                           + batch.sessions[s_index].settings.session_unique_name \
-                                                           + '_annual_physical_effects.csv'
-                        annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
+                        if 'Physical' in options.calc_effects:
+                            annual_physical_effects_filename = options.batch_path + '_' \
+                                                               + batch.sessions[s_index].settings.output_folder \
+                                                               + batch.sessions[s_index].settings.session_unique_name \
+                                                               + '_annual_physical_effects.csv'
+                            annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
-                        apa_cost_effects_filename = options.batch_path + '_' \
-                                                    + batch.sessions[s_index].settings.output_folder \
-                                                    + batch.sessions[s_index].settings.session_unique_name \
-                                                    + '_annual_present_and_annualized_cost_effects.csv'
-                        apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
+                        if 'Costs' in options.calc_effects:
+                            apa_cost_effects_filename = options.batch_path + '_' \
+                                                        + batch.sessions[s_index].settings.output_folder \
+                                                        + batch.sessions[s_index].settings.session_unique_name \
+                                                        + '_annual_present_and_annualized_cost_effects.csv'
+                            apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
 
                 batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
                 batch_summary_filename = batch.name + '_summary_results.csv'
                 batch_summary_df.to_csv(batch_summary_filename, index=False)
 
-                batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
-                batch_annual_physical_effects_filename = batch.name + '_annual_physical_effects.csv'
-                batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
+                if 'Physical' in options.calc_effects:
+                    batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
+                    batch_annual_physical_effects_filename = batch.name + '_annual_physical_effects.csv'
+                    batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
 
-                batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
-                batch_apa_cost_effects_filename = batch.name + '_annual_present_and_annualized_cost_effects.csv'
-                batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
+                if 'Costs' in options.calc_effects:
+                    batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
+                    batch_apa_cost_effects_filename = batch.name + '_annual_present_and_annualized_cost_effects.csv'
+                    batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
 
 
 if __name__ == '__main__':

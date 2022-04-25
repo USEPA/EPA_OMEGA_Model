@@ -24,7 +24,7 @@ def get_scc_cf(calendar_year):
     """
     from effects.cost_factors_scc import CostFactorsSCC
 
-    cost_factors = ['co2_global_5.0_USD_per_metricton',
+    cost_factors = ('co2_global_5.0_USD_per_metricton',
                     'co2_global_3.0_USD_per_metricton',
                     'co2_global_2.5_USD_per_metricton',
                     'co2_global_3.95_USD_per_metricton',
@@ -36,7 +36,7 @@ def get_scc_cf(calendar_year):
                     'n2o_global_3.0_USD_per_metricton',
                     'n2o_global_2.5_USD_per_metricton',
                     'n2o_global_3.95_USD_per_metricton',
-                    ]
+                    )
 
     return CostFactorsSCC.get_cost_factors(calendar_year, cost_factors)
 
@@ -55,7 +55,7 @@ def get_criteria_cf(calendar_year):
     """
     from effects.cost_factors_criteria import CostFactorsCriteria
 
-    cost_factors = ['pm25_tailpipe_3.0_USD_per_uston',
+    cost_factors = ('pm25_tailpipe_3.0_USD_per_uston',
                     'pm25_upstream_3.0_USD_per_uston',
                     'nox_tailpipe_3.0_USD_per_uston',
                     'nox_upstream_3.0_USD_per_uston',
@@ -67,7 +67,7 @@ def get_criteria_cf(calendar_year):
                     'nox_upstream_7.0_USD_per_uston',
                     'so2_tailpipe_7.0_USD_per_uston',
                     'so2_upstream_7.0_USD_per_uston',
-                    ]
+                    )
 
     return CostFactorsCriteria.get_cost_factors(calendar_year, cost_factors)
 
@@ -85,8 +85,8 @@ def get_energysecurity_cf(calendar_year):
     """
     from effects.cost_factors_energysecurity import CostFactorsEnergySecurity
 
-    cost_factors = ['dollars_per_bbl',
-                    ]
+    cost_factors = ('dollars_per_bbl',
+                    )
 
     return CostFactorsEnergySecurity.get_cost_factors(calendar_year, cost_factors)
 
@@ -104,9 +104,9 @@ def get_congestion_noise_cf(reg_class_id):
     """
     from effects.cost_factors_congestion_noise import CostFactorsCongestionNoise
 
-    cost_factors = ['congestion_cost_dollars_per_mile',
+    cost_factors = ('congestion_cost_dollars_per_mile',
                     'noise_cost_dollars_per_mile',
-                    ]
+                    )
 
     return CostFactorsCongestionNoise.get_cost_factors(reg_class_id, cost_factors)
 
@@ -121,9 +121,9 @@ def get_maintenance_cost(veh_type):
         Curve coefficient values to calculate maintenance costs per mile at any odometer value.
 
     """
-    from context.maintenance_cost_inputs import MaintenanceCostInputs
+    from context.maintenance_cost import MaintenanceCost
 
-    d = MaintenanceCostInputs.get_maintenance_cost_curve_coefficients(veh_type)
+    d = MaintenanceCost.get_maintenance_cost_curve_coefficients(veh_type)
 
     return d['slope'], d['intercept']
 
@@ -143,8 +143,9 @@ def calc_cost_effects(physical_effects_dict):
     """
     from context.fuel_prices import FuelPrice
     from producer.vehicles import VehicleFinal
-    from context.repair_cost_inputs import RepairCostInputs
-    from context.refueling_cost_inputs import RefuelingCostInputs
+    from context.repair_cost import RepairCost
+    from context.refueling_cost import RefuelingCost
+    from common.omega_eval import Eval
 
     # UPDATE cost effects data
     costs_dict = dict()
@@ -183,13 +184,14 @@ def calc_cost_effects(physical_effects_dict):
 
             new_vehicle_cost = vehicle_info_dict[vehicle_id]
 
-            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class \
+            mfr_id, name, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, powertrain_type \
                 = physical['manufacturer_id'], \
                   physical['name'], \
                   physical['base_year_reg_class_id'], \
                   physical['reg_class_id'], \
                   physical['in_use_fuel_id'], \
-                  physical['fueling_class']
+                  physical['fueling_class'], \
+                  physical['powertrain_type']
 
             vehicle_count, annual_vmt, odometer, vmt, vmt_liquid, vmt_elec, kwh, gallons, imported_bbl \
                 = physical['registered_count'], \
@@ -222,7 +224,7 @@ def calc_cost_effects(physical_effects_dict):
                 tech_cost_dollars = vehicle_count * new_vehicle_cost
 
             # fuel costs
-            fuel_dict = eval(in_use_fuel_id, {'__builtins__': None}, {})
+            fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
             for fuel, fuel_share in fuel_dict.items():
                 retail_price = FuelPrice.get_fuel_prices(calendar_year, 'retail_dollars_per_unit', fuel)
                 pretax_price = FuelPrice.get_fuel_prices(calendar_year, 'pretax_dollars_per_unit', fuel)
@@ -234,16 +236,7 @@ def calc_cost_effects(physical_effects_dict):
                     fuel_pretax_cost_dollars += pretax_price * gallons
 
             # maintenance costs
-            if fueling_class == 'BEV':
-                powertrain_veh_type = 'BEV'
-            elif name.__contains__('PHEV'):
-                powertrain_veh_type = 'PHEV'
-            elif name.__contains__('HEV'):
-                powertrain_veh_type = 'HEV'
-            else:
-                powertrain_veh_type = 'ICE'
-
-            slope, intercept = get_maintenance_cost(powertrain_veh_type)
+            slope, intercept = get_maintenance_cost(powertrain_type)
             maintenance_cost_per_mile = slope * odometer + intercept
             maintenance_cost_dollars = maintenance_cost_per_mile * vmt
 
@@ -255,23 +248,23 @@ def calc_cost_effects(physical_effects_dict):
             else:
                 operating_veh_type = 'suv'
 
-            repair_cost_per_mile = RepairCostInputs.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_veh_type, operating_veh_type, age)
+            repair_cost_per_mile = RepairCost.calc_repair_cost_per_mile(new_vehicle_cost, powertrain_type, operating_veh_type, age)
             repair_cost_dollars = repair_cost_per_mile * vmt
 
             # refueling costs
-            if powertrain_veh_type == 'BEV':
+            if powertrain_type == 'BEV':
                 range = 300 # TODO do we stay with this or will range be an attribute tracked within omega
                 if (operating_veh_type, range) in refueling_bev_dict.keys():
                     refueling_cost_per_mile = refueling_bev_dict[(operating_veh_type, range)]
                 else:
-                    refueling_cost_per_mile = RefuelingCostInputs.calc_bev_refueling_cost_per_mile(operating_veh_type, range)
+                    refueling_cost_per_mile = RefuelingCost.calc_bev_refueling_cost_per_mile(operating_veh_type, range)
                     refueling_bev_dict.update({(operating_veh_type, range): refueling_cost_per_mile})
                 refueling_cost_dollars = refueling_cost_per_mile * vmt
             else:
                 if operating_veh_type in refueling_liquid_dict.keys():
                     refueling_cost_per_gallon = refueling_liquid_dict[operating_veh_type]
                 else:
-                    refueling_cost_per_gallon = RefuelingCostInputs.calc_liquid_refueling_cost_per_gallon(operating_veh_type)
+                    refueling_cost_per_gallon = RefuelingCost.calc_liquid_refueling_cost_per_gallon(operating_veh_type)
                     refueling_liquid_dict.update({operating_veh_type: refueling_cost_per_gallon})
                 refueling_cost_dollars = refueling_cost_per_gallon * gallons
 
@@ -371,6 +364,7 @@ def calc_cost_effects(physical_effects_dict):
                                      'reg_class_id': reg_class_id,
                                      'in_use_fuel_id': in_use_fuel_id,
                                      'fueling_class': fueling_class,
+                                     'powertrain_type': powertrain_type,
                                      'registered_count': vehicle_count,
                                      'annual_vmt': annual_vmt,
                                      'odometer': odometer,

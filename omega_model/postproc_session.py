@@ -850,7 +850,7 @@ def plot_market_shares(calendar_years, total_sales):
         market_share_results['abs_share_frac_%s' % mc] = market_category_abs_share_frac
 
     # tally up context size class sales
-    for csc in NewVehicleMarket.context_size_classes:
+    for csc in NewVehicleMarket.base_year_context_size_class_sales:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             csc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
@@ -901,12 +901,12 @@ def plot_market_shares(calendar_years, total_sales):
 
     # plot context size class results
     fig, ax1 = figure()
-    for csc in NewVehicleMarket.context_size_classes:
+    for csc in NewVehicleMarket.base_year_context_size_class_sales:
         ax1.plot(calendar_years, market_share_results['abs_share_frac_%s' % csc], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]',
               '%s\nContext Size Class Absolute Market Shares' % omega_globals.options.session_unique_name)
-    ax1.legend(NewVehicleMarket.context_size_classes.keys(), ncol=2, loc='upper center')
+    ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s CSC Shares.png' % omega_globals.options.session_unique_name)
 
     # plot reg class results
@@ -977,7 +977,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
         market_share_results['%s_abs_share_frac_%s' % (compliance_id, mc)] = market_category_abs_share_frac
 
     # tally up context size class sales
-    for csc in NewVehicleMarket.context_size_classes:
+    for csc in NewVehicleMarket.base_year_context_size_class_sales:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
             csc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
@@ -1030,12 +1030,12 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
 
     # plot context size class results
     fig, ax1 = figure()
-    for csc in NewVehicleMarket.context_size_classes:
+    for csc in NewVehicleMarket.base_year_context_size_class_sales:
         ax1.plot(calendar_years, market_share_results['%s_abs_share_frac_%s' % (compliance_id, csc)], '.--')
     ax1.set_ylim(-0.05, 1.05)
     label_xyt(ax1, 'Year', 'Absolute Market Share [%]', '%s %s\nContext Size Class Absolute Market Shares'
               % (compliance_id, omega_globals.options.session_unique_name))
-    ax1.legend(NewVehicleMarket.context_size_classes.keys(), ncol=2, loc='upper center')
+    ax1.legend(NewVehicleMarket.base_year_context_size_class_sales.keys(), ncol=2, loc='upper center')
     fig.savefig(omega_globals.options.output_folder + '%s CSC Shares %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 

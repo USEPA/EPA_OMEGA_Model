@@ -121,15 +121,20 @@ class NewVehicleMarket(OMEGABase):
 
     """
 
-    _data_by_csc_rc = dict()  # private dict, sales by context size class and reg class
+    _data_by_csc_rc = dict()  # private dict, sales by context size class and legacy reg class
+    _data_by_rc = pd.DataFrame()  # private dict, sales by legacy reg class
     _data_by_csc = dict()  # private dict, sales by context size class
     _data_by_total = dict()  # private dict, total sales
 
     context_size_class_info_by_nrmc = dict()  #: dict of dicts: information about which context size classes are in which non-responsive market categories as well as what share of the size class is within the non-responsive category.  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
-    context_size_classes = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
-    manufacturer_context_size_classes = dict()  #: dict: sales totals for each context size class by manufacturer represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    base_year_context_size_class_sales = dict()  #: dict: sales totals for each context size class represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
+    manufacturer_base_year_context_size_class_sales = dict()  #: dict: sales totals for each context size class by manufacturer represented in the base year vehicles input file (e.g 'vehicles.csv').  Populated by vehicles.py in VehicleFinal.init_vehicles_from_file()
     _context_new_vehicle_generalized_costs = dict()  # private dict,  stores total sales-weighted new vehicle generalized costs for use in determining overall sales response as a function of new vehicle generalized cost
     _session_new_vehicle_generalized_costs = dict()  # private dict,  stores total sales-weighted new vehicle generalized costs for the current session
+
+    context_size_classes = []  # list of known context size classes from the input file (not all may be used, depending on the composition of the base year fleet)
+    context_ids = []  # list of known context IDs from the input file
+    context_case_ids = []  # list of known case IDs from the input file
 
     @classmethod
     def init_context_new_vehicle_generalized_costs(cls, filename):
@@ -143,12 +148,12 @@ class NewVehicleMarket(OMEGABase):
         """
 
         cls.context_size_class_info_by_nrmc.clear()
-        cls.context_size_classes.clear()
-        cls.manufacturer_context_size_classes.clear()
+        cls.base_year_context_size_class_sales.clear()
+        cls.manufacturer_base_year_context_size_class_sales.clear()
         cls._context_new_vehicle_generalized_costs.clear()
         cls._session_new_vehicle_generalized_costs.clear()
 
-        if not omega_globals.options.generate_context_new_vehicle_generalized_costs_file:
+        if not omega_globals.options.generate_context_calibration_files:
             df = pd.read_csv(filename, index_col=0, dtype=str)
             # wanted to do: cls._new_vehicle_generalized_costs = df['new_vehicle_price_dollars'].to_dict()
             # OK, this is really weird and you shouldn't have to do this, but for whatever reason, when pandas
@@ -245,7 +250,7 @@ class NewVehicleMarket(OMEGABase):
         cls._session_new_vehicle_generalized_costs['%s_%s' % (calendar_year, compliance_id)] = generalized_cost
 
     @staticmethod
-    def new_vehicle_sales(calendar_year, context_size_class=None, context_reg_class=None):
+    def new_vehicle_data(calendar_year, context_size_class=None, context_reg_class=None, value='sales'):
         """
         Get new vehicle sales by session context ID, session context case, calendar year, context size class
         and context reg class.  User can specify total sales (no optional arguments) or sales by context size class or
@@ -280,18 +285,64 @@ class NewVehicleMarket(OMEGABase):
                     context_size_class, context_reg_class, calendar_year) in NewVehicleMarket._data_by_csc_rc:
                 return NewVehicleMarket._data_by_csc_rc[omega_globals.options.context_id,
                                                         omega_globals.options.context_case_id,
-                                                        context_size_class, context_reg_class, calendar_year]['sales']
+                                                        context_size_class, context_reg_class, calendar_year]['sales'].values
             else:
                 return 0
 
-        elif context_size_class:
-            return NewVehicleMarket._data_by_csc['sales'][omega_globals.options.context_id,
+        elif context_size_class and not context_reg_class:
+            return sum(NewVehicleMarket._data_by_csc[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
-                                                    context_size_class, calendar_year].sum()
+                                                    context_size_class, calendar_year].values)
+        elif context_reg_class and not context_size_class:
+            return NewVehicleMarket._data_by_rc[value].loc[omega_globals.options.context_id,
+                                                    omega_globals.options.context_case_id,
+                                                    context_reg_class, calendar_year]
         else:
-            return NewVehicleMarket._data_by_total['sales'][omega_globals.options.context_id,
+            return sum(NewVehicleMarket._data_by_total[value][omega_globals.options.context_id,
                                                     omega_globals.options.context_case_id,
-                                                    calendar_year].sum()
+                                                    calendar_year].values)
+
+    @staticmethod
+    def validate_context_size_class(context_size_class):
+        """
+        Validate the given context size class
+
+        Args:
+            context_size_class (str): e.g. 'Large Pickup', etc
+
+        Returns:
+            ''True'' if the given context size class name is valid, ''False'' otherwise
+
+        """
+        return context_size_class in NewVehicleMarket.context_size_classes
+
+    @staticmethod
+    def validate_context_id(context_id):
+        """
+        Validate the given context ID
+
+        Args:
+            context_id (str): e.g. 'Reference case', etc
+
+        Returns:
+            ''True'' if the given context ID name is valid, ''False'' otherwise
+
+        """
+        return context_id in NewVehicleMarket.context_ids
+
+    @staticmethod
+    def validate_case_id(case_id):
+        """
+        Validate the given case ID
+
+        Args:
+            case_id (str): e.g. 'AEO2021', etc
+
+        Returns:
+            ''True'' if the given case ID name is valid, ''False'' otherwise
+
+        """
+        return context_id in NewVehicleMarket.context_ids
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -309,6 +360,7 @@ class NewVehicleMarket(OMEGABase):
         """
 
         NewVehicleMarket._data_by_csc_rc.clear()
+        NewVehicleMarket._data_by_rc = pd.DataFrame()
         NewVehicleMarket._data_by_csc.clear()
         NewVehicleMarket._data_by_total.clear()
 
@@ -332,12 +384,23 @@ class NewVehicleMarket(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
-                NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
-                NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
+        if not template_errors:
+            validation_dict = {'reg_class_id': list(legacy_reg_classes)}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            from producer.vehicle_aggregation import sales_weight_average_dataframe
+            NewVehicleMarket._data_by_rc = df.groupby(['context_id', 'case_id', 'reg_class_id', 'calendar_year']).apply(sales_weight_average_dataframe)
+
+            NewVehicleMarket._data_by_csc_rc = df.set_index(['context_id', 'case_id', 'context_size_class', 'reg_class_id', 'calendar_year']).sort_index().to_dict(orient='index')
+            NewVehicleMarket._data_by_csc = df.set_index(['context_id', 'case_id', 'context_size_class', 'calendar_year']).sort_index().to_dict(orient='series')
+            NewVehicleMarket._data_by_total = df.set_index(['context_id', 'case_id', 'calendar_year']).sort_index().to_dict(orient='series')
+            NewVehicleMarket.context_size_classes = df['context_size_class'].unique().tolist()
+            NewVehicleMarket.context_ids = df['context_id'].unique().tolist()
+            NewVehicleMarket.context_case_ids = df['case_id'].unique().tolist()
 
         return template_errors
 
@@ -357,7 +420,7 @@ if __name__ == '__main__':
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(NewVehicleMarket.new_vehicle_sales(2021))
+            print(NewVehicleMarket.new_vehicle_data(2021))
         else:
             print(init_fail)
             print("\n#INIT FAIL\n%s\n" % traceback.format_exc())

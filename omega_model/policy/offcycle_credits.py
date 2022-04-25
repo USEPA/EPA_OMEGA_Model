@@ -117,15 +117,21 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             attribute, value = credit_column.split(':')
             if vehicle.__getattribute__(attribute) == value:
                 for offcycle_credit in OffCycleCredits.offcycle_credit_names:
-                    start_years = pd.Series(OffCycleCredits._data['start_year'][offcycle_credit])
-                    if len(start_years[start_years <= vehicle.model_year]) > 0:
-                        year = max(start_years[start_years <= vehicle.model_year])
+                    cache_key = (credit_column, attribute, vehicle.model_year, offcycle_credit)
+                    if cache_key not in OffCycleCredits._data:
+                        start_years = np.array(OffCycleCredits._data['start_year'][offcycle_credit])
+                        if len(start_years[start_years <= vehicle.model_year]) > 0:
+                            year = max(start_years[start_years <= vehicle.model_year])
 
-                        credit_value = OffCycleCredits._data[offcycle_credit, year][credit_column]
-                        credit_destination = \
-                            OffCycleCredits._data[offcycle_credit, year]['credit_destination']
+                            credit_value = OffCycleCredits._data[offcycle_credit, year][credit_column]
+                            credit_destination = \
+                                OffCycleCredits._data[offcycle_credit, year]['credit_destination']
 
-                        cost_cloud[credit_destination] += credit_value * cost_cloud[offcycle_credit]
+                            OffCycleCredits._data[cache_key] = (credit_destination, credit_value)
+
+                    (credit_destination, credit_value) = OffCycleCredits._data[cache_key]
+
+                    cost_cloud[credit_destination] += credit_value * cost_cloud[offcycle_credit]
 
         return cost_cloud
 
@@ -161,24 +167,33 @@ class OffCycleCredits(OMEGABase, OffCycleCreditsBase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                OffCycleCredits._offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
+        if not template_errors:
+            validation_dict = {'credit_name': ['start_stop', 'high_eff_alternator', 'ac_leakage', 'ac_efficiency'],
+                               'credit_group': ['menu', 'ac'],
+                               'credit_destination': ['cert_direct_offcycle_co2e_grams_per_mile',
+                                                      'cert_indirect_offcycle_co2e_grams_per_mile'],
+                               }
 
-                for cc in OffCycleCredits._offcycle_credit_value_columns:
-                    reg_class_id = cc.split(':')[1]
-                    if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
-                        template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
-                if not template_errors:
-                    OffCycleCredits.offcycle_credit_names = list(df['credit_name'].unique())
-                    OffCycleCredits._offcycle_credit_groups = list(df['credit_group'].unique())
-                    # convert dataframe to dict keyed by credit name and start year
-                    OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
-                    # add 'start_year' key which returns start years by credit name
-                    OffCycleCredits._data.update(
-                        df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='series'))
+        if not template_errors:
+            OffCycleCredits._offcycle_credit_value_columns = [c for c in df.columns if (':' in c)]
+
+            for cc in OffCycleCredits._offcycle_credit_value_columns:
+                reg_class_id = cc.split(':')[1]
+                if reg_class_id not in omega_globals.options.RegulatoryClasses.reg_classes:
+                    template_errors.append('*** Invalid Reg Class ID "%s" in %s ***' % (reg_class_id, filename))
+
+        if not template_errors:
+            OffCycleCredits.offcycle_credit_names = list(df['credit_name'].unique())
+            OffCycleCredits._offcycle_credit_groups = list(df['credit_group'].unique())
+            # convert dataframe to dict keyed by credit name and start year
+            OffCycleCredits._data = df.set_index(['credit_name', 'start_year']).to_dict(orient='index')
+            # add 'start_year' key which returns start years by credit name
+            OffCycleCredits._data.update(
+                df[['credit_name', 'start_year']].set_index('credit_name').to_dict(orient='dict'))
 
         return template_errors
 
@@ -204,10 +219,11 @@ if __name__ == '__main__':
         init_fail += omega_globals.options.RegulatoryClasses.init_from_file(
             omega_globals.options.policy_reg_classes_file)
 
-        from context.cost_clouds import CostCloud
-        init_fail += \
-            CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file,
-                                                 verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.CostCloud.\
+            init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
+                                        omega_globals.options.bev_vehicle_simulation_results_file,
+                                        omega_globals.options.phev_vehicle_simulation_results_file,
+                                        verbose=omega_globals.options.verbose)
 
         init_fail += OffCycleCredits.init_from_file(omega_globals.options.offcycle_credits_file,
                                                     verbose=omega_globals.options.verbose)
@@ -218,7 +234,7 @@ if __name__ == '__main__':
                 model_year = 2020
                 reg_class_id = 'car'
                 cost_curve_class = 'ice_MPW_LRL'
-                cost_cloud = CostCloud.get_cloud(model_year, cost_curve_class)
+                cost_cloud = omega_globals.options.CostCloud.get_cloud(self)
 
             vehicle = dummyVehicle()
 

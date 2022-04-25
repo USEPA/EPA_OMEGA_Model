@@ -12,6 +12,9 @@ sales-weighted generalized cost.**
 from omega_model import *
 
 
+_cache = dict()
+
+
 def context_new_vehicle_sales(calendar_year):
     """
     Get new vehicle sales from the context.
@@ -26,23 +29,36 @@ def context_new_vehicle_sales(calendar_year):
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
     from context.new_vehicle_market import NewVehicleMarket
 
-    sales_dict = dict()
+    if calendar_year not in _cache:
+        sales_dict = dict()
 
-    if omega_globals.options.flat_context:
-        calendar_year = omega_globals.options.flat_context_year
+        if omega_globals.options.flat_context:
+            calendar_year = omega_globals.options.flat_context_year
 
-    # calculate sales by non-responsive market category as a function of context size class sales and
-    # base year share of those vehicles in the non-responsive market category
-    for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
-        sales_dict[nrmc] = 0
-        for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
-            sales_dict[nrmc] += NewVehicleMarket.new_vehicle_sales(calendar_year, context_size_class=csc) * \
-                                     NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
+        # calculate sales by non-responsive market category as a function of context size class sales and
+        # base year share of those vehicles in the non-responsive market category
+        for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+            sales_dict[nrmc] = 0
+            for csc in NewVehicleMarket.context_size_class_info_by_nrmc[nrmc]:
+                sales_dict[nrmc] += NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=csc) * \
+                                    NewVehicleMarket.context_size_class_info_by_nrmc[nrmc][csc]['share']
 
-    # get total sales from context
-    sales_dict['total'] = NewVehicleMarket.new_vehicle_sales(calendar_year)
+        for rc in legacy_reg_classes:
+            sales_dict[rc] = NewVehicleMarket.new_vehicle_data(calendar_year, context_size_class=None,
+                                                               context_reg_class=rc)
 
-    return sales_dict
+        # get total sales from context
+        sales_dict['total'] = NewVehicleMarket.new_vehicle_data(calendar_year)
+
+        for nrmc in NewVehicleMarket.context_size_class_info_by_nrmc:
+            sales_dict['%s_share' % nrmc] = sales_dict[nrmc] / sales_dict['total']
+
+        for rc in legacy_reg_classes:
+            sales_dict['%s_share' % rc] = sales_dict[rc] / sales_dict['total']
+
+        _cache[calendar_year] = sales_dict
+
+    return _cache[calendar_year]
 
 
 def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_new_vehicle_generalized_cost=False):
@@ -86,6 +102,10 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_n
     return Q/Q0
 
 
+def init_sales_volume():
+    _cache.clear()
+
+
 if __name__ == '__main__':
     try:
         if '__file__' in locals():
@@ -108,11 +128,11 @@ if __name__ == '__main__':
         # override reg_classes from __init__.py:
         importlib.import_module('omega_model').reg_classes = omega_globals.options.RegulatoryClasses.reg_classes
 
+        from producer.vehicle_aggregation import VehicleAggregation
         from producer.vehicles import VehicleFinal, DecompositionAttributes
         from producer.vehicle_annual_data import VehicleAnnualData
         from producer.manufacturers import Manufacturer  # needed for manufacturers table
         from context.onroad_fuels import OnroadFuel  # needed for showroom fuel ID
-        from context.cost_clouds import CostCloud  # needed for vehicle cost from CO2e
         from context.new_vehicle_market import NewVehicleMarket
         from omega_model.omega import init_user_definable_decomposition_attributes, get_module
 
@@ -135,14 +155,20 @@ if __name__ == '__main__':
                                                 verbose=omega_globals.options.verbose)
         init_fail += OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
-        init_fail += CostCloud.init_cost_clouds_from_file(omega_globals.options.vehicle_simulation_results_and_costs_file, verbose=omega_globals.options.verbose)
+        init_fail += omega_globals.options.CostCloud.\
+            init_cost_clouds_from_files(omega_globals.options.ice_vehicle_simulation_results_file,
+                                        omega_globals.options.bev_vehicle_simulation_results_file,
+                                        omega_globals.options.phev_vehicle_simulation_results_file,
+                                        verbose=omega_globals.options.verbose)
 
         init_fail += omega_globals.options.VehicleTargets.init_from_file(omega_globals.options.policy_targets_file,
                                                                          verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=verbose_init)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=omega_globals.options.verbose)
 
         init_fail += NewVehicleMarket.init_from_file(
             omega_globals.options.context_new_vehicle_market_file, verbose=omega_globals.options.verbose)

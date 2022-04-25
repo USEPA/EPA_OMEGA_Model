@@ -72,6 +72,12 @@ class OnroadFuel(OMEGABase):
 
     _data = dict()  # private dict, in-use fuel properties
 
+    fuel_ids = []  # list of known fuel ids
+
+    # TODO: I don't know where this should be defined, or if it should be a user input
+    kilowatt_hours_per_gallon = 33.7  # for MPGe calcs from kWh/mi ...
+    grams_co2e_per_gallon = 8887  # for MPG calcs from gCO2e/mi
+
     @staticmethod
     def get_fuel_attribute(calendar_year, in_use_fuel_id, attribute):
         """
@@ -92,32 +98,19 @@ class OnroadFuel(OMEGABase):
                     OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit')
 
         """
-        import pandas as pd
 
-        start_years = pd.Series(OnroadFuel._data['start_year'][in_use_fuel_id])
-        if len(start_years[start_years <= calendar_year]) > 0:
-            year = max([yr for yr in start_years if yr <= calendar_year])
+        cache_key = (calendar_year, in_use_fuel_id, attribute)
 
-            return OnroadFuel._data[in_use_fuel_id, year][attribute]
-        else:
-            raise Exception('Missing onroad fuel values for %s, %d or prior' % (fuel_id, calendar_year))
+        if cache_key not in OnroadFuel._data:
+            start_years = np.atleast_1d(OnroadFuel._data['start_year'][in_use_fuel_id])
+            if len(start_years[start_years <= calendar_year]) > 0:
+                year = max([yr for yr in start_years if yr <= calendar_year])
 
-    @staticmethod
-    def validate_fuel_id(fuel_id):
-        """
-        Validate fuel ID
+                OnroadFuel._data[cache_key] = OnroadFuel._data[in_use_fuel_id, year][attribute]
+            else:
+                raise Exception('Missing policy fuel values for %s, %d or prior' %(in_use_fuel_id, calendar_year))
 
-        Args:
-            fuel_id (str): e.g. 'pump gasoline')
-
-        Returns:
-            Error message in a list if fuel_id is not valid
-
-        """
-        if fuel_id not in OnroadFuel._data['start_year'].keys():
-            return ['Unexpected fuel_id "%s"' % fuel_id]
-        else:
-            return []
+        return OnroadFuel._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -152,11 +145,17 @@ class OnroadFuel(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                OnroadFuel._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
-                OnroadFuel._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='series'))
+        if not template_errors:
+            validation_dict = {'unit': ['gallon', 'kWh']}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            OnroadFuel._data = df.set_index(['fuel_id', 'start_year']).to_dict(orient='index')
+            OnroadFuel._data.update(df[['start_year', 'fuel_id']].set_index('fuel_id').to_dict(orient='dict'))
+            OnroadFuel.fuel_ids = df['fuel_id'].unique()
 
         return template_errors
 
@@ -178,7 +177,6 @@ if __name__ == '__main__':
             OnroadFuel.init_from_file(omega_globals.options.onroad_fuels_file, verbose=omega_globals.options.verbose)
 
         if not init_fail:
-            print(OnroadFuel.validate_fuel_id('pump gasoline'))
             print(OnroadFuel.get_fuel_attribute(2020, 'pump gasoline', 'direct_co2e_grams_per_unit'))
         else:
             print(init_fail)

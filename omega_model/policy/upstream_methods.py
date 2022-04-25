@@ -44,6 +44,7 @@ Data Column Name and Description
 print('importing %s' % __file__)
 
 from omega_model import *
+from policy.policy_fuels import PolicyFuel
 
 
 def upstream_zero(vehicle, co2_grams_per_mile, kwh_per_mile):
@@ -79,9 +80,6 @@ def upstream_xev_ice_delta(vehicle, co2_grams_per_mile, kwh_per_mile):
         Upstream cert emissions based on kWh/mi relative to an ICE vehicle with the same target emissions
 
     """
-    from policy.policy_fuels import PolicyFuel
-    import numpy as np
-
     if vehicle.fueling_class == 'BEV':
         upstream_gco2_per_kwh = \
             PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2e_grams_per_unit')
@@ -119,8 +117,6 @@ def upstream_actual(vehicle, co2_grams_per_mile, kwh_per_mile):
         Upstream cert emissions based on cert direct kWh/mi and CO2e g/mi
 
     """
-    from policy.policy_fuels import PolicyFuel
-
     upstream_gco2_per_kwh = \
         PolicyFuel.get_fuel_attribute(vehicle.model_year, 'electricity', 'upstream_co2e_grams_per_unit')
 
@@ -152,6 +148,8 @@ class UpstreamMethods(OMEGABase):
 
     _data = pd.DataFrame()  # private Dataframe, upstream methods by start year
 
+    _cache = dict()
+
     @staticmethod
     def get_upstream_method(calendar_year):
         """
@@ -164,16 +162,23 @@ class UpstreamMethods(OMEGABase):
             A callable python function used to calculate upstream cert emissions for the given calendar year
 
         """
-        start_years = UpstreamMethods._data['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
 
-            method = UpstreamMethods._data['upstream_calculation_method'].loc[
-                UpstreamMethods._data['start_year'] == calendar_year].item()
+        cache_key = calendar_year
 
-            return upstream_method_dict[method]
-        else:
-            raise Exception('Missing upstream calculation method for %d or prior' % calendar_year)
+        if cache_key not in UpstreamMethods._cache:
+
+            start_years = np.atleast_1d(UpstreamMethods._data['start_year'])
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
+
+                method = UpstreamMethods._data['upstream_calculation_method'].loc[
+                    UpstreamMethods._data['start_year'] == calendar_year].item()
+
+                UpstreamMethods._cache[cache_key] = upstream_method_dict[method]
+            else:
+                raise Exception('Missing upstream calculation method for %d or prior' % calendar_year)
+
+        return UpstreamMethods._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -193,6 +198,8 @@ class UpstreamMethods(OMEGABase):
 
         UpstreamMethods._data = pd.DataFrame()
 
+        UpstreamMethods._cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
@@ -207,7 +214,7 @@ class UpstreamMethods(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 UpstreamMethods._data = df

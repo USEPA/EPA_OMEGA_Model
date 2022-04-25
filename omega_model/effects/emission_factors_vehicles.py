@@ -13,7 +13,7 @@ File Type
 Template Header
     .. csv-table::
 
-       input_template_name:,context_emission_factors-vehicles,input_template_version:,0.1
+       input_template_name:,emission_factors_vehicles,input_template_version:,0.1
 
 Sample Data Columns
     .. csv-table::
@@ -67,8 +67,8 @@ class EmissionFactorsVehicles(OMEGABase):
         Args:
             model_year (int): vehicle model year for which to get emission factors
             age (int): the vehicle age
-            reg_class_id (string): the regulatory class, e.g., 'car' or 'truck'
-            in_use_fuel_id (string): the liquid fuel ID, e.g., 'pump gasoline'
+            reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
+            in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             emission_factors: name of emission factor or list of emission factor attributes to get
 
         Returns: emission factor or list of emission factors
@@ -76,20 +76,26 @@ class EmissionFactorsVehicles(OMEGABase):
         """
         import pandas as pd
 
-        calendar_years = pd.Series(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
-        ages = pd.Series(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
+        cache_key = (model_year, age, reg_class_id, in_use_fuel_id, emission_factors)
 
-        year = max([yr for yr in calendar_years if yr <= model_year])
-        age_use = max([a for a in ages if a <= age])
+        if cache_key not in EmissionFactorsVehicles._data:
 
-        factors = []
-        for ef in emission_factors:
-            factors.append(EmissionFactorsVehicles._data[year, age_use, reg_class_id, in_use_fuel_id][ef])
+            calendar_years = np.atleast_1d(EmissionFactorsVehicles._data['model_year'][in_use_fuel_id])
+            ages = np.array(EmissionFactorsVehicles._data['age'][in_use_fuel_id])
 
-        if len(emission_factors) == 1:
-            return factors[0]
-        else:
-            return factors
+            year = max([yr for yr in calendar_years if yr <= model_year])
+            age_use = max([a for a in ages if a <= age])
+
+            factors = []
+            for ef in emission_factors:
+                factors.append(EmissionFactorsVehicles._data[year, age_use, reg_class_id, in_use_fuel_id][ef])
+
+            if len(emission_factors) == 1:
+                EmissionFactorsVehicles._data[cache_key] = factors[0]
+            else:
+                EmissionFactorsVehicles._data[cache_key] = factors
+
+        return EmissionFactorsVehicles._data[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -110,7 +116,7 @@ class EmissionFactorsVehicles(OMEGABase):
         if verbose:
             omega_log.logwrite(f'\nInitializing database from {filename}...')
 
-        input_template_name = 'context_emission_factors-vehicles'
+        input_template_name = 'emission_factors_vehicles'
         input_template_version = 0.1
         input_template_columns = {'model_year', 'age', 'reg_class_id', 'in_use_fuel_id',
                                   'voc_grams_per_mile', 'co_grams_per_mile', 'nox_grams_per_mile', 'pm25_grams_per_mile', 'sox_grams_per_gallon',
@@ -125,14 +131,23 @@ class EmissionFactorsVehicles(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
-            if not template_errors:
-                EmissionFactorsVehicles._data = \
-                    df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
-                        .to_dict(orient='index')
-                EmissionFactorsVehicles._data.update(
-                    df[['model_year', 'age', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
+        if not template_errors:
+            from context.onroad_fuels import OnroadFuel
+
+            # validate columns
+            validation_dict = {'in_use_fuel_id': OnroadFuel.fuel_ids,
+                               'reg_class_id': list(legacy_reg_classes)}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
+
+        if not template_errors:
+            EmissionFactorsVehicles._data = \
+                df.set_index(['model_year', 'age', 'reg_class_id', 'in_use_fuel_id']).sort_index()\
+                    .to_dict(orient='index')
+            EmissionFactorsVehicles._data.update(
+                df[['model_year', 'age', 'in_use_fuel_id']].set_index('in_use_fuel_id').to_dict(orient='series'))
 
         return template_errors
 

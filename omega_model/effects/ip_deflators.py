@@ -53,6 +53,8 @@ class ImplictPriceDeflators(OMEGABase):
     """
     _data = dict()  # private dict, implicit price deflators by calendar year
 
+    _cache = dict()
+
     @staticmethod
     def get_price_deflator(calendar_year):
         """
@@ -65,13 +67,21 @@ class ImplictPriceDeflators(OMEGABase):
             The implicit price deflator for the given calendar year.
 
         """
-        calendar_years = pd.Series(ImplictPriceDeflators._data.keys())
-        if len(calendar_years[calendar_years <= calendar_year]) > 0:
-            year = max(calendar_years[calendar_years <= calendar_year])
+        cache_key = calendar_year
 
-            return ImplictPriceDeflators._data[year]['price_deflator']
-        else:
-            raise Exception(f'Missing implicit price deflator for {calendar_year} or prior')
+        if cache_key not in ImplictPriceDeflators._cache:
+
+            calendar_years = pd.Series(ImplictPriceDeflators._data.keys())
+            # calendar_years = np.array(list(ImplictPriceDeflators._data.keys()))
+            # calendar_years = np.array([*ImplictPriceDeflators._data])
+            if len(calendar_years[calendar_years <= calendar_year]) > 0:
+                year = max(calendar_years[calendar_years <= calendar_year])
+
+                ImplictPriceDeflators._cache[cache_key] = ImplictPriceDeflators._data[year]['price_deflator']
+            else:
+                raise Exception(f'Missing implicit price deflator for {calendar_year} or prior')
+
+        return ImplictPriceDeflators._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -91,6 +101,8 @@ class ImplictPriceDeflators(OMEGABase):
 
         ImplictPriceDeflators._data.clear()
 
+        ImplictPriceDeflators._cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
@@ -105,7 +117,7 @@ class ImplictPriceDeflators(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 ImplictPriceDeflators._data = df.set_index('calendar_year').to_dict(orient='index')

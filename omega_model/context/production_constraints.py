@@ -68,6 +68,8 @@ class ProductionConstraints(OMEGABase):
     """
     _data = pd.DataFrame()
 
+    _cache = dict()
+
     @staticmethod
     def get_minimum_share(calendar_year, market_class_id):
         """
@@ -85,19 +87,24 @@ class ProductionConstraints(OMEGABase):
             ``producer.compliance_strategy.create_tech_and_share_sweeps()``
 
         """
-        minimum_share = 0
+        cache_key = ('minimum_share', calendar_year, market_class_id)
 
-        start_years = ProductionConstraints._data['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
+        if cache_key not in ProductionConstraints._cache:
+            minimum_share = 0
 
-            min_key = '%s:%s' % (market_class_id, min_share_units)
+            start_years = ProductionConstraints._data['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
 
-            if min_key in ProductionConstraints._data:
-                minimum_share = ProductionConstraints._data[min_key].loc[
-                    ProductionConstraints._data['start_year'] == calendar_year].item()
+                min_key = '%s:%s' % (market_class_id, min_share_units)
 
-        return minimum_share
+                if min_key in ProductionConstraints._data:
+                    minimum_share = ProductionConstraints._data[min_key].loc[
+                        ProductionConstraints._data['start_year'] == calendar_year].item()
+
+            ProductionConstraints._cache[cache_key] = minimum_share
+
+        return ProductionConstraints._cache[cache_key]
 
     @staticmethod
     def get_maximum_share(calendar_year, market_class_id):
@@ -115,19 +122,24 @@ class ProductionConstraints(OMEGABase):
             ``producer.compliance_strategy.create_tech_and_share_sweeps()``
 
         """
-        maximum_share = 1
+        cache_key = ('maximum_share', calendar_year, market_class_id)
 
-        start_years = ProductionConstraints._data['start_year']
-        if len(start_years[start_years <= calendar_year]) > 0:
-            calendar_year = max(start_years[start_years <= calendar_year])
+        if cache_key not in ProductionConstraints._cache:
+            maximum_share = 1
 
-            max_key = '%s:%s' % (market_class_id, max_share_units)
+            start_years = ProductionConstraints._data['start_year']
+            if len(start_years[start_years <= calendar_year]) > 0:
+                calendar_year = max(start_years[start_years <= calendar_year])
 
-            if max_key in ProductionConstraints._data:
-                maximum_share = ProductionConstraints._data[max_key].loc[
-                    ProductionConstraints._data['start_year'] == calendar_year].item()
+                max_key = '%s:%s' % (market_class_id, max_share_units)
 
-        return maximum_share
+                if max_key in ProductionConstraints._data:
+                    maximum_share = ProductionConstraints._data[max_key].loc[
+                        ProductionConstraints._data['start_year'] == calendar_year].item()
+
+            ProductionConstraints._cache[cache_key] = maximum_share
+
+        return ProductionConstraints._cache[cache_key]
 
     @staticmethod
     def init_from_file(filename, verbose=False):
@@ -147,6 +159,8 @@ class ProductionConstraints(OMEGABase):
 
         ProductionConstraints._data = pd.DataFrame()
 
+        ProductionConstraints._cache.clear()
+
         if verbose:
             omega_log.logwrite('\nInitializing data from %s...' % filename)
 
@@ -161,7 +175,7 @@ class ProductionConstraints(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
 

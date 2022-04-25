@@ -33,8 +33,11 @@ import traceback
 
 
 try:
+    import time
     import pandas as pd
     pd.set_option('chained_assignment', 'raise')
+    from pandas.api.types import is_numeric_dtype
+    import numpy as np
 
     from common.omega_globals import *
     from common.omega_types import *
@@ -42,11 +45,12 @@ try:
     from common import file_io, omega_log
     from common.input_validation import *
     from common.omega_functions import *
+    from common.omega_eval import *
+    from context.context_base_classes import *
+    from context.onroad_fuels import *
     from policy.policy_base_classes import *
     from consumer.consumer_base_classes import *
     from producer.producer_base_classes import *
-
-    import scipy.interpolate
 
     # --- OMEGA2 global constants ---
 
@@ -87,20 +91,37 @@ try:
             self.manufacturers_file = path + 'test_inputs/manufacturers.csv'
             self.market_classes_file = path + 'test_inputs/market_classes.csv'
             self.vehicles_file = path + 'test_inputs/vehicles.csv'
+            self.vehicles_df = pd.DataFrame()
             self.onroad_vehicle_calculations_file = path + 'test_inputs/onroad_vehicle_calculations.csv'
             self.sales_share_file = path + 'test_inputs/sales_share_params.csv'
             self.onroad_fuels_file = path + 'test_inputs/onroad_fuels.csv'
             self.context_id = 'AEO2021'
             self.context_case_id = 'Reference case'
             self.context_new_vehicle_generalized_costs_file = 'context_new_vehicle_prices.csv'
-            self.generate_context_new_vehicle_generalized_costs_file = True
+            self.sales_share_calibration_file = 'context_sales_share_calibration.csv'
+            self.generate_context_calibration_files = True
             self.context_fuel_prices_file = path + 'test_inputs/context_fuel_prices.csv'
             self.fuel_upstream_methods_file = path + 'test_inputs/policy_fuel_upstream_methods.csv'
             self.vehicle_price_modifications_file = path + 'test_inputs/vehicle_price_modifications.csv'
             self.drive_cycles_file = path + 'test_inputs/drive_cycles.csv'
             self.drive_cycle_weights_file = path + 'test_inputs/drive_cycle_weights.csv'
+            self.drive_cycle_ballast_file = path + 'test_inputs/drive_cycle_ballast.csv'
             self.context_new_vehicle_market_file = path + 'test_inputs/context_new_vehicle_market.csv'
-            self.vehicle_simulation_results_and_costs_file = path + 'test_inputs/simulated_vehicles.csv'
+
+            # self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_ice.csv'
+            # self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_bev.csv'
+            # self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_phev.csv'
+
+            self.ice_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_ice.csv'
+            self.bev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_bev.csv'
+            self.phev_vehicle_simulation_results_file = path + 'test_inputs/simulated_vehicles_rse_phev.csv'
+
+            # TODO: add these to the batch process
+            self.powertrain_cost_input_file = path + 'test_inputs/powertrain_cost.csv'
+            self.glider_cost_input_file = path + 'test_inputs/glider_cost.csv'
+            self.body_styles_file = path + 'test_inputs/body_styles.csv'
+            self.mass_scaling_file = path + 'test_inputs/mass_scaling.csv'
+
             self.analysis_initial_year = None
             self.analysis_final_year = 2021
             self.logfile_prefix = 'o2log_'
@@ -136,16 +157,16 @@ try:
             self.general_inputs_for_effects_file = path + 'test_inputs/general_inputs_for_effects.csv'
             self.ip_deflators_file = path + 'test_inputs/implicit_price_deflators.csv'
             self.cpi_deflators_file = path + 'test_inputs/cpi_price_deflators.csv'
-            self.scc_cost_factors_file = path + 'test_inputs/cost_factors-scc.csv'
-            self.criteria_cost_factors_file = path + 'test_inputs/cost_factors-criteria.csv'
-            self.energysecurity_cost_factors_file = path + 'test_inputs/cost_factors-energysecurity.csv'
-            self.congestion_noise_cost_factors_file = path + 'test_inputs/cost_factors-congestion-noise.csv'
-            self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors-vehicles.csv'
-            self.emission_factors_powersector_file = path + 'test_inputs/emission_factors-powersector.csv'
-            self.emission_factors_refinery_file = path + 'test_inputs/emission_factors-refinery.csv'
-            self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost_inputs.csv'
-            self.repair_cost_inputs_file = path + 'test_inputs/repair_cost_inputs.csv'
-            self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost_inputs.csv'
+            self.scc_cost_factors_file = path + 'test_inputs/cost_factors_scc.csv'
+            self.criteria_cost_factors_file = path + 'test_inputs/cost_factors_criteria.csv'
+            self.energysecurity_cost_factors_file = path + 'test_inputs/cost_factors_energysecurity.csv'
+            self.congestion_noise_cost_factors_file = path + 'test_inputs/cost_factors_congestion_noise.csv'
+            self.emission_factors_vehicles_file = path + 'test_inputs/emission_factors_vehicles.csv'
+            self.emission_factors_powersector_file = path + 'test_inputs/emission_factors_powersector.csv'
+            self.emission_factors_refinery_file = path + 'test_inputs/emission_factors_refinery.csv'
+            self.maintenance_cost_inputs_file = path + 'test_inputs/maintenance_cost.csv'
+            self.repair_cost_inputs_file = path + 'test_inputs/repair_cost.csv'
+            self.refueling_cost_inputs_file = path + 'test_inputs/refueling_cost.csv'
 
             self.start_time = 0
             self.end_time = 0
@@ -166,6 +187,7 @@ try:
             self.producer_compliance_search_tolerance = 1e-6
             self.producer_cross_subsidy_price_tolerance = 1e-4
             self.run_profiler = False
+            self.multiprocessing = True and not self.run_profiler and not getattr(sys, 'frozen', False)
             self.flat_context = False
             self.flat_context_year = 2021
 
@@ -179,6 +201,7 @@ try:
                                             'cross_subsidy_search_', 'cross_subsidy_multipliers_',
                                             'cross_subsidy_convergence_']
 
+            self.log_vehicle_cloud_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_compliance_search_years = []  # = 'all' or list of years to log, empty list to disable logging
             self.log_consumer_iteration_years = [2050]  # = 'all' or list of years to log, empty list to disable logging
             self.log_producer_decision_and_response_years = []  # = 'all' or list of years to log, empty list to disable logging
@@ -195,6 +218,7 @@ try:
             self.SalesShare = None
             self.ProducerGeneralizedCost = None
             self.MarketClass = None
+            self.CostCoud = None
 
 except:
     print("\n#RUNTIME FAIL\n%s\n" % traceback.format_exc())

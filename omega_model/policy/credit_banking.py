@@ -215,8 +215,8 @@ class CreditBank(OMEGABase):
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
-                                                        verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, input_template_columns,
+                                                             verbose=verbose)
 
         return template_errors
 
@@ -241,8 +241,17 @@ class CreditBank(OMEGABase):
                                                          verbose=verbose)
 
         if not template_errors:
-            template_errors = validate_template_columns(filename, input_template_columns, input_template_columns,
-                                                        verbose=verbose)
+            df = pd.read_csv(filename, skiprows=1)
+
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns,
+                                                             verbose=verbose)
+
+        if not template_errors:
+            from producer.manufacturers import Manufacturer
+
+            validation_dict = {'compliance_id': Manufacturer.manufacturers}
+
+            template_errors += validate_dataframe_columns(df, validation_dict, filename)
 
         return template_errors
 
@@ -565,6 +574,7 @@ if __name__ == '__main__':
 
         from producer.manufacturers import Manufacturer
         from producer.manufacturer_annual_data import ManufacturerAnnualData
+        from producer.vehicle_aggregation import VehicleAggregation
         from producer.vehicles import VehicleFinal
         from producer.vehicle_annual_data import VehicleAnnualData
 
@@ -581,9 +591,11 @@ if __name__ == '__main__':
         init_fail += Manufacturer.init_database_from_file(omega_globals.options.manufacturers_file,
                                                           verbose=omega_globals.options.verbose)
 
-        init_fail += VehicleFinal.init_database_from_file(omega_globals.options.vehicles_file,
-                                                          omega_globals.options.onroad_vehicle_calculations_file,
-                                                          verbose=omega_globals.options.verbose)
+        init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
+                                                       verbose=verbose_init)
+
+        init_fail += VehicleFinal.init_from_file(omega_globals.options.onroad_vehicle_calculations_file,
+                                                 verbose=omega_globals.options.verbose)
 
         # credit_bank = CreditBank('test_inputs/ghg_debits.csv', 'consolidated_OEM')
         # credit_bank.update_credit_age(2020)

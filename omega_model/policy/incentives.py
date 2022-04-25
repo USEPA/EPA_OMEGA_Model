@@ -121,14 +121,14 @@ class Incentives(OMEGABase):
             # read in the data portion of the input file
             df = pd.read_csv(filename, skiprows=1)
 
-            template_errors = validate_template_columns(filename, input_template_columns, df.columns, verbose=verbose)
+            template_errors = validate_template_column_names(filename, input_template_columns, df.columns, verbose=verbose)
 
             if not template_errors:
                 df = df.set_index('start_year')
                 df = df.drop([c for c in df.columns if 'Unnamed' in c], axis='columns')
 
                 Incentives._data = df.to_dict(orient='index')
-                Incentives._data['start_year'] = np.array(list(Incentives._data.keys()))
+                Incentives._data['start_year'] = np.array([*Incentives._data]) # np.array(list(Incentives._data.keys()))
 
         return template_errors
 
