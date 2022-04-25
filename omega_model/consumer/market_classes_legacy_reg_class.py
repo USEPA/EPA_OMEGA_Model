@@ -76,11 +76,11 @@ class MarketClass(OMEGABase, MarketClassBase):
             The vehicle's market class ID based on vehicle characteristics.
 
         """
-        if vehicle.base_year_reg_class_id == 'truck' and vehicle.powertrain_type in ['BEV', 'FCV']:
+        if vehicle.base_year_reg_class_id == 'truck' and vehicle.powertrain_type in ['EV', 'FCV']:
             market_class_id = 'hauling.BEV'
-        elif vehicle.base_year_reg_class_id == 'truck' and vehicle.powertrain_type not in ['BEV', 'FCV']:
+        elif vehicle.base_year_reg_class_id == 'truck' and vehicle.powertrain_type in ['EV', 'FCV']:
             market_class_id = 'hauling.ICE'
-        elif vehicle.powertrain_type in ['BEV', 'FCV']:
+        elif vehicle.powertrain_type in ['EV', 'FCV']:
             market_class_id = 'non_hauling.BEV'
         else:
             market_class_id = 'non_hauling.ICE'

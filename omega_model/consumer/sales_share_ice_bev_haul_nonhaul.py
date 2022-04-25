@@ -426,11 +426,10 @@ class SalesShare(OMEGABase, SalesShareBase):
     @staticmethod
     def save_calibration(filename):
         """
+            Save calibration data (if necessary) that aligns reference session market shares with context
 
         Args:
-            filename:
-
-        Returns:
+            filename (str): name of the calibration file
 
         """
         if omega_globals.options.standalone_run:
@@ -439,23 +438,27 @@ class SalesShare(OMEGABase, SalesShareBase):
         calibration = pd.Series(SalesShare._data['non_hauling_calibration'], name='non_hauling_calibration')
         calibration.to_csv(filename)
 
-        pdar_df = pd.DataFrame(SalesShare.prev_producer_decisions_and_responses)
-        pdar_df.to_csv(filename.replace('context_sales_share_calibration', 'context_sales_share_pdar'))
-
     @staticmethod
     def store_producer_decision_and_response(producer_decision_and_response):
         """
+            Store producer decision and response (if necessary) for reference in future years
 
         Args:
-            producer_decision_and_response:
-
-        Returns:
+            producer_decision_and_response (Series): producer decision and consumer response
 
         """
         SalesShare.prev_producer_decisions_and_responses.append(producer_decision_and_response)
 
     @staticmethod
     def calc_base_year_data(base_year_vehicles_df):
+        """
+            Calculate base year data (if necessary) such as sales-weighted curbweight, etc, if needed for reference
+            in future years
+
+        Args:
+            base_year_vehicles_df (DataFrame): base year vehicle data
+
+        """
         base_year = max(base_year_vehicles_df['model_year'].values)
         base_year_vehicles_df = base_year_vehicles_df[base_year_vehicles_df['model_year'] == base_year]
 

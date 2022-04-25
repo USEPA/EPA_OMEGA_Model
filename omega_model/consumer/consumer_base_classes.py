@@ -123,6 +123,43 @@ class SalesShareBase:
                         inspect.currentframe().f_code.co_name)
 
     @staticmethod
+    def save_calibration(filename):
+        """
+            Save calibration data (if necessary) that aligns reference session market shares with context
+
+        Args:
+            filename (str): name of the calibration file
+
+        """
+        raise Exception('**Attempt to call abstract method SalesShareBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
+    def store_producer_decision_and_response(producer_decision_and_response):
+        """
+            Store producer decision and response (if necessary) for reference in future years
+
+        Args:
+            producer_decision_and_response (Series): producer decision and consumer response
+
+        """
+        raise Exception('**Attempt to call abstract method SalesShareBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
+    def calc_base_year_data(base_year_vehicles_df):
+        """
+            Calculate base year data (if necessary) such as sales-weighted curbweight, etc, if needed for reference
+            in future years
+
+        Args:
+            base_year_vehicles_df (DataFrame): base year vehicle data
+
+        """
+        raise Exception('**Attempt to call abstract method SalesShareBase.%s() without child class override**' %
+                        inspect.currentframe().f_code.co_name)
+
+    @staticmethod
     def init_from_file(filename, verbose=False):
         """
 
