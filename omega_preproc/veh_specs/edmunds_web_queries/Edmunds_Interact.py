@@ -209,8 +209,8 @@ def update_raw_tables(tmp_raw_table0, _num_menu_columns):
     _engine_list = ['Torque', 'Base engine size', 'Horsepower', 'Turning circle', 'Valves', 'direct injection', 'Base engine type', \
                     'Valve timing', 'Cam type', 'Cylinders', 'cylinder deactivation']
     _comfort_convenience_list = ['electric power steering', 'power steering']
-    _measurements_list = ['Length', 'Maximum towing capacity', 'Wheel base', 'Width', 'Curb weight', 'Maximum payload', 'Gross weight', 'Height', \
-                        'Ground clearance', 'Cargo capacity, all seats in place']
+    _dimensions_list = ['Length', 'Maximum towing capacity', 'Wheel base', 'Width', 'Overall Width Without Mirrors', 'Overall Width With Mirrors', 'Curb weight', 'Maximum payload', \
+                        'Gross weight', 'Height', 'Ground clearance', 'Cargo capacity, all seats in place']
     _fuel_mpg_list = ['EPA mileage est. (cty/hwy)', 'Combined MPG', 'Fuel type', 'Fuel tank capacity', 'Range in miles (cty/hwy)']
     _PHEV_fuel_mpg_list = ['EPA Combined MPGe', 'Range in miles (cty/hwy)',  'EPA Time to charge battery (at 240v)', 'Fuel tank capacity', \
                            'Combined MPG', 'EPA kWh/100 mi', 'Fuel type', 'EPA Electricity Range']
@@ -221,7 +221,7 @@ def update_raw_tables(tmp_raw_table0, _num_menu_columns):
     _warrenty_list = ['Free maintenance', 'Basic', 'Drivetrain', 'Rust', 'Roadside', 'Hybrid Component', 'EV Battery']
     _no_to_nan_list =  ['MSRP', 'Torque', 'Cylinders', 'Total Seating', 'Basic Warranty', 'Horsepower', 'Turning circle', 'Valves' \
                         'Engine Type', 'Base engine size', 'EPA Time to charge battery (at 240v)', 'EPA Highway MPGe'] + \
-                       _drivetrain_list + _fuel_mpg_list + _BEV_fuel_mpg_list + _measurements_list + _warrenty_list
+                       _drivetrain_list + _fuel_mpg_list + _BEV_fuel_mpg_list + _dimensions_list + _warrenty_list
 
     _num_specs_list = len(tmp_raw_table)
     _num_specs = len(tmp_raw_table0)
@@ -247,10 +247,13 @@ def update_raw_tables(tmp_raw_table0, _num_menu_columns):
     if _category == 'Engine': _new_specs_list = _engine_list
     if _category == 'Comfort & Convenience':
         _new_specs_list = _comfort_convenience_list
-    if _category == 'Measurements':
-        _new_specs_list = _measurements_list
+    if _category == 'Dimensions':
+        _new_specs_list = _dimensions_list
+        # % a = [x.lower() for x in _specs_list]
         if 'Maximum towing capacity'in _specs_list:
             _index_towing_capacity = _specs_list.index('Maximum towing capacity')
+        if 'Overall Width Without Mirrors' in _specs_list:
+            _index_width_without_mirrors = _specs_list.index('Overall width without mirrors')
     if _category == 'Warranty': _new_specs_list = _warrenty_list
 
     _specs_seq = []
@@ -468,12 +471,12 @@ def est_max_towing_capacity(df):
 
 def Edmunds_Interact(url):
     max_attempts = 10
-    max_time = 60
+    max_time = 30
     sleep_3sec = 3
-    sleep_sec = 0.5
+    sleep_sec = 1
     wait_sec = 30
-    _max_trim_groups_count = 20 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
-    _max_trim_buttons =  60     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
+    _max_trim_groups_count = 75 # for 4K resolution monitor, set 10 for low resolution monitors like 1080K
+    _max_trim_buttons =  100     # for 4K resolution monitor, set 33 (10 x 3 menu columns) for 1080K monitor
     _num_menu_columns = 1 # 3 trims were displayed in 2020, and changed the trim column to 1 in 2021
     trim_options = []
     num_column_shift = 2 #
@@ -634,7 +637,7 @@ def Edmunds_Interact(url):
         df.reset_index(drop=True, inplace=True)
     # df = est_max_towing_capacity(df)
     driver.close()
-    return (df, readin_check)
+    return (df, readin_check, trims_text)
 
 def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_text, i_trims_page, trim_group, num_column_shift, df):
 
@@ -650,7 +653,7 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
         del table_list[num_table_list-1]
         num_table_list = num_table_list - 1
 
-    for table_count in range(0, len(table_list)):
+    for table_count in range(num_table_list):
         # if table_count == 12:
         #     print(raw_table)
         if table_list_count == 0 and len(table_list[table_count]) > 0:
@@ -663,11 +666,12 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
             table_check = 0
             pass
         if table_check == 0: continue
+        name_category = table_list[table_count].columns[0]
+        # if (table_count > 0) and ((name_category == 'Front Seat Dimensions') or (name_category == 'Rear Seat Dimensions') or (name_category == 'In-Car Entertainment') or (name_category == 'Colors')): continue
+        # if (table_count > 0) and ((name_category == 'Interior Options') or (name_category == 'Exterior Options') or (name_category == 'Power Feature')): continue
 
-        table_tag = raw_table.columns[0]
-        if len(raw_table) > 0 and isinstance(raw_table, pd.DataFrame) and \
-                not ("Highlights" in table_tag) \
-                and table_tag != 'OVERVIEW':
+        # table_tag = raw_table.columns[0]
+        if len(raw_table) > 0 and isinstance(raw_table, pd.DataFrame): # and (not ("Highlights" in table_tag)) and (table_tag != 'OVERVIEW'):
             raw_table.columns = pd.Series(raw_table.columns).str.strip()
 
             if len(table_list[table_count].columns) > (1 + _num_menu_columns):
@@ -677,32 +681,71 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
             try:
                 # important_tables = important_tables.loc[:, ~important_tables.columns.duplicated()]
                 # important_tables = pd.concat([important_tables, raw_table])
-                if table_count == 0: df_tmp = pd.concat([df_tmp, raw_table])
+                if (name_category == 'Overview'):
+                    for j in range(len(table_list[table_count])):
+                        if ('EPA Combined MPGe'.lower() in table_list[table_count][name_category][j].lower()):
+                            table_list[table_count][name_category][j] = 'EPA Combined MPGe'
+
+                if table_count == 0 and len(df_tmp) > 0:
+                    df_tmp = pd.concat([df_tmp, raw_table])
+                # df = pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='inner')
+                # df = df.drop_duplicates(subset=['Specifications'])
 
                 raw_table = raw_table.loc[:, ~raw_table.columns.duplicated()]
-                name_category = table_list[table_count].columns[0]
+                # name_category = table_list[table_count].columns[0]
                 for i in range(_num_menu_columns):
                     table_list[table_count] = table_list[table_count].rename(columns={table_list[table_count].columns[1 + i]: trims_text[i_trims_page]})
                 tmp_raw_table = table_list[table_count]
-                if tmp_raw_table.columns[0] != 'Category': tmp_raw_table.insert(0, 'Category', '')
-                tmp_raw_table['Category'] = name_category
-                tmp_raw_table = tmp_raw_table.rename(columns={name_category: 'Specifications'})
-                front_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" front headrests")]
-                rear_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" rear headrests")]
-                months_of_provided_satellite_radio_service = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" Months of provided satellite radio service")]
-                watts_stereo_output = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" watts stereo output")]
-                total_speakers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" total speakers")]
-                subwoofers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" subwoofer")]
-                tires = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" tires")]
-                wheels = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" in. wheels")]
-                power_driver_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power driver seat")]
-                power_passenger_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power passenger seat")]
-                manual_driver_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("manual driver seat adjustment")]
-                manual_passenger_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" manual passenger seat adjustment")]
-                if str(tmp_raw_table['Category'][0]).lower() == 'safety' and (len(front_headrests)  > 0 or len(rear_headrests)  > 0):
-                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, front_headrests, 'front headrests')
-                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, rear_headrests, 'rear headrests')
-                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                if (name_category == 'Battery & Range') or (name_category == 'Fuel & MPG'):
+                    for j in range(len(tmp_raw_table)):
+                        if ('EPA Combined MPGe'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA Combined MPGe'
+                        elif ('EPA Electricity Range'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA Electricity Range'
+                        elif ('EPA Time To Charge Battery (At 240V)'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA Time To Charge Battery (At 240V)'
+                        elif ('EPA KWh/100 Mi'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'EPA KWh/100 Mi'
+                if (name_category == 'Tires & Wheels'):
+                    for j in range(len(tmp_raw_table)):
+                        tmp_val = tmp_raw_table[name_category][j]
+                        if ('In. Wheels'.lower() in tmp_raw_table[name_category][j].lower()):
+                            tmp_raw_table[name_category][j] = 'Wheels'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif ('All Season Tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('PERFORMANCE TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or ('ALL-SEASON RUN FLAT TIRES'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('All terrain tires'.lower() in tmp_raw_table[name_category][j].lower()) or ('Null Tires'.lower() in tmp_raw_table[name_category][j].lower()) or \
+                             ('Puncture-Sealing Tires'.lower() in tmp_raw_table[name_category][j].lower()) :
+                            tmp_raw_table[name_category][j] = 'Tire Types'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()) and (tmp_val.split(' ')[0].replace('/', '').isalnum()):
+                            tmp_raw_table[name_category][j] = 'Tires'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+                        elif (' Tires'.lower() in tmp_raw_table[name_category][j].lower()) and ('Spare' not in tmp_val):
+                            tmp_raw_table[name_category][j] = 'Tire Types'
+                            tmp_raw_table[tmp_raw_table.columns[1]][j] = tmp_val
+
+                if tmp_raw_table.columns[0] != 'Category':
+                    tmp_raw_table.insert(0, 'Category', name_category)
+                # tmp_raw_table['Category'] = name_category
+                tmp_raw_table = tmp_raw_table.rename(columns={tmp_raw_table.columns[1]: 'Specifications', tmp_raw_table.columns[2]: 'Trim'})
+                # tmp_raw_table.insert(3, 'Trim', trims_text[i_trims_page])
+                # front_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" front headrests")]
+                # rear_headrests = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" rear headrests")]
+                # months_of_provided_satellite_radio_service = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" Months of provided satellite radio service")]
+                # watts_stereo_output = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" watts stereo output")]
+                # total_speakers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" total speakers")]
+                # subwoofers = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" subwoofer")]
+                # tires = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" tires")]
+                # wheels = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" in. wheels")]
+                # power_driver_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power driver seat")]
+                # power_passenger_seat = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("power passenger seat")]
+                # manual_driver_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains("manual driver seat adjustment")]
+                # manual_passenger_seat_adjustment = tmp_raw_table[tmp_raw_table["Specifications"].str.contains(" manual passenger seat adjustment")]
+                # if str(tmp_raw_table['Category'][0]).lower() == 'safety' and (len(front_headrests)  > 0 or len(rear_headrests)  > 0):
+                #     tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, front_headrests, 'front headrests')
+                #     tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, rear_headrests, 'rear headrests')
+                #     tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
                 # elif str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and (len(subwoofers)  > 0 or len(total_speakers)  > 0 or len(months_of_provided_satellite_radio_service) > 0 or len(watts_stereo_output) > 0):
                 #     if len(subwoofers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, subwoofers, 'subwoofer(s)')
                 #     if len(total_speakers)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, total_speakers, 'total speakers')
@@ -710,48 +753,52 @@ def html_page_to_tables(table_list_count, table_list, _num_menu_columns, trims_t
                 #         tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, months_of_provided_satellite_radio_service, 'Months of provided satellite radio service')
                 #     if len(watts_stereo_output) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table,_num_menu_columns, watts_stereo_output, 'watts stereo output')
                 #     tmp_raw_table = drop_merged_option(tmp_raw_table,_num_menu_columns)
-                elif str(tmp_raw_table['Category'][0]).lower() == 'tires & wheels' and (len(tires)  > 0 or len(wheels) > 0):
-                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, tires, 'tires')
-                    tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, wheels, 'wheels')
-                    tmp_raw_table = trim_tires_wheels(tmp_raw_table, _num_menu_columns)
-                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
-                elif str(tmp_raw_table['Category'][0]).lower() == 'front seats' and (len(power_driver_seat)  > 0 or len(power_passenger_seat)  > 0 or len(manual_driver_seat_adjustment) > 0 or len(manual_passenger_seat_adjustment) > 0):
-                    if len(power_driver_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, power_driver_seat, 'power driver seat')
-                    if len(power_passenger_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, power_passenger_seat, 'power passenger seat')
-                    if len(manual_driver_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, manual_driver_seat_adjustment, 'manual driver seat adjustment')
-                    if len(manual_passenger_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, manual_passenger_seat_adjustment, 'manual passenger seat adjustment')
-                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
-                elif str(tmp_raw_table['Category'][0]).lower() == 'overview' or str(tmp_raw_table['Category'][0]).lower() == 'drivetrain' or \
-                        str(tmp_raw_table['Category'][0]).lower() == 'fuel & mpg' or str(tmp_raw_table['Category'][0]).lower() == 'engine' or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == False) or \
-                    str(tmp_raw_table['Category'][0]).lower() == 'measurements' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
-                    tmp_raw_table = update_raw_tables(tmp_raw_table, _num_menu_columns)
-                    tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
-
-                if (str(tmp_raw_table['Category'][0]).lower() == 'colors' and SKIP_PRINTING_COLORS == True) or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'exterior options' and SKIP_PRINTING_EXTERIOR_OPTIONS == True) or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == True) or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'packages' and SKIP_PRINTING_PACKAGES == True) or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and SKIP_IN_CAR_ENTERTAINMENT == True) or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'power feature' and SKIP_POWER_FEATURE == True) or \
-                        (str(tmp_raw_table['Category'][0]).lower() == 'interior options' and SKIP_PRINTING_INTERIOR_OPTIONS == True):
-                    continue
-                else:
-                    df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
-                    df_tmp.fillna('', inplace=True)
+                # elif str(tmp_raw_table['Category'][0]).lower() == 'tires & wheels' and (len(tires)  > 0 or len(wheels) > 0):
+                #     tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, tires, 'tires')
+                #     tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, wheels, 'wheels')
+                #     tmp_raw_table = trim_tires_wheels(tmp_raw_table, _num_menu_columns)
+                #     tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                # elif str(tmp_raw_table['Category'][0]).lower() == 'front seats' and (len(power_driver_seat)  > 0 or len(power_passenger_seat)  > 0 or len(manual_driver_seat_adjustment) > 0 or len(manual_passenger_seat_adjustment) > 0):
+                #     if len(power_driver_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, power_driver_seat, 'power driver seat')
+                #     if len(power_passenger_seat)  > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, power_passenger_seat, 'power passenger seat')
+                #     if len(manual_driver_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, manual_driver_seat_adjustment, 'manual driver seat adjustment')
+                #     if len(manual_passenger_seat_adjustment) > 0: tmp_raw_table = merge_trim_options(tmp_raw_table, _num_menu_columns, manual_passenger_seat_adjustment, 'manual passenger seat adjustment')
+                #     tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                # elif str(tmp_raw_table['Category'][0]).lower() == 'overview' or str(tmp_raw_table['Category'][0]).lower() == 'drivetrain' or \
+                #         str(tmp_raw_table['Category'][0]).lower() == 'fuel & mpg' or str(tmp_raw_table['Category'][0]).lower() == 'engine' or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == False) or \
+                #     str(tmp_raw_table['Category'][0]).lower() == 'dimensions' or str(tmp_raw_table['Category'][0]).lower() == 'warranty':
+                #     tmp_raw_table = update_raw_tables(tmp_raw_table, _num_menu_columns)
+                #     tmp_raw_table = drop_merged_option(tmp_raw_table, _num_menu_columns)
+                #
+                # if (str(tmp_raw_table['Category'][0]).lower() == 'colors' and SKIP_PRINTING_COLORS == True) or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'exterior options' and SKIP_PRINTING_EXTERIOR_OPTIONS == True) or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'comfort & convenience' and SKIP_PRINTING_COMFORT_CONVENIENCE == True) or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'packages' and SKIP_PRINTING_PACKAGES == True) or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'in-car entertainment' and SKIP_IN_CAR_ENTERTAINMENT == True) or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'power feature' and SKIP_POWER_FEATURE == True) or \
+                #         (str(tmp_raw_table['Category'][0]).lower() == 'interior options' and SKIP_PRINTING_INTERIOR_OPTIONS == True):
+                #     continue
+                # else:
+                df_tmp = df_tmp.append(tmp_raw_table, ignore_index=True)
+                df_tmp.fillna('', inplace=True)
                 if table_count == (num_table_list-1):
                     if (trim_group == 0 and _num_menu_columns > 1) or (i_trims_page == 0):
                         df = df_tmp
                     else:
-                        df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='inner')
+                        # dfc = pd.concat([df, df_tmp], axis=1, keys=["Category", "Specifications"], how = 'outer', ignore_index=True, sort=False) #join="inner", ignore_index=True, sort=False)
+                        df =  pd.merge(df, df_tmp, on=['Category', 'Specifications'], how='outer')
+                        # dfj = df.join(df_tmp, how='outer')
                         df = df.drop_duplicates(subset=['Specifications'])
             except NameError:
                 df_tmp = table_list[table_count]
                 name_category = table_list[table_count].columns[0]
-                if df_tmp.columns[0] != 'Category': df_tmp.insert(0, 'Category', '')
-                df_tmp['Category'] = name_category
-                if df_tmp.columns[1] != 'Specifications': df_tmp = df_tmp.rename(columns={df_tmp.columns[0]: 'Category', df_tmp.columns[1]: 'Specifications'})
-                for i in range(_num_menu_columns): df_tmp = df_tmp.rename(columns={df_tmp.columns[num_column_shift + i]: trims_text[i_trims_page]})
-                df_tmp = update_raw_tables(df_tmp, _num_menu_columns)
-                df_tmp = drop_merged_option(df_tmp, _num_menu_columns)
+                # if df_tmp.columns[0] != 'Category': df_tmp.insert(0, 'Category', '')
+                # if df_tmp.columns[1] != 'Specifications':
+                df_tmp.insert(0, 'Category', name_category)
+                df_tmp = df_tmp.rename(columns={df_tmp.columns[1]: 'Specifications', df_tmp.columns[2]: 'Trim'}) #, df_tmp.columns[2]: 'Spec Values'})
+                # df_tmp.insert(3, 'Trim', trims_text[i_trims_page])
+                # for i in range(_num_menu_columns): df_tmp = df_tmp.rename(columns={df_tmp.columns[num_column_shift + i]: trims_text[i_trims_page]})
+                # df_tmp = update_raw_tables(df_tmp, _num_menu_columns)
+                # df_tmp = drop_merged_option(df_tmp, _num_menu_columns)
     return df
