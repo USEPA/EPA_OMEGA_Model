@@ -1424,6 +1424,7 @@ def run_omega(session_runtime_options, standalone_run=False):
 
     session_runtime_options.start_time = time.time()
     session_runtime_options.standalone_run = standalone_run
+    session_runtime_options.multiprocessing = session_runtime_options.multiprocessing and not standalone_run
 
     init_fail = None
 
