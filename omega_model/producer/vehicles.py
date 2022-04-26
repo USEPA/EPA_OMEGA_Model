@@ -1045,7 +1045,7 @@ class VehicleFinal(SQABase, Vehicle):
     manufacturer_id = Column(String, ForeignKey('manufacturers.manufacturer_id'))  #: vehicle manufacturer ID
     compliance_id = Column(String)  #: compliance ID, may be the manufacturer ID or 'consolidated_OEM'
     manufacturer = relationship('Manufacturer', back_populates='vehicles')  #: SQLAlchemy relationship link to manufacturer table
-    annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')  #: SQLAlchemy relationship link to vehicle annual data table
+    # annual_data = relationship('VehicleAnnualData', cascade='delete, delete-orphan')  #: SQLAlchemy relationship link to vehicle annual data table
 
     model_year = Column(Numeric)  #: vehicle model year
     fueling_class = Column(Enum(*fueling_classes, validate_strings=True))  #: fueling class, e.g. 'BEV', 'ICE'
@@ -1136,6 +1136,7 @@ class VehicleFinal(SQABase, Vehicle):
         self._initial_registered_count = initial_registered_count
 
         omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
+        omega_globals.session.flush()  # update vehicle_id, otherwise it's None
 
         VehicleAnnualData.update_registered_count(self,
                                                   calendar_year=self.model_year,
@@ -1291,7 +1292,7 @@ class VehicleFinal(SQABase, Vehicle):
                 cost_curve_class=df.loc[i, 'cost_curve_class'],
                 in_use_fuel_id=df.loc[i, 'in_use_fuel_id'],
                 cert_fuel_id=df.loc[i, 'cert_fuel_id'],
-                initial_registered_count=df.loc[i, 'sales'],
+                # initial_registered_count=df.loc[i, 'sales'],
                 unibody_structure=df.loc[i, 'unibody_structure'],
                 drive_system=df.loc[i, 'drive_system'],
                 curbweight_lbs=df.loc[i, 'curbweight_lbs'],
@@ -1325,6 +1326,9 @@ class VehicleFinal(SQABase, Vehicle):
                 veh.compliance_id = veh.manufacturer_id
 
             VehicleFinal.compliance_ids.add(veh.compliance_id)
+
+            # update initial registered count >after< setting compliance id, it's required for vehicle annual data
+            veh.initial_registered_count = df.loc[i, 'sales']
 
             # TODO: what are we doing about fuel cell vehicles...?
             if veh.powertrain_type in ['BEV', 'FCV']:

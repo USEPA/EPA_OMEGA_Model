@@ -54,9 +54,9 @@ def update_stock(calendar_year, compliance_id=None):
     # pull in this year's vehicle ids:
     this_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year, compliance_id)
 
-    odometer_data = VehicleAnnualData.get_odometers(calendar_year-1)
+    last_years_vehicle_annual_data = VehicleAnnualData.get_vehicle_annual_data(calendar_year-1)
 
-    omega_globals.session.add_all(this_years_vehicle_annual_data)
+    # omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
         market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_id)
@@ -81,13 +81,16 @@ def update_stock(calendar_year, compliance_id=None):
         else:
             pass
 
-    prior_year_vehicle_ids = odometer_data['vehicle_id'].values
+    if last_years_vehicle_annual_data.empty:
+        prior_year_vehicle_data = []
+    else:
+        prior_year_vehicle_data = [(vehicle.vehicle_id, vehicle.odometer) for vehicle in last_years_vehicle_annual_data.values]
 
     vad_list = []
 
     # CREATE vehicle annual data for last year's stock, now one year older:
-    if len(prior_year_vehicle_ids):
-        for vehicle_id in prior_year_vehicle_ids:
+    if len(prior_year_vehicle_data):
+        for vehicle_id, prior_odometer in prior_year_vehicle_data:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
             age = calendar_year - model_year
 
@@ -97,23 +100,23 @@ def update_stock(calendar_year, compliance_id=None):
             if reregistration_factor > 0:
                 annual_vmt = omega_globals.options.OnroadVMT.get_vmt(calendar_year, market_class_id, age)
 
-                odometer = max(0, odometer_data[odometer_data['vehicle_id'].values == vad.vehicle_id]['odometer'].values)
+                odometer = max(0, prior_odometer)
                 odometer += annual_vmt
 
                 registered_count = initial_registered_count * reregistration_factor
 
-                vad_list.append(VehicleAnnualData(vehicle_id=int(vehicle_id),
-                                                  calendar_year=calendar_year,
-                                                  registered_count=registered_count,
-                                                  age=calendar_year-model_year,
-                                                  annual_vmt=annual_vmt,
-                                                  odometer=odometer,
-                                                  vmt=annual_vmt * registered_count)
-                                )
+                vad_list.append(VehicleAnnualData.create(calendar_year=calendar_year,
+                                  vehicle_id=int(vehicle_id),
+                                  compliance_id=compliance_id,
+                                  age=calendar_year - model_year,
+                                  registered_count=registered_count,
+                                  annual_vmt=annual_vmt,
+                                  odometer=odometer,
+                                  vmt=annual_vmt * registered_count))
             else:
                 pass
 
-    omega_globals.session.add_all(vad_list)
+    VehicleAnnualData.add_all(vad_list)
 
 
 if __name__ == '__main__':
