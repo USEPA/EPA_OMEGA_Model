@@ -1318,6 +1318,8 @@ def init_omega(session_runtime_options):
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=verbose_init)
 
+        init_fail += VehicleAnnualData.init_vehicle_annual_data()
+
         if not init_fail:
             init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
                                                            verbose=verbose_init)

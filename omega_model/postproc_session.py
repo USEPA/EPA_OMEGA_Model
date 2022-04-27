@@ -12,9 +12,14 @@ import effects.omega_effects
 from omega_model import *
 from common.omega_plot import *
 from policy.credit_banking import CreditBank
+from producer.vehicle_annual_data import VehicleAnnualData
+import consumer
 
 market_classes = []
 market_categories = []
+
+vehicle_data = None
+vehicle_annual_data = None
 
 
 def run_postproc(iteration_log, credit_banks):
@@ -32,6 +37,7 @@ def run_postproc(iteration_log, credit_banks):
     from producer.vehicles import VehicleFinal
     from effects.omega_effects import run_effects_calcs
     import pandas as pd
+    global vehicle_data, vehicle_annual_data
 
     global market_classes, market_categories
     market_classes = omega_globals.options.MarketClass.market_classes
@@ -45,6 +51,20 @@ def run_postproc(iteration_log, credit_banks):
 
     vehicle_years = list(range(omega_globals.options.analysis_initial_year - 1,
                                omega_globals.options.analysis_final_year + 1))
+
+    # collect vehicle data in one database hit then filter it later
+    vehicle_data = omega_globals.session.query(VehicleFinal.vehicle_id, VehicleFinal.model_year,
+                                               VehicleFinal.market_class_id, VehicleFinal.context_size_class,
+                                               VehicleFinal.reg_class_id, VehicleFinal.cert_co2e_Mg,
+                                               VehicleFinal.new_vehicle_mfr_generalized_cost_dollars,
+                                               VehicleFinal.new_vehicle_mfr_cost_dollars,
+                                               VehicleFinal.target_co2e_grams_per_mile,
+                                               VehicleFinal.cert_co2e_grams_per_mile,
+                                               VehicleFinal.cert_direct_kwh_per_mile,
+                                               VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id).all()
+
+    # index vehicle annual data by vehicle id and age for quick access
+    vehicle_annual_data = pd.DataFrame(VehicleAnnualData._data).set_index(['vehicle_id', 'age'])
 
     analysis_years = vehicle_years[1:]
 
@@ -129,9 +149,7 @@ def run_postproc(iteration_log, credit_banks):
                       omega_globals.options.session_unique_name + '_vehicles',
                       omega_globals.options.verbose)
 
-    dump_table_to_csv(omega_globals.options.output_folder, 'vehicle_annual_data',
-                      omega_globals.options.session_unique_name + '_vehicle_annual_data',
-                      omega_globals.options.verbose)
+    vehicle_annual_data.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicle_annual_data.csv')
 
     dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
@@ -222,48 +240,63 @@ def plot_cert_co2e_gpmi(calendar_years):
         dict of average cert co2e g/mi data by total, market class and market category
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
+    co2e_data = dict()
 
-    average_cert_co2e_data = dict()
-
-    # tally up total sales- and VMT- weighted co2
-    average_cert_co2e_data['total'] = []
+    co2e_data['total'] = []
     for cy in calendar_years:
-        average_cert_co2e_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count) /
-            func.sum(VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count)).
-                                               filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                               filter(VehicleFinal.model_year == cy).
-                                               filter(VehicleAnnualData.age == 0).scalar())
+        weighted_value = 0
+        count = 0
+        vehicle_id_and_vmt_and_co2gpmi = [(v.vehicle_id, v.lifetime_VMT, v.cert_co2e_grams_per_mile) for v in vehicle_data if v.model_year == cy]
+
+        for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
+            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
+
+        co2e_data['total'].append(weighted_value / count)
 
     # tally up market_category sales- and VMT- weighted co2
     for mcat in market_categories:
         market_category_co2e = []
-        for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_co2_and_VMT = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                                 VehicleFinal.market_class_id,
-                                                                                 VehicleFinal.cert_co2e_grams_per_mile,
-                                                                                 VehicleFinal.lifetime_VMT) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_co2e = 0
-            mcat_count = 0
-            for result in registered_count_and_market_id_and_co2_and_VMT:
-                if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count) * float(result.lifetime_VMT)
-                    sales_weighted_co2e += float(result.registered_count) * \
-                                           float(result.cert_co2e_grams_per_mile) * float(result.lifetime_VMT)
-            market_category_co2e.append(sales_weighted_co2e / max(1, mcat_count))
+        for cy in calendar_years:
+            weighted_value = 0
+            count = 0
+            vehicle_id_and_vmt_and_co2gpmi_market_class_id = \
+                [(v.vehicle_id, v.lifetime_VMT, v.cert_co2e_grams_per_mile, v.market_class_id) for v in
+                 vehicle_data if v.model_year == cy]
 
-        average_cert_co2e_data[mcat] = market_category_co2e
+            for vehicle_id, lifetime_vmt, co2gpmi, market_class_id in vehicle_id_and_vmt_and_co2gpmi_market_class_id:
+                if mcat in market_class_id.split('.'):
+                    weighted_value += \
+                        vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
+
+            market_category_co2e.append(weighted_value / count)
+
+        co2e_data[mcat] = market_category_co2e
+
+    # tally up market_class sales- and VMT- weighted co2
+    for mc in market_classes:
+        market_class_co2e = []
+        for cy in calendar_years:
+            weighted_value = 0
+            count = 0
+            vehicle_id_and_vmt_and_co2gpmi = \
+                [(v.vehicle_id, v.lifetime_VMT, v.cert_co2e_grams_per_mile) for v in
+                 vehicle_data if v.model_year == cy and v.market_class_id == mc]
+
+            for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
+                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
+
+            market_class_co2e.append(weighted_value / count)
+
+        co2e_data[mc] = market_class_co2e
 
     # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_cert_co2e_data[mcat], '.--')
-    ax1.plot(calendar_years, average_cert_co2e_data['total'], '.-')
+        ax1.plot(calendar_years, co2e_data[mcat], '.--')
+    ax1.plot(calendar_years, co2e_data['total'], '.-')
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -273,26 +306,18 @@ def plot_cert_co2e_gpmi(calendar_years):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_cert_co2e_data[mc] = []
-        for cy in calendar_years:
-            average_cert_co2e_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
-                func.sum(VehicleAnnualData.registered_count)).
-                                              filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                              filter(VehicleFinal.model_year == cy).
-                                              filter(VehicleFinal.market_class_id == mc).
-                                              filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.-')
+            ax1.plot(calendar_years, co2e_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_cert_co2e_data[mc], '.--')
+            ax1.plot(calendar_years, co2e_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Cert CO2e g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
     fig.savefig(
         omega_globals.options.output_folder + '%s V Cert CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return average_cert_co2e_data
+
+    return co2e_data
 
 
 def plot_cert_direct_kwh_pmi(calendar_years):
@@ -306,41 +331,57 @@ def plot_cert_direct_kwh_pmi(calendar_years):
         dict of average cert direct kWh/mi data by total, market class and market category
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
-
     average_cert_direct_kwh_data = dict()
 
     # tally up total sales weighted kWh
     average_cert_direct_kwh_data['total'] = []
     for cy in calendar_years:
-        average_cert_direct_kwh_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.cert_direct_kwh_per_mile * VehicleAnnualData.registered_count) /
-            func.sum(VehicleAnnualData.registered_count)).
-                                                     filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                                     filter(VehicleFinal.model_year == cy).
-                                                     filter(VehicleAnnualData.age == 0).scalar())
+        weighted_value = 0
+        count = 0
+        vehicle_id_and_kwh = [(v.vehicle_id, v.cert_direct_kwh_per_mile) for v in vehicle_data if v.model_year == cy]
+
+        for vehicle_id, kwh in vehicle_id_and_kwh:
+            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * kwh
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+        average_cert_direct_kwh_data['total'].append(weighted_value / count)
 
     # tally up market_category sales weighted kWh
     for mcat in market_categories:
         market_category_cost = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_kwh = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                                 VehicleFinal.market_class_id,
-                                                                                 VehicleFinal.cert_direct_kwh_per_mile) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_cost = 0
-            mcat_count = 0
-            for result in registered_count_and_market_id_and_kwh:
-                if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.cert_direct_kwh_per_mile)
-            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
+            weighted_value = 0
+            count = 0
+
+            vehicle_id_and_market_class_id_and_kwh = \
+                [(v.vehicle_id, v.market_class_id, v.cert_direct_kwh_per_mile) for v in vehicle_data if v.model_year == cy]
+
+            for vehicle_id, market_class_id, kwh in vehicle_id_and_market_class_id_and_kwh:
+                if mcat in market_class_id.split('.'):
+                    weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * kwh
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_cost.append(weighted_value / count)
 
         average_cert_direct_kwh_data[mcat] = market_category_cost
+
+    # tally up market_class sales weighted kWh
+    for mc in market_classes:
+        market_class_cost = []
+        for idx, cy in enumerate(calendar_years):
+            weighted_value = 0
+            count = 0
+
+            vehicle_id_and_kwh = \
+                [(v.vehicle_id, v.cert_direct_kwh_per_mile) for v in vehicle_data if v.model_year == cy and v.market_class_id == mc]
+
+            for vehicle_id, kwh in vehicle_id_and_kwh:
+                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * kwh
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_class_cost.append(weighted_value / count)
+
+        average_cert_direct_kwh_data[mc] = market_class_cost
 
     # market category chart
     fig, ax1 = figure()
@@ -356,15 +397,6 @@ def plot_cert_direct_kwh_pmi(calendar_years):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_cert_direct_kwh_data[mc] = []
-        for cy in calendar_years:
-            average_cert_direct_kwh_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_direct_kwh_per_mile * VehicleAnnualData.registered_count) /
-                func.sum(VehicleAnnualData.registered_count)).
-                                                    filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                                    filter(VehicleFinal.model_year == cy).
-                                                    filter(VehicleFinal.market_class_id == mc).
-                                                    filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
             ax1.plot(calendar_years, average_cert_direct_kwh_data[mc], '.-')
         else:
@@ -380,86 +412,94 @@ def plot_cert_direct_kwh_pmi(calendar_years):
 
 def plot_target_co2e_gpmi(calendar_years):
     """
-    Plot vehicle target CO2e g/mi v. model year, by market class and market category.
+    Plot cert CO2e g/mi versus model year, by market class and market category.
 
     Args:
         calendar_years ([years]): list of model years
 
     Returns:
-        dict of average cert target CO2e g/mi data by total, market class and market category
+        dict of average cert co2e g/mi data by total, market class and market category
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
+    co2e_data = dict()
 
-    average_target_co2e_data = dict()
-
-    # tally up total sales- and VMT- weighted co2
-    average_target_co2e_data['total'] = []
+    co2e_data['total'] = []
     for cy in calendar_years:
-        average_target_co2e_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.target_co2e_grams_per_mile * VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count) /
-            func.sum(VehicleFinal.lifetime_VMT * VehicleAnnualData.registered_count)).
-                                                      filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                                      filter(VehicleFinal.model_year == cy).
-                                                      filter(VehicleAnnualData.age == 0).scalar())
+        weighted_value = 0
+        count = 0
+        vehicle_id_and_vmt_and_co2gpmi = [(v.vehicle_id, v.lifetime_VMT, v.target_co2e_grams_per_mile) for v in
+                                          vehicle_data if v.model_year == cy]
+
+        for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
+            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
+
+        co2e_data['total'].append(weighted_value / count)
 
     # tally up market_category sales- and VMT- weighted co2
     for mcat in market_categories:
         market_category_co2e = []
-        for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_co2_and_VMT = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                                 VehicleFinal.market_class_id,
-                                                                                 VehicleFinal.target_co2e_grams_per_mile,
-                                                                                 VehicleFinal.lifetime_VMT) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_co2e = 0
-            mcat_count = 0
-            for result in registered_count_and_market_id_and_co2_and_VMT:
-                if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count) * float(result.lifetime_VMT)
-                    sales_weighted_co2e += float(result.registered_count) * float(
-                        result.target_co2e_grams_per_mile) * float(result.lifetime_VMT)
-            market_category_co2e.append(sales_weighted_co2e / max(1, mcat_count))
+        for cy in calendar_years:
+            weighted_value = 0
+            count = 0
+            vehicle_id_and_vmt_and_co2gpmi_market_class_id = \
+                [(v.vehicle_id, v.lifetime_VMT, v.target_co2e_grams_per_mile, v.market_class_id) for v in
+                 vehicle_data if v.model_year == cy]
 
-        average_target_co2e_data[mcat] = market_category_co2e
+            for vehicle_id, lifetime_vmt, co2gpmi, market_class_id in vehicle_id_and_vmt_and_co2gpmi_market_class_id:
+                if mcat in market_class_id.split('.'):
+                    weighted_value += \
+                        vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
+
+            market_category_co2e.append(weighted_value / count)
+
+        co2e_data[mcat] = market_category_co2e
+
+    # tally up market_class sales- and VMT- weighted co2
+    for mc in market_classes:
+        market_class_co2e = []
+        for cy in calendar_years:
+            weighted_value = 0
+            count = 0
+            vehicle_id_and_vmt_and_co2gpmi = \
+                [(v.vehicle_id, v.lifetime_VMT, v.target_co2e_grams_per_mile) for v in
+                 vehicle_data if v.model_year == cy and v.market_class_id == mc]
+
+            for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
+                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
+
+            market_class_co2e.append(weighted_value / count)
+
+        co2e_data[mc] = market_class_co2e
 
     # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_target_co2e_data[mcat], '.--')
-    ax1.plot(calendar_years, average_target_co2e_data['total'], '.-')
+        ax1.plot(calendar_years, co2e_data[mcat], '.--')
+    ax1.plot(calendar_years, co2e_data['total'], '.-')
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
               '%s\nAverage Vehicle Target CO2e g/mi by Market Category v Year' % omega_globals.options.session_unique_name)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
+        omega_globals.options.output_folder + '%s V Target CO2e gpmi Mkt Cat.png' % omega_globals.options.session_unique_name)
 
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_target_co2e_data[mc] = []
-        for cy in calendar_years:
-            average_target_co2e_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.target_co2e_grams_per_mile * VehicleAnnualData.registered_count) /
-                func.sum(VehicleAnnualData.registered_count)).
-                                                     filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                                     filter(VehicleFinal.model_year == cy).
-                                                     filter(VehicleFinal.market_class_id == mc).
-                                                     filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_target_co2e_data[mc], '.-')
+            ax1.plot(calendar_years, co2e_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, average_target_co2e_data[mc], '.--')
+            ax1.plot(calendar_years, co2e_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'CO2e [g/mi]',
-              '%s\nAverage Vehicle Target CO2e g/mi by Market Class v Year' % omega_globals.options.session_unique_name)
+              '%s\nAverage Vehicle Target CO2e g/mi  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes)
     fig.savefig(
-        omega_globals.options.output_folder + '%s V Tgt CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return average_target_co2e_data
+        omega_globals.options.output_folder + '%s V Target CO2e gpmi Mkt Cls.png' % omega_globals.options.session_unique_name)
+
+    return co2e_data
 
 
 def plot_vehicle_cost(calendar_years):
@@ -473,40 +513,54 @@ def plot_vehicle_cost(calendar_years):
         dict of average vehicle cost data by total, market class and market category
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
-
     average_cost_data = dict()
 
     # tally up total sales weighted cost
     average_cost_data['total'] = []
     for cy in calendar_years:
-        average_cost_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
-            func.sum(VehicleAnnualData.registered_count)).
-                                          filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                          filter(VehicleFinal.model_year == cy).
-                                          filter(VehicleAnnualData.age == 0).scalar())
+        weighted_cost = 0
+        count = 0
+        vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data if
+                               v.model_year == cy]
+        for vehicle_id, cost in vehicle_id_and_cost:
+            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
-    # tally up market_category sales
+        average_cost_data['total'].append(weighted_cost / count)
+
+    # tally up market_category costs
     for mcat in market_categories:
         market_category_cost = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_cost = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                                  VehicleFinal.market_class_id,
-                                                                                  VehicleFinal.new_vehicle_mfr_cost_dollars) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_cost = 0
-            mcat_count = 0
-            for result in registered_count_and_market_id_and_cost:
-                if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.new_vehicle_mfr_cost_dollars)
-            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
+            weighted_cost = 0
+            count = 0
+            vehicle_id_and_market_class_id_and_cost = \
+                [(v.vehicle_id, v.market_class_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data if v.model_year == cy]
+
+            for vehicle_id, market_class_id, cost in vehicle_id_and_market_class_id_and_cost:
+                if mcat in market_class_id.split('.'):
+                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_cost.append(weighted_cost / count)
 
         average_cost_data[mcat] = market_category_cost
+
+    # tally up market_class costs
+    for mc in market_classes:
+        market_class_cost = []
+        for idx, cy in enumerate(calendar_years):
+            weighted_cost = 0
+            count = 0
+            vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data if
+                                   v.model_year == cy and v.market_class_id == mc]
+            for vehicle_id, cost in vehicle_id_and_cost:
+                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_class_cost.append(weighted_cost / count)
+
+        average_cost_data[mc] = market_class_cost
 
     # market category chart
     fig, ax1 = figure()
@@ -522,15 +576,6 @@ def plot_vehicle_cost(calendar_years):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_cost_data[mc] = []
-        for cy in calendar_years:
-            average_cost_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
-                func.sum(VehicleAnnualData.registered_count)).
-                                         filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                         filter(VehicleFinal.model_year == cy).
-                                         filter(VehicleFinal.market_class_id == mc).
-                                         filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
             ax1.plot(calendar_years, average_cost_data[mc], '.-')
         else:
@@ -558,49 +603,66 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
         dict of average vehicle cost data by total, market class and market category for the given manufacturer
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
-
-    average_cost_data = dict()
+    cost_data = dict()
 
     # tally up total sales weighted cost
-    average_cost_data['%s_total' % compliance_id] = []
+    cost_data['%s_total' % compliance_id] = []
     for cy in calendar_years:
-        average_cost_data['%s_total' % compliance_id].append(omega_globals.session.query(
-            func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
-            func.sum(VehicleAnnualData.registered_count)).
-                                                             filter(
-            VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                                             filter(VehicleFinal.compliance_id == compliance_id).
-                                                             filter(VehicleFinal.model_year == cy).
-                                                             filter(VehicleAnnualData.age == 0).scalar())
+        weighted_cost = 0
+        count = 0
+        vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data
+                               if v.model_year == cy and v.compliance_id == compliance_id]
 
-    # tally up market_category sales
+        for vehicle_id, cost in vehicle_id_and_cost:
+            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+        cost_data['%s_total' % compliance_id].append(weighted_cost / count)
+
+    # tally up market_category costs
     for mcat in market_categories:
         market_category_cost = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_cost = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                                  VehicleFinal.market_class_id,
-                                                                                  VehicleFinal.new_vehicle_mfr_cost_dollars) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.compliance_id == compliance_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_cost = 0
-            mcat_count = 0
-            for result in registered_count_and_market_id_and_cost:
-                if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(result.new_vehicle_mfr_cost_dollars)
-            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
+            weighted_cost = 0
+            count = 0
 
-        average_cost_data['%s_%s' % (compliance_id, mcat)] = market_category_cost
+            vehicle_id_and_market_class_id_and_cost = \
+                [(v.vehicle_id, v.market_class_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data
+                 if v.model_year == cy and v.compliance_id == compliance_id]
+
+            for vehicle_id, market_class_id, cost in vehicle_id_and_market_class_id_and_cost:
+                if mcat in market_class_id.split('.'):
+                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_cost.append(weighted_cost / count)
+
+        cost_data['%s_%s' % (compliance_id, mcat)] = market_category_cost
+
+    # tally up market_class costs
+    for mc in market_classes:
+        market_class_cost = []
+        for idx, cy in enumerate(calendar_years):
+            weighted_cost = 0
+            count = 0
+
+            vehicle_id_and_cost = \
+                [(v.vehicle_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data if v.model_year == cy
+                 and v.market_class_id == mc and v.compliance_id == compliance_id]
+
+            for vehicle_id, cost in vehicle_id_and_cost:
+                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_class_cost.append(weighted_cost / count)
+
+        cost_data['%s_%s' % (compliance_id, mc)] = market_class_cost
 
     # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, average_cost_data['%s_%s' % (compliance_id, mcat)], '.--')
-    ax1.plot(calendar_years, average_cost_data['%s_total' % compliance_id], '.-')
+        ax1.plot(calendar_years, cost_data['%s_%s' % (compliance_id, mcat)], '.--')
+    ax1.plot(calendar_years, cost_data['%s_total' % compliance_id], '.-')
     ax1.legend(market_categories + ['%s_total' % compliance_id])
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s %s\nAverage Vehicle Cost by Market Category v Year' %
@@ -611,21 +673,10 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        average_cost_data['%s_%s' % (compliance_id, mc)] = []
-        for cy in calendar_years:
-            average_cost_data['%s_%s' % (compliance_id, mc)].append(omega_globals.session.query(
-                func.sum(VehicleFinal.new_vehicle_mfr_cost_dollars * VehicleAnnualData.registered_count) /
-                func.sum(VehicleAnnualData.registered_count)).
-                                                                    filter(
-                VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                                                    filter(VehicleFinal.compliance_id == compliance_id).
-                                                                    filter(VehicleFinal.model_year == cy).
-                                                                    filter(VehicleFinal.market_class_id == mc).
-                                                                    filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, average_cost_data['%s_%s' % (compliance_id, mc)], '.-')
+            ax1.plot(calendar_years, cost_data['%s_%s' % (compliance_id, mc)], '.-')
         else:
-            ax1.plot(calendar_years, average_cost_data['%s_%s' % (compliance_id, mc)], '.--')
+            ax1.plot(calendar_years, cost_data['%s_%s' % (compliance_id, mc)], '.--')
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s %s\nAverage Vehicle Cost  by Market Class v Year'
@@ -635,7 +686,7 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
     fig.savefig(omega_globals.options.output_folder + '%s V Cost Mkt Cls %s.png'
                 % (omega_globals.options.session_unique_name, compliance_id))
 
-    return average_cost_data
+    return cost_data
 
 
 def plot_vehicle_generalized_cost(calendar_years):
@@ -650,48 +701,63 @@ def plot_vehicle_generalized_cost(calendar_years):
         dict of average generalized cost data by total, market class and market category
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
-    import consumer
-
-    generalized_cost_data = dict()
+    cost_data = dict()
 
     # tally up total sales weighted cost
-    generalized_cost_data['total'] = []
+    cost_data['total'] = []
     for cy in calendar_years:
-        generalized_cost_data['total'].append(omega_globals.session.query(
-            func.sum(VehicleFinal.new_vehicle_mfr_generalized_cost_dollars * VehicleAnnualData.registered_count) /
-            func.sum(VehicleAnnualData.registered_count)).
-                                              filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                              filter(VehicleFinal.model_year == cy).
-                                              filter(VehicleAnnualData.age == 0).scalar())
+        weighted_cost = 0
+        count = 0
+        vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_generalized_cost_dollars) for v in vehicle_data if v.model_year == cy]
 
-    # tally up market_category sales
+        for vehicle_id, cost in vehicle_id_and_cost:
+            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+        cost_data['total'].append(weighted_cost / count)
+
+    # tally up market_category costs
     for mcat in market_categories:
         market_category_cost = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id_and_cost = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                                  VehicleFinal.market_class_id,
-                                                                                  VehicleFinal.new_vehicle_mfr_generalized_cost_dollars) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_cost = 0
-            mcat_count = 0
-            for result in registered_count_and_market_id_and_cost:
-                if mcat in result.market_class_id.split('.'):
-                    mcat_count += float(result.registered_count)
-                    sales_weighted_cost += float(result.registered_count) * float(
-                        result.new_vehicle_mfr_generalized_cost_dollars)
-            market_category_cost.append(sales_weighted_cost / max(1, mcat_count))
+            weighted_cost = 0
+            count = 0
 
-        generalized_cost_data[mcat] = market_category_cost
+            vehicle_id_and_market_class_id_and_cost = \
+                [(v.vehicle_id, v.market_class_id, v.new_vehicle_mfr_generalized_cost_dollars) for v in vehicle_data if v.model_year == cy]
+
+            for vehicle_id, market_class_id, cost in vehicle_id_and_market_class_id_and_cost:
+                if mcat in market_class_id.split('.'):
+                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_cost.append(weighted_cost / count)
+
+        cost_data[mcat] = market_category_cost
+
+    # tally up market_class costs
+    for mc in market_classes:
+        market_class_cost = []
+        for idx, cy in enumerate(calendar_years):
+            weighted_cost = 0
+            count = 0
+
+            vehicle_id_and_cost = \
+                [(v.vehicle_id, v.new_vehicle_mfr_generalized_cost_dollars) for v in vehicle_data if v.model_year == cy and v.market_class_id == mc]
+
+            for vehicle_id, cost in vehicle_id_and_cost:
+                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_class_cost.append(weighted_cost / count)
+
+        cost_data[mc] = market_class_cost
 
     # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
-        ax1.plot(calendar_years, generalized_cost_data[mcat], '.--')
-    ax1.plot(calendar_years, generalized_cost_data['total'], '.-')
+        ax1.plot(calendar_years, cost_data[mcat], '.--')
+    ax1.plot(calendar_years, cost_data['total'], '.-')
     ax1.legend(market_categories + ['total'])
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized Cost by Market Category v Year' % omega_globals.options.session_unique_name)
@@ -701,19 +767,10 @@ def plot_vehicle_generalized_cost(calendar_years):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        generalized_cost_data[mc] = []
-        for cy in calendar_years:
-            generalized_cost_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.new_vehicle_mfr_generalized_cost_dollars * VehicleAnnualData.registered_count) /
-                func.sum(VehicleAnnualData.registered_count)).
-                                             filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                                             filter(VehicleFinal.model_year == cy).
-                                             filter(VehicleFinal.market_class_id == mc).
-                                             filter(VehicleAnnualData.age == 0).scalar())
         if 'ICE' in mc:
-            ax1.plot(calendar_years, generalized_cost_data[mc], '.-')
+            ax1.plot(calendar_years, cost_data[mc], '.-')
         else:
-            ax1.plot(calendar_years, generalized_cost_data[mc], '.--')
+            ax1.plot(calendar_years, cost_data[mc], '.--')
 
     label_xyt(ax1, 'Year', 'Cost [$]',
               '%s\nAverage Vehicle Generalized_Cost  by Market Class v Year' % omega_globals.options.session_unique_name)
@@ -721,7 +778,8 @@ def plot_vehicle_generalized_cost(calendar_years):
     ax1.legend(market_classes)
     fig.savefig(
         omega_globals.options.output_folder + '%s V GenCost Mkt Cls.png' % omega_globals.options.session_unique_name)
-    return generalized_cost_data
+
+    return cost_data
 
 
 def plot_vehicle_megagrams(calendar_years):
@@ -735,36 +793,33 @@ def plot_vehicle_megagrams(calendar_years):
         dict of vehicle cert CO2e Mg data by total, market class and market category
 
     """
-    from producer.vehicles import VehicleFinal
-    from producer.vehicle_annual_data import VehicleAnnualData
-
     Mg_data = dict()
 
     # tally up total Mg
     Mg_data['total'] = []
     for cy in calendar_years:
         Mg_data['total'].append(
-            omega_globals.session.query(func.sum(VehicleFinal.cert_co2e_Mg)).
-                filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                filter(VehicleFinal.model_year == cy).
-                filter(VehicleAnnualData.age == 0).scalar())
+            sum([v.cert_co2e_Mg for v in vehicle_data if v.model_year == cy]))
 
-    # tally up market_category Mg
     for mcat in market_categories:
         market_category_Mg = []
         for idx, cy in enumerate(calendar_years):
-            market_id_and_Mg = omega_globals.session.query(VehicleFinal.market_class_id,
-                                                           VehicleFinal.cert_co2e_Mg) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
-            sales_weighted_Mg = 0
-            for result in market_id_and_Mg:
-                if mcat in result.market_class_id.split('.'):
-                    sales_weighted_Mg += float(result.cert_co2e_Mg)
-            market_category_Mg.append(sales_weighted_Mg)
+            market_id_and_Mg = [(v.market_class_id, v.cert_co2e_Mg) for v in vehicle_data if v.model_year == cy]
+            Mg = 0
+            for market_class_id, cert_co2e_Mg in market_id_and_Mg:
+                if mcat in market_class_id.split('.'):
+                    Mg += float(cert_co2e_Mg)
+            market_category_Mg.append(Mg)
 
         Mg_data[mcat] = market_category_Mg
+
+    for mc in market_classes:
+        market_class_Mg = []
+        for idx, cy in enumerate(calendar_years):
+            market_class_Mg.append(sum([v.cert_co2e_Mg for v in vehicle_data if v.model_year == cy
+                                        and v.market_class_id == mc]))
+
+        Mg_data[mc] = market_class_Mg
 
     # market category chart
     fig, ax1 = figure()
@@ -779,15 +834,6 @@ def plot_vehicle_megagrams(calendar_years):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        Mg_data[mc] = []
-        for cy in calendar_years:
-            Mg_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_co2e_Mg)).
-                               filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id).
-                               filter(VehicleFinal.model_year == cy).
-                               filter(VehicleFinal.market_class_id == mc).
-                               filter(VehicleAnnualData.age == 0).scalar())
-
         if 'ICE' in mc:
             ax1.plot(calendar_years, Mg_data[mc], '.-')
         else:
@@ -797,6 +843,7 @@ def plot_vehicle_megagrams(calendar_years):
               '%s\nVehicle CO2e Mg  by Market Class v Year' % omega_globals.options.session_unique_name)
     ax1.legend(market_classes + ['total'])
     fig.savefig(omega_globals.options.output_folder + '%s V Mg Mkt Cls.png' % omega_globals.options.session_unique_name)
+
     return Mg_data
 
 
@@ -813,8 +860,6 @@ def plot_market_shares(calendar_years, total_sales):
 
     """
     from context.new_vehicle_market import NewVehicleMarket
-    from producer.vehicle_annual_data import VehicleAnnualData
-    from producer.vehicles import VehicleFinal
 
     market_share_results = dict()
 
@@ -822,15 +867,12 @@ def plot_market_shares(calendar_years, total_sales):
     for mcat in market_categories:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                         VehicleFinal.market_class_id) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
             count = 0
-            for result in registered_count_and_market_id:
-                if mcat in result.market_class_id.split('.'):
-                    count += result.registered_count
+            vehicle_id_and_market_class_id = [(v.vehicle_id, v.market_class_id) for v in vehicle_data if v.model_year == cy]
+            for vehicle_id, market_class_id in vehicle_id_and_market_class_id:
+                if mcat in market_class_id.split('.'):
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
 
         market_share_results['abs_share_frac_%s' % mcat] = market_category_abs_share_frac
@@ -839,42 +881,38 @@ def plot_market_shares(calendar_years, total_sales):
     for mc in market_classes:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            mc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.market_class_id == mc) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).scalar()
-            if not mc_sales:
-                mc_sales = 0
-            market_category_abs_share_frac.append(float(mc_sales) / total_sales[idx])
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.market_class_id == mc]
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % mc] = market_category_abs_share_frac
 
     # tally up context size class sales
     for csc in NewVehicleMarket.base_year_context_size_class_sales:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            csc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.context_size_class == csc) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).scalar()
-            if not csc_sales:
-                csc_sales = 0
-            market_category_abs_share_frac.append(float(csc_sales) / total_sales[idx])
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.context_size_class == csc]
+
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % csc] = market_category_abs_share_frac
 
     # tally up reg class sales
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            rc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.reg_class_id == rc) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).scalar()
-            if not rc_sales:
-                rc_sales = 0
-            market_category_abs_share_frac.append(float(rc_sales) / total_sales[idx])
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.reg_class_id == rc]
+
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % rc] = market_category_abs_share_frac
 
     # plot market category results
@@ -938,8 +976,6 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
 
     """
     from context.new_vehicle_market import NewVehicleMarket
-    from producer.vehicle_annual_data import VehicleAnnualData
-    from producer.vehicles import VehicleFinal
 
     market_share_results = dict()
 
@@ -947,64 +983,57 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
     for mcat in market_categories:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            registered_count_and_market_id = omega_globals.session.query(VehicleAnnualData.registered_count,
-                                                                         VehicleFinal.market_class_id) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.compliance_id == compliance_id) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).all()
             count = 0
-            for result in registered_count_and_market_id:
-                if mcat in result.market_class_id.split('.'):
-                    count += result.registered_count
+            vehicle_id_and_market_class_id = [(v.vehicle_id, v.market_class_id) for v in vehicle_data
+                                              if v.model_year == cy and v.compliance_id == compliance_id]
+            for vehicle_id, market_class_id in vehicle_id_and_market_class_id:
+                if mcat in market_class_id.split('.'):
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
 
-        market_share_results['%s_abs_share_frac_%s' % (compliance_id, mcat)] = market_category_abs_share_frac
+        market_share_results['abs_share_frac_%s' % mcat] = market_category_abs_share_frac
 
     # tally up market class sales
     for mc in market_classes:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            mc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.compliance_id == compliance_id) \
-                .filter(VehicleFinal.market_class_id == mc) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).scalar()
-            if not mc_sales:
-                mc_sales = 0
-            market_category_abs_share_frac.append(float(mc_sales) / total_sales[idx])
-        market_share_results['%s_abs_share_frac_%s' % (compliance_id, mc)] = market_category_abs_share_frac
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.market_class_id == mc
+                           and v.compliance_id == compliance_id]
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_abs_share_frac.append(float(count) / total_sales[idx])
+        market_share_results['abs_share_frac_%s' % (compliance_id, mc)] = market_category_abs_share_frac
 
     # tally up context size class sales
     for csc in NewVehicleMarket.base_year_context_size_class_sales:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            csc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.compliance_id == compliance_id) \
-                .filter(VehicleFinal.context_size_class == csc) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).scalar()
-            if not csc_sales:
-                csc_sales = 0
-            market_category_abs_share_frac.append(float(csc_sales) / total_sales[idx])
-        market_share_results['%s_abs_share_frac_%s' % (compliance_id, csc)] = market_category_abs_share_frac
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.context_size_class == csc
+                           and v.compliance_id == compliance_id]
+
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_abs_share_frac.append(float(count) / total_sales[idx])
+        market_share_results['abs_share_frac_%s' % (compliance_id, csc)] = market_category_abs_share_frac
 
     # tally up reg class sales
     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
         market_category_abs_share_frac = []
         for idx, cy in enumerate(calendar_years):
-            rc_sales = omega_globals.session.query(func.sum(VehicleAnnualData.registered_count)) \
-                .filter(VehicleAnnualData.vehicle_id == VehicleFinal.vehicle_id) \
-                .filter(VehicleFinal.compliance_id == compliance_id) \
-                .filter(VehicleFinal.reg_class_id == rc) \
-                .filter(VehicleAnnualData.calendar_year == cy) \
-                .filter(VehicleAnnualData.age == 0).scalar()
-            if not rc_sales:
-                rc_sales = 0
-            market_category_abs_share_frac.append(float(rc_sales) / total_sales[idx])
-        market_share_results['%s_abs_share_frac_%s' % (compliance_id, rc)] = market_category_abs_share_frac
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.reg_class_id == rc
+                           and v.compliance_id == compliance_id]
+
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+
+            market_category_abs_share_frac.append(float(count) / total_sales[idx])
+        market_share_results['abs_share_frac_%s' % (compliance_id, rc)] = market_category_abs_share_frac
 
     # plot market category results
     fig, ax1 = figure()
@@ -1066,28 +1095,25 @@ def plot_total_sales(calendar_years, compliance_ids):
         (context_sales, total_sales, manufacturer_sales)
 
     """
-    import numpy as np
-    import consumer
-    from producer.vehicle_annual_data import VehicleAnnualData
-    from producer.vehicles import VehicleFinal
-
     total_sales = []
     for cy in calendar_years:
-        total_sales.append(float(omega_globals.session.query(func.sum(VehicleAnnualData.registered_count))
-                                 .filter(VehicleAnnualData.calendar_year == cy)
-                                 .filter(VehicleAnnualData.age == 0).scalar()))
+        count = 0
+        vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy]
+        for vehicle_id in vehicle_ids:
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+        total_sales.append(count)
+
     total_sales = np.array(total_sales)
 
     manufacturer_sales = dict()
     for compliance_id in compliance_ids:
         manufacturer_sales[compliance_id] = []
         for cy in calendar_years:
-            manufacturer_sales[compliance_id].append(
-                float(omega_globals.session.query(func.sum(VehicleAnnualData.registered_count))
-                      .filter(VehicleFinal.vehicle_id == VehicleAnnualData.vehicle_id)
-                      .filter(VehicleFinal.compliance_id == compliance_id)
-                      .filter(VehicleAnnualData.calendar_year == cy)
-                      .filter(VehicleAnnualData.age == 0).scalar()))
+            count = 0
+            vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.compliance_id == compliance_id]
+            for vehicle_id in vehicle_ids:
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
+            manufacturer_sales[compliance_id].append(count)
 
     context_sales = np.array(
         [consumer.sales_volume.context_new_vehicle_sales(cy)['total'] for cy in calendar_years[1:]])
