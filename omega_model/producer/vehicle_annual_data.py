@@ -19,28 +19,21 @@ class VehicleAnnualData(OMEGABase):
 
     """
 
-    _data = pd.DataFrame()
-
-    def __init__(self, calendar_year, vehicle_id, compliance_id, age, registered_count=0, annual_vmt=0, odometer=0, vmt=0):
-        self.calendar_year = calendar_year  #: calendar year, e.g. ``2030``
-        self.vehicle_id = vehicle_id  #: vehicle ID, e.g. ``1``
-        self.age = age  #: vehicle age, new vehicles have age ``0``
-        self.registered_count = registered_count  #: count of vehicles remaining in service (registered)
-        self.annual_vmt = annual_vmt  #: vehicle miles travelled in the given year
-        self.odometer = odometer  #: the cumulative annual_vmt or odometer reading
-        self.vmt = vmt  #: annual vehicle miles travelled times registered count
+    _data = []
 
     @staticmethod
     def create(calendar_year, vehicle_id, compliance_id, age, registered_count=0, annual_vmt=0, odometer=0, vmt=0):
-        vad = VehicleAnnualData(calendar_year, vehicle_id, compliance_id, age,
-                                registered_count, annual_vmt, odometer, vmt)
-
         return {'calendar_year': calendar_year, 'compliance_id': compliance_id, 'vehicle_id': vehicle_id,
-                'age': age, 'data': vad}
+                'age': age, 'registered_count': registered_count, 'annual_vmt': annual_vmt, 'odometer': odometer,
+                'vmt': vmt}
 
     @staticmethod
     def add_all(vad_list):
-        VehicleAnnualData._data = VehicleAnnualData._data.append(vad_list, ignore_index=True)
+        if type(vad_list) == list:
+            for vad in vad_list:
+                VehicleAnnualData._data.append(vad)
+        else:
+            VehicleAnnualData._data.append(vad_list)  # , ignore_index=True)
 
     @staticmethod
     def update_registered_count(vehicle, calendar_year, registered_count):
@@ -56,16 +49,17 @@ class VehicleAnnualData(OMEGABase):
             Nothing, updates vehicle annual data table
 
         """
-        age = calendar_year - vehicle.model_year
+        age = int(calendar_year - vehicle.model_year)
 
-        vad = VehicleAnnualData._data[(VehicleAnnualData._data['calendar_year'] == calendar_year) &
-                                      (VehicleAnnualData._data['vehicle_id'] == vehicle.vehicle_id)]
+        vad = [v for v in VehicleAnnualData._data
+               if v['calendar_year'] == calendar_year and v['vehicle_id'] == vehicle.vehicle_id]
 
-        if vad.empty:
-            vad = VehicleAnnualData.create(calendar_year, vehicle.vehicle_id, vehicle.compliance_id, age, registered_count)
+        if not vad:
+            vad = VehicleAnnualData.create(int(calendar_year), vehicle.vehicle_id, vehicle.compliance_id, age,
+                                           registered_count)
             VehicleAnnualData.add_all(vad)
         else:
-            vad['data'].item().registered_count = registered_count
+            vad['registered_count'] = registered_count
 
     @staticmethod
     def get_calendar_years():
@@ -76,7 +70,7 @@ class VehicleAnnualData(OMEGABase):
             List of calendar years that have vehicle annual data.
 
         """
-        return VehicleAnnualData._data['calendar_year'].values
+        return [v['calendar_year'] for v in VehicleAnnualData._data]
 
     @staticmethod
     def get_vehicle_annual_data(calendar_year, compliance_id=None, attributes=None):
@@ -95,25 +89,20 @@ class VehicleAnnualData(OMEGABase):
         from producer.vehicles import VehicleFinal
 
         if attributes is None and compliance_id is None:
-            result = VehicleAnnualData._data[VehicleAnnualData._data['calendar_year'] == calendar_year]['data']
+            result = [v for v in VehicleAnnualData._data
+                      if v['calendar_year'] == calendar_year]
         elif attributes is None and compliance_id is not None:
-            result = VehicleAnnualData._data[(VehicleAnnualData._data['calendar_year'] == calendar_year) &
-                                             (VehicleAnnualData._data['compliance_id'] == compliance_id)]['data']
+            result = [v for v in VehicleAnnualData._data
+                      if v['calendar_year'] == calendar_year and v['compliance_id'] == compliance_id]
 
         return result
 
     @staticmethod
-    def get_odometers(calendar_year):
-        data = omega_globals.session.query(VehicleAnnualData.vehicle_id, VehicleAnnualData.odometer).\
-            filter(VehicleAnnualData.calendar_year == calendar_year).all()
-        return pd.DataFrame(data, columns=['vehicle_id', 'odometer'])
-
-    @staticmethod
     def init_vehicle_annual_data():
-        global _data
 
         _cache.clear()
-        VehicleAnnualData._data = pd.DataFrame(columns=('calendar_year', 'compliance_id', 'vehicle_id', 'age', 'data'))
+
+        VehicleAnnualData._data = []
 
         return []
 

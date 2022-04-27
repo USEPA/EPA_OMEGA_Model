@@ -59,7 +59,7 @@ def update_stock(calendar_year, compliance_id=None):
     # omega_globals.session.add_all(this_years_vehicle_annual_data)
     # UPDATE vehicle annual data for this year's stock
     for vad in this_years_vehicle_annual_data:
-        market_class_id, model_year, initial_registered_count = get_vehicle_info(vad.vehicle_id)
+        market_class_id, model_year, initial_registered_count = get_vehicle_info(vad['vehicle_id'])
         age = calendar_year - model_year
 
         reregistration_factor = omega_globals.options.Reregistration.\
@@ -75,21 +75,19 @@ def update_stock(calendar_year, compliance_id=None):
 
         if reregistration_factor > 0:
             registered_count = initial_registered_count * reregistration_factor
-            vad.annual_vmt = annual_vmt
-            vad.odometer = odometer
-            vad.vmt = annual_vmt * registered_count
-        else:
-            pass
+            vad['annual_vmt'] = annual_vmt
+            vad['odometer'] = odometer
+            vad['vmt'] = annual_vmt * registered_count
 
-    if last_years_vehicle_annual_data.empty:
+    if not last_years_vehicle_annual_data:
         prior_year_vehicle_data = []
     else:
-        prior_year_vehicle_data = [(vehicle.vehicle_id, vehicle.odometer) for vehicle in last_years_vehicle_annual_data.values]
+        prior_year_vehicle_data = [(v['vehicle_id'], v['odometer']) for v in last_years_vehicle_annual_data]
 
     vad_list = []
 
     # CREATE vehicle annual data for last year's stock, now one year older:
-    if len(prior_year_vehicle_data):
+    if prior_year_vehicle_data:
         for vehicle_id, prior_odometer in prior_year_vehicle_data:
             market_class_id, model_year, initial_registered_count = get_vehicle_info(vehicle_id)
             age = calendar_year - model_year
@@ -113,10 +111,8 @@ def update_stock(calendar_year, compliance_id=None):
                                   annual_vmt=annual_vmt,
                                   odometer=odometer,
                                   vmt=annual_vmt * registered_count))
-            else:
-                pass
 
-    VehicleAnnualData.add_all(vad_list)
+        VehicleAnnualData.add_all(vad_list)
 
 
 if __name__ == '__main__':

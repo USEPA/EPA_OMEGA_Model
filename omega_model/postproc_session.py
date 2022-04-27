@@ -13,7 +13,7 @@ from omega_model import *
 from common.omega_plot import *
 from policy.credit_banking import CreditBank
 from producer.vehicle_annual_data import VehicleAnnualData
-from consumer import *
+import consumer
 
 market_classes = []
 market_categories = []
@@ -64,7 +64,7 @@ def run_postproc(iteration_log, credit_banks):
                                                VehicleFinal.lifetime_VMT, VehicleFinal.compliance_id).all()
 
     # index vehicle annual data by vehicle id and age for quick access
-    vehicle_annual_data = VehicleAnnualData._data.set_index(['vehicle_id', 'age'])
+    vehicle_annual_data = pd.DataFrame(VehicleAnnualData._data).set_index(['vehicle_id', 'age'])
 
     analysis_years = vehicle_years[1:]
 
@@ -149,9 +149,7 @@ def run_postproc(iteration_log, credit_banks):
                       omega_globals.options.session_unique_name + '_vehicles',
                       omega_globals.options.verbose)
 
-    # dump_table_to_csv(omega_globals.options.output_folder, 'vehicle_annual_data',
-    #                   omega_globals.options.session_unique_name + '_vehicle_annual_data',
-    #                   omega_globals.options.verbose)
+    vehicle_annual_data.to_csv(omega_globals.options.output_folder + omega_globals.options.session_unique_name + '_vehicle_annual_data.csv')
 
     dump_table_to_csv(omega_globals.options.output_folder, 'manufacturer_annual_data',
                       omega_globals.options.session_unique_name + '_manufacturer_annual_data',
@@ -251,8 +249,8 @@ def plot_cert_co2e_gpmi(calendar_years):
         vehicle_id_and_vmt_and_co2gpmi = [(v.vehicle_id, v.lifetime_VMT, v.cert_co2e_grams_per_mile) for v in vehicle_data if v.model_year == cy]
 
         for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
-            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt * co2gpmi
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt
+            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
 
         co2e_data['total'].append(weighted_value / count)
 
@@ -268,9 +266,9 @@ def plot_cert_co2e_gpmi(calendar_years):
 
             for vehicle_id, lifetime_vmt, co2gpmi, market_class_id in vehicle_id_and_vmt_and_co2gpmi_market_class_id:
                 if mcat in market_class_id.split('.'):
-                    weighted_value += vehicle_annual_data.loc[vehicle_id, 0][
-                                          'data'].registered_count * lifetime_vmt * co2gpmi
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt
+                    weighted_value += \
+                        vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
 
             market_category_co2e.append(weighted_value / count)
 
@@ -287,9 +285,8 @@ def plot_cert_co2e_gpmi(calendar_years):
                  vehicle_data if v.model_year == cy and v.market_class_id == mc]
 
             for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
-                weighted_value += vehicle_annual_data.loc[vehicle_id, 0][
-                                      'data'].registered_count * lifetime_vmt * co2gpmi
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt
+                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
 
             market_class_co2e.append(weighted_value / count)
 
@@ -344,8 +341,8 @@ def plot_cert_direct_kwh_pmi(calendar_years):
         vehicle_id_and_kwh = [(v.vehicle_id, v.cert_direct_kwh_per_mile) for v in vehicle_data if v.model_year == cy]
 
         for vehicle_id, kwh in vehicle_id_and_kwh:
-            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * kwh
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * kwh
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
         average_cert_direct_kwh_data['total'].append(weighted_value / count)
 
@@ -361,8 +358,8 @@ def plot_cert_direct_kwh_pmi(calendar_years):
 
             for vehicle_id, market_class_id, kwh in vehicle_id_and_market_class_id_and_kwh:
                 if mcat in market_class_id.split('.'):
-                    weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * kwh
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                    weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * kwh
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_cost.append(weighted_value / count)
 
@@ -379,8 +376,8 @@ def plot_cert_direct_kwh_pmi(calendar_years):
                 [(v.vehicle_id, v.cert_direct_kwh_per_mile) for v in vehicle_data if v.model_year == cy and v.market_class_id == mc]
 
             for vehicle_id, kwh in vehicle_id_and_kwh:
-                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * kwh
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * kwh
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_class_cost.append(weighted_value / count)
 
@@ -434,8 +431,8 @@ def plot_target_co2e_gpmi(calendar_years):
                                           vehicle_data if v.model_year == cy]
 
         for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
-            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt * co2gpmi
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt
+            weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
 
         co2e_data['total'].append(weighted_value / count)
 
@@ -451,9 +448,9 @@ def plot_target_co2e_gpmi(calendar_years):
 
             for vehicle_id, lifetime_vmt, co2gpmi, market_class_id in vehicle_id_and_vmt_and_co2gpmi_market_class_id:
                 if mcat in market_class_id.split('.'):
-                    weighted_value += vehicle_annual_data.loc[vehicle_id, 0][
-                                          'data'].registered_count * lifetime_vmt * co2gpmi
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt
+                    weighted_value += \
+                        vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
 
             market_category_co2e.append(weighted_value / count)
 
@@ -470,9 +467,8 @@ def plot_target_co2e_gpmi(calendar_years):
                  vehicle_data if v.model_year == cy and v.market_class_id == mc]
 
             for vehicle_id, lifetime_vmt, co2gpmi in vehicle_id_and_vmt_and_co2gpmi:
-                weighted_value += vehicle_annual_data.loc[vehicle_id, 0][
-                                      'data'].registered_count * lifetime_vmt * co2gpmi
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * lifetime_vmt
+                weighted_value += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt * co2gpmi
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * lifetime_vmt
 
             market_class_co2e.append(weighted_value / count)
 
@@ -527,8 +523,8 @@ def plot_vehicle_cost(calendar_years):
         vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data if
                                v.model_year == cy]
         for vehicle_id, cost in vehicle_id_and_cost:
-            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
         average_cost_data['total'].append(weighted_cost / count)
 
@@ -543,8 +539,8 @@ def plot_vehicle_cost(calendar_years):
 
             for vehicle_id, market_class_id, cost in vehicle_id_and_market_class_id_and_cost:
                 if mcat in market_class_id.split('.'):
-                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_cost.append(weighted_cost / count)
 
@@ -557,10 +553,10 @@ def plot_vehicle_cost(calendar_years):
             weighted_cost = 0
             count = 0
             vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_cost_dollars) for v in vehicle_data if
-                                   v.model_year == cy]
+                                   v.model_year == cy and v.market_class_id == mc]
             for vehicle_id, cost in vehicle_id_and_cost:
-                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_class_cost.append(weighted_cost / count)
 
@@ -618,8 +614,8 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
                                if v.model_year == cy and v.compliance_id == compliance_id]
 
         for vehicle_id, cost in vehicle_id_and_cost:
-            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
         cost_data['%s_total' % compliance_id].append(weighted_cost / count)
 
@@ -636,8 +632,8 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
 
             for vehicle_id, market_class_id, cost in vehicle_id_and_market_class_id_and_cost:
                 if mcat in market_class_id.split('.'):
-                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_cost.append(weighted_cost / count)
 
@@ -655,8 +651,8 @@ def plot_manufacturer_vehicle_cost(calendar_years, compliance_id):
                  and v.market_class_id == mc and v.compliance_id == compliance_id]
 
             for vehicle_id, cost in vehicle_id_and_cost:
-                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_class_cost.append(weighted_cost / count)
 
@@ -715,8 +711,8 @@ def plot_vehicle_generalized_cost(calendar_years):
         vehicle_id_and_cost = [(v.vehicle_id, v.new_vehicle_mfr_generalized_cost_dollars) for v in vehicle_data if v.model_year == cy]
 
         for vehicle_id, cost in vehicle_id_and_cost:
-            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+            weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
         cost_data['total'].append(weighted_cost / count)
 
@@ -732,8 +728,8 @@ def plot_vehicle_generalized_cost(calendar_years):
 
             for vehicle_id, market_class_id, cost in vehicle_id_and_market_class_id_and_cost:
                 if mcat in market_class_id.split('.'):
-                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                    weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_cost.append(weighted_cost / count)
 
@@ -750,8 +746,8 @@ def plot_vehicle_generalized_cost(calendar_years):
                 [(v.vehicle_id, v.new_vehicle_mfr_generalized_cost_dollars) for v in vehicle_data if v.model_year == cy and v.market_class_id == mc]
 
             for vehicle_id, cost in vehicle_id_and_cost:
-                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count * cost
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                weighted_cost += vehicle_annual_data.loc[vehicle_id, 0]['registered_count'] * cost
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_class_cost.append(weighted_cost / count)
 
@@ -817,6 +813,14 @@ def plot_vehicle_megagrams(calendar_years):
 
         Mg_data[mcat] = market_category_Mg
 
+    for mc in market_classes:
+        market_class_Mg = []
+        for idx, cy in enumerate(calendar_years):
+            market_class_Mg.append(sum([v.cert_co2e_Mg for v in vehicle_data if v.model_year == cy
+                                        and v.market_class_id == mc]))
+
+        Mg_data[mc] = market_class_Mg
+
     # market category chart
     fig, ax1 = figure()
     for mcat in market_categories:
@@ -830,13 +834,6 @@ def plot_vehicle_megagrams(calendar_years):
     # market class chart
     fig, ax1 = figure()
     for mc in market_classes:
-        Mg_data[mc] = []
-        for cy in calendar_years:
-            Mg_data[mc].append(omega_globals.session.query(
-                func.sum(VehicleFinal.cert_co2e_Mg)).
-                               filter(VehicleFinal.model_year == cy).
-                               filter(VehicleFinal.market_class_id == mc).scalar())
-
         if 'ICE' in mc:
             ax1.plot(calendar_years, Mg_data[mc], '.-')
         else:
@@ -874,7 +871,7 @@ def plot_market_shares(calendar_years, total_sales):
             vehicle_id_and_market_class_id = [(v.vehicle_id, v.market_class_id) for v in vehicle_data if v.model_year == cy]
             for vehicle_id, market_class_id in vehicle_id_and_market_class_id:
                 if mcat in market_class_id.split('.'):
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
 
@@ -887,7 +884,7 @@ def plot_market_shares(calendar_years, total_sales):
             count = 0
             vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.market_class_id == mc]
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % mc] = market_category_abs_share_frac
@@ -900,7 +897,7 @@ def plot_market_shares(calendar_years, total_sales):
             vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.context_size_class == csc]
 
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % csc] = market_category_abs_share_frac
@@ -913,7 +910,7 @@ def plot_market_shares(calendar_years, total_sales):
             vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.reg_class_id == rc]
 
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % rc] = market_category_abs_share_frac
@@ -991,7 +988,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
                                               if v.model_year == cy and v.compliance_id == compliance_id]
             for vehicle_id, market_class_id in vehicle_id_and_market_class_id:
                 if mcat in market_class_id.split('.'):
-                    count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                    count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
 
@@ -1005,7 +1002,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
             vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.market_class_id == mc
                            and v.compliance_id == compliance_id]
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % (compliance_id, mc)] = market_category_abs_share_frac
@@ -1019,7 +1016,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
                            and v.compliance_id == compliance_id]
 
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % (compliance_id, csc)] = market_category_abs_share_frac
@@ -1033,7 +1030,7 @@ def plot_manufacturer_market_shares(calendar_years, compliance_id, total_sales):
                            and v.compliance_id == compliance_id]
 
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
 
             market_category_abs_share_frac.append(float(count) / total_sales[idx])
         market_share_results['abs_share_frac_%s' % (compliance_id, rc)] = market_category_abs_share_frac
@@ -1103,7 +1100,7 @@ def plot_total_sales(calendar_years, compliance_ids):
         count = 0
         vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy]
         for vehicle_id in vehicle_ids:
-            count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+            count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
         total_sales.append(count)
 
     total_sales = np.array(total_sales)
@@ -1115,7 +1112,7 @@ def plot_total_sales(calendar_years, compliance_ids):
             count = 0
             vehicle_ids = [v.vehicle_id for v in vehicle_data if v.model_year == cy and v.compliance_id == compliance_id]
             for vehicle_id in vehicle_ids:
-                count += vehicle_annual_data.loc[vehicle_id, 0]['data'].registered_count
+                count += vehicle_annual_data.loc[vehicle_id, 0]['registered_count']
             manufacturer_sales[compliance_id].append(count)
 
     context_sales = np.array(

@@ -1245,8 +1245,11 @@ class VehicleFinal(SQABase, Vehicle):
                               'base_year_target_coef_a', 'base_year_target_coef_b', 'base_year_target_coef_c'] \
                               + VehicleFinal.dynamic_attributes
 
-        # model year and registered count are required to make a full-blown VehicleFinal object
-        veh = VehicleFinal(model_year=vehicle.model_year, initial_registered_count=1)
+        # model year and registered count are required to make a full-blown VehicleFinal object, compliance_id
+        # is required for vehicle annual data init
+        veh = VehicleFinal(model_year=vehicle.model_year,
+                           compliance_id=vehicle.compliance_id,
+                           initial_registered_count=1)
 
         # get the rest of the attributes from the list
         for p in inherit_properties:
