@@ -18,8 +18,11 @@ path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(path, '..'))  # picks up omega_model sub-packages
 
 from omega_model import *
-from omega_model.consumer import stock
-from omega_model.context.onroad_fuels import OnroadFuel
+from omega_model.consumer import stock, sales_volume
+
+from context.onroad_fuels import OnroadFuel
+from context.price_modifications import PriceModifications
+
 import postproc_session
 
 
@@ -209,10 +212,8 @@ def run_producer_consumer():
     """
 
     from producer.vehicles import VehicleFinal
-    from producer import compliance_search
     from policy.credit_banking import CreditBank
-
-    # iteration_log = pd.DataFrame()
+    from producer import compliance_search
 
     iteration_log = []
 
@@ -372,8 +373,11 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
         abs(1 - _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
 
-    cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
-        _cross_subsidy_options_and_response.values()
+    # cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
+    #     _cross_subsidy_options_and_response.values()
+    # TODO: the above used to work... now it throws an error
+    for k, v in _cross_subsidy_options_and_response.items():
+        cross_subsidy_options_and_response[k] = v
 
 
 def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_decision_and_response,
@@ -406,18 +410,16 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
         (best_producer_decision_and_response, iteration_log, cross_subsidy_options_and_response)
 
     """
-    import numpy as np
     from producer import compliance_search
-    import consumer
 
     producer_decision['average_new_vehicle_mfr_generalized_cost_initial'] = \
         calc_new_vehicle_mfr_generalized_cost(producer_decision, producer_market_classes)
 
     producer_decision['context_new_vehicle_sales'] = producer_decision['total_sales']
 
-    consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                                     producer_decision['average_new_vehicle_mfr_generalized_cost_initial'],
-                                                     update_context_new_vehicle_generalized_cost=True)
+    sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
+                                            producer_decision['average_new_vehicle_mfr_generalized_cost_initial'],
+                                            update_context_new_vehicle_generalized_cost=True)
 
     cross_subsidy_options_and_response = pd.DataFrame()
 
@@ -430,7 +432,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
     producer_decision = producer_decision.drop(duplicate_columns)
-    producer_decision_and_response = producer_decision.append(cross_subsidy_options_and_response)
+    producer_decision_and_response = pd.concat([producer_decision, cross_subsidy_options_and_response])
 
     producer_decision_and_response['cross_subsidy_iteration_num'] = producer_consumer_iteration_num
 
@@ -642,10 +644,6 @@ def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_
         Updates ``producer_decision_and_response`` columns
         
     """
-    import numpy as np
-    import consumer
-    from context.price_modifications import PriceModifications
-
     producer_decision_and_response['average_cross_subsidized_price_total'] = 0
     producer_decision_and_response['average_modified_cross_subsidized_price_total'] = 0
     producer_decision_and_response['average_new_vehicle_mfr_cost'] = 0
@@ -670,9 +668,9 @@ def calc_sales_and_cost_data_from_shares(calendar_year, compliance_id, producer_
 
     producer_decision_and_response['new_vehicle_sales'] = \
         producer_decision_and_response['context_new_vehicle_sales'] * \
-        consumer.sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
-                                                         producer_decision_and_response[
-                                                             'average_new_vehicle_mfr_generalized_cost'])
+        sales_volume.new_vehicle_sales_response(calendar_year, compliance_id,
+                                                producer_decision_and_response[
+                                                    'average_new_vehicle_mfr_generalized_cost'])
 
 
 def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multiplier_columns, prev_multiplier_range,
@@ -698,9 +696,6 @@ def create_cross_subsidy_options(calendar_year, continue_search, mc_pair, multip
         options (continue_search, price_options_df)
 
     """
-    import numpy as np
-    from context.price_modifications import PriceModifications
-
     first_pass = not all([mc in producer_decision_and_response for mc in multiplier_columns])
 
     if first_pass and producer_decision_and_response.empty:
@@ -767,7 +762,7 @@ def tighten_multiplier_range(multiplier_column, prev_multiplier_ranges, producer
         collapsed (multiplier_range, search_collapsed)
 
     """
-    import numpy as np
+
 
     prev_multiplier = producer_decision_and_response[multiplier_column]
     prev_multiplier_range = prev_multiplier_ranges[multiplier_column]
@@ -922,7 +917,7 @@ def calc_market_category_data(producer_decision):
         Nothing, updates ``producer_decsion`` with calculated market data
 
     """
-    import numpy as np
+
 
     for mcat in omega_globals.options.MarketClass.market_categories:
         producer_decision['average_new_vehicle_mfr_cost_%s' % mcat] = 0

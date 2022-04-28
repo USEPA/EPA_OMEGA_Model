@@ -15,6 +15,8 @@ from pandas.api.types import is_numeric_dtype
 import numpy as np
 import common.omega_globals as omega_globals
 
+# np.seterr(all='raise')  # for troubleshooting runtime warnings
+
 
 def sales_weight_average_dataframe(df):
     """
@@ -28,17 +30,14 @@ def sales_weight_average_dataframe(df):
         DataFrame with sales-weighted-average for numeric columns
 
     """
-    import numpy as np
-
     numeric_columns = [c for c in df.columns if is_numeric_dtype(df[c])]
     non_numeric_columns = [c for c in df.columns if not is_numeric_dtype(df[c])]
 
-    avg_df = pd.Series()
+    avg_df = pd.Series(dtype='float64')
 
     for c in numeric_columns:
         if 'sales' not in c and c != 'model_year':
-            avg_df[c] = np.nansum(df[c].values * df['sales'].values) / np.sum(
-                df['sales'].values * ~np.isnan(df[c].values))
+            avg_df[c] = np.nansum(df[c].values * df['sales'].values) / np.sum(df['sales'].values)
         elif 'sales' in c:
             avg_df[c] = df[c].sum()
 

@@ -86,8 +86,6 @@ class GeneralInputsForEffects(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        # import numpy as np
-
         GeneralInputsForEffects._data.clear()
 
         if verbose:

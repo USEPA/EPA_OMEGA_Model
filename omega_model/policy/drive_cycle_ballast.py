@@ -126,7 +126,7 @@ class DriveCycleBallast(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         DriveCycleBallast._data.clear()
 

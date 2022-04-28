@@ -82,8 +82,6 @@ Data Column Name and Description
 **CODE**
 
 """
-import numpy as np
-import pandas as pd
 
 print('importing %s' % __file__)
 
@@ -161,7 +159,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
+                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
@@ -223,7 +221,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
+                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
@@ -285,7 +283,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             Copy of the requested cost cload data.
 
         """
-        import numpy as np
+
         from context.mass_scaling import MassScaling
         from policy.drive_cycle_ballast import DriveCycleBallast
         from context.powertrain_cost import PowertrainCost

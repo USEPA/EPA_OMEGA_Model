@@ -102,7 +102,7 @@ class Incentives(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         Incentives._data.clear()
 

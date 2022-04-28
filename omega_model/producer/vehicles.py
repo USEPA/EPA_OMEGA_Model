@@ -65,7 +65,7 @@ For example, a ``fueling_class:BEV:/:cert_direct_kwh_per_mile->onroad_direct_kwh
 **CODE**
 
 """
-import numpy as np
+
 
 print('importing %s' % __file__)
 
@@ -220,7 +220,7 @@ class VehicleAttributeCalculations(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         if clear_cache:
             VehicleAttributeCalculations._cache = dict()

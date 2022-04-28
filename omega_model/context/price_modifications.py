@@ -111,7 +111,7 @@ class PriceModifications(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         PriceModifications._data = pd.DataFrame()
 

@@ -31,8 +31,6 @@ Sample Data Columns
 **CODE**
 
 """
-import pandas as pd
-import numpy as np
 
 print('importing %s' % __file__)
 

@@ -431,7 +431,7 @@ class CreditBank(OMEGABase):
                         t = self.create_credit_transaction(credit)
                         t['credit_value_Mg'] = credit['ending_balance_Mg']
                         t['credit_destination'] = 'EXPIRATION'
-                        self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
+                        self.transaction_log = pd.concat([self.transaction_log, t])
                     last_years_credits = last_years_credits.drop(idx)
 
         ggh_debits = last_years_credits[last_years_credits['beginning_balance_Mg'] < 0]
@@ -446,10 +446,10 @@ class CreditBank(OMEGABase):
                     t = self.create_credit_transaction(debit)
                     t['credit_value_Mg'] = debit['ending_balance_Mg']
                     t['credit_destination'] = 'PAST_DUE'
-                    self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
+                    self.transaction_log = pd.concat([self.transaction_log, t])
                     last_years_credits = last_years_credits.drop(idx)
 
-        self.credit_bank = pd.DataFrame.append(self.credit_bank, last_years_credits)
+        self.credit_bank = pd.concat([self.credit_bank, last_years_credits])
 
     def handle_credit(self, calendar_year, beginning_balance_Mg):
         """
@@ -482,7 +482,7 @@ class CreditBank(OMEGABase):
 
         """
         new_credit = self.create_credit(calendar_year, self.compliance_id, beginning_balance_Mg)
-        self.credit_bank = pd.DataFrame.append(self.credit_bank, new_credit, ignore_index=True)
+        self.credit_bank = pd.concat([self.credit_bank, new_credit], ignore_index=True)
         new_credit = self.credit_bank.iloc[-1].copy()  # grab credit as a Series
 
         this_years_credits = self.credit_bank[self.credit_bank['calendar_year'] == calendar_year].copy()
@@ -536,7 +536,7 @@ class CreditBank(OMEGABase):
         t['credit_destination'] = debit['model_year']
         credit['ending_balance_Mg'] -= transaction_amount_Mg
         debit['ending_balance_Mg'] += transaction_amount_Mg
-        self.transaction_log = pd.DataFrame.append(self.transaction_log, t)
+        self.transaction_log = pd.concat([self.transaction_log, t])
         this_years_credits.loc[credit.name] = credit  # update credit
         this_years_credits.loc[debit.name] = debit  # update debit
         ManufacturerAnnualData.update_model_year_cert_co2e_Mg(debit['model_year'], debit['compliance_id'], -transaction_amount_Mg)

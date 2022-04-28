@@ -484,7 +484,7 @@ class SalesShare(OMEGABase, SalesShareBase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         SalesShare._data.clear()
 
