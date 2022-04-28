@@ -488,12 +488,32 @@ def create_composite_vehicles(calendar_year, compliance_id):
         Vehicle.reset_vehicle_ids()
 
         manufacturer_vehicles = []
-        # update each vehicle and calculate compliance target for each vehicle
+
+        start_time = time.time()
+
+        # transfer prior vehicle data to this year's vehicles
         for prior_veh in manufacturer_prior_vehicles:
             new_veh = Vehicle()
             transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
             manufacturer_vehicles.append(new_veh)
             new_veh.initial_registered_count = new_veh.base_year_market_share
+
+        if omega_globals.options.multiprocessing:
+            results = []
+            for new_veh in manufacturer_vehicles:
+                results.append(omega_globals.pool.apply_async(func=calc_vehicle_frontier,
+                                                              args=[new_veh],
+                                                              callback=None,
+                                                              error_callback=error_callback))
+
+            manufacturer_vehicles = [r.get() for r in results]
+        else:
+            for new_veh in manufacturer_vehicles:
+                cost_cloud = omega_globals.options.CostCloud.get_cloud(new_veh)
+                new_veh.cost_curve = new_veh.create_frontier_df(cost_cloud)
+                VehicleAttributeCalculations.perform_attribute_calculations(new_veh)
+
+        print('Created manufacturer_vehicles %.20f' % (time.time() - start_time))
 
         # sum([new_veh.base_year_market_share for new_veh in manufacturer_vehicles]) == 2.0 at this point due to
         # intentional duplicate entries for "alternative" powertrain vehicles, but "market_share" is used for relative
@@ -558,13 +578,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
 
         composite_vehicles = []
 
-        # for mc in mctrc:
-        #     for rc in omega_globals.options.RegulatoryClasses.reg_classes:
-        #         if mctrc[mc][rc]:
-        #             cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
-        #             cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
-        #             composite_vehicles.append(cv)
-
         if omega_globals.options.multiprocessing:
             results = []
             # start longest jobs first!
@@ -598,6 +611,13 @@ def create_composite_vehicles(calendar_year, compliance_id):
         context_based_total_sales = _cache[cache_key]['context_based_total_sales']
 
     return composite_vehicles, market_class_tree, context_based_total_sales
+
+
+def create_manufacturer_vehicles(calendar_year, manufacturer_vehicles, prior_veh):
+    new_veh = Vehicle()
+    transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
+    manufacturer_vehicles.append(new_veh)
+    new_veh.initial_registered_count = new_veh.base_year_market_share
 
 
 def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_vehicles, producer_decision):
