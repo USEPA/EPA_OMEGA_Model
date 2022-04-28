@@ -40,6 +40,14 @@ from effects.general_functions import dollar_adjustment_factor
 _cache = dict()
 
 
+def find_TRX(x):
+    return x.find('TRX')
+
+
+def get_trans(x):
+    return x['cost_curve_class'][x['trx_idx']:x['trx_idx_end']]
+
+
 class PowertrainCost(OMEGABase):
     """
     **Loads and provides access to powertrain cost data, provides methods to calculate powertrain costs.**
@@ -108,10 +116,12 @@ class PowertrainCost(OMEGABase):
         # powertrain costs for anything with a liquid fueled engine
         if powertrain_type in ['ICE', 'HEV', 'PHEV']:
 
-            pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(lambda x: x.find('TRX'))
+            # pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(lambda x: x.find('TRX'))
+            pkg_df['trx_idx'] = pkg_df['cost_curve_class'].apply(find_TRX)
             pkg_df['trx_idx_end'] = pkg_df['trx_idx'].values + 5
 
-            trans = pkg_df.apply(lambda x: x['cost_curve_class'][x['trx_idx']:x['trx_idx_end']], axis=1).values
+            # trans = pkg_df.apply(lambda x: x['cost_curve_class'][x['trx_idx']:x['trx_idx_end']], axis=1).values
+            trans = pkg_df.apply(get_trans, axis=1).values
 
             gasoline_flag = pkg_df['gas_fuel'].values
             diesel_flat = pkg_df['diesel_fuel'].values

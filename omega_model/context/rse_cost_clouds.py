@@ -87,6 +87,14 @@ print('importing %s' % __file__)
 
 from omega_model import *
 
+from context.mass_scaling import MassScaling
+from context.powertrain_cost import PowertrainCost
+from context.glider_cost import GliderCost
+
+from policy.drive_cycle_ballast import DriveCycleBallast
+
+from producer.vehicles import VehicleAttributeCalculations, Vehicle
+
 _cache = dict()
 
 # define list of non-numeric columns to ignore during frontier creation since they goof up pandas auto-typing of
@@ -284,15 +292,7 @@ class CostCloud(OMEGABase, CostCloudBase):
 
         """
 
-        from context.mass_scaling import MassScaling
-        from policy.drive_cycle_ballast import DriveCycleBallast
-        from context.powertrain_cost import PowertrainCost
-        from context.glider_cost import GliderCost
-        from producer.vehicles import VehicleAttributeCalculations, Vehicle
-        import copy
-
-        import time
-        start_time = time.time()
+        # start_time = time.time()
 
         # print('Generating Cost Cloud for %s' % vehicle.name)
 
@@ -323,8 +323,6 @@ class CostCloud(OMEGABase, CostCloudBase):
             rated_hp = vehicle.motor_kw * 1.34102
         else:  # HEVs / PHEVs... what to do about sizing...?
             rated_hp = vehicle.eng_rated_hp + vehicle.motor_kw * 1.34102
-
-        cost_cloud = pd.DataFrame()
 
         cloud_points = []  # build a list of dicts that will be dumped into the cloud at the end
                            # (faster than sequentially appending Series objects)

@@ -27,9 +27,10 @@ def context_new_vehicle_sales(calendar_year):
 
     """
     #  PHASE0: hauling/non, EV/ICE, We don't need shared/private for beta
-    from context.new_vehicle_market import NewVehicleMarket
 
     if calendar_year not in _cache:
+        from context.new_vehicle_market import NewVehicleMarket
+
         sales_dict = dict()
 
         if omega_globals.options.flat_context:
@@ -80,7 +81,6 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_n
     from context.new_vehicle_market import NewVehicleMarket
 
     if type(P) is list:
-
         P = np.array(P)
 
     if omega_globals.options.session_is_reference and isinstance(P, float) and \

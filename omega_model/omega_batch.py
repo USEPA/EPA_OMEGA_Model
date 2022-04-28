@@ -440,6 +440,7 @@ applied.
 print('importing %s' % __file__)
 
 import os, sys
+import copy
 
 # make sure top-level project folder is on the path (i.e. folder that contains omega_model)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -952,11 +953,9 @@ class OMEGASessionObject(OMEGABase):
             Nothing, updates ``self.settings``
 
         """
-        from copy import copy
-
         self.batch.batch_log.logwrite('Getting User settings...')
 
-        self.settings = copy(self.batch.settings)    # copy batch-level settings to session
+        self.settings = copy.copy(self.batch.settings)    # copy batch-level settings to session
 
         self.settings.session_name = self.name
         self.settings.session_unique_name = self.batch.name + '_' + self.name
@@ -1447,8 +1446,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
         batch.add_sessions(verbose=options.verbose)
 
-        import copy
-
         expanded_batch = copy.deepcopy(batch)
         expanded_batch.name = os.path.splitext(os.path.basename(options.batch_file))[0] + '_expanded' + \
                               os.path.splitext(options.batch_file)[1]
@@ -1620,7 +1617,6 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
             if options.dispy:  # run remote job on cluster, except for first job if generating context vehicle prices
                 dispy_session_list = session_list
 
-                import copy
                 # run reference case to generate vehicle prices then dispy the rest
                 run_bundled_sessions(options, remote_batchfile, [0])
                 dispy_session_list = dispy_session_list[1:]
