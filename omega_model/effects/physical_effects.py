@@ -15,38 +15,56 @@ import pandas as pd
 from omega_model import *
 
 
-def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
+def get_vehicle_emission_rate(model_year, reg_class_id, fuel, ind_var_name, ind_var_value, rate_name):
     """
 
     Args:
-        calendar_year: The calendar year for which a vehicle's emission factors are needed.
         model_year: The model year of the specific vehicle.
         reg_class_id: The regulatory class ID of the vehicle.
         fuel: The fuel ID (i.e., pump_gasoline, pump_diesel)
+        ind_var_dict: An independent variable dictionary of the form {'age': 10} or {'odometer': 75000}
+        rate_name: The emission rate to get.
 
     Returns:
         A list of emission factors as specified in the emission_factors list for the given model-year vehicle in a given calendar year.
 
     """
-    from effects.emission_factors_vehicles import EmissionFactorsVehicles
+    from effects.emission_rates_vehicles import EmissionRatesVehicles
 
-    emission_factors = ('voc_grams_per_mile',
-                        'co_grams_per_mile',
-                        'nox_grams_per_mile',
-                        'pm25_grams_per_mile',
-                        'sox_grams_per_gallon',
-                        'benzene_grams_per_mile',
-                        'butadiene13_grams_per_mile',
-                        'formaldehyde_grams_per_mile',
-                        'acetaldehyde_grams_per_mile',
-                        'acrolein_grams_per_mile',
-                        'ch4_grams_per_mile',
-                        'n2o_grams_per_mile',
-                        )
 
-    age = calendar_year - model_year
-
-    return EmissionFactorsVehicles.get_emission_factors(model_year, age, reg_class_id, fuel, emission_factors)
+    return EmissionRatesVehicles.get_emission_rate(model_year, reg_class_id, fuel, ind_var_name, ind_var_value, rate_name)
+# def get_vehicle_ef(calendar_year, model_year, reg_class_id, fuel):
+#     """
+#
+#     Args:
+#         calendar_year: The calendar year for which a vehicle's emission factors are needed.
+#         model_year: The model year of the specific vehicle.
+#         reg_class_id: The regulatory class ID of the vehicle.
+#         fuel: The fuel ID (i.e., pump_gasoline, pump_diesel)
+#
+#     Returns:
+#         A list of emission factors as specified in the emission_factors list for the given model-year vehicle in a given calendar year.
+#
+#     """
+#     from effects.emission_factors_vehicles import EmissionFactorsVehicles
+#
+#     emission_factors = ('voc_grams_per_mile',
+#                         'co_grams_per_mile',
+#                         'nox_grams_per_mile',
+#                         'pm25_grams_per_mile',
+#                         'sox_grams_per_gallon',
+#                         'benzene_grams_per_mile',
+#                         'butadiene13_grams_per_mile',
+#                         'formaldehyde_grams_per_mile',
+#                         'acetaldehyde_grams_per_mile',
+#                         'acrolein_grams_per_mile',
+#                         'ch4_grams_per_mile',
+#                         'n2o_grams_per_mile',
+#                         )
+#
+#     age = calendar_year - model_year
+#
+#     return EmissionFactorsVehicles.get_emission_factors(model_year, age, reg_class_id, fuel, emission_factors)
 
 
 def get_powersector_ef(calendar_year):
@@ -205,30 +223,28 @@ def calc_physical_effects(calendar_years):
                 liquid_fuel = None
                 electric_fuel = None
 
-                vmt_liquid_fuel = 0
-                vmt_electricity = 0
-                onroad_gallons_per_mile = 0
-                fuel_consumption_gallons = 0
-                fuel_consumption_kWh = 0
+                vmt_liquid_fuel = vmt_electricity \
+                    = onroad_gallons_per_mile = fuel_consumption_gallons = fuel_consumption_kWh = 0
 
-                voc_tailpipe_ustons = 0
-                co_tailpipe_ustons = 0
-                nox_tailpipe_ustons = 0
-                pm25_tailpipe_ustons = 0
-                so2_tailpipe_ustons = 0
-                benzene_tailpipe_ustons = 0
-                butadiene13_tailpipe_ustons = 0
-                formaldehyde_tailpipe_ustons = 0
-                acetaldehyde_tailpipe_ustons = 0
-                acrolein_tailpipe_ustons = 0
+                voc_tailpipe_ustons = co_tailpipe_ustons = nox_tailpipe_ustons = pm25_tailpipe_ustons \
+                    = so2_tailpipe_ustons = benzene_tailpipe_ustons = butadiene13_tailpipe_ustons \
+                    = formaldehyde_tailpipe_ustons = acetaldehyde_tailpipe_ustons = acrolein_tailpipe_ustons = 0
 
-                ch4_tailpipe_metrictons = 0
-                n2o_tailpipe_metrictons = 0
-                co2_tailpipe_metrictons = 0
+                pm25_brakewear_ustons = pm25_tirewear_ustons = 0
+                pm25_brakewear_l = pm25_brakewear_e = pm25_tirewear_l = pm25_tirewear_e = 0
+                
+                ch4_tailpipe_metrictons = n2o_tailpipe_metrictons = co2_tailpipe_metrictons = 0
 
-                voc_ps, co_ps, nox_ps, pm25_ps, sox_ps, benzene_ps, butadiene13_ps, formaldehyde_ps, acetaldehyde_ps, acrolein_ps, co2_ps, ch4_ps, n2o_ps, \
-                voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
-                    = 26 * [0]
+                voc_ps = co_ps = nox_ps = pm25_ps = sox_ps = benzene_ps = butadiene13_ps = formaldehyde_ps \
+                    = acetaldehyde_ps = acrolein_ps = co2_ps = ch4_ps = n2o_ps \
+                    = voc_ref = co_ref = nox_ref = pm25_ref = sox_ref = benzene_ref = butadiene13_ref = formaldehyde_ref \
+                    = acetaldehyde_ref = acrolein_ref = co2_ref = ch4_ref = n2o_ref \
+                    = 0
+
+                veh_rates_by = 'age'  # for now; set as an input if we want to; value can be 'age' or 'odometer'
+                ind_var_value = pd.to_numeric(vad['age'])
+                if veh_rates_by == 'odometer':
+                    ind_var_value = pd.to_numeric(vad['odometer'])
 
                 fuel_dict = Eval.eval(in_use_fuel_id, {'__builtins__': None}, {})
                 for fuel, fuel_share in fuel_dict.items():
@@ -242,6 +258,12 @@ def calc_physical_effects(calendar_years):
                         vmt_electricity = vad['vmt'] * fuel_share
                         fuel_consumption_kWh += vmt_electricity * onroad_direct_kwh_per_mile / transmission_efficiency
 
+                        # vehicle emission rates:
+                        pm25_brakewear_e = get_vehicle_emission_rate(model_year, base_year_reg_class_id, fuel, veh_rates_by,
+                                                                     ind_var_value, 'pm25_brakewear_grams_per_mile')
+                        pm25_tirewear_e = get_vehicle_emission_rate(model_year, base_year_reg_class_id, fuel, veh_rates_by,
+                                                                    ind_var_value, 'pm25_tirewear_grams_per_mile')
+
                         # upstream EGU emission factors for electric fuel operation
                         voc_ps, co_ps, nox_ps, pm25_ps, sox_ps, benzene_ps, butadiene13_ps, formaldehyde_ps, acetaldehyde_ps, acrolein_ps, co2_ps, ch4_ps, n2o_ps \
                             = get_powersector_ef(calendar_year)
@@ -253,29 +275,81 @@ def calc_physical_effects(calendar_years):
                         fuel_consumption_gallons = vad['vmt'] * onroad_gallons_per_mile / transmission_efficiency
 
                         # vehicle tailpipe emission factors for liquid fuel operation
-                        voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
-                            = get_vehicle_ef(calendar_year, model_year, base_year_reg_class_id, liquid_fuel)
+                        # voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
+                        #     = get_vehicle_ef(calendar_year, model_year, base_year_reg_class_id, liquid_fuel)
+
+                        # vehicle emission rates
+                        pm25_brakewear_l = get_vehicle_emission_rate(model_year, base_year_reg_class_id, fuel, veh_rates_by,
+                                                                     ind_var_value, 'pm25_brakewear_grams_per_mile')
+                        pm25_tirewear_l = get_vehicle_emission_rate(model_year, base_year_reg_class_id, fuel, veh_rates_by,
+                                                                    ind_var_value, 'pm25_tirewear_grams_per_mile')
+
+                        # vehicle tailpipe emission rates for liquid fuel operation
+                        veh_rates = {'voc': {'rate_name': 'voc_grams_per_mile', 'rate': 0},
+                                     'co': {'rate_name': 'co_grams_per_mile', 'rate': 0},
+                                     'nox': {'rate_name': 'nox_grams_per_mile', 'rate': 0},
+                                     'pm25_exhaust': {'rate_name': 'pm25_exhaust_grams_per_mile', 'rate': 0},
+                                     'so2': {'rate_name': 'so2_grams_per_gallon', 'rate': 0},
+                                     'benzene': {'rate_name': 'benzene_grams_per_mile', 'rate': 0},
+                                     'butadiene13': {'rate_name': 'butadiene13_grams_per_mile', 'rate': 0},
+                                     'formaldehyde': {'rate_name': 'formaldehyde_grams_per_mile', 'rate': 0},
+                                     'acetaldehyde': {'rate_name': 'acetaldehyde_grams_per_mile', 'rate': 0},
+                                     'acrolein': {'rate_name': 'acrolein_grams_per_mile', 'rate': 0},
+                                     'ch4': {'rate_name': 'ch4_grams_per_mile', 'rate': 0},
+                                     'n2o': {'rate_name': 'n2o_grams_per_mile', 'rate': 0},
+                                     }
+                        for pollutant, values in veh_rates.items():
+                            rate_name = values['rate_name']
+                            rate = get_vehicle_emission_rate(model_year, base_year_reg_class_id, fuel, veh_rates_by,
+                                                             ind_var_value, rate_name)
+                            veh_rates[pollutant]['rate'] = rate
 
                         # upstream refinery emission factors for liquid fuel operation
                         voc_ref, co_ref, nox_ref, pm25_ref, sox_ref, benzene_ref, butadiene13_ref, formaldehyde_ref, acetaldehyde_ref, acrolein_ref, co2_ref, ch4_ref, n2o_ref \
                             = get_refinery_ef(calendar_year, liquid_fuel)
 
                         # calc tailpipe emissions for liquid fuel operation
-                        voc_tailpipe_ustons += vmt_liquid_fuel * voc / grams_per_us_ton
-                        co_tailpipe_ustons += vmt_liquid_fuel * co / grams_per_us_ton
-                        nox_tailpipe_ustons += vmt_liquid_fuel * nox / grams_per_us_ton
-                        pm25_tailpipe_ustons += vmt_liquid_fuel * pm25 / grams_per_us_ton
-                        benzene_tailpipe_ustons += vmt_liquid_fuel * benzene / grams_per_us_ton
-                        butadiene13_tailpipe_ustons += vmt_liquid_fuel * butadiene13 / grams_per_us_ton
-                        formaldehyde_tailpipe_ustons += vmt_liquid_fuel * formaldehyde / grams_per_us_ton
-                        acetaldehyde_tailpipe_ustons += vmt_liquid_fuel * acetaldehyde / grams_per_us_ton
-                        acrolein_tailpipe_ustons += vmt_liquid_fuel * acrolein / grams_per_us_ton
+                        factor = vmt_liquid_fuel / grams_per_us_ton
+                        voc_tailpipe_ustons += veh_rates['voc']['rate'] * factor
+                        co_tailpipe_ustons += veh_rates['co']['rate'] * factor
+                        nox_tailpipe_ustons += veh_rates['nox']['rate'] * factor
+                        pm25_tailpipe_ustons += veh_rates['pm25_exhaust']['rate'] * factor
+                        benzene_tailpipe_ustons += veh_rates['benzene']['rate'] * factor
+                        butadiene13_tailpipe_ustons += veh_rates['butadiene13'][
+                                                           'rate'] * factor
+                        formaldehyde_tailpipe_ustons += veh_rates['formaldehyde'][
+                                                            'rate'] * factor
+                        acetaldehyde_tailpipe_ustons += veh_rates['acetaldehyde'][
+                                                            'rate'] * factor
+                        acrolein_tailpipe_ustons += veh_rates['acrolein']['rate'] * factor
 
-                        so2_tailpipe_ustons += fuel_consumption_gallons * sox / grams_per_us_ton
+                        so2_tailpipe_ustons += veh_rates['so2']['rate'] * fuel_consumption_gallons / grams_per_us_ton
 
-                        ch4_tailpipe_metrictons += vmt_liquid_fuel * ch4 / grams_per_metric_ton
-                        n2o_tailpipe_metrictons += vmt_liquid_fuel * n2o / grams_per_metric_ton
-                        co2_tailpipe_metrictons += vmt_liquid_fuel * onroad_direct_co2e_grams_per_mile / grams_per_metric_ton
+                        factor = vmt_liquid_fuel / grams_per_metric_ton
+                        ch4_tailpipe_metrictons += veh_rates['ch4']['rate'] * factor
+                        n2o_tailpipe_metrictons += veh_rates['n2o']['rate'] * factor
+                        co2_tailpipe_metrictons += onroad_direct_co2e_grams_per_mile * factor
+
+                # other vehicle emissions
+                pm25_brakewear_ustons += (vmt_liquid_fuel * pm25_brakewear_l + vmt_electricity * pm25_brakewear_e) \
+                                         / grams_per_us_ton
+                pm25_tirewear_ustons += (vmt_liquid_fuel * pm25_tirewear_l + vmt_electricity * pm25_tirewear_e) \
+                                        / grams_per_us_ton
+                        # voc_tailpipe_ustons += vmt_liquid_fuel * voc / grams_per_us_ton
+                        # co_tailpipe_ustons += vmt_liquid_fuel * co / grams_per_us_ton
+                        # nox_tailpipe_ustons += vmt_liquid_fuel * nox / grams_per_us_ton
+                        # pm25_tailpipe_ustons += vmt_liquid_fuel * pm25 / grams_per_us_ton
+                        # benzene_tailpipe_ustons += vmt_liquid_fuel * benzene / grams_per_us_ton
+                        # butadiene13_tailpipe_ustons += vmt_liquid_fuel * butadiene13 / grams_per_us_ton
+                        # formaldehyde_tailpipe_ustons += vmt_liquid_fuel * formaldehyde / grams_per_us_ton
+                        # acetaldehyde_tailpipe_ustons += vmt_liquid_fuel * acetaldehyde / grams_per_us_ton
+                        # acrolein_tailpipe_ustons += vmt_liquid_fuel * acrolein / grams_per_us_ton
+                        #
+                        # so2_tailpipe_ustons += fuel_consumption_gallons * sox / grams_per_us_ton
+                        #
+                        # ch4_tailpipe_metrictons += vmt_liquid_fuel * ch4 / grams_per_metric_ton
+                        # n2o_tailpipe_metrictons += vmt_liquid_fuel * n2o / grams_per_metric_ton
+                        # co2_tailpipe_metrictons += vmt_liquid_fuel * onroad_direct_co2e_grams_per_mile / grams_per_metric_ton
 
                 # calc upstream emissions for both liquid and electric fuel operation
                 kwhs, gallons = fuel_consumption_kWh, fuel_consumption_gallons
@@ -357,6 +431,8 @@ def calc_physical_effects(calendar_years):
                                              'co_tailpipe_ustons': co_tailpipe_ustons,
                                              'nox_tailpipe_ustons': nox_tailpipe_ustons,
                                              'pm25_tailpipe_ustons': pm25_tailpipe_ustons,
+                                             'pm25_brakewear_ustons': pm25_brakewear_ustons,
+                                             'pm25_tirewear_ustons': pm25_tirewear_ustons,
                                              'so2_tailpipe_ustons': so2_tailpipe_ustons,
                                              'benzene_tailpipe_ustons': benzene_tailpipe_ustons,
                                              'butadiene13_tailpipe_ustons': butadiene13_tailpipe_ustons,
