@@ -13,7 +13,7 @@ vehicle CO2e g/mi) and market shares that achieve a targeted certification outco
 
 from omega_model import *
 from producer.vehicles import DecompositionAttributes, cost_curve_interp_key
-import numpy as np
+
 import consumer
 
 _cache = dict()
@@ -181,7 +181,7 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
 
     """
     import time
-    # import numpy as np
+    #
     from common.omega_functions import partition, cartesian_prod
     from consumer.sales_volume import context_new_vehicle_sales
 

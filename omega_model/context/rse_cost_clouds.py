@@ -82,8 +82,6 @@ Data Column Name and Description
 **CODE**
 
 """
-import numpy as np
-import pandas as pd
 
 print('importing %s' % __file__)
 
@@ -285,7 +283,7 @@ class CostCloud(OMEGABase, CostCloudBase):
             Copy of the requested cost cload data.
 
         """
-        import numpy as np
+
         from context.mass_scaling import MassScaling
         from policy.drive_cycle_ballast import DriveCycleBallast
         from context.powertrain_cost import PowertrainCost

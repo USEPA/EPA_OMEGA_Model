@@ -97,7 +97,7 @@ class ImplictPriceDeflators(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         ImplictPriceDeflators._data.clear()
 

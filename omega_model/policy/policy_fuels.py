@@ -119,7 +119,7 @@ class PolicyFuel(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         PolicyFuel._data.clear()
 

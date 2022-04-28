@@ -157,7 +157,7 @@ def _validate_dataframe_column(df, column_name, allowed_values, header_lines=2):
         Empty list on success or list of errors on failure
 
     """
-    import numpy as np
+
 
     error_list = []
 

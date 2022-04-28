@@ -155,7 +155,7 @@ class ProductionConstraints(OMEGABase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         ProductionConstraints._data = pd.DataFrame()
 

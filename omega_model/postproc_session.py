@@ -168,7 +168,7 @@ def plot_effects(calendar_years, physical_effects_df):
         dict of physical effects data for the vehicle stock aggregated by calendar year
 
     """
-    import numpy as np
+
 
     physical_effects = dict()
 

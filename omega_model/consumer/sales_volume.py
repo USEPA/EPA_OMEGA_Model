@@ -80,7 +80,7 @@ def new_vehicle_sales_response(calendar_year, compliance_id, P, update_context_n
     from context.new_vehicle_market import NewVehicleMarket
 
     if type(P) is list:
-        import numpy as np
+
         P = np.array(P)
 
     if omega_globals.options.session_is_reference and isinstance(P, float) and \

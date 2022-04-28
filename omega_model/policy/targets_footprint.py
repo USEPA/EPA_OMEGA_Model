@@ -171,7 +171,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             Target CO2e Mg value(s) for the given vehicle and/or sales variants.
 
         """
-        import numpy as np
+
         from policy.incentives import Incentives
 
         start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
@@ -217,7 +217,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             Cert CO2e Mg value(s) for the given vehicle, CO2e g/mi variants and/or sales variants.
 
         """
-        import numpy as np
+
         from policy.incentives import Incentives
 
         start_years = VehicleTargets._data[vehicle.reg_class_id]['start_year']
@@ -259,7 +259,7 @@ class VehicleTargets(OMEGABase, VehicleTargetsBase):
             List of template/input errors, else empty list on success
 
         """
-        import numpy as np
+
 
         VehicleTargets._data.clear()
 
