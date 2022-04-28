@@ -8,6 +8,8 @@
 """
 print('importing %s' % __file__)
 
+import re
+
 
 def make_valid_python_identifier(s):
     """
@@ -20,8 +22,6 @@ def make_valid_python_identifier(s):
         A valid python identifier based on the source string
 
     """
-    import re
-
     s = s.replace(' ', '_')  # personal preference, spaces as underscores instead of deletes
 
     # Remove invalid characters

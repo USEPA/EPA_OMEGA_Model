@@ -38,6 +38,7 @@ try:
     pd.set_option('chained_assignment', 'raise')
     from pandas.api.types import is_numeric_dtype
     import numpy as np
+    import copy
 
     from common.omega_globals import *
     from common.omega_types import *
