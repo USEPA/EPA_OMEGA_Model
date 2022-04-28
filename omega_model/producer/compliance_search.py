@@ -10,11 +10,25 @@ vehicle CO2e g/mi) and market shares that achieve a targeted certification outco
 
 """
 
+import time
+import pandas as pd
+import numpy as np
 
-from omega_model import *
-from producer.vehicles import DecompositionAttributes, cost_curve_interp_key
+from common import omega_globals, omega_log
 
-import consumer
+from producer.vehicles import *
+from common.omega_functions import *
+
+from consumer.sales_volume import context_new_vehicle_sales
+
+from context.production_constraints import ProductionConstraints
+from context.new_vehicle_market import NewVehicleMarket
+
+from policy.required_sales_share import RequiredSalesShare
+
+from producer.manufacturer_annual_data import ManufacturerAnnualData
+
+import matplotlib.pyplot as plt
 
 _cache = dict()
 
@@ -53,9 +67,6 @@ def create_tech_sweeps(composite_vehicles, candidate_production_decisions, share
         A dataframe containing a range of composite vehicle CO2e g/mi options factorially combined
 
     """
-    import time
-    from common.omega_functions import cartesian_prod
-
     child_df_list = []
 
     start_time = time.time()
@@ -180,11 +191,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
         A dataframe containing a range of market share options factorially combined
 
     """
-    import time
-    #
-    from common.omega_functions import partition, cartesian_prod
-    from consumer.sales_volume import context_new_vehicle_sales
-
     child_df_list = []
 
     children = list(market_class_dict)
@@ -211,8 +217,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
             share_column_names = [producer_prefix + c for c in children]
 
         if all(s in omega_globals.options.MarketClass.responsive_market_categories for s in children):
-            from context.production_constraints import ProductionConstraints
-            from policy.required_sales_share import RequiredSalesShare
 
             min_constraints = dict()
             max_constraints = dict()
@@ -231,7 +235,6 @@ def create_share_sweeps(calendar_year, market_class_dict, candidate_production_d
                                            min_constraints=min_constraints, max_constraints=max_constraints)
             else:
                 # narrow search span to a range of shares around the winners
-                from common.omega_functions import generate_constrained_nearby_shares
                 sales_share_df = \
                     generate_constrained_nearby_shares(share_column_names, candidate_production_decisions,
                                                        share_range,
@@ -288,10 +291,6 @@ def apply_production_decision_to_composite_vehicles(composite_vehicles, selected
         A list of updated `CompositeVehicle`` objects
 
     """
-    import copy
-
-    composite_vehicles = copy.deepcopy(composite_vehicles)
-    from producer.vehicles import VehicleAttributeCalculations
 
     # assign co2 values and sales to vehicles...
     for cv in composite_vehicles:
@@ -450,8 +449,6 @@ def search_production_options(compliance_id, calendar_year, producer_decision_an
 
 
 def update_vehicles(calendar_year, prior_veh, vehicle_id=None):
-    from producer.vehicles import Vehicle, transfer_vehicle_data
-
     new_veh = Vehicle(vehicle_id=vehicle_id)
     transfer_vehicle_data(prior_veh, new_veh, model_year=calendar_year)
     new_veh.initial_registered_count = new_veh.base_year_market_share
@@ -460,8 +457,6 @@ def update_vehicles(calendar_year, prior_veh, vehicle_id=None):
 
 
 def calc_composite_vehicles(mc, rc, mctrc):
-    from producer.vehicles import CompositeVehicle
-
     cv = CompositeVehicle(mctrc[mc][rc], vehicle_id='%s.%s' % (mc, rc), weight_by='base_year_market_share')
     cv.composite_vehicle_share_frac = cv.initial_registered_count / mctrc[mc]['sales']
 
@@ -484,9 +479,6 @@ def create_composite_vehicles(calendar_year, compliance_id):
         ``compliance_id``)
 
     """
-    from producer.vehicles import VehicleFinal, Vehicle, CompositeVehicle, transfer_vehicle_data
-    from consumer.sales_volume import context_new_vehicle_sales
-    from context.new_vehicle_market import NewVehicleMarket
 
     cache_key = calendar_year
     if cache_key not in _cache:
@@ -624,8 +616,6 @@ def finalize_production(calendar_year, compliance_id, candidate_mfr_composite_ve
         Nothing, updates the OMEGA database with the finalized vehicles
 
     """
-    from producer.manufacturer_annual_data import ManufacturerAnnualData
-    from producer.vehicles import VehicleFinal, transfer_vehicle_data
 
     manufacturer_new_vehicles = []
 
@@ -812,7 +802,6 @@ def _plot_tech_share_combos_total(calendar_year, production_options):
         production_options (DataFrame): dataframe of the production options, including compliance outcomes in Mg
 
     """
-    import matplotlib.pyplot as plt
     plt.figure()
     plt.plot(production_options['total_cert_co2e_megagrams'],
              production_options['total_cost_dollars'], '.')
