@@ -82,6 +82,8 @@ from common.omega_functions import weighted_value
 from context.fuel_prices import FuelPrice
 from context.onroad_fuels import OnroadFuel
 
+from producer.vehicle_annual_data import VehicleAnnualData
+
 cost_curve_interp_key = 'credits_co2e_Mg_per_vehicle'  # was 'cert_co2e_grams_per_mile'
 
 
@@ -1132,7 +1134,6 @@ class VehicleFinal(SQABase, Vehicle):
             Nothing, updates vehicle initial registered count
 
         """
-        from producer.vehicle_annual_data import VehicleAnnualData
         self._initial_registered_count = initial_registered_count
 
         omega_globals.session.add(self)  # update database so vehicle_annual_data foreign key succeeds...
