@@ -413,6 +413,9 @@ def calc_annual_physical_effects(input_df):
         A DataFrame of physical effects by calendar year.
 
     """
+    input_attributes_list = ['grams_per_metric_ton']
+    grams_per_metric_ton = get_inputs_for_effects(*input_attributes_list)
+
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
     additional_attributes = ['count', 'consumption', 'barrels', 'tons']
     for additional_attribute in additional_attributes:
@@ -437,5 +440,17 @@ def calc_annual_physical_effects(input_df):
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
     return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_gallons_per_mile',
+                     return_df['fuel_consumption_gallons'] / return_df['vmt_liquid_fuel'])
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_direct_kwh_per_mile',
+                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_direct_co2e_grams_per_mile',
+                     return_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / return_df['vmt_liquid_fuel'])
 
     return return_df
