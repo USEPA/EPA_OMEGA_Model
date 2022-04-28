@@ -1656,14 +1656,14 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
                             annual_physical_effects_filename = options.batch_path + '_' \
                                                                + batch.sessions[s_index].settings.output_folder \
                                                                + batch.sessions[s_index].settings.session_unique_name \
-                                                               + '_annual_physical_effects.csv'
+                                                               + '_physical_effects_annual.csv'
                             annual_physical_effects_dfs.append(pd.read_csv(annual_physical_effects_filename))
 
                         if 'Costs' in options.calc_effects:
                             apa_cost_effects_filename = options.batch_path + '_' \
                                                         + batch.sessions[s_index].settings.output_folder \
                                                         + batch.sessions[s_index].settings.session_unique_name \
-                                                        + '_annual_present_and_annualized_cost_effects.csv'
+                                                        + '_cost_effects_annual_present_and_annualized.csv'
                             apa_cost_effects_dfs.append(pd.read_csv(apa_cost_effects_filename))
 
                 batch_summary_df = pd.concat(session_summary_dfs, ignore_index=True, sort=False)
@@ -1672,12 +1672,12 @@ def run_omega_batch(no_validate=False, no_sim=False, bundle_path=None, no_bundle
 
                 if 'Physical' in options.calc_effects:
                     batch_annual_physical_effects_df = pd.concat(annual_physical_effects_dfs, ignore_index=True, sort=False)
-                    batch_annual_physical_effects_filename = batch.name + '_annual_physical_effects.csv'
+                    batch_annual_physical_effects_filename = batch.name + '_physical_effects_annual.csv'
                     batch_annual_physical_effects_df.to_csv(batch_annual_physical_effects_filename, index=False)
 
                 if 'Costs' in options.calc_effects:
                     batch_apa_cost_effects_df = pd.concat(apa_cost_effects_dfs, ignore_index=True, sort=False)
-                    batch_apa_cost_effects_filename = batch.name + '_annual_present_and_annualized_cost_effects.csv'
+                    batch_apa_cost_effects_filename = batch.name + '_cost_effects_annual_present_and_annualized.csv'
                     batch_apa_cost_effects_df.to_csv(batch_apa_cost_effects_filename, index=False)
 
 
