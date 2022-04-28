@@ -10,6 +10,8 @@ and then to calculate from them the pollutant inventories, including fuel consum
 **CODE**
 
 """
+import pandas as pd
+
 from omega_model import *
 
 
@@ -427,6 +429,45 @@ def calc_annual_physical_effects(input_df):
     return_df = input_df[[*groupby_cols, *attributes]]
     return_df = return_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
 
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_gallons_per_mile',
+                     return_df['fuel_consumption_gallons'] / return_df['vmt_liquid_fuel'])
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_direct_kwh_per_mile',
+                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_direct_co2e_grams_per_mile',
+                     return_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / return_df['vmt_liquid_fuel'])
+
+    attributes += ['onroad_gallons_per_mile',
+                   'onroad_direct_kwh_per_mile',
+                   'onroad_direct_co2e_grams_per_mile']
+
+    # groupby calendar year and regclass
+    groupby_cols = ['session_name', 'calendar_year', 'reg_class_id']
+    yr_rc_df = input_df[[*groupby_cols, *attributes]]
+    yr_rc_df = yr_rc_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    yr_rc_df.insert(yr_rc_df.columns.get_loc('reg_class_id') + 1, 'fueling_class', 'ALL')
+    
+    yr_rc_df['onroad_gallons_per_mile'] = yr_rc_df['fuel_consumption_gallons'] / yr_rc_df['vmt']
+    yr_rc_df['onroad_direct_kwh_per_mile'] = yr_rc_df['fuel_consumption_kWh'] / yr_rc_df['vmt']
+    yr_rc_df['onroad_direct_co2e_grams_per_mile'] = yr_rc_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / yr_rc_df['vmt']
+
+    # groupby calendar year
+    groupby_cols = ['session_name', 'calendar_year']
+    yr_df = input_df[[*groupby_cols, *attributes]]
+    yr_df = yr_df.groupby(by=groupby_cols, axis=0, as_index=False).sum()
+    yr_df.insert(yr_df.columns.get_loc('calendar_year') + 1, 'fueling_class', 'ALL')
+    yr_df.insert(yr_df.columns.get_loc('calendar_year') + 1, 'reg_class_id', 'ALL')
+
+    yr_df['onroad_gallons_per_mile'] = yr_df['fuel_consumption_gallons'] / yr_df['vmt']
+    yr_df['onroad_direct_kwh_per_mile'] = yr_df['fuel_consumption_kWh'] / yr_df['vmt']
+    yr_df['onroad_direct_co2e_grams_per_mile'] = yr_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / yr_df['vmt']
+
+    return_df = pd.concat([return_df, yr_rc_df, yr_df], axis=0, ignore_index=True)
+
     # calc additional attributes
     input_attributes_list = ['gallons_of_gasoline_us_annual', 'bbl_oil_us_annual', 'kwh_us_annual', 'year_for_compares']
 
@@ -440,17 +481,5 @@ def calc_annual_physical_effects(input_df):
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
     return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
-
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
-                     'onroad_gallons_per_mile',
-                     return_df['fuel_consumption_gallons'] / return_df['vmt_liquid_fuel'])
-
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
-                     'onroad_direct_kwh_per_mile',
-                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
-
-    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
-                     'onroad_direct_co2e_grams_per_mile',
-                     return_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / return_df['vmt_liquid_fuel'])
 
     return return_df

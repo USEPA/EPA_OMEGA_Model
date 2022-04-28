@@ -96,7 +96,7 @@ def run_effects_calcs():
         if not omega_globals.options.multiprocessing:
             print('Saving Annual Physical Effects...')
             annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
-                                               f'{omega_globals.options.session_unique_name}_annual_physical_effects.csv'
+                                               f'{omega_globals.options.session_unique_name}_physical_effects_annual.csv'
 
             annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
             annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
@@ -127,7 +127,7 @@ def run_effects_calcs():
             present_and_annualized_dict = calc_present_and_annualized_values(cost_effects_dict, calendar_years)
 
             present_and_annualized_filename = f'{omega_globals.options.output_folder}' + \
-                                              f'{omega_globals.options.session_unique_name}_annual_present_and_annualized_cost_effects.csv'
+                                              f'{omega_globals.options.session_unique_name}_cost_effects_annual_present_and_annualized.csv'
 
             present_and_annualized_cost_df = \
                 save_dict_to_csv(present_and_annualized_dict, present_and_annualized_filename, index=False)
@@ -155,7 +155,7 @@ def run_effects_calcs():
         if 'Physical' in omega_globals.options.calc_effects:
             print('Saving Annual Physical Effects...')
             annual_physical_effects_filename = f'{omega_globals.options.output_folder}' + \
-                                               f'{omega_globals.options.session_unique_name}_annual_physical_effects.csv'
+                                               f'{omega_globals.options.session_unique_name}_physical_effects_annual.csv'
 
             annual_physical_effects_df = calc_annual_physical_effects(physical_effects_df)
             annual_physical_effects_df.to_csv(annual_physical_effects_filename, index=False)
