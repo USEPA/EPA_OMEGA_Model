@@ -24,7 +24,7 @@ from PySide2.QtGui import QIcon, QColor, QTextOption
 from PySide2.QtWidgets import QWidget, QMessageBox
 # from playsound import playsound
 
-# PyCharm indicates the next statement is not used but is needed for the compile to satisfy PySide2.QtUiTools.
+# PyCharm indicates the next statement is not used but is needed for the compile process to satisfy PySide2.QtUiTools.
 import PySide2.QtXml
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication
