@@ -161,7 +161,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
+                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')
@@ -223,7 +223,7 @@ class CostCloud(OMEGABase, CostCloudBase):
                 # for each cost curve class
                 for cost_curve_class in cost_curve_classes:
                     class_cloud = df[df['cost_curve_class'] == cost_curve_class].iloc[0]
-                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series()}
+                    _cache[powertrain_type][cost_curve_class] = {'rse': dict(), 'tech_flags': pd.Series(dtype='float64')}
 
                     for c in rse_columns:
                         _cache[powertrain_type][cost_curve_class]['rse'][c] = compile(class_cloud[c], '<string>', 'eval')

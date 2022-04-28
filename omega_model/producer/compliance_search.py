@@ -933,7 +933,7 @@ def select_candidate_manufacturing_decisions(production_options, calendar_year, 
             best_compliant_tech_share_option = lowest_cost_compliant_tech_share_option
 
         candidate_production_decisions = \
-            pd.DataFrame.append(best_compliant_tech_share_option, best_non_compliant_tech_share_option)
+            pd.concat([best_compliant_tech_share_option, best_non_compliant_tech_share_option])
 
     elif compliant_tech_share_options.empty:
         # grab best non-compliant option (least under-compliance)

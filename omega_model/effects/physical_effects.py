@@ -188,12 +188,12 @@ def calc_physical_effects(calendar_years):
                               'onroad_direct_kwh_per_mile']
 
             # need vehicle info once for each vehicle, not every calendar year for each vehicle
-            if vad.vehicle_id not in vehicle_info_dict:
-                vehicle_info_dict[vad.vehicle_id] = VehicleFinal.get_vehicle_attributes(vad.vehicle_id, attribute_list)
+            if vad['vehicle_id'] not in vehicle_info_dict:
+                vehicle_info_dict[vad['vehicle_id']] = VehicleFinal.get_vehicle_attributes(vad['vehicle_id'], attribute_list)
 
             mfr_id, name, model_year, base_year_reg_class_id, reg_class_id, in_use_fuel_id, fueling_class, \
             powertrain_type, target_co2e_grams_per_mile, onroad_direct_co2e_grams_per_mile, onroad_direct_kwh_per_mile \
-                = vehicle_info_dict[vad.vehicle_id]
+                = vehicle_info_dict[vad['vehicle_id']]
 
             # need vehicle effects for each vehicle and for each calendar year since they change year-over-year
             vehicle_effects_dict = dict()
@@ -237,7 +237,7 @@ def calc_physical_effects(calendar_years):
                     # calc fuel consumption and get emission factors
                     if fuel == 'US electricity' and onroad_direct_kwh_per_mile:
                         electric_fuel = fuel
-                        vmt_electricity = vad.vmt * fuel_share
+                        vmt_electricity = vad['vmt'] * fuel_share
                         fuel_consumption_kWh += vmt_electricity * onroad_direct_kwh_per_mile / transmission_efficiency
 
                         # upstream EGU emission factors for electric fuel operation
@@ -246,9 +246,9 @@ def calc_physical_effects(calendar_years):
 
                     elif fuel != 'US electricity' and onroad_direct_co2e_grams_per_mile:
                         liquid_fuel = fuel
-                        vmt_liquid_fuel = vad.vmt * fuel_share
+                        vmt_liquid_fuel = vad['vmt'] * fuel_share
                         onroad_gallons_per_mile += onroad_direct_co2e_grams_per_mile / co2_emissions_grams_per_unit
-                        fuel_consumption_gallons = vad.vmt * onroad_gallons_per_mile / transmission_efficiency
+                        fuel_consumption_gallons = vad['vmt'] * onroad_gallons_per_mile / transmission_efficiency
 
                         # vehicle tailpipe emission factors for liquid fuel operation
                         voc, co, nox, pm25, sox, benzene, butadiene13, formaldehyde, acetaldehyde, acrolein, ch4, n2o \
@@ -321,21 +321,21 @@ def calc_physical_effects(calendar_years):
                     flag = 1
 
                 vehicle_effects_dict.update({'session_name': omega_globals.options.session_name,
-                                             'vehicle_id': int(vad.vehicle_id),
+                                             'vehicle_id': int(vad['vehicle_id']),
                                              'manufacturer_id': mfr_id,
                                              'name': name,
                                              'calendar_year': int(calendar_year),
-                                             'model_year': calendar_year - vad.age,
-                                             'age': int(vad.age),
+                                             'model_year': calendar_year - vad['age'],
+                                             'age': int(vad['age']),
                                              'base_year_reg_class_id': base_year_reg_class_id,
                                              'reg_class_id': reg_class_id,
                                              'in_use_fuel_id': in_use_fuel_id,
                                              'fueling_class': fueling_class,
                                              'powertrain_type': powertrain_type,
-                                             'registered_count': vad.registered_count,
-                                             'annual_vmt': vad.annual_vmt,
-                                             'odometer': vad.odometer,
-                                             'vmt': vad.vmt,
+                                             'registered_count': vad['registered_count'],
+                                             'annual_vmt': vad['annual_vmt'],
+                                             'odometer': vad['odometer'],
+                                             'vmt': vad['vmt'],
                                              'vmt_liquid_fuel': vmt_liquid_fuel,
                                              'vmt_electricity': vmt_electricity,
                                              'onroad_direct_co2e_grams_per_mile': onroad_direct_co2e_grams_per_mile,
@@ -397,7 +397,7 @@ def calc_physical_effects(calendar_years):
                                              }
                                             )
             if flag:
-                key = (int(vad.vehicle_id), int(calendar_year), int(vad.age))
+                key = (int(vad['vehicle_id']), int(calendar_year), int(vad['age']))
                 calendar_year_effects_dict[key] = vehicle_effects_dict
         physical_effects_dict.update(calendar_year_effects_dict)
     return physical_effects_dict
@@ -413,6 +413,9 @@ def calc_annual_physical_effects(input_df):
         A DataFrame of physical effects by calendar year.
 
     """
+    input_attributes_list = ['grams_per_metric_ton']
+    grams_per_metric_ton = get_inputs_for_effects(*input_attributes_list)
+
     attributes = [col for col in input_df.columns if ('vmt' in col or 'vmt_' in col) and '_vmt' not in col]
     additional_attributes = ['count', 'consumption', 'barrels', 'tons']
     for additional_attribute in additional_attributes:
@@ -437,5 +440,17 @@ def calc_annual_physical_effects(input_df):
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_kWh', share_of_us_annual_kwh)
     return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1, f'share_of_{year_for_compares}_US_gasoline', share_of_us_annual_gasoline)
     return_df.insert(return_df.columns.get_loc('barrels_of_oil') + 1, f'share_of_{year_for_compares}_US_oil', share_of_us_annual_oil)
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_gallons_per_mile',
+                     return_df['fuel_consumption_gallons'] / return_df['vmt_liquid_fuel'])
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_direct_kwh_per_mile',
+                     return_df['fuel_consumption_kWh'] / return_df['vmt_electricity'])
+
+    return_df.insert(return_df.columns.get_loc('fuel_consumption_kWh') + 1,
+                     'onroad_direct_co2e_grams_per_mile',
+                     return_df['co2_tailpipe_metrictons'] * grams_per_metric_ton / return_df['vmt_liquid_fuel'])
 
     return return_df

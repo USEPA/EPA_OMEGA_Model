@@ -46,7 +46,7 @@ class TechTracking(OMEGABase):
             vads = VehicleAnnualData.get_vehicle_annual_data(calendar_year)
 
             for vad in vads:
-                vehicle_id, age, registered_count = vad.vehicle_id, vad.age, vad.registered_count
+                vehicle_id, age, registered_count = vad['vehicle_id'], vad['age'], vad['registered_count']
                 key = vehicle_id, int(calendar_year), int(age)
 
                 if vehicle_id not in new_vehicle_info_dict:
@@ -198,7 +198,7 @@ class TechTracking(OMEGABase):
 # 
 #         for vad in vads:
 # 
-#             vehicle_id, age, registered_count = vad.vehicle_id, vad.age, vad.registered_count
+#             vehicle_id, age, registered_count = vad['vehicle_id'], vad['age'], vad['registered_count']
 #             key = vehicle_id, int(calendar_year), int(age)
 # 
 #             if vehicle_id not in new_vehicle_info_dict:

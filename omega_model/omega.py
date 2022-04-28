@@ -372,8 +372,11 @@ def calc_cross_subsidy_metrics(mcat, cross_subsidy_pair, producer_decision, cros
         abs(1 - _cross_subsidy_options_and_response['average_cross_subsidized_price_%s' % mcat] /
             _cross_subsidy_options_and_response['average_new_vehicle_mfr_cost_%s' % mcat])
 
-    cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
-        _cross_subsidy_options_and_response.values()
+    # cross_subsidy_options_and_response[list(_cross_subsidy_options_and_response.keys())] = \
+    #     _cross_subsidy_options_and_response.values()
+    # TODO: the above used to work... now it throws an error
+    for k, v in _cross_subsidy_options_and_response.items():
+        cross_subsidy_options_and_response[k] = v
 
 
 def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_decision_and_response,
@@ -430,7 +433,7 @@ def iterate_producer_cross_subsidy(calendar_year, compliance_id, best_producer_d
 
     duplicate_columns = set.intersection(set(producer_decision.index), set(cross_subsidy_options_and_response.index))
     producer_decision = producer_decision.drop(duplicate_columns)
-    producer_decision_and_response = producer_decision.append(cross_subsidy_options_and_response)
+    producer_decision_and_response = pd.concat([producer_decision, cross_subsidy_options_and_response])
 
     producer_decision_and_response['cross_subsidy_iteration_num'] = producer_consumer_iteration_num
 
@@ -1317,6 +1320,8 @@ def init_omega(session_runtime_options):
 
         init_fail += GliderCost.init_from_file(omega_globals.options.glider_cost_input_file,
                                                verbose=verbose_init)
+
+        init_fail += VehicleAnnualData.init_vehicle_annual_data()
 
         if not init_fail:
             init_fail += VehicleAggregation.init_from_file(omega_globals.options.vehicles_file,
