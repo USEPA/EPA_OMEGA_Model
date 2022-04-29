@@ -62,7 +62,7 @@ class EmissionRatesVehicles(OMEGABase):
     _cache = dict()
 
     @staticmethod
-    def get_emission_rate(model_year, reg_class_id, in_use_fuel_id, ind_var_name, independent_variable, rate_name):
+    def get_emission_rate(model_year, reg_class_id, in_use_fuel_id, ind_var_name, independent_variable, *rate_names):
         """
 
         Args:
@@ -70,30 +70,33 @@ class EmissionRatesVehicles(OMEGABase):
             reg_class_id (str): the regulatory class, e.g., 'car' or 'truck'
             in_use_fuel_id (str): the liquid fuel ID, e.g., 'pump gasoline'
             ind_var_dict (dictionary): the independent_variable and value e.g., {'age': 10} or {'odometer': 75000}).
-            rate_name: name of emission rate to get
+            rate_names: name of emission rate to get
 
         Returns:
             The emission rate or list of emission rates
 
         """
         locals_dict = locals()
-        cache_key = (model_year, reg_class_id, in_use_fuel_id, rate_name, ind_var_name)
         rate = 0
-        rate_name_keys = [k for k in EmissionRatesVehicles._data.keys()
-                          if k[1] == reg_class_id
-                          and k[2] == in_use_fuel_id
-                          and k[3] == rate_name
-                          and k[4] == ind_var_name]
-        if cache_key not in EmissionRatesVehicles._cache:
-            max_start_year = max([k[0] for k in rate_name_keys])
-            year = min(model_year, max_start_year)
-            rate = eval(EmissionRatesVehicles._data[year, reg_class_id, in_use_fuel_id, rate_name, ind_var_name]['equation'], {},
-                        locals_dict)
-            EmissionRatesVehicles._cache[cache_key] = rate
-        else:
-            rate = EmissionRatesVehicles._cache[cache_key]
+        return_rates = list()
+        for rate_name in rate_names:
+            cache_key = (model_year, reg_class_id, in_use_fuel_id, rate_name, ind_var_name)
+            if cache_key not in EmissionRatesVehicles._cache:
+                rate_name_keys = [k for k in EmissionRatesVehicles._data.keys()
+                                  if k[1] == reg_class_id
+                                  and k[2] == in_use_fuel_id
+                                  and k[3] == rate_name
+                                  and k[4] == ind_var_name]
+                max_start_year = max([k[0] for k in rate_name_keys])
+                year = min(model_year, max_start_year)
+                rate = eval(EmissionRatesVehicles._data[year, reg_class_id, in_use_fuel_id, rate_name, ind_var_name]['equation'], {},
+                            locals_dict)
+                EmissionRatesVehicles._cache[cache_key] = rate
+            else:
+                rate = EmissionRatesVehicles._cache[cache_key]
+            return_rates.append(rate)
 
-        return rate
+        return return_rates
 
     @staticmethod
     def init_from_file(filename, verbose=False):
