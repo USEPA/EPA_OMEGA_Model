@@ -23,7 +23,7 @@ class InputFiles(OMEGABase):
             description (str): target template description (optional)
 
         Returns:
-            Updates input_file_dict with {template_name: description}
+            Updates InputFiles._data with template name and description information.
 
         """
         InputFiles._data[template_name] = {'template': template_name,
