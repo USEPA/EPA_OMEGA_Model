@@ -13,6 +13,7 @@ Used during the initialization process.
 print('importing %s' % __file__)
 
 from omega_model import *
+from omega_model.input_files import InputFiles
 
 import pandas as pd
 
@@ -51,6 +52,31 @@ def get_template_name(filename):
         template_name = version_data[name_index + 1]
 
     return template_name
+
+
+def get_description(template_name, filename):
+    """
+    Get input file template name.  Can be used to identify the type of input file during simulation initialization
+    when more than one type of input file may be provided (e.g. various GHG standards).
+
+    Args:
+        template_name (str): target template name
+        filename (str): name of the file from which to get the input template name
+
+    Returns:
+        Nothing; updates input_files.InputFiles._data
+
+    """
+    # read first row of input file as list of values
+    version_data = pd.read_csv(filename, header=None, nrows=1).values.tolist()[0]
+    if 'description:' not in version_data:
+        description = None
+    else:
+        description_index = version_data.index('description:')
+        description = version_data[description_index + 1]
+    InputFiles.update_input_files_dict(template_name, description)
+
+    return
 
 
 def validate_template_version_info(filename, input_template_name, input_template_version, verbose=False):
@@ -103,6 +129,9 @@ def validate_template_version_info(filename, input_template_name, input_template
         omega_log.logwrite(error_list)
     elif verbose:
         omega_log.logwrite('')
+
+    if 'description:' in version_data:
+        get_description(template_name, filename)
 
     return error_list
 

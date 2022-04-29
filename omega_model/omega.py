@@ -1174,6 +1174,7 @@ def init_omega(session_runtime_options):
     init_fail += init_user_definable_submodules()
 
     # import database modules to populate ORM metadata
+    from omega_model.input_files import InputFiles
     from context.onroad_fuels import OnroadFuel
     from context.fuel_prices import FuelPrice
     from context.new_vehicle_market import NewVehicleMarket
@@ -1230,6 +1231,8 @@ def init_omega(session_runtime_options):
         # load remaining input data
 
         init_sales_volume()
+
+        init_fail += InputFiles().init_input_files()
 
         init_fail += omega_globals.options.MarketClass.init_from_file(omega_globals.options.market_classes_file,
                                                                       verbose=verbose_init)
